@@ -1,0 +1,181 @@
+{
+ "id": "CERT-PC-K2-KNOWN",
+ "title": "CERT-PC-K2-KNOWN: a known-strength k = 2 certificate positive control at G12's depth-1 sizes: two distinct declared categories merged into one site (STRONG / MID / EDGE pairs by a TRAIN-only rule), gated on certifying with margin at full size (zero calls; REGISTERED 2026-10-03)",
+ "question": "Is the site-null certificate sensitive to 2-way structure of known strength at n 486 / 441?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "the commit that writes it (parent e18fe595)",
+  "program_lines": "docs/judge_v2_program.md L24036-L24052",
+  "program_lines_as_of": "the commit that writes them, parent e18fe595, re-grepped",
+  "date": "2026-10-03",
+  "provenance": "docs/agents/plans/2026-10-03_reframing_memo_v3.md (6db5a3dd); the orchestrator's brief; autonomous scheduling"
+ },
+ "script": {
+  "path": "tools/analysis/cert_pc_k2_known.py + certKnownPair arm",
+  "sha16": "15717e13 (git blob, LF)",
+  "commit": "8419d4ce (merged 793d56ae)"
+ },
+ "ready": null,
+ "go": "autonomous-scheduling authorisation (zero calls)",
+ "run": {
+  "outcome_file": "rp12-r2-run outcome.txt (sha256 27061cd4...) + kk_sites.csv + arm/*; never committed; backup E:/TaxoArena_backup_2026-10-03_cert_pc_k2_known (SHA256SUMS 9/9 OK)",
+  "outcome_commit": "ops 38b32f13 + 4c76baf4 (branch cert-pc-k2-known)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "R2 B0 MMLU_PRO_LB member, draw 5a3e756 TRAIN",
+  "date": "2026-10-03"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_cert_pc_k2_known.md",
+  "commit": "07721b48",
+  "verdict": "VALID (W-1..W-6; PROC-1, ENV-1)"
+ },
+ "criteria": [
+  {
+   "id": "G-KS",
+   "text": "gate per pair: KNOWN-STRENGTH iff the full-size site certifies (k_d <= 14/300, C0 comparable) AND statistic - null p95 > SD of the statistic over the five n-486 subsamples; else NOT-A-CONTROL [Q-KK2: sample SD (ddof 1) decides; population SD beside]",
+   "result": "FAILED",
+   "value": "NOT-A-CONTROL 3/3: STRONG full certified (n 1,254, k_d 14, p 0.0498) but margin 0.000180 < sample SD 0.002022 (pop. 0.001808); MID k_d 172; EDGE k_d 298",
+   "denominator": "1 full site per chosen pair"
+  },
+  {
+   "id": "KK1",
+   "text": "DECIDING (point of counts), n 486: NO-CONTROL iff < 2 gated pairs; K2-SENSITIVE iff every gated pair CERTIFIED-AT-SIZE (>= 4/5); K2-SIZE-LIMIT iff any gated pair <= 1/5; MIXED otherwise. Verdict line: SCOREABLE for STRONG / MID (p_d ~0.003 vs bar 0.05, MDE80 0.0352); EDGE DESCRIPTIVE-ONLY [Q-KK1 2026-10-03: counts STRONG and MID only; EDGE descriptive]",
+   "result": "n/a",
+   "value": "NO-CONTROL (registered non-outcome; nothing about the certificate); n 486: 0/5 for all three pairs",
+   "denominator": "per gated pair 5 subsamples at n 486 (and 441), 300 null reps each; DEFF 1.0 by construction"
+  },
+  {
+   "id": "KK2",
+   "text": "deciding: KK1 at n 441 [Q-KK1 2026-10-03: counts STRONG and MID only; EDGE descriptive]",
+   "result": "n/a",
+   "value": "NO-CONTROL; n 441: STRONG 2/5 (MIXED), MID 0/5, EDGE 0/5",
+   "denominator": "per gated pair 5 subsamples at n 486 (and 441), 300 null reps each; DEFF 1.0 by construction"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "stage-0 statistics: STRONG 0.20 [0.12, 0.35]; MID within 0.010 of 0.1078; EDGE within 0.010 of 0.070",
+   "result": "FAILED",
+   "value": "STRONG 0.1196 below [0.12, 0.35] (pre-arm) FAILED; MID 0.1055, EDGE 0.0704 HELD",
+   "denominator": "eligible pairs (combined TRAIN >= 972, each >= 100)"
+  },
+  {
+   "id": "P2",
+   "text": "G-KS KNOWN-STRENGTH: STRONG 0.90, MID 0.80, EDGE 0.30",
+   "result": "FAILED",
+   "value": "no pair KNOWN-STRENGTH; Brier STRONG 0.8100, MID 0.6400, EDGE 0.0900",
+   "denominator": "chosen pairs"
+  },
+  {
+   "id": "P3",
+   "text": "KK1: K2-SENSITIVE 0.55, MIXED 0.10, K2-SIZE-LIMIT 0.15, NO-CONTROL 0.20",
+   "result": "FAILED",
+   "value": "NO-CONTROL occurred (p 0.20); Brier 0.9750",
+   "denominator": "per gated pair 5 subsamples at n 486 (and 441), 300 null reps each; DEFF 1.0 by construction"
+  },
+  {
+   "id": "P4",
+   "text": "merged-site null p95 at n 486 (median over chosen pairs' subsamples) 0.060 [0.045, 0.075]",
+   "result": "FAILED",
+   "value": "merged-site null p95 at n 486 median 0.116337 outside [0.045, 0.075]",
+   "denominator": "per gated pair 5 subsamples at n 486 (and 441), 300 null reps each; DEFF 1.0 by construction"
+  },
+  {
+   "id": "P5",
+   "text": "C0 comparable everywhere 0.85",
+   "result": "HELD",
+   "value": "C0 comparable 33/33; Brier 0.0225",
+   "denominator": "all sites"
+  }
+ ],
+ "falsifier": {
+  "text": "F-KK fires iff KK1 reads K2-SIZE-LIMIT: a k = 2 size-sensitivity limit is shown; overturns the k = 2 reading of CERT-PC-SIZE W-2 ('0 of 60 not explained by n alone'); G12's 0 of 60 then reads 'possibly a sensitivity limit at k = 2'.",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "stage0_pairs": "STRONG chemistry + law 0.1196; MID engineering + law 0.1055; EDGE economics + physics 0.0704 (TRAIN-only, full size, no null; seen pre-arm)",
+  "G-KS": "NOT-A-CONTROL 3/3; STRONG full k_d 14 (p 0.0498), margin 0.000180 vs SD 0.002022; MID k_d 172; EDGE k_d 298",
+  "KK1_KK2": "NO-CONTROL / NO-CONTROL (0 gated); F-KK not fired; C0 33/33",
+  "merged_null_descriptive": "plain site-null p95 0.081-0.127 (n 441-1282); declared statistics 0.89-1.20 of their null median (descriptive)",
+  "identity": "0.107803, k_d 0 (= PC1)"
+ },
+ "sentence_of_record": "On R2's B0 MMLU_PRO_LB member (draw 5a3e756 TRAIN; qwen3 512-slice; sepBar 0.0145; 300 reps), no chosen pair qualified as a known-strength k = 2 control (G-KS NOT-A-CONTROL 3/3): only chemistry+law certified at full size (k_d 14, p 0.0498), and its margin over the null p95 (0.00018) was below the subsampling SD (0.0020). KK1 and KK2 NO-CONTROL; F-KK not fired; a registered non-outcome about the certificate. [k = 2 sensitivity of the plain site null stays UNDETERMINED (two declared-label k = 2 controls failed to qualify); merged-pair nulls large (p95 0.081-0.127), declared statistics 0.89-1.20 of the null median, descriptive; the covariance mechanism is a hypothesis; CERT-PC-SIZE W-2 stands for 14-way only; G12's 0/60 never 'uninformative' or 'insensitive'; PROC-1: launched before the C-1 delta review, done afterwards, fix exact.]",
+ "chips": [
+  "REGISTERED 2026-10-03, BEFORE ANY CODE; not built",
+  "VALID (POST-RUN 07721b48): G-KS NOT-A-CONTROL 3/3; KK1 / KK2 NO-CONTROL; F-KK NOT FIRED",
+  "NOTHING ABOUT THE CERTIFICATE; k = 2 SENSITIVITY UNDETERMINED; MECHANISM A HYPOTHESIS; PROC-1 LAUNCHED BEFORE DELTA REVIEW (FIX EXACT)"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-03",
+   "by": "registrar (pre-data; Q-KK1, Q-KK2, stage-0 disclosure)",
+   "text": "KK1 / KK2 / F-KK count STRONG and MID only, EDGE descriptive (L24046, L24048, L24050); G-KS sample SD decides (L24044); stage 0 seen pre-arm, P1 STRONG part FAILED (L24049); record L24087-L24091."
+  },
+  {
+   "date": "2026-10-03",
+   "by": "registrar (POSTRUN 07721b48)",
+   "text": "outcome recorded; PROC-1 disclosed (arm launched before the C-1 delta review; reviewed afterwards, fix exact). docs/judge_v2_program.md L24106-L24116 (section \"## CERT-PC-K2-KNOWN (2026-10-03, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent 07721b48)"
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (consistency check 2026-10-04; zero calls)",
+   "text": "READY pointer completed: docs/reviews/READY_cert_pc_k2_known.md committed in 1a836808 (blob d48d8954, LF); NOT READY on D-1; C-1 delta review done retrospectively (PROC-1); 'ready' kept as written."
+  }
+ ],
+ "does_not_show": [
+  "anything about the certificate's k = 2 sensitivity (NO-CONTROL)",
+  "'too demanding' or 'insensitive' certificate",
+  "that G12's 0 of 60 is uninformative",
+  "the covariance mechanism (hypothesis; deflated null not run)",
+  "a routed anchor, another member, draw or slice"
+ ],
+ "ledger": {
+  "row_id": "CERT-PC-K2-KNOWN",
+  "version": "v374 (2026-10-03: OUTCOME bracket, OK + WARN chips) | v371 (2026-10-03: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "CERT-PC-K2",
+  "CERT-PC-SIZE",
+  "CERT-POSITIVE-CONTROL"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; MIX-LRT-SITE (closed) not touched: the J site null of record is used unchanged"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "site nulls about 40-70 min (rule-7 window)",
+  "agent_hours": "about 1.5 h",
+  "reads_pool": true
+ },
+ "outputs": "never committed: pinned by sha256, backed up to E: with SHA256SUMS.txt",
+ "sources": [
+  "docs/judge_v2_program.md L24036-L24052 (_as_of the commit that writes it, parent e18fe595, re-grepped)",
+  "docs/agents/plans/2026-10-03_reframing_memo_v3.md (6db5a3dd)",
+  "docs/judge_v2_program.md L24087-L24091 (_as_of the commit that writes it, parent ea335789, re-grepped)",
+  "docs/reviews/POSTRUN_cert_pc_k2_known.md (07721b48; blob bc415dac, LF)",
+  "docs/judge_v2_program.md L24106-L24116 (section \"## CERT-PC-K2-KNOWN (2026-10-03, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent 07721b48)"
+ ],
+ "last_update": "2026-10-04",
+ "pair_rule": "eligible iff combined TRAIN >= 972 and each category >= 100; STRONG = max statistic; MID = nearest 0.1078; EDGE = nearest 0.070; ties lexicographic; no replacement",
+ "ready_of_record": {
+  "file": "docs/reviews/READY_cert_pc_k2_known.md",
+  "commit": "1a836808",
+  "blob": "d48d8954 (LF)",
+  "note": "NOT READY on D-1; C-1 delta review done retrospectively (PROC-1)"
+ },
+ "plain_description": {
+  "sq": "SQ2 Trust",
+  "what": "A positive control for the split certificate. It merges two distinct declared MMLU-Pro subjects into one cell, at strong, medium and borderline pairings. Then it asks whether the certificate detects the known two-way split at realistic sizes (about 450-490 questions). No calls.",
+  "why": "An earlier test saw 0 of 60 two-way splits certified. That could mean no real structure, or a certificate too weak to see two-way structure. A known-strength control would tell these apart.",
+  "information": "If known two-way splits certify, the certificate can see that kind of structure. If they fail at full size, the certificate has a sensitivity limit. Result: done, a non-outcome. No chosen pair qualified as a valid control. Only chemistry+law certified, and only by a margin smaller than its own subsampling noise. So the certificate's sensitivity to two-way splits stays undetermined. This does not show the certificate is too strict or insensitive.",
+  "written": "2026-10-07"
+ }
+}

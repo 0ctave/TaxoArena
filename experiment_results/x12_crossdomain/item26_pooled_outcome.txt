@@ -1,0 +1,67 @@
+reserved_pool_id=p2dca21ab5f4ef3ae
+=== ITEM-26-POOLED + RE-JUDGE-RULE (registered 2026-09-17, commit 62c4084, docs/judge_v2_program.md L5458-L5521; zero judge calls) ===
+  judge grok-4-1-fast-non-reasoning | STACK-v2 | cap 8192 | temperature omitted | dual order | reference judge_solve/grok-reasoning.db
+  draw D=0 GROK-CALIB experiment_results\x12_crossdomain\grok_calib.db | 9142 rows (pinned 9142) | INVALID 11 (pinned 11) | rule-10 would reclassify 1 more (COUNTED, not applied: the record's single-draw values used the invalid column only)
+  draw D=1 KOTLIN     experiment_results\judge_wiring\board\kotlin_c0d3f708cbc3930e.db | 9123 rows (pinned 9123) | INVALID 17 (pinned 17) | rule-10 would reclassify 0 more (COUNTED, not applied: the record's single-draw values used the invalid column only)
+  shared matches 9123 = every Kotlin match; GROK-CALIB rows dropped 19 (reference-less; match_ids [104, 179, 682, 1988, 2456, 2540, 3360, 3621, 3774, 4277, 4702, 5596, 5683, 5962, 6166, 6267, 6951, 7700, 7829]; qids [871, 898, 1392, 1795, 1984, 3780, 4983, 4988, 6033, 11164]); both draws now sit on the same 9123 matches
+  fidelity: build_edges reproduces systematic_budget.build on the Kotlin draw edge for edge (918 edges; max |dm|+|ds|+|dA| 0.0e+00)
+  draw D=0 GROK-CALIB edges 918 unfiltered / 890 filtered (gap >= 0.02) | established 810 | wrong-direction: 21 of the established (the events), 51 of all
+  draw D=1 KOTLIN     edges 918 unfiltered / 890 filtered (gap >= 0.02) | established 810 | wrong-direction: 25 of the established (the events), 57 of all
+  across draws: edges common 918 | only D=0 0 | only D=1 0 | anchor question sets differ by 0 questions (INVALID rows) | established-label disagreements 0 | max |dA| 0.0000
+  pooled established set = edges established in BOTH draws: 810 (each enters twice, once per draw, with its own m and s)
+
+=== (2) single-draw identification on the restricted population, beside the record ===
+  D=0 GROK-CALIB established 810: b0 -3.3939 b1 +2.7680 delta-dev 4.34 -> IDENTIFIED | record: b1 +2.7194 delta-dev 4.47 (grok_calib_outcome.txt L11/L14) | vectorised nll == sb.nll within 1.6e-13
+  D=1 KOTLIN     established 810: b0 -2.9585 b1 +2.0451 delta-dev 2.26 -> NOT identified | record: b1 +2.0451 delta-dev 2.26 (judge_wiring/board_outcome.txt L45/L48) | vectorised nll == sb.nll within 7.8e-14
+  the Kotlin draw reproduces the record (its population is unchanged by the restriction); the GROK-CALIB draw differs by the 19 dropped matches only
+
+=== (3) the pooled fit: tau(A, D) = exp(b0 + b1 A + b2 D) on the union of both draws' established edges (3 free parameters) ===
+  pooled established edges 1620 (810 per draw) | events (wrong-direction established) 46 | b0 -3.1616 | b1 +2.4446 | b2 -0.0871 | nll 116.228
+  null (b1 = 0; b0, b2 free): b0 -1.7025 b2 -0.0163 nll 119.481 | delta-deviance 6.51 vs 3.84 -> IDENTIFIED
+  beside it, the single-draw values of record: D=0 4.47 (b1 +2.72) | D=1 2.26 (b1 +2.05)
+  tau at A = 0.30 / 0.60 / 0.90: D=0 0.088 / 0.184 / 0.382 | D=1 0.081 / 0.168 / 0.350
+
+=== (4) question-clustered bootstrap of the pooled fit (questions resampled within anchor, both draws rebuilt from the same resample, inner B=300, outer B=300) ===
+  first replicate 30.8 s -> ~154 min for B=300
+  300 replicates (0 degenerate, no events) | b1 +2.4446, 95% percentile interval [+0.230, +7.990] | b2 [-0.263, +0.128] | delta-deviance median 7.91, share >= 3.84: 0.757
+
+=== (5) power statement (C2): parametric simulation at true b1 = +2.7, b0 / b2 at the pooled fit, 1000 label sets each, P(delta-deviance >= 3.84) ===
+  D=0 established (single draw)    edges  810 | mean simulated events  29.4 | power 0.622
+  D=1 established (single draw)    edges  810 | mean simulated events  26.9 | power 0.569
+  pooled (both draws)              edges 1620 | mean simulated events  56.4 | power 0.856
+
+=== (6) LOAO at 0.975 on the pooled fit (folds on the established edges of the other 13 anchors, both draws; evaluated on every edge of the held-out anchor) ===
+  [unfiltered (adopted denominator, UNFILTERED-ADOPT)]
+  draw           edges  called   wrong wrong(est)   nominal status                                   utility = called / all edges (D6)
+  D=0 GROK-CALIB     918     688       4          2      1.12 UNDETERMINED (power rule: nominal < 3)   74.9% -> PASS
+  D=1 KOTLIN       918     686       3          1      1.03 UNDETERMINED (power rule: nominal < 3)   74.7% -> PASS
+  pooled          1836    1374       7          3      2.16 UNDETERMINED (power rule: nominal < 3)   (each edge counted twice; not a utility)
+  [key gap >= 0.02 (the derivation's population)]
+  draw           edges  called   wrong wrong(est)   nominal status                                   utility = called / all edges (D6)
+  D=0 GROK-CALIB     890     682       3          2      1.05 UNDETERMINED (power rule: nominal < 3)   76.6% -> PASS
+  D=1 KOTLIN       890     683       2          1      1.00 UNDETERMINED (power rule: nominal < 3)   76.7% -> PASS
+  pooled          1780    1365       5          3      2.05 UNDETERMINED (power rule: nominal < 3)   (each edge counted twice; not a utility)
+
+=== (7) criteria, predictions, falsifier ===
+  (C1) pooled delta-deviance 6.51 >= 3.84: HELD -> b1 identified on the pooled established labels; 'ORDERED-JUDGED available for grok' rests on the pooled evidence of both draws
+  (C2) power at ~26 events: D=0 0.622 (29.4 events), D=1 0.569 (26.9 events); at ~52 events (pooled) 0.856 (56.4 events) -> printed whatever C1 does: HELD (a statement, not a bar)
+  (C3) LOAO per draw (unfiltered): D=0 called 688 wrong 4 (established 2) nominal 1.12 -> UNDETERMINED (power rule: nominal < 3) | D=1 called 686 wrong 3 (established 1) nominal 1.03 -> UNDETERMINED (power rule: nominal < 3) | pooled nominal 2.16 -> UNDETERMINED (power rule: nominal < 3)
+  (C4) utility >= 60% per draw (unfiltered, deciding): D=0 74.9% HELD | D=1 74.7% HELD | filtered beside: D=0 76.6% | D=1 76.7%
+  prediction: pooled delta-deviance in [3.5, 5.5]: FAILED (6.51)
+  prediction: LOAO wrong 2-4 (established 1-2) on D=0: HELD (wrong 4, established 2)
+  prediction: LOAO wrong 2-4 (established 1-2) on D=1: HELD (wrong 3, established 1)
+  prediction: nominal ~2.2 (read on the pooled LOAO, each edge twice; scored within [1.5, 3.0]): HELD (2.16)
+  prediction: status UNDETERMINED: HELD
+  prediction (registrar): b2 within [-1, +1]: HELD (-0.0871)
+  FALSIFIER pooled delta-deviance < 2.5: not triggered (6.51)
+  free parameters: 3 (b0, b1, b2) = the SYSTEMATIC-BUDGET criterion (4) ceiling
+
+=== RE-JUDGE-RULE (plan Amendment 4, docs/plan_2026-09-15.md; a rule, not a measurement; on disk: yes) ===
+  TRIGGER: judge fingerprint change (deployment / model id of the judge).
+  TRIGGER: reference vintage change on a question (a new cached solve for that question).
+  TRIGGER: canary alarm (CANARY-BASELINE; pass 2 >= 2026-09-22).
+  NOT a trigger: tree re-celling while the anchor-rubric bytes are held fixed (verdicts depend on the tree only through the rubric, +0.2pp of discrimination, STACK-NORUBRIC; a regenerated rubric is a prompt-hash change, guard 11).
+  NOT a trigger: provider re-draw alone (whole-board agreement inside 1.9pp, JUDGE-WIRING-BOARD).
+  Every re-judge is read on identical matches, both conventions, question-clustered CI, floor ~1.9pp below 1,000 matches.
+  consequence for the continual object: a refit each epoch will not grant and withdraw ORDERED-JUDGED on the same judge, because the certificate is read on pooled draws with a power number beside it
+  runtime 8903 s

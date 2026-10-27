@@ -1,0 +1,213 @@
+{
+  "ready": null,
+  "go": "n/a (0 calls; Amendment 6)",
+  "run": {
+    "outcome_file": "experiment_results/multicorpus/union_profile_home_outcome.txt",
+    "outcome_commit": "8e8f987",
+    "calls": 0,
+    "cce": 0,
+    "pool": "paeec37aa28063c75",
+    "date": "2026-09-19",
+    "other_files": [
+      "experiment_results/multicorpus/union_profile_home_strata.csv"
+    ]
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-19_zero_call_batch2.md §2",
+    "commit": "83cb8e5",
+    "verdict": "numbers READY (all CONFIRMED to 4 dp); the D >= 20 sentence is permitted only with the D1 bracket (28 power, 8 strict)"
+  },
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "depends_on": [
+    "PROFILE-INTERVAL-ALL-UNION",
+    "PROFILE-RELIABILITY-INTERACTION",
+    "MC-ROUTER",
+    "MATH-FIX"
+  ],
+  "last_update": "2026-09-23",
+  "id": "UNION-PROFILE-HOME",
+  "title": "UNION-PROFILE-HOME: are the 39 order-reliable union strata or the 14 MMLU-Pro anchors the profile's home? (the numbers the author's question 3 needs)",
+  "question": "On the union pool paeec37aa28063c75 (6,482 reserved q, 52 designed strata, 18-model key): interaction-only reliability WITH an interval on the 52 / 39 / 14 objects, coverage of the pool by the order-reliable strata, and per order-reliable stratum whether the key's undominated set differs from its source's.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "8b3f6e2",
+    "program_lines": "docs/judge_v2_program.md L7926-L8063",
+    "date": "2026-09-19"
+  },
+  "script": {
+    "path": "tools/analysis/union_profile_home.py",
+    "sha16": "fefb1844f44b1769",
+    "commit": "8e8f987"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "the 52-stratum interaction-only R reproduces 0.8537 to 4 dp (the gate)",
+      "result": "HELD",
+      "value": "0.8537 (r 0.7447; LOSO [0.8024, 0.9049]; independently established, seed 99 0.8497)",
+      "denominator": "52 strata, 18 models, 6,482 reserved q"
+    },
+    {
+      "id": "C2",
+      "text": "the 39-stratum interaction-only R with its jackknife interval is PUBLISHED (class PASS if the lower bound >= 0.70)",
+      "result": "DELIVERED",
+      "value": "0.8651 [0.8155, 0.9146] re-halved (fixed [0.8220, 0.9081]; halving SD 0.0119); class PASS",
+      "denominator": "39 order-reliable strata (cls_raw PASS), 5,411 q"
+    },
+    {
+      "id": "C3",
+      "text": "the 14 MMLU_PRO_LB strata's interaction-only R with interval PUBLISHED beside K12 / K46, rosters and pools named, no level claim",
+      "result": "DELIVERED",
+      "value": "0.6814 [0.5613, 0.8014] (18-model union roster, 3,609 reserved MMLU-Pro q) beside K12 0.8665 [0.8000, 0.9330] / K46 0.8118 [0.7254, 0.8983] (p2dca, 2,811 judged q); no level claim",
+      "denominator": "14 MMLU_PRO_LB strata"
+    },
+    {
+      "id": "C4",
+      "text": "HOME COUNT: the number of the 39 order-reliable strata whose undominated set differs from its source's",
+      "result": "DELIVERED",
+      "value": "D = 36 of 39 (28 strict supersets = power, 8 dominate a source-undominated model = strict, 3 equal)",
+      "denominator": "39 order-reliable strata; exact two-sided McNemar p < 0.05 on the stratum's reserved questions"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "(plan) interaction-only R over the 39 in [0.80, 0.90]",
+      "result": "HELD",
+      "value": "0.8651",
+      "denominator": "39 strata"
+    },
+    {
+      "id": "P2",
+      "text": "(plan) the 14 MMLU_PRO_LB strata's interaction-only R in [0.80, 0.90]",
+      "result": "FAILED",
+      "value": "0.6814",
+      "denominator": "14 strata"
+    },
+    {
+      "id": "P3",
+      "text": "(plan) D >= 20 of 39",
+      "result": "HELD",
+      "value": "36",
+      "denominator": "39 strata"
+    },
+    {
+      "id": "P4",
+      "text": "(registrar) the 52-stratum jackknife half-width <= 0.06",
+      "result": "HELD",
+      "value": "re-halved 0.0513 (fixed 0.0413)",
+      "denominator": "52 folds"
+    },
+    {
+      "id": "P5",
+      "text": "(registrar) coverage of the 39 order-reliable strata >= 0.85 of 6,482",
+      "result": "FAILED",
+      "value": "5411 / 6482 = 0.8348 (MUSR 0/3, GPQA 1/3, BBH 17/24)",
+      "denominator": "6,482 reserved q"
+    },
+    {
+      "id": "P6",
+      "text": "(registrar) BBH's 24-stratum interaction-only R < the 39-stratum reading",
+      "result": "HELD",
+      "value": "0.7815 [0.6743, 0.8886] vs 0.8651",
+      "denominator": "24 BBH strata"
+    },
+    {
+      "id": "P7",
+      "text": "(registrar) the argmax-differs count over the 52 reproduces 25 exactly ('the gate for (3)')",
+      "result": "FAILED",
+      "value": "27 of 52 on the registered reserved-side MATH-FIX object (5 ties); 25 is MC-ROUTER's train-side own-split ingested-MATH count (object switch); the 'gate' wording is a registration inconsistency, C1 is the only gate",
+      "denominator": "52 strata"
+    },
+    {
+      "id": "P8",
+      "text": "(registrar) median |U_s| over the 39 >= 3 models",
+      "result": "HELD",
+      "value": "4.0",
+      "denominator": "39 strata"
+    }
+  ],
+  "falsifier": {
+    "text": "F1: D < 10 of 39; overturns the plan's claim that the union strata are the profile's home because of their routing consequence (the strict count 8 sits inside this band but the registered rule scores D = 36)",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "R_interaction_only_52": "0.8537 (r 0.7447; SD 0.0088; jk re-halved [0.8024, 0.9049], fixed [0.8124, 0.8950]); model-demeaned 0.9424 [0.9264, 0.9585]",
+    "R_interaction_only_39": "0.8651 (r 0.7622; SD 0.0119; [0.8155, 0.9146]; fixed [0.8220, 0.9081]); model-demeaned 0.9416; class PASS",
+    "R_interaction_only_14_MMLU_PRO_LB": "0.6814 (r 0.5167; SD 0.0382; [0.5613, 0.8014]; fixed [0.5716, 0.7911]); model-demeaned 0.9450 [0.9010, 0.9891]",
+    "R_per_source": "BBH 24: 0.7815 [0.6743, 0.8886]; MATH 7: 0.6597 [0.4468, 0.8727]; MUSR 3: 0.6767 [0.3306, 1.0228]; GPQA 3: 0.7282 [-0.1102, 1.5665]; IFEVAL undefined (1 stratum)",
+    "logit_additive_null_interaction_only": "52: 0.1266 [0.0363, 0.2323]; 39: 0.1263 [0.0119, 0.2711]; 14: 0.0786 [-0.0352, 0.2271]; variance shares model/stratum/interaction 0.20/0.58/0.22",
+    "coverage": "39 order-reliable 5411 / 6482 = 0.8348; 27 PASS-of-record 4315 = 0.6657; 47 non-FAIL 5979 = 0.9224",
+    "D_undominated_sets": "36 of 39 differ (U_s != U_src); 28 power (U_src strict subset of U_s), 8 strict (BBH hyperbaton, movie_recommendation, navigate, penguins_in_a_table, web_of_lies; MMLU_PRO_LB law, history, math), 3 equal (BBH/date_understanding, IFEVAL/ifeval, MMLU_PRO_LB/physics); median |U_s| 4.0",
+    "U_src": "MMLU_PRO_LB {Qwen2.5-32B, Qwen2.5-72B} (141 of 153 edges); BBH {Qwen2.5-72B, internlm2_5-20b} (141); MATH {Qwen2.5-32B, Qwen2.5-72B, Qwen2.5-Math-7B} (131); MUSR 6 (40); IFEVAL {Llama-3.1-70B, Llama-3.3-70B, Qwen2.5-72B} (123); GPQA 4 (35)",
+    "argmax_differs": "27 of 52 on the registered object (reserved side, MATH-FIX; 5 ties); MC-ROUTER's train-side own-split ingested-MATH replay 25 of 52 (beside)",
+    "MMLU_14_vs_source_18_roster": "13 of 14 differ; stratum argmax Qwen2.5-32B 8, Llama-3.3-70B 2, Qwen2.5-72B 2, Llama-3.1-70B 2; source argmax Qwen2.5-32B",
+    "roster_subsets_52_both_39_both": "all 18 0.8537 / 0.8651; middle 9 0.8580 / 0.8858; top 9 0.8213 / 0.8385; bottom 9 0.8483 / 0.8677 (point, not recomputed by the reviewer)"
+  },
+  "sentence_of_record": "the union strata are the profile's home: they carry an order-reliable key profile AND a routing consequence the sources do not [D = 36 of 39 under the registered rule U_s != U_src; 28 of the 36 are strict supersets of the source's set (power), 8 dominate a source-undominated model (BBH x5, MMLU law/history/math); the strict count is below the falsifier's band of 10; the 'routing consequence' clause is earned in 8 strata]",
+  "chips": [
+    "C1 0.8537 HELD",
+    "C2 0.8651 [0.8155, 0.9146] PASS",
+    "C3 0.6814 [0.5613, 0.8014] 18-roster, no level claim",
+    "C4 D 36/39 (28 power, 8 strict)",
+    "P2 P5 P7 FAILED",
+    "coverage 0.835"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-19",
+      "by": "UNION-PROFILE-HOME post-run review D1 (docs/reviews/2026-09-19_zero_call_batch2.md, 83cb8e5)",
+      "text": "D = 36 of 39 under the registered rule U_s != U_src; 28 of the 36 are strict supersets of the source's set (power), 8 dominate a source-undominated model (BBH x5, MMLU law/history/math); the strict count is below the falsifier's band of 10; the 'routing consequence' clause is earned in 8 strata."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "UNION-PROFILE-HOME post-run review D2",
+      "text": "P7's 'gate for (3)' wording is a registration inconsistency: C1 is the only gate; the 25 vs 27 is an object switch (train-side own-split ingested MATH vs reserved-side MATH-FIX), not a reproduction failure (bracket also at the registration, L8008)."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "UNION-PROFILE-HOME post-run review D3 (FRAMEWORK L179 / L180)",
+      "text": "L179 'gemini best in all 14 anchors on both rosters' is on p2dca's 12/46-model rosters; on the 18-model union roster the stratum argmax is Qwen2.5-32B in 8, Llama-3.3-70B 2, Qwen2.5-72B 2, Llama-3.1-70B 2 and the 14-stratum interaction-only R reads 0.6814 [0.5613, 0.8014]. L180 '25 of 52' is MC-ROUTER's train-side count; reserved side with MATH-FIX 27 of 52 (5 ties); undominated-set reading 36 of 39, 28 power, 8 strict."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "UNION-PROFILE-HOME post-run review D4",
+      "text": "'~20%%' in the outcome file is a %-escape in a non-format string: cosmetic, write-once file, left as is."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the coordinator's verified record-integrity blocker A1 (insertion only, zero calls; no number of this record moves)",
+      "text": "DISCLOSED 2026-09-23 by the registrar (blocker A1, insertion only, zero calls; NO number of this record moves and nothing above is rewritten): THE UNION TREE THIS RESULT IS ROUTED ON FAILS THE TRAIN-ONLY INVARIANT. Snapshot 20260911_144214 carries 427 distinct EVAL texts among its member slots by exact text and 432 under the split function's own key norm-v1 (FRAMEWORK L229 / L373, `gradlew trainOnlyAudit`, read-only), i.e. 432 of the 6,482 paeec EVAL ids = 6.66% of the routed population were visible to construction. THE WORST-CASE BOUND, which needs no run and is a BOUND AND NOT AN ESTIMATE OF THE EFFECT (it assumes every contaminated item is correct BECAUSE of the contamination, which is the largest the effect can possibly be). UNION TREE 20260911_144214: 432 of 6,482 paeec EVAL ids = 6.66% (exact text 427). At MC-ROOT's Top-1 of 81.58% that is 5,288.0 correct, so a clean reading is at worst (5,288 - 432) / (6,482 - 432) = 4,856 / 6,050 = 80.26%: THE UNION ROUTING HEADLINE CANNOT FALL BY MORE THAN 1.32pp. MC-E2E's +3.38pp router gain and PROFILE-INTERVAL-ALL-UNION's 0.8537 are bounded by the same 6.66% share. MMLU-PRO TREE 20260910_043557: 70 of 3,445 = 2.03% (exact text 37), so AT MOST 2.03pp on any routed proportion - about 5 questions per anchor spread over the 14 bareq512_s42 anchors at 119-304 questions per anchor. THE BOUND IS A WORST CASE AND NOT AN ESTIMATE; no clean re-read was run, and whether to rebuild under content closure (0 judge calls, new snapshot ids, every routed readout moves) or to disclose at this bound is an OPEN AUTHOR DECISION registered in docs/agents/results/SPLIT-FUNCTION-IMPL.json."
+    }
+  ],
+  "does_not_show": [
+    "which object the paper leads with (the author's question 3)",
+    "a level comparison between the 14 union MMLU-Pro strata (18 models, paeec) and the K12 / K46 anchors (p2dca)",
+    "a routing GAIN (MC-E2E's +3.38pp is a different instrument and is not re-read)",
+    "any order inside an undominated set (U_s is a set)",
+    "anything below the designed stratum (no leaf row)",
+    "anything on the 5 order-FAIL strata and GPQA/Physics / GPQA/Chemistry (no order claim, no set)",
+    "that the 28 power-effect strata would keep differing at the source's support",
+    "the roster subsets and the logit null as independently established (beside, not recomputed by the reviewer)",
+    "[DISCLOSED 2026-09-23 by the registrar (blocker A1, insertion only, zero calls; NO number of this record moves and nothing above is rewritten): THE UNION TREE THIS RESULT IS ROUTED ON FAILS THE TRAIN-ONLY INVARIANT. Snapshot 20260911_144214 carries 427 distinct EVAL texts among its member slots by exact text and 432 under the split function's own key norm-v1 (FRAMEWORK L229 / L373, `gradlew trainOnlyAudit`, read-only), i.e. 432 of the 6,482 paeec EVAL ids = 6.66% of the routed population were visible to construction. THE WORST-CASE BOUND, which needs no run and is a BOUND AND NOT AN ESTIMATE OF THE EFFECT (it assumes every contaminated item is correct BECAUSE of the contamination, which is the largest the effect can possibly be). UNION TREE 20260911_144214: 432 of 6,482 paeec EVAL ids = 6.66% (exact text 427). At MC-ROOT's Top-1 of 81.58% that is 5,288.0 correct, so a clean reading is at worst (5,288 - 432) / (6,482 - 432) = 4,856 / 6,050 = 80.26%: THE UNION ROUTING HEADLINE CANNOT FALL BY MORE THAN 1.32pp. MC-E2E's +3.38pp router gain and PROFILE-INTERVAL-ALL-UNION's 0.8537 are bounded by the same 6.66% share. MMLU-PRO TREE 20260910_043557: 70 of 3,445 = 2.03% (exact text 37), so AT MOST 2.03pp on any routed proportion - about 5 questions per anchor spread over the 14 bareq512_s42 anchors at 119-304 questions per anchor. THE BOUND IS A WORST CASE AND NOT AN ESTIMATE; no clean re-read was run, and whether to rebuild under content closure (0 judge calls, new snapshot ids, every routed readout moves) or to disclose at this bound is an OPEN AUTHOR DECISION registered in docs/agents/results/SPLIT-FUNCTION-IMPL.json.]"
+  ],
+  "ledger": {
+    "row_id": "UNION-PROFILE-HOME",
+    "version": "v116 [UPDATED 2026-09-23 at ledger v130 (audit OK, 227 rows): the blocker-A1 TRAIN-ONLY disclosure, with its counts and its worst-case bound, inserted into this row's observed cell. No number in the row moves.]"
+  },
+  "sources": [
+    "experiment_results/multicorpus/union_profile_home_outcome.txt (8e8f987): data check, reliability table, null, coverage, undominated sets, criteria, predictions as printed",
+    "docs/reviews/2026-09-19_zero_call_batch2.md §2 (83cb8e5): CONFIRMED status, the 28 / 8 / 3 decomposition, D1-D5, sentence of record, chips",
+    "docs/judge_v2_program.md §UNION-PROFILE-HOME registration L7926-L8063 and outcome section (this commit); docs/design/FRAMEWORK.md L179 / L180 brackets (this commit)"
+  ],
+  "plain_description": {
+    "sq": "SQ1 Use",
+    "what": "On the six-corpus union pool (6,482 questions, 18 models), it measures how reliably each designed stratum orders models. For each reliable stratum it then checks whether the set of best models differs from its source corpus's set. No calls.",
+    "why": "It decides whether the per-cell model profile lives best on the 39 union strata or on the 14 MMLU-Pro categories.",
+    "information": "It answers which object the profile should be built on. Result: the 39 strata are reliable (0.865), while the 14 MMLU-Pro categories are less so (0.68). The best set differs from the source's in 36 of 39 strata, but in 28 of these the set is only larger, a power effect. A real routing consequence shows in only 8 strata. Which object the paper leads with stays the author's choice. Answer keys only. Caveat disclosed later: the union tree used leaks some evaluation questions into training.",
+    "written": "2026-10-07"
+  }
+}

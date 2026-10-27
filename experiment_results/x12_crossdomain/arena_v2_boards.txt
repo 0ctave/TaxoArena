@@ -1,0 +1,28 @@
+12-model board (all 9142 verdicts) vs key accuracy on the pool:
+  iask_pro                     theta +2.157 | key acc 0.817
+  gemini-3.1-pro_5-shots       theta +2.139 | key acc 0.913
+  arx_0314                     theta +1.596 | key acc 0.834
+  gpt-4o-2024-08-06            theta +1.521 | key acc 0.750
+  deepseek-chat-v2_5           theta +0.593 | key acc 0.657
+  Meta-Llama-3_1-70B-Instruct  theta -0.092 | key acc 0.630
+  Qwen1.5-72B-Chat             theta -0.222 | key acc 0.474
+  c4ai-command-r-v01           theta -0.944 | key acc 0.363
+  Meta-Llama-3_1-8B            theta -1.243 | key acc 0.371
+  Yi-6b-Chat                   theta -1.491 | key acc 0.271
+  Llama-2-13b-hf               theta -1.863 | key acc 0.235
+  Llama-2-7b-hf                theta -2.151 | key acc 0.178
+  rho 0.9720
+
+top-4 on the 1872 top-cluster matches (key order gemini-3.1-pro_5-shots > arx_0314 > iask_pro > gpt-4o-2024-08-06):
+  ungated                    n=1872: gemini-3.1-pro_5-shots > iask_pro > arx_0314 > gpt-4o-2024-08-06 (1 violations)
+  mean-confidence-weighted   n=1872: gemini-3.1-pro_5-shots > iask_pro > arx_0314 > gpt-4o-2024-08-06 (1 violations)
+  gated >= 0.95 both orders  n= 535: gemini-3.1-pro_5-shots > iask_pro > arx_0314 > gpt-4o-2024-08-06 (1 violations)
+  x12 v1 on the same matches n=1872: iask_pro > gemini-3.1-pro_5-shots > arx_0314 > gpt-4o-2024-08-06 (2 violations)
+
+head-to-head among the top-4 (STACK-v2 verdicts; key-decidable accuracy of the judge on that pair):
+  iask_pro                 vs gemini-3.1-pro_5-shots   n=324 | iask_pro wins 0.49 | key: iask_pro right on 31/155 decidable | judge right 89/155
+  iask_pro                 vs gpt-4o-2024-08-06        n=270 | iask_pro wins 0.69 | key: iask_pro right on 91/117 decidable | judge right 90/117
+  iask_pro                 vs arx_0314                 n=285 | iask_pro wins 0.62 | key: iask_pro right on 34/101 decidable | judge right 56/101
+  gemini-3.1-pro_5-shots   vs gpt-4o-2024-08-06        n=309 | gemini-3.1 wins 0.68 | key: gemini-3.1 right on 169/184 decidable | judge right 126/184
+  gemini-3.1-pro_5-shots   vs arx_0314                 n=315 | gemini-3.1 wins 0.61 | key: gemini-3.1 right on 104/128 decidable | judge right 77/128
+  gpt-4o-2024-08-06        vs arx_0314                 n=369 | gpt-4o-202 wins 0.44 | key: gpt-4o-202 right on 43/172 decidable | judge right 128/172

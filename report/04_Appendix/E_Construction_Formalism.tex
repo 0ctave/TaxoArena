@@ -1,0 +1,572 @@
+\chapter{Taxonomy Construction Formalism}\label{app:dag-formalism}\label{sec:meth-construction-summary}
+
+This appendix gives the full architectural and mathematical detail behind the taxonomy
+construction pipeline summarised in Section~\ref{sec:arch-taxonomy}
+(Chapter~\ref{ch:methodology}).
+The pipeline is the instrument rather than the contribution (Section~\ref{sec:approach});
+this appendix exists so the exact mechanics are preserved and traceable.
+
+\section{Construction Pipeline Walkthrough}\label{sec:app-dag-pipeline}
+
+\subsection{Seed Initialisation from Ground-Truth Domains}
+
+Before iterative refinement begins, each corpus query is assigned to the anchor node for
+its MMLU-Pro ground-truth domain label, creating 14 top-level partitions, each a
+\texttt{GraphNode} with initial member set $Q_D^{\text{canonical}}$.
+(Anchors sit at depth~1 beneath a formal root at depth~0; depth-conditioned rules below
+are stated in implementation depths.)
+Anchor immutability is enforced structurally: every destructive topology operation
+exempts nodes at depth $\leq 1$, so anchors are never removed, merged, or dissolved.
+The anchor's \texttt{sliceDim} is fixed at $d = 256$, the single embedding dimension used
+at every depth (Section~\ref{subsec:dim-schedule}).
+The ground-truth assignment is initialisation only: trickle routing may reassign a
+query, so the adapted partition $Q_D^{\text{adapted}}$ at the end of construction need
+not equal $Q_D^{\text{canonical}}$ (Section~\ref{subsec:migration}).
+
+\subsection{Iterative Six-Phase Refinement Loop}\label{tab:pipeline}
+
+After anchor initialisation, \texttt{TaxonomyEngine} executes the six-phase loop already
+summarised in Section~\ref{sec:arch-taxonomy} --- embedding
+(Section~\ref{sec:meth-mrl}), vMF/NiW fitting (Section~\ref{sec:meth-vmf}), trickle
+routing (Section~\ref{sec:meth-routing}), adaptive splitting
+(Sections~\ref{sec:meth-split} and~\ref{sec:meth-proposal-gate}), topological
+optimisation, and the convergence check (Section~\ref{subsec:quiescence}) --- and is not
+re-walked here. Three facts matter downstream.
+The loop is global: splitting proceeds per depth across all branches, and queries may
+migrate between anchors at every iteration, though routing is skipped entirely in
+iteration~1 (Section~\ref{subsec:migration}).
+Phase~5 applies its anchor-exempt operations in a fixed, outcome-relevant order ---
+starved-leaf handling, sibling fusion, near-duplicate fusion, repeated sole-child
+dissolution, and a second starved-leaf pass --- each as a measured proposal under the
+gate of Section~\ref{sec:meth-proposal-gate}; each accepted edit re-routes the corpus
+and becomes the base state the next proposal is measured against.
+Every operator preserves the single-parent invariant
+(Section~\ref{app:cross-link-operator}), so each iteration maps a tree to a tree.
+
+\subsection{Cross-Domain Migration}\label{subsec:migration}\label{sec:meth-migration}
+
+At bootstrap, each anchor $D_k$ holds the canonical partition (every query on its
+ground-truth anchor with weight $1.0$) with a vMF/NiW self-model fit at $d = 256$.
+This assignment is preserved through the first construction iteration: Phase~3
+reassignment is skipped in iteration~1, so the first split/optimise/refit pass operates
+on the pure ground-truth partition, and geometric reassignment starts at iteration~2,
+once real sub-domain structure exists for routing to act on (re-routing immediately in
+iteration~1 let queries drift onto merely-similar wrong anchors, and the skip retires the
+disabled bias nudge \texttt{enableGtWarmStart}).
+From iteration~2 onward, queries are reassigned by the standard trickle routing of
+Section~\ref{sec:meth-routing}; \textit{migration} is emergent from this re-routing, and
+the \textit{adapted partition} $Q_{D_k}^{\text{adapted}}$ is the anchor-level assignment
+after construction completes. Anchor self-models and all sub-domain structure below an
+anchor are built from it, and the validation comparison
+(Section~\ref{sec:meth-validation}) uses the adapted partition.
+The migration rate
+$m_{D_k} = |Q_{D_k}^{\text{adapted}} \setminus Q_{D_k}^{\text{canonical}}| /
+|Q_{D_k}^{\text{canonical}}|$ is a descriptive diagnostic only: an earlier version made
+$\Delta\tau = \tau_{\text{adapted}} - \tau_{\text{canonical}}$ the primary metric of the
+second research question, replaced after its premise was tested under pre-registration
+and refused (Section~\ref{sec:res-granularity}).
+
+\subsection{Completion, Quiescence, and Reproducibility}\label{subsec:quiescence}
+
+Construction termination is criterion-based with a budget ceiling: the loop runs for at
+most \texttt{numIterations} iterations (value in Chapter~\ref{ch:experimental-design}),
+and early stopping (\texttt{enableEarlyStopping}, on canonically) is a
+\textbf{disjunction of two independent criteria}, evaluated every iteration and reported
+jointly in the run log.
+The \emph{structural} criterion (\texttt{TaxonomyStabilizer}) counts an iteration
+quiescent when the graph edit distance between $\mathcal{G}^{(t)}$ and
+$\mathcal{G}^{(t-1)}$ is zero and fires after five consecutive quiescent iterations,
+with a floor of $\max(0.8 \cdot |\mathcal{A}|, 5)$ iterations --- at
+$|\mathcal{A}| = 14$ anchors, $11$.
+The \emph{objective} criterion records
+$\Delta J_{\text{edits}} = J_{\text{after edits}} - J_{\text{before edits}}$ and the
+re-routing drift $\Delta J_{\text{route}}$, calls an iteration stationary when both lie
+within $\tau$, and fires after five consecutive stationary iterations.
+
+\textbf{The canonical run stops at iteration~10, so the structural criterion cannot be
+what fired}, its floor being $11$. The run log records \texttt{GED converged=false} at
+every iteration and closes with early stopping ``due to convergence (J stationarity)''.
+Iterations 8, 9 and 10 are identical on every column of
+\texttt{iteration\_metrics.csv} (Section~\ref{sec:res-construction}), which is a property
+of the frozen artifact rather than the reason the loop stopped. Stating which arm fired
+weakens the guarantee and is recorded for that reason: a structural oscillation leaving
+$J$ stationary would satisfy the criterion that stopped this run.
+The fixed-point certificate is a separate check on the frozen artifact and has
+\textbf{period 1}: it asks only what one further application of the operator would do.
+The frozen run's certificate values, quoted in summary form in
+Section~\ref{sec:res-construction}, are: edit-phase objective change $0$; re-routing
+objective change $-3.33 \times 10^{-16}$; maximum $1 - \cos(\hat{\boldsymbol{\mu}})$
+across all nodes $1.11 \times 10^{-16}$; maximum relative change in concentration
+$4.25 \times 10^{-13}$; tolerance $10^{-6}$.
+
+\paragraph{Neither criterion observes $\theta$, and the sweep shows what that costs.}
+Both criteria read structure and the objective; neither reads the node parameters that
+routing depends on. Across the twenty-seed sweep this is not a theoretical gap. Four
+seeds stop without certifying, and all four fail on concentration by three to four orders
+of magnitude while the structural gate is quiescent. The mechanism in each case is a
+\textbf{period-2 cycle}: $\Delta J_{\text{route}}$ alternates in sign at constant
+magnitude for every remaining iteration while $\Delta J_{\text{edits}}$ stays exactly
+$0$, so the construction is oscillating between two states rather than approaching one.
+The certificate, being period~1, correctly refuses; the stopping rule cannot see it.
+The distribution across the sweep is bimodal rather than continuous --- sixteen certified
+runs sit at a maximum relative $\Delta\kappa$ of $3$--$7 \times 10^{-13}$ and the four
+failures at $1.3$--$6.0 \times 10^{-3}$, ten orders apart with nothing between --- so no
+run is marginal.
+The split by arm is sharper still. Of the three sweep runs that stopped on the
+\emph{structural} criterion, three of three failed to certify; of the seventeen that
+stopped on objective stationarity, one did (one-sided Fisher exact, $p = 0.0035$).
+This is a measured limitation of the stopping rule rather than seed noise, and the fix is
+available: requiring the certificate's two $\theta$ terms as a third conjunct, or
+refusing the structural arm while $|\Delta J_{\text{route}}| > \tau$, would close it.
+Neither is implemented, and the frozen artifact is certified independently of the
+question.
+A leaf-level log-semantic-volume trajectory is additionally tracked as a convergence
+diagnostic and participates in neither criterion.
+If neither streak completes, the budget is exhausted and the snapshot is frozen as-is,
+with the recorded GED and $J$ trajectories distinguishing quiescent from still-evolving
+taxonomies.
+
+Construction is deterministic under a fixed seed: PCA power-iteration initialisation is
+seeded from the problem shape, node identifiers are monotonic counters, and
+order-sensitive floating-point aggregations iterate their inputs in sorted order, so two
+runs at the same seed produce structurally identical taxonomies and cross-configuration
+comparisons are exact. Determinism holds \emph{at} a seed and says nothing across seeds:
+at the canonical configuration, twenty seeds yield between 72 and 93 leaves against the
+frozen artifact's 87 (R3, Section~\ref{sec:arch-requirements}).
+
+\section{Directional Node Model}\label{sec:meth-vmf}
+
+\subsection{von Mises--Fisher Density and MLE}
+
+The vMF distribution on $\mathcal{S}^{d-1}$ with mean direction $\boldsymbol{\mu}$ and
+concentration $\kappa \geq 0$ has density
+\[
+p(\mathbf{x} \mid \boldsymbol{\mu}, \kappa)
+= C_d(\kappa) \exp\!\left(\kappa \boldsymbol{\mu}^\top \mathbf{x}\right),
+\qquad
+C_d(\kappa) = \frac{\kappa^{d/2 - 1}}{(2\pi)^{d/2}\, I_{d/2 - 1}(\kappa)}.
+\]
+Given $N$ unit-vector observations, the MLE of $\boldsymbol{\mu}$ is the normalised
+sample mean $\hat{\boldsymbol{\mu}} = \bar{\mathbf{x}} / \|\bar{\mathbf{x}}\|_2$, and the
+Banerjee closed-form approximation~\parencite{banerjee2005vmf}
+$\hat{\kappa}_{0} = (\bar{R}\, d - \bar{R}^3)/(1 - \bar{R}^2)$,
+$\bar{R} = \|\bar{\mathbf{x}}\|_2$, avoids iterative root-finding for $\kappa$ but
+carries an $O(d/N)$ upward bias. It is refined in three steps.
+First, it seeds Newton--Raphson steps on the exact likelihood equation
+$A_d(\kappa) = \bar{R}$, $A_d(\kappa) = I_{d/2}(\kappa)/I_{d/2-1}(\kappa)$, yielding
+$\hat{\kappa}_{\text{ML}}$; at $d = 256$ two or three steps suffice everywhere and the
+cap of five is not reached.
+Second, the refined estimate is multiplied by a small-sample shrinkage factor
+\[
+\hat{\kappa}
+= \hat{\kappa}_{\text{ML}} \cdot \frac{N - 1}{N + d - 2},
+\]
+in the spirit of the high-accuracy estimators of Hornik and
+Gr\"{u}n~\parencite{hornik2014vmf}.
+Because this correction scales with $N$, parents are systematically sharper than their
+children --- the reason routing compares \emph{directions} rather than densities
+(Section~\ref{sec:meth-routing}).
+Third, the shrunk estimate is blended with a parent-anchored empirical-Bayes prior
+$\kappa_{\text{parent}}$ (the node's parent's concentration, or a default prior at the
+root):
+\[
+\kappa_{\text{final}}
+= (1 - \alpha(\rho))\,\hat{\kappa}
++ \alpha(\rho)\,\kappa_{\text{parent}},
+\qquad
+\alpha(\rho) =
+\begin{cases}
+0 & \rho \leq 2,\\
+(\rho - 2)/8 & 2 < \rho \leq 10,\\
+1 & \rho > 10,
+\end{cases}
+\]
+where $\rho = d/n$ is the dimension-to-effective-sample-size ratio: a node's own data
+dominate when it is well supported, and the parent prior takes over as support thins.
+At $d = 256$ and the frozen run's $n_{\min} = 55$, a minimum-size leaf sits at
+$\rho = 256/55 = 4.65$, hence a blend weight of $\alpha = 0.33$; the fully
+prior-dominated $\rho > 10$ regime, reached only below $n = 26$, is not entered by any
+leaf of the frozen artifact.
+The estimator therefore does not bind leaf size: the floor is chosen on \emph{budget}
+grounds and clears the estimator's lower bound near $n = 26$ by a factor of two
+(Appendix~\ref{app:tuning-protocol}; Section~\ref{sec:arch-requirements}).
+Numerically stable evaluation of $\log I_\nu(\kappa)$ via the Debye asymptotic expansion
+is given in Appendix~\ref{app:numerics}.
+
+\subsection{NiW Auxiliary Regulariser}
+
+A Normal-inverse-Wishart (NiW) posterior is fit to each node's member embeddings as an
+auxiliary, diagnostic-only summary of its local geometry: routing, migration, and
+topology decisions all operate on the vMF geometry (Section~\ref{sec:meth-routing}), and
+the stored posterior serves only the leaf log-semantic-volume convergence diagnostic of
+Section~\ref{subsec:quiescence}.
+The NiW is \textit{not} the conjugate prior for the vMF, whose conjugate is the vMF
+itself~\parencite{gopal2014mises}; it is an engineering regulariser whose posterior
+predictive is a multivariate Student-$t$, accurate while the tangent-plane approximation
+holds. Its hyperparameters, update equations, and predictive density are given in
+Appendix~\ref{app:numerics}; because $d = 256$ is fixed at every depth
+(Section~\ref{sec:meth-mrl}), a diagonal approximation to $\boldsymbol{\Lambda}_N$ is
+stored.
+Node centroids are refit directly to the fresh weighted MLE each iteration, subject to a
+no-update band that freezes a centroid once its refit direction agrees with the previous
+one to within cosine $0.9975$ (an earlier exponential-moving-average smoothing amplified
+oscillation in matched A/B runs and was removed).
+
+\section{Fixed-Dimension Matryoshka Embedding Slice}\label{sec:meth-mrl}\label{subsec:dim-schedule}
+
+MRL~\parencite{kusupati2022mrl} trains a single embedding model such that every prefix
+slice $\mathbf{x}_{1:m}$ is itself a meaningful embedding
+(Section~\ref{sec:taxonomy-construction}).
+TaxoArena uses a single fixed slice, $d(\ell) = 256$ for all depths $\ell$, rather than a
+per-depth schedule: a larger $d$ increases angular resolution but degrades the
+concentration estimate as $d/N$ grows (Section~\ref{sec:meth-vmf}), and a single
+dimension keeps all nodes on the same unit hypersphere, so fusion and dissolution
+comparisons require no cross-depth down-projection.
+Re-normalisation after slicing is mandatory, since MRL guarantees semantic meaningfulness
+of $\mathbf{x}_{1:d}$ but not unit norm:
+$\mathbf{x}^{(\ell)} = \mathbf{x}_{1:d} / \|\mathbf{x}_{1:d}\|_2$.
+The width is a fixed operating point and has not been ablated: it is a compile-time
+constant with no configuration path, and an ablation over $d$ would in any case confound
+representation width with the concentration estimator's regime and with the
+proposal-time PCA geometry (Section~\ref{sec:meth-split}), both of which move with $d$.
+
+\section{Trickle Routing}\label{sec:meth-routing}
+
+Routing separates three decisions that a single absolute floor previously conflated:
+whether to descend at all, which siblings compete, and which reached destinations count
+as memberships.
+At an internal node $v$, the competition set $K(v) = C(v)$ is the node's children.
+
+\textbf{(i) Descent gate.}
+The walk descends from $v$ for query $\mathbf{x}$ iff
+\[
+\max_{c \in K(v)}
+\hat{\boldsymbol{\mu}}_c^\top \mathbf{x}
+\;\geq\;
+(\bar{r}_v - \delta)\,
+\hat{\boldsymbol{\mu}}_v^\top \mathbf{x},
+\qquad
+\bar{r}_v
+= \Big\| \sum_{c \in C(v)} \omega_c\, \hat{\boldsymbol{\mu}}_c \Big\|_2
+\in [0,1],
+\]
+where $\omega_c$ are the children's normalised query masses and
+$\delta = \texttt{descentMargin} \geq 0$ (canonical $0.12$).
+The factor $\bar{r}_v$ makes the bound tight: the parent's direction is approximately
+the \emph{normalised} mean of its children's, so the raw parent dot product overstates
+what the children can collectively achieve by exactly $1/\bar{r}_v$; the bound is
+derived rather than tuned, and at $\delta = 0$ no free parameter enters the decision.
+The comparison is between directions, never densities: the $N$-dependent shrinkage of
+Section~\ref{sec:meth-vmf} makes parents systematically sharper than children, biasing
+cross-level log-density comparisons toward the parent.
+
+A query that fails the gate is neither dropped nor force-assigned: it is held at $v$ with
+its full unit weight, so mass is conserved and $\sum_v \sum_q w_v(q) = N$ holds at every
+proposal, asserted at runtime.
+\textbf{At the canonical $\delta = 0.12$ this outcome never occurs}:
+\texttt{residualQueries} is $0$ of $8299$ and the held-out hold rate is $0.00\%$, because
+$\delta$ over-provisions the quantity it exists to pay for.
+What the Jensen step gives away is the gap between a node's own fitted direction and its
+children's mass-weighted resultant; that gap is measured every iteration, and its worst
+value is $1 - \cos = 0.0486$ over the frozen artifact's 67 internal nodes and $0.0647$
+over all twenty-one runs of this configuration, so the margin of $0.12$ is $1.85\times$
+the largest gap ever observed.
+Consequently $J$'s cell decomposition (Section~\ref{sec:meth-proposal-gate}) has one cell
+per leaf and no others.
+This is stated as a limitation rather than a feature: $\delta$ is set well above its
+derivation, and while off-configuration runs confirm the mechanism is live (held queries
+appear at $\delta = 0.00$ and $0.05$ and none from $0.06$ upward), no run at the frozen
+configuration locates the boundary.
+
+\textbf{(ii) Direction-only sibling competition with a cosine beam.}
+Admitted siblings are scored
+$f_c = \bar{\kappa}\,\hat{\boldsymbol{\mu}}_c^\top \mathbf{x}$ with the \emph{shared
+mean} concentration $\bar{\kappa}$ of the level; per-child concentrations and normalisers
+are excluded, so a child cannot attract queries through concentration bookkeeping, only
+through direction.
+The beam keeps every sibling within an additive cosine margin of the best,
+\[
+\Big\{ c :
+\hat{\boldsymbol{\mu}}_c^\top \mathbf{x}
+\geq
+\max_{c'} \hat{\boldsymbol{\mu}}_{c'}^\top \mathbf{x} - \gamma
+\Big\},
+\qquad \gamma = \texttt{routingBeamGamma},
+\]
+the argmax always survives, and per-level transition probabilities renormalise over the
+beam.
+The walk accumulates log path mass; paths whose absolute posterior falls below
+$10^{-30}$ are abandoned as a purely numerical fan-out guard carrying no membership
+semantics (an earlier $10^{-4}$ sat inside the range real memberships occupy).
+
+\textbf{(iii) Final membership share.}
+After the walk, the query's accumulated masses are normalised over the destinations it
+actually reached, and a destination counts as a genuine membership iff it holds at least
+\texttt{membershipFloor} of \emph{that query's own} normalised membership.
+Because the floor is self-normalised, its meaning is invariant to depth and fan-out; an
+absolute product-versus-floor test is not, and mathematically forbids balanced structure
+beyond shallow depths.
+If no destination clears the share, the single best destination is kept. The floor trims
+negligible tails; whether the walk descends at all is the descent gate's decision, not
+the floor's.
+
+The \textit{primary} leaf is the argmax of the per-query normalised membership weights
+--- a bookkeeping convention for aggregation, not an exclusivity property of the fits.
+Held-out queries at evaluation time are routed through the same gate, beam, and share
+floor, read-only against the frozen snapshot, capped at \texttt{maxLeafAssignments}
+leaves per query as a judge-call-cost bound.
+The arena's routing path additionally applies a near-uniform posterior guard (dropping
+all secondary memberships when a destination distribution is close to flat) and a second
+degree cap, neither of which participates in construction; they are a live candidate
+explanation for the routing disagreement of Section~\ref{sec:res-adapted-partition}.
+MMLU-Pro labels are never used in the routing decision; they are inspected only
+afterward, for the canonical-versus-adapted divergence metrics
+(Section~\ref{sec:meth-validation}).
+
+\section{Adaptive Splitting Oracle}\label{sec:meth-split}
+
+Split proposals are generated by vMF-EM clustering; for efficiency the clustering runs in
+a PCA-projected subspace whose dimension depends on cluster size (32 dimensions below 100
+members, 64 below 500, 128 otherwise), with deterministic, seeded power-iteration
+initialisation; the resulting partition is then re-fit and evaluated in the fixed
+256-dimensional routing geometry, so no acceptance decision is made in the reduced space.
+Only leaves are split. A node is eligible when its mass \emph{and} its effective sample
+size $\mathrm{ess} = (\sum_q w_q)^2 / \sum_q w_q^2$ both reach $2 n_{\min}$, and its
+depth is below $D_{\max}$; under soft membership these two quantities differ, and the
+effective-support test can refuse a node the mass test admits.
+
+A proposed partition $\{S_c\}$ is judged by a \emph{chance-corrected separation score}.
+For a set $S$ of unit vectors, define the total pairwise cosine dissimilarity
+\[
+W(S) = |S|^2 - \Big\|\sum_{\mathbf{x} \in S} \mathbf{x}\Big\|_2^2
+= \sum_{i \neq j \in S} \left(1 - \mathbf{x}_i^\top \mathbf{x}_j\right),
+\]
+computable in $O(|S|\,d)$ from the member sum alone.
+The observed within-cluster scatter of the partition is $\sum_c W(S_c)$; under a
+uniformly random partition of the same $n$ points into the same cluster sizes $\{n_c\}$,
+its exact expectation is
+\[
+\mathbb{E}\Big[\sum_c W(S_c)\Big]
+= W(S_{\text{total}}) \cdot
+\sum_c \frac{n_c (n_c - 1)}{n (n - 1)},
+\]
+because each unordered pair lands inside cluster $c$ with probability
+$n_c(n_c-1)/(n(n-1))$.
+The score is
+\[
+s = 1 - \frac{\sum_c W(S_c)}
+{\mathbb{E}\left[\sum_c W(S_c)\right]},
+\]
+which equals $1$ for a perfect partition (each cluster internally identical), is
+approximately $0$ for a random partition, negative for an anti-clustered one, and exactly
+$0$ for the degenerate $k = 1$ ``partition'', so a non-separating wrapper can never clear
+a positive threshold.
+The chance correction removes the mechanical dependence a raw within/total ratio has on
+$k$ and on the cluster-size profile, so a single threshold means the same thing
+everywhere in the graph.
+This score is \emph{not} a Dasgupta cost delta; Dasgupta's cost
+\parencite{dasgupta2016cost} is retained only as the whole-tree Total Dasgupta Cost
+evaluation metric (Appendix~\ref{app:metrics}).
+
+Acceptance proceeds in four stages, of which the EM clustering is only the first.
+\begin{enumerate}
+\item \textbf{Proposal.} vMF-EM at a \emph{forced} $k$, tried in ascending order
+$k = 2, 3, \ldots, \texttt{maxK}$, with the first $k$ whose proposal survives every later
+stage winning and no further $k$ attempted. Selection is by first acceptance rather than
+by comparing candidates, which keeps the split bit-identical at a fixed seed: no float
+comparison decides between two $k$ values. \texttt{maxK} $= 4$ is a cost bound.
+\item \textbf{Routed sustainability.} Proposal vMF components are refit at $d = 256$ and
+every target query is re-assigned by the same level-local posterior the trickler uses;
+the split is rejected unless \emph{every} child holds at least $n_{\min}$ members under
+that routed assignment.
+This closes the loop between birth and survival --- a split occurs only if routing will
+sustain every child it creates --- and eliminated a persistent spawn-and-starve churn in
+which the majority of pruned nodes died within two iterations of birth. Children are then
+refit on their routed populations.
+\item \textbf{Min-pairwise separation.} Every \emph{pair} of routed children must score
+$s \geq \epsilon_{\text{sep}}$ on the chance-corrected statistic above.
+The gate is pairwise rather than $k$-way for gate consistency: the same statistic, at
+the same bar, is what the sibling merger applies to \emph{destroy} a pair, and a joint
+$k$-way score of $0.06$ can contain a pair at $0.015$ that the merger fuses in the same
+iteration --- the split/fuse limit cycle. With one statistic at one bar the two
+acceptance regions are disjoint, so nothing creatable is immediately destroyable.
+It is also the binding gate empirically: $129$ of the frozen run's $373$ proposal records
+are min-pairwise rejections, against $5682$ min-pairwise rejections and $0$ joint $k$-way
+rejections across every run in the repository; the joint score survives only as the
+per-node \texttt{dasguptaDeltaNorm} diagnostic that the within-node null reads.
+\item \textbf{Global gate.} The split is committed only if it clears the standard-error
+rule of Section~\ref{sec:meth-proposal-gate}. Local quality is already established by
+stages 1--3; the global test asks the different question of whether the improvement is
+larger than its own measurement error.
+\end{enumerate}
+The recursion depth is hard-capped at $D_{\max}$, which the frozen artifact does not
+reach ($D_{\max} = 8$ against a realised depth of 6).
+The threshold $\epsilon_{\text{sep}}$ (\texttt{proposalSeparationBar}) has no closed-form
+optimum. Its value in the frozen run is $\epsilon_{\text{sep}} = 0.025$, positioned
+between two measured nulls: an isotropic null whose $p_{95}$ spans $0.0055$--$0.0093$
+over $n = 75\ldots900$, and the within-node null of a node's own elongation, whose median
+lies above it. The bar is therefore conservative by a factor of $2.7$--$4.5$ against
+``separated at all'' and permissive against ``separated by more than this node's own
+elongation''; the second is the source of limitation~1 in Section~\ref{sec:arch-limits}.
+The \emph{same} score at the \emph{same} bar also gates sibling fusion, which is the
+property stage~3 depends on. A single constant serving both a \emph{level} and a
+\emph{difference} would be the threshold-reuse defect of rule~D4
+(Section~\ref{sec:meth-discipline}); the two roles are decoupled into independent
+configuration fields, and the difference role is not used, $k$ being chosen by first
+acceptance rather than marginal improvement.
+
+\section{The Proposal Gate}\label{sec:meth-proposal-gate}
+
+Every structural edit (split, fusion, prune, and dissolution) is applied as a
+\emph{measured proposal} rather than by its local rule alone.
+The gate operates on a global objective $J$: the chance-corrected separation score of
+Section~\ref{sec:meth-split} lifted to the whole corpus, with one cell per leaf, weighted
+by soft membership.
+The cell decomposition is exhaustive because routing is: at the canonical descent
+margin every query reaches a leaf (Section~\ref{sec:meth-routing}), so no cell is empty.
+The proposal procedure is: snapshot the current state (topology, node parameters, and
+assignments); apply the candidate edit tentatively; recompute descent-gate statistics;
+clear and fully re-route every query through the modified taxonomy; measure
+$J' = J(\mathcal{G}')$; and commit under an acceptance rule expressed in units of the
+\emph{paired} standard error of $\Delta J$ itself:
+\[
+\text{accept}
+\iff
+\begin{cases}
+\Delta J > \max\bigl(\tau,\; z^{*}\cdot
+\widehat{\mathrm{SE}}_{\text{paired}}(\Delta J)\bigr)
+& \widehat{\mathrm{SE}}_{\text{paired}}(\Delta J) > 0,\\[4pt]
+\Delta |V| < 0
+& \widehat{\mathrm{SE}}_{\text{paired}}(\Delta J) = 0,
+\end{cases}
+\qquad
+\Delta J = J' - J,
+\qquad z^{*} = 2.0 .
+\]
+The test is one-sided; on rejection the snapshot is restored.
+$\widehat{\mathrm{SE}}_{\text{paired}}(\Delta J)$ is a paired Dirichlet bootstrap over
+200 replicates at a fixed seed, resampling only queries whose cell assignment changed
+between the two states, so both sides share a corpus draw and the shared variance
+cancels.
+
+The second branch is not a fallback tolerance but a different case:
+$\widehat{\mathrm{SE}}_{\text{paired}} = 0$ identifies a pure structural edit that moves
+no query --- a pass-through dissolution --- for which $\Delta J$ is exactly $0$ and $z$
+is undefined; the size test lets those commit. The two branches are alternatives rather
+than layers: where the standard error is positive there is no lexicographic tie-break, so
+a $J$-neutral simplification cannot commit. Exactly one of the frozen run's 70 accepted
+edits took the second branch.
+The floor $\tau$ (\texttt{tau}, canonical $10^{-6}$) is what makes a termination bound
+available: every accepted edit raises $J$ by at least $\tau$ and $J$ is bounded above by
+$1$, so at most $(1 - J_0)/\tau$ edits can ever commit; with $z^{*}\cdot\mathrm{SE}$
+alone a vanishing standard error would admit a vanishing improvement and that bound
+collapses.
+
+\textbf{Why the rule is expressed this way is the argument, and it is separate from any
+claim that it improves the tree.}
+The size of a defensible improvement is not a property of the corpus but of the edit:
+across the frozen run's 69 accepted edits that move queries, $\mathrm{SE}(\Delta J)$
+spans $13.4\times$, from $3.27\times10^{-5}$ to $4.38\times10^{-4}$, so no single
+absolute tolerance is correct at both ends of that range.
+The gate declined eight split sites whose $\Delta J$ exceeded $\tau$, four at $z < 1$
+and the worst at $z = 0.089$ ($\Delta J = 9.46\times10^{-6}$ against
+$\mathrm{SE}(\Delta J) = 1.06\times10^{-4}$); a $\tau$-only rule commits all eight, and
+committing an edit whose measured improvement is an eleventh of its own measurement error
+is incoherent regardless of what it does downstream.
+In the frozen run the $\tau$ arm never bound: the smallest operative threshold across
+the 173 gate rejections is $8.83\times10^{-5}$ ($88\tau$) and the smallest
+$z^{*}\cdot\mathrm{SE}$ among accepted edits $6.54\times10^{-5}$ ($65\tau$), so the rule
+reduced in practice to $\Delta J > 2\,\mathrm{SE}$ at every site and the threshold that
+governed every decision was measured rather than set.
+The gate's two natural empirical corroborations --- that it tightens run-to-run
+stability \emph{across seeds}, and that it raises $J$ --- were both tested and both
+refuted (Section~\ref{sec:res-construction}), and it is adopted on coherence alone.
+
+\paragraph{The neutrality measurements.} Demoted from
+Section~\ref{sec:res-construction}, which keeps the verdicts. The
+gate's effect on run-to-run structure is an additive offset of about
+$4.4$ leaves. The dispersion reading needs its mechanics stated,
+because the raw numbers point the wrong way: the coefficient of
+variation of leaf counts rose from $14.3\%$ to $15.7\%$ under the gate
+and was initially read as a degradation, but the standard deviation is
+unchanged (variance ratio $1.05$ against an $F(4,4)$ critical value of
+$6.39$; the correlation between a seed's leaf-count reduction and its
+deviation from the mean is $+0.006$), and the coefficient of variation
+rises mechanically because the mean fell. The correct statement is
+that no dispersion change is detectable in either direction, the
+second instance of rule~D3 (Section~\ref{sec:meth-discipline}). On the
+objective: $J$ is higher on 2 of 5 seeds, exact two-sided sign test
+$p = 1.000$, median $\Delta J = -0.0001$; the apparent gain was seed
+42 alone. An earlier draft quoted $p = 0.812$ for this comparison,
+which no tail of a sign test on five seeds can return; it is
+withdrawn. Caveat: the five-seed sweep's leaf counts predate a
+correction to the splitter's routing check and are \textsc{void as to
+values} (marker defined in Section~\ref{sec:res-construction}); the
+two negative results are comparisons internal to the sweep and are
+unaffected, but the underlying counts need re-deriving.
+
+The same argument rules out selecting the branching factor $k$ by $\arg\max \Delta J$
+over candidates: a maximum over noisy estimates is biased upward even when all
+candidates are equivalent, so the $k$-fallback takes the \emph{lowest} $k$ among
+candidates that each independently cleared the same gate.
+Setting $z^{*} = 0$ recovers the legacy lexicographic rule
+$\Delta J > \tau \;\vee\; (|\Delta J| \leq \tau \wedge \Delta|V| < 0)$, retained as an
+attributable baseline arm. The rule is uniform across edit types, making accept and
+reject decisions comparable between splits and shrink edits; every proposal writes
+$\Delta J$, its standard error, the resulting $z$, and the binding threshold to the
+proposal log.
+
+The gate has two structural consequences.
+Sole-child dissolution needs no separate justification: a parent's only tree child
+separates nothing (the score of Section~\ref{sec:meth-split} is identically $0$ at
+$k = 1$), and the gate confirms empirically that removing it does not degrade $J$;
+top-level nodes are exempt.
+Starved-leaf handling (a leaf whose branch falls below $n_{\min}$, the same floor that
+gates birth) is a three-way choice --- keep, absorb into the parent, or fuse into the
+nearest sibling --- decided by whichever option measures best under the gate.
+
+\paragraph{What the coarsening half actually contributed.}
+The gate applies uniformly to growth and coarsening, but the frozen run used the two
+halves asymmetrically: of 70 accepted edits, 68 were splits and \textbf{2} were
+coarsening moves --- both sole-child dissolutions, both in iteration~2. No fusion was
+ever accepted, none was proposed after iteration~3, and the remaining ten coarsening
+proposals were declined at $z$ between $-7.2$ and $-14.6$, strongly $J$-degrading rather
+than marginal. The design's growth/coarsening symmetry is therefore stated but not
+exercised by this artifact: what shaped the frozen tree was the split gate declining
+candidates, not the merger reclaiming them.
+
+\section{The Single-Parent Invariant}\label{app:cross-link-operator}
+
+Every topology operator maps a tree to a tree, and one of them needs an explicit
+restriction to do so: fusing two nodes under different parents would leave the survivor
+holding both parent edges, producing a multi-parent node, so fusion proposals are
+restricted to pairs sharing a parent.
+The structural-integrity gates of Appendix~\ref{app:tuning-protocol} check the invariant
+directly by counting multi-parent nodes, which must be zero; in the frozen artifact all
+154 nodes have exactly one parent and \texttt{crossDomainNodes} is $0$.
+An operator that deliberately created second parents was built, measured, and retired
+before this construction was frozen. It is reported as a measured negative result in
+Section~\ref{sec:poly-negative} and forms no part of the method described here.
+
+\paragraph{Evaluation-time multi-leaf assignment} of held-out queries is a separate
+mechanism. It applies the same routing read-only to the frozen snapshot, capped at
+\texttt{maxLeafAssignments}, and does not modify the topology.
+It does \emph{not} determine which leaves a query contributes comparisons to: for every
+arena run reported in this thesis the propagation path received each query's primary leaf
+only, and the secondary memberships were computed and discarded
+(Appendix~\ref{app:numerics}).
+
+\paragraph{The admission record and the provenance caveat.} Demoted
+from Section~\ref{sec:poly-negative}, which keeps the retiring
+evidence. That admission was decided by evaluation order rather than
+by evidence is explicit in the proposal sequence: one node was
+accepted at four hosts and rejected at two, and acquired five parents
+by iteration~1 (median capture fraction $f$ of $0.802$ accepted
+against $0.818$ rejected). One caveat on provenance bounds what those
+numbers can be checked against: they come from a construction the
+current source can no longer produce --- the operator was deleted, and
+with it the proposal type its records were written under, so the
+proposal logs of the frozen artifact and of every run that postdates
+the deletion contain no cross-link rows. The measurements stand as a
+record of why the operator was retired and cannot be re-derived from
+any artifact this thesis reports.

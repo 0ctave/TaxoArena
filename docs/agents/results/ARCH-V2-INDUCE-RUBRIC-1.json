@@ -1,0 +1,348 @@
+{
+  "id": "ARCH-V2-INDUCE-RUBRIC-1",
+  "title": "ARCH-V2-INDUCE-RUBRIC-1: one MCQ rubric artefact induced from gen_view TRAIN of the split of record (recipe component)",
+  "question": "Mint the MCQ rubric artefact that fills E-J's $rubric slot for ARCH-V2-PILOT-K46 and stage 1 (no rubric-value claim)",
+  "kind": "build",
+  "state": "done",
+  "registration": {
+    "commit": "b44227f (the registration commit: it adds this record and the programme section, before any live inducer code)",
+    "program_lines": "docs/judge_v2_program.md L15964-L15973",
+    "program_lines_as_of": "b44227f",
+    "date": "2026-09-24",
+    "program_lines_brackets": "L15967 (views), L15968 (selection), L15969 (induction.py pin) and L16071 (D1 EFFECT) bracketed 2026-09-24, as of the commit that writes docs/judge_v2_program.md L16202-L16221"
+  },
+  "script": {
+    "path": "tools/analysis/judge_v2/induce_run.py (with tools/analysis/judge_v2/induction.py) on main at 06a17be (merged by path from 4b60b60)",
+    "sha16": "tools/analysis/judge_v2/induce_run.py blob:4c9c0a20f99873d1d02e51cc5c5bb2ae7a587af8 / sha256-lf16:add7df769d1c7efd (working tree sha256-crlf16:6121a4e1b7ab337d); tools/analysis/judge_v2/induction.py blob:f4d65f59156f8f3f28d3257989d8baab1953d83e / sha256-lf16:ab0db179a8380a5d (working tree sha256-crlf16:dd8265df1f53e8d6)",
+    "commit": "06a17be (main; byte-identical to 4b60b60 on all 11 paths)",
+    "superseded": "23e56e7: induce_run.py cf7770c8 / 907f3a1db7959548; induction.py 0de6153f / d49af83f2d3ff633"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_induce_rubric_1.md",
+    "commit": "4fab4c3",
+    "at": "4b60b60",
+    "section": "## DELTA 2026-09-24 (split-2 re-pin) — 4b60b60 (2713f45 merge of main 5b89159, 4b60b60 re-pin). INSERTED; everything below is unchanged",
+    "review_blob": "blob:296c1eb21ab164a7b76f3b55c1b57626bde01dc1 / sha256-lf16:8992b2b064a75240",
+    "verdict": "READY for --run (R1 the split-2 re-pin and R2 the induction.py pin owed by the registrar: recorded at docs/judge_v2_program.md L16202-L16221)",
+    "earlier": [
+      {
+        "file": "docs/reviews/READY_induce_rubric_1.md",
+        "commit": "6b65efe",
+        "at": "af2a6a8",
+        "verdict": "NOT READY until C1 (write-ahead invocation record, HIGH), C2 (the V2 reference leg, MEDIUM), C3 (LOW, fixed in scratch); C4 ruled (population narrowed to mmlu-pro-v2); C5 disclosure; payload 3c0a0b08... and induction.py e2c2157b / 85971d068e71841c confirmed at af2a6a8, both SUPERSEDED by C4 before any call",
+        "delta": {
+          "file": "docs/reviews/READY_induce_rubric_1.md",
+          "commit": "abd4255",
+          "at": "23e56e7",
+          "verdict": "READY-WITH-CONDITIONS; payload c0443981d0bbbfc3a6750077b22f6e1c8c90738a0e777a1754d7f895bb3c7655; C1-C5 witnessed; D2 cost ceiling 6 invocations; D1 HIGH OPEN (a 215-token passage shared with an EVAL item: a ruling before --run)"
+        }
+      }
+    ]
+  },
+  "go": "n/a: at most 6 invocations (<= 3 attempts + <= 3 transport errors), 1 expected; under the 4,000-match rule; within the day cap",
+  "run": {
+    "outcome_file": "experiment_results/archv2/induce_rubric_1/outcome.txt",
+    "outcome_commit": "5df0e81",
+    "calls": 1,
+    "calls_note": "1 invocation of <= 6 (logical call_judge_full invocations, CANARY D2); attempt cache 1 invocation / 1 attempt / 0 transport, day ledger 1 row (calls 1, ts 2026-09-24 20:58:38), run stdout '1 attempt(s) with a reply, 0 transport error(s)': agree",
+    "cce": null,
+    "pool": "gen_view_REG.db (SPLIT-2) TRAIN, mmlu-pro-v2 x MC_LETTER (sha256_bytes c2930c60...); eval_view e35b7518... opened only after the reply (V2)",
+    "date": "2026-09-24",
+    "from": "main at 86f26e2",
+    "attempt_1": "finish_reason 'stop', response id 51a49549-9e24-47dc-ab3e-b842bcba59b9, reply sha256 22965043689274be4628c61bb2a58d440bcf2769e46cd4a17b07abe3c4193f4b, class VALID",
+    "files": {
+      "experiment_results/archv2/induce_rubric_1/rubric_mcq_ARCH-V2-INDUCE-RUBRIC-1.json": "blob:c63e78725ec50c8ea369bf8b0c1035e73818d0f8 / sha256-lf c16384465c86029fc6493b9add9a07249a826764c8ea1a6fe8640400722da3e0 / sha256-crlf16:fb7345b89b60138c (working tree LF)",
+      "experiment_results/archv2/induce_rubric_1/input_variant_ids.json": "blob:dc32fffca679133bae0ea32da07ef49f8bd62493 / sha256-lf 7a1107bd33e7205cf4385732191666501140b8e551781f36a9da29943cf2ff8e / sha256-crlf16:16d92fdb53fa4221 (working tree LF)",
+      "experiment_results/archv2/induce_rubric_1/outcome.txt": "blob:ef67507e23aff97894618a4ed062f33163661211 / sha256-lf 25bd3241a8ca101de21afcd9e1d70036f9c8cf71806c1ad543505d0a9370ca8d / sha256-crlf16:35e650b94539e186 (working tree LF)",
+      "experiment_results/archv2/induce_rubric_1/induce_run_stdout.txt": "blob:c7c984b4186d429b41b0f28b088fabafe1cff47d / sha256-lf 6adf25950579c53fb06caabff6175ccfb67b86b24b8f2d4ec3db4a65471e865b / sha256-crlf16:f1d6b81a0d7a4816 (working tree CRLF, 34 CR)",
+      "experiment_results/archv2/induce_rubric_1/induce_dryrun_stdout.txt": "blob:f656e980c8f1151a755368b8c23ff8539c2c2478 / sha256-lf 8cc63798ab48bb6ab867e9dbcaaf1d2765e7016a5aa939a7841f50261894fe43 / sha256-crlf16:711087706bd72e41 (working tree CRLF, 28 CR)",
+      "experiment_results/day_calls_2026-09-24.json": "blob:3fade131cdcb849b7573d8559d3dbc772714df2a / sha256-lf f9ca4c14ee298c6a6eda8d79a42274710879ccbd4aa16eeb1f38c9d43b201bf1 / sha256-crlf16:d776c844668ba5d0 (working tree CRLF, 85 CR, no final newline)",
+      "experiment_results/archv2/induce_rubric_1/attempts.db": "UNTRACKED (M1): 53,248 bytes, sha256 of the bytes 68cac66e49e0770e4ee14654608adf6f6ea0d58e98f4115c18212da83644d4e9; backup E:\\TaxoArena_backup_2026-09-24\\induce_rubric_1\\attempts.db sha256 EQUAL; E: is the same physical disk; re-included by .gitignore:145 (!experiment_results/**/*.db), so a git add -A would commit it"
+    },
+    "order_witness": "the attempts.db event table (seq): 1 launch 18:58:14.602515Z; 2 reply_committed 18:58:28.286936Z; 3 eval_view_opened 18:58:30.027160Z (L2: the witness of record)"
+  },
+  "review": {
+    "file": "docs/reviews/POSTRUN_induce_rubric_1.md",
+    "commit": "60c8e6b",
+    "verdict": "VALID: no BLOCKER; claims 1-17 CONFIRMED; F1 HIGH (FORWARD, blocks ARCH-V2-PILOT-K46's READY; does not touch VALID); M1 MEDIUM (attempts.db untracked and re-included by .gitignore); L1-L5 LOW; the 'stage judge' label ACCEPTED FOR THIS RUN ONLY"
+  },
+  "criteria": [
+    {
+      "id": "V1",
+      "text": "verbatim audit (SHINGLE 8), 0 hits",
+      "result": "HELD",
+      "value": "PASS: 0 hits (the review's own matcher, two tokenizers)",
+      "denominator": "the reply of record vs the 40 inputs (40 stems + 392 option texts)"
+    },
+    {
+      "id": "V2",
+      "text": "leak check against EVAL key material, 0 hits required",
+      "result": "HELD",
+      "value": "PASS: 0 hits (review: 0 8-gram hits vs 9,899 eval_view variants / 89,110 texts at k = 8, 7, 6, 5; 0 vs 4,086 EVAL answer texts; 0 vs 1,095 references)",
+      "denominator": "the reply of record vs EVAL key material"
+    },
+    {
+      "id": "V3",
+      "text": "content-key counts: GATE / EVAL / sentinel refused and counted; TRAIN only",
+      "result": "HELD",
+      "value": "PASS: candidate rows 7,441, distinct 7,441, duplicates collapsed 0, GATE refused 1,929, other non-TRAIN 0, EVAL hits 0, not TRAIN 0; TRAIN 40 / 40",
+      "denominator": "the 40 selected inputs (7,441 candidates)"
+    },
+    {
+      "id": "V4",
+      "text": "artefact written mode x, committed, artefact_sha256 and rubric_sha256 pinned",
+      "result": "HELD",
+      "value": "PASS: mode x, committed 5df0e81; artefact_sha256 2177d046d96aeacd925f5e76551bd863cfe55f425c69276cf4ced05d473ebdb0, rubric_sha256 ef9c9e8759147960dedff70c3b86fe9f6b8b9caad8ddc39fb0fdc1c253e0eb07",
+      "denominator": "the artefact"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "the first attempt is valid (0.8)",
+      "result": "HELD",
+      "value": "1 attempt, VALID",
+      "denominator": "1 attempt"
+    },
+    {
+      "id": "P2",
+      "text": "V1-V4 pass",
+      "result": "HELD",
+      "value": "V1-V4 PASS (4 of 4)",
+      "denominator": "4 criteria"
+    }
+  ],
+  "falsifier": {
+    "text": "three formal failures (UNDETERMINED) overturn the plan to fill the slot by one induction; the slot question returns to the author",
+    "fired": false,
+    "value": "NOT FIRED (0 formal failures in 1 attempt)"
+  },
+  "numbers_of_record": {
+    "invocations": "1 of <= 6 (DB 1 = day ledger 1 = stdout 1; logical invocations; provider HTTP tries UNDETERMINED, L1)",
+    "attempts": "1 (attempt 1 VALID, finish 'stop'); formal failures 0 of 1",
+    "artefact_sha256": "2177d046d96aeacd925f5e76551bd863cfe55f425c69276cf4ced05d473ebdb0 (content pin; induction.load_artefact)",
+    "rubric_sha256": "ef9c9e8759147960dedff70c3b86fe9f6b8b9caad8ddc39fb0fdc1c253e0eb07 (sha256 of the UTF-8 rubric string)",
+    "reply_sha256": "22965043689274be4628c61bb2a58d440bcf2769e46cd4a17b07abe3c4193f4b (attempt 1)",
+    "payload_sha256": "cce432e1353e7c27e913862da0215322c279fe71aca9d9b174d3ab178963c7c4 (29,882 bytes; = the READY pin)",
+    "input_variant_ids_sorted_set_sha256": "99484486d75774b379bd35713063022a8c05b8949b7b2d61045f95670d9abe50 (n 40; = the READY pin); ordered 89bed2562c1f8575ed0dbfd5b9980216aa346ef26d5837fbe574b7b775ef132a",
+    "attempts_db_sha256": "68cac66e49e0770e4ee14654608adf6f6ea0d58e98f4115c18212da83644d4e9 (bytes; 53,248 bytes; untracked; E: backup equal)",
+    "V3_counts": "candidates 7,441 / distinct 7,441 / GATE refused 1,929 / EVAL hits 0 / not TRAIN 0 (denominator: mmlu-pro-v2 x MC_LETTER TRAIN candidates)",
+    "F1_audit": "bare-letter outputs 0 of 167,308 mmlu-pro-v2 eval_view responses; 'answer is (X)' 131,936 (78.9%); empty 21,465 (12.8%) (the review's read-only audit; not an outcome of this run)",
+    "adoption": "NOT ADOPTED (the F1 ruling, option (iii)); no verdict uses artefact_sha256 2177d046... (docs/judge_v2_program.md L16274-L16324)"
+  },
+  "sentence_of_record": "ARCH-V2-INDUCE-RUBRIC-1 (2026-09-24, 1 invocation of <= 6; run 5df0e81, VALID by post-run review 60c8e6b): one MCQ rubric artefact (population mmlu-pro-v2 TRAIN, 40 inputs) was induced on the first attempt, V1-V4 PASS, artefact_sha256 2177d046... / rubric_sha256 ef9c9e87... [a RECIPE COMPONENT: no rubric-value or accuracy claim; F1 HIGH OPEN: the rubric grades format (a bare letter), not answers, and a judge-design-specialist ruling is pending before ARCH-V2-PILOT-K46's READY]",
+  "chips": [
+    "REGISTERED 2026-09-24, BEFORE ANY LIVE INDUCER CODE",
+    "RAN ONCE 5df0e81; VALID (POST-RUN 60c8e6b)",
+    "V1-V4 PASS; P1 P2 HELD; FALSIFIER NOT FIRED",
+    "1 INVOCATION OF &le; 6",
+    "F1 RULED: NOT ADOPTED; RE-INDUCE AS ARCH-V2-INDUCE-RUBRIC-2",
+    "RECIPE COMPONENT; NO SUPPORT LINE"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-24",
+      "by": "registrar (the judge-design-specialist's rulings, verbatim)",
+      "text": "Findings 1-3 ruled before the amended code: dedup by component_id (pre-call; seed kept); transport errors limit 3 (UNDETERMINED BY INSTRUMENT); V2 leak check after the reply only. docs/judge_v2_program.md L15996-L16007."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (READY 6b65efe; the C4 ruling, verbatim)",
+      "text": "NOT READY until C1-C3; C4 RULED: population narrowed to mmlu-pro-v2 (pre-call; seed kept); selection of record 16c0733b...; payload and induction.py pins re-derived at the READY delta. docs/judge_v2_program.md L16043-L16051."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (delta READY abd4255)",
+      "text": "READY-WITH-CONDITIONS; the induction.py pin replaced (0de6153f / d49af83f2d3ff633); payload pinned; cost ceiling 6 invocations; D1 HIGH open (the passage family) before --run. docs/judge_v2_program.md L16053-L16064."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (the D1 ruling, verbatim)",
+      "text": "D1 RULED: exclusion at 8 tokens, replaced in sort order; the audit step and its list before --run; selection 2dfd2d78...; the payload re-pinned by a READY delta. docs/judge_v2_program.md L16066-L16072."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (the author's decision, relayed)",
+      "text": "The author chose \"Redraw the split\" (Amendment 19): the split of record b51eb71 is superseded for forward use; this item is ON HOLD until ARCH-V2-SPLIT-DRAW-2 and its R4, then re-pinned by insertion. docs/judge_v2_program.md L16092-L16099."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (delta READY 4fab4c3; merge 06a17be)",
+      "text": "READY for --run on the split of record 5a3e756: R1 selection 99484486..., payload cce432e1..., audit list 68c0b960... (7,441 / 679 / 0; 35 kept, 5 replaced, last rank 47), superseding 2dfd2d78... and a4f6e2b7...; R2 induction.py f4d65f59 / ab0db179a8380a5d; instrument induce_run.py 4c9c0a20 / add7df769d1c7efd; merged by path at 06a17be (11 blobs = 4b60b60); cost <= 6 invocations. docs/judge_v2_program.md L16202-L16221."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (post-run review 60c8e6b)",
+      "text": "RAN ONCE 5df0e81 from main 86f26e2; 1 invocation of <= 6; attempt 1 VALID; V1-V4 PASS; P1, P2 HELD; falsifier NOT FIRED; VALID. Pins re-derived by the registrar. M1: attempts.db pinned (68cac66e...; untracked). 'stage judge' accepted for this run only (VIEWS-AUDIT-STAGE queued). F1 HIGH OPEN, blocks PILOT-K46's READY; L1-L5 queued. docs/judge_v2_program.md L16235-L16272 (section \"## ARCH-V2-INDUCE-RUBRIC-1 (2026-09-24, 1 invocation of <= 6; run 5df0e81) — VALID (post-run review 60c8e6b) ...\"; lines _as_of the commit that writes them, parent 60c8e6b, re-grepped)"
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (the judge-design-specialist's F1 ruling, relayed condensed by the orchestrator)",
+      "text": "F1 RULED: option (iii) (= the review's (c)): re-induce under ARCH-V2-INDUCE-RUBRIC-2; (i)/(a) and (ii)/(b) declined. This artefact stays VALID and of record, NOT ADOPTED (it grades response format); no verdict uses it. Cause: the registered prompt (no response description, opaque contract id, unlettered sorted options); V1-V4 formal only; ruling (2) specified no fitness check. docs/judge_v2_program.md L16274-L16324 (section \"## Registrar's record 2026-09-24 (insertion only; zero calls; BEFORE any code) — the judge-design-specialist's RULING on ARCH-V2-INDUCE-RUBRIC-1 F1 HIGH (relayed CONDENSED by the orchestrator, not verbatim) ...\"; lines _as_of the commit that writes them, parent e78811b, re-grepped)"
+    }
+  ],
+  "does_not_show": [
+    "any rubric value or accuracy effect (recipe component only; the rubric's content makes no rubric-value claim)",
+    "the combination GENERIC_SYSTEM + this rubric (unmeasured until G17 / adoption / G21)",
+    "whether the judge follows or ignores a format-only rubric (F1)",
+    "the number of provider-side HTTP tries (L1); whether a server-side generation was discarded is UNDETERMINED",
+    "the integrity of the E: backup beyond its sha equality",
+    "anything about a corpus other than mmlu-pro-v2",
+    "that this artefact is fit for the slot: it is NOT ADOPTED (the F1 ruling)"
+  ],
+  "ledger": {
+    "row_id": "ARCH-V2-INDUCE-RUBRIC-1",
+    "version": "v249 (F1 ruled: observed-cell bracket NOT ADOPTED; warn chip 'F1 HIGH OPEN ...' -> 'F1 RULED: NOT ADOPTED; RE-INDUCE AS ARCH-V2-INDUCE-RUBRIC-2'); v248 (RAN ONCE / VALID)"
+  },
+  "depends_on": [
+    "ARCH-V2-E-J",
+    "ARCH-V2-SPLIT-DRAW-1",
+    "ARCH-V2-SPLIT-DRAW-2"
+  ],
+  "supersedes": null,
+  "superseded_by": "ARCH-V2-INDUCE-RUBRIC-2 (for forward use, once its artefact is minted and VALID; this artefact stays of record, NOT ADOPTED)",
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing"
+  },
+  "support": "N/A: a recipe component; no accuracy claim, no estimate (docs/judge_v2_program.md L15964-L15973)",
+  "registered_seeds": {
+    "selection": "ARCHV2-INDUCE-1:5abb79f55c3719d122b5310151f975493609f37b (ARCH-V2-INDUCE-SELECT-1, L15515-L15528)"
+  },
+  "pins": {
+    "INDUCTION_SYSTEM_sha256": "4c4bf36f61f43f37f0057ce31e96b086528735aae338a60c1e19432a009823e7",
+    "INDUCTION_USER_TEMPLATE_sha256": "7ed21eba7b9b9e13222b275400d0808706a1a4217b7f30db87391ea2fb9f7481",
+    "n": 40,
+    "shingle": 8,
+    "model": "grok-4-1-fast-non-reasoning",
+    "cap": 8192,
+    "population": "gen_view_REG.db (SPLIT-2) TRAIN, corpus_version mmlu-pro-v2, contract MC_LETTER (C4)",
+    "payload_sha256_superseded": "c0443981d0bbbfc3a6750077b22f6e1c8c90738a0e777a1754d7f895bb3c7655 (abd4255; superseded by the D1 ruling before any call)",
+    "gen_view_superseded": "data_v2/REG_ARCHV2-SPLIT-1_c03031568a0a9d827d834b075512b8e4dd095642/gen_view_REG.db sha256_bytes 690d06b8fc108ccf99f01f1b460e18a2e4847f6ecbd6ab51d242050a96d86fc2 (846,086,144 bytes; from the manifest of record data_v2/manifests/REG_ARCHV2-SPLIT-1_c03031568a0a9d827d834b075512b8e4dd095642.json, sha256 5fd9d238..., b51eb71)",
+    "gen_view": "data_v2/REG_ARCHV2-SPLIT-2_2929bd46aa271d883050bfe735f96e621ed55fd2/gen_view_REG.db sha256_bytes c2930c609c67d6c7e1f8b8fbcd8f6f1970478a28f844d086d0b0db169d10c0ec (manifest of record data_v2/manifests/REG_ARCHV2-SPLIT-2_2929bd46aa271d883050bfe735f96e621ed55fd2.json sha256 912eaa5fed6910b8b485124cd4fdfea1440055dc4f253eea1f168efddb841ad8; split of record 5a3e756, R4 MET e2623b4)",
+    "eval_view": "data_v2/REG_ARCHV2-SPLIT-2_2929bd46aa271d883050bfe735f96e621ed55fd2/eval_view_REG.db sha256_bytes e35b7518878205837bfd16266dfdd8a6e76a226ed67957796d1d33cb72b5e369 (opened only after the reply, V2)",
+    "selection_sorted_set_sha256_superseded": "2dfd2d780e9baebac77534f9f9f7a5cdaa5a762107eeb668c8fa2617fe007612 (D1 ruling; supersedes 16c0733b..., which superseded 32e9c7ca...)",
+    "selection_sorted_set_sha256": "99484486d75774b379bd35713063022a8c05b8949b7b2d61045f95670d9abe50 (SPLIT-2; 35 kept, 5 excluded and replaced in sort order, last rank used 47; supersedes 2dfd2d780e9baebac77534f9f9f7a5cdaa5a762107eeb668c8fa2617fe007612 (SPLIT-1) before any call)",
+    "payload_sha256": "cce432e1353e7c27e913862da0215322c279fe71aca9d9b174d3ab178963c7c4 (29,882 bytes; --run --expect-payload-sha)",
+    "audit_list": "experiment_results/archv2/induce_rubric_1_audit/overlap_exclusions_split2.json: list_sha256 (in-file content sha, recomputed by OA.load vs induce_run.py EXCL_SHA) 68c0b960a4a7bedc76db079cdc2e0f01d5ef0b2fc4304f5486706cb27b71418a; file blob:8060308f8a6067e4d15cc4ef382c4218f0ba7f0e / sha256-lf16:0f42a5719848f753 (working tree sha256-crlf16:2d13e651d1c1eca8); candidates 7,441, excluded 679, run >= 50: 0; audit_blob a5ad80c1",
+    "audit_list_superseded": "experiment_results/archv2/induce_rubric_1_audit/overlap_exclusions.json (SPLIT-1): list_sha256 a4f6e2b77b3ccda9c215829eafa4292b87dd0718222a71c7e4358bd61191f19c; blob:403f176e970638448c31c4afcfa04938bca5d517; 7,927 / 1,102 / 103",
+    "other_instrument_pins": "_base.py blob:6f25e4ceac4ee5515930a751ce19864a2c9897cc / sha256-lf16:36f386ccc8c45782 (pins data_v2 views.py blob:7a0f0ab31a09e02fcc54db6b8ce26d99284b1603, common.py blob:462ffef3b839624685cfea7b8abd3181d7b5a8c7); induce_overlap_audit.py blob:a5ad80c1deeec18a381d0eda984ec3d3a16caee6 / sha256-lf16:f469809f14af4347; induce_cache.py blob:a143c286ee6835469d9095668994da732cb7a55c / sha256-lf16:5e2aaa8937e31cd1; induce_run_selftest.py blob:a2f60ceb3adf79dd74f532ea3fee49bfc7637991 / sha256-lf16:f0a3f1d1ace1efdb; accepted_tests_ledger.py blob:cd308834e126a571613e4e9a7ac9550ae79b1c5d / sha256-lf16:81b10b4861333274 (CEILINGS 6)",
+    "disclosure_of_record": "5 inputs sharing >= 8 consecutive tokens with EVAL texts excluded and replaced in sort order before the first call; seed kept"
+  },
+  "cost": {
+    "invocations_max": 6,
+    "attempts_max": 3,
+    "transport_errors_max": 3,
+    "calls_expected": 1
+  },
+  "sources": [
+    "docs/judge_v2_program.md L15957-L15973",
+    "docs/judge_v2_program.md L15957-L15962 (the ruling, verbatim)",
+    "docs/judge_v2_program.md L15996-L16007",
+    "docs/judge_v2_program.md L16043-L16051",
+    "docs/reviews/READY_induce_rubric_1.md (6b65efe)",
+    "docs/judge_v2_program.md L16053-L16064",
+    "docs/judge_v2_program.md L16066-L16072",
+    "docs/judge_v2_program.md L16092-L16099",
+    "docs/judge_v2_program.md L16202-L16221 (section \"## Registrar's record 2026-09-24 (insertion only; zero calls; BEFORE --run) — ARCH-V2-INDUCE-RUBRIC-1 delta READY 4fab4c3 (at 4b60b60) ...\"; lines as of the commit that writes them, re-grepped)",
+    "docs/reviews/READY_induce_rubric_1.md (4fab4c3), section \"## DELTA 2026-09-24 (split-2 re-pin) — 4b60b60 ...\"",
+    "experiment_results/archv2/induce_rubric_1/outcome.txt (5df0e81)",
+    "docs/reviews/POSTRUN_induce_rubric_1.md (60c8e6b), sections \"## PINS FOR THE REGISTRAR (the pilot's K-pins consume these)\", \"## PER-CLAIM TABLE\", \"## FINDINGS BY SEVERITY\"",
+    "docs/judge_v2_program.md L16235-L16272 (section \"## ARCH-V2-INDUCE-RUBRIC-1 (2026-09-24, 1 invocation of <= 6; run 5df0e81) — VALID (post-run review 60c8e6b) ...\"; lines _as_of the commit that writes them, parent 60c8e6b, re-grepped)",
+    "docs/judge_v2_program.md L16274-L16324 (section \"## Registrar's record 2026-09-24 (insertion only; zero calls; BEFORE any code) — the judge-design-specialist's RULING on ARCH-V2-INDUCE-RUBRIC-1 F1 HIGH (relayed CONDENSED by the orchestrator, not verbatim) ...\"; lines _as_of the commit that writes them, parent e78811b, re-grepped)"
+  ],
+  "last_update": "2026-09-24 (registrar: F1 RULED, NOT ADOPTED; superseded for forward use by ARCH-V2-INDUCE-RUBRIC-2; ledger v249; docs/judge_v2_program.md L16274-L16324)",
+  "amendments": [
+    {
+      "date": "2026-09-24",
+      "record": "docs/judge_v2_program.md L15996-L16007",
+      "by": "judge-design-specialist (three rulings, verbatim)",
+      "text": "finding 1: select_inputs deduplicates to distinct variant_id (duplicates asserted identical), sorts by the unchanged key, keeps the first variant per component_id until n = 40; check_inputs_bound fetches all rows and requires them identical; a pre-call correction, seed kept, disclosed; the induction.py pin replaced by the amended blob after its READY. finding 2: transport errors stop fail-closed, do not consume an attempt, are disclosed and counted on the day ledger, own limit 3 -> UNDETERMINED BY INSTRUMENT; a relaunch re-posts the identical body. finding 3: the V2 leak check opens eval_view_REG.db (expect_sha256 vs the manifest) only after the first valid reply is cached, no call after the open (asserted), a V2 failure never re-posts (not of record; the author decides); stage 'judge' a disclosed mislabel for this run"
+    },
+    {
+      "date": "2026-09-24",
+      "record": "docs/judge_v2_program.md L16043-L16051",
+      "by": "judge-design-specialist (C4 ruling, verbatim)",
+      "text": "population narrowed to corpus_version mmlu-pro-v2, contract MC_LETTER, side TRAIN (pre-call; seed, sort key, dedup, n 40 unchanged); selection of record sorted-set sha256 16c0733b303cbae18e2a28ddbb265a05fd19b6d38f7f3baff081530ec32ccef2; the payload re-derived by the dry-run and pinned by the READY delta; the artefact labelled 'MCQ rubric, population mmlu-pro-v2 TRAIN', slot for mmlu-pro-v2 matches only"
+    },
+    {
+      "date": "2026-09-24",
+      "record": "docs/judge_v2_program.md L16066-L16072",
+      "by": "judge-design-specialist (D1 ruling, verbatim)",
+      "text": "EVAL-overlapping inputs excluded at 8 tokens (= SHINGLE) and replaced in sort order (pre-call; seed kept); a separate zero-call audit step commits the excluded TRAIN id list with its sha before --run; the inducer reads only that list; selection of record sorted-set sha256 2dfd2d780e9baebac77534f9f9f7a5cdaa5a762107eeb668c8fa2617fe007612 (7 replaced by ranks 41-47); 16c0733b and payload c0443981 superseded"
+    },
+    {
+      "date": "2026-09-24",
+      "record": "docs/judge_v2_program.md L16202-L16221",
+      "by": "registrar (the reviewer's R1 / R2, 4fab4c3)",
+      "text": "forced re-pin to SPLIT-2 (not a re-selection: seed, sort key, population, dedup, component rule, n 40, threshold 8 unchanged); the D1 disclosure reads 5 inputs; PILOT-K46 C0(c) bracketed forward (the merged induction.py is f4d65f59)"
+    }
+  ],
+  "merge": {
+    "commit": "06a17be",
+    "parent": "4fab4c3",
+    "kind": "pathspec commit (not a branch merge)",
+    "paths": 11,
+    "byte_identical_to": "4b60b60 (11 of 11 blobs, re-derived by the registrar)",
+    "selftest_on_main": "judge_v2 selftest 174/174 (relayed by the coordinator; not re-run by the registrar)"
+  },
+  "launch": "python tools/analysis/judge_v2/induce_run.py --dry-run  (must print sorted-set 99484486d75774b3... and payload cce432e1353e7c27...; otherwise a FAILED PRECONDITION); then python tools/analysis/judge_v2/induce_run.py --run --go --expect-payload-sha cce432e1353e7c27e913862da0215322c279fe71aca9d9b174d3ab178963c7c4",
+  "open_items": [
+    {
+      "id": "F1",
+      "severity": "HIGH",
+      "state": "RULED 2026-09-24: option (iii), re-induce as ARCH-V2-INDUCE-RUBRIC-2; this artefact NOT ADOPTED",
+      "queue": "INDUCE-RUBRIC-1-F1-FORMAT-RUBRIC",
+      "text": "the rubric grades FORMAT (bare letter), not answers; blocks ARCH-V2-PILOT-K46's READY; judge-design-specialist ruling pending on (a) keep + print the TIE rate, (b) empty slot as a registered deviation, (c) re-induce under a new registration citing the corpus contract"
+    },
+    {
+      "id": "M1",
+      "severity": "MEDIUM",
+      "state": "PINNED (sha in this record and the programme); committing the file by path NOT done",
+      "text": "attempts.db untracked and re-included by .gitignore:145"
+    },
+    {
+      "id": "L1",
+      "severity": "LOW",
+      "state": "queued",
+      "queue": "INDUCE-RUBRIC-1-L1"
+    },
+    {
+      "id": "L2",
+      "severity": "LOW",
+      "state": "discharged by this record (the event table is the witness of record)",
+      "queue": "INDUCE-RUBRIC-1-L2"
+    },
+    {
+      "id": "L3",
+      "severity": "LOW",
+      "state": "discharged by this record (four disclosures cited from outcome.txt)",
+      "queue": "INDUCE-RUBRIC-1-L3"
+    },
+    {
+      "id": "L4",
+      "severity": "LOW",
+      "state": "queued (for the pilot's K-pins)",
+      "queue": "INDUCE-RUBRIC-1-L4"
+    },
+    {
+      "id": "L5",
+      "severity": "LOW",
+      "state": "queued (for the pilot's K-pins)",
+      "queue": "INDUCE-RUBRIC-1-L5"
+    },
+    {
+      "id": "stage-judge",
+      "severity": "n/a",
+      "state": "accepted for this run only; VIEWS-AUDIT-STAGE still queued",
+      "queue": "VIEWS-AUDIT-STAGE"
+    }
+  ],
+  "plain_description": {
+    "sq": "Engineering/infrastructure",
+    "what": "One automated run that asks an LLM to write a grading rubric for multiple-choice questions, from 40 training questions of MMLU-Pro, to be plugged into the new (v2) judging recipe.",
+    "why": "The v2 judging pipeline needs a rubric component before its pilot can run; this test produces and checks that component.",
+    "information": "It tells whether the rubric-writing step works mechanically, not whether rubrics help. Result: done; the artefact was produced on the first try and passed its formal checks, but a review found it grades the answer format (a bare letter), not the answer itself, so it was NOT ADOPTED and a second induction was ordered. It makes no claim about rubric value or accuracy.",
+    "written": "2026-10-07"
+  }
+}

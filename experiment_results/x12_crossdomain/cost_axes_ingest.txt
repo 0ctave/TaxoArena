@@ -1,0 +1,267 @@
+COST-AXES-INGEST (FRAMEWORK item 16; registered by reference at eaf1dbf) -- zero LLM calls, zero network
+pool of record p2dca21ab5f4ef3ae asserted active (pool_guard); union pool paeec37aa28063c75 addressed by explicit id
+union DB: 21606 questions, 18 models (Meta-Llama-3-70B-Instruct asserted absent); TRAIN = 15124 outside the pool, EVAL = 6482 in it
+MATH-FIX labels differ from the harness labels on 5181 (question, model) rows; primary reading uses MATH-FIX
+
+=== 1. Token counts per (model, cell) from the stored generations ===
+  stored generations exist for IFEVAL, MATH only: 1865 questions x 18 models = 33570 texts; the other four corpora were
+  scored by option loglikelihood (model_output empty on every row; raw lm-eval samples hold logprob pairs).
+  Generative EVAL questions in the pool: 560 of 6482 (IFEVAL 162, MATH 398)
+  each model's OWN tokenizer: NOT COMPUTED -- none of the 18 tokenizers is on disk and the run is network-free.
+  proxies counted offline: cl100k_bpe, texify_bpe, mpnet_wordpiece, chars_div4, ws_words
+  cl100k_base: loaded from C:\Users\octav\AppData\Local\Temp\data-gym-cache\9b5ad71b2ce5302211f9c61530b329a4922fc6a4 (file mtime 2026-09-16 01:19)
+  PROVENANCE: the cl100k rank file was fetched into the tiktoken cache by an environment probe in this session (2026-09-16 01:19),
+  before this script existed; that fetch was a network access the test constraint forbids and is disclosed here. The script never downloads.
+  (per-model scale anchor below uses the harness cap: max_gen_toks MATH 1024, IFEVAL 1280 in the model's own tokens)
+
+  mean output tokens per query, EVAL side (pool), by proxy; MATH pooled over its 7 cells:
+    model                          IFEVAL (cl100k/texify/mpnet_/chars_/ws_wor)  MATH (cl100k/texify/mpnet_/chars_/ws_wor)
+    DeepSeek-R1-Distill-Llama-8B       806      939      823      913      604       994     1217      990      784      633
+    DeepSeek-R1-Distill-Qwen-32B       795      931      804      903      591       968     1197      966      746      607
+    Falcon3-10B-Instruct               263      316      254      303      189       361      516      394      221      138
+    Llama-3.1-70B-Instruct             360      429      354      399      257       430      556      480      270      172
+    Llama-3.2-3B-Instruct              359      438      346      399      255       443      569      501      269      156
+    Llama-3.3-70B-Instruct             347      405      338      391      256       651      813      685      492      363
+    Mistral-Small-Instruct-2409        348      423      340      366      237       311      416      347      192      130
+    Mixtral-8x7B-Instruct-v0.1         324      377      324      371      244       294      374      347      191       96
+    OLMo-2-1124-7B-Instruct            282      335      272      322      202       603      833      659      407      309
+    Phi-3.5-mini-instruct              384      458      382      475      282       469      614      512      322      228
+    Qwen2.5-32B-Instruct               283      341      275      322      203       577      785      627      388      296
+    Qwen2.5-72B-Instruct               321      380      314      369      234       625      847      672      414      320
+    Qwen2.5-7B-Instruct                276      329      270      310      194       593      807      649      393      298
+    Qwen2.5-Coder-7B-Instruct          269      320      262      314      197       629      856      681      424      324
+    Qwen2.5-Math-7B-Instruct           425      541      438      445      321       567      762      623      373      274
+    Yi-1.5-34B-Chat-16K                536      637      544      623      401       680      860      703      563      391
+    c4ai-command-r-plus-08-2024        340      402      335      407      251       272      359      310      166      102
+    internlm2_5-20b-chat               394      469      386      443      282       637      824      662      420      333
+
+  per (model, cell) mean tokens on EVAL, proxy cl100k_bpe (the criterion's primary cost unit):
+    model                             ifeval   Algebra Counting   Geometry Intermedi Number Th Prealgebr Precalcul
+    DeepSeek-R1-Distill-Llama-8B         806       976      1017      1004      1014       992       951      1030
+    DeepSeek-R1-Distill-Qwen-32B         795       954       972       997      1002       943       917       999
+    Falcon3-10B-Instruct                 263       274       290       437       469       322       239       538
+    Llama-3.1-70B-Instruct               360       291       366       374       655       394       257       678
+    Llama-3.2-3B-Instruct                359       329       347       341       679       390       275       703
+    Llama-3.3-70B-Instruct               347       524       507       767       852       673       428       828
+    Mistral-Small-Instruct-2409          348       239       195       310       476       216       186       525
+    Mixtral-8x7B-Instruct-v0.1           324       240       269       258       393       278       156       483
+    OLMo-2-1124-7B-Instruct              282       498       556       678       790       564       374       791
+    Phi-3.5-mini-instruct                384       377       376       464       637       414       285       739
+    Qwen2.5-32B-Instruct                 283       499       493       593       743       563       365       784
+    Qwen2.5-72B-Instruct                 321       512       589       681       792       612       419       822
+    Qwen2.5-7B-Instruct                  276       490       552       594       752       581       407       807
+    Qwen2.5-Coder-7B-Instruct            269       522       570       653       835       574       414       840
+    Qwen2.5-Math-7B-Instruct             425       422       500       623       792       523       365       769
+    Yi-1.5-34B-Chat-16K                  536       536       665       703       841       671       511       910
+    c4ai-command-r-plus-08-2024          340       208       190       205       431       204       139       499
+    internlm2_5-20b-chat                 394       561       533       695       795       592       459       829
+    cells: ifeval=IFEVAL/ifeval; Algebra=MATH/Algebra; Counting =MATH/Counting & Probability; Geometry=MATH/Geometry; Intermedi=MATH/Intermediate Algebra; Number Th=MATH/Number Theory; Prealgebr=MATH/Prealgebra; Precalcul=MATH/Precalculus
+
+  DIAGNOSTIC scale anchor: outputs whose <think> never closes (non_terminated in checker_answers_v1.db) stopped at
+  the harness cap, so they hold max_gen_toks OWN tokens; median proxy count / cap = proxy tokens per own token.
+    model                          corpus   n@cap    cap   cl100k_bpe   texify_bpe mpnet_wordpi   chars_div4     ws_words
+    DeepSeek-R1-Distill-Llama-8B   IFEVAL      34   1280        1.001        1.250        1.039        0.904        0.545   [Llama-3 (128k)]
+    DeepSeek-R1-Distill-Llama-8B   MATH       935   1024        1.001        1.216        0.999        0.763        0.644   [Llama-3 (128k)]
+    DeepSeek-R1-Distill-Qwen-32B   IFEVAL      19   1280        1.001        1.206        1.031        0.951        0.670   [Qwen2.5 (152k)]
+    DeepSeek-R1-Distill-Qwen-32B   MATH      1043   1024        0.978        1.174        0.969        0.715        0.599   [Qwen2.5 (152k)]
+  READ: 1.00 means the proxy counts like that model's own tokenizer on its capped outputs; only the two R1 distills
+  ever hit the cap, so the anchor covers the Llama-3 and Qwen2.5 vocabularies only. Nothing below uses this scale.
+
+=== 2. Reproduction of TIER-ROUTER-U as recorded (in-sample: selected AND scored on the pool; harness labels;
+       cost = parameter count by the record's regex) ===
+    policy                  accuracy mean params B (regex)
+    best single               0.5543           72.0
+    per-cell best             0.6169           46.1
+    tier-then-cheapest        0.6143           38.3
+    tier-then-cheapest vs per-cell best: -0.0026 accuracy (-0.26pp) at 83.0% of the params B (regex)   [n = 6482]
+    record: 0.5543 / 0.6169 / 0.6143 at 72.0 / 46.1 / 38.3 B -> REPRODUCED
+    the regex sizes Phi-3.5-mini-instruct at 70 B (declared 3.8), c4ai-command-r-plus at 70 B (104), Mixtral-8x7B at 7 B (46.7)
+
+=== 3. THE ITEM: TIER-ROUTER-U out of sample (policy on TRAIN, scored on the pool) with TOKEN cost, on the
+       8 cells that have stored generations (MATH x7, IFEval x1) ===
+  per-cell best = argmax TRAIN accuracy; tier-then-cheapest = top key tier on TRAIN (gap 0.017) then argmin TRAIN
+  mean tokens; both scored on the cell's EVAL questions. Criterion: accuracy within 0.5pp AND tokens <= 85%.
+
+  --- MATH-FIX labels (primary): 8 cells, EVAL n = 560, TRAIN n = 1305 ---
+  proxy cl100k_bpe:
+    policy                  accuracy    mean tokens
+    best single               0.6625          491.6
+    per-cell best             0.6875          522.2
+    tier-then-cheapest        0.6929          515.9
+    tier-then-cheapest vs per-cell best: +0.0054 accuracy (+0.54pp) at 98.8% of the tokens   [n = 560]
+    criterion: accuracy MET (+0.54pp vs -0.5pp), cost NOT MET (98.8% vs 85%)
+    in-sample counterpart (select on EVAL): per-cell best 0.7107, tier-then-cheapest 0.7107 at 100.0% tokens; OOS optimism gap +2.32pp / +1.79pp
+    hardest reading (OOS tier-then-cheapest vs ORACLE per-cell best selected on EVAL): -1.79pp at 100.0% tokens -> accuracy NOT MET, cost NOT MET
+  proxy texify_bpe:
+    policy                  accuracy    mean tokens
+    best single               0.6625          656.6
+    per-cell best             0.6875          690.1
+    tier-then-cheapest        0.6929          681.9
+    tier-then-cheapest vs per-cell best: +0.0054 accuracy (+0.54pp) at 98.8% of the tokens   [n = 560]
+    criterion: accuracy MET (+0.54pp vs -0.5pp), cost NOT MET (98.8% vs 85%)
+    in-sample counterpart (select on EVAL): per-cell best 0.7107, tier-then-cheapest 0.7107 at 100.0% tokens; OOS optimism gap +2.32pp / +1.79pp
+    hardest reading (OOS tier-then-cheapest vs ORACLE per-cell best selected on EVAL): -1.79pp at 100.6% tokens -> accuracy NOT MET, cost NOT MET
+  proxy mpnet_wordpiece:
+    policy                  accuracy    mean tokens
+    best single               0.6625          525.1
+    per-cell best             0.6875          554.3
+    tier-then-cheapest        0.6929          548.1
+    tier-then-cheapest vs per-cell best: +0.0054 accuracy (+0.54pp) at 98.9% of the tokens   [n = 560]
+    criterion: accuracy MET (+0.54pp vs -0.5pp), cost NOT MET (98.9% vs 85%)
+    in-sample counterpart (select on EVAL): per-cell best 0.7107, tier-then-cheapest 0.7107 at 100.0% tokens; OOS optimism gap +2.32pp / +1.79pp
+    hardest reading (OOS tier-then-cheapest vs ORACLE per-cell best selected on EVAL): -1.79pp at 100.0% tokens -> accuracy NOT MET, cost NOT MET
+  proxy chars_div4:
+    policy                  accuracy    mean tokens
+    best single               0.6625          369.2
+    per-cell best             0.6875          395.9
+    tier-then-cheapest        0.6893          395.9
+    tier-then-cheapest vs per-cell best: +0.0018 accuracy (+0.18pp) at 100.0% of the tokens   [n = 560]
+    criterion: accuracy MET (+0.18pp vs -0.5pp), cost NOT MET (100.0% vs 85%)
+    in-sample counterpart (select on EVAL): per-cell best 0.7107, tier-then-cheapest 0.7107 at 100.0% tokens; OOS optimism gap +2.32pp / +2.14pp
+    hardest reading (OOS tier-then-cheapest vs ORACLE per-cell best selected on EVAL): -2.14pp at 102.4% tokens -> accuracy NOT MET, cost NOT MET
+  proxy ws_words:
+    policy                  accuracy    mean tokens
+    best single               0.6625          269.1
+    per-cell best             0.6875          289.1
+    tier-then-cheapest        0.6893          288.3
+    tier-then-cheapest vs per-cell best: +0.0018 accuracy (+0.18pp) at 99.7% of the tokens   [n = 560]
+    criterion: accuracy MET (+0.18pp vs -0.5pp), cost NOT MET (99.7% vs 85%)
+    in-sample counterpart (select on EVAL): per-cell best 0.7107, tier-then-cheapest 0.7107 at 100.0% tokens; OOS optimism gap +2.32pp / +2.14pp
+    hardest reading (OOS tier-then-cheapest vs ORACLE per-cell best selected on EVAL): -2.14pp at 102.7% tokens -> accuracy NOT MET, cost NOT MET
+
+  --- harness labels (sensitivity): 8 cells, EVAL n = 560, TRAIN n = 1305 ---
+  proxy cl100k_bpe:
+    policy                  accuracy    mean tokens
+    best single               0.4446          409.8
+    per-cell best             0.4518          410.4
+    tier-then-cheapest        0.4554          405.4
+    tier-then-cheapest vs per-cell best: +0.0036 accuracy (+0.36pp) at 98.8% of the tokens   [n = 560]
+    criterion: accuracy MET (+0.36pp vs -0.5pp), cost NOT MET (98.8% vs 85%)
+    in-sample counterpart (select on EVAL): per-cell best 0.4732, tier-then-cheapest 0.4732 at 100.0% tokens; OOS optimism gap +2.14pp / +1.79pp
+    hardest reading (OOS tier-then-cheapest vs ORACLE per-cell best selected on EVAL): -1.79pp at 106.0% tokens -> accuracy NOT MET, cost NOT MET
+  proxy texify_bpe:
+    policy                  accuracy    mean tokens
+    best single               0.4446          519.5
+    per-cell best             0.4518          529.4
+    tier-then-cheapest        0.4518          529.4
+    tier-then-cheapest vs per-cell best: +0.0000 accuracy (+0.00pp) at 100.0% of the tokens   [n = 560]
+    criterion: accuracy MET (+0.00pp vs -0.5pp), cost NOT MET (100.0% vs 85%)
+    in-sample counterpart (select on EVAL): per-cell best 0.4732, tier-then-cheapest 0.4732 at 100.0% tokens; OOS optimism gap +2.14pp / +2.14pp
+    hardest reading (OOS tier-then-cheapest vs ORACLE per-cell best selected on EVAL): -2.14pp at 107.2% tokens -> accuracy NOT MET, cost NOT MET
+  proxy mpnet_wordpiece:
+    policy                  accuracy    mean tokens
+    best single               0.4446          443.9
+    per-cell best             0.4518          442.5
+    tier-then-cheapest        0.4554          437.0
+    tier-then-cheapest vs per-cell best: +0.0036 accuracy (+0.36pp) at 98.8% of the tokens   [n = 560]
+    criterion: accuracy MET (+0.36pp vs -0.5pp), cost NOT MET (98.8% vs 85%)
+    in-sample counterpart (select on EVAL): per-cell best 0.4732, tier-then-cheapest 0.4732 at 100.0% tokens; OOS optimism gap +2.14pp / +1.79pp
+    hardest reading (OOS tier-then-cheapest vs ORACLE per-cell best selected on EVAL): -1.79pp at 107.2% tokens -> accuracy NOT MET, cost NOT MET
+  proxy chars_div4:
+    policy                  accuracy    mean tokens
+    best single               0.4446          307.6
+    per-cell best             0.4518          312.1
+    tier-then-cheapest        0.4554          306.9
+    tier-then-cheapest vs per-cell best: +0.0036 accuracy (+0.36pp) at 98.3% of the tokens   [n = 560]
+    criterion: accuracy MET (+0.36pp vs -0.5pp), cost NOT MET (98.3% vs 85%)
+    in-sample counterpart (select on EVAL): per-cell best 0.4732, tier-then-cheapest 0.4732 at 100.0% tokens; OOS optimism gap +2.14pp / +1.79pp
+    hardest reading (OOS tier-then-cheapest vs ORACLE per-cell best selected on EVAL): -1.79pp at 102.2% tokens -> accuracy NOT MET, cost NOT MET
+  proxy ws_words:
+    policy                  accuracy    mean tokens
+    best single               0.4446          196.7
+    per-cell best             0.4518          211.5
+    tier-then-cheapest        0.4554          207.3
+    tier-then-cheapest vs per-cell best: +0.0036 accuracy (+0.36pp) at 98.0% of the tokens   [n = 560]
+    criterion: accuracy MET (+0.36pp vs -0.5pp), cost NOT MET (98.0% vs 85%)
+    in-sample counterpart (select on EVAL): per-cell best 0.4732, tier-then-cheapest 0.4732 at 100.0% tokens; OOS optimism gap +2.14pp / +1.79pp
+    hardest reading (OOS tier-then-cheapest vs ORACLE per-cell best selected on EVAL): -1.79pp at 105.0% tokens -> accuracy NOT MET, cost NOT MET
+
+  per-cell picks, primary reading (MATH-FIX, cl100k_bpe); EVAL accuracy and mean tokens of each pick; best single = Qwen2.5-32B-Instruct
+    cell                          n_ev tier  per-cell best (TRAIN)           acc     tok  tier-then-cheapest              acc     tok
+    IFEVAL/ifeval                  162    1  Llama-3.3-70B-Instruct        0.889     347  Llama-3.3-70B-Instruct        0.889     347  (same pick)
+    MATH/Algebra                    92    2  Qwen2.5-32B-Instruct          0.870     499  Qwen2.5-32B-Instruct          0.870     499  (same pick)
+    MATH/Counting & Probability     37    2  Qwen2.5-32B-Instruct          0.730     493  Qwen2.5-32B-Instruct          0.730     493  (same pick)
+    MATH/Geometry                   40    3  Qwen2.5-72B-Instruct          0.400     681  Qwen2.5-32B-Instruct          0.475     593  (both Qwen2.5 (152k))
+    MATH/Intermediate Algebra       84    2  Qwen2.5-32B-Instruct          0.321     743  Qwen2.5-32B-Instruct          0.321     743  (same pick)
+    MATH/Number Theory              46    1  Qwen2.5-32B-Instruct          0.761     563  Qwen2.5-32B-Instruct          0.761     563  (same pick)
+    MATH/Prealgebra                 58    1  Qwen2.5-72B-Instruct          0.810     419  Qwen2.5-72B-Instruct          0.810     419  (same pick)
+    MATH/Precalculus                41    1  Qwen2.5-32B-Instruct          0.220     784  Qwen2.5-32B-Instruct          0.220     784  (same pick)
+    cells where the two policies diverge: 1; of those, both picks generate in the same vocabulary: 1
+    (where both picks share a tokenizer, the own-tokenizer cost ratio differs from a proxy's only through the proxy's
+     text-dependent scale, not through vocabulary differences)
+    top-tier members on TRAIN per cell: ifeval: Llama-3.3-70B-; Algebra: Qwen2.5-32B-In, Qwen2.5-72B-In; Counting : Qwen2.5-32B-In, Qwen2.5-72B-In; Geometry: Qwen2.5-72B-In, Qwen2.5-32B-In, Qwen2.5-Math-7; Intermedi: Qwen2.5-32B-In, Qwen2.5-Math-7; Number Th: Qwen2.5-32B-In; Prealgebr: Qwen2.5-72B-In; Precalcul: Qwen2.5-32B-In
+
+=== 4. Uncertainty on the primary reading (MATH-FIX labels), every proxy ===
+  (i) EVAL question bootstrap, policy fixed (selected once on TRAIN), stratified within cell, B = 2000;
+  (ii) TRAIN bootstrap, policy re-selected on each resample and scored on the full EVAL side, B = 1000.
+  proxy cl100k_bpe       point +0.54pp at  98.8% | (i) EVAL-boot delta 95% [-0.71, +1.79]pp, ratio [98.2, 99.4]%, SE 0.64pp
+                         | (ii) TRAIN-boot delta 95% [-2.50, +0.89]pp, ratio [95.4, 100.6]%; P(both criteria met) = 0.000; identical policy in 0.6% of resamples
+  proxy texify_bpe       point +0.54pp at  98.8% | (i) EVAL-boot delta 95% [-0.71, +1.79]pp, ratio [98.2, 99.4]%, SE 0.63pp
+                         | (ii) TRAIN-boot delta 95% [-2.50, +0.89]pp, ratio [94.9, 100.9]%; P(both criteria met) = 0.000; identical policy in 0.2% of resamples
+  proxy mpnet_wordpiece  point +0.54pp at  98.9% | (i) EVAL-boot delta 95% [-0.71, +1.79]pp, ratio [98.3, 99.5]%, SE 0.64pp
+                         | (ii) TRAIN-boot delta 95% [-2.50, +0.89]pp, ratio [95.3, 100.6]%; P(both criteria met) = 0.000; identical policy in 0.6% of resamples
+  proxy chars_div4       point +0.18pp at 100.0% | (i) EVAL-boot delta 95% [-1.79, +2.14]pp, ratio [99.0, 101.1]%, SE 0.96pp
+                         | (ii) TRAIN-boot delta 95% [-2.68, +0.90]pp, ratio [95.2, 100.9]%; P(both criteria met) = 0.000; identical policy in 0.1% of resamples
+  proxy ws_words         point +0.18pp at  99.7% | (i) EVAL-boot delta 95% [-1.79, +2.14]pp, ratio [98.4, 101.2]%, SE 1.01pp
+                         | (ii) TRAIN-boot delta 95% [-2.68, +0.89]pp, ratio [93.5, 100.5]%; P(both criteria met) = 0.000; identical policy in 0.0% of resamples
+
+=== 5. All 52 cells out of sample under the parameter PROXY (no token cost exists on 44 of them) ===
+  This is the record's 0.6143-vs-0.6169 read with selection on TRAIN and scoring on the pool; not the item's criterion.
+  MATH-FIX labels, cost = record_regex (best single on TRAIN = Qwen2.5-72B-Instruct):
+    policy                  accuracy  mean params B
+    best single               0.5912           72.0
+    per-cell best             0.6220           49.1
+    tier-then-cheapest        0.6172           35.5
+    tier-then-cheapest vs per-cell best: -0.0048 accuracy (-0.48pp) at 72.3% of the params B   [n = 6482]
+    accuracy criterion (0.5pp): MET; parameter ratio 72.3% (<= 85%)
+    cells where tier-then-cheapest = per-cell best: 37 of 52; singleton top tier on TRAIN: 34
+  MATH-FIX labels, cost = declared_params (best single on TRAIN = Qwen2.5-72B-Instruct):
+    policy                  accuracy  mean params B
+    best single               0.5912           72.7
+    per-cell best             0.6220           49.3
+    tier-then-cheapest        0.6193           35.6
+    tier-then-cheapest vs per-cell best: -0.0028 accuracy (-0.28pp) at 72.2% of the params B   [n = 6482]
+    accuracy criterion (0.5pp): MET; parameter ratio 72.2% (<= 85%)
+    cells where tier-then-cheapest = per-cell best: 37 of 52; singleton top tier on TRAIN: 34
+  harness labels, cost = record_regex (best single on TRAIN = Qwen2.5-72B-Instruct):
+    policy                  accuracy  mean params B
+    best single               0.5543           72.0
+    per-cell best             0.6017           49.2
+    tier-then-cheapest        0.5967           35.6
+    tier-then-cheapest vs per-cell best: -0.0049 accuracy (-0.49pp) at 72.3% of the params B   [n = 6482]
+    accuracy criterion (0.5pp): MET; parameter ratio 72.3% (<= 85%)
+    cells where tier-then-cheapest = per-cell best: 37 of 52; singleton top tier on TRAIN: 36
+  harness labels, cost = declared_params (best single on TRAIN = Qwen2.5-72B-Instruct):
+    policy                  accuracy  mean params B
+    best single               0.5543           72.7
+    per-cell best             0.6017           49.4
+    tier-then-cheapest        0.5987           35.7
+    tier-then-cheapest vs per-cell best: -0.0029 accuracy (-0.29pp) at 72.3% of the params B   [n = 6482]
+    accuracy criterion (0.5pp): MET; parameter ratio 72.3% (<= 85%)
+    cells where tier-then-cheapest = per-cell best: 37 of 52; singleton top tier on TRAIN: 36
+
+=== 6. Verdict ===
+  Key denominator: EVAL questions of union pool paeec37aa28063c75 with all 18 models' results, per (source, domain) cell;
+  560 on the 8 generative cells (MATH 398, IFEval 162), 6,482 on all 52. Key-scored throughout (leaderboard verifiers;
+  MATH-FIX extractor on MATH): no judge verdict enters, so no wrong-direction count and no McNemar-established count arises.
+  Criterion (a), token counts per (model, cell) via each model's tokenizer: NOT COMPUTED offline; 5 proxies recorded (section 1).
+  Criterion (b), primary (MATH-FIX), per proxy:
+    cl100k_bpe       delta +0.54pp (ok)  tokens  98.8% (FAIL)  -> NOT MET
+    texify_bpe       delta +0.54pp (ok)  tokens  98.8% (FAIL)  -> NOT MET
+    mpnet_wordpiece  delta +0.54pp (ok)  tokens  98.9% (FAIL)  -> NOT MET
+    chars_div4       delta +0.18pp (ok)  tokens 100.0% (FAIL)  -> NOT MET
+    ws_words         delta +0.18pp (ok)  tokens  99.7% (FAIL)  -> NOT MET
+  Criterion (b), sensitivity (harness labels), per proxy:
+    cl100k_bpe       delta +0.36pp (ok)  tokens  98.8% (FAIL)  -> NOT MET
+    texify_bpe       delta +0.00pp (ok)  tokens 100.0% (FAIL)  -> NOT MET
+    mpnet_wordpiece  delta +0.36pp (ok)  tokens  98.8% (FAIL)  -> NOT MET
+    chars_div4       delta +0.36pp (ok)  tokens  98.3% (FAIL)  -> NOT MET
+    ws_words         delta +0.36pp (ok)  tokens  98.0% (FAIL)  -> NOT MET
+  Hardest reading (OOS tier-then-cheapest vs ORACLE per-cell best on EVAL), primary labels: cl100k_bpe -1.79pp at 100.0%; texify_bpe -1.79pp at 100.6%; mpnet_wordpiece -1.79pp at 100.0%; chars_div4 -2.14pp at 102.4%; ws_words -2.14pp at 102.7%
+  accuracy part met under 5/5 proxies; cost part met under 0/5 proxies.
+  VERDICT on the item's criterion (generative cells, out of sample): FAIL under every proxy tokenizer
+  Bootstrap (section 4): TRAIN-resample P(both parts met) per proxy = cl100k_bpe 0.000, texify_bpe 0.000, mpnet_wordpiece 0.000, chars_div4 0.000, ws_words 0.000
+  Scope statement: the criterion is decidable only where generations are stored (8 of 52 cells, 560 of 6,482 EVAL
+  questions); on the other 44 cells token cost does not exist in this DB and the router's cost axis remains the
+  parameter PROXY (section 5). Latency: NOT COMPUTED, needs timed regeneration (registered separately per the item).
+  elapsed 11 s

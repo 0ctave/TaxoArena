@@ -1,0 +1,169 @@
+{
+  "id": "SYSTEMATIC-SIGNAL",
+  "title": "SYSTEMATIC-SIGNAL: can a free signal predict where the bootstrap is confidently wrong? (the fix for TIER-HONEST's flaw; zero calls)",
+  "question": "On the 891 (anchor, model-pair) edges from RESOLVE-CALIB, each with the arena's bootstrap P(A above B) and the key's verdict, are the wrong-direction edges distinguishable from the right ones by three predictors computable without extra calls: (a) the two models' answer-agreement rate within the anchor, (b) the incumbent reference's accuracy in the anchor, (c) the key gap between the two models (the sanity check, unavailable at deployment)?",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "426016e",
+    "program_lines": "docs/judge_v2_program.md L2347-L2369",
+    "program_lines_as_of": "6aa2a0d",
+    "heading": "## Registered 2026-09-14 (before looking at any result, ZERO calls) — SYSTEMATIC-SIGNAL: can a free signal predict where the bootstrap is confidently wrong?",
+    "outcome_heading": [
+      "L2375: - **SYSTEMATIC-SIGNAL (2026-09-14, zero calls): CONFIRMED. Two free signals predict where the bootstrap is"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "tools/analysis/systematic_signal.py",
+    "sha16": "945ed1d397426a8d",
+    "commit": "6d50fb3"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/systematic_signal.txt",
+    "outcome_commit": "6d50fb3",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (the x12 board; RESOLVE-CALIB's 891 edges)",
+    "date": "2026-09-14"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the adversarial recomputation of record is the SYSTEMATIC-BUDGET correction bracket, docs/judge_v2_program.md L2371-L2386 (be1b0d7), and the SYSTEMATIC-BUDGET ledger row (v87)",
+    "commit": "be1b0d7",
+    "verdict": "the effect survives; three published numbers corrected by insertion: (a) reference accuracy is KEY-DERIVED, not a free signal (the shipped budget carries answer agreement ONLY); (b) the 0.82% / 1.08% wrong-call rates rest on a selected denominator (honest: 920 edges, 60 wrong, 748 called with 11 wrong = 1.47%); (c) 18 of the 44 wrong-direction labels are not established by exact McNemar (b1 3.3133 -> 2.1430 on the 809 established)"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "PRIMARY: among edges the arena CALLS at the 0.975 threshold, the mean answer-agreement of wrong-direction edges minus that of correct ones is positive with a bootstrap CI excluding zero",
+      "result": "HELD",
+      "value": "wrong 0.704 vs right 0.437, +0.267 [+0.150, +0.374]",
+      "denominator": "739 called of 891 edges at 0.975, 8 wrong-direction (the key-gap >= 0.02 filtered denominator; honest denominator per the correction: 920 edges / 748 called / 11 wrong)"
+    },
+    {
+      "id": "C2",
+      "text": "the same for reference accuracy, expected NEGATIVE",
+      "result": "HELD",
+      "value": "0.765 vs 0.852, -0.088 [-0.111, -0.052]; key gap -0.290 [-0.318, -0.261] as the sanity check [CORRECTED by SYSTEMATIC-BUDGET: reference accuracy is key-derived, not a free signal]",
+      "denominator": "739 called edges, 8 wrong"
+    },
+    {
+      "id": "C3",
+      "text": "a two-predictor logistic of wrong-direction on agreement and reference accuracy: does either survive the other",
+      "result": "HELD",
+      "value": "answer-agreement +1.511 +- 0.215 (z +7.0), reference accuracy -0.798 +- 0.190 (z -4.2); each survives conditioning on the other",
+      "denominator": "all 891 edges, 44 wrong [18 of the 44 not established by McNemar: SYSTEMATIC-BUDGET (c)]"
+    },
+    {
+      "id": "C4",
+      "text": "OPERATING POINT: if a signal works, the agreement threshold at which declining edges would have removed the wrong calls, and how many correct calls that costs",
+      "result": "DELIVERED",
+      "value": "declining at agreement > 0.70 removes 4 of 8 wrong calls and costs 97 of 731 correct; at 0.85 removes 2 and costs 11: as a HARD GATE the signal is poor (ledger chip GATE FAILS); the table was the wrong instrument for a continuous widener",
+      "denominator": "739 called edges"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "answer-agreement is the stronger signal and gives a difference of +0.05 to +0.15",
+      "result": "FAILED",
+      "value": "+0.267 [+0.150, +0.374]: the stronger signal (HELD in direction), the size too small by a factor of two (the registered band FAILED)",
+      "denominator": "739 called edges"
+    },
+    {
+      "id": "P2",
+      "text": "reference accuracy is weaker and may not survive",
+      "result": "FAILED",
+      "value": "it survives the two-predictor logistic (z -4.2); weaker than agreement (z +7.0)",
+      "denominator": "891 edges"
+    },
+    {
+      "id": "P3",
+      "text": "a usable operating point declines under 15% of called edges to remove most wrong ones",
+      "result": "FAILED",
+      "value": "0.70 threshold: 4 of 8 removed at a cost of 97 of 731 correct (13.3% declined, half removed); 0.85: 2 of 8 at 11 correct",
+      "denominator": "739 called edges"
+    },
+    {
+      "id": "P-power",
+      "text": "POWER CAVEAT: ~6 wrong edges at the 0.975 threshold; a null must be reported as UNDERPOWERED",
+      "result": "n/a",
+      "value": "did not bite: 8 wrong edges, the effect large enough (+0.267) that its interval clears zero; the logistic uses all 44 wrong edges",
+      "denominator": "739 called / 891 edges"
+    }
+  ],
+  "falsifier": {
+    "text": "if none of the three signals predicts a wrong call, the design's fix for its worst flaw (RESOLVE's systematic budget) does not work and the tier map cannot be trusted at the boundaries that matter",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "edges": "891 (anchor, model-pair) edges from RESOLVE-CALIB; 739 called at 0.975, 8 wrong-direction; 44 wrong over all 891",
+    "primary_agreement": "wrong 0.704 vs right 0.437: +0.267 [+0.150, +0.374]",
+    "reference_accuracy": "wrong 0.765 vs right 0.852: -0.088 [-0.111, -0.052] (KEY-DERIVED per the SYSTEMATIC-BUDGET correction; not deployable as a free signal)",
+    "key_gap": "0.066 vs 0.356: -0.290 [-0.318, -0.261] (sanity check, not available at deployment)",
+    "two_predictor_logistic_891": "answer-agreement +1.511 +- 0.215 (z +7.0); reference accuracy -0.798 +- 0.190 (z -4.2)",
+    "operating_point_table": "agreement > 0.70: removes 4 of 8 wrong, costs 97 of 731 correct; > 0.85: removes 2, costs 11",
+    "corrections_by_SYSTEMATIC-BUDGET": "(a) reference accuracy key-derived (rejudge_reference.py L69 / L79); shipped budget carries agreement ONLY though the two-predictor fit is better (LOAO deviance 193.55 vs 216.94); (b) honest denominator 920 edges / 60 wrong / 748 called / 11 wrong = 1.47% (not 0.82% / 1.08%); (c) 18 of 44 wrong-direction labels among the 82 edges McNemar cannot adjudicate (809 adjudicated); b1 3.3133 -> 2.1430 on established edges"
+  },
+  "sentence_of_record": "SYSTEMATIC-SIGNAL (2026-09-14, zero calls): CONFIRMED. Two free signals predict where the bootstrap is confidently wrong, and both survive each other. [CORRECTED 2026-09-14 by SYSTEMATIC-BUDGET: (a) calling reference accuracy a 'free' signal was wrong: it is free of extra CALLS and KEY-DERIVED, so the shipped budget carries answer agreement ONLY; (b) the denominator is selected: on the honest denominator 920 edges, 60 wrong, 748 called with 11 wrong = 1.47%; (c) 41% of the wrong-direction labels are not established (18 of 44 sit among the 82 edges McNemar cannot adjudicate); the effect survives, b1 3.3133 -> 2.1430 on established edges.] As a HARD GATE the signal is poor (4 of 8 wrong removed at 97 of 731 correct); RESOLVE proposes a continuous widener, which a threshold sweep does not test.",
+  "chips": [
+    "CONFIRMED",
+    "GATE FAILS"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-14",
+      "by": "SYSTEMATIC-BUDGET (programme L2371-L2386, be1b0d7; the ledger carries it in the SYSTEMATIC-BUDGET row and the v87 note, not in this row's observed cell)",
+      "text": "three ways, before any of this was published outside the repo: (a) CALLING REFERENCE ACCURACY A 'FREE' SIGNAL WAS WRONG. It is free of extra CALLS and it is KEY-DERIVED (rejudge_reference.references() returns the reference graded against the answer key); it cannot be computed at deployment on unkeyed data; the shipped budget therefore carries answer agreement ONLY, even though adding reference accuracy fits materially better (LOAO deviance 193.55 against 216.94). (b) THE DENOMINATOR IS SELECTED: the 0.82% / 1.08% wrong-call rates rest on the key-gap >= 0.02 filter, unavailable at deployment and dropping edges that are far MORE often wrong; honest denominator 920 edges, 60 wrong, 748 called with 11 wrong = 1.47%. (c) 41% OF THE WRONG-DIRECTION LABELS ARE NOT ESTABLISHED: exact two-sided McNemar adjudicates 809 of the 891; 18 of the 44 'wrong' edges sit among the 82 it cannot; the effect survives (b1 3.3133 -> 2.1430 on established edges only)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "INCONSISTENCIES-PASS (registrar, zero calls; insertion only)",
+      "text": "CORRECTED 2026-09-14 by SYSTEMATIC-BUDGET, carried into THIS row on 2026-09-23 by INCONSISTENCIES-PASS (registrar, zero calls; insertion only) (until now it lived only in the SYSTEMATIC-BUDGET row and the v87 note): (a) calling reference accuracy a 'free' signal was wrong: it is free of extra CALLS and KEY-DERIVED, so the shipped budget carries answer agreement ONLY; (b) the denominator is selected: on the honest denominator 920 edges, 60 wrong, 748 called with 11 wrong = 1.47%; (c) 41% of the wrong-direction labels are not established (18 of the 44 sit among the 82 edges McNemar cannot adjudicate); the effect survives, b1 3.3133 → 2.1430 on established edges. [ledger: observed cell of row SYSTEMATIC-SIGNAL, v132]"
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "that reference accuracy is a deployable (unkeyed) signal (it is key-derived; a per-cell reference accuracy calibrated once on keyed data and carried as a constant is REF-BY-CELL's narrower framing)",
+    "a usable hard gate (the operating-point table was the wrong instrument for a continuous widener; SYSTEMATIC-BUDGET fits the widener)",
+    "a wrong-call rate on an unselected denominator below 1.47%",
+    "that all 44 wrong-direction labels are established (18 are not)"
+  ],
+  "ledger": {
+    "row_id": "SYSTEMATIC-SIGNAL",
+    "version": "v84 (row added at 47bdbec; the corrections are carried in the v87 note and the SYSTEMATIC-BUDGET row, this row's observed cell is unbracketed) [v132 2026-09-23: INCONSISTENCIES-PASS insertion in this row]; [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "TIER-HONEST",
+    "RESOLVE-CALIB",
+    "REF-BY-CELL",
+    "DECOMP"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L2347-L2369 (registration 426016e): question, design, registered readouts (1)-(4), predictions, power caveat, output paths",
+    "docs/judge_v2_program.md L2371-L2422 (outcome bullet 6d50fb3, with the SYSTEMATIC-BUDGET correction bracket L2384-L2400 at be1b0d7): every number, the operating-point table, the power caveat's scoring",
+    "experiment_results/x12_crossdomain/systematic_signal.txt (6d50fb3): the outcome file",
+    "docs/test_ledger.html row SYSTEMATIC-SIGNAL (v84, 47bdbec; v87 note 7623f02): chips verbatim (CONFIRMED / GATE FAILS), observed cell, evidence (systematic_signal.py, 426016e, 6d50fb3); row SYSTEMATIC-BUDGET (55fb9bf, be1b0d7) for the three corrections",
+    "script sha16 = sha256 of tools/analysis/systematic_signal.py at 6d50fb3, first 16 hex (identity, computed by the registrar 2026-09-20; the script was later edited at 13f2142 for the SPLIT-FUNCTION-IMPL pool_guard change)",
+    "criterion ids C1-C4 and prediction ids P1-P3 are the registrar's numbering of the registration's (1)-(4) and its PREDICTIONS sentence; the programme carries no explicit HELD / FAILED scoring for this pre-09-15 test, the scores here are read from the outcome bullet's own words ('too small by a factor of two'; 'the wrong instrument')",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' lines to grep -n regardless of line drift; line numbers re-lined 2026-09-22 as of programme HEAD 6aa2a0d (shift +0 from the batch-1 reading)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "On 891 subject-by-model-pair comparisons, checks whether signals available without extra calls predict where the arena is confidently wrong about which model is better. The signals are how often the two models give the same answer, and how accurate the reference is.",
+    "why": "Confidence intervals were sometimes confidently wrong. This looks for a cheap warning signal to widen uncertainty where errors are likely.",
+    "information": "A predictive signal would let the system flag risky comparisons; none would leave those errors hidden. Result: confirmed as stated, but corrected. High answer agreement between the two models predicts wrong calls. Reference accuracy also predicts them, but it needs the answer key, so only answer agreement can be used in practice. As a hard cut-off the signal is poor, so it is used as a continuous widening instead. Ruled history rather than evidence (older question pool).",
+    "written": "2026-10-07"
+  }
+}

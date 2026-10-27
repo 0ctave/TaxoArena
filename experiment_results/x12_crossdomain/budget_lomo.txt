@@ -1,0 +1,42 @@
+=== BUDGET-LOMO: three fold structures on the same 891 edges (corrected 2026-09-15) ===
+  wrong counts as all(McNemar-established) over the anchor's judged questions.
+
+  fold structure                  scored   called     wrong    nominal     ratio  utility
+  in sample (no holdout)             891      665      2(1)       1.30      1.5x     74.6%
+  raw certificate                    891      739      8(4)       0.83      9.7x   (empirical called set, Gaussian nominal)
+  leave-one-ANCHOR-out (14)          891      663      3(2)       1.27      2.4x     74.4%
+  leave-one-PAIR-out (66)            891      664      3(2)       1.29      2.3x     74.5%
+  leave-one-MODEL-out, last fold wins     891      666      3(2)       1.18      2.5x     74.7%
+  leave-one-MODEL-out, first fold wins     891      668      3(2)       1.30      2.3x     75.0%
+  (under LOMO each edge touches two folds; oof keeps one score per edge, so scored = 891, not 2x)
+
+=== (1) PRIMARY: does the calibration claim survive a MODEL-axis fold? ===
+  LOMO: 666 called, 3 wrong (2 established) against 1.18 nominal = 2.5x (all) / 1.7x (established)
+  LOAO was 2.4x all-labels; the raw certificate 9.7x. The registered falsifier (LOMO worse than the raw
+  certificate) does not fire.
+
+=== (2) DOES b1 SWING WHEN ONE MODEL IS WITHHELD? ===
+  b1 across the 12 LOMO folds: min +2.0529 | median +3.1241 | max +5.3673 | spread 2.61x
+      withhold iask_pro                       b1 = +2.0529
+      withhold Llama-2-13b-hf                 b1 = +2.6435
+      withhold Yi-6b-Chat                     b1 = +2.6600
+      withhold arx_0314                       b1 = +2.6641
+      withhold Llama-2-7b-hf                  b1 = +2.8334
+      withhold c4ai-command-r-v01             b1 = +3.0627
+      withhold Meta-Llama-3_1-8B              b1 = +3.1241
+      withhold gpt-4o-2024-08-06              b1 = +3.5818
+      withhold gemini-3.1-pro_5-shots         b1 = +3.7014
+      withhold Qwen1.5-72B-Chat               b1 = +4.5585
+      withhold Meta-Llama-3_1-70B-Instruct    b1 = +5.0595
+      withhold deepseek-chat-v2_5             b1 = +5.3673
+  NOTE: b0 and b1 co-vary across folds (the review measured corr -0.99), so the swing in b1 alone
+  overstates the swing in tau at mid agreement and understates it at low agreement. Neither
+  'unstable parameter' nor 'stable calibration despite it' is established by this table.
+
+=== (3) UTILITY, and the parameter-free gate on the same edges ===
+  budget under LOMO: 666 called, 3 wrong (2 est), 68 correct surrendered
+  gate A < 0.60: 567 called, 2 wrong (2 est), 166 correct surrendered
+  gate A < 0.65: 608 called, 3 wrong (2 est), 126 correct surrendered
+  gate A < 0.70: 638 called, 4 wrong (3 est), 97 correct surrendered
+  gate A < 0.75: 673 called, 4 wrong (3 est), 62 correct surrendered
+  gate A < 0.80: 707 called, 4 wrong (3 est), 28 correct surrendered

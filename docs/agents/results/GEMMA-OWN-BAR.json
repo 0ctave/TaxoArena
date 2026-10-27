@@ -1,0 +1,159 @@
+{
+ "id": "GEMMA-OWN-BAR",
+ "title": "GEMMA-OWN-BAR: with a gemma-768 separation bar from the record's bar rule on TRAIN-only nulls, does a gemma anchor-free MASSIVE tree build beyond 4 leaves and partition as well as gemma k-means at matched k (T-C1)? (zero calls; REGISTERED 2026-10-03)",
+ "question": "Were M-AF-g's 4 leaves the qwen3-tuned bar, or the recipe?",
+ "kind": "build",
+ "state": "done",
+ "registration": {
+  "commit": "the commit that writes it (parent 2cb20cca)",
+  "program_lines": "docs/judge_v2_program.md L23915-L23927",
+  "program_lines_as_of": "the commit that writes them, parent 2cb20cca, re-grepped",
+  "date": "2026-10-03",
+  "heading": "## Registered 2026-10-03 (before any code or call) — GEMMA-OWN-BAR: with a separation bar calibrated for gemma 768 by the record's own bar rule on TRAIN-only nu ...",
+  "provenance": "docs/agents/plans/2026-10-03_15h_schedule.md (the orchestrator) under the autonomous-scheduling authorisation; criteria etc. the registrar's"
+ },
+ "script": {
+  "path": "gemma-own-bar tooling",
+  "sha16": null,
+  "commit": "25814d1a (branch gemma-own-bar, unmerged)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_gemma_own_bar.md",
+  "commit": "e18fe595",
+  "blob": "9ab575d5 (LF)",
+  "verdict": "READY with conditions C1-C3"
+ },
+ "go": "autonomous-scheduling authorisation (zero calls, cheap)",
+ "run": {
+  "outcome_file": "experiment_results/gemma_own_bar (bar_g.json 76f2ed35..., cal/*, g_af/seed_42 proposals.csv 6107bba1...); never committed; backup E:/TaxoArena_backup_2026-10-03_gemma_own_bar (SHA256SUMS, verified)",
+  "outcome_commit": "ops f375f2aa",
+  "calls": 0,
+  "cce": 0,
+  "pool": "S1 MASSIVE TRAIN (n 9,826; GATE not read)",
+  "date": "2026-10-03"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_gemma_own_bar.md",
+  "commit": "ea335789",
+  "verdict": "VALID (W-1..W-3; D-1..D-3)"
+ },
+ "criteria": [
+  {
+   "id": "GO1",
+   "text": "S1's T-C1 rule: D1 = NMI_fine(G-AF) - mean_s NMI_fine(gemma k-means k = L); EQUIVALENT iff 90% interval inside +/-delta_c (GATE); LOSS / GAIN flags; UNDETERMINED otherwise; 'degenerate tree' if <= 10 leaves. Verdict line: SCOREABLE (|D| 0.005 < reach 0.013) [CORRECTED 2026-10-03 (R1): 'degenerate tree' iff L < 10 (programme Support (f)); F-GO's leaf clause iff L <= 10]",
+   "result": "n/a",
+   "value": "NOT READ: L = 1 (root never split), no tree to score; neither EQUIVALENT nor LOSS; not a scored 'degenerate tree'",
+   "denominator": "MASSIVE EVAL 4,946 / 4,923 (Kish 1.0093)"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "bar_g 0.012 [0.007, 0.020]",
+   "result": "FAILED",
+   "value": "MISSED: bar_g 0.043748 vs [0.007, 0.020] (gemma null p95 0.068082 > qwen3 0.038906)",
+   "denominator": "MASSIVE EVAL 4,946 / 4,923 (Kish 1.0093)"
+  },
+  {
+   "id": "P2",
+   "text": "G-AF leaves 40 [15, 90]",
+   "result": "FAILED",
+   "value": "MISSED: L 1 vs [15, 90]",
+   "denominator": "MASSIVE EVAL 4,946 / 4,923 (Kish 1.0093)"
+  },
+  {
+   "id": "P3",
+   "text": "D1 -0.005 [-0.025, +0.015]; GO1 EQUIVALENT 0.50, LOSS 0.15",
+   "result": "n/a",
+   "value": "not scoreable (GO1 not read); Briers not scoreable",
+   "denominator": "MASSIVE EVAL 4,946 / 4,923 (Kish 1.0093)"
+  }
+ ],
+ "falsifier": {
+  "text": "F-GO fires iff G-AF builds <= 10 leaves under bar_g, or GO1 flags LOSS: the recipe, not only the bar, fails to transfer to gemma 768. [R1 2026-10-03: leaf clause iff L <= 10; 'degenerate' iff L < 10]",
+  "fired": true
+ },
+ "numbers_of_record": {
+  "bar_g": "0.043748 = 0.025 x 0.068082 / 0.038906 (order-statistic range [0.04325, 0.04401]; TRAIN n 9,826)",
+  "L": "1 (root never split in 5 iterations; best min-pair separation 0.02874 < 0.043748)",
+  "relative_root_separation": "gemma 0.42x its null p95 (below all 300 replicates, min 0.0654); qwen3 M-AF root 1.00x (0.039)",
+  "width_only_bar": "0.010885 (descriptive, not run)"
+ },
+ "sentence_of_record": "GEMMA-OWN-BAR VALID. G-AF built L = 1 (the root never split in 5 iterations; best root min-pair separation 0.02874 against the registered embedder-calibrated bar_g 0.043748 = 0.025 × 0.068082 / 0.038906). F-GO FIRES on its leaf clause (L ≤ 10). GO1 NOT READ: the engine refuses a single-leaf anchor-free DAG (no snapshot), so there is no partition to score. GO1 is neither EQUIVALENT nor LOSS, and the 'degenerate tree' mark (L < 10) has no score to attach to. P1 MISSED (0.0437 vs [0.007, 0.020]; the embedder-specific null p95 is HIGHER for gemma 768 than for qwen3 256, opposite to the width rule's direction). P2 MISSED (1 vs [15, 90]). P3 and the Briers not scoreable. Under the registered bar rule, M-AF-g's 4 leaves are NOT attributable to a qwen3-tuned bar that is too strict for gemma: the rule's gemma bar is stricter (0.0437 > 0.025). The F-GO sentence holds only in this form: 'the anchor-free recipe does not build a gemma 768 MASSIVE tree under this rule's embedder-calibrated bar'. Width-only bar 0.0109 descriptive and untested. [W-1: neither root clears its own moment-matched null, never 'below noise' or 'no structure'; W-2: the null records the k-way statistic, the bar gates min-pair (equal only at k = 2), bar_g may be inflated; W-3: both nulls ran at 0.025.]",
+ "chips": [
+  "REGISTERED 2026-10-03, BEFORE ANY CODE; not built",
+  "VALID (POST-RUN ea335789): L = 1; F-GO FIRES (LEAF CLAUSE); GO1 NOT READ",
+  "GEMMA&#x27;S OWN BAR STRICTER (0.0437 &gt; 0.025): STALL NOT A TOO-STRICT qwen3 BAR; W-1 NOT &#x27;BELOW NOISE&#x27;; W-2 k-WAY vs MIN-PAIR; W-3 NULLS AT 0.025"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-03",
+   "by": "registrar (E1-SPLIT-DRAWS POSTRUN 285589ba)",
+   "text": "cross-reference (pre-data): E1-SPLIT-DRAWS's N_e1sd1 (28 leaves) stalled under the same qwen3-tuned bar 0.025: the same mechanism. docs/judge_v2_program.md L23929-L23937 (section \"## E1-SPLIT-DRAWS (2026-10-03, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent 285589ba)"
+  },
+  {
+   "date": "2026-10-03",
+   "by": "registrar (pre-data; R1)",
+   "text": "L = 10 ratified as the programme states: degenerate iff L < 10; F-GO leaf clause iff L <= 10; JSON and ledger slip corrected. Programme bracket at L23923."
+  },
+  {
+   "date": "2026-10-03",
+   "by": "registrar (pre-data; READY C3a / C3b)",
+   "text": "C3a GOB-R1: GO1's verbatim T-C1 decides (D1 over k-means seeds 0-19; spread_K over 0-4); C3b GOB-K1: both nulls run at bar 0.025. Programme L23920, L23918; record L24070-L24074."
+  },
+  {
+   "date": "2026-10-03",
+   "by": "registrar (record note; READY D-1)",
+   "text": "D-1 MEDIUM: compute_go does not assert the arm's world (gemma / massive / salt 1); the code is correct as written (the literal 'M-AF-g'); not a READY condition."
+  },
+  {
+   "date": "2026-10-03",
+   "by": "registrar (POSTRUN ea335789)",
+   "text": "outcome recorded; brackets on S1 Q-1 (L23812), the E1 cross-reference (L23917, re-worded without direction), GO1 (L23922), FALSIFIER (L23925); memo v3 SQ5 and change 6. docs/judge_v2_program.md L24093-L24104 (section \"## GEMMA-OWN-BAR (2026-10-03, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent 65e5c0d7)"
+  }
+ ],
+ "does_not_show": [
+  "that the recipe does not transfer to gemma at any bar (0.025 built 4 leaves; 0.0109 not run)",
+  "that gemma is worse than qwen3 for intents (D3 the author's)",
+  "a null result on GO1",
+  "'below noise' or 'no structure' (W-1)",
+  "a bar_g free of the k-way / min-pair mismatch (W-2) or a null measured at bar_g (W-3)"
+ ],
+ "ledger": {
+  "row_id": "GEMMA-OWN-BAR",
+  "version": "v373 (2026-10-03: OUTCOME bracket, OK + WARN chips) | v362 (2026-10-03: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "INTENT-TRANSFER-S1"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 1,
+  "cpu": "two null runs + one construction + readout",
+  "agent_hours": "about 2 h",
+  "reads_pool": false
+ },
+ "outputs": "never committed: pinned by sha256, backed up to E:",
+ "sources": [
+  "docs/judge_v2_program.md L23915-L23927 (_as_of the commit that writes it, parent 2cb20cca, re-grepped)",
+  "docs/agents/plans/2026-10-03_15h_schedule.md",
+  "docs/reviews/READY_gemma_own_bar.md (merged e18fe595; blob 9ab575d5, LF); docs/judge_v2_program.md L24070-L24074 (_as_of the commit that writes it, parent 56093589, re-grepped)",
+  "docs/reviews/POSTRUN_gemma_own_bar.md (ea335789; blob 79acfa0e, LF)",
+  "docs/judge_v2_program.md L24093-L24104 (section \"## GEMMA-OWN-BAR (2026-10-03, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent 65e5c0d7)"
+ ],
+ "last_update": "2026-10-03",
+ "plain_description": {
+  "sq": "SQ5 Invariance",
+  "what": "An earlier anchor-free tree built with the gemma embedder on MASSIVE intents had only 4 leaves. This test rebuilt it with a separation threshold recalibrated for gemma's own embedding space, rather than the threshold tuned for the default qwen3 embedder.",
+  "why": "It asks whether the tiny gemma tree came from an unfair threshold tuned for another embedder, or from the recipe itself.",
+  "information": "Many leaves would blame the threshold. A tiny tree again would point at the recipe for this embedder. Result: done, valid. The gemma-calibrated threshold came out stricter, not looser (0.044 vs 0.025), and the tree never split (1 leaf), so the comparison with gemma k-means could not be scored. Conclusion, in this form only: the anchor-free recipe does not build a gemma MASSIVE tree under this threshold rule. It does not show the recipe fails at every threshold, nor 'no structure'.",
+  "written": "2026-10-07"
+ }
+}

@@ -1,0 +1,15 @@
+THREAD-CAP B2/B3 run log (run-operator 2026-09-29; main 32c4c72; zero calls)
+23:13:35 wcheck.ps1 pre -> wcheck_pre.txt (W1 FREE x7, no W2 process, W4 31.6 GB)
+23:13:45-23:14:05 table_pins.py main embeddings_cache.db mmlu_pro_dataset_cache_v2.db ag_news_smoke_cache_v1.db -> pins_main_pre.txt (60 PIN lines)
+23:14:13 backup to E:/TaxoArena_backup_2026-09-29/threadcap_b2 (sha256 equal; backup.txt)
+git worktree add --detach .claude/worktrees/threadcap-b2 32c4c72
+23:15:07 b2_leg.sh A12a 12 <SPR>/tc_b2 -> EXIT 0 (A12a/leg.txt, bootrun.log.txt)
+23:16:12 b2_leg.sh A12b 12 -> EXIT 0 ; 23:16:35 b2_leg.sh A8 8 -> EXIT 0
+python experiment_results/lcb_stage0/d9b/helpers/d9b_compare.py <A12a> <A12b> <SPR>/tc_b2/cmp_C2a A A2 -> exit 0 (cmp_C2a/)
+python .../d9b_compare.py <A12a> <A8> <SPR>/tc_b2/cmp_C2b A B -> exit 0 (cmp_C2b/)   [pool_copy_* dirs not kept]
+gradlew threadCapProbeExec --offline --no-daemon with -PjvmThreads=0 / 25 / abc / absent -> EXIT 1 / 1 / 1 / 0 (B3/)
+23:18:13 wcheck.ps1 post -> wcheck_post.txt ; table_pins post -> pins_main_post.txt: diff of 60 PIN lines EMPTY
+table_pins on the worktree copy -> pins_wt_copy_after_A8.txt (queries differs from main: the copy only)
+pool_guard.py --pool p2dca21ab5f4ef3ae -> rc 0 (pool_guard_post.txt)
+worktree removed (git worktree remove hit a long path; the rest deleted by relative path; git worktree prune; list shows none)
+git status: tracked changes .gitignore, config/application.yml, docs/judge_v2_program.md NOT made by this run (peer/author); none touched.

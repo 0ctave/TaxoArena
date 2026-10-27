@@ -1,0 +1,136 @@
+{
+  "id": "H9-REM-FLAG",
+  "title": "H9-REM-FLAG: Block 3 prerequisite: the construction-order shuffle debug flag (constructionOrderShuffleSeed), then the H9-REM order arms o0 / o1-o3 (zero calls)",
+  "question": "Implement a TOML-only, fail-closed, inert-when-absent flag that permutes the arbitrary-but-deterministic orders the 2026-09-07 audit identified (site order inside a depth in the split pass; enumeration order in the four merge passes), then run the registered arms: is the greedy loop's construction-order dependence inside the 20-seed sample floor (Top-1 0.750-0.776, leaves 72-92, mu-match 62-79/87)?",
+  "kind": "engineering",
+  "state": "done",
+  "registration": {
+    "commit": "31ed388",
+    "program_lines": "docs/judge_v2_program.md (lines as of 5dc8a06) L4116-L4151 (flag implemented, arm registered, NOT YET RUN; the review's comparator insertion L4142-L4149: Top-1 read against the same-code unshuffled o0 control, the frozen artifact for mu-match only); by reference L3603 (H9-REM in the construction block)",
+    "date": "2026-09-16",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## H9-REM construction-order shuffle: DEBUG FLAG IMPLEMENTED, ARM REGISTERED (2026-09-16, zero calls, NOT YET RUN)",
+    "outcome_heading": [
+      "L4179: ## Blocks 3-4 engineering landed (2026-09-16, zero calls) — SPLIT-FUNCTION-IMPL + TRAIN-ONLY-TREE, H9-REM flag, PERF-8 memo",
+      "L4205: ## H9-REM ORDER ARMS (2026-09-16, zero calls) — construction-order dependence is an order of magnitude below the sample-draw floor: NEAR-INERT"
+    ]
+  },
+  "script": {
+    "path": "ConstructionOrder.kt (taxonomy.operations); experiment_configs/h9_order/o{0,1,2,3}_s42.toml; readout tools/analysis/h9_stability.py",
+    "sha16": "65833955cc436eeb (h9_stability.py at 394786a)",
+    "commit": "31ed388 (flag; merged 7079ac0); arms run 2d24fcd"
+  },
+  "ready": null,
+  "go": "n/a (0 LLM calls; four label-free constructions ~3.5 min each, pool verified by id after each)",
+  "run": {
+    "outcome_file": "experiment_results/h9_order/h9_order_readout.txt",
+    "outcome_commit": "2d24fcd",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (the 70/30 seed-42 split; verified by id afterwards)",
+    "date": "2026-09-16",
+    "other_files": [
+      "experiment_results/h9_order/o{0,1,2,3}/seed_42 manifests (construction_order_shuffle_seed = null / 1 / 2 / 3; proposal_memo_mode = off)",
+      "ConstructionOrderInertnessTest 4/4, ConstructionOrderTest 5/5"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the adversarial code review of the worktree (MERGEABLE with two LOW fixes applied: cross-check shared by the JSON decoder; [H9-ORDER] warn at every entry point; o0 control added) and its comparator correction by insertion (L4142-L4149) are the checks of record",
+    "commit": "7079ac0",
+    "verdict": "MERGEABLE; the arms ran: order NEAR-INERT (Top-1 spread 0.25pp vs the 2.6pp seed floor; 85-86 of 86 leaves re-identified)"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "registered readout (h9_stability.py): Top-1 and leaf count vs the same-code seed-42 UNSHUFFLED rebuild o0 (alpha bar 2.5pp); mu-match / leaf identity vs the July frozen artifact",
+      "result": "HELD",
+      "value": "Top-1 o0 / o1 / o2 / o3 0.7719 / 0.7735 / 0.7735 / 0.7744, spread 0.25pp (alpha bar 2.5pp PASS; 20-seed floor 2.6pp); leaves 86 in every arm (frozen 87; seed range 72-92); depth 6 / 6 / 6 / 5; anchor drift 0.52-0.53pp vs frozen (bar 5pp); mu-match vs frozen 81 / 81 / 81 / 79 of 87; arm-vs-arm vs o0 at cos >= 0.95: 86 / 86 / 85 of 86 (at >= 0.99: 86 / 83 / 78); loosest pair o2 vs o3 85/86 (min best-cos 0.842); o0 vs frozen 0.772 vs 0.775 and 81/87 = the same-code drift REGISTRATION.md discloses (0.9pp), not order",
+      "denominator": "4 arms x 86 leaves; the frozen artifact's 87 leaves; the 20-seed floor"
+    },
+    {
+      "id": "C0",
+      "text": "FAIL-CLOSED and INERT: unknown key fatal; non-integer fatal; refused on a run that constructs nothing; effective value must come from the run's own config; inert when absent (golden replay: topology SHA-256 c0fb70a1...a36ace, 18 nodes / 10 leaves, pinned on the UNMODIFIED loop; the absent path returns the caller's own list, assertSame)",
+      "result": "HELD",
+      "value": "ConstructionOrderInertnessTest 4/4, ConstructionOrderTest 5/5; seed 1 visits the iteration-1 split sites in a different order ([n4,n2,n3] -> [n3,n4,n2]) and reproduces itself",
+      "denominator": "in-JVM synthetic mini construction (3 anchors x 2 vMF sub-modes, 600 points)"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "(the audit's) Top-1 inside the seed band; leaf identity moves; if leaf count and mu-match fall INSIDE the seed floor, the seed spread is not sample-only",
+      "result": "HELD",
+      "value": "Top-1 inside (spread 0.25pp); leaf identity moves little (85-86 of 86 at 0.95; 78-86 at 0.99); leaves 86 and mu-match 79-81 inside the seed floor: order dependence exists and is an order of magnitude below the sample draw",
+      "denominator": "4 arms"
+    }
+  ],
+  "falsifier": {
+    "text": "none registered (a prerequisite flag plus a descriptive arm readout against the seed floor)",
+    "fired": false,
+    "note": "the audit's 'greedy order-dependence' risk is bounded and closed as a construction-variance term below the seed floor; the H9-REM row closes with this readout"
+  },
+  "numbers_of_record": {
+    "flag": "constructionOrderShuffleSeed = <long>; permutes the split-pass site order inside a depth and the enumeration order in the four merge passes (starved-leaf, sibling merge incl. the cluster[0] survivor choice, redundant pairs, passthrough collapse) as a pure function of (seed, iteration, pass tag); NOT permuted: the deepest-first depth schedule and the ascending-k first-accept rule; side finding fixed: DiagnosticsBundle.open() never reset its row counters",
+    "arms": "o0 (control, key absent), o1 / o2 / o3 (seed 1 / 2 / 3); runs 89, 84, 84, 82 s; manifests construction_order_shuffle_seed null / 1 / 2 / 3, proposal_memo_mode off; source not dirty; no tracked file changed",
+    "readout": "Top-1 0.7719 / 0.7735 / 0.7735 / 0.7744 (spread 0.25pp); leaves 86 x 4; depth 6 / 6 / 6 / 5; anchor drift 0.52-0.53pp; mu-match vs frozen 81 / 81 / 81 / 79 of 87; vs o0 at cos >= 0.95 86 / 86 / 85, at >= 0.99 86 / 83 / 78; o2 vs o3 85/86 (min best-cos 0.842); o0 vs frozen 0.772 vs 0.775, 81/87 (same-code drift 0.9pp)",
+    "not_run": "the gemma embedding arm (Ollama fault, parked)"
+  },
+  "sentence_of_record": "H9-REM ORDER ARMS (2026-09-16, zero calls): construction-order dependence is an order of magnitude below the sample-draw floor: NEAR-INERT. The greedy loop's proposal / acceptance ORDER moves Top-1 by a quarter of a point (0.25pp across four arms, against the 2.6pp seed floor) and re-identifies 85-86 of 86 leaves, against a sample-draw floor that moves Top-1 by 2.6pp and re-identifies 62-79 of 87. Order dependence exists (o3 the most different arm: depth 5, 78 leaves matched at 0.99) and is small; the audit's 'greedy order-dependence' risk is bounded here and closed as a construction-variance term below the seed floor. The H9-REM row closes with this readout.",
+  "chips": [
+    "FLAG IMPLEMENTED",
+    "ARMS RUN: ORDER NEAR-INERT"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-16",
+      "by": "review fix, inserted in the arm registration (programme L4142-L4149, 31ed388 lineage)",
+      "text": "the COMPARATOR for the Top-1 readout is NOT the July frozen artifact (it predates the bareq512 promotion and later code changes, so a difference would confound order-dependence with code drift); Top-1 and leaf count are read against the same-code seed-42 UNSHUFFLED rebuild o0 (the key ABSENT; ConstructionOrderInertnessTest certifies absent == pre-flag); the frozen artifact is kept for mu-match / leaf identity only; any o0-vs-frozen gap is reported as code drift, not as order-dependence."
+    },
+    {
+      "date": "2026-09-16",
+      "by": "ledger v107 (the [RUN 2026-09-16] insertion in the observed cell)",
+      "text": "the arms ran: Top-1 0.7719 / 0.7735 / 0.7735 / 0.7744 (spread 0.25pp against the 2.6pp twenty-seed floor; alpha bar 2.5pp PASS), leaves 86 in every arm, mu-match vs frozen 81 / 81 / 81 / 79 of 87; the audit's greedy-order risk closes as a variance term below the seed floor; the gemma arm stays parked."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "INCONSISTENCIES-PASS (registrar, zero calls; insertion only)",
+      "text": "NAME 2026-09-23 by INCONSISTENCIES-PASS (registrar, zero calls; insertion only): the programme id of the order-arm work is H9-REM-FLAG ('## Blocks 3-4 engineering landed (2026-09-16, zero calls) — SPLIT-FUNCTION-IMPL + TRAIN-ONLY-TREE, H9-REM flag, PERF-8 memo'; section-7 row H9-REM-FLAG, record docs/agents/results/H9-REM-FLAG.json); this row keeps its name; nothing renamed. [ledger: observed cell of row H9-REM, v132]"
+    }
+  ],
+  "does_not_show": [
+    "order dependence on an anchor-free tree (H9-REM is on the ANCHORED tree, where the depth-1 layer is fixed by the labels; ANCHOR-FREE-REDRAW's R4 measured it there: byte-inert on membership)",
+    "the gemma embedding arm (parked)"
+  ],
+  "ledger": {
+    "row_id": "H9-REM-FLAG",
+    "version": "v107 (row added v106 at fd21fec; [RUN] insertion v107) [v132 2026-09-23: INCONSISTENCIES-PASS insertion in this row]"
+  },
+  "depends_on": [
+    "H9-1",
+    "H9-EXT",
+    "SPLIT-RATIO-SEEDS",
+    "PERF-8-MEMO"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "construction-order dependence on the anchored tree (CONTEXT / ANCHOR-FREE-REDRAW's closed-lines check: 'H9-REM closed construction-order dependence on the ANCHORED tree, near-inert')"
+  },
+  "sources": [
+    "docs/judge_v2_program.md (lines as of 5dc8a06) L4116-L4151 (flag implemented, arm registered; the review's comparator insertion L4142-L4149; 31ed388), L4194-L4196 (Blocks 3-4 landed, c0f5ff7)",
+    "docs/judge_v2_program.md (lines as of 5dc8a06) L4205-L4222 (H9-REM ORDER ARMS outcome section 2d24fcd): arms, readout, reading",
+    "experiment_results/h9_order/h9_order_readout.txt (2d24fcd)",
+    "docs/test_ledger.html row H9-REM-FLAG (v106 fd21fec; [RUN] v107): chips verbatim, observed cell, evidence (ConstructionOrder.kt, experiment_configs/h9_order/, 31ed388, 7079ac0)",
+    "script sha16 = sha256 of tools/analysis/h9_stability.py at 394786a (the readout's only commit), first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' lines (grep -n them regardless of line drift); line numbers are as of programme HEAD 5dc8a06"
+  ],
+  "last_update": "2026-09-23",
+  "plain_description": {
+    "sq": "SQ5 Invariance",
+    "what": "Adds a debug setting that shuffles the order in which the tree builder considers splits and merges. It rebuilds the topic-labelled tree under 3 shuffled orders plus an unshuffled control. No judge calls.",
+    "why": "An audit flagged that the greedy builder may depend on processing order. This test measures how much.",
+    "information": "If order effects are as large as drawing a new data sample, the tree is fragile. If much smaller, the risk is bounded. Result: order dependence exists but is close to inert. Top-1 accuracy moves by only 0.25 points, against 2.6 points across data re-draws, and 85-86 of 86 leaves are recovered. Shown on the labelled tree only.",
+    "written": "2026-10-07"
+  }
+}

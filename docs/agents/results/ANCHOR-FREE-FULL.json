@@ -1,0 +1,126 @@
+{
+  "id": "ANCHOR-FREE-FULL",
+  "title": "ANCHOR-FREE-FULL: the embeddings-only tree on the FULL corpus (STRUCTURAL EVIDENCE ONLY; never arena-bound)",
+  "question": "What does the embeddings-only tree look like when grown on the full corpus (testRatio 0.001, ~11,990 of the 12,000 MMLU-Pro questions on the construction side)? This tree has SEEN the arena pool p2dca and is refused for judging by the TRAIN-ONLY guard; readouts against the train-only anchor-free tree of record.",
+  "kind": "build",
+  "state": "done",
+  "registration": {
+    "commit": "f26e057",
+    "program_lines": "docs/judge_v2_program.md (lines as of 5dc8a06) L4465-L4477",
+    "date": "2026-09-17",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-17 (before running) — ANCHOR-FREE-FULL: the embeddings-only tree on the FULL corpus (STRUCTURAL EVIDENCE ONLY; never arena-bound)",
+    "outcome_heading": [
+      "L4539: ## ANCHOR-FREE-FULL (2026-09-17, zero judge calls; STRUCTURAL EVIDENCE ONLY, never arena-bound) — 36% more leaves, the same first split, count up and share down in certification"
+    ]
+  },
+  "script": {
+    "path": "tools/analysis/anchor_free_readout.py (arm experiment_configs/anchorfree/af_full_s42.toml)",
+    "sha16": "203b62c09b7cfd36",
+    "commit": "e355764"
+  },
+  "ready": null,
+  "go": "n/a (0 judge calls; one construction + one 300-rep site null)",
+  "run": {
+    "outcome_file": "experiment_results/anchorfree/anchor_free_full_readout.txt",
+    "outcome_commit": "11a80fe",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p7f7ce1d0b7a2dd59 (testRatio 0.001: 11,757 train queries, 11 judgeable ids held out); NOT the pool of record; the tree has seen p2dca",
+    "date": "2026-09-17",
+    "other_files": [
+      "experiment_results/anchorfree/site_null_af_full_s42.csv"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the adversarial check of record is the one the programme names: EXPLORATORY, STRUCTURAL EVIDENCE ONLY; no adversarial recomputation recorded",
+    "commit": "11a80fe",
+    "verdict": "descriptive; adjudicates nothing; never arena-bound"
+  },
+  "criteria": [
+    {
+      "id": "readout",
+      "text": "no criterion; leaves, depth, largest leaf, certified sites and share, IN-SAMPLE majority-label purity (not comparable to held-out figures), key-only LOO Brier with the F2-CLEAN caveat, migration matrix, mu-match",
+      "result": "DELIVERED",
+      "value": "full corpus vs train-only record: leaves / nodes / depth 110 / 204 / 8 vs 81 / 150 / 7; depth-1 cells 2 (same axis) vs 2; certified 18 of 94 (19%; d0 1, d1 2, d2 4, d3 5, d4 4, d5 1, d6 1) vs 16 of 69 (23%); in-sample majority-label purity 0.748 [0.733, 0.762] (record's train-side 0.714; its 0.715 is held-out, not comparable); key-only +13.60 (+0.40 [-0.18, +1.00]; cells saw the scored questions); key profile R at leaves 0.835 (10 cells) vs 0.829 (21); leaves matched to the record 68 of 81",
+      "denominator": "11,757 train queries; site null 300 reps; build 175 s"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "leaves ~ +40%",
+      "result": "HELD",
+      "value": "+36%",
+      "denominator": "110 vs 81"
+    },
+    {
+      "id": "P2",
+      "text": "certified sites up in count and roughly flat in share",
+      "result": "FAILED",
+      "value": "count HELD (18 vs 16); share FAILED (23 -> 19%, down)",
+      "denominator": "94 vs 69 sites"
+    },
+    {
+      "id": "P3",
+      "text": "the same first split (quantitative / discursive)",
+      "result": "HELD",
+      "value": "two depth-1 cells on the same axis",
+      "denominator": "depth-1"
+    },
+    {
+      "id": "P4",
+      "text": "in-sample purity a few points above the train-only tree's train-side purity",
+      "result": "HELD",
+      "value": "0.748 vs 0.714",
+      "denominator": "in-sample"
+    }
+  ],
+  "falsifier": {
+    "text": "none (EXPLORATORY; adjudicates nothing; never arena-bound)",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "table": "leaves 110 / nodes 204 / depth 8 vs 81 / 150 / 7; certified 18 of 94 (19%) vs 16 of 69 (23%); in-sample purity 0.748 [0.733, 0.762]; key-only +13.60 (+0.40 [-0.18, +1.00]); mu-match 68 of 81",
+    "reading": "45% more data buys 36% more leaves and two more certified sites; the extra certified sites sit at depths 2-4; the share falls because the new sites are mostly small: data is a leaf lever, not a certification-share lever, on this corpus"
+  },
+  "sentence_of_record": "ANCHOR-FREE-FULL (2026-09-17, zero judge calls; STRUCTURAL EVIDENCE ONLY, never arena-bound): 36% more leaves, the same first split, count up and share down in certification (18 of 94 = 19% vs 16 of 69 = 23%). Data is a leaf lever, not a certification-share lever, on this corpus. Nothing here may be judged, induced from, or published as a board.",
+  "chips": [
+    "STRUCTURAL EVIDENCE ONLY",
+    "SAME FIRST SPLIT, +36% LEAVES",
+    "SHARE DOWN 23 -> 19%"
+  ],
+  "brackets": [],
+  "does_not_show": [
+    "a held-out purity (there is no held-out set; the 0.748 is in-sample)",
+    "anything judged, induced or published from this tree (refused by the TRAIN-ONLY guard)"
+  ],
+  "ledger": {
+    "row_id": "ANCHOR-FREE-FULL",
+    "version": "v111 (85a661e)"
+  },
+  "depends_on": [
+    "ANCHOR-FREE",
+    "SPLIT-RATIO",
+    "SPLIT-FUNCTION-IMPL"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md (lines as of 5dc8a06) L4465-L4477 (registration f26e057): arm, hygiene, readouts, prediction",
+    "docs/judge_v2_program.md (lines as of 5dc8a06) L4539-L4558 (outcome section 11a80fe): the table, the prediction scored, the reading",
+    "experiment_results/anchorfree/anchor_free_full_readout.txt (11a80fe)",
+    "docs/test_ledger.html row ANCHOR-FREE-FULL (v111): chips verbatim, evidence (af_full_s42.toml, readout, site null, 11a80fe)",
+    "script sha16 = sha256 of tools/analysis/anchor_free_readout.py at e355764, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' lines (grep -n them regardless of line drift); line numbers are as of programme HEAD 5dc8a06"
+  ],
+  "last_update": "2026-09-22",
+  "plain_description": {
+    "sq": "SQ3 Taxonomy",
+    "what": "Grows the embeddings-only tree (no declared subject labels) on almost all 12,000 MMLU-Pro questions instead of only the training share, and compares it with the train-only tree of record. No judge calls.",
+    "why": "Asks whether the tree's shape depends on how much data it is grown from: more leaves, a different first split, more certified splits?",
+    "information": "If more data gave a higher share of certified splits, data size would be a way to get a more trustworthy tree. If it only adds leaves, data is not the bottleneck. Result: done, structural evidence only. With the full corpus the tree has 36% more leaves and the same first split. More splits certify (18 vs 16), but a smaller share of them (19% vs 23%). On this corpus, data adds leaves but does not raise the certified share. This tree has seen the arena questions, so it may never be judged, used to write rubrics or published as a leaderboard.",
+    "written": "2026-10-07"
+  }
+}

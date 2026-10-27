@@ -1,0 +1,223 @@
+{
+  "id": "EMBED-DIM-SLICE",
+  "title": "EMBED-DIM-SLICE: is S0's fine-level 'gemma beats qwen3' (C1a; SLOTSWAP M3) an artefact of the 256-d slice? qwen3 at 256/512/1024/4096 vs gemma at 256/768, each slice chosen on GATE, EVAL read once (zero calls; REGISTERED)",
+  "question": "On S0's pinned intent corpora and embeddings, is S0's \"gemma beats qwen3 at the fine level\" (C1a, 2 of 3 corpora; SLOTSWAP M3) an artefact of the 256-d slice, which keeps 6% of qwen3's 4096 dims and 33% of gemma's 768?",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "the commit that writes this record (parent a5c88533)",
+    "program_lines": "docs/judge_v2_program.md L22579-L22607",
+    "program_lines_as_of": "the commit that writes them, parent a5c88533, re-grepped",
+    "date": "2026-10-01",
+    "heading": "## Registered 2026-10-01 (before any code or call) — EMBED-DIM-SLICE: on S0's pinned intent corpora and embeddings, ...",
+    "provenance": "docs/agents/plans/2026-10-02_embed_dim_slice.md (a5c88533) '## Registration text (for the registrar)', registered as written; the author's order \"run the dimension test first\" (plan Amendment 32)"
+  },
+  "script": {
+    "path": "tools/analysis/embed_dim_slice.py",
+    "sha16": "blob:068550b4f7a5a918 (git hash-object, LF, of record; full blob:068550b4f7a5a918b9bd1f3e9c2ae4e4a86a9b44)",
+    "commit": "91e738d7 (merge of embed-dim-slice 1d27b6a3 by path)"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_embed_dim_slice.md",
+    "commit": "d26afd88",
+    "verdict": "MERGEABLE; --run READY after merge under C1-C4 (C1 main only, blob 068550b4, no Ollama run in the window; C2 post-run recomputation from nmi_matrix.csv and BASIC CIs, closes D1 MEDIUM; C3 EB7 admissible; C4 EB5/EB6 bracketed)"
+  },
+  "go": "n/a (0 calls, 0 cce); the author's order \"run the dimension test first\" (plan Amendment 32)",
+  "run": {
+    "outcome_file": "experiment_results/embed_dim_slice/outcome.txt (blob:b183890be7554164f03dfe1eea70bf5ee9738e92, LF, git hash-object; nmi_matrix.csv blob:1056bad95a5353f0060f4c24e0cc392975e3bf2d)",
+    "outcome_commit": "54ea7329",
+    "calls": 0,
+    "cce": 0,
+    "pool": "none (S0's pinned intent DBs; pins unchanged before/after)",
+    "date": "2026-10-01",
+    "script": "tools/analysis/embed_dim_slice.py blob:068550b4f7a5a918b9bd1f3e9c2ae4e4a86a9b44 (LF)"
+  },
+  "review": {
+    "file": "docs/reviews/POSTRUN_embed_dim_slice.md",
+    "commit": "b249529b",
+    "verdict": "VALID; DS1 REOPEN-CANDIDATE and F-DS FIRED reproduced to the digit from nmi_matrix.csv + BASIC CIs (C2 discharged); notes N1 (CLINC wording, MEDIUM), N2 (survives not unchanged, MEDIUM), N3-N5 LOW; wording conditions W1-W5 applied by the registrar"
+  },
+  "criteria": [
+    {
+      "id": "IDENTITY",
+      "text": "precondition (refuses, no readout): qwen3@256 and gemma@256 reproduce S0's fine D +0.03340 / -0.00691 / +0.05628 (5 dp) and S at seed 0 0.7598 / 0.8262",
+      "result": "HELD",
+      "value": "REPRODUCED: D(256) +0.03340 / -0.00691 / +0.05628; S seed 0 0.7598 / 0.8262",
+      "denominator": "3 corpora + MASSIVE S"
+    },
+    {
+      "id": "DS1",
+      "text": "DECIDING; POINT AND INTERVAL (one conjunctive clause, S0's C1 rule): per corpus D* = mean_s NMI_EVAL(gemma, d_g*) - mean_s NMI_EVAL(qwen3, d_q*) at K_f 60/150/77; BETTER iff D* > bar AND BASIC CI > 0; WORSE symmetric; else NEITHER; bar = max(MDE80, in-run seed spread of either arm). REOPEN-CANDIDATE iff gemma BETTER on >= 2 of 3; KEEP iff <= 1; KEEP-STRONG iff gemma WORSE on >= 2 of 3. No UNDETERMINED. KEEP words: 'not shown', never 'explained by the slice' [2026-10-01 C2: post-run review recomputes bar and status from nmi_matrix.csv and BASIC CIs]",
+      "result": "DELIVERED",
+      "value": "REOPEN-CANDIDATE (gemma BETTER on 2 of 3) at d_q* 1024, d_g* 768 (GATE-selected before EVAL): MASSIVE D* +0.03329 BASIC [+0.02961, +0.03998] bar 0.01428 BETTER; CLINC -0.00244 [-0.00560, -0.00048] bar 0.00968 NEITHER (inside its seed-spread bar; never \"gemma worse\", never parity, N1); Banking77 +0.04386 [+0.04108, +0.04990] bar 0.01216 BETTER. Classification invariant to the qwen3 slice (review robustness, point clause only)",
+      "denominator": "EVAL fine: MASSIVE 4,946 items / 4,923 components; CLINC 6,672 / 6,672; Banking77 3,908 / 3,905"
+    },
+    {
+      "id": "DS2",
+      "text": "DESCRIPTIVE-ONLY: qwen3 NMI(d) - NMI(256), d in {512, 1024, 4096}, per corpus; gemma 768 - 256",
+      "result": "n/a",
+      "value": "DESCRIPTIVE-ONLY: qwen3 NMI(1024)-NMI(256) +0.00130 / +0.00012 / +0.00909; gemma 768-256 +0.00119 / +0.00459 / -0.00333",
+      "denominator": "as DS1"
+    },
+    {
+      "id": "DS3",
+      "text": "DESCRIPTIVE-ONLY: S(gemma, d_g*) - S(qwen3, d_q*) on MASSIVE, K 60, mean seeds 0-4, component-bootstrap CI",
+      "result": "n/a",
+      "value": "DESCRIPTIVE-ONLY: S(gemma@768)-S(qwen3@1024) +0.03650 [+0.02544, +0.04742] (percentile; BASIC [+0.02557, +0.04755])",
+      "denominator": "3,222 variants / 3,207 components"
+    },
+    {
+      "id": "DS4",
+      "text": "DESCRIPTIVE-ONLY: H per arm on MASSIVE and CLINC with item-bootstrap interval and size-matched random p95 [2026-10-01 C4/EB5: item-bootstrap = TRAIN-component bootstrap]",
+      "result": "n/a",
+      "value": "DESCRIPTIVE-ONLY; not quoted beyond that (N4: H flat across qwen3 512-4096; dropped-labels unit unstated)",
+      "denominator": "60 / 150 labels"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "d_q* in {1024, 4096} 0.55, = 512 0.30, = 256 0.15; d_g* = 768 0.75",
+      "result": "HELD",
+      "value": "d_q* = 1024 (in {1024, 4096}, p 0.55, Brier 0.2025); d_g* = 768 (p 0.75, Brier 0.0625)",
+      "denominator": "GATE: 1,691 / 2,333 / 1,290 in-scope items"
+    },
+    {
+      "id": "P2",
+      "text": "qwen3 NMI(d_q*) - NMI(256): +0.010 [0.000, +0.025] on each corpus (80%)",
+      "result": "HELD",
+      "value": "+0.00130 / +0.00012 / +0.00909, all in [0.000, +0.025] (3 of 3)",
+      "denominator": "as DS1"
+    },
+    {
+      "id": "P3",
+      "text": "D*: MASSIVE +0.022 [+0.005, +0.040]; CLINC -0.012 [-0.025, +0.002]; Banking77 +0.045 [+0.030, +0.060] (80%)",
+      "result": "HELD",
+      "value": "MASSIVE +0.03329, CLINC -0.00244, Banking77 +0.04386, each inside its 80% interval (3 of 3)",
+      "denominator": "as DS1"
+    },
+    {
+      "id": "P4",
+      "text": "verdict KEEP 0.55 (KEEP-STRONG 0.05), REOPEN-CANDIDATE 0.45",
+      "result": "FAILED",
+      "value": "modal KEEP (p 0.55) did not occur; REOPEN-CANDIDATE (p 0.45) occurred; Brier 0.3025",
+      "denominator": "3 corpora"
+    },
+    {
+      "id": "P5",
+      "text": "DS3 +0.055 [+0.030, +0.080] (80%)",
+      "result": "HELD",
+      "value": "DS3 +0.03650 in [+0.030, +0.080]",
+      "denominator": "3,222 variants / 3,207 components"
+    },
+    {
+      "id": "P6",
+      "text": "gemma H > qwen3 H on MASSIVE at every qwen3 slice 0.85; qwen3 H non-decreasing in d on both corpora 0.50 [2026-10-01 C4/EB6: gemma read at d_g*]",
+      "result": "HELD",
+      "value": "gemma H > qwen3 H on MASSIVE at every qwen3 slice (p 0.85, Brier 0.0225); qwen3 H non-decreasing (p 0.50, Brier 0.2500) HELD through ties (N4). Mean Brier over 9 probability events 0.1397",
+      "denominator": "60 / 150 labels"
+    }
+  ],
+  "falsifier": {
+    "text": "F-DS fires iff DS1 reads REOPEN-CANDIDATE: overturns the working hypothesis that S0's gemma > qwen3 at the fine level is a slice artefact; S0 C1a and SLOTSWAP M3's descriptive rows then survive the dimension confound (RAW prompts, mismatched quantisation); no recorded number revised",
+    "fired": true
+  },
+  "numbers_of_record": {
+    "support": "DEFF (Kish, measured in S0) 1.0093 / 1.0000 / 1.0015; n_eff 4,900 / 6,672 / 3,902; SE(D) transported from S0 at 256 0.00289 / 0.00137 / 0.00247; MDE80 0.0081 / 0.0038 / 0.0069; planning bars 0.0246 / 0.0094 / 0.0143 (bar of record = in-run spread)",
+    "verdict_line": "DS1 SCOREABLE as a 2-of-3 classification (Banking77 SCOREABLE; CLINC, MASSIVE DESCRIPTIVE-ONLY at their predicted points); DS2, DS3, DS4 DESCRIPTIVE-ONLY",
+    "structural_leg": "inside the in-run seed spread a corpus reads NEITHER at any budget (KEEP by construction on that corpus)",
+    "selection": "GATE score qwen3 256 0.85697 / 512 0.857 / 1024 0.8634 / 4096 0.86247 -> d_q* 1024 (near-tie, 4096 0.00093 below); gemma 256 0.88529 / 768 0.88752 -> d_g* 768; selection.json sha256 f1b508cf... written before the first EVAL read",
+    "DS1_massive": "D* +0.03329, 95% BASIC [+0.02961, +0.03998], bar 0.01428 -> BETTER; n 4,946 EVAL items / 4,923 components",
+    "DS1_clinc": "D* -0.00244, 95% BASIC [-0.00560, -0.00048], bar 0.00968 -> NEITHER; n 6,672 / 6,672",
+    "DS1_banking77": "D* +0.04386, 95% BASIC [+0.04108, +0.04990], bar 0.01216 -> BETTER; n 3,908 / 3,905",
+    "DS1_verdict": "REOPEN-CANDIDATE (2 of 3); F-DS FIRED",
+    "slice_share_of_edge": "Banking77 D +0.05628 (256/256) -> +0.04386 (1024/768); DS3 S +0.0664 (SLOTSWAP M3, seed 0) -> +0.03650 [+0.02544, +0.04742] (seed mean; 3,222 variants)"
+  },
+  "sentence_of_record": "EMBED-DIM-SLICE (2026-10-01, 0 calls; run 54ea7329, post-run review b249529b VALID): at each embedder's GATE-selected slice (qwen3 1024, gemma 768), gemma's fine edge survives the slice confound on >= 2 of 3 corpora: MASSIVE BETTER (D* +0.03329, BASIC [+0.02961, +0.03998], bar 0.01428; 4,946 EVAL items), Banking77 BETTER (+0.04386 [+0.04108, +0.04990], bar 0.01216; 3,908), CLINC NEITHER (inside its seed-spread bar 0.00968; 6,672); DS1 REOPEN-CANDIDATE, F-DS FIRED. [quantisation (qwen3 Q4_K_M vs gemma BF16) and prompt protocol (RAW on both sides) UNCONTROLLED: the result does not separate the embedders from their quantisation; the edge survives, it is not unchanged: the slice explains part of it (Banking77 D +0.056 -> +0.044; DS3 S +0.066 -> +0.037); REOPEN-CANDIDATE is a candidate, not a reopening: this test alone never changes the embedder of record, D3 stands; DS2-DS4 DESCRIPTIVE-ONLY; intent corpora only, nothing about MMLU-Pro]",
+  "chips": [
+    "REGISTERED; not built [plan]",
+    "READY d26afd88 / MERGED 91e738d7 (C1&ndash;C4) [plan]",
+    "VALID (POST-RUN b249529b); RUN 54ea7329: DS1 REOPEN-CANDIDATE (GEMMA@768 BETTER THAN QWEN3@1024 ON MASSIVE, BANKING77; CLINC NEITHER); F-DS FIRED [ok]",
+    "QUANTISATION: Q4_K_M ~ Q8_0 (EMBED-QUANT); ABOVE Q8_0 UNTESTED; PROMPTS RAW UNCONTROLLED; EDGE SURVIVES, NOT UNCHANGED; EMBEDDER OF RECORD UNCHANGED (D3 STANDS) [warn]"
+  ],
+  "brackets": [
+    {
+      "date": "2026-10-01",
+      "by": "registrar (per docs/reviews/READY_embed_dim_slice.md (d26afd88))",
+      "text": "C3 (EB7): the dry-run identity reads EVAL only for S0's own 256 arms (values of record, before any selection); ADMISSIBLE; pre-data; docs/judge_v2_program.md L22719-L22723 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data) — EMBED-DIM-SLICE built, merged (91e738d7) and READY (d26afd88) under C1-C4; ...\"; _as_of the commit that writes it, parent 91e738d7, re-grepped)"
+    },
+    {
+      "date": "2026-10-01",
+      "by": "registrar (per docs/reviews/READY_embed_dim_slice.md (d26afd88))",
+      "text": "C4 (EB5): DS4's \"item-bootstrap\" read as the TRAIN-component bootstrap; (EB6): P6 reads gemma at d_g*; pre-data; docs/judge_v2_program.md L22719-L22723 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data) — EMBED-DIM-SLICE built, merged (91e738d7) and READY (d26afd88) under C1-C4; ...\"; _as_of the commit that writes it, parent 91e738d7, re-grepped)"
+    },
+    {
+      "date": "2026-10-01",
+      "by": "registrar (per docs/reviews/READY_embed_dim_slice.md (d26afd88))",
+      "text": "C2: the post-run review recomputes the bar and each DS1 status from nmi_matrix.csv and the BASIC CIs (closes D1); pre-data; docs/judge_v2_program.md L22719-L22723 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data) — EMBED-DIM-SLICE built, merged (91e738d7) and READY (d26afd88) under C1-C4; ...\"; _as_of the commit that writes it, parent 91e738d7, re-grepped)"
+    },
+    {
+      "date": "2026-10-01",
+      "by": "registrar (per docs/reviews/READY_embed_dim_slice.md (d26afd88))",
+      "text": "merged on main 91e738d7, blob:068550b4 (LF); pre-data; docs/judge_v2_program.md L22719-L22723 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data) — EMBED-DIM-SLICE built, merged (91e738d7) and READY (d26afd88) under C1-C4; ...\"; _as_of the commit that writes it, parent 91e738d7, re-grepped)"
+    },
+    {
+      "date": "2026-10-01",
+      "by": "registrar (per docs/reviews/POSTRUN_embed_dim_slice.md (b249529b))",
+      "text": "OUTCOME recorded, VALID; wording N1, N2, W1-W5 applied; EMBED-QUANT recommendation trigger MET (download and go the author's, pending); docs/judge_v2_program.md L22725-L22736 (section \"## EMBED-DIM-SLICE (2026-10-01, 0 calls) — VALID (post-run review docs/reviews/POSTRUN_embed_dim_slice.md, b249529b): DS1 REOPEN-CANDIDATE ...\"; _as_of the commit that writes it, parent b249529b, re-grepped)"
+    },
+    {
+      "date": "2026-10-01",
+      "by": "EMBED-QUANT (registrar; W-EQ-1 of docs/reviews/POSTRUN_embed_quant.md, 0342bb94)",
+      "text": "the quantisation half of the sentence-of-record bracket is NARROWED, not deleted: read 'quantisation: Q4_K_M ~ Q8_0 (EMBED-QUANT); above Q8_0 untested; prompts RAW'. Quantisation is not shown to explain the edge (Q4->Q8 upper bound about +0.004, about a tenth of D*); prompts UNCONTROLLED until CP1; D3 stands. Warn chip narrowed in ledger v333; bracket appended at the CONFOUNDS line (L22733) of section \"## EMBED-DIM-SLICE (2026-10-01, 0 calls) — VALID ...\"; docs/judge_v2_program.md L22833-L22844 (section \"## EMBED-QUANT (2026-10-01, 0 calls) — VALID (post-run review docs/reviews/POSTRUN_embed_quant.md, 0342bb94): EQ1 NOT-A-CONFOUND ...\"; _as_of the commit that writes it, parent 0342bb94, re-grepped)"
+    }
+  ],
+  "does_not_show": [
+    "that gemma is a better embedder: this test alone never changes the embedder of record; D3 stands (revisit the author's under checkpoint B); REOPEN-CANDIDATE is a candidate, not a reopening (W3)",
+    "anything about quantisation (qwen3 Q4_K_M vs gemma BF16) or prompts (RAW on both sides): both UNCONTROLLED (W2)",
+    "gemma worse, or parity, on CLINC (NEITHER inside its seed-spread bar; no TOST) (N1)",
+    "that the edge is unchanged by the slice: it survives, the slice explains part of it (N2)",
+    "anything about MMLU-Pro or capability text (intent corpora only)",
+    "that d_q* = 1024 is the right slice for trees (NMI vs gold, not certification; relayed, nothing of record changes) (W4)"
+  ],
+  "ledger": {
+    "row_id": "EMBED-DIM-SLICE",
+    "version": "v333 (2026-10-01: warn chip narrowed, bracket) | v330 (2026-10-01: OUTCOME bracket, three chips) | v328 (2026-10-01: new row, PLAN chip)"
+  },
+  "depends_on": [
+    "INTENT-TRANSFER-S0",
+    "INTENT-S0-SLOTSWAP-MECH"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "value": false,
+    "text": "closes nothing; CONTEXT §5 lines not touched"
+  },
+  "cost": {
+    "calls": 0,
+    "cce": 0,
+    "embeddings": 0,
+    "cpu": "~1-2 h single-threaded (estimate, unsourced; the dry-run prices it)",
+    "memory": "~0.94 GB"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L22579-L22607 (section \"## Registered 2026-10-01 (before any code or call) — EMBED-DIM-SLICE: on S0's pinned intent corpora and embeddings, ...\"; _as_of the commit that writes it, parent a5c88533, re-grepped)",
+    "docs/agents/plans/2026-10-02_embed_dim_slice.md (a5c88533)",
+    "docs/agents/results/INTENT-TRANSFER-S0.json (DB sha256 pins)",
+    "docs/plan_2026-09-15.md Amendment 32",
+    "docs/reviews/READY_embed_dim_slice.md (d26afd88)",
+    "docs/judge_v2_program.md L22719-L22723 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data) — EMBED-DIM-SLICE built, merged (91e738d7) and READY (d26afd88) under C1-C4; ...\"; _as_of the commit that writes it, parent 91e738d7, re-grepped)",
+    "docs/judge_v2_program.md L22725-L22736 (section \"## EMBED-DIM-SLICE (2026-10-01, 0 calls) — VALID (post-run review docs/reviews/POSTRUN_embed_dim_slice.md, b249529b): DS1 REOPEN-CANDIDATE ...\"; _as_of the commit that writes it, parent b249529b, re-grepped)",
+    "experiment_results/embed_dim_slice/outcome.txt (54ea7329)",
+    "docs/reviews/POSTRUN_embed_dim_slice.md (b249529b)"
+  ],
+  "last_update": "2026-10-01",
+  "plain_description": {
+    "sq": "SQ5 Invariance",
+    "what": "An earlier result found that the gemma embedder beats the qwen3 embedder at fine levels, but both were cut to 256 dimensions, which keeps only 6% of qwen3's size and 33% of gemma's. This test compares each embedder at several sizes on three intent datasets with known labels, choosing the size on one data part and reading the result once on another.",
+    "why": "It checks whether the 'gemma is better' finding is just an artefact of the size cut.",
+    "information": "If the edge vanished, the earlier finding would be an artefact. Result (no new calls): at each embedder's best size, gemma's edge survives on 2 of 3 datasets (MASSIVE and Banking77) and is a tie on CLINC. The size cut explains part of the edge, not all of it. Prompts were not controlled. A later check found that quantisation does not explain the edge (tested up to Q8 only). This makes 'gemma is better' a candidate for reopening, not a change of the embedder of record. Intent datasets only; nothing about MMLU-Pro.",
+    "written": "2026-10-07"
+  }
+}

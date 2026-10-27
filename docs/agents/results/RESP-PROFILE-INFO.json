@@ -1,0 +1,173 @@
+{
+ "id": "RESP-PROFILE-INFO",
+ "title": "RESP-PROFILE-INFO: out-of-sample R^2 of 3PL residuals explained by AF-U cells vs 200 random within-source cell sets (RP1) and K_0 (RP2); exploratory union-DB look disclosed (zero calls; REGISTERED 2026-10-04)",
+ "question": "Do source-conditioned cells predict which model wins after difficulty is removed, beyond random within-source cells?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "633255f2",
+  "program_lines": "docs/judge_v2_program.md L24388-L24400",
+  "program_lines_as_of": "633255f2 (parent b7fb6bc8), re-grepped",
+  "date": "2026-10-04",
+  "provenance": "docs/literature/2026-10-04_response_structure.md (a8fb1be4; blob 0230843b); docs/agents/plans/2026-10-04_literature_shortlist.md (68a3d731); the author's Go (docs/agents/plans/2026-10-04_W1_W2_schedule.md (be8e54d3))"
+ },
+ "script": {
+  "path": "tools/analysis/resp_profile_info.py",
+  "sha16": "sha256-lf16:76430a0388e142f5 (LF; the working tree is LF)",
+  "blob": "1817ec8a (LF)",
+  "helper": "resp_structure_common blob ba67f78f; union_cells_io 92a04543; cell_flips 998d39a7; union_af_route bf3f17db; v2_declared_cells f0f56805 (the review's pins)",
+  "commit": "c7506ede"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_resp_structure.md",
+  "commit": "c7506ede",
+  "blob": "62adb4f6 (LF)",
+  "verdict": "READY"
+ },
+ "go": "the author's Go for zero-call windows (2026-10-04)",
+ "run": {
+  "outcome_file": "experiment_results/archv2/resp_profile_info/resp_profile_info_outcome.txt (sha256 11abd6040aa707d400b85352a4af7db69742bfb0a4eeef92ff0ee882055ac536; write-once, never committed); backup E:/TaxoArena_backup_2026-10-04_rpi (SHA256SUMS.txt, 8 OK)",
+  "outcome_commit": "run from main (code merged c7506ede); outcome not committed",
+  "calls": 0,
+  "cce": 0,
+  "pool": "reader: pv2_1575de61bb20e977 (B0-2 rc 0; views sha256 before = after)",
+  "date": "2026-10-04",
+  "concurrency": "overlapped GRANULARITY-GT and the routing-trio tail (zero-call CPU readers; rule 7 not engaged): NOT AFFECTING (review task 4)"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_resp_profile_info.md",
+  "commit": "6cb817b6",
+  "blob": "d8ce0495 (LF)",
+  "verdict": "VALID with two word conditions (R-RP2-X, R-IRT; both MEDIUM); R-P1, N-RWS, N-OVF LOW"
+ },
+ "criteria": [
+  {
+   "id": "RP1",
+   "text": "DECIDING: BEYOND-SOURCE iff R2_int(AF-U) > RWS p97.5; NOT-BEYOND otherwise. SCOREABLE as a classification",
+   "result": "HELD",
+   "value": "BEYOND-SOURCE: R2_int(AF-U) +0.052744 > RWS p97.5 +0.037950 (median +0.036597; MC SE 0.000134); 'beyond random within-source cells of the same sizes' (N-RWS); R-1 top-0.1% cells dropped +0.050731 vs p97.5 +0.035660; constrained-ML 3PL +0.055433 vs +0.039648",
+   "denominator": "EVAL 5,907 items / 5,404 components x 18 models; AF-U 123 cells; 200 RWS draws"
+  },
+  {
+   "id": "RP2",
+   "text": "deciding (like G13): AF-BETTER / K0-BETTER / NEITHER against spread_K. DESCRIPTIVE-ONLY at the prediction (pilot DEFF 1.6; SE 0.0008)",
+   "result": "HELD",
+   "value": "K0-BETTER: D -0.004423, 95% [-0.006118, -0.002728] (two-stage, B 2,000; SE 0.000865), spread_K 0.000861. QUALIFIER R-RP2-X: K0-BETTER for AF-U as built; about half of D comes from the 191 EVAL items AF-U files into another source's leaf (R2 0.0095 vs K mean 0.0805 there); on the 5,716 own-source-filed items D = -0.0021 (approx 95% [-0.0037, -0.0005]) against spread_K 0.0008: still K0-BETTER (unregistered, descriptive)",
+   "denominator": "EVAL 5,907 / 5,404 components; K_0 seeds 0-4 (own-source split 5,716 / cross 191, descriptive)"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "R2_int(AF-U) in [0.000, 0.030]",
+   "result": "FAILED",
+   "value": "+0.052744 (1.76x the band ceiling; R-P1)",
+   "denominator": "EVAL 5,907"
+  },
+  {
+   "id": "P2",
+   "text": "RP1 BEYOND-SOURCE 0.55",
+   "result": "HELD",
+   "value": "BEYOND-SOURCE occurred; Brier 0.2025",
+   "denominator": "EVAL 5,907"
+  },
+  {
+   "id": "P3",
+   "text": "RP2 NEITHER 0.70",
+   "result": "FAILED",
+   "value": "K0-BETTER, not NEITHER; Brier 0.4900",
+   "denominator": "EVAL 5,907"
+  },
+  {
+   "id": "P4",
+   "text": "BBH cells carry the largest share 0.65 (descriptive)",
+   "result": "HELD",
+   "value": "BBH 0.3609 largest (MMLU_PRO 0.3114; constrained-ML BBH 0.4694); Brier 0.1225",
+   "denominator": "EVAL 5,907 (AF-U per-source shares)"
+  }
+ ],
+ "falsifier": {
+  "text": "F-RP fires iff RP1 NOT-BEYOND: no which-model information beyond random within-source cells once difficulty is removed.",
+  "fired": false,
+  "outcome": "NOT FIRED (RP1 BEYOND-SOURCE; robust to R-1 and the constrained-ML fit)"
+ },
+ "numbers_of_record": {
+  "RP1": "R2_int(AF-U) +0.052744 vs RWS p97.5 +0.037950 (median +0.036597; 200 draws); EVAL 5,907 x 18",
+  "RP2_D": "-0.004423, 95% [-0.006118, -0.002728] (SE 0.000865, two-stage B 2,000); spread_K 0.000861; K0-BETTER (R-RP2-X)",
+  "RP2_own_source": "D -0.0021 (approx 95% [-0.0037, -0.0005]; 5,716 own-source-filed items) vs spread_K 0.0008: K0-BETTER (unregistered, descriptive)",
+  "RP2_cross_source": "191 EVAL items: R2 AF-U 0.0095 vs K mean 0.0805 (D -0.071022)",
+  "R-1": "top 0.1% cells (107 of 106,326) carry 3.06% of sum e^2; dropped: +0.050731 vs RWS p97.5 +0.035660",
+  "R-2": "TRAIN floor 0.10 on 6,759 (MMLU_PRO), 0.25 on 57 (GPQA), 0 on 5,025; EVAL 0.10 on 3,376, 0.25 on 34, 0 on 2,497",
+  "R-IRT": "builder's alternating JML 1,216.7 log-lik below the constrained optimum; weakest theta -1.97 vs -3.66; no verdict changes",
+  "DEFF": "MEASURED two-stage 2.118 (declared 1.6; reviewer 2.156); n_eff 2,789; MDE80 0.002421; |D| = 5.1 SE",
+  "descriptive_arms": "K0..K4 +0.057607/+0.057527/+0.056746/+0.056747/+0.057208; SRC +0.045400; declared +0.060463; source share 0.7509; difficulty-carried share 0.4901"
+ },
+ "sentence_of_record": "RESP-PROFILE-INFO (2026-10-04, 0 calls) — VALID; RP1 BEYOND-SOURCE, RP2 K0-BETTER (R-RP2-X), F-RP not fired. On the content-closed v2 union EVAL (5,907 items / 5,404 components x 18 models), after a 3PL fitted by alternating JML with standardised theta (not the penalised optimum; verdicts robust to the constrained optimum, POSTRUN_resp_profile_info.md) removes difficulty, discrimination and general ability, AF-U cells carry which-model residual structure beyond random within-source cells of the same sizes: R2_int +0.052744 vs RWS p97.5 +0.037950 (unchanged with the top 0.1% of cells dropped, R-1). Against per-source k-means at matched counts: D -0.004423 (95% [-0.006118, -0.002728]; spread_K 0.000861): K0-BETTER for AF-U as built; about half of D comes from the 191 EVAL items AF-U files into another source's leaf (R2 0.0095 vs K mean 0.0805 there); on the 5,716 own-source-filed items D = -0.0021 (approx 95% [-0.0037, -0.0005]) against spread_K 0.0008: still K0-BETTER (unregistered, descriptive). DEFF measured 2.118. P1 FAILED; P2 Brier 0.2025; P3 Brier 0.4900; P4 HELD. [POSTRUN docs/reviews/POSTRUN_resp_profile_info.md, 6cb817b6; outcome not committed, sha256 11abd604...]",
+ "chips": [
+  "REGISTERED 2026-10-04, BEFORE ANY CODE; not built",
+  "VALID (POST-RUN 6cb817b6): RP1 BEYOND-SOURCE (R2_int +0.0527 &gt; RWS p97.5 +0.0380); RP2 K0-BETTER; F-RP NOT FIRED",
+  "RP2 QUALIFIED R-RP2-X (HALF OF D FROM 191 CROSS-SOURCE FILINGS; OWN-SOURCE D &minus;0.0021 STILL K0-BETTER, DESCRIPTIVE); IRT AN ALTERNATING FIT, NOT THE OPTIMUM (R-IRT; VERDICTS ROBUST)"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-04",
+   "by": "registrar (pre-data; READY_resp_structure)",
+   "text": "B-RP readings RP-R1..R9 of record; O8 non-deciding; post-run duties R-1 (heavy-tailed residuals) and R-2 (items per floor). L24395."
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (POSTRUN 6cb817b6)",
+   "text": "outcome recorded with R-RP2-X on every RP2 quote and the R-IRT words; R-1, R-2 supplied by the review; DEFF measured 2.118; concurrency ruled not affecting; OUTCOME brackets on READOUTS AND CRITERIA (L24395), SUPPORT (L24396), FALSIFIER (L24398); R-IRT carried to CELL-DIFFICULTY (L24407) and CELL-STRATA-EVAL (L24421); outcome section docs/judge_v2_program.md L24551-L24565 (section \"## RESP-PROFILE-INFO (2026-10-04, 0 calls) — VALID (POSTRUN 6cb817b6) ...\"; _as_of the commit that writes it, parent af8a207c, re-grepped)."
+  }
+ ],
+ "does_not_show": [
+  "a routing gain",
+  "roster-independent structure (18 models)",
+  "a dimension count of the matrix",
+  "that AF-U beats per-source k-means as a residual partition (K0-BETTER)",
+  "that the 3PL is the penalised optimum (R-IRT)",
+  "a registered own-source reading (R-RP2-X is descriptive)"
+ ],
+ "ledger": {
+  "row_id": "RESP-PROFILE-INFO",
+  "version": "v388 (2026-10-04: OUTCOME bracket, OK + WARN chips) | v383 (2026-10-04: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "UNION-AF-ROUTE",
+  "ROUTE-SOURCE-NULL (RWS arm)",
+  "KEY-INFO-V2 (related)"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; no Gaussian-mixture LR / BIC, MDL or Bayesian evidence (MIX-LRT-SITE untouched); no judge, rubric, reference, frontier, temperature"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "CPU minutes-1 h (pool reader)",
+  "agent_hours": "about 3 h",
+  "reads_pool": true
+ },
+ "outputs": "never committed: stored on E: with SHA256SUMS.txt; temp under E:/TaxoArena_tmp via scratch_dir",
+ "sources": [
+  "docs/judge_v2_program.md L24388-L24400 (_as_of 633255f2, parent b7fb6bc8, re-grepped)",
+  "docs/literature/2026-10-04_response_structure.md (a8fb1be4; blob 0230843b)",
+  "docs/agents/plans/2026-10-04_literature_shortlist.md (68a3d731)",
+  "docs/reviews/POSTRUN_resp_profile_info.md (6cb817b6; blob d8ce0495, LF)",
+  "experiment_results/archv2/resp_profile_info/resp_profile_info_outcome.txt (sha256 11abd604...; not committed; E:/TaxoArena_backup_2026-10-04_rpi)",
+  "docs/judge_v2_program.md L24551-L24565 (section \"## RESP-PROFILE-INFO (2026-10-04, 0 calls) — VALID (POSTRUN 6cb817b6) ...\"; _as_of the commit that writes it, parent af8a207c, re-grepped)"
+ ],
+ "last_update": "2026-10-04",
+ "disclosure": "exploratory read-only look at the union DB (TRAIN + EVAL; no cell or label quantity) during the response-structure pass (docs/literature/2026-10-04_response_structure.md (a8fb1be4; blob 0230843b) section 0)",
+ "label_status": "AF-U [SC] where used",
+ "plain_description": {
+  "sq": "SQ3 Taxonomy",
+  "what": "Removes question difficulty and general model ability with an item-response model, on 5,907 evaluation items x 18 models from a content-closed multi-source pool. It then measures how well the discovered cells explain which model does better. This is compared with random cells of the same sizes inside each source, and with per-source k-means clusters of matched count. No calls.",
+  "why": "Asks whether the discovered cells carry real which-model-wins information beyond the dataset source, and whether they beat a simple clustering baseline.",
+  "information": "Beating random cells means cells carry signal beyond source. Beating k-means would favour the discovered tree. Result: done. The cells beat random cells of the same size inside each source (explained share 0.053 vs 0.038 at the 97.5th percentile). But per-source k-means is slightly better than the tree as built, and that holds descriptively on own-source items too. This is not a routing gain and is tied to these 18 models.",
+  "written": "2026-10-07"
+ }
+}

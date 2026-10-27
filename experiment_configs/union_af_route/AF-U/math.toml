@@ -1,0 +1,75 @@
+# UNION-AF-ROUTE (RP13; docs/judge_v2_program.md L22627-L22653 + pre-data addition L23093-L23116), build AF-U, member math.
+# DERIVED from experiment_configs/rp12_r2/B0/math.toml (RP12-R2 arm B0) by EXACTLY these changes, the registration's
+# 'anchors OFF, the anchor-free recipe of record (af_clean_s42: z 2.0, mcs 55, 256-d slice, bar 0.025)':
+#   anchorFree = true added; proposalSeparationBar 0.0145 -> 0.025; embeddingSliceDim 512 -> 256; outputDir -> experiment_results/archv2/union_af_route/AF-U/<member>.
+# acceptanceZ 2.0 and minClusterSize 55 are B0's and af_clean_s42's alike. Label-free (labelling and judge induction OFF).
+# Tree-construction specialist, 2026-10-02, zero calls; NOT READY until the adversarial-reviewer's READY.
+# Launch (detached worktree pinned at one commit, D-8; one construction at a time, rule 7; backup first):
+#   .\gradlew.bat bootRun --console=plain -q --offline -PjvmThreads=12 --args="--config experiment_configs/union_af_route/AF-U/math.toml"
+corpora      = ["MATH"]
+corpusDbPath = "multicorpus_cache_v1.db"
+
+models = [
+    "DeepSeek-R1-Distill-Llama-8B",
+    "DeepSeek-R1-Distill-Qwen-32B",
+    "Falcon3-10B-Instruct",
+    "Llama-3.1-70B-Instruct",
+    "Llama-3.2-3B-Instruct",
+    "Llama-3.3-70B-Instruct",
+    "Mistral-Small-Instruct-2409",
+    "Mixtral-8x7B-Instruct-v0.1",
+    "OLMo-2-1124-7B-Instruct",
+    "Phi-3.5-mini-instruct",
+    "Qwen2.5-32B-Instruct",
+    "Qwen2.5-72B-Instruct",
+    "Qwen2.5-7B-Instruct",
+    "Qwen2.5-Coder-7B-Instruct",
+    "Qwen2.5-Math-7B-Instruct",
+    "Yi-1.5-34B-Chat-16K",
+    "c4ai-command-r-plus-08-2024",
+    "internlm2_5-20b-chat"
+]
+
+category      = ""
+queryLimit    = 0
+outputDir     = "experiment_results/archv2/union_af_route/AF-U/math"
+seed          = 42
+v2PoolFile    = "experiment_configs/engine_pool_pv2_1575de61bb20e977.json"
+pool          = "pv2_1575de61bb20e977"
+
+runPipeline        = true
+runBenchmark       = false
+runTrickle         = true
+runBaselines       = false
+enableFinalMetrics = true
+enableLabeling     = false
+judgeInduction     = false
+anchorFree         = true
+
+dagMode = "DAG_MAX"
+
+maxDepth              = 8
+minClusterSize        = 55
+proposalSeparationBar = 0.025
+tau                   = 1e-6
+acceptanceZ           = 2.0
+enableRefitGate       = false
+
+membershipFloor       = 0.25
+routingBeamGamma      = 0.2
+descentMargin         = 0.12
+
+effectiveSupportFloor = 2.0
+defaultKappaPrior     = 10.0
+
+numIterations         = 50
+maxLeafAssignments    = 5
+
+fusionSimilarityThreshold = 0.90
+enableGtWarmStart         = false
+
+enableProfiling           = true
+
+embeddingSliceDim = 256
+splitDropTopPcs   = 0
+splitWhiten       = false

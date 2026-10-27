@@ -1,0 +1,345 @@
+"""J1 — judge-strength ceiling test: re-judge the R3 stratified x12 sample with a
+REASONING-class judge, byte-identical prompts (docs/judge_improvement_proposals.md, J1;
+criteria frozen at 7a4391a; launch parameters recorded there before the first call).
+
+Judge: chosen per run. Default `--provider azure --model grok-4-1-fast-reasoning` — a
+Foundry deployment on the same resource that serves Mistral-Large-3 and the non-reasoning
+grok (xAI has no contestant in the roster: no family confound). Fallback `--provider hf
+--model deepseek-ai/DeepSeek-R1-0528` (Hugging Face router; validated on 3 matches before
+its credits ran out; family disclosure: deepseek-chat-v2_5 is a mid-tier CONTESTANT, but
+no top-4 model is DeepSeek, so the registered primary is not self-preference-confounded).
+
+Sample: rejudge_grok.sample_matches() — the same 1,980 matches R3 judged (seed 42,
+100 per top-cluster pair + the rest spread), so Mistral / grok / R1 are all paired.
+Prompts: rejudge_grok's v1 templates extracted from TaxonomyArenaService.kt at runtime
+(embedded comment included, as in every re-judge comparison so far). Reasoning text
+(<think>...</think>) is stripped before the JSON verdict is parsed.
+
+    python tools/analysis/rejudge_reasoning.py --pilot 12
+    python tools/analysis/rejudge_reasoning.py --workers 16
+    python tools/analysis/rejudge_reasoning.py --analyze
+
+2026-09-16 (JUDGE-FINISH-AUDIT, FRAMEWORK.md item 19 / process rule 10): call_judge_full now returns a
+provider content-filter REFUSAL (HTTP 400 whose body carries "content_filter") as an EMPTY content with
+finish_reason 'content_filter' instead of raising, so every caller parses it as INVALID / NON_TERMINATED
+and counts it against the unparsed guard; the raw dict carries _refusal (body[:500]) and _response_id.
+Every other HTTPError is still raised. The response id and finish_reason are also attached to the raw
+message dict (msg["_response_id"], msg["_finish_reason"]) on ordinary responses. Four scripts carried a
+local judge_full()/except-HTTPError copy of this handling (newcomer_placement, grok_calib, stack_norubric,
+stage3_math); they are left in place and are now no-ops on refusals.
+"""
+import os, sys, re, json, time, math, sqlite3, argparse, threading, urllib.request, urllib.error
+from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(os.path.dirname(HERE))
+sys.path.insert(0, HERE)
+import rejudge_grok as rj
+
+# Provider is chosen on the command line: --provider azure --model <Foundry deployment name>
+# (the resource that serves Mistral-Large-3 / grok; the key is resource-level) or
+# --provider hf --model deepseek-ai/DeepSeek-R1-0528 (Hugging Face router). Each judge
+# model gets its own cache DB so arms never mix.
+PROVIDER = "azure"
+JUDGE_MODEL = "grok-4-1-fast-reasoning"
+ROUTER = "https://router.huggingface.co/v1/chat/completions"
+MAX_TOKENS = 8192
+TOP4 = ["iask_pro", "gemini-3.1-pro_5-shots", "gpt-4o-2024-08-06", "arx_0314"]
+TOKEN = None
+AZURE_ENDPOINT = None
+AZURE_KEY = None
+
+
+REFERENCE = None   # --reference grok-reasoning = J1-R: the reasoning judge WITH the J2-R reference (docs/judge_v2_program.md)
+
+
+def cache_path():
+    tag = re.sub(r"[^A-Za-z0-9]+", "_", JUDGE_MODEL.split("/")[-1]).strip("_").lower()
+    if REFERENCE: tag += "_ref" + REFERENCE.replace("-reasoning", "").replace("-", "")
+    return os.path.join(ROOT, "experiment_results", "x12_crossdomain", "rejudge_%s.db" % tag)
+
+
+def load_env():
+    global TOKEN, AZURE_ENDPOINT, AZURE_KEY
+    kv = {}
+    for line in open(os.path.join(ROOT, ".env"), encoding="utf-8"):
+        line = line.strip().replace("\r", "")
+        if "=" in line and not line.startswith("#"):
+            k, v = line.split("=", 1)
+            kv[k] = v
+    TOKEN = kv.get("HUGGINGFACE_TOKEN")
+    if "AZURE_AI_ENDPOINT" in kv:
+        AZURE_ENDPOINT = kv["AZURE_AI_ENDPOINT"].rstrip("/") + "/models/chat/completions?api-version=2024-05-01-preview"
+        AZURE_KEY = kv.get("AZURE_GROK_API_KEY") or kv.get("AZURE_AI_API_KEY")
+    if PROVIDER == "hf":
+        assert TOKEN, "HUGGINGFACE_TOKEN missing from .env"
+    else:
+        assert AZURE_ENDPOINT and AZURE_KEY, "AZURE_AI_ENDPOINT / AZURE_GROK_API_KEY missing from .env"
+
+
+THINK = re.compile(r"<think>.*?</think>", re.S)
+
+
+TEMPERATURE = None   # TEMP-0 sets this to 0.0; when None the field is OMITTED, so every existing
+                     # script posts a byte-identical body to the one it has always posted.
+
+
+def call_judge(system, user, retries=6):
+    """Back-compatible 4-tuple. Three callers unpack exactly four values
+    (rejudge_reasoning.judge_match, rubric_512_r, rubric_kit2), so this signature is fixed."""
+    return call_judge_full(system, user, retries)[:4]
+
+
+def payload_body(system, user):
+    """The exact request body call_judge_full posts: key order model / max_tokens / messages [/ temperature],
+    serialised by json.dumps with its defaults (", " / ": " separators, ensure_ascii). Extracted 2026-09-16
+    (JUDGE-WIRING) so judge_wiring.py --dump-payload / --shas hash the same bytes this module posts; the
+    posted bytes are unchanged. The local name is kept so canary_baseline's source assertion still matches."""
+    payload_body = {"model": JUDGE_MODEL, "max_tokens": MAX_TOKENS,
+                    "messages": [{"role": "system", "content": system},
+                                 {"role": "user", "content": user}]}
+    if TEMPERATURE is not None:
+        payload_body["temperature"] = TEMPERATURE
+    return payload_body
+
+
+def payload_bytes(system, user):
+    return json.dumps(payload_body(system, user)).encode("utf-8")
+
+
+def call_judge_full(system, user, retries=6):
+    """As call_judge, plus finish_reason and the raw message.
+
+    Added 2026-09-14 for REF-QUAL-KIMI: a reasoning deployment can burn the whole token budget in
+    `reasoning_content` and return an EMPTY `content` with finish_reason='length'. That is
+    indistinguishable from a wrong answer unless finish_reason is read, and it silently voided 40.5%
+    of the first Kimi qualification. The request payload is unchanged."""
+    body = payload_bytes(system, user)
+    if PROVIDER == "hf":
+        url, headers = ROUTER, {"Content-Type": "application/json", "Authorization": "Bearer " + TOKEN}
+    else:
+        url, headers = AZURE_ENDPOINT, {"Content-Type": "application/json", "api-key": AZURE_KEY}
+    for attempt in range(retries):
+        req = urllib.request.Request(url, data=body, method="POST", headers=headers)
+        t0 = time.time()
+        try:
+            with urllib.request.urlopen(req, timeout=600) as r:
+                provider = r.headers.get("x-inference-provider", "") if PROVIDER == "hf" else "azure:" + ""
+                payload = json.loads(r.read().decode("utf-8"))
+            if PROVIDER != "hf":
+                provider = "azure:" + str(payload.get("model", JUDGE_MODEL))
+            msg = payload["choices"][0]["message"]
+            # Some reasoning deployments return the final answer in content and the chain
+            # in reasoning_content; others inline <think>. Either way only content is parsed.
+            content = msg.get("content") or ""
+            usage = payload.get("usage") or {}
+            finish = payload["choices"][0].get("finish_reason")
+            # 2026-09-16: provenance on the raw dict (6th element); the tuple arity is unchanged.
+            msg["_response_id"] = payload.get("id")
+            msg["_finish_reason"] = finish
+            return (content, provider, usage.get("completion_tokens"), time.time() - t0, finish, msg)
+        except urllib.error.HTTPError as e:
+            if e.code in (408, 429, 500, 502, 503, 504) and attempt < retries - 1:
+                time.sleep(min(2 ** attempt * 3, 60)); continue
+            if e.code == 400:
+                # 2026-09-16: a content-filter REFUSAL is deterministic (re-posting it stalls a run; not caching it
+                # drops the match from the guard denominator). Return it as an empty content with
+                # finish_reason 'content_filter' so every caller scores it INVALID / NON_TERMINATED.
+                body_txt = ""
+                try: body_txt = e.read().decode("utf-8", "replace")
+                except Exception: pass
+                if "content_filter" in body_txt:
+                    rid = None
+                    try: rid = json.loads(body_txt).get("id")
+                    except Exception: pass
+                    prov = "hf" if PROVIDER == "hf" else "azure"
+                    return ("", prov + ":refusal", 0, time.time() - t0, "content_filter",
+                            {"_refusal": body_txt[:500], "_response_id": rid, "_finish_reason": "content_filter"})
+            raise
+        except (urllib.error.URLError, TimeoutError, ConnectionError):
+            if attempt < retries - 1:
+                time.sleep(min(2 ** attempt * 3, 60)); continue
+            raise
+    raise RuntimeError("unreachable")
+
+
+def strip_think(text):
+    return THINK.sub("", text).strip()
+
+
+def open_cache():
+    con = sqlite3.connect(cache_path())
+    con.execute("""CREATE TABLE IF NOT EXISTS verdicts (
+        match_id INTEGER PRIMARY KEY, model_a TEXT, model_b TEXT, node_id TEXT, qid INTEGER,
+        mistral_winner TEXT,
+        vote1 TEXT, vote2_raw TEXT, conf1 REAL, conf2 REAL,
+        r1_winner TEXT, r1_flip INTEGER, r1_invalid INTEGER,
+        raw1 TEXT, raw2 TEXT, provider1 TEXT, provider2 TEXT,
+        tok1 INTEGER, tok2 INTEGER, lat1 REAL, lat2 REAL, ts REAL)""")
+    con.commit()
+    return con
+
+
+def judge_one(match, nodes, evals):
+    mid, qid, ma, mb, nid, winner, is_tie = match
+    qid = int(qid)
+    ra, rb = evals.get((qid, ma)), evals.get((qid, mb))
+    if ra is None or rb is None:
+        return None
+    qtext = ra[0]
+    if REFERENCE:
+        import rejudge_reference as rref
+        ref = REFS.get(qid)
+        if ref is None: return None
+        qtext = rref.with_reference(qtext, ref)
+    ta, tb = rj.robust_trace(ra[2], ra[3], ra[1]), rj.robust_trace(rb[2], rb[3], rb[1])
+    system = rj.build_system_prompt(nodes[nid])
+    raw1, p1, k1, l1 = call_judge(system, rj.build_user_prompt(qtext, ta, tb))
+    raw2, p2, k2, l2 = call_judge(system, rj.build_user_prompt(qtext, tb, ta))
+    v1, c1 = rj.parse_judge(strip_think(raw1))
+    v2, c2 = rj.parse_judge(strip_think(raw2))
+    w, flip, invalid = rj.combine_orders(v1, v2)
+    w_name = {"Model A": ma, "Model B": mb}.get(w, w)
+    return (mid, ma, mb, nid, qid, "TIE" if is_tie else winner, v1, v2, c1, c2,
+            w_name, int(flip), int(invalid), raw1, raw2, p1, p2, k1, k2, l1, l2, time.time())
+
+
+REFS = {}
+
+
+def run(pilot=None, workers=16):
+    global REFS
+    if REFERENCE:
+        import rejudge_reference as rref
+        rref.set_reference(REFERENCE); REFS = rref.references()
+    load_env()
+    nodes = rj.load_nodes()
+    sample = rj.sample_matches()
+    if pilot:
+        sample = sample[:pilot]
+    cache = open_cache()
+    done = {r[0] for r in cache.execute("SELECT match_id FROM verdicts")}
+    todo = [m for m in sample if m[0] not in done]
+    print("sample %d | cached %d | to judge %d (%d calls) | workers %d"
+          % (len(sample), len(sample) - len(todo), len(todo), 2 * len(todo), workers), flush=True)
+    if not todo:
+        return
+    evals = rj.load_eval_rows([int(m[1]) for m in todo], {m[2] for m in todo} | {m[3] for m in todo})
+    lock = threading.Lock()
+    ok = skip = err = 0
+    toks, lats = [], []
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        futs = {ex.submit(judge_one, m, nodes, evals): m for m in todo}
+        for i, fut in enumerate(as_completed(futs), 1):
+            try:
+                row = fut.result()
+            except Exception as e:
+                err += 1
+                print("  ERROR match %s: %s" % (futs[fut][0], str(e)[:160]), flush=True)
+                continue
+            if row is None:
+                skip += 1; continue
+            with lock:
+                cache.execute("INSERT OR REPLACE INTO verdicts VALUES (%s)" % ",".join("?" * 22), row)
+                cache.commit()
+            ok += 1
+            toks += [t for t in (row[17], row[18]) if t]
+            lats += [row[19], row[20]]
+            if i % 20 == 0 or i == len(todo):
+                print("  %d/%d (ok %d, skip %d, err %d) | mean tokens %.0f | mean latency %.0fs"
+                      % (i, len(todo), ok, skip, err, sum(toks) / max(1, len(toks)), sum(lats) / max(1, len(lats))), flush=True)
+    print("done: ok %d, skipped %d, errors %d" % (ok, skip, err), flush=True)
+
+
+# ── Analysis (J1 registered) ───────────────────────────────────────────────────
+def gt_correct():
+    ev = sqlite3.connect("file:%s?mode=ro" % rj.EVAL_DB, uri=True)
+    return {(q, m): bool(c) for q, m, c in ev.execute("SELECT question_id, model_name, is_correct FROM eval_results")}
+
+
+def mcnemar_p(b, c):
+    n = b + c
+    if n == 0:
+        return 1.0
+    k = min(b, c)
+    return min(1.0, 2.0 * sum(math.comb(n, i) * 0.5 ** n for i in range(k + 1)))
+
+
+def analyze():
+    cache = open_cache()
+    rows = cache.execute("SELECT match_id, model_a, model_b, qid, mistral_winner, r1_winner, r1_flip, r1_invalid, "
+                         "provider1, tok1, tok2 FROM verdicts").fetchall()
+    if not rows:
+        print("no verdicts cached"); return
+    grok = {}
+    if os.path.exists(rj.CACHE_DB):
+        g = sqlite3.connect("file:%s?mode=ro" % rj.CACHE_DB, uri=True)
+        grok = {r[0]: r[1] for r in g.execute("SELECT match_id, grok_winner FROM verdicts WHERE grok_invalid=0")}
+    G = gt_correct()
+    valid = [r for r in rows if not r[7]]
+    print("=== J1: %s vs Mistral-Large-3 (paired, same matches, same prompts) ===" % JUDGE_MODEL)
+    print("judged %d | invalid %d | flips %.1f%% | ties R1 %.1f%% vs Mistral %.1f%% | providers %s | mean completion tokens %.0f"
+          % (len(valid), len(rows) - len(valid), 100 * sum(r[6] for r in valid) / len(valid),
+             100 * sum(r[5] == "TIE" for r in valid) / len(valid), 100 * sum(r[4] == "TIE" for r in valid) / len(valid),
+             sorted({r[8] for r in valid}), sum((r[9] or 0) + (r[10] or 0) for r in valid) / (2 * len(valid))))
+
+    def decidable(r):
+        ca, cb = G.get((r[3], r[1])), G.get((r[3], r[2]))
+        if ca is None or cb is None or ca == cb:
+            return None
+        return r[1] if ca else r[2]
+
+    for label, subset in (("TOP-CLUSTER pairs (REGISTERED PRIMARY)", [r for r in valid if r[1] in TOP4 and r[2] in TOP4]),
+                          ("all pairs", valid)):
+        dec = [(r, decidable(r)) for r in subset]
+        dec = [(r, d) for r, d in dec if d is not None]
+        m_ok = sum(r[4] == d for r, d in dec); r_ok = sum(r[5] == d for r, d in dec)
+        b = sum(1 for r, d in dec if r[5] == d and r[4] != d); c = sum(1 for r, d in dec if r[4] == d and r[5] != d)
+        p = mcnemar_p(b, c)
+        line = "  %s: n_dec=%d | correct-verdict rate (ties wrong): R1 %.3f vs Mistral %.3f (%+.3f) | discordant R1-only %d vs Mistral-only %d | McNemar p=%.4f" % (
+            label, len(dec), r_ok / max(1, len(dec)), m_ok / max(1, len(dec)), (r_ok - m_ok) / max(1, len(dec)), b, c, p)
+        if grok:
+            gd = [(r, d) for r, d in dec if r[0] in grok]
+            if gd:
+                line += " | grok %.3f (n=%d)" % (sum(grok[r[0]] == d for r, d in gd) / len(gd), len(gd))
+        print(line)
+        if "PRIMARY" in label:
+            print("  REGISTERED J1 PRIMARY (R1 > Mistral on top-cluster key-decidable, p < 0.05): %s"
+                  % ("PASS" if (r_ok > m_ok and p < 0.05) else "FAIL"))
+    # secondary: top-4 BT order on the top-cluster matches, violations vs GT (key accuracy on frozen pool)
+    import judge_free_tests as jf
+    acc, _ = jf.gt_and_lengths(set(TOP4))
+    gt_order = sorted(TOP4, key=lambda m: -acc[m])
+    top = [r for r in valid if r[1] in TOP4 and r[2] in TOP4]
+    for name, col in (("Mistral", 4), ("R1", 5)):
+        th = jf.board_from(((r[1], r[2], 0.5 if r[col] == "TIE" else (1.0 if r[col] == r[1] else 0.0), 1.0) for r in top), TOP4)
+        o, pv, av = jf.violations(th, gt_order)
+        print("  top-4 board [%s] on %d matches: %s (pairwise violations %d, GT %s)" % (name, len(top), " > ".join(o), pv, " > ".join(gt_order)))
+    if grok:
+        th = jf.board_from(((r[1], r[2], 0.5 if grok[r[0]] == "TIE" else (1.0 if grok[r[0]] == r[1] else 0.0), 1.0) for r in top if r[0] in grok), TOP4)
+        o, pv, _ = jf.violations(th, gt_order)
+        print("  top-4 board [grok]: %s (violations %d)" % (" > ".join(o), pv))
+
+
+if __name__ == "__main__":
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--pilot", type=int, default=None)
+    ap.add_argument("--workers", type=int, default=16)
+    ap.add_argument("--analyze", action="store_true")
+    ap.add_argument("--provider", choices=["azure", "hf"], default="azure")
+    ap.add_argument("--model", default=None)
+    ap.add_argument("--reference", choices=["grok-reasoning"], default=None)
+    a = ap.parse_args()
+    REFERENCE = a.reference
+    PROVIDER = a.provider
+    if a.model:
+        JUDGE_MODEL = a.model
+    elif PROVIDER == "hf":
+        JUDGE_MODEL = "deepseek-ai/DeepSeek-R1-0528"
+    print("judge=%s provider=%s cache=%s" % (JUDGE_MODEL, PROVIDER, os.path.basename(cache_path())), flush=True)
+    if a.analyze:
+        analyze()
+    else:
+        run(pilot=a.pilot, workers=a.workers)
+        analyze()

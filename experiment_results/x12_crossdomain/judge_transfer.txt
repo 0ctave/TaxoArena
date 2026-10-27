@@ -1,0 +1,113 @@
+=== JUDGE-TRANSFER: does tau(A) = exp(b0 + b1*A), fitted on Mistral x12, transfer to a grok judge? ===
+  registered 2026-09-15 at 60cb7f3; zero calls; verdicts read from the existing grok cache only.
+
+=== DATA CHECK: the grok cache stack_v2_kit2_grok.db ===
+  3948 verdicts total on 1371 distinct questions, 66 (model_a, model_b) orderings
+  arm datacard            1974 verdicts | 1371 questions | 1974 matches | invalid 0
+  arm stackv2_datacard    1974 verdicts | 1371 questions | 1974 matches | invalid 0
+  rubric_kit2.judge(): the leaf data card is appended only when arm in ('datacard', 'reasoned');
+  'stackv2_datacard' is the base STACK-v2 prompt with NO card -> that arm is used here.
+  using arm stackv2_datacard: 1974 valid verdicts on 1371 questions, 66 unordered pairs
+  Meta-Llama-3-70B-Instruct: excluded everywhere (not in the roster; asserted).
+
+  routed by rubric_512.primary_routing('bareq512_s42') like build(): 1974 rows routed, 0 unrouted, 0 disagree with the DB's anchor column
+
+  per-anchor matches in the card-free arm, against the 200 floor build() uses and the registered 100 floor:
+  anchor              matches  questions    >=200    >=100
+  Biology                 139         91       no      yes
+  Business                 63         53       no       NO
+  Chemistry               139        101       no      yes
+  Computer science        129         90       no      yes
+  Economics               124         91       no      yes
+  Engineering              88         64       no       NO
+  Health                  134         74       no      yes
+  History                  75         57       no       NO
+  Law                     120        104       no      yes
+  Math                    289        182      yes      yes
+  Other                   170        124       no      yes
+  Philosophy               64         48       no       NO
+  Physics                 250        152      yes      yes
+  Psychology              190        140       no      yes
+  qualify at the 100 floor: 10 of 14 anchors -> Biology, Chemistry, Computer science, Economics, Health, Law, Math, Other, Physics, Psychology
+  excluded: Business, Engineering, History, Philosophy
+  qualify at the 200 floor build() uses: Math, Physics
+
+  grok edges (key gap > 0): 658, of which 59 wrong-direction | key gap >= 0.02: 640, 50 wrong
+  bootstrap: 300 question-resampled boards per anchor, Random(42) in sorted-anchor order, board_from, as build().
+  KEY DENOMINATOR for every McNemar below: the anchor's GROK-JUDGED questions (anchor_qs from this arm),
+  1149 questions over the 10 qualifying anchors; agreement from eval_results.pred over those same questions.
+
+=== THE MISTRAL PARAMETERS (systematic_budget.build + fit on the 891 filtered x12 edges; cached C:\Users\octav\AppData\Local\Temp\claude\Z--FAC-TUBerlin-THESIS-TaxoArena\7c10e5cb-d16b-4a0e-864a-f3a6151d835b\scratchpad\bigpic\mistral_build.pkl) ===
+  b0 = -3.2326 | b1 = +3.3133 | shipped -3.2326 / +3.3133 -> reproduced
+  in-roster reference (x12, Mistral, in sample), same columns as below:
+  set             edges  rawcall     wrong   budcall     wrong  nominal   ratio
+  x12 Mistral       891      739      8(4)       665      2(1)     1.30    1.5x | established only: 651 called, 1 wrong, 1.19 nom = 0.8x
+
+=== (1) COLD: the Mistral parameters applied unchanged to the grok edges, called iff c_bud >= 0.975 ===
+  wrong counts are all(McNemar-established) on the anchor's grok-judged questions.
+  set             edges  rawcall     wrong   budcall     wrong  nominal   ratio
+  grok, all         640      421      2(0)       365      0(0)     1.04    0.0x | established only: 354 called, 0 wrong, 0.93 nom = 0.0x
+  Biology            65       37      0(0)        31      0(0)     0.10    0.0x | established only: 31 called, 0 wrong, 0.10 nom = 0.0x
+  Chemistry          65       46      1(0)        42      0(0)     0.10    0.0x | established only: 40 called, 0 wrong, 0.06 nom = 0.0x
+  Computer scien     65       37      0(0)        30      0(0)     0.10    0.0x | established only: 30 called, 0 wrong, 0.10 nom = 0.0x
+  Economics          63       36      0(0)        32      0(0)     0.08    0.0x | established only: 32 called, 0 wrong, 0.08 nom = 0.0x
+  Health             62       43      0(0)        37      0(0)     0.19    0.0x | established only: 33 called, 0 wrong, 0.14 nom = 0.0x
+  Law                63       43      1(0)        39      0(0)     0.12    0.0x | established only: 37 called, 0 wrong, 0.11 nom = 0.0x
+  Math               66       49      0(0)        42      0(0)     0.04    0.0x | established only: 42 called, 0 wrong, 0.04 nom = 0.0x
+  Other              64       41      0(0)        31      0(0)     0.13    0.0x | established only: 29 called, 0 wrong, 0.13 nom = 0.0x
+  Physics            64       50      0(0)        48      0(0)     0.12    0.0x | established only: 47 called, 0 wrong, 0.10 nom = 0.0x
+  Psychology         63       39      0(0)        33      0(0)     0.07    0.0x | established only: 33 called, 0 wrong, 0.07 nom = 0.0x
+  subset of the above on the anchors that would also clear the 200 floor (not a rerun; same per-anchor draws):
+  >=200 anchors     130       99      0(0)        90      0(0)     0.16    0.0x | established only: 89 called, 0 wrong, 0.15 nom = 0.0x
+  sensitivity, SECONDARY denominator = the Mistral x12 judged questions of the anchor (larger set, more power to establish):
+  grok, x12-den     640      421      2(0)       365      0(0)     1.04    0.0x | established only: 361 called, 0 wrong, 0.99 nom = 0.0x
+
+  (1) realised against nominal, cold:
+      ALL labels:         0 wrong of 365 called vs nominal 1.04 -> ratio 0.00x | Poisson P(X >= 0 | 1.04) = 1.000
+      ESTABLISHED labels: 0 wrong of 354 called vs nominal 0.93 -> ratio 0.00x | Poisson P(X >= 0 | 0.93) = 1.000
+      registered band 1.5-3x on established labels; falsifier > 5x on established labels.
+      -> criterion (1): UNDETERMINED (nominal 0.93 < 3 expected wrong calls on established labels: 0 observed cannot be told from calibrated; Poisson p = 1.000)
+      rule: budget_transfer's pre-committed reading (nominal < 3 -> UNDETERMINED) with the one addition that a
+      significant Poisson excess at low nominal fires the falsifier rather than hiding behind the power caveat.
+
+=== (2) REFIT ON GROK: b1 against the Mistral anchor-clustered CI [1.72, 7.87] ===
+  same construction as the shipped fit (all labels, key gap >= 0.02, 640 edges, 50 wrong):
+    b0 = -3.8600 | b1 = +3.5837 | deviance 217.72 (best of 4 starts) | tau at A = 0.30/0.60/0.90: 0.062 / 0.181 / 0.530
+    cold Mistral parameters on the same edges: deviance 220.63
+  established labels only (528 edges, 14 wrong): b0 = -14.8984 | b1 = -13.8656  <- DEGENERATE: MLE at tau -> 0 for every A (no widener); not an estimate of b1
+
+  IDENTIFIABILITY (profile deviance, b0 profiled out; 3.84 = one-parameter 95% cut):
+  b1                             -2.00    0.00    1.00    1.72    2.00    3.00    5.00    7.87   10.00   15.00   20.00   30.00
+  all labels delta-dev           11.02    5.70    2.37    0.98    0.64    0.06    0.18    0.85    1.33    2.25    2.95    3.97
+  established labels delta-dev    0.00    0.00    0.00    0.00    0.00    0.00    0.00    0.00    0.00    0.00    0.00    0.04
+  all labels                   deviance at Mistral params 220.63 | at tau = 0 (raw) 228.74 | at the grok MLE 217.78
+  established labels           deviance at Mistral params 101.41 | at tau = 0 (raw) 89.54 | at the grok MLE 89.54
+  all labels: LR test of b1 = 0 -> delta-dev 5.70 (b1 = 0 rejected at 5%); delta-dev at the CI ends 0.98 / 0.85; at b1 = 15: 2.25
+  anchor-clustered bootstrap of the grok refit (200 reps over 10 anchors, 200 identified): b1 95% [-0.78, +19.15], median +3.43
+
+  -> b1 refit, all labels (the shipped construction): +3.5837 is INSIDE [1.72, 7.87]
+  -> b1 refit, established labels: UNIDENTIFIED - the profile deviance is flat in b1 and the MLE is 'no widener';
+     the Mistral parameters fit these edges WORSE than tau = 0 by 11.87 deviance (2 parameters).
+  -> criterion (2): UNDETERMINED (point +3.58 is inside, so the registered falsifier does not fire, but the grok data do not locate b1: profile delta-dev < 3.84 across the whole CI and out to b1 = 15; on established labels b1 is unidentified)
+     reading chosen: the registered refit is on the population the shipped b1 was fitted on (all labels, gap >= 0.02);
+     the literal point-in-interval check is reported first; the verdict is the hardest reading the registration
+     supports - a refit whose own profile cannot tell the CI's ends from b1 = 15 has not been located inside it.
+
+=== (3) UTILITY: fraction of grok edges the cold budget still calls (bar 60%, as SYSTEMATIC-BUDGET (2) and BUDGET-TRANSFER (2)) ===
+  raw certificate calls 421 of 640 (65.8%); cold budget calls 365 of 640 (57.0%); correct calls surrendered 54
+  gate A < 0.70: 376 called, 0 wrong (0 est), 43 correct surrendered
+  gate A < 0.80: 408 called, 1 wrong (0 est), 12 correct surrendered
+  gate A < 0.85: 416 called, 1 wrong (0 est), 4 correct surrendered
+  in-roster x12 for comparison: raw 739 of 891 (82.9%), budget 665 of 891 (74.6%)
+  retained relative to the raw certificate: 86.7% of raw calls (365 of 421)
+  -> criterion (3): 57.0% of edges called against the 60% bar the two previous budget tests registered -> FAIL
+     reading chosen: 'utility' is not given a bar in this registration; the 60% bar of SYSTEMATIC-BUDGET (2) and
+     BUDGET-TRANSFER (2) is the only one on record and is the harder reading (the raw certificate itself calls 65.8% here).
+
+=== SUMMARY ===
+  data: arm stackv2_datacard, 1974 verdicts, 10 anchors at the 100 floor (Business, Engineering, History, Philosophy excluded), 640 edges at gap >= 0.02
+  (1) cold ratio all 0.00x (0/1.04) | established 0.00x (0/0.93) -> UNDETERMINED (nominal 0.93 < 3 expected wrong calls on established labels: 0 observed cannot be told from calibrated; Poisson p = 1.000)
+  (2) b1 refit on grok +3.5837 (all) / UNIDENTIFIED (tau -> 0) (established) vs [1.72, 7.87] -> UNDETERMINED (point +3.58 is inside, so the registered falsifier does not fire, but the grok data do not locate b1: profile delta-dev < 3.84 across the whole CI and out to b1 = 15; on established labels b1 is unidentified)
+  (3) utility 57.0% -> FAIL
+  PREDICTION (b1 inside CI AND cold established ratio 1.5-3x): b1 inside; ratio not in band (underpowered, nominal 0.93)
+  FALSIFIER (b1 point refit outside CI OR established ratio > 5x): does not fire on the b1 criterion; the ratio criterion is underpowered

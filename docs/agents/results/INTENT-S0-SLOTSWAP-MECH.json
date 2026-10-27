@@ -1,0 +1,208 @@
+{
+  "id": "INTENT-S0-SLOTSWAP-MECH",
+  "title": "INTENT-S0-SLOTSWAP-MECH: what carries S0-C4's slot-swap instability: origin margin (M1), swap share (M2), embedder (M3, descriptive) (DONE, VALID: M1 HELD, M2 HELD; zero calls)",
+  "question": "On MASSIVE's 3,222 slot-swap variants of INTENT-TRANSFER-S0 C4, is a label-free cell flip predicted by the origin's distance to its cell boundary (M1), by the share of tokens swapped (M2), and does the embedder move S (M3, descriptive)?",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "the commit that writes this record (parent e7348f3)",
+    "program_lines": "docs/judge_v2_program.md L22301-L22330",
+    "program_lines_as_of": "the commit that writes them, parent e7348f3, re-grepped",
+    "date": "2026-10-01",
+    "heading": "## Registered 2026-10-01 (before any code or call) \u2014 INTENT-S0-SLOTSWAP-MECH: on MASSIVE's 3,222 slot-swap variants of INTENT-TRANSFER-S0 C4, ...",
+    "provenance": "docs/agents/plans/2026-10-01_checkpoint_A.md (167062c) '### Registration text 1 (for the registrar): INTENT-S0-SLOTSWAP-MECH', registered as drafted + registrar's items R-1..R-4"
+  },
+  "script": {
+    "path": "tools/analysis/intent_s0_slotswap_mech.py",
+    "sha16": "sha256-lf16:e459e16fee7a6feb (blob:7821815544e47679f611204d9bbd02a039bd46d4; the blob is LF)",
+    "commit": "db060d4 (branch slotswap-mech); MERGED by path b903cfc8 2026-10-01 after READY 97d5f45 (blob:7821815544e47679f611204d9bbd02a039bd46d4 on main, LF)"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_gold_geom_slotswap.md",
+    "commit": "97d5f45",
+    "merge": "b903cfc8",
+    "verdict": "MERGEABLE; --dry-run READY on SC-1, SC-2; --run READY after SC-3 (SB1-SB5 bracketed: DONE 2026-10-01) and SC-4; SC-4 DISCHARGED 2026-10-01 (--run cleared under SC-1, SC-2)",
+    "conditions": [
+      "SC-1 rule 7 (no java.exe, construction, site null or Ollama embedding in flight; W1-W5)",
+      "SC-2 run from the main checkout",
+      "SC-3 DISCHARGED 2026-10-01 (SB1, SB2 at 16ec85e; SB3-SB5 in this record)",
+      "SC-4 DISCHARGED 2026-10-01 by the registrar: dry-run de018cf9 terciles [1027, 1027, 1168] (tie mass at the upper edge, SB1 / R-1; no empty compared group); M2 SE at the realised sizes 0.0197 (registered 0.0199), MDE80 0.0551 < 0.12: SCOREABLE unchanged; --run cleared under SC-1, SC-2",
+      "owed LOW: SS-D1, SS-D2, SS-D3"
+    ],
+    "source": "docs/reviews/READY_gold_geom_slotswap.md (97d5f45) \"## Verdicts\", \"## Per-claim table (deciding claims)\", \"## Conditions\", \"## Defects (each with a fix)\""
+  },
+  "go": "n/a (0 calls, 0 cce)",
+  "run": {
+    "outcome_file": "experiment_results/intent_transfer/slotswap_mech_outcome.txt (blob:dd165e77d37a8ef04d79d5156b210a2826b49ad4, LF of record, 0 CR); transcript experiment_results/archv2/rp12/readouts/slotswap_run_run.txt (SS-P3: cited there, not moved)",
+    "outcome_commit": "174b4abf",
+    "calls": 0,
+    "cce": 0,
+    "pool": "none read; S0 DB pins re-checked before/after, unchanged",
+    "date": "2026-10-01",
+    "script": "intent_s0_slotswap_mech.py blob:7821815544e47679f611204d9bbd02a039bd46d4 (= READY pin)"
+  },
+  "review": {
+    "file": "docs/reviews/POSTRUN_gold_slotswap_lcb.md",
+    "commit": "207d800e",
+    "verdict": "VALID: M1 HELD, M2 HELD; F-SM1, F-SM2 NOT FIRED; M3 descriptive; under W-S1..W-S3; deciding numbers reproduced (S1-S7); LOW defects SS-P1..SS-P3"
+  },
+  "criteria": [
+    {
+      "id": "M1",
+      "text": "INTERVAL decides: D_Q = flip rate (lowest origin-margin quintile) - flip rate (highest); HELD iff lower(95% CI) >= 0.10; FAILED iff upper < 0.10; UNDETERMINED otherwise",
+      "result": "HELD",
+      "value": "D_Q = 0.5512 - 0.0823 = 0.4689, 95% CI [0.4253, 0.5123]; lower >= 0.10 (the interval decides); an association (W-S1)",
+      "denominator": "644 vs 644 variants (lowest vs highest origin-margin quintile of 3,222; 3,207 components)"
+    },
+    {
+      "id": "M2",
+      "text": "INTERVAL decides: D_T = flip rate (top swap-share tercile) - flip rate (bottom); HELD iff lower > 0; FAILED iff upper <= 0; UNDETERMINED otherwise",
+      "result": "HELD",
+      "value": "D_T = 0.3125 - 0.1714 = 0.1411, 95% CI [0.1067, 0.1752]; lower > 0; also with margin held fixed (review's within-quintile null mean 0.0244, p97.5 0.0583); share confounded with item length, no causal word (W-S2)",
+      "denominator": "1,168 vs 1,027 variants (top vs bottom swap-share tercile; realised [1027, 1027, 1168])"
+    },
+    {
+      "id": "M3",
+      "text": "DESCRIPTIVE-ONLY: S_gemma - S_qwen3, S_nomic - S_qwen3, paired, against the seed spread 0.0335",
+      "result": "n/a",
+      "value": "DESCRIPTIVE: S_gemma - S_qwen3 +0.0664 [+0.0515, +0.0820]; S_nomic - S_qwen3 -0.0667 [-0.0843, -0.0497]; outside the seed spread 0.0335 (one seed per embedder, RAW); never an embedder ranking or parity (W-S3)",
+      "denominator": "3,222 variants (paired)"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "D_Q 0.30 [0.20, 0.40]; M1 HELD p 0.80",
+      "result": "FAILED",
+      "value": "D_Q 0.4689 above [0.20, 0.40] (interval FAILED); M1 HELD p 0.80: event HELD, Brier 0.0400",
+      "denominator": "M1"
+    },
+    {
+      "id": "P2",
+      "text": "D_T +0.12 [+0.04, +0.20]; M2 HELD p 0.65",
+      "result": "HELD",
+      "value": "D_T 0.1411 in [+0.04, +0.20]; M2 HELD p 0.65: event HELD, Brier 0.1225",
+      "denominator": "M2"
+    },
+    {
+      "id": "P3",
+      "text": "S_gemma - S_qwen3 +0.04 [0.00, +0.08]; S_nomic - S_qwen3 -0.04 [-0.08, 0.00]",
+      "result": "HELD",
+      "value": "S_gemma - S_qwen3 +0.0664 in [0.00, +0.08]; S_nomic - S_qwen3 -0.0667 in [-0.08, 0.00] (both parts)",
+      "denominator": "M3"
+    }
+  ],
+  "falsifier": {
+    "text": "F-SM1 (fires iff M1 FAILED): overturns the reading that margin-gated (selective) filing remedies F4; F4's qualifier would read 'surface-dominated' (the thesis word is the author's, D2). F-SM2 (fires iff M2 FAILED): overturns the slot-dominance explanation of S0 D6's short-text deficit. Neither revises a recorded number.",
+    "fired": false,
+    "note": "F-SM1 (fires iff M1 FAILED): NOT FIRED; F-SM2 (fires iff M2 FAILED): NOT FIRED (reviewed 207d800e). F-SM1 NOT FIRED keeps the margin-gating reading open; it does not license 'remedies' (W-S1)"
+  },
+  "numbers_of_record": {
+    "dry_run (pre-data; de018cf9 slotswap_dryrun_run.txt)": "3,222 variants / 3,207 components; swap-share terciles [1027, 1027, 1168] (SB1 mid-rank, ties together); M2 SE at the realised sizes sqrt(0.21/1168 + 0.21/1027) x sqrt(1.0093) = 0.0197 (registered 0.0199), MDE80 0.0551 (bar 0); the dry-run's M1 'realised quintile sizes [644 x 5]' is the nominal n // 5 (registrar's LOW defect); realised quintile sizes are printed by --run",
+    "M1 (of record; 174b4abf; review 207d800e)": "D_Q 0.4689, 95% CI [0.4253, 0.5123]; flip rates by margin quintile 0.5512 / 0.2791 / 0.1894 / 0.0992 / 0.0823 (sizes [644, 645, 644, 645, 644]); denominator 3,222 variants in 3,207 components",
+    "M2 (of record)": "D_T 0.1411, 95% CI [0.1067, 0.1752]; tercile flip rates 0.1714 / 0.2269 / 0.3125 (sizes [1027, 1027, 1168]); joint logistic b_margin -1.1187 (SE 0.0636), b_share 0.3431 (SE 0.0427), descriptive",
+    "M3 (DESCRIPTIVE)": "S qwen3 0.7598 / nomic 0.6930 / gemma 0.8262; gemma - qwen3 +0.0664 [+0.0515, +0.0820]; nomic - qwen3 -0.0667 [-0.0843, -0.0497]; seed spread 0.0335; one k-means seed, RAW",
+    "support as measured": "DEFF (Kish, ICC 1) 1.0093; mean cluster size 1.0047 (SS-P1); n_eff 3,192; SE M1 0.0227 / M2 0.0197 (bootstrap 0.0221 / 0.0176); MDE80 0.0637 / 0.0551",
+    "selective stability (DESCRIPTIVE, no interval)": "S over the top 80% of origin margins 0.8375 (n 2,578) vs all 0.7598; not a registered criterion; not 'margin gating remedies F4'"
+  },
+  "sentence_of_record": "On MASSIVE's 3,222 slot-swap variants (3,207 components; qwen3 256, K 60, k-means seed 0), variants of low-margin origins flip cells more (0.551 vs 0.082, lowest vs highest origin-margin quintile; D_Q 0.469 [0.425, 0.512]), and a larger inserted-token share predicts flips, also with margin held fixed (D_T 0.141 [0.107, 0.175], top vs bottom swap-share tercile). [associations over fixed variants, no causal word; share is confounded with item length; it does not show that slot swaps are a small perturbation nor that margin gating remedies F4 ('selective stability' 0.8375 is descriptive, no interval); M3 (gemma +0.066, nomic -0.067 against qwen3; one seed, RAW) is never an embedder ranking or parity; the embedder of record and F4's qualifier word (D2) are the author's; W-S1..W-S3, review 207d800e]",
+  "chips": [
+    "REGISTERED 2026-10-01, BEFORE ANY CODE [plan]",
+    "M1, M2 SCOREABLE; M3 DESCRIPTIVE-ONLY [plan]",
+    "BUILT db060d4 (UNMERGED); SB1, SB2 CONFIRMED; READY REVIEW OWED [plan]",
+    "READY 97d5f45 / MERGED b903cfc8: READY UNDER SC-1..SC-4; SB1-SB5 BRACKETED; SC-4 TERCILE SIZES BEFORE --RUN [plan]",
+    "RAN 174b4abf; VALID (207d800e): M1 HELD (D_Q 0.469 [0.425, 0.512]), M2 HELD (D_T 0.141 [0.107, 0.175]); ASSOCIATIONS, NO CAUSAL READING; NO REMEDY CLAIM FOR F4; M3 DESCRIPTIVE, NO EMBEDDER RANKING [ok]"
+  ],
+  "brackets": [
+    {
+      "date": "2026-10-01",
+      "by": "the registrar (checkpoint A text; insertion only; zero calls)",
+      "text": "REGISTERED from checkpoint A (167062c). R-1 tie rule and realised group sizes printed; R-2 S by slot count (c9c2fed W-5) seen before registration, disclosed; R-3 F4 qualifier wording is the author's (D2); R-4 kind zero-call. Precondition (data-steward): all 3,222 variants in the three S0 embedding DBs. docs/judge_v2_program.md L22301-L22330 (section \"## Registered 2026-10-01 (before any code or call) \u2014 INTENT-S0-SLOTSWAP-MECH: on MASSIVE's 3,222 slot-swap variants of INTENT-TRANSFER-S0 C4, ...\"; _as_of the commit that writes it, parent e7348f3, re-grepped)"
+    },
+    {
+      "date": "2026-10-01",
+      "by": "the registrar (pre-data; insertion only; none moves a bar)",
+      "text": "Built on branch slotswap-mech db060d4 (zero calls; nothing run on data). The builder's readings: SB1 CONFIRMED: mid-rank groups, ties stay in one quantile group; an empty compared group gives no interval and the criterion prints UNDETERMINED (a registered outcome). SB2 CONFIRMED: whitespace tokens (str.split), swap share on the VARIANT side; origin-side share printed NOT OF RECORD. SB3-SB5 not ruled here (left to the READY review). Bracketed into the registration. State registered -> built. docs/judge_v2_program.md L22359-L22384 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-readout) \u2014 READY_rp12_pair_mc ccef91d and merge 87ee41e; ...\"; _as_of the commit that writes it, parent 4fad894, re-grepped)"
+    },
+    {
+      "date": "2026-10-01",
+      "by": "the registrar (READY_gold_geom_slotswap 97d5f45; merge b903cfc8; the orchestrator's brief of 2026-10-01; pre-data; insertion only)",
+      "text": "READY 97d5f45 (MERGEABLE; dry-run and run READY under SC-1..SC-4), merged by path b903cfc8. SB3 (swapped values recovered by re-running c4_variants' draw, SEED_C4, same order; render mismatch REFUSES), SB4 (bootstrap seed SEED_MECH 20261003; zero-weight draws dropped and counted), SB5 (selective stability = S over margin quintiles 2-5) CONFIRMED pre-data, bracketed into INSTRUMENT and PRINTED, DESCRIPTIVE. Review evidence: R-2 3,222 / 3,222 variants in each of the three DBs (S3); Support (d)-(e) re-derived (S6). SC-4 owed before --run. State built -> READY. docs/judge_v2_program.md L22386-L22395 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data) \u2014 READY_gold_geom_slotswap 97d5f45 and merge b903cfc8; ...\"; _as_of the commit that writes it, parent 5210a9e, re-grepped)"
+    },
+    {
+      "date": "2026-10-01",
+      "by": "the registrar (correction by insertion)",
+      "text": "[CORRECTED 2026-10-01 by the registrar: the pointers of 2026-10-01 to docs/judge_v2_program.md L22359-L22384 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-readout) \u2014 READY_rp12_pair_mc ccef91d and merge 87ee41e; ...\") say \"parent 4fad894\"; the commit that wrote them, 16ec85e, has parent b3183bb (git log --format='%h %p' -1 16ec85e); the span stands.] docs/judge_v2_program.md L22386-L22395 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data) \u2014 READY_gold_geom_slotswap 97d5f45 and merge b903cfc8; ...\"; _as_of the commit that writes it, parent 5210a9e, re-grepped)"
+    },
+    {
+      "date": "2026-10-01",
+      "by": "the registrar (SC-4; insertion only; pre-data)",
+      "text": "SC-4 DISCHARGED: terciles [1027, 1027, 1168] read against SB1 / R-1 (tie mass at the upper edge; no empty compared group); M2 SCOREABLE unchanged at the realised sizes (SE 0.0197, MDE80 0.0551); --run may proceed under SC-1, SC-2. LOW defect: the dry-run M1 quintile line prints the nominal n // 5 [644 x 5] (sum 3,220), not realised sizes. docs/judge_v2_program.md L22397-L22404 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run by the registrar) \u2014 SC-4 read: INTENT-S0-SLOTSWAP-MECH --run may proceed; ...\"; _as_of the commit that writes it, parent 2b8f809a, re-grepped)"
+    },
+    {
+      "date": "2026-10-01",
+      "by": "the registrar (post-run review 207d800e; insertion only)",
+      "text": "RAN 174b4abf; OUTCOME of record: VALID; M1 HELD, M2 HELD, F-SM1 / F-SM2 NOT FIRED, M3 descriptive; W-S1..W-S3 applied; SS-P1 (quote DEFF (Kish, ICC 1) 1.0093, mean cluster size 1.0047), SS-P2 (dry-run label), SS-P3 (transcript path) LOW; SS-D1..SS-D3 owed. [NOTE: the chips list of the previous update carried an 'SC-4 READ ...' chip that the ledger row never had; the list now mirrors the ledger row at v324.] State READY -> done. docs/judge_v2_program.md L22457-L22470 (section \"## INTENT-S0-SLOTSWAP-MECH (2026-10-01, 0 calls) \u2014 VALID (post-run review docs/reviews/POSTRUN_gold_slotswap_lcb.md, 207d800e): M1 ...\"; _as_of the commit that writes it, parent 12ceb48c, re-grepped)"
+    }
+  ],
+  "does_not_show": [
+    "a causal mechanism (associations over fixed variants; share confounded with item length)",
+    "that margin gating remedies F4 (selective stability descriptive, no interval)",
+    "anything about a tree leaf (k-means cells only), capability text or natural paraphrase",
+    "embedder parity or ranking (M3 descriptive, one seed, RAW)",
+    "a second split draw or k-means seed for M1 / M2"
+  ],
+  "ledger": {
+    "row_id": "INTENT-S0-SLOTSWAP-MECH",
+    "version": "v324 (2026-10-01: outcome bracket and chip, VALID 207d800e) | v323 (2026-10-01: READY_gold_geom_slotswap 97d5f45 / merge b903cfc8; GB2-GB4, SB3-SB5 bracketed; measured gold null; GC-3 STOP; parent of 16ec85e corrected) | v322 (2026-10-01: MC-EXCLUDE / ruling (b) bracket, READY_rp12_pair_mc ccef91d / merge 87ee41e; GB1, SB1, SB2 confirmed) | v321 (2026-10-01: new section-7 row, registered)"
+  },
+  "depends_on": [
+    "INTENT-TRANSFER-S0 (C4 variants, pinned DBs)",
+    "the data-steward's variant-presence check"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing; touches no closed line (CONTEXT section 5 checked at e7348f3)"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L22301-L22330 (section \"## Registered 2026-10-01 (before any code or call) \u2014 INTENT-S0-SLOTSWAP-MECH: on MASSIVE's 3,222 slot-swap variants of INTENT-TRANSFER-S0 C4, ...\"; _as_of the commit that writes it, parent e7348f3, re-grepped)",
+    "docs/judge_v2_program.md L22292-L22299 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-readout) \u2014 checkpoint A (167062c): B-A1, B-A2, B-A3 bracketed into ARCH-V2-E-T; ...\"; _as_of the commit that writes it, parent e7348f3, re-grepped)",
+    "docs/agents/plans/2026-10-01_checkpoint_A.md (167062c)",
+    "docs/judge_v2_program.md L22359-L22384 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-readout) \u2014 READY_rp12_pair_mc ccef91d and merge 87ee41e; ...\"; _as_of the commit that writes it, parent 4fad894, re-grepped)",
+    "docs/judge_v2_program.md L22386-L22395 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data) \u2014 READY_gold_geom_slotswap 97d5f45 and merge b903cfc8; ...\"; _as_of the commit that writes it, parent 5210a9e, re-grepped)",
+    "docs/reviews/READY_gold_geom_slotswap.md (97d5f45) \"## Verdicts\", \"## Per-claim table (deciding claims)\", \"## Conditions\", \"## Defects (each with a fix)\"",
+    "docs/judge_v2_program.md L22397-L22404 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run by the registrar) \u2014 SC-4 read: INTENT-S0-SLOTSWAP-MECH --run may proceed; ...\"; _as_of the commit that writes it, parent 2b8f809a, re-grepped)",
+    "experiment_results/archv2/rp12/readouts/slotswap_dryrun_run.txt (de018cf9)",
+    "experiment_results/intent_transfer/slotswap_mech_outcome.txt (174b4abf)",
+    "docs/reviews/POSTRUN_gold_slotswap_lcb.md (207d800e)",
+    "docs/judge_v2_program.md L22457-L22470 (section \"## INTENT-S0-SLOTSWAP-MECH (2026-10-01, 0 calls) \u2014 VALID (post-run review docs/reviews/POSTRUN_gold_slotswap_lcb.md, 207d800e): M1 ...\"; _as_of the commit that writes it, parent 12ceb48c, re-grepped)"
+  ],
+  "last_update": "2026-10-01 (registrar: registered; ledger v321); 2026-10-01 (registrar: built db060d4, readings confirmed; ledger v322); 2026-10-01 (registrar: READY 97d5f45 / merge b903cfc8; SB3-SB5 bracketed; SC-4 owed; ledger v323); 2026-10-01 (registrar: SC-4 discharged, --run cleared; ledger unchanged v323); 2026-10-01 (registrar: ran 174b4abf; VALID by 207d800e; done; ledger v324)",
+  "support": {
+    "a": "3,222 variants in 3,207 components (Kish 1.0047); quintiles ~644, terciles ~1,074",
+    "b": "DEFF 1.0093 MEASURED (S0 C4)",
+    "c": "n_eff 3,192",
+    "d": "M1 sqrt(0.24/640 + 0.09/640) x sqrt(1.0093) = 0.0228; M2 sqrt(2 x 0.21/1,070) x sqrt(1.0093) = 0.0199; M3 sqrt(0.25/3,192) = 0.0089 (declared discordance)",
+    "e": "MDE80 M1 0.064 (bar 0.10); M2 0.056 (bar 0); M3 0.025, effective bar 0.0335",
+    "f": "M1 SCOREABLE (0.20 > 0.064); M2 SCOREABLE (0.12 > 0.056); M3 DESCRIPTIVE-ONLY (0.0065 < 0.025)",
+    "g": "M1, M2 reachable; M3 never passes a true gap inside the seed spread"
+  },
+  "cost": {
+    "calls_expected": 0,
+    "cce_expected": 0,
+    "calls_max": 0,
+    "cce_max": 0,
+    "machine": "CPU ~15 min single-threaded; not a pool reader",
+    "agent_hours": "engine-coder ~2 h + READY",
+    "priced": "the research lead's estimates"
+  },
+  "plain_description": {
+    "sq": "SQ5 Invariance",
+    "what": "On 3,222 MASSIVE intent queries whose slot words were swapped (e.g. a different city name), it asks what predicts a query jumping to a different k-means cell. Candidates are how close the original sat to a cell boundary and how much of the text was swapped, with a descriptive look at the embedder.",
+    "why": "An earlier test found cells unstable under slot swaps. This test tries to explain why, and whether flagging near-boundary queries could help.",
+    "information": "If boundary closeness predicts flips, low-confidence queries could be flagged. If swap size predicts flips, the instability is driven by surface wording. Result: done. Both predict flips. Near-boundary queries flipped 55% of the time vs 8% for the safest fifth, and larger swaps flipped more even at fixed boundary distance. These are associations, not causes (swap share is mixed up with text length). Not shown: that boundary-gating fixes the problem. The embedder look is descriptive only, one seed, not a ranking.",
+    "written": "2026-10-07"
+  }
+}

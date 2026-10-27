@@ -1,0 +1,133 @@
+# ══════════════════════════════════════════════════════════════════════════
+#  outputDir: experiment_results/canonical_freeze
+#  canonical_freeze.toml — THE FROZEN ARTIFACT
+#
+#  This is the run whose snapshot every downstream result cites. It must be
+#  reproducible from the repository alone, which means it runs from a COMMITTED
+#  tree: check run_manifest.json reports "dirty": false before using anything
+#  from it. A run from uncommitted code is a diagnostic, not an artifact.
+#
+#  ── Differences from canonical_baseline.toml, and why ─────────────────────
+#  enableLabeling = true
+#      The existing labels came from a dirty run. Labels are part of the frozen
+#      artifact: every leaf-level result is quoted by concept name.
+#  judgeInduction = true
+#      REQUIRED, and not retrofittable. ensureJudgePrompts throws on the first
+#      leaf lacking a rubric, and judgeInduction runs ONLY inside the
+#      construction branch -- there is no path that adds rubrics to an existing
+#      snapshot. A snapshot without rubrics can never be arena'd, so the rubrics
+#      must be induced here, in the run that produces the frozen snapshotId.
+#  runBaselines = false
+#      WARD_BASELINE is broken (8.47% top-1, ~chance, a scoring-path bug) and
+#      k-means at matched k is already measured. Nothing to gain, one bad number
+#      to avoid.
+#  runBenchmark = false
+#      The arena is a separate run against this snapshot, with its own roster.
+#
+#  ── Everything else is canonical and unchanged ────────────────────────────
+#  seed 42 was fixed before any result was observed. It is ATYPICAL on both
+#  axes and that must be reported rather than discovered by a reader: 88 leaves
+#  against 64-68 for the other four seeds, and held-out top-1 75.16% against a
+#  five-seed mean of 74.10 +/- 1.14. It is NOT atypical in partition content
+#  (mean ARI 0.609 involving seed 42, versus 0.653 among the other four), so the
+#  difference is granularity, not a different geometry.
+#
+#  minClusterSize stays 30. It is the binding constraint on granularity -- 39 of
+#  42 blocked splits hit it against 6 hitting the separation bar -- but no
+#  blocked node reaches min_child 29, so lowering it to 25 recovers 7 nodes and
+#  to 20 recovers 11. That substructure is real but small-grained, and cells
+#  that small are individually unmeasurable (r ~ 0.45 at ~18 held-out queries).
+#
+#  proposalSeparationBar stays 0.025, calibrated between two measured nulls
+#  (isotropic p95 0.0209, within-domain 0.068-0.130). It binds only 6 nodes.
+#  Philosophy's best split scores 0.0212 -- between the 95th and 99th percentile
+#  of the isotropic null, i.e. at the boundary of detectability -- and the bar
+#  declines it. Philosophy is therefore a single 406-query leaf, which is a
+#  reported property with a measured cost: it is among the least evaluatively
+#  informative cells in the taxonomy.
+#
+#  ── Verify before citing this run ─────────────────────────────────────────
+#   * run_manifest.json: "dirty": false, commit recorded, config_sha256 present
+#   * fixed_point_certificate.txt: CERTIFIED true on all four terms
+#   * 14/14 depth-1 anchors retained
+#   * mass conserved (no [MASS] warnings)
+#   * snapshotId logged -- every later run references it
+#   * diagnostics/iteration_metrics.csv has ROWS, not just a header
+#   * diagnostics/proposals.csv non-empty
+#   * [JUDGE-LEAK] audit clean for every leaf (the gate throws if not)
+#
+#  ── The arena that follows this run ───────────────────────────────────────
+#  Judge at LEAVES, not at a coarser cut. aggregateLeafScores pools sufficient
+#  statistics, so leaf-level verdicts can be re-aggregated offline to depth-3
+#  (65 cells), depth-2 (37), depth-1 (14) and MMLU-Pro's 14 labels -- yielding a
+#  granularity-fidelity curve from ONE run. Judging at a coarse cut forecloses
+#  the fine end permanently; judging fine costs nothing later.
+#
+#  The budget lever is the ROSTER, not the cells: calls scale as
+#  2 x cells x pairs x n, and pairs = M(M-1)/2 is quadratic in the roster. At 15
+#  models (105 pairs) a leaf-level run cannot complete one pass in 10k calls; at
+#  8 models (28 pairs) it can. Spearman at n=8 needs rho ~ 0.74 for p<0.05,
+#  which the smoke runs clear. Suggested 8, balanced 4/4 on trace presence so
+#  the RQ1 stratification survives, spanning 23-77% GT accuracy:
+#    trace:    claude-3-5-sonnet, gpt-4o, deepseek-chat-v2_5, claude-3-5-haiku
+#    no trace: Meta-Llama-3_1-70B-Instruct, Qwen1.5-72B-Chat, Llama-2-70b-hf,
+#              Llama-2-13b-hf
+# ══════════════════════════════════════════════════════════════════════════
+
+datasetType   = "MMLU_PRO"
+
+models        = [
+    "gpt-4o-2024-08-06",
+    "claude-3-5-sonnet-20241022",
+    "gemini-1.5-pro-002",
+    "deepseek-chat-v2_5",
+    "Meta-Llama-3_1-70B-Instruct",
+    "Qwen1.5-72B-Chat",
+    "gpt-4o-mini",
+    "claude-3-5-haiku-20241022",
+    "Mixtral-8x7B-Instruct-v0.1",
+    "c4ai-command-r-v01",
+    "Qwen1.5-14B-Chat",
+    "Meta-Llama-3_1-8B-Instruct",
+    "gemini-1.5-flash-002",
+    "Llama-2-70b-hf",
+    "Llama-2-13b-hf"
+]
+
+category      = ""
+queryLimit    = 0
+outputDir     = "experiment_results/canonical_freeze"
+testRatio     = 0.3
+seed          = 42
+
+runPipeline        = true
+runBenchmark       = false
+runTrickle         = true
+runBaselines       = false
+enableFinalMetrics = true
+enableLabeling     = true
+judgeInduction     = true
+
+dagMode = "DAG_MAX"
+
+maxDepth              = 8
+minClusterSize        = 30
+proposalSeparationBar = 0.025
+tau                   = 1e-6
+acceptanceZ           = 0.0
+enableRefitGate       = false
+
+membershipFloor       = 0.25
+routingBeamGamma      = 0.2
+descentMargin         = 0.12
+
+effectiveSupportFloor = 2.0
+defaultKappaPrior     = 10.0
+
+numIterations         = 50
+maxLeafAssignments    = 5
+
+fusionSimilarityThreshold = 0.90
+enableGtWarmStart         = false
+
+enableProfiling           = true

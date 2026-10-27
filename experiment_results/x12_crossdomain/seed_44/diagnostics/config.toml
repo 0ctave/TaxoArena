@@ -1,0 +1,114 @@
+# CROSS-DOMAIN 12-MODEL ARENA — one Bradley-Terry scale, expanded roster, PRE-REGISTERED.
+#
+# WHY THIS RUN EXISTS (2026-09-06). The 8-model cross-domain pair of runs established,
+# pre-registered and confirmed (x8_crossdomain_confirm.toml, p_perm = 0.003 twice), that
+# arena verdicts recover the model x domain-group interaction. Both runs, however, carried
+# the interaction on ONE model per side (arx_0314 toward math, Llama-2-7b-hf toward
+# law+psychology), and the confirm run shared 83% of its comparison slots with the
+# exploratory schedule. This run changes both weaknesses at once: four roster additions
+# selected from the 47-model ground-truth screen put TWO models from different families on
+# each side of the registered axis, and the roster change itself forces a genuinely
+# different schedule (66 pairs vs 28), giving the design independence the confirm run
+# lacked.
+#
+# ROSTER ADDITIONS, frozen here with their reserved-set ground-truth deltas
+# (logit deviation math minus mean of law+psychology, additive model removed):
+#
+#   iask_pro             +1.31   second math-specialist, different family than arx
+#   deepseek-chat-v2_5   +0.89   (chemistry-law +1.35: strongest chemistry axis in the pool)
+#   c4ai-command-r-v01   -0.90   second law-leaning model, different family than Llama-2
+#   Llama-2-13b-hf       -1.06   within-family corroboration of the Llama-2 tilt
+#
+# Full-roster GT deltas on the registered axis, for the record: gemini +1.18, arx +1.32,
+# gpt-4o +0.57, iask +1.31, deepseek +0.89, L3.1-70B -0.15, Qwen72B -0.40, command-r
+# -0.90, L3.1-8B -0.22, Yi-6b -1.03, L2-13b -1.06, L2-7b -1.51.
+#
+# PREFLIGHT (2026-09-06, smoke12_preflight.toml): 12-model loading, judging, and
+# kill+restart verified on Business (1,375 matches; new-model judge agreement 73.5-79.9%,
+# inside the roster band; zero INVALID through a 103-429 burst; mid-crash resume re-judged
+# only the missing slots). Throughput restored to the zero-429 point 32 permits / 3.0 rps.
+#
+# REGISTRATION, frozen here before the run starts:
+#
+#   Primary test: tools/analysis/crossdomain_interaction_lrt.py as committed at 6433111,
+#   run UNCHANGED on this run's database (it aggregates whatever roster the db holds).
+#   Additive Bradley-Terry against per-group Bradley-Terry over Math / Law+Psychology /
+#   other; ties half-weighted; Jeffreys 0.5; permutation null = group labels shuffled
+#   within pair, NPERM = 1000, permutation RNG seed 42. Per-model deltas
+#   delta(m) = theta_m(Math) - theta_m(Law+Psychology) are read from the primary
+#   script's per-group fits (extraction only, no new statistic).
+#
+#   CONFIRMED if all five hold:
+#     (1) p_perm < 0.05;
+#     (2) arx_0314        delta > 0   (replication, third independent dataset);
+#     (3) Llama-2-7b-hf   delta < 0   (replication, third independent dataset);
+#     (4) iask_pro        delta > 0   (new model, new family, math side);
+#     (5) c4ai-command-r-v01 delta < 0 (new model, new family, law side).
+#   Any other pattern is reported as-is; (1) alone is "interaction present, direction
+#   pattern unconfirmed".
+#
+#   Secondary, DESCRIPTIVE ONLY (adjudicates nothing): deepseek-chat-v2_5
+#   delta(chemistry - law) > 0 from per-anchor fits; Llama-2-13b-hf delta < 0 on the
+#   primary axis; the 12-model global ordering against reserved-set GT accuracy
+#   (rho/tau via tools/analysis/refit_bt_from_matches.py methodology).
+#
+# DESIGN. x8_crossdomain_deep design with the expanded roster, fresh seed 44, its own
+# outputDir and untracked database. Expected scale ~7-10k logical comparisons (placement
+# stopping decides; 66 pairs vs 28 at k-1 racing focus). resumeBenchmark is ON from the
+# start: a crash is recovered by relaunching the same command — verified to reconstruct
+# recorded matches and re-judge only missing slots. NOTE: a resumed run's manifest counts
+# reconstructed comparisons in llmJudgeApiCalls; actual spend is new matches x 2.
+#
+# Launch: set -a; source <(tr -d '\r' < .env); set +a; \
+#   ./gradlew.bat bootRun --rerun-tasks \
+#     -Dranking.db.path=experiment_results/x12_crossdomain/ratings_x12.db \
+#     --args="--config experiment_configs/x12_crossdomain.toml"
+# AFTER the run (and after any resume): restore
+# frozen_triples_20260727_042523_Headless_Run_Auto_ge_MAIN.json from HEAD.
+#
+# MAIN ONLY, NOT a thesis result: the settled batch stands as published.
+#
+datasetType   = "MMLU_PRO"
+models        = [
+    "gemini-3.1-pro_5-shots",
+    "arx_0314",
+    "gpt-4o-2024-08-06",
+    "iask_pro",
+    "deepseek-chat-v2_5",
+    "Meta-Llama-3_1-70B-Instruct",
+    "Qwen1.5-72B-Chat",
+    "c4ai-command-r-v01",
+    "Meta-Llama-3_1-8B",
+    "Yi-6b-Chat",
+    "Llama-2-13b-hf",
+    "Llama-2-7b-hf"
+]
+snapshotId    = "20260727_042523_Headless_Run_Auto_ge"
+# category deliberately ABSENT: the whole reserved pool routes, across every domain's cells.
+queryLimit    = 0
+outputDir     = "experiment_results/x12_crossdomain"
+testRatio     = 0.3
+seed          = 44
+
+runPipeline        = false
+regenerateSplit    = false   # load-bearing: use the canonical reserved pool as-is
+runBenchmark       = true
+runTrickle         = false
+runBaselines       = false
+enableFinalMetrics = false
+enableLabeling     = false   # rubrics already in the snapshot
+judgeInduction     = false
+
+conditions         = ["MAIN"]
+resumeBenchmark    = true    # crash recovery: relaunch the same command, no re-judging
+questionsPerRound  = 250
+confidenceGate     = 0.0
+parallelism        = 4
+reservedOnly       = true
+
+dagMode = "DAG_MAX"
+maxDepth              = 8
+minClusterSize        = 55
+proposalSeparationBar = 0.025
+
+judgeOptionMode = "RESOLVED"

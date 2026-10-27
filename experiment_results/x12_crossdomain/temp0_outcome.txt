@@ -1,0 +1,17 @@
+=== TEMP-0: the same prompt twice at temperature 0, on DECOMP's 299 byte-identical-prompt matches ===
+
+  (1) PRIMARY - the test-retest floor:
+      at the provider DEFAULT (DECOMP, same 299 matches)  0.057
+      at TEMPERATURE 0 (this run)                         0.050
+      difference -0.007  bootstrap 95% CI [-0.030, +0.017]
+      byte-identical RESPONSES between the two passes: 0.177 at temperature 0 | 0.000 at the default (n=299)
+      REGISTERED BAR: below 0.02 -> the floor is NOT a temperature artefact; keep the +-3pp reading rule
+
+  (2) IS IT THE SAME JUDGE, or a different one? (the risk that makes a lower floor useless)
+      agreement between the temperature-0 verdict and the default-temperature verdict 0.940 on 299 matches
+      the new contestant's win rate: temperature 0 0.779 | default 0.779 (+0.000) | 8:8 | McNemar p=1
+      -> the verdict distribution is unchanged, so temperature 0 is a QUIETER judge, not a different one
+
+  (3) POWER - minimum detectable paired effect, SE = sqrt(d/n):
+      default        n=600: SE 0.0097, 2-sigma 0.019 | n=1000: SE 0.0075, 2-sigma 0.015
+      temperature 0  n=600: SE 0.0091, 2-sigma 0.018 | n=1000: SE 0.0071, 2-sigma 0.014

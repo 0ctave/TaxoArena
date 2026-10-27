@@ -1,0 +1,22 @@
+=== ARENA-V3-COMPILED: the paper's board from the interventions that survived ===
+  judge Mistral-Large-3 (the x12 MAIN judge), reasoning reference, v2 mechanics, anchor rubric, dual order
+
+  board                      matches    calls      ties decisive-and-correct  correct-given-committed
+  A  ARENA-V2, all matches      9142    18284     0.209   0.852 [0.842, 0.863]      0.918 [0.910, 0.926]
+  B  + disagreement filter      5276    10552     0.118   0.846 [0.836, 0.858]      0.912 [0.904, 0.922]
+  C  + replicate tie-break      5276    11802     0.051   0.868 [0.858, 0.879]      0.903 [0.893, 0.911]
+
+  board                             rho             rho 95% CI   top-4 viol    viol 95% CI
+  A  ARENA-V2, all matches       0.9720     0.9580-0.9860            2          1-3
+  B  + disagreement filter       0.9860     0.9720-0.9860            1          1-2
+  C  + replicate tie-break       0.9860     0.9720-0.9860            1          1-2
+  (ORACLE-BOARD, the key as verdict on the same schedule: rho 1.0000, 0 violations)
+
+  (1) PRIMARY, both rates on the SAME 4106 common decidable matches: C 0.868 vs A 0.846 (+0.022)
+      (for reference, each board's rate on its own decidable set: A 0.852 over all matches, C 0.868
+       over the filtered ones - different denominators, not comparable directly)
+      discordant 0:92 | McNemar p=4.039e-28 | registered bar: +3pp and p<0.05 -> FAIL
+  (2) BOARD: rho 0.9860 (bar 0.967) and 1 top-4 violations (bar <=1) -> PASS
+  (3) COST: 11802 calls against 18284 for the unfiltered dual-order board = 65% (bar <=70%) -> PASS
+  (4) DUAL REPORTING: decisive-and-correct 0.852 -> 0.868 (+0.016) while correct-given-committed
+      0.918 -> 0.903 (-0.015) -> the gain is DECISIVENESS, not discrimination - the abstention finding stated as cleanly as it can be

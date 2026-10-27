@@ -1,0 +1,154 @@
+{
+  "id": "JUDGE-TRANSFER",
+  "title": "JUDGE-TRANSFER: does the widener transfer across JUDGE families? (zero calls)",
+  "question": "Fit tau on Mistral x12 (the shipped b0, b1), apply COLD to per-anchor edges built from grok-judged verdicts (stack_v2_kit2_grok.db, the arm without the leaf card, 1,974 verdicts on 1,371 x12 questions; 10 of 14 anchors at a 100-match floor); also refit b1 on grok: (1) realised vs nominal on the grok edges, all / established; (2) b1 refit inside the Mistral CI [1.72, 7.87]; (3) utility.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "60cb7f3",
+    "program_lines": "docs/judge_v2_program.md L3312 (section) and L3341-L3351 (C. JUDGE-TRANSFER)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-15 (before any run) — six tests from the big picture after the review. Standing rules from the review apply to all six: every wrong-direction count carries its McNemar-established count on the anchor's judged questions; UNDETERMINED is a registered outcome; the key denominator is named; nulls preserve what the question conditions on; the data object is checked before strata are read into it.",
+    "outcome_heading": [
+      "L3399: ## BIG-PICTURE TESTS A, C, D, E — outcomes (2026-09-15, zero calls). Each built by one agent from the registration at 60cb7f3 and recomputed by an independent checker; every number reproduced; verdict labels corrected by the checker where the builder's rested on an unregistered reading.",
+      "L3419: - **JUDGE-TRANSFER (2026-09-15, zero calls): falsifier does not fire on either half; b1 refit on grok +3.58 is inside [1.72, 7.87] (registered point check MET, weakly located); cold ratio UNDETERMINED at nominal 0.93 (0 wrong of 354 established calls), with the > 5x falsifier region excluded at p = 0.0096; utility 57.0% with no bar registered here.**"
+    ],
+    "date": "2026-09-15"
+  },
+  "script": {
+    "path": "tools/analysis/judge_transfer.py",
+    "sha16": "4319987f4d01d0b5",
+    "commit": "22e16f7"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/judge_transfer.txt",
+    "outcome_commit": "22e16f7",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-15"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the independent checker's recomputation recorded inside the outcome bullet (check_*.py scratch scripts named there; 'every number reproduced; verdict labels corrected by the checker where the builder's rested on an unregistered reading')",
+    "commit": "22e16f7",
+    "verdict": "every number reproduced by the independent checker; verdict labels as corrected by the checker"
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "realised wrong-direction rate (all / established) vs nominal on the grok edges with the Mistral parameters cold",
+      "result": "UNDETERMINED",
+      "value": "640 edges (gap >= 0.02; 50 wrong): raw certificate 421 called, 2(0) wrong; cold budget at 0.975: 365 called, 0(0) wrong, nominal 1.04 -> 0.00x; established-only 354 called, 0 wrong, nominal 0.93 -> 0.00x; every anchor 0 wrong of 30-48 called; Math+Physics 90/0/0.16; unfiltered 658 edges: raw 422/3(0), budget 365/0(0)/1.04: UNDETERMINED (nominal < 3, budget_transfer's pre-committed rule); a cold ratio above 5x is excluded at p 0.0096",
+      "denominator": "640 grok edges over 10 anchors (Business 63, Engineering 88, History 75, Philosophy 64 matches excluded at the 100-match floor); key denominator the anchor's GROK-JUDGED questions (1,149)"
+    },
+    {
+      "id": "(2)",
+      "text": "b1 refit on grok inside the Mistral anchor-clustered CI [1.72, 7.87]",
+      "result": "HELD",
+      "value": "all labels, gap >= 0.02: b0 -3.8600, b1 +3.5837, deviance 217.72 (Mistral params 220.63; tau = 0 228.74) -> INSIDE; profile delta-dev at b1 = 0 / 1.72 / 7.87 / 15: 5.70 / 0.98 / 0.85 / 2.25 (b1 = 0 rejected p ~0.017; nothing in [~1, ~30] is); anchor-clustered bootstrap seed-dependent ([-0.78, +19.15] seed 7; [+0.28, +28.20] seed 2026); established labels only (528 edges, 14 wrong): MLE degenerate at tau -> 0, profile flat: PASS on the registered point check (checker) with the identifiability caveat; builder printed UNDETERMINED",
+      "denominator": "640 / 528 edges"
+    },
+    {
+      "id": "(3)",
+      "text": "utility",
+      "result": "DELIVERED",
+      "value": "cold budget 365/640 = 57.0% (55.5% unfiltered); raw 421/640 = 65.8%; 86.7% of raw calls retained; 54 correct calls surrendered to remove 2 unestablished wrong; gate A < 0.80 removes 1 of the 2 for 12 correct; in-roster x12 raw 82.9%, budget 74.6%: a number, no bar registered here (below the 60% bar other tests set at x12 support)",
+      "denominator": "640 edges"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "b1 refit on grok lands inside the CI (widening with agreement is a judge-family property)",
+      "result": "HELD",
+      "value": "+3.5837 inside [1.72, 7.87]; b1 > 0 established by LR; weakly located",
+      "denominator": "640 edges"
+    },
+    {
+      "id": "P2",
+      "text": "the cold ratio is 1.5-3x on established labels",
+      "result": "UNDETERMINED",
+      "value": "0 of 354 at nominal 0.93: P(X = 0 | 2.79) = 0.061, the 1.5-3x band is not confirmable",
+      "denominator": "354 established called"
+    },
+    {
+      "id": "P3",
+      "text": "'the b1 criterion is the one with power'",
+      "result": "FAILED",
+      "value": "50 wrong edges leave the b1 profile nearly flat above ~1",
+      "denominator": "640 edges"
+    }
+  ],
+  "falsifier": {
+    "text": "b1 refit outside the CI or a cold ratio above 5x on established labels means the parameter is Mistral-specific and must be published so",
+    "fired": false,
+    "note": "does not fire on either half; the ratio half is excluded at this support (P(X = 0 | 4.65) = 0.0096); nothing supports 'Mistral-specific'; nothing establishes transfer at the operating point; on established labels the grok data prefer no widener (tau = 0 is the MLE)"
+  },
+  "numbers_of_record": {
+    "data": "stack_v2_kit2_grok.db arm stackv2_datacard (no leaf card); 1,974 valid verdicts on 1,371 questions, 66 pairs, ARENA12; 10 of 14 anchors at the 100-match floor; edges 658 (gap > 0, 59 wrong) / 640 (gap >= 0.02, 50 wrong)",
+    "cold": "raw 421 called / 2(0) wrong; budget 365 / 0(0) / nominal 1.04; established 354 / 0 / 0.93",
+    "refit": "b0 -3.8600, b1 +3.5837 (deviance 217.72 vs 220.63 Mistral params vs 228.74 tau = 0); profile flat above ~1; bootstrap seed-dependent; established-only MLE tau -> 0",
+    "utility": "57.0% cold (55.5% unfiltered); raw 65.8%; x12 in-roster 82.9% / 74.6%",
+    "checker_notes": "grok edge table bit-identical; the gap >= 0.02 filter silently dropped 18 edges (9 wrong), restated; runtime 28 s not '~10 min'"
+  },
+  "sentence_of_record": "JUDGE-TRANSFER (2026-09-15, zero calls): falsifier does not fire on either half; b1 refit on grok +3.58 is inside [1.72, 7.87] (registered point check MET, weakly located: the profile is nearly flat above ~1 and the anchor-clustered bootstrap is seed-dependent; on established labels alone the MLE is tau -> 0); cold ratio UNDETERMINED at nominal 0.93 (0 wrong of 354 established calls), with the > 5x falsifier region excluded at p = 0.0096; utility 57.0% with no bar registered here. 'The b1 criterion is the one with power' did NOT hold. Nothing supports 'Mistral-specific'; nothing establishes transfer at the operating point. [GROK-CALIB 2026-09-16 superseded the cold UNDETERMINED with a fitted board of the judge's own.]",
+  "chips": [
+    "(1) UNDETERMINED",
+    "(2) INSIDE THE CI",
+    "NEITHER HALF OF THE PREDICTION DECIDED"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-15",
+      "by": "the independent checker (check_jt.py), recorded in the outcome bullet (22e16f7)",
+      "text": "verdict corrections: (2) is PASS on the registered point-in-interval check with the identifiability caveat attached, not UNDETERMINED (the downgrade rested on an unregistered profile / bootstrap analysis); (3) is a number, not a FAIL (bar imported from other registrations)."
+    },
+    {
+      "date": "2026-09-16",
+      "by": "GROK-CALIB (programme L3940: 'JUDGE-TRANSFER's UNDETERMINED cold ratio is now superseded by a fitted board of the judge's own')",
+      "text": "the shipped judge has its own calibration board (b1 +2.72 identified on established labels, utility 74.9%, calibration UNDETERMINED at the operating point)."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "transfer at the operating point (0 events at nominal 0.93)",
+    "that the parameter is Mistral-specific",
+    "a widener the grok data prefer on established labels (tau = 0 is the MLE)"
+  ],
+  "ledger": {
+    "row_id": "JUDGE-TRANSFER",
+    "version": "v98 (22e16f7); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "SYSTEMATIC-BUDGET",
+    "BUDGET-TRANSFER",
+    "RK-1b-GROK",
+    "GROK-CALIB"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L3312 / L3341-L3351 (C. JUDGE-TRANSFER) (registration 60cb7f3): question, criteria, prediction, falsifier",
+    "docs/judge_v2_program.md L3419 ff. (outcome bullet, 22e16f7): the criterion table, predictions scored, the checker's recomputation and defects",
+    "experiment_results/x12_crossdomain/judge_transfer.txt (22e16f7)",
+    "docs/test_ledger.html row JUDGE-TRANSFER (v98 (22e16f7)): chips verbatim, design / criteria / observed cells, evidence",
+    "script sha16 = sha256 of tools/analysis/judge_transfer.py at 22e16f7, first 16 hex (identity, computed by the registrar 2026-09-22; later edited at 13f2142 for the pool_guard change)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' or '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Takes the uncertainty-widening parameters fitted on one judge (Mistral) and applies them unchanged to verdicts from a different judge family (grok). It also refits them on grok, using stored verdicts only.",
+    "why": "It tests whether the confidence calibration is specific to one judge or carries over when the judge is swapped.",
+    "information": "Transfer would mean calibration need not be redone per judge; failure would mean it must be. Result: inconclusive. The grok refit falls inside the Mistral interval, but the estimate is weakly pinned down. The error rate at the operating point could not be measured (0 errors among 354 calls), although a large failure was ruled out. Nothing supports 'Mistral-specific', and transfer at the operating point is not established. It was later superseded by grok's own calibration, and ruled history rather than evidence (older question pool).",
+    "written": "2026-10-07"
+  }
+}

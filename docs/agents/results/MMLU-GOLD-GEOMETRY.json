@@ -1,0 +1,181 @@
+{
+  "id": "MMLU-GOLD-GEOMETRY",
+  "title": "MMLU-GOLD-GEOMETRY: is MMLU-Pro's declared 14-category level geometric over its 91 (src, category) fine labels in qwen3 (H vs permutation p95); read beside RP12 G12 (B-A2) (DONE, VALID: G-1 HELD; zero calls)",
+  "question": "Over MMLU-Pro's fine sources (src x category), does the declared 14-category level form geometric clusters in qwen3 (H above its permutation p95), and where does it sit beside CLINC 0.143 and MASSIVE 0.404 (descriptive)?",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "the commit that writes this record (parent e7348f3)",
+    "program_lines": "docs/judge_v2_program.md L22332-L22357",
+    "program_lines_as_of": "the commit that writes them, parent e7348f3, re-grepped",
+    "date": "2026-10-01",
+    "heading": "## Registered 2026-10-01 (before any code or call) \u2014 MMLU-GOLD-GEOMETRY: over MMLU-Pro's fine sources (src x category), ...",
+    "provenance": "docs/agents/plans/2026-10-01_checkpoint_A.md (167062c) '### Registration text 2 (for the registrar): MMLU-GOLD-GEOMETRY' + the data-steward's census (the orchestrator's relay, 2026-10-01) + registrar's items R-1..R-4"
+  },
+  "script": {
+    "path": "tools/analysis/mmlu_gold_geometry.py",
+    "sha16": "sha256-lf16:e861b4e0e2dd387f (blob:5ab1c87846e56cdd29da72f557e97ccb00645260; the blob is LF)",
+    "commit": "6402ee6 (branch mmlu-gold-geom); MERGED by path b903cfc8 2026-10-01 after READY 97d5f45 (blob:5ab1c87846e56cdd29da72f557e97ccb00645260 on main, LF)"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_gold_geom_slotswap.md",
+    "commit": "97d5f45",
+    "merge": "b903cfc8",
+    "verdict": "MERGEABLE; --dry-run READY on GC-1..GC-3; --run READY after the dry-run meets GC-2, GG-D1 is discharged (the GC-3 count) and GC-4 (GB1-GB4 bracketed: DONE 2026-10-01); runs before G12 is read (B-A2, R-3)",
+    "conditions": [
+      "GC-1 rule 7 (no java.exe, construction, site null or Ollama embedding in flight; W1-W5)",
+      "GC-2 MET 2026-10-01 (460cfea8): TRAIN items 6,992; excluded no src 2, multi-src 2, multi-domain 0 (R-2 and the reviewed instrument, by count); kept 6,988; 91 labels in 14, min 12; 6,988 of 6,988 with a 4096-d vector",
+      "GC-3 MET 2026-10-01 (460cfea8): 6,988 of 6,988 kept texts equal a queries.distilled_text of the B0 MMLU_PRO_LB snapshot's 6,993 root ids (worktree and main caches); shortfall 0; STOP not fired",
+      "GC-4 DISCHARGED 2026-10-01 (GB1 at 16ec85e; GB2-GB4 in this record)",
+      "POST-RUN: with all 91 labels kept, d2 p95 must equal 0.0264 at seed 2105 -- printed 0.0264 at the run (40d841d7), run-unreviewed",
+      "owed LOW: GG-D2, GG-D3, GG-D4, GG-D5"
+    ],
+    "source": "docs/reviews/READY_gold_geom_slotswap.md (97d5f45) \"## Verdicts\", \"## Per-claim table (deciding claims)\", \"## Conditions\", \"## Defects (each with a fix)\""
+  },
+  "go": "n/a (0 calls, 0 cce)",
+  "run": {
+    "outcome_file": "experiment_results/mmlu_gold_geometry/outcome.txt (blob:ec65dd67010bc84985e12aecfb931083a5201382, LF; working tree equal); log gold_run_run.txt",
+    "outcome_commit": "40d841d7",
+    "calls": 0,
+    "cce": 0,
+    "pool": "none (registered; no EVAL read); embeddings_cache per-table hashes unchanged before/after",
+    "date": "2026-10-01 (main 460cfea8, 08:22, wall 30s)",
+    "status": "reviewed: VALID (207d800e)"
+  },
+  "review": {
+    "file": "docs/reviews/POSTRUN_gold_slotswap_lcb.md",
+    "commit": "207d800e",
+    "verdict": "VALID: G-1 HELD; F-G1 NOT FIRED; under wording conditions W-G1, W-G2; every deciding number reproduced (G1-G5); LOW defects only (GG-D2 still owed)"
+  },
+  "criteria": [
+    {
+      "id": "G-1",
+      "text": "POINT decides: HELD iff H > random p95 (1,000 relabellings); FAILED iff H <= p95; item-bootstrap CI printed, not deciding",
+      "result": "HELD",
+      "value": "H 0.2912 (qwen3 slice 256) > random p95 0.0264 (null mean -0.0005, SD 0.0155, 1,000 size-matched relabellings, seed 2105); the point decides; margin 0.265 = 6.9 x MDE80 0.0384 (review); item bootstrap 95% [0.2587, 0.3734] printed, not deciding; reviewed VALID 207d800e",
+      "denominator": "91 fine labels (src, category) over 14 categories; TRAIN MMLU_PRO_LB"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "H 0.30 [0.12, 0.50] (80%); G-1 HELD p 0.85",
+      "result": "HELD",
+      "value": "H 0.2912 inside [0.12, 0.50] HELD; G-1 event HELD, Brier 0.0225 (reviewed)",
+      "denominator": "G-1"
+    }
+  ],
+  "falsifier": {
+    "text": "F-G1 (fires iff G-1 FAILED): the declared categories are not a geometric level in the embedder of record; overturns reading a G12 N-1 fire as 'the construction fails to certify' (G12 read under B-A2; D_fd > 0 expected); no recorded number revised.",
+    "fired": false,
+    "note": "F-G1 (fires iff G-1 FAILED): NOT FIRED (reviewed 207d800e); feeds B-A2's reading of ARCH-V2-E-T-R2 G12 only"
+  },
+  "numbers_of_record": {
+    "steward_census (pre-data)": "src in raw leaderboard sample files (doc.src): 91 values, 4 prefixes, nested under 14 categories (6.5 per category); options-key join 11,835 of 12,000 unique, 165 unmatched (163 none, 2 ambiguous); every label >= 10 TRAIN; EVAL coverage 3,479 of 3,492 (13 without src); TRAIN 6,994 (LB route) vs 7,001 (mmlu_pro route), recorded at B0-1",
+    "null_measured (pre-data; READY review 97d5f45 G6, G7)": "on the real gold map (91 labels, raw composition), 1,000 relabellings: p95 0.0264 at seed 2105 (0.0264 at 2102), mean -0.0005, SD 0.0155; MDE80 = 2.485 x 0.0155 = 0.0384; beside the transported planning values SD 0.018 / MDE80 0.045; SCOREABLE unchanged",
+    "GC-2 / GC-3 (pre-run; 460cfea8)": "TRAIN items 6,992, kept 6,988 (no src 2, multi-src 2); 91 in 14, min 12; 6,988 / 6,988 4096-d; GC-3 6,988 of 6,988, shortfall 0",
+    "H (of record; outcome.txt 40d841d7; review 207d800e)": "H 0.2912 (qwen3 slice 256, deciding) vs random p95 0.0264 (mean -0.0005, SD 0.0155, 1,000 relabellings, seed 2105); item bootstrap 95% [0.2587, 0.3734], SE 0.0294 (B 1,000, not deciding); slice 512 H 0.3130 (printed); denominator 91 fine labels in 14 categories, 6,988 kept TRAIN items [REVIEWED 2026-10-01: VALID]"
+  },
+  "sentence_of_record": "The 14 declared MMLU-Pro categories are recovered above chance by average-link on qwen3 fine-source TRAIN centroids: ARI H 0.291 (p95 of 1,000 size-matched relabellings 0.026; slice 256; 6,988 TRAIN items, 91 sources). [partial recovery, far from 1 (never 'the categories are geometric clusters' without the number); the CLINC 0.143 / MASSIVE 0.404 comparison is DESCRIPTIVE-ONLY (different K, no interval); TRAIN centroids only, qwen3 only, nothing about EVAL, a tree, filing or certification; W-G1, W-G2, review 207d800e]",
+  "chips": [
+    "REGISTERED 2026-10-01, BEFORE ANY CODE [plan]",
+    "STEWARD SRC CHECK PASSED (91 LABELS / 14 CATEGORIES; 3,479 OF 3,492 EVAL WITH SRC); MUST RUN BEFORE G12 IS READ [plan]",
+    "BUILT 6402ee6 (UNMERGED); GB1 CONFIRMED; READY REVIEW OWED [plan]",
+    "READY 97d5f45 / MERGED b903cfc8: DRY-RUN READY; --RUN AFTER GC-2 AND THE GC-3 COUNT; GB1-GB4 BRACKETED; NULL P95 0.0264 MEASURED, SCOREABLE [plan]",
+    "RAN 40d841d7; VALID (207d800e): G-1 HELD (H 0.2912 &gt; P95 0.0264; 91 LABELS / 14 CATEGORIES); PARTIAL RECOVERY (ARI 0.29, FAR FROM 1); CLINC / MASSIVE DESCRIPTIVE ONLY [ok]"
+  ],
+  "brackets": [
+    {
+      "date": "2026-10-01",
+      "by": "the registrar (checkpoint A text; the data-steward's precondition discharged per the orchestrator's relay; insertion only)",
+      "text": "REGISTERED (not only drafted: the steward's src check passed). Support (b)-(e) completed by the registrar: null SD ~0.018 transported from S0's D2 p95s, MDE80 ~0.045 vs a ~0.03 bar; SCOREABLE. R-1 member MMLU_PRO_LB; R-2 unmatched rows and EVAL items without src printed; R-3 run before G12 is read, rule-7 reader; R-4 kind zero-call. docs/judge_v2_program.md L22332-L22357 (section \"## Registered 2026-10-01 (before any code or call) \u2014 MMLU-GOLD-GEOMETRY: over MMLU-Pro's fine sources (src x category), ...\"; _as_of the commit that writes it, parent e7348f3, re-grepped)"
+    },
+    {
+      "date": "2026-10-01",
+      "by": "the registrar (pre-data; insertion only; none moves a bar)",
+      "text": "Built on branch mmlu-gold-geom 6402ee6 (zero calls; nothing run on data). The builder's readings: GB1 CONFIRMED: d2's null seed SEED_D2 + 3 = 2105, the member entering d2 as a fourth corpus name for the call only, restored after (S0's corpora used 2102-2104; no collision). GB2-GB4 not ruled here (left to the READY review). Bracketed into the registration. State registered -> built. docs/judge_v2_program.md L22359-L22384 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-readout) \u2014 READY_rp12_pair_mc ccef91d and merge 87ee41e; ...\"; _as_of the commit that writes it, parent 4fad894, re-grepped)"
+    },
+    {
+      "date": "2026-10-01",
+      "by": "the registrar (READY_gold_geom_slotswap 97d5f45; merge b903cfc8; the orchestrator's brief of 2026-10-01; pre-data; insertion only)",
+      "text": "READY 97d5f45 (MERGEABLE; dry-run READY on GC-1..GC-3), merged by path b903cfc8. GB2 (fine label = src alone; nesting enforced), GB3 (null SD, mean, MDE80 measured from the same 1,000 permutations; replica p95 == d2 p95 or REFUSES), GB4 (item bootstrap seed BOOT_SEED 20261001, percentile 95%) CONFIRMED pre-data, bracketed into INSTRUMENT. The measured null (G6, G7: p95 0.0264 at seed 2105, mean -0.0005, SD 0.0155, MDE80 0.0384) bracketed into SUPPORT (b), (d), (e), (f) beside the transported 0.018 / 0.045; SCOREABLE unchanged. GC-3 / GG-D1 (MEDIUM): corpus_questions.text vs queries.distilled_text counted read-only in the run window; any shortfall a STOP to the registrar. Disclosed builder read on multicorpus_cache_v1.db during an RP12 build: procedural rule-7 breach, LOW, no consequence (bracketed into HYGIENE). State built -> READY. docs/judge_v2_program.md L22386-L22395 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data) \u2014 READY_gold_geom_slotswap 97d5f45 and merge b903cfc8; ...\"; _as_of the commit that writes it, parent 5210a9e, re-grepped)"
+    },
+    {
+      "date": "2026-10-01",
+      "by": "the registrar (correction by insertion)",
+      "text": "[CORRECTED 2026-10-01 by the registrar: the pointers of 2026-10-01 to docs/judge_v2_program.md L22359-L22384 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-readout) \u2014 READY_rp12_pair_mc ccef91d and merge 87ee41e; ...\") say \"parent 4fad894\"; the commit that wrote them, 16ec85e, has parent b3183bb (git log --format='%h %p' -1 16ec85e); the span stands.] docs/judge_v2_program.md L22386-L22395 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data) \u2014 READY_gold_geom_slotswap 97d5f45 and merge b903cfc8; ...\"; _as_of the commit that writes it, parent 5210a9e, re-grepped)"
+    },
+    {
+      "date": "2026-10-01",
+      "by": "the registrar (insertion only)",
+      "text": "GC-2 MET and GC-3 MET (shortfall 0; the STOP did not fire); --run 40d841d7 recorded as run-unreviewed: G-1 HELD, F-G1 NOT FIRED as printed; post-run review OWED; under R-3 / B-A2 the review and the outcome section precede any G12 read (now ARCH-V2-E-T-R2's). Computed on corpus data independent of RP12 (no RP12 tree read): it stands as run, untouched by ARCH-V2-E-T G10 FAILED. docs/judge_v2_program.md L22397-L22404 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run by the registrar) \u2014 SC-4 read: INTENT-S0-SLOTSWAP-MECH --run may proceed; ...\"; _as_of the commit that writes it, parent 2b8f809a, re-grepped)"
+    },
+    {
+      "date": "2026-10-01",
+      "by": "the registrar (post-run review 207d800e; insertion only)",
+      "text": "OUTCOME of record: VALID; G-1 HELD (H 0.2912 > p95 0.0264), F-G1 NOT FIRED; W-G1 words of record, W-G2 cross-corpus DESCRIPTIVE-ONLY; GG-D2 LOW disclosed (GG-D3..GG-D5 owed). R2-2 of ARCH-V2-E-T-R2 discharged. [NOTE: the chips list of the previous update carried a 'RAN 40d841d7 ... RUN-UNREVIEWED [run]' chip that the ledger row never had (ledger unchanged at v323); the list now mirrors the ledger row at v324.] State run-unreviewed -> done. docs/judge_v2_program.md L22445-L22455 (section \"## MMLU-GOLD-GEOMETRY (2026-10-01, 0 calls) \u2014 VALID (post-run review docs/reviews/POSTRUN_gold_slotswap_lcb.md, 207d800e): G-1 ...\"; _as_of the commit that writes it, parent 12ceb48c, re-grepped)"
+    }
+  ],
+  "does_not_show": [
+    "anything about EVAL, a tree, filing or certification (TRAIN centroids only)",
+    "that the 14 categories are the right taxonomy, or that they ARE geometric clusters (ARI 0.29: partial recovery)",
+    "any non-qwen3 embedder",
+    "a ranking against CLINC or MASSIVE (different K, no interval)"
+  ],
+  "ledger": {
+    "row_id": "MMLU-GOLD-GEOMETRY",
+    "version": "v324 (2026-10-01: outcome bracket and chip, VALID 207d800e) | v323 (2026-10-01: READY_gold_geom_slotswap 97d5f45 / merge b903cfc8; GB2-GB4, SB3-SB5 bracketed; measured gold null; GC-3 STOP; parent of 16ec85e corrected) | v322 (2026-10-01: MC-EXCLUDE / ruling (b) bracket, READY_rp12_pair_mc ccef91d / merge 87ee41e; GB1, SB1, SB2 confirmed) | v321 (2026-10-01: new section-7 row, registered)"
+  },
+  "depends_on": [
+    "ARCH-V2-SPLIT-DRAW-2 (draw 5a3e756 TRAIN)",
+    "INTENT-TRANSFER-S0 (D2 function)",
+    "the data-steward's src census (discharged 2026-10-01)"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing; not the GMM LR / BIC half of L6; CONTEXT section 5 checked at e7348f3"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L22332-L22357 (section \"## Registered 2026-10-01 (before any code or call) \u2014 MMLU-GOLD-GEOMETRY: over MMLU-Pro's fine sources (src x category), ...\"; _as_of the commit that writes it, parent e7348f3, re-grepped)",
+    "docs/judge_v2_program.md L22292-L22299 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-readout) \u2014 checkpoint A (167062c): B-A1, B-A2, B-A3 bracketed into ARCH-V2-E-T; ...\"; _as_of the commit that writes it, parent e7348f3, re-grepped)",
+    "docs/agents/plans/2026-10-01_checkpoint_A.md (167062c)",
+    "docs/judge_v2_program.md L22359-L22384 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-readout) \u2014 READY_rp12_pair_mc ccef91d and merge 87ee41e; ...\"; _as_of the commit that writes it, parent 4fad894, re-grepped)",
+    "docs/judge_v2_program.md L22386-L22395 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data) \u2014 READY_gold_geom_slotswap 97d5f45 and merge b903cfc8; ...\"; _as_of the commit that writes it, parent 5210a9e, re-grepped)",
+    "docs/reviews/READY_gold_geom_slotswap.md (97d5f45) \"## Verdicts\", \"## Per-claim table (deciding claims)\", \"## Conditions\", \"## Defects (each with a fix)\"",
+    "docs/judge_v2_program.md L22397-L22404 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run by the registrar) \u2014 SC-4 read: INTENT-S0-SLOTSWAP-MECH --run may proceed; ...\"; _as_of the commit that writes it, parent 2b8f809a, re-grepped)",
+    "docs/judge_v2_program.md L22406-L22415 (section \"## ARCH-V2-E-T (2026-10-01, 0 calls) \u2014 G10 FAILED AS REGISTERED (byte rule: ...); F2 FIRES; the lane STOPS; ...\"; _as_of the commit that writes it, parent 2b8f809a, re-grepped)",
+    "experiment_results/mmlu_gold_geometry/gold_dryrun_run.txt, gold_gc3_count_run.txt (460cfea8)",
+    "experiment_results/mmlu_gold_geometry/outcome.txt (40d841d7)",
+    "docs/reviews/POSTRUN_gold_slotswap_lcb.md (207d800e)",
+    "docs/judge_v2_program.md L22445-L22455 (section \"## MMLU-GOLD-GEOMETRY (2026-10-01, 0 calls) \u2014 VALID (post-run review docs/reviews/POSTRUN_gold_slotswap_lcb.md, 207d800e): G-1 ...\"; _as_of the commit that writes it, parent 12ceb48c, re-grepped)"
+  ],
+  "last_update": "2026-10-01 (registrar: registered; ledger v321); 2026-10-01 (registrar: built 6402ee6, readings confirmed; ledger v322); 2026-10-01 (registrar: READY 97d5f45 / merge b903cfc8; GB2-GB4 bracketed; measured null; GC-3 STOP; ledger v323); 2026-10-01 (registrar: GC-2 / GC-3 met; ran 40d841d7 -> run-unreviewed; untouched by G10 FAILED; ledger unchanged v323); 2026-10-01 (registrar: VALID by 207d800e; done; ledger v324)",
+  "support": {
+    "a": "unit fine label, K_f 91 (14 categories)",
+    "b": "DEFF n/a (permutation over labels); null SD transported from S0 D2 p95s (0.0161, 0.0370): p95 ~0.03, SD ~0.018",
+    "c": "91 labels",
+    "d": "null SD 0.018 (transported); H's item SE not derived (bootstrap printed)",
+    "e": "MDE80 (1.645 + 0.84) x 0.018 = 0.045",
+    "f": "SCOREABLE (0.30 vs ~0.03: 0.27 > 0.045); cross-corpus contrast DESCRIPTIVE-ONLY",
+    "g": "reachable (fixed function of TRAIN centroids)",
+    "measured_2026-10-01": "97d5f45 G7: null SD 0.0155 (transported 0.018), MDE80 0.0384 (transported 0.045), bar p95 0.0264; SCOREABLE (0.30 - 0.0264 = 0.27 > 0.0384; lower 80% bound 0.12 clears)"
+  },
+  "cost": {
+    "calls_expected": 0,
+    "cce_expected": 0,
+    "calls_max": 0,
+    "cce_max": 0,
+    "machine": "CPU minutes; rule-7 reader of embeddings_cache.db",
+    "agent_hours": "engine-coder (with SLOTSWAP-MECH) + READY",
+    "priced": "the research lead's estimates"
+  },
+  "plain_description": {
+    "sq": "SQ3 Taxonomy",
+    "what": "Groups the 91 fine MMLU-Pro source-subject labels by their average qwen3 embeddings and checks whether the grouping recovers the 14 official categories better than random relabellings.",
+    "why": "Tests whether MMLU-Pro's declared categories actually show up as structure in embedding space, which matters for judging trees against those categories.",
+    "information": "Strong recovery means the categories are geometric; weak recovery means comparing trees against them is limited. Result: done; recovered above chance but only partially (agreement 0.29, against 0.03 for the 95th percentile of random relabellings; 1 would be perfect). Training data and qwen3 only; the comparison with CLINC and MASSIVE is descriptive.",
+    "written": "2026-10-07"
+  }
+}

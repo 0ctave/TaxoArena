@@ -1,0 +1,96 @@
+{
+ "artefact_sha256": "9f0e4ce9f2991f5caf410ed09c77853c63e0c04a5a0f7bce3136989aef81e7a2",
+ "corpus_type": "mcq",
+ "manifest": {
+  "artefact_label": "MCQ rubric, population mmlu-pro-v2 TRAIN (ARCH-V2-INDUCE-RUBRIC-3, jv2-induce-5)",
+  "content_key_check": {
+   "eval_hits": 0,
+   "n_option_texts": 392,
+   "n_texts": 40,
+   "not_gen_side": 0,
+   "sides": [
+    "TRAIN"
+   ]
+  },
+  "gen_view": "gen_view_REG.db",
+  "gen_view_meta": {
+   "content_check": "69353 checked, 0 hits",
+   "eval_key_count": "6153",
+   "of_record": "registered seed (ARCH-V2-SPLIT-DRAW-2)",
+   "seed": "ARCHV2-SPLIT-2:2929bd46aa271d883050bfe735f96e621ed55fd2",
+   "sides": "TRAIN,GATE",
+   "split_sha256_bytes": "a4e8a1362818c424d2fa5fd8b290726a80eb82d3ee5cdec354212c81da61a37d",
+   "view_kind": "gen",
+   "views_blob": "7a0f0ab31a09e02fcc54db6b8ce26d99284b1603"
+  },
+  "gen_view_sha256_bytes": "c2930c609c67d6c7e1f8b8fbcd8f6f1970478a28f844d086d0b0db169d10c0ec",
+  "induction_blob": "blob:147e6874926b65393037cdcacd0e29aa308651ef",
+  "induction_version": "jv2-induce-5",
+  "input_variant_ids_ordered_sha256": "89bed2562c1f8575ed0dbfd5b9980216aa346ef26d5837fbe574b7b775ef132a",
+  "input_variant_ids_sha256": "99484486d75774b379bd35713063022a8c05b8949b7b2d61045f95670d9abe50",
+  "inputs_selected_by": "select_inputs",
+  "model": {
+   "attempt_of_record": 2,
+   "finish_reason": "stop",
+   "max_tokens": 8192,
+   "model": "grok-4-1-fast-non-reasoning",
+   "of_record": "REGISTERED ARCH-V2-INDUCE-RUBRIC-3 (attempt 2 of record)",
+   "payload_sha256": "e5ace2a5840fc6c15bd51fff10f6eefc0ee9b4dde9286147f7bdbeadcd19553a",
+   "provider": "azure:grok-4-1-fast-non-reasoning",
+   "reply_sha256": "d0d27f080540d355b5669030274d18bce458ec596ddeea2d98dcd1ffbe3b773f",
+   "response_id": "89b37a3c-d4fb-40f1-b8f9-fc704058bec8",
+   "temperature_label": "omitted"
+  },
+  "n_inputs": 40,
+  "overlap_exclusion": {
+   "file": "overlap_exclusions_split2.json",
+   "list_sha256": "68c0b960a4a7bedc76db079cdc2e0f01d5ef0b2fc4304f5486706cb27b71418a",
+   "n_excluded": 679,
+   "threshold": 8
+  },
+  "population": {
+   "contracts": [
+    "MC_LETTER"
+   ],
+   "corpus_version": "mmlu-pro-v2"
+  },
+  "prompt_system_sha256": "e95c59b22c3df56b79f2ed9a93f8b6912ca8aff15d78d849c79c9ba17c8896d7",
+  "prompt_user_sha256": "a66db2209ac1b4efc360f08f9bdb0962fbf3a8000d1841d69f879d896b45f1d6",
+  "seed": "ARCHV2-INDUCE-1:5abb79f55c3719d122b5310151f975493609f37b",
+  "seed_label": "REGISTERED ARCH-V2-INDUCE-SELECT-1",
+  "seed_registration": "ARCH-V2-INDUCE-SELECT-1",
+  "sides_admitted": [
+   "TRAIN"
+  ],
+  "train_only_witness": {
+   "candidate_rows": 7441,
+   "distinct_variants": 7441,
+   "duplicates_collapsed": 0,
+   "excluded_by_population": {
+    "mc6-2026-09-11 IMPORTED:acc_norm": 4259,
+    "mc6-2026-09-11 MC_LETTER": 7143
+   },
+   "excluded_skipped_in_order": 7,
+   "exclusion_list_size": 679,
+   "gate_excluded": 1929,
+   "last_rank": 47,
+   "other_excluded": 0,
+   "population": {
+    "contracts": [
+     "MC_LETTER"
+    ],
+    "corpus_version": "mmlu-pro-v2"
+   },
+   "skipped_by_component": 0,
+   "train_candidates": 7441
+  },
+  "verbatim_audit": {
+   "hits": 0,
+   "shingle": 8
+  },
+  "views_blob": "blob:7a0f0ab31a09e02fcc54db6b8ce26d99284b1603"
+ },
+ "of_record": "REGISTERED ARCH-V2-INDUCE-RUBRIC-3 (attempt 2 of record)",
+ "rubric": "The judge evaluates which response (Model A or Model B) better answers the MCQ. First, determine the correct option letter by independently solving the question, using the reference solution (if provided) only as one possibly erroneous input among others. Correctness of final answer is primary: prefer the response matching the judge's correct letter; TIE if both match or neither does. If final answers differ in correctness, the correct one wins regardless of reasoning. If both correct or both incorrect, compare reasoning quality only: prefer the one with fewer factual errors, logical gaps, or unsupported steps; TIE if reasoning error counts are equal. Ignore length, formatting, or presence/absence of explanation. Responses may end with a clear letter choice (possibly followed by option text), state no letter, or be truncated/empty (noted as selecting none or a letter). Call verdict 'A', 'B', or 'TIE'.",
+ "rubric_sha256": "9e0a4022b58b30268e36617b46e13105354d22f2b17f6e83f3e3099ee18c04b1"
+}

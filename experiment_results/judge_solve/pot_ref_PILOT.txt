@@ -1,0 +1,32 @@
+=== REF-FORM-BY-CELL solve stage (R1 / R2 / C1) | cache grok-reasoning-pot.db | 12 of 597 eligible questions cached | protocol pinned 2026-09-19 00:27:50 ===
+  GUARD: content_filter + length = 0 of 597 eligible (0.0%) [OK] | finish_reason: stop 12
+
+(R1) SOLVE STAGE per cell (eligible questions with a cached row; the incumbent = grok-reasoning.db on the SAME questions; CoT = grok-reasoning-cot.db beside, no execution)
+  cell            n yield | status table                                         | PoT_y PoT_d   inc |   CoT | fix/break (McNemar p) yielded | deploy | CoT fix/break
+  Math            5 1.000 | picked 5                                             | 1.000 1.000 1.000 | 1.000 |   0 /   0 (p=1.0000) [inc on yielded 1.000] |   0 /   0 |   0 /   0
+  Physics         3 0.667 | no_pick 1, picked 2                                  | 1.000 0.667 1.000 | 1.000 |   0 /   0 (p=1.0000) [inc on yielded 1.000] |   0 /   1 |   0 /   0
+  Chemistry       4 1.000 | picked 4                                             | 1.000 1.000 1.000 | 1.000 |   0 /   0 (p=1.0000) [inc on yielded 1.000] |   0 /   0 |   0 /   0
+  QUANT4         12 0.917 | no_pick 1, picked 11                                 | 1.000 0.917 1.000 | 1.000 |   0 /   0 (p=1.0000) [inc on yielded 1.000] |   0 /   1 |   0 /   0
+
+  C1 (form is a lever on the REFERENCE): among-yielded PoT 1.000 vs incumbent 1.000 on the same 11 q = +0.0pp (bar >= +2pp) | fix 0 : break 0, McNemar p=1.0000 (bar < 0.05) -> FAILED
+  PREDICTIONS: yield 0.917 (0.80-0.92) HELD | degenerate 0.000 (<= 0.05) HELD | fix rate 0.000 on 0 incumbent-wrong yielded (0.25-0.40) FAILED | break rate 0.000 (0.01-0.03) FAILED | among-yielded gain +0.0pp (+1..+3) FAILED | deployment -8.3pp (-3..+2) FAILED
+     Math         PoT among yielded 1.000 (predicted 0.95-0.98) FAILED
+     Physics      PoT among yielded 1.000 (predicted 0.92-0.96) FAILED
+     Chemistry    PoT among yielded 1.000 (predicted 0.88-0.93) FAILED
+
+(R2) LEAKAGE on the reference itself (no judge call): per-contestant answer agreement on the 11 yielded eligible questions
+      Llama-2-13b-hf                 PoT 0.167 | incumbent 0.167 | +0.000 (n=6)
+      Llama-2-7b-hf                  PoT 0.250 | incumbent 0.250 | +0.000 (n=8)
+      Meta-Llama-3_1-70B-Instruct    PoT 0.727 | incumbent 0.727 | +0.000 (n=11)
+      Meta-Llama-3_1-8B              PoT 0.364 | incumbent 0.364 | +0.000 (n=11)
+      Qwen1.5-72B-Chat               PoT 0.286 | incumbent 0.286 | +0.000 (n=7)
+      Yi-6b-Chat                     PoT 0.333 | incumbent 0.333 | +0.000 (n=6)
+      arx_0314                       PoT 0.909 | incumbent 0.909 | +0.000 (n=11)   <- frontier
+      c4ai-command-r-v01             PoT 0.300 | incumbent 0.300 | +0.000 (n=10)
+      deepseek-chat-v2_5             PoT 0.818 | incumbent 0.818 | +0.000 (n=11)
+      gemini-3.1-pro_5-shots         PoT 1.000 | incumbent 1.000 | +0.000 (n=11)   <- frontier
+      gpt-4o-2024-08-06              PoT 0.818 | incumbent 0.818 | +0.000 (n=11)   <- frontier
+      iask_pro                       PoT 0.909 | incumbent 0.909 | +0.000 (n=11)   <- frontier
+  PREDICTION gemini agreement within +-3pp of the incumbent's: +0.0pp -> HELD | worst frontier delta +0.000 (REF-QUAL gate (3) bar 0.03, informational here)
+
+  STATUS: PILOT (12 of 597 eligible cached); no outcome of record is written

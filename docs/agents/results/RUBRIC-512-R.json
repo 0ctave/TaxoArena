@@ -1,0 +1,132 @@
+{
+  "id": "RUBRIC-512-R",
+  "title": "RUBRIC-512-R: cell rubric value for the REASONING judge (~8k calls; both arms fresh in one session)",
+  "question": "As RUBRIC-512 (R3's 1,980 matches; CELL = the bareq512_s42 leaf rubric; GENERIC = the production text; byte-identical v1 templates) but judge = grok-4-1-fast-reasoning, BOTH arms fresh in one session; PRIMARY cell > generic on key-decidable, paired McNemar p < 0.05; SECONDARY the reasoning judge's gain exceeds Mistral's RUBRIC-512 +1.8pp; prediction +0 to +2pp, not significant; secondary FAILS.",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "1e8203c",
+    "program_lines": "docs/judge_v2_program.md L174-L183 (outcome bullet; the registration at 1e8203c 'Register J3-R ... and RUBRIC-512-R' is recorded in the early programme block, which the L17 bias table B4 summarises)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "- **RUBRIC-512-R (2026-09-10 02:20): exactly zero for the reasoning judge — B4 closed for both",
+    "outcome_heading": [
+      "L174: the same bullet"
+    ],
+    "date": "2026-09-09"
+  },
+  "script": {
+    "path": "tools/analysis/rubric_512_r.py",
+    "sha16": "1347ea95753daf3e (at 20c3f42)",
+    "commit": "20c3f42"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (~8k calls: 1,980 matches x 2 arms x 2 orders; 3,956 jobs)",
+  "run": {
+    "outcome_file": "experiment_results/rubric_512/grok_reasoning_outcome.txt",
+    "outcome_commit": "ae0002f",
+    "calls": "3,956 jobs (~8k calls)",
+    "cce": "not stated",
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-10",
+    "other_files": [
+      "experiment_results/rubric_512/grok_reasoning_{cell,generic}.db (caches)",
+      "experiment_results/rubric_512/grok_reasoning.log"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); docs/campaign_review_2026-09-10.md section 5.1 restates the result",
+    "commit": "849fb17",
+    "verdict": "ZERO (24:24); B4 closed for both judge tiers"
+  },
+  "criteria": [
+    {
+      "id": "PRIMARY",
+      "text": "cell > generic on key-decidable, paired McNemar p < 0.05",
+      "result": "FAILED",
+      "value": "3,956 jobs, 0 errors, 946 decidable: cell 0.842 vs generic 0.842 (24:24; p 1.0); top cluster 0.665 = 0.665; discursive +0.4, quantitative -0.5",
+      "denominator": "946 key-decidable R3 pairs"
+    },
+    {
+      "id": "SECONDARY",
+      "text": "the reasoning judge's gain exceeds Mistral's RUBRIC-512 +1.8pp",
+      "result": "FAILED",
+      "value": "0.0 vs +1.8",
+      "denominator": "946"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "+0 to +2pp, NOT significant; secondary FAILS",
+      "result": "HELD",
+      "value": "0.0, p 1.0; secondary FAILED",
+      "denominator": "946"
+    }
+  ],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "four clean tests agree: cell rubrics are worth 0 to +1pp to any judge tier on keyed questions; B4 closed for both tiers; LEAF-SS (the leaf-vs-anchor follow-up gated on this result) was cancelled, later run properly as LEAF-POWERED"
+  },
+  "numbers_of_record": {
+    "accuracy": "cell 0.842 vs generic 0.842 (24:24; p 1.0); top cluster 0.665 = 0.665; discursive +0.4; quantitative -0.5"
+  },
+  "sentence_of_record": "RUBRIC-512-R (2026-09-10, ~8k calls): exactly zero for the reasoning judge: on 946 key-decidable pairs cell 0.842 vs generic 0.842 (24:24; p = 1.0); top cluster 0.665 = 0.665; discursive +0.4, quantitative -0.5; the secondary (gain > Mistral's +1.8) FAILS. Four clean tests agree: cell rubrics are worth 0 to +1pp to any judge tier on keyed questions; B4 closed for both.",
+  "chips": [
+    "ZERO (24:24)"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-23",
+      "by": "CORRECTIONS_2026-09-23 (registrar)",
+      "text": "[CORRECTED 2026-09-23 by the registrar: registration.program_lines pointed at the outcome bullet and the B4 table row because the registration text was thought absent. The registration of record is docs/judge_improvement_proposals.md L337 (HEAD e422daa) '### RUBRIC-512-R — cell rubric value for the REASONING judge (~8k grok-reasoning calls)', added by 1e8203c, the only file that commit touched.]"
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the SPLIT-FOLLOWUPS review 8ebfa7a (insertion only, zero calls)",
+      "text": "Route (b) APPLIES: this readout used the leaf rubrics induced on bareq512_s42 = snapshot 20260909_212117, whose induction held 28 p2dca norm-v1-only twins (exact, 16 leaves) with the key and CoT, and whose labelling prompts held 26 twin texts (16 leaves). CORRECTED 2026-09-23 by the SPLIT-FOLLOWUPS review (8ebfa7a): FALSE for the tree of record. 20260909_212117 was built with labelling and induction ON (143 LLM-written labels - not 158: the other 15 are the root and the 14 ground-truth anchors - and 87 induced leaf judgePrompt / judgeRubric). Induction withheld the active pool by EXACT linked text after an 80% hash hold-in, so 29 of the 37 exact twins were withheld; 28 OF THE 33 NORM-V1-ONLY TWINS WERE IN THE INDUCTION CORPORA OF 16 LEAVES, with the key mark and CoT; 28 IS EXACT, NOT AN UPPER BOUND (the corpus model reproduces all 17 [JUDGE-LEAK] log lines). Labelling applies NO reserved filter: 26 twin texts (12 exact, 14 norm-v1-only) were in the leaf labelling prompts of 16 leaves (the sampling is deterministic and was reproduced); internal-node samples are seeded and unreproduced, and all 70 are eligible there. ROUTE (b) APPLIES to RUBRIC-512 (cell arm), RUBRIC-512-SS, RUBRIC-512-R, LEAF-POWERED and rubric_text_stats; the RK-1 kit material is built from 212117 leaf members and its exposure is unmeasured. See docs/judge_v2_program.md L14455-L14487 (SPLIT-FOLLOWUPS)."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a cell-rubric gain for the reasoning judge"
+  ],
+  "ledger": {
+    "row_id": "RUBRIC-512-R",
+    "version": "v22 (849fb17); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "RUBRIC-512",
+    "RUBRIC-512-SS",
+    "LEAF-SS",
+    "LEAF-POWERED"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "rubric text at every granularity (CONTEXT.md section 5: RUBRIC, LADDER, RUBRIC-512-R, J6, RK-1, LEAF-POWERED, STACK-NORUBRIC)"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L174-L183 (outcome; registration 1e8203c) and L17 (the B4 bias-table row)",
+    "experiment_results/rubric_512/grok_reasoning_outcome.txt (ae0002f)",
+    "docs/campaign_review_2026-09-10.md L183 / L297",
+    "docs/test_ledger.html row RUBRIC-512-R (v22): chips verbatim, evidence (rubric_512_r.py, rubric_512/grok_reasoning.log, grok_reasoning_{cell,generic}.db, 1e8203c)",
+    "script sha16 = sha256 of tools/analysis/rubric_512_r.py at 20c3f42, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/judge_improvement_proposals.md L337-L346 (registration 1e8203c)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Judges about 1,980 matches twice with the reasoning version of grok: once with a rubric written for each cell of the tree and once with the generic rubric, then compares accuracy on questions with a known answer.",
+    "why": "Checks whether cell-specific rubrics help a stronger reasoning judge, after they gave little to a weaker judge.",
+    "information": "A gain would justify per-cell rubrics; none closes that line. Result: done; exactly zero gain (84.2% vs 84.2%). Together with other tests, cell rubrics are worth 0 to +1 point on keyed questions; the rubric line was closed. On the older p2dca question family, later ruled 'history, not evidence'.",
+    "written": "2026-10-07"
+  }
+}

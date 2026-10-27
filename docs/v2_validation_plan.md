@@ -1,0 +1,486 @@
+# v2 validation plan — frozen tests for the seven proposals (2026-09-08)
+
+Committed BEFORE any proposal's test runs. Each test adjudicates one proposal from
+docs/v2_construction_proposals.md; descriptive readouts are labeled. Order follows
+the recipe: P7 -> P1 -> P2 -> P5 -> P3, with P6 cheap-parallel and P4 deferred.
+
+## P7 — determinism check (gate for everything)
+Test: build the SAME config (seed 137 derivative, labeling off) twice into fresh
+directories at current HEAD; byte-compare dag_snapshots.jsonl and the validation
+CSVs. PASS iff bit-identical. Registered claim: the construction is bit-reproducible
+at fixed (config, seed, code). Any diff is a P7 work item (sorted-accumulation gaps).
+
+## P1 — consensus construction (the centerpiece)
+Data: the 20 existing frozen-config seed builds (16 sweep + 4 arm-1), train-side
+question assignments derived per build by nearest-leaf-centroid (max cos of the
+256-slice vs leaf vmfMu) — the same disclosed approximation used for the ladder
+corpora; the frozen build and embedder builds are additional descriptive axes.
+Procedure (frozen): per anchor, co-assignment fraction across builds; average-linkage
+agglomerative cut at co-assignment >= 0.6; cells below 55 train questions merged into
+their nearest (by centroid) sibling cell.
+REGISTERED PRIMARY: split the 20 builds into two disjoint 10-build halves by seeded
+coin flip (seed 777); run the identical procedure per half; PASS iff
+ARI(consensus_A, consensus_B) on shared train questions >= 0.90, reported against the
+measured baseline mean pairwise ARI between INDIVIDUAL builds. FALSIFIED (per the
+proposal's own criterion, adapted to the assignment metric) iff ARI < 0.80.
+DESCRIPTIVE: consensus cell count per anchor; twin-absorption check (do the E1
+within-anchor twin pairs land in one consensus cell?); cross-embedder agreement once
+the nomic/gemma builds land. DEFERRED to the Kotlin warm-start build: the Top-1 and
+mu-match clauses of the original proposal.
+
+## P2 — site-level + deflated nulls, certification by pruning
+Harness: extend the withinNull arm from anchors to every accepted split site of the
+frozen artifact (population = the site's own train questions; same anisotropy-
+preserving generator, 300 reps, seeded), plus the DEFLATED variant (split direction
+projected out of the covariance).
+REGISTERED: (a) power check — the deflated null must certify the known CS
+contamination split while leaving Philosophy's two sites uncertified; (b) trunk
+viability — site-level certification retains >= 15 splits, including the Chemistry
+and Biology depth-1 splits (q = 0.000 at anchor level); trunk anchor drift <= 0.5pp.
+Any other pattern reported as-is.
+
+## P5 — support-derived strata floors
+Procedure: rebuild strata with the acceptance rule "both halves >= 240 reserved"
+(deff 2.0 x k/S^2 lower band) as strata_profile_v2.json — the frozen v1 file is
+untouched. DESCRIPTIVE now: resulting stratum count and reserved-size distribution.
+REGISTERED RIDER on the next profile-mode run: every stratum's QUERY-LEVEL SE <= 0.15
+at <= 1.25x the R2 verdict budget.
+
+## P6 — twin fusion vs placebo fusion (E2 harness variant)
+Conditions on the frozen tree, full reserved pool, E2 metric: T (tree), F (top-3
+cross-anchor E1 twin pairs FUSED: members merged, re-routed), Pf (3 placebo fusions:
+random same-anchor-count leaf pairs at matched sizes, seed 999).
+REGISTERED (two-sided): D = (F - T) - (Pf - T) per question; fusion helps iff mean
+D > 0 with the 10,000-fold bootstrap CI excluding 0 AND sign p < 0.05; D <= 0 or CI
+straddling 0 closes the overlap program with soft routing fully vindicated.
+
+## P3 — functional twig gate (the one judge-spend test)
+Prepared, NOT launched (>= 15k judge calls; runs on explicit go). Frozen design:
+candidate twigs = every leaf whose parent is inside the (P2) certified trunk; probe =
+per twig, up to 100 key-decidable reserved matches routed to it, sampled seeded,
+QUESTIONS BURNED from future measurement use; arms = twig rubric vs PARENT rubric,
+paired, dual-order; per-twig one-sided McNemar with Benjamini-Hochberg FDR 10%;
+pooled kept-twig gain on a fresh probe draw as the registered secondary. The
+Philosophy readout (does any Philosophy twig survive the functional gate?) is a
+named descriptive.
+
+## P4 — ll-objective (v2.1, deferred)
+Design recorded in the proposals doc; no test frozen yet. Prerequisite: P1+P2
+baseline stable. When scheduled: primary = cross-seed recurrence of ll-gated splits
+exceeds J-gated baseline recurrence; reserved pool touched exactly once.
+
+## D1 — slice width and within-node anisotropy (dimension sweep; registered 2026-09-08)
+Question: does the MRL slice width, or removing a node's dominant shared directions
+before the split proposal, change how much CERTIFIABLE sub-anchor structure the
+construction finds? Motivation: the within-node null runs 3x the isotropic null
+(shared dominant directions, not dimensionality per se), and the repo's own MRL
+ladder (128 at the root) was abandoned for costing coarse-level accuracy.
+Arms, 2 seeds each (137, 2048; body = p7_det_1, labeling off, structure only):
+  d128 / d256 (baseline) / d512 — `embeddingSliceDim`;
+  abt2 — 256 with the top-2 within-node principal components dropped before EM
+  (`splitDropTopPcs = 2`, all-but-the-top); white — 256 with variance-whitened PCA
+  coordinates before EM (`splitWhiten = true`). Both PCA variants act on the PROPOSAL
+  only; routing, vMF fits and the separation gate stay on the raw slice.
+Bar 0.025 flat in every arm. Registered confound: the isotropic null scales with the
+width, so the same bar is looser at 128 and tighter at 512 — measured by
+`gradlew isoNullByDim` (n = 130/406/900, 300 reps) and reported alongside; the
+primary metric below is self-calibrated per arm and does not depend on it.
+Metrics per build: (a) site-level certification count (`gradlew siteNull` at the
+arm's own geometry, 300 reps, on the build's own snapshot; CSV per build under
+experiment_results/dimsweep/); (b) cross-seed ARI of nearest-leaf-centroid train
+assignments (P1 metric; baseline 0.663); (c) held-out Top-1 with Wilson CI;
+(d) Philosophy leaf count and (e) leaf count, descriptive.
+GATE: d256_s137 must reproduce experiment_results/p7_det_1's dag_snapshots.jsonl
+hash — the refactor that made the width configurable must be a no-op at 256/0/false
+or the sweep is void until it is.
+REGISTERED PRIMARY (per arm vs d256): an arm IMPROVES granularity coherence iff
+(a) exceeds d256's count in BOTH seeds AND (c)'s Wilson CI overlaps d256's in both
+seeds AND (b) >= ARI(d256) - 0.02. Any other pattern = NO IMPROVEMENT.
+PREDICTIONS (committed before launch): d128 loses certifications and Top-1; d512
+changes little; abt2 and white are the only arms that can raise (a). Because they
+change the proposal only, a null there is informative: it says the acceptance
+geometry (raw-slice routing + min-pair gate), not the proposal, is the bottleneck,
+which is the premise for a stage-2 representation-level whitening arm (pre-authorized
+"more complex dimension management", to be registered separately if reached).
+Readout: tools/analysis/dimsweep_report.py.
+SPLIT HYGIENE (added 2026-09-08 mid-sweep, no design change): each arm builds on its
+OWN seed split (splitSeed = seed), so ~69% of the frozen arena pool p2dca21ab5f4ef3ae
+sits on these trees' TRAIN side and every build ACTIVATES its own pool in the dataset
+DB. Consequences: (i) sweep trees are structural evidence only — any arm promoted to
+arena use must be rebuilt with splitSeed = 42 (the frozen split) and its rubrics induced
+in that run; (ii) after the chain, the frozen pool is re-pinned
+(`tools/analysis/pool_guard.py --activate`) before any judged run or is_reserved-based
+analysis. The metrics above are unaffected (site nulls use the build's own train
+population; Top-1 uses the build's own held-out split; ARI uses questions outside the
+frozen pool).
+
+## D2 — stage-2 dimension sweep (registered 2026-09-09, before launch)
+Arms, seeds 137 / 2048, body = D1: abt2d512 (`embeddingSliceDim 512`, `splitDropTopPcs
+2`), bareq512 (512 dims, bar 0.0145 = 0.025 x isotropic-null ratio 0.0040/0.0069 — the
+bar-equalized control for d512), abt1 (256 dims, `splitDropTopPcs 1` — dose-response).
+Metrics: D1's (site-level certification at the arm's geometry, Top-1, cross-seed ARI,
+Philosophy leaves) plus F6's key-only leaf-level LOO Brier vs the frozen tree.
+REGISTERED: (i) bareq512 — the d512 certification gain is NOT a bar artefact iff
+bareq512's certified count >= d256's (7, 9) in both seeds; (ii) abt2d512 IMPROVES iff its
+certified count > d512's (13, 13) in both seeds AND its F6 leaf-level loss vs frozen is
+>= −0.5 (x1000) — i.e. it certifies more without abt2's capability-information loss;
+(iii) abt1 descriptive. Predictions: (i) holds (width effect real, with more leaves than
+d512); (ii) FAILS on the F6 clause — abt2's loss is the leaf count, and abt2d512 will
+also have ~60 leaves. Split hygiene as D1 (structural evidence only; splitSeed = 42
+rebuild before any arena use); frozen pool re-pinned by the chain itself at the end.
+
+## D3 — does the width gain continue at 1024? (registered 2026-09-09, before launch)
+Arm: bareq1024 (`embeddingSliceDim 1024`, bar = 0.025 x p95_iso(1024, n=406) / 0.0069,
+MEASURED by `gradlew isoNullByDim -DisoDims=1024` at the head of the chain and written
+into the configs before building — never extrapolated), seeds 137 / 2048, body = D1.
+Reference = bareq512 (D2): 84/88 leaves, 11/11 certified, Top-1 0.747/0.771, ARI 0.688,
+F6 leaf-level loss −0.10/−0.23.
+REGISTERED: CONTINUES iff certified > 11 in both seeds AND Top-1 Wilson CI overlaps
+bareq512's in both seeds AND F6 loss vs frozen >= −0.5 (x1000). TURNED iff certified < 11
+in either seed OR Top-1 CI entirely below bareq512's in either seed. Otherwise SATURATED.
+Also recorded: the 1024 isotropic p95 (the concentration rate — 128→256→512 shrank by
+~1.7x per doubling, faster than sqrt(2)); build wall time; site-null wall time.
+Prediction: SATURATED — certification within ±2 of bareq512, F6 flat, Top-1 flat or
+−1pt; the isotropic null at 1024 ≈ 0.0023.
+
+## D4 — domain arrival: does unseeded structure re-emerge certified? (registered 2026-09-09)
+Two arms, seed 137, D1 body at 512 dims / bar 0.0145 (the bareq512 recipe), labeling off:
+`excludeFromAnchoring = ["Philosophy"]` and `excludeFromAnchoring = ["Law"]` — the domain's
+questions enter the corpus but get no depth-1 anchor and must route from the root.
+(Launch note 2026-09-09 22:09: the first launch used lowercase keys and aborted at the
+fail-closed membership check — the dataset keys are capitalised; configs corrected, nothing
+was built or measured, the registration is unchanged.)
+Readouts: where the excluded domain's train questions end up (host anchors, residual pool,
+new splits), whether any accepted split whose region is >= 60% the excluded domain
+CERTIFIES at site level, and the held-out routing purity of that domain's questions.
+REGISTERED: ARRIVES iff a certified split with >= 60% excluded-domain region exists and
+the domain's held-out questions route to it (>= 50% of them) — the evolving-tree claim in
+miniature; ABSORBED iff they spread over host anchors with no certified split; PARKED iff
+they sit in residual pools. Prediction: Law ARRIVES (large, distinctive); Philosophy is
+ABSORBED into Psychology/History (its geometry is diffuse: the only arms that ever certify
+it drop the top PCs).
+
+## T3 — routing inflation of the pool of record (registered 2026-09-09)
+`routeReserved` on the frozen snapshot with p8a29 activated (its true held-out pool), then
+re-pin p2dca. Readout: primary-anchor purity of p8a29 (held-out) vs p2dca (in-sample 71%,
+H5: 73.6%) and the leaf-assignment agreement rate. REGISTERED: the in-sample figure
+overstates held-out purity by >= 3pp (else the routing claims need no correction).
+Prediction: held-out purity ~68–70%.
+
+## OUTCOMES (updated as tests adjudicate)
+
+- P6 (2026-09-08): **NULL — overlap program closed, soft routing vindicated.** Full pool
+  n = 3,599: D = (F−T) − (Pf−T) mean +0.1987, CI [+0.0495, +0.3478], but exact sign test
+  p = 0.0923 with a NEGATIVE nonzero majority (+1007/−1085) — the conjunctive criterion
+  fails. Both arms hurt the tree outright: F−T −0.728 (p 3.9e-22), Pf−T −0.927 (p 3.3e-17);
+  every real pair negative on its own subset (Thermo, the largest twin, −6.85). Fusion
+  implemented as the labeled QUERY-MOVE variant (no cross-anchor parent redirect).
+  Artifacts: E2FusionRunner.kt, scripts/e2_fusion_analysis.py,
+  experiment_configs/p6_fusion_registration.md, experiment_results/e2_fusion/. With E1+E2
+  this closes every structural response to overlap (edge, bridge, merge); E3 stays unrun
+  per the registered sequence.
+
+- P1 (2026-09-08): **FALSIFIED** by the registered primary. Disjoint-half consensus
+  ARI = 0.6533 (bar >= 0.90, falsifier < 0.80), vs baseline mean pairwise build ARI
+  0.663 (0.585-0.704) — consensus over 10 builds agrees across halves NO BETTER than
+  two individual seed builds. The v1 procedure (nearest-centroid assignments,
+  average-linkage at co-assignment 0.6, min-cell 55 merges) does not stabilize leaf
+  identity; the instability does not average out at B=10. Full-consensus descriptives:
+  67 cells, size median 88. Artifacts: tools/analysis/consensus_tree.py,
+  experiment_results/consensus_p1_report.txt, consensus_cells_v1.json. Possible
+  procedure variants (higher B, co-assignment-weighted warm start, different cut)
+  remain open but are NEW proposals needing their own registrations; P1 as designed
+  is dead and the v2 recipe reorders around P2.
+
+- P7 (2026-09-08): SPLIT VERDICT. Structure is bit-reproducible (dag_snapshots.jsonl
+  hash-identical across two same-config builds at HEAD) — the core claim PASSES.
+  The full byte-diff FAILS on 7 files, decomposing into: (i) JBootstrap SE column in
+  proposals.csv differs at the 4th significant digit (deltaJ and decisions identical)
+  — the paired bootstrap's capture iteration is not order-stable despite its fixed
+  seed; (ii) trickle/routing/quality validation CSVs differ — evaluation-path float
+  accumulation, the same family as the disclosed 0.9pp July-vs-HEAD Top-1 drift;
+  (iii) timestamps (benign). Work items: sort JBootstrap capture iteration;
+  deterministic accumulation in trickle validation; strip volatile fields from the
+  gate's file set. Artifacts: experiment_results/p7_det_{1,2}/, p7 chain log.
+  Also: the embeddinggemma arm failed twice on an Ollama-internal socket-exhaustion
+  error (its runner, not our code); parked — nomic already carries the
+  second-embedder axis (75 leaves, Top-1 0.716, Philosophy splits x4).
+
+- P2 (2026-09-08): **FALSIFIED on both registered checks** (`gradlew siteNull`, 300 reps
+  per site per arm; table `docs/data/site_null_frozen.csv`; full readout in
+  `docs/separation_null_by_size.md` "SITE-LEVEL (2026-09-08)"). (a) power check FAIL —
+  the deflated null certifies CS depth-1 (q_defl=0.043) but ALSO Philosophy depth-1, at
+  exactly q_defl=0.050 (obs 0.03188 vs deflated p95 0.03162); at 300 reps the two q's are
+  statistically indistinguishable (binomial SE ~0.013), so the construction lacks the
+  registered discrimination — substantive, not a rounding accident. Philosophy's second
+  site stays uncertified (0.257) as required. (b) trunk viability FAIL — matched
+  site-level nulls certify 6/66 (9%): Chemistry 0.000, Biology 0.000, Math 0.013,
+  Engineering 0.013, Business 0.027 (depth 1) + one depth-4 Math site (0.047); the
+  registered falsifier (< 15: "trunk tier too thin; strata absorb its role") fires even
+  though Chemistry and Biology certify as required. The anchor-level 35% clear was
+  confirmed as an upper bound (collapses 4x under matched nulls). CERTIFIED TRUNK =
+  {Chemistry, Math, Business, Engineering, Biology} depth-1 splits only; the drift clause
+  is moot and unmeasured (offline geometry, no routing arm). Downstream: P3's candidate
+  twig set must be re-derived against this 5-site trunk or its gate redesigned; P5's
+  strata inherit the trunk tier's measurement role. Deflated null survives as a
+  per-site diagnostic (q's in the CSV), not as the CS-vs-Philosophy discriminator;
+  dip-test / mixture-BIC variants are unregistered future work.
+
+- D1 (2026-09-08, registered 523b85d; gate PASSED — d256_s137 hash-identical to
+  p7_det_1; tables experiment_results/dimsweep/site_null_<arm>_s<seed>.csv, report.txt,
+  iso_null_by_dim.out; frozen pool re-pinned after the chain):
+  **d512 IMPROVES (prediction "changes little" WRONG); d128, abt2, white NO IMPROVEMENT.**
+
+  | arm | leaves | certified sites | trunk anchors | Top-1 | cross-seed ARI |
+  |---|---|---|---|---|---|
+  | d256 (base) | 84 / 83 | 7/60, 9/65 | 5, 7 | 0.737, 0.749 | 0.678 |
+  | d128 | 95 / 94 | 5/75, 3/76 | 2, 2 | 0.719, 0.729 | 0.580 |
+  | d512 | 75 / 84 | 13/54, 13/57 | 7, 7 | 0.747, 0.771 | 0.679 |
+  | abt2 | 63 / 61 | 17/27, 18/25 | 15, 18 | 0.731, 0.755 | 0.657 |
+  | white | 20 / 17 | 2/5, 1/3 | 2, 1 | 0.734, 0.744 | 0.756 |
+
+  d128: more leaves, fewer certified, trunk collapses to Engineering+Math, Top-1 -2pp,
+  ARI -0.10 — fewer dimensions manufacture noise splits (the MRL tail carries signal).
+  d512: fewer splits, twice the certified count, trunk 7/7 (Law and Physics join),
+  Top-1 up, ARI unchanged — passes all three clauses. Confound (registered): isotropic
+  p95 at n=406 is 0.0115 / 0.0069 / 0.0040 at 128 / 256 / 512 dims, so the flat bar is
+  2.2x / 3.6x / 6.2x the noise floor — 512 runs a stricter effective bar, which prunes
+  but cannot by itself ADD certified sites (13 vs 7-9). A bar-equalized 512 arm
+  (bar ~0.0145) is the stage-2 test that separates width from bar.
+  abt2 (top-2 within-node PCs dropped before EM, geometry unchanged so NO bar
+  confound): 63-72% of accepted sites certify (vs 12-14% baseline), trunk 15-18 of 14
+  anchors' worth of sites INCLUDING Philosophy depth-1 in both seeds — the first arm ever
+  to certify a Philosophy split; Top-1 within CI; ARI 0.6566 vs floor 0.6575 — misses
+  the registered clause by 0.001 and is adjudicated NO IMPROVEMENT as registered.
+  ARI across trees of different leaf counts is a blunt stability metric; this is the
+  arm with the strongest signal in the sweep and the obvious stage-2 registration
+  (abt1 / abt3, abt2 x 512 dims, bar-equalized).
+  white: variance-whitened proposals almost never survive the raw-geometry gate —
+  5 and 3 accepted splits, 20/17 leaves; ARI 0.756 is the stability of a near-stump.
+  Confirms the proposal-only design's premise the other way: the acceptance geometry,
+  not the proposal, is the binding constraint, and only proposals that stay compatible
+  with it (abt2) get through.
+  Split hygiene: all ten trees are structural evidence only (own-seed splits); any arm
+  promoted to arena use is rebuilt with splitSeed = 42.
+
+- D2 (2026-09-09, registered cc8b42c; tables experiment_results/dimsweep2/, report.txt,
+  f6_d2.txt; frozen pool re-pinned by the chain): **(i) PASS — the width effect is real;
+  (ii) FAIL as predicted; bareq512 is the best tree measured so far on every axis.**
+
+  | arm | leaves | certified | trunk | Top-1 | ARI | F6 leaf loss vs frozen (x1000) |
+  |---|---|---|---|---|---|---|
+  | bareq512 (512 dims, bar 0.0145) | 84 / 88 | 11/67, 11/71 | 6, 6 | 0.747, 0.771 | 0.688 | −0.10 [−0.74,+0.52], −0.23 [−0.87,+0.39] |
+  | abt2d512 (512 dims, drop top-2 PCs) | 35 / 34 | 11/11, 7/12 | 11, 7 | 0.744, 0.759 | 0.670 | −2.68, −3.13 (CIs exclude 0) |
+  | abt1 (256 dims, drop top-1 PC) | 81 / 73 | 16/49, 10/45 | 13, 9 | 0.741, 0.749 | 0.461 | −0.60 [−1.33,+0.13], −2.22 |
+  | (D1 refs) d256 / d512 | 84,83 / 75,84 | 7,9 / 13,13 | 5,7 / 7,7 | 0.737,0.749 / 0.747,0.771 | 0.678 / 0.679 | 0 / −0.45, −0.27 |
+
+  (i) bareq512 certifies 11 and 11 >= d256's 7 and 9 at EQUAL leaf counts (84/88 vs
+  84/83), with d512's Top-1, the highest cross-seed ARI of any arm (0.688) and no
+  key-only capability loss — so D1's d512 gain was not the stricter effective bar. This
+  arm dominates the frozen configuration on certification, Top-1 and stability while
+  matching it on profile information; it is the construction to promote (rebuild with
+  splitSeed = 42 before any arena use). (ii) abt2d512 certifies 11/11 (seed 137: every
+  accepted split passes its own null) and 7/12, i.e. fewer sites than d512's 13, and
+  loses 2.7–3.1/1000 of key-only capability information — abt2's loss is the leaf count
+  (~35 cells), not the dropped components. It is the instrument for the certified-leaf
+  ladder (all leaves certified), not a profile tree. (iii) abt1 dose-response: dropping
+  one PC already lifts certification to 22–33% of sites and certifies Philosophy in
+  both seeds, but cross-seed ARI collapses to 0.46 — the top principal component
+  carries the stable part of the structure, and removing it trades stability for
+  certifiability. Whitening (D1) is the limit of that trade.
+
+- LADDER (2026-09-08, registered 4c4e5e7): **PRIMARY FAILS — the specificity curve
+  is not monotone.** generic 0.761 < anchor 0.774 > stratum 0.757 < leaf 0.770
+  (n=967 fully paired); leaf-vs-anchor 35:38 discordant, p=0.68. Anchor-level
+  induced rubrics match leaf rubrics and beat generic; the knee sits at or before
+  ANCHOR granularity. No contradiction with the confirmed cell>generic (p=0.0001)
+  and cell>wrong-cell (p=0.006) results: rubric value = domain-correct content,
+  wrong specificity harms, finer-than-anchor right specificity adds ~nothing here.
+  Old-vs-fresh session confound disclosed (leaf/generic arms reused as registered).
+  Consequence: P3's twig gate loses its premise as designed; a same-session leaf
+  re-judge (~4k calls) is the follow-up if the knee needs settling.
+
+- D3 (2026-09-09, registered above): **TURNED at 1024 — on certification, not on routing.**
+  bareq1024 (bar 0.0087 from the MEASURED isotropic p95 0.00240 at n=406; 128→256→512→1024
+  p95 0.0115/0.0069/0.0040/0.0024, i.e. ~1.7x per doubling throughout): 80/88 leaves,
+  site-certified 6/66 and 6/73 (bareq512: 11/67, 11/71) — below 11 in BOTH seeds, so the
+  registered TURNED clause fires; depth-1 certified 4 and 3 (bareq512: 6 and 6). The other
+  readouts do not turn: Top-1 0.765 [0.751,0.779] / 0.776 [0.762,0.790] overlaps (and
+  numerically exceeds) bareq512's 0.747 / 0.771; cross-seed ARI 0.697 (the highest of any
+  arm; bareq512 0.688); F6 key-only leaf-level loss vs frozen −0.49 / +0.24 (x1000), inside
+  the −0.5 clause, with anchor==category 78–79% (bareq512 76.6–76.9%). Reading: the width
+  gain in certifiable structure peaks at 512 — at 1024 the within-node null tightens faster
+  than the observed separations, and half the splits that certified at 512 no longer clear
+  their site null, while routing and capability information are unchanged or marginally
+  better. Prediction (SATURATED, certification within ±2) was wrong on certification (−5)
+  and right on Top-1/F6. bareq512 remains the construction to promote. Wall: build 594 s,
+  site-null 2,114 / 2,205 s per seed at 1024. Artifacts: experiment_results/dimsweep3/
+  (report.txt, f6_d3.txt, bar_derivation.txt, site-null CSVs).
+
+- T3 (2026-09-09, registered above): **FAIL — there is no routing inflation to correct.**
+  The frozen tree routes its TRUE held-out pool p8a29 (3,433 routed of 3,437) at 74.0%
+  primary-anchor purity [72.5, 75.5], against 73.6% on the arena pool p2dca (71% in-sample):
+  in-sample minus held-out = −0.5pp; the registered ≥ 3pp overstatement does not exist. Within
+  p2dca the train-side 2,425 route at 72.2% and the clean 1,020 at 76.8% — the questions the
+  tree was built on route WORSE, not better (construction assigns hard, boundary questions to
+  foreign-anchored leaves and routing keeps them there; held-out questions are placed by
+  centroid similarity alone). Per category the two pools agree within ±3pp except Biology
+  (held-out +7.3). Determinism check: the 1,020 questions present in both pools route to the
+  same leaf in both runs (100%). Consequence: H5's 73.6% and the arena-side routing figures
+  stand as honest held-out estimates; the incident's "in-sample routing" caveat is retained as
+  disclosure but carries no measurable bias. Prediction (68–70%) wrong. Artifacts:
+  experiment_results/dimsweep4/frozen_p8a29_leaf_assignments.csv, t3_outcome.txt.
+
+- D4 first measurement (2026-09-09 22:22–22:27, builds arrive_philosophy_s137 / arrive_law_s137
+  on the corrected keys): **VOID — harness defect, not a result.** Both arms came out "ABSORBED"
+  with ZERO withheld train questions in any leaf or residual pool: the routable corpus was
+  gathered from the anchored depth-1 branches only, so the 349 (Philosophy) / ~715 (Law)
+  unanchored queries never entered the DAG, and the `[HOLD-OUT] retained` guard passed because
+  it checked the label map rather than tree membership — exactly the vacuity the guard was
+  written to prevent. The held-out routing readouts of those runs (Philosophy → Other 54,
+  Psychology 38, CS 31; Law → Philosophy 113, Other 86) describe how an ABSENT domain routes and
+  are kept as a descriptive only. Fix: withheld queries are placed at the root with full weight
+  at bootstrap (the trickle's own out-of-distribution fallback location), the corpus is gathered
+  from the root, and a tree-membership guard replaces the label-map guard. No effect on runs
+  without `excludeFromAnchoring`. The registration is unchanged; the arms are rebuilt.
+
+- D4 (2026-09-09, rebuilt 22:39–23:12 with the withheld queries placed at the root; registered
+  above): **both arms ABSORBED on the letter; Law is rediscovered as content but not as a
+  certified split — the prediction was right for Philosophy and wrong for Law.**
+  Philosophy (349 unanchored train questions; tree 88 leaves, 11/72 sites certified): they
+  settle under Other (51%), Psychology (26%), Computer science (12%), History (8%) and re-emerge
+  as four 77–81%-Philosophy regions — a depth-3 split under Other (n=176, 80%, itself two ~80%
+  leaves) and a 93-question leaf under Psychology. The largest region does NOT certify (observed
+  separation 0.022 vs its site null p95 0.038) and captures 35% of held-out Philosophy (150);
+  held-out Philosophy routes Other 68 / Psychology 35 / CS 33. ABSORBED, as predicted (into
+  Other/Psychology rather than Psychology/History).
+  Law (~715 unanchored train questions, 761 leaf memberships; tree 98 leaves, 10/84 sites
+  certified): Law TAKES OVER two host anchors — the Philosophy anchor's region becomes 94% Law
+  (n=386) and Other's 72% (n=494) — and re-emerges as twelve 90–100%-Law regions (the two
+  depth-2 splits n=372 at 97% and n=319 at 94%). Held-out Law (330) routes 89% into Law-dominated
+  structure (Other 165, Philosophy 149), but no single region reaches the registered 50%: the two
+  big ones carry 45% and 44% each, and the Other anchor site carries exactly 50.0% but does not
+  certify (0.027 vs p95 0.073); no Law-dominated split site certifies (Philosophy anchor 0.052 vs
+  0.072; depth-2 sites 0.035 vs 0.075 / 0.097; depth-3 0.050 vs 0.077, 0.040 vs 0.066). ABSORBED
+  on the letter; the prediction "ARRIVES" was wrong.
+  Reading: (i) routing recovers an unseeded domain — its questions form near-pure regions and
+  its held-out questions land in them; (ii) certification does not — a within-node null run on a
+  population that is itself 94–97% Law measures Law-internal structure, and the Law-vs-host
+  boundary at the anchor level does not clear the anchor's null either, consistent with the
+  campaign-wide rarity of certified sites (10–11 of 72–84 here; 11/67 in D2); (iii) the
+  construction has no mechanism to BIRTH a depth-1 anchor — an arriving domain can only split an
+  existing anchor's region, so it splits itself across the two nearest hosts (Philosophy/Other
+  for Law; Other/Psychology for Philosophy). The "evolving tree" claim therefore holds for
+  routing and cell formation but NOT for anchor-level structure without a root-level split
+  proposal, which the loop deliberately never makes (the root is never a split candidate).
+  Harness note: the first launch (22:22) was void — see the entry above; the fix (withheld
+  queries at the root, tree-membership guard) is inert without `excludeFromAnchoring`.
+  Wall: builds 119 s / 290 s (new code), site-nulls 1,082 s / ~800 s at 512 dims; the
+  overlapped chain's two nulls collided on Gradle's shared test-results directory once
+  (serialised since, d25fc35). Artifacts: experiment_results/dimsweep4/ (d4_outcome.txt,
+  site_null_arrive_*.csv; the void runs kept as *_VOID for the record).
+
+- LEAF-PROFILE (2026-09-10 02:07–02:25, registered in tools/analysis/leaf_profile_evidence.py before
+  running; zero calls): **A REAL, B NOT RESOLVED — exactly as predicted. The per-leaf capability
+  profile exists in the ground truth; the judged arena cannot resolve it at R2's budget.**
+  A (key, 46 models × 10,925 questions, clean bareq512_s42 tree, leaf = nearest centroid): within-anchor
+  model×leaf interaction beyond model + leaf-difficulty, question-level permutation (200): pooled LRT
+  3,795 vs null p95 2,362, p = 0.005; 10/14 anchors individually p < 0.05 (Math LRT 520 vs 341 with a
+  leaf-over-anchor LOO Brier gain of +12.7/1000; Business +5.4; Biology +4.6; Engineering +3.9; Other,
+  Philosophy, Chemistry, Health, Physics, Economics significant; Computer science p = 0.065; Law,
+  Psychology, History not significant, Law/Psychology with negative Brier gains — their leaves are
+  difficulty strata, not skill strata).
+  B (R2 atlas, 36,871 Mistral verdicts, 12 models, per-leaf vs anchor-level BT within anchors, same
+  permutation): pooled p = 0.24; 4/14 anchors nominally significant (Business, History, Other,
+  Philosophy), none after pooling. Median verdicts per (leaf, model) cell = 54 (p25 = 35), against
+  the q ≥ k/S² requirement of ~120–190 distinct questions per cell for SE 0.15 (H6b). Caveat: the
+  statistic uses the atlas's registered penalised BT (0.5 pseudo-counts), so the contrast is negative
+  where shrinkage dominates (Physics −157, Biology −66): it is conservative for thin leaves, which is
+  the point — at this volume the leaf-level fit is prior-dominated.
+  Consequence for the thesis: "per-leaf capability profile" is a TRUE statement about the ground
+  truth captured by the taxonomy (F2/F5/LEAF-PROFILE-A) and a BUDGET statement about the arena
+  (M1 leaf-level hurts; LEAF-PROFILE-B; H6b). The arena resolves profiles at anchor granularity;
+  leaf granularity needs roughly 3–4× the verdicts per cell, or the key. Next (zero-call): price it
+  with the M3 synthetic arena — verdicts per cell at which the leaf profile beats the anchor profile
+  on held-out prediction. Output experiment_results/leaf_profile_evidence.txt.
+
+- LEAF-POWER (2026-09-10 02:14–02:20, registered in tools/analysis/leaf_profile_power.py before
+  running; zero calls): **the leaf-level profile never beats the anchor-level profile on held-out
+  prediction, even with the key as oracle and 400 verdicts per (leaf, model) — prediction (V* ≈ 80–120
+  oracle) WRONG.** Clean bareq512_s42 tree, 84 leaves with ≥ 60 keyed questions, 12 arena models, 50/50
+  question split per leaf (train-half median 58 distinct questions per leaf), 5 seeds. Held-out
+  log-loss (leaf vs anchor): ORACLE V=54 0.465 vs 0.434, V=400 0.432 vs 0.429, leaf better in 0/5
+  seeds at every budget; top-1 agreement with the key's best model per leaf 0.64 vs 0.84 at V=54 and
+  0.80 vs 0.90 at V=400. NOISY (Mistral-like) judge: V=400 0.537 vs 0.534, top-1 0.54 vs 0.85; 0/5
+  everywhere. The gap narrows monotonically with V but does not close: beyond ~2 verdicts per question
+  the leaf fit is re-sampling the same ~58 questions, so the binding quantity is DISTINCT QUESTIONS
+  per leaf (H6b: q ≥ k/S², ~120–190 for SE 0.15), not verdicts — while the anchor fit pools ~6 leaves'
+  questions. Together with LEAF-PROFILE: the leaf-level interaction is real (p = 0.005 on 46 models
+  and all questions) but small relative to the between-model differences, so a separately estimated
+  leaf profile is worse than the anchor profile at any verdict budget the current reserved pool
+  (median 40 arena questions per leaf; 58 keyed train questions here) can supply. What this means for
+  the design: (i) per-leaf profiles need either more distinct questions per cell (a larger or harder
+  keyed pool) or partial pooling — leaf = anchor + shrunken deviation (a LEAF-SHRINK zero-call test
+  is the natural next; M1's hierarchical prior hurt on next-verdict prediction, so it must be tested,
+  not assumed); (ii) the R2 strata (20 cells at SE ≤ 0.15) were the right granularity for the arena;
+  (iii) the honest thesis claim is "anchor-level profiles from the arena; sub-anchor structure shown
+  on the key". Output experiment_results/leaf_profile_power.txt.
+
+- LEAF-SHRINK (2026-09-10 02:24–02:30, registered before running; zero calls): **NOT RESCUED —
+  partial pooling does not beat the anchor-only profile at any budget.** Same synthetic arena as
+  LEAF-POWER, leaf profile = anchor + λ·(free leaf − anchor). NOISY judge at R2's V = 54: λ = 0 0.538,
+  λ = 0.25 0.543, λ = 1 0.564 (held-out log-loss; anchor-only best in 5/5 seeds); at V = 400 the same
+  order. ORACLE: anchor-only best at V = 54 and 120; at V = 400 λ = 0.25 ties it (0.4287 vs 0.4287,
+  3/5 seeds). Top-1 agreement with the key's best model per leaf falls monotonically with λ at every
+  budget (V = 54 noisy: 0.51 → 0.32). Closure: for judged arenas on this question pool the ANCHOR
+  profile is the right estimator; the leaf-level deviation, though real on the key (LEAF-PROFILE A), is
+  too small and too under-determined to be worth estimating from verdicts until a cell holds several
+  hundred distinct questions. Prediction (λ = 0.25 wins at V ≥ 120 oracle) wrong except at 400.
+  Output experiment_results/leaf_profile_shrink.txt.
+
+- HYGIENE-REPLICA (2026-09-10 04:33–04:36, registered as a byte-identity check of the promoted tree):
+  **the promoted bareq512_s42 build and its label-free replica are NOT the same tree — and the cause is
+  a z-gate flip on the bootstrap SE, not labeling.** Labeling is strictly post-pass (the promoted log
+  starts labeling at 20:55:03, after iteration 18). Iterations 1–6 are identical proposal-by-proposal
+  (181 proposals, identical decisions). At iteration 7 the proposal GROW n00000191 has the SAME dJ
+  (0.000152082) in both runs but SE_dJ 0.000076077 (z = 1.9990 → REJECTED) in the promoted run and
+  0.000075678 (z = 2.0096 → ACCEPTED) in the replica; the trees diverge from there (18 vs 15
+  iterations; final 158 nodes both, 37 nodes differ by ±1 query and kappa; leaf count, depth
+  distribution, held-out Top-1 and the migration matrix identical). Consequence for P7: "structure is
+  bit-reproducible" holds only when no proposal lands within the bootstrap SE's run-to-run noise of the
+  acceptance threshold (z = 2.0); the evaluation-path instability P7 recorded CAN propagate into
+  structure through the gate. P7's two runs and the perf replay gate passed because no borderline
+  proposal occurred in those configs. Replica 2 (same label-free config, same code) is running to show
+  whether identical code flips the same decision. Fix: an order-independent (sorted-accumulation)
+  bootstrap SE in JBootstrap — a P7 work item, small; it changes SE_dJ in the last digits and makes the
+  gate deterministic. Until then, the promoted snapshot 20260909_212117 is the tree of record (its
+  rubrics, routing CSV and every RUBRIC-512 / STACK verdict use it); the replica is not promoted.
+  Artifacts: experiment_results/hygiene/ (diff.txt, the two run dirs).
+  UPDATE 04:47: replica 2 (identical code and config) diverged from replica 1 at the same iteration-7
+  decision and took the promoted tree's path (18 iterations): identical code is run-to-run
+  nondeterministic on this config. First fix (sorted traversal of queryWeights / residualQueries /
+  the affected set in JBootstrap.capture, estimate and pairedDeltaSe): two fixed builds now agree on
+  the first 160 proposals INCLUDING SE_dJ (before the fix, SE differed from proposal 1), then differ on
+  one proposal's SE at iteration 6 (0.000081068 vs 0.000083675, same dJ) while the DAG stays identical
+  in every field through iteration 7, and diverge at iteration 8 on a gate flip. So the residual
+  nondeterminism (~3% of SE) enters through the INPUT of the SE (the affected set or its weights after
+  the temporary edit), not through the sorted accumulation — an instrumented pair of builds
+  (JBOOT_DEBUG prints the affected-set hash and fixed mass per proposal) is running to pin it. Until it
+  is pinned: the paper's P7 statement becomes "structure reproducible except at borderline z-gate
+  decisions (|z − 2| ≲ 0.05); the bootstrap SE varies ~3% run to run"; every tree of record is a
+  saved snapshot, which is what the arena and the analyses load, so no published number depends on
+  re-running construction.
+  RESOLVED 05:14 (commit below): the residual source was the unordered `values.sum()` over
+  ConcurrentHashMap query-weight maps on the construction path (fitter nEffective → kappa; splitter
+  mass/ESS gate; operations cN and totalAssignedMass; two GraphNode mass sums) — the instrumented
+  deviant (run 7) showed the SAME affected-set size and mass but different MEMBERS at the first
+  differing proposal, i.e. the temporary split's fit differed in the last bit and near-tie queries
+  changed sides. With every reduction ordered (taxonomy.utils.orderedSum / orderedSumOf) plus the sorted
+  bootstrap, three consecutive builds of the promoted config are BYTE-IDENTICAL: DAG, proposals.csv
+  including every SE_dJ, the bootstrap inputs, 14 iterations (runs 10–12). Unit suite 262/262 after the
+  change. P7 is therefore closed: construction is bit-reproducible from this commit on. Consequence for
+  artifacts: the ordered sums change last bits, so trees built before this commit (including the
+  promoted 20260909_212117) are reproducible only as saved snapshots, not by rebuilding — which is how
+  every analysis and arena run consumes them. A rebuild of bareq512_s42 under the deterministic code
+  yields a third, equally valid tree (dag 1d1a0645…, 14 iterations); it is NOT promoted, the snapshot of
+  record stays.

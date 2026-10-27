@@ -1,0 +1,137 @@
+{
+  "id": "COST-AXES-INGEST",
+  "title": "COST-AXES-INGEST: FRAMEWORK item 16: token counts per (model, cell) and the tier-then-cheapest router's accuracy and cost against the per-cell best, out of sample (zero LLM calls; one builder-side network fetch disclosed)",
+  "question": "(a) token counts per (model, cell) via each model's tokenizer; (b) accuracy: tier-then-cheapest within 0.5pp of the per-cell best out of sample (policy on TRAIN 15,124 q, scored on 560 pool q, MATH-FIX labels) AND cost <= 85% of the per-cell best's token cost; the all-52-cell OOS re-read under the parameter PROXY; latency.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "eaf1dbf",
+    "program_lines": "docs/judge_v2_program.md L3603-L3611 (by reference; docs/design/FRAMEWORK.md L368 item 16); the Block 1 record bullet at L3826",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-15 (before any run) — BY REFERENCE: the 26 tests in docs/design/FRAMEWORK.md \"Tests to register before shipping\" (commit 8d77f7b), with the criteria, predictions and call counts stated there, scheduled in docs/plan_2026-09-15.md",
+    "outcome_heading": [
+      "L3662: ## Block 1 record (2026-09-15/16, zero calls) — FRAMEWORK items 1-12, 14-16: fourteen zero-call tests built, each adversarially checked; verdicts of record below (checker's number wins where it refutes the builder)",
+      "L3826: - **COST-AXES-INGEST (2026-09-16, zero LLM calls; one builder-side network fetch disclosed): FAIL on the item's criterion, tokenizer-robust; the cost half cannot be met by any tokenizer on this data; the all-52-cell parameter-proxy re-read is UNDETERMINED, not PASS.**"
+    ],
+    "date": "2026-09-15"
+  },
+  "script": {
+    "path": "tools/analysis/cost_axes_ingest.py",
+    "sha16": "5398af2ffea8135f",
+    "commit": "7076615"
+  },
+  "ready": null,
+  "go": "n/a (0 calls; Block 1)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/cost_axes_ingest.txt",
+    "outcome_commit": "7076615",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (pool_guard.assert_pool_of_record() first; union pool paeec37aa28063c75 by explicit id where used)",
+    "date": "2026-09-15/16"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); each Block 1 test was 'adversarially checked' at build time and the checker's number wins where it refutes the builder (Block 1 record header L3662-L3663); the checker-confirmed defects are listed in the bullet",
+    "commit": "7076615",
+    "verdict": ""
+  },
+  "criteria": [
+    {
+      "id": "(a)",
+      "text": "token counts per (model, cell) via each model's tokenizer",
+      "result": "n/a",
+      "value": "NOT COMPUTED with the models' own tokenizers (none on disk); 5 offline proxies recorded on the 8 generative cells (MATH 7, IFEval 1; 33,570 stored texts; spot-check 300 texts, 0 mismatches); cl100k anchored at 1.001 own-tokens/proxy-token on Llama-3, 0.978-1.001 on Qwen2.5; cl100k over-counts Mistral / Yi / Phi vocabularies by up to ~20%: PARTLY (proxy table verified)",
+      "denominator": "8 generative cells, 33,570 texts"
+    },
+    {
+      "id": "(b)-accuracy",
+      "text": "tier-then-cheapest within 0.5pp of the per-cell best, OOS",
+      "result": "HELD",
+      "value": "best single 0.6625, per-cell best 0.6875, tier-then-cheapest 0.6929 (+0.54pp; +0.18pp under chars/words); EVAL-boot 95% [-0.71, +1.79]pp; TRAIN-boot [-2.50, +1.07]pp, P(met) 0.65; vs the EVAL-oracle per-cell best -1.79pp: met at the point, not established (checker PARTLY; builder PASS)",
+      "denominator": "560 pool q; policy on 15,124 TRAIN q"
+    },
+    {
+      "id": "(b)-cost",
+      "text": "<= 85% of the per-cell best's token cost",
+      "result": "FAILED",
+      "value": "cl100k 515.9 vs 522.2 = 98.8%; texify 98.8%, mpnet 98.9%, chars/4 100.0%, words 99.7%; EVAL-boot [98.2, 99.4]%; TRAIN-boot minimum 92.7%, P(<= 85%) = 0.000; vs best single 104-107%; structural floor: an EVAL-oracle cheapest-in-tier pick gives 98.8-99.1% because the TRAIN top tier is a singleton or a same-vocabulary Qwen2.5 pair in 7 of 8 cells (only Geometry diverges, 593 vs 681)",
+      "denominator": "8 generative cells"
+    },
+    {
+      "id": "(b)-joint",
+      "text": "both halves",
+      "result": "FAILED",
+      "value": "accuracy met 5/5 proxies, cost 0/5; P(both) = 0.000; hardest reading fails both",
+      "denominator": "8 cells"
+    },
+    {
+      "id": "all-52",
+      "text": "all-52-cell OOS re-read under the parameter PROXY (not the item's criterion)",
+      "result": "UNDETERMINED",
+      "value": "MATH-FIX / record regex: best single 0.5912, per-cell best 0.6220, tier-then-cheapest 0.6172, -0.48pp at 72.3% of parameters; picks coincide in 37 of 52 cells; 34 singleton TRAIN tiers; checker: EVAL-boot delta [-1.13, +0.20]pp, P(>= -0.5pp) 0.53; TRAIN-boot with re-selection P(both met) 0.59: UNDETERMINED (coin flip 0.02pp inside the bar; builder PASS withdrawn)",
+      "denominator": "52 union cells"
+    },
+    {
+      "id": "latency",
+      "text": "latency",
+      "result": "n/a",
+      "value": "not computed; needs timed regeneration (registered separately)",
+      "denominator": "n/a"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none beyond the criterion (registered by reference)",
+    "fired": false,
+    "note": "TIER-ROUTER-U's product-shape claim (-0.26pp at 83% of parameters, in sample) does not carry to token cost where token cost exists (1.2% saving) and degrades to -0.48pp at 72% out of sample where it does not; the cost axis stays a parameter PROXY on 44 of 52 cells"
+  },
+  "numbers_of_record": {
+    "accuracy_OOS": "best single 0.6625; per-cell best 0.6875; tier-then-cheapest 0.6929 (+0.54pp); EVAL-boot [-0.71, +1.79]pp; TRAIN-boot [-2.50, +1.07]pp",
+    "cost": "98.8% (cl100k) / 98.8-100.0% across proxies; EVAL-boot [98.2, 99.4]%; P(<= 85%) 0.000",
+    "all_52": "0.5912 / 0.6220 / 0.6172, -0.48pp at 72.3% of parameters; EVAL-boot [-1.13, +0.20]pp",
+    "in_sample_reproduction": "TIER-ROUTER-U reproduced byte-for-byte (0.5543 / 0.6169 / 0.6143 at 72.0 / 46.1 / 38.3 B; the record regex mis-sizes Phi-3.5-mini, command-r-plus and Mixtral)",
+    "constraint_breach": "tiktoken fetched the cl100k_base rank file from the network during the builder's probing (cache mtime 2026-09-16 01:19); the script loads from cache with requests.get replaced by a raiser; the verdict does not rest on cl100k",
+    "cap_note": "16 of 18 models have MATH outputs at >= 95% of max_gen_toks (the same cap finding as CHECKER-ANSWER-INGEST)"
+  },
+  "sentence_of_record": "COST-AXES-INGEST (2026-09-16, zero LLM calls; one builder-side network fetch disclosed): FAIL on the item's criterion, tokenizer-robust (accuracy met at the point on 5/5 proxies, +0.54pp OOS with an interval covering 0; cost 98.8% of the per-cell best against the <= 85% bar on every proxy, P(<= 85%) = 0.000, a structural floor because the TRAIN top tier is a singleton or a same-vocabulary pair in 7 of 8 cells); the all-52-cell parameter-proxy re-read is UNDETERMINED, not PASS (-0.48pp at 72.3% of parameters, a coin flip 0.02pp inside the bar); the cost axis stays a parameter proxy on 44 of 52 cells; latency not computed.",
+  "chips": [
+    "FAIL (COST HALF, TOKENIZER-ROBUST)",
+    "(a) TOKENS NOT COMPUTED (PROXY TABLE VERIFIED)",
+    "52-CELL RE-READ UNDETERMINED (checker; builder PASS)",
+    "LATENCY NOT COMPUTED"
+  ],
+  "brackets": [],
+  "does_not_show": [
+    "a token cost from the models' own tokenizers (none on disk; proxies only)",
+    "latency (needs timed regeneration)",
+    "a cost saving where token cost exists (1.2%)"
+  ],
+  "ledger": {
+    "row_id": "COST-AXES-INGEST",
+    "version": "v103 (684be03)"
+  },
+  "depends_on": [
+    "TIER-ROUTER-U",
+    "MATH-FIX",
+    "CHECKER-ANSWER-INGEST"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L3603-L3611 (by-reference registration eaf1dbf) and docs/design/FRAMEWORK.md L368 item 16: criterion, prediction, call count",
+    "docs/judge_v2_program.md L3826 ff. (Block 1 record bullet, 7076615): the criterion table, predictions scored, checker-confirmed defects, script and output",
+    "experiment_results/x12_crossdomain/cost_axes_ingest.txt (7076615)",
+    "docs/test_ledger.html row COST-AXES-INGEST (v103 684be03): chips verbatim, design / criteria / observed cells, evidence",
+    "script sha16 = sha256 of tools/analysis/cost_axes_ingest.py at 7076615 (its first commit), first 16 hex (identity, computed by the registrar 2026-09-22; later edited at 13f2142 for the pool_guard change)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' heading and the '- **ID (...)**' bullet line inside the Block 1 record, to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06"
+  ],
+  "last_update": "2026-09-22",
+  "plain_description": {
+    "sq": "SQ4 Price",
+    "what": "Token counts were estimated per model and per cell with tokenizer proxies. A router that picks the cheapest model within 0.5 points of the best model in each cell was then scored out of sample. It needed to reach 85% or less of the best model's token cost. No LLM calls were made.",
+    "why": "It tests whether per-cell routing can save money as well as keep accuracy.",
+    "information": "Passing would show a real cost saving from routing. Failing would mean the savings exist only on a rough parameter-count proxy. Result: done, FAIL, and robust to the choice of tokenizer. Accuracy was kept (+0.54 points, interval covering 0). Cost was 98.8% of the best model's, a saving of only about 1%, because the top tier often has only one model. The re-read on all 52 cells is undetermined. Latency was not computed.",
+    "written": "2026-10-07"
+  }
+}

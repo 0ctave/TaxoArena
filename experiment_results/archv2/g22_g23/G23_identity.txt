@@ -1,0 +1,53 @@
+[POOL] p2dca21ab5f4ef3ae: pool_guard.assert_pool_of_record PASSED (the id file and the reserved_pool rows both hash to it; the guard's own read-only open of the eval DB is not in the DB-open log below)
+=== ARCH-V2 G22 SIMULATOR, leg identity: RUN UNDER THE REGISTRATION ARCH-V2-G23 at d6129cf (programme L15208-L15265), master ARCHV2-G23-REC-1 ===
+  argv: tools/analysis/archv2_g23_replay.py --leg identity --out experiment_results/archv2/g22_g23/G23_identity.txt --tables-dir experiment_results/archv2/g22_g23
+  master 'ARCHV2-G23-REC-1' | data root Z:\FAC\TUBerlin\THESIS\TaxoArena | started 2026-09-24 10:44:22
+  instrument identity (git blob / sha256-lf16 of the LF rendering; working tree state):
+    archv2_g22_sim.py                  blob:522cefe751fcbf53d8e898f043218b697c254db2 sha256-lf16:eff3435a973c1cfd (CRLF sha256-crlf16:9023845e49799760)
+    archv2_arena/__init__.py           blob:210bd76eaff44916ea9d85b0d6dcccd711d85154 sha256-lf16:ae6a0736954a8674 (CRLF sha256-crlf16:2f57cabe6c394809)
+    archv2_arena/streams.py            blob:30c23f9700a1309cda059c76bfe6fcbc6c41d64b sha256-lf16:315a30993d340650 (CRLF sha256-crlf16:bd52a16174d485b7)
+    archv2_arena/ro.py                 blob:98cfb84a58e7844e24b73ba301c2792cddc61b7c sha256-lf16:23d4f38710e3007f (CRLF sha256-crlf16:297117b2176e7cd7)
+    archv2_arena/bt.py                 blob:8ee2e28b4fe9097f68b462562adaedea92f54813 sha256-lf16:138bd034706eb2e1 (CRLF sha256-crlf16:b9c25ce1f79d1875)
+    archv2_arena/cert.py               blob:d150ec9c3084352354bd83c4b106f7936f11d036 sha256-lf16:11e2ec7e76e0b495 (CRLF sha256-crlf16:1a5f2a861058b6d1)
+    archv2_arena/verdict_model.py      blob:2d6d0e2c9f494f33bfc40fab18a30d31b2d433ad sha256-lf16:10b9a030c3f09e47 (CRLF sha256-crlf16:5ba1fa98b405f8a1)
+    archv2_arena/data.py               blob:7de0b135028ba96eab24b2ba998a62dd74e03247 sha256-lf16:78d3947f51dc8596 (CRLF sha256-crlf16:769163d4f95b4437)
+    archv2_arena/design.py             blob:4959cb525c8d07a26d19358c3f98342d5b28b3d2 sha256-lf16:becd63768eedb8fc (CRLF sha256-crlf16:c0e5c5ffd6dcd994)
+    archv2_arena/g22.py                blob:257d14ca64328f1d48d52fc57b0386dc71690b3b sha256-lf16:a8e7026c0d7e8c7a (CRLF sha256-crlf16:407a72846563346f)
+    archv2_arena/report.py             blob:51639563bdd47d48e0ec8b1673eee0e7b865653a sha256-lf16:da954a3c4d1b833f (CRLF sha256-crlf16:50e5e1884a1eb849)
+    archv2_arena/synth.py              blob:02db84ba5d3ee2c819bddc1be4455ec0e186b5ca sha256-lf16:b64657775ffa4422 (CRLF sha256-crlf16:3633804b08d6b3f1)
+    archv2_arena/selftest_g22.py       blob:88adb8247e51f9231282fc421fe9b6d82ac18aff sha256-lf16:e12bf469e0071db9 (CRLF sha256-crlf16:50145f9087cd36d5)
+    archv2_arena/selftest_g22_v2.py    blob:bd1e73f96db66ae31cb360a28be466c925e6c86c sha256-lf16:b3f4d8bffa636c41 (CRLF sha256-crlf16:d478cfe70a36b9d1)
+  G23 modules:
+    archv2_g23_replay.py               blob:c0dc861339032041f3d871456ff5216b412ddf77 sha256-lf16:0d07c4f20415778b (CRLF sha256-crlf16:e22c358859d6ca82)
+    archv2_arena/g23.py                blob:ff6a1201db9321c4379e933f1b4c9d34e4047410 sha256-lf16:882540d6ff955471 (CRLF sha256-crlf16:86d19c819e1019cc)
+    archv2_arena/selftest_g23.py       blob:836679b59d9d1a3e5e83afd22c97bf1c4b215951 sha256-lf16:9f4933e7273dc383 (CRLF sha256-crlf16:7c941cd258be34e3)
+  inputs (size, mtime; -wal / -journal sizes):
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\mmlu_pro_dataset_cache_v2.db | 974917632 B | mtime 2026-09-19 16:30:10 | -wal 0 B
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\x12_crossdomain\grok_calib.db | 37879808 B | mtime 2026-09-16 05:00:28 | no sidecar
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\snapshots.db | 1065541632 B | mtime 2026-09-23 04:34:26 | -wal 0 B
+  recorded table: Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\x12_crossdomain\grok_calib_systematic_budget.txt
+
+=== (a) IDENTITY: the v1 configuration of the NEW code reproduces the recorded edge tables ===
+  systematic_budget.build LF source sha256-16 128baa007a44a219 (pinned 128baa007a44a219, the CERT-UNDER-FILTER R4 pin): MATCH
+  RECORDED build() (shim opens 2, stack cache opens through the stub 1): 920 edges, table sha256 04754dbc5d942dbf3cf0616723785e2bed0a19c11fae49d4fdb59d0e52c22382
+  NEW edges_exact on the read-only loader (B 300, Random(42)): 920 edges, table sha256 04754dbc5d942dbf3cf0616723785e2bed0a19c11fae49d4fdb59d0e52c22382
+  (1) EDGE TABLES BYTE-IDENTICAL (125206 bytes; anchor question lists identical)
+  (2) filtered (gap >= 0.02): n 891, raw_called 733, raw_wrong 7, b0 -3.5451, b1 +3.3854, loao_called 667, loao_wrong 2, loao_wrong_est 1, loao_nominal 1.11, est 809, b1_est +2.7194, ddev 4.47
+  (2) unfiltered: n 920, raw_called 740, raw_wrong 8, b0 -3.3172, b1 +3.3001, loao_called 653, loao_wrong 2, loao_wrong_est 1, loao_nominal 1.24, est 809, b1_est +2.7194, ddev 4.47
+  (2) the record's integers and printed values: ALL REPRODUCED
+    recorded (1) block: (1) LOAO calibration, realised at or below nominal: PASS in aggregate (2 wrong vs 1.11 nominal)
+    rendered (1) block: (1) LOAO calibration, realised at or below nominal - THE CRITERION OF RECORD, on the | CALLED set at the 0.975 operating point: UNDETERMINED (nominal < 3) | wrong(established) 2(1) of 667 called vs 1.11 nominal = 1.8x (status word: FRAMEWORK L101) | DESCRIPTIVE, NOT THE CRITERION: out-of-fold nominal over ALL 891 edges 46.6 against | 40 observed wrong = CONSERVATIVE, carried by the 224 edges the certificate never calls | (38 wrong vs 45.53 nominal). [CORRECTED 2026-09-15 by the REVIEW: the aggregate has | no bite - a doubled widener also passes it - and it is NOT the verdict word.]
+  (3) recorded table Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\x12_crossdomain\grok_calib_systematic_budget.txt regenerated by systematic_budget.main('filtered') fed by the NEW builder (consumed 1x): IDENTICAL EXCEPT THE DECLARED CRITERION-(1) BLOCK (1 recorded lines -> 7)
+  EXECUTION WITNESS (this leg): {'edges_exact.boards': 4200, 'edges_exact.edges': 920, 'g23.loao_folds': 28, 'g23.exact_fit': 28, 'g23.renderer_consumed_new_build': 1} -> the new code ran
+  IDENTITY LEG: PASS
+
+  EXECUTION WITNESS (new code paths): {'edges_exact.boards': 4200, 'edges_exact.edges': 920, 'g23.exact_fit': 28, 'g23.loao_folds': 28, 'g23.renderer_consumed_new_build': 1}
+  DB OPENS (all through pool_guard.open_ro: -wal/-journal refused, then mode=ro&immutable=1): 6
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\mmlu_pro_dataset_cache_v2.db
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\x12_crossdomain\grok_calib.db
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\snapshots.db
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\mmlu_pro_dataset_cache_v2.db
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\x12_crossdomain\grok_calib.db
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\snapshots.db
+  RANDOM STREAMS (master 'ARCHV2-G23-REC-1'): 1 named streams, log sha256 846a1ed7546a3e0a047cf5ed878d0e0e306f2f69bc99f36e286bcd73e05e8345 (full list in the .streams.tsv beside this file); seed = sha256(master|name)[:8] big-endian unless 'of record'
+    v2-loader/edges_exact/build()-Random(42)                                       42  random.Random (seed of record)

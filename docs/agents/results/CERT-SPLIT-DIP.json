@@ -1,0 +1,204 @@
+{
+ "id": "CERT-SPLIT-DIP",
+ "title": "CERT-SPLIT-DIP: sample-splitting dip certificate (k-means k = 2 on half A, Hartigan dip of half B on A's centroid difference, 2 x median p over 20 halvings) on FRESH plants of CERT-PLANTED's populations; size on moment-matched Gaussians; elongation controls (the PC1 median-cut control without bimodality) as falsifier; merged-pair positive controls; R256 slice descriptive; run with SI-NULL-TRIAD (zero calls; REGISTERED 2026-10-08)",
+ "question": "Does a sample-splitting dip rule certify planted 2-way shifts the plain site null of record does not, without certifying unimodal (incl. elongated) clouds?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "e83b59d5",
+  "program_lines": "docs/judge_v2_program.md L24958-L24972",
+  "program_lines_as_of": "e83b59d5 (parent d8ab39fa), re-grepped",
+  "date": "2026-10-08",
+  "heading": "## Registered 2026-10-08 (before any code or call) — CERT-SPLIT-DIP: does a sample-splitting dip certificate ...",
+  "provenance": "the orchestrator's brief of 2026-10-08 (design); criteria, Support, predictions, falsifier the registrar's; docs/judge_v2_program.md L24950-L24956 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — six zero-call tests registered ...\"; _as_of the commit that writes it, parent d8ab39fa, re-grepped)"
+ },
+ "script": {
+  "path": "tools/analysis/cert_split_dip.py (imports tools/analysis/si_null_triad.py blob:7928e99b, NOT of record for SI-NULL-TRIAD)",
+  "blob": "blob:1d46cd733e8728a35a30e5c88df5a564d1d5961a",
+  "sha16": "sha256-lf16:be9591398f263faa",
+  "commit": "397ebd77 (built, branch worktree-wf_fa0ebf63-18c-2)",
+  "merged": "c5f23e7a (registrar's batch, by path; parent 17c34de9)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_cert_split_dip.md",
+  "commit": "4bb0b263",
+  "verdict": "CERT-SPLIT-DIP READY (C1-C4); SI-NULL-TRIAD NOT READY (B1); [2026-10-08 registrar, D1 of POSTRUN 4111aecf: run command carries --data-root .claude/worktrees/rp12-r2-run on all three modes; dry-run re-prints pins, D0, 6993 and G12 from that root before --run]"
+ },
+ "go": "the author's 2026-10-08 authorisation (relayed in the orchestrator's brief, words not supplied): register and run the zero-call batch a-f; no judged calls",
+ "run": {
+  "outcome_file": "experiment_results/cert_split_dip/CERT_SPLIT_DIP_OUTCOME.txt (sha256 a40ada93aa2525975408bb241365f778baae3fd2507244aebafc3dfb180eb5f0, 41 lines; write-once, never committed); cache.jsonl dffe346efa657eb6...; SI_NULL_TRIAD_* in HELD_not_of_record/ (not of record); backup E:/TaxoArena_backup_20261009_cert_split_dip (SHA256SUMS 9/9 OK, own sha256 77d686689dcaa178, review row 14)",
+  "outcome_commit": "outcome not committed (run from main, script blob 1d46cd73, --data-root .claude/worktrees/rp12-r2-run per ruling D1)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "TRAIN root .claude/worktrees/rp12-r2-run (run.log L44 6993 IDENTITY rows, mode=ro&immutable=1; L47 G12 blob 21f110af OK, snapshot 20261001_094311); busy.ps1 rc 1 before the reads; analyze opens no DB",
+  "date": "2026-10-09"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_CERT-SPLIT-DIP.md",
+  "commit": "692d12ff",
+  "verdict": "VALID; SD0 SIZE-OK; SD1 SENSITIVE 60/60 (independently reproduced, 210/210 site by site); SD2 POS-OK; F-SD NOT FIRED; P1-P6 HELD; SI-NULL-TRIAD REFUSED at SIN-3 (0.9707), not of record; S-1 MEDIUM (SD1 qualifier), C3 LOW / C4 MEDIUM disclosed, L-1..L-3 LOW"
+ },
+ "criteria": [
+  {
+   "id": "SD0",
+   "text": "gate: SIZE-OK iff the 300 SIZE draws (SI-NULL-TRIAD's) certify at rate <= 0.10 with CP upper <= 0.15 AND delta 0 <= 1 of 15 at n 486; else ANTI-CONSERVATIVE (SD1 NOT EVALUABLE). POINT of the counts decides",
+   "result": "HELD",
+   "value": "SIZE-OK: SIZE 0 of 300 (rate 0.0000, 95% CP upper 0.0122); delta 0 0 of 15 at n 486 (n 441 0 of 15, descriptive); rule 8 not refuted",
+   "denominator": "300 Gaussian draws; 15 unplanted subsamples at n 486"
+  },
+  {
+   "id": "SD1",
+   "text": "DECIDING (POINT of the count): at delta 6, fresh plants, n 486 + 441 pooled: SENSITIVE iff >= 45 of 60 certify; INSENSITIVE iff <= 15 of 60; MIXED otherwise. SCOREABLE (narrowly; DEFF 1.5 declared pilot assumption, n_eff 40, SE 0.0685 at 0.75, MDE80 0.192)",
+   "result": "HELD",
+   "value": "SENSITIVE: 60 of 60 (n 486 30/30, n 441 30/30; bar >= 45); rule 8 not refuted; plain site null of record at delta 6 0 of 15 + 0 of 15. Qualifier (S-1): point classification at the declared DEFF 1.5; realised DEFF not estimable at delta 6; 20/20 in each of the 3 categories; category-level DEFF 6.0 at delta 4, descriptive",
+   "denominator": "60 fresh-plant sites (30 subsamples x 2 plants; 3 categories of 20)"
+  },
+  {
+   "id": "SD2",
+   "text": "positive control: POS-OK iff >= 4 of 5 certify in >= 2 of 3 merged pairs (STRONG, MID, EDGE; n 486); POS-FAIL iff <= 1 of 5 in >= 2 of 3; MIXED otherwise",
+   "result": "HELD",
+   "value": "POS-OK: STRONG 5/5, MID 5/5, EDGE 5/5",
+   "denominator": "15 merged-pair subsamples"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "SD0 SIZE-OK 0.95; SIZE rate 0.00 [0.00, 0.02]",
+   "result": "HELD",
+   "value": "SIZE rate 0.0000 in [0.00, 0.02]; SIZE-OK (forecast 0.95), Brier 0.0025",
+   "denominator": "300 draws"
+  },
+  {
+   "id": "P2",
+   "text": "SD1 SENSITIVE 0.90 / MIXED 0.08 / INSENSITIVE 0.02; certified at delta 6: 58 [50, 60] of 60",
+   "result": "HELD",
+   "value": "60 in [50, 60]; SENSITIVE (forecast 0.90), Brier 0.0168",
+   "denominator": "60 sites"
+  },
+  {
+   "id": "P3",
+   "text": "certified of 60: delta 3 2 [0, 8]; delta 4 12 [3, 25]; delta 8 60 [57, 60]",
+   "result": "HELD",
+   "value": "delta 3 0 in [0, 8]; delta 4 6 in [3, 25]; delta 8 60 in [57, 60]",
+   "denominator": "60 sites per delta"
+  },
+  {
+   "id": "P4",
+   "text": "SD2 POS-OK 0.95",
+   "result": "HELD",
+   "value": "POS-OK (forecast 0.95), Brier 0.0025",
+   "denominator": "15 sites"
+  },
+  {
+   "id": "P5",
+   "text": "elongation controls certified 0 [0, 3] of 70",
+   "result": "HELD",
+   "value": "0 of 70 in [0, 3] (E1 0/50, E2 0/20)",
+   "denominator": "70 controls"
+  },
+  {
+   "id": "P6",
+   "text": "median delta* 5 [4, 6]",
+   "result": "HELD",
+   "value": "median delta* 5 in [4, 6] (5 in each category)",
+   "denominator": "3 categories at n 486"
+  }
+ ],
+ "falsifier": {
+  "text": "F-SD fires iff >= 8 of the 70 elongation controls certify (50 PC1-matched unimodal Gaussian surrogates of the STRONG / MID n-486 subsamples + 20 synthetic elongated clouds) OR SD1 reads INSENSITIVE; overturns 'certifies 2-way structure, not axis variance' (it would be an elongation detector like the deflated null, CERT-K2-DEFLATED W-2)",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "SD0": "SIZE-OK; SIZE 0 of 300 (95% CP upper 0.0122); delta 0 0 of 15 at n 486 and 0 of 15 at n 441",
+  "SD1": "SENSITIVE 60 of 60 (30/30 at n 486, 30/30 at n 441; bar 45 of 60); point classification at the declared DEFF 1.5; realised DEFF not estimable at delta 6; 20/20 in each of the 3 categories; category-level DEFF 6.0 at delta 4 (descriptive)",
+  "SD1_comparator": "plain site null of record at delta 6 (record plants): 0 of 15 at n 486, 0 of 15 at n 441 (cpl_sites.csv)",
+  "SD2": "POS-OK; 5 of 5 in each of the 3 merged pairs",
+  "F-SD": "NOT FIRED; elongation controls 0 of 70 (E1 0/50, E2 0/20; fires at >= 8)",
+  "power_curve": "fresh plants, each size: D4 3/30, D5 27/30, D6-D10 30/30; delta* 5 in each category (descriptive)",
+  "support_realised": "declared DEFF 1.5, n_eff 40, MDE80 0.192; ICC undefined at delta 6; delta 4 category ICC 0.263 (DEFF 6.0, n_eff 10); point clears the bar by 0.25, beyond the MDE up to DEFF 2.55",
+  "SI-NULL-TRIAD": "REFUSED at SIN-3 identity 0.9707 (bar 0.99): failed precondition, not of record"
+ },
+ "sentence_of_record": "CERT-SPLIT-DIP (2026-10-09, 0 calls) — VALID; SD1 SENSITIVE: the sample-splitting dip rule certified 60 of 60 freshly planted 2-way shifts at delta 6 (G12's depth-1 sizes n 486 and 441), where the plain site null of record certified 0 of 15 at each size; SD0 SIZE-OK (0 of 300 moment-matched Gaussians), SD2 POS-OK (15 of 15), F-SD NOT FIRED (0 of 70 elongated controls). [POSTRUN docs/reviews/POSTRUN_CERT-SPLIT-DIP.md, 692d12ff: SENSITIVE is a point classification at the declared DEFF 1.5; realised DEFF not estimable at delta 6; 20/20 in each of the 3 categories; category-level DEFF 6.0 at delta 4, descriptive; every null and control p = 1.0, so SIZE-OK bounds the rate, not a calibrated size; no tree site certified; SI-NULL-TRIAD refused at SIN-3, not of record.]",
+ "chips": [
+  "REGISTERED 2026-10-08, BEFORE ANY CODE",
+  "FAILED PRECONDITION (POST-RUN 4111aecf): DRY-RUN REFUSED AT G12/P2, WRONG DATA ROOT; NO OUTCOME; D1 RULED, READY",
+  "VALID (POST-RUN 692d12ff): SD1 SENSITIVE 60/60 (POINT AT DECLARED DEFF 1.5; 20/20 PER CATEGORY); SD0 SIZE-OK; SD2 POS-OK; F-SD NOT FIRED"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-08",
+   "by": "registrar (docs/judge_v2_program.md L25147-L25157 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — rulings GAP-FIX-CC C-1 (B-3), SI-NULL-TRIAD B1 and SIN-2; ...\"; _as_of the commit that writes it, parent 17c34de9, re-grepped))",
+   "text": "READY; tool merged to main by path, blob verified. C1: SI-NULL-TRIAD outputs of the joint run go to <out>/HELD_not_of_record/ (not of record); C3 seed overlap and C4 category-level dependence disclosed post-run; SD1 MDE80 at DEFF 2.0 registered 0.217 recomputes to 0.2214 (review row 10), DESCRIPTIVE-ONLY at DEFF 2 unchanged."
+  },
+  {
+   "date": "2026-10-08",
+   "by": "registrar (POSTRUN 4111aecf; docs/judge_v2_program.md L25205-L25211 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run) — GAP-FIX-CC and CERT-SPLIT-DIP: ...\"; _as_of the commit that writes it, parent f4dd6292, re-grepped))",
+   "text": "Failed precondition recorded; bracket appended to DATA OBJECT AND HYGIENE of the registration (L24962). RULING D1: --data-root Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/rp12-r2-run on dry-run, run and analyze; the dry-run re-prints the 4 pins, D0 (tol 1e-6), the 6993 IDENTITY count and 'G12 blob 21f110af OK; snapshot 20261001_094311...' before --run; no code change, no delta review. C1 (SI_NULL_TRIAD_* to HELD_not_of_record/), C3, C4 owed at the real run's post-run review. SI-NULL-TRIAD never ran; NOT READY (B1)."
+  },
+  {
+   "date": "2026-10-08",
+   "by": "registrar (D-2026-10-08)",
+   "text": "D-2026-10-08-1 (the author's words, now supplied verbatim): \"a. Certificates (recommended), b+c. Hierarchy tests (recommended), d. SCPB gate, e+f. GAP-FIX-CC and SuperGPQA\"; judged spend \"None for now (Recommended)\". The go of record is unchanged in substance. Source: docs/judge_v2_program.md L25317-L25327 (section \"## Author's decision 2026-10-08 (recorded by the registrar; zero calls; insertion only) — D-2026-10-08-1..6 ...\"; _as_of the commit that writes it, parent 5211616a, re-grepped); authority docs/agents/author_decisions/2026-10-08.md (5211616a); plan Amendment 40"
+  },
+  {
+   "date": "2026-10-09",
+   "by": "registrar (POSTRUN 692d12ff, VALID; docs/judge_v2_program.md L25328-L25340 (section \"## CERT-SPLIT-DIP (2026-10-09, 0 calls) — VALID (POSTRUN 692d12ff): ...\"; _as_of the commit that writes it, parent 38eac1c8, re-grepped))",
+   "text": "OUTCOME recorded; bracket appended to READOUTS AND CRITERIA of the registration (L24966). SD1 printed with the S-1 qualifier; C3 (E1/E2 seeds inside SIZE's range, nil here) and C4 (category dependence) disclosed; L-1 (full argv), L-2 (SD2 line lacks its count; write-once), L-3 (READY C2 test gaps) relayed. SI-NULL-TRIAD refused at SIN-3 (0.9707), files HELD_not_of_record, state unchanged. READY -> run -> done."
+  }
+ ],
+ "does_not_show": [
+  "a certificate of any tree site (G12's sites not run by the dip arm; a later registration with multiplicity control)",
+  "an exact or calibrated size (every null and control p = 1.0; SIZE-OK bounds the rate only)",
+  "k > 2; other members, draws, categories or embedders (R256 descriptive)",
+  "that the plain site null of record is wrong (a different calibration, not a correction)",
+  "anything from SI-NULL-TRIAD (refused at SIN-3, not of record)",
+  "a GMM LR / BIC mode test (closed)"
+ ],
+ "ledger": {
+  "row_id": "CERT-SPLIT-DIP",
+  "version": "v420 (2026-10-09: OUTCOME bracket; VALID ok chip beside REGISTERED and the failed-precondition chip) | v417 (2026-10-08: failed-precondition bracket; warn chip beside REGISTERED) | v414 (2026-10-08: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "CERT-PLANTED (populations, record P counts)",
+  "CERT-K2-DEFLATED (PC1 median-cut control)",
+  "CERT-PC-K2-KNOWN (merged pairs)",
+  "SI-NULL-TRIAD (joint run; its SIZE draws)"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; the dip half of L6 is OPEN (MIX-LRT-SITE closed the GMM LR / BIC half only; prog L21353, L21408); no LR / BIC / MDL / Bayesian evidence; no judge, rubric, reference, frontier, temperature"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "about 1-2 h (dip arm) + SI-NULL-TRIAD's 3-5 h in the same pool window",
+  "agent_hours": "about 4 h",
+  "reads_pool": true
+ },
+ "outputs": "never committed: pinned by sha256, stored on E: with SHA256SUMS.txt; temp under E:/TaxoArena_tmp via scratch_dir",
+ "sources": [
+  "docs/judge_v2_program.md L24958-L24972 (_as_of the commit that writes it, parent d8ab39fa, re-grepped)",
+  "docs/judge_v2_program.md L24950-L24956 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — six zero-call tests registered ...\"; _as_of the commit that writes it, parent d8ab39fa, re-grepped)",
+  "E:/TaxoArena_tmp/cert_split/VERIFIED_HEADLINE.txt (pilot verification; seen)",
+  "docs/judge_v2_program.md L25147-L25157 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — rulings GAP-FIX-CC C-1 (B-3), SI-NULL-TRIAD B1 and SIN-2; ...\"; _as_of the commit that writes it, parent 17c34de9, re-grepped)",
+  "docs/judge_v2_program.md L25205-L25211 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run) — GAP-FIX-CC and CERT-SPLIT-DIP: ...\"; _as_of the commit that writes it, parent f4dd6292, re-grepped)",
+  "docs/judge_v2_program.md L25317-L25327 (section \"## Author's decision 2026-10-08 (recorded by the registrar; zero calls; insertion only) — D-2026-10-08-1..6 ...\"; _as_of the commit that writes it, parent 5211616a, re-grepped); authority docs/agents/author_decisions/2026-10-08.md (5211616a); plan Amendment 40",
+  "docs/judge_v2_program.md L25328-L25340 (section \"## CERT-SPLIT-DIP (2026-10-09, 0 calls) — VALID (POSTRUN 692d12ff): ...\"; _as_of the commit that writes it, parent 38eac1c8, re-grepped)",
+  "docs/reviews/POSTRUN_CERT-SPLIT-DIP.md (692d12ff)",
+  "experiment_results/cert_split_dip/CERT_SPLIT_DIP_OUTCOME.txt (sha256 a40ada93aa252597...)"
+ ],
+ "last_update": "2026-10-09",
+ "label_status": "[LF] (labels define merged-pair populations only)",
+ "pilot_disclosure": "SEEN before registration, pilot role only (never evidence): E:/TaxoArena_tmp/cert_split (results.json sha256 32fcf7cd8baa1367..., VERIFIED_HEADLINE.txt 98b32054b56bde7b...), E:/TaxoArena_tmp/hier_tests (granularity_free/results.json 2fc8ba3a99b8dc54..., nesting/results.json cb5a74cf0d870081..., test3_fair_backoff/results.json 866284ca1bb5cf98..., + review dirs), E:/TaxoArena_tmp/scpb/review_v3_synthesis.md d341748f5265229d...; 2026-10-07, zero calls, TRAIN only, not committed",
+ "plain_description": {
+  "sq": "SQ3 Taxonomy",
+  "what": "Tests a new way to certify a 2-way split: find the split axis on one random half of the items and test for two bumps on the other half. It is run on artificial data with planted splits of known size, on structureless data, and on stretched-but-single-bump data. No judge calls.",
+  "why": "The current certificate needs a planted split of about delta 10 before it fires; this asks whether a simple held-out bimodality test does better without being fooled by stretched clouds.",
+  "information": "Shows whether choosing the split on one half and testing for two bumps on the other half detects real planted 2-way structure without being fooled by stretched single-bump clouds. Result: done. It detected all 60 planted splits at a size the existing site test missed (0 of 30), flagged none of 300 null clouds and none of 70 stretched controls, and caught all 15 known merged pairs. This holds for 3 MMLU-Pro categories on one tree member; the precision claim rests on an assumed dependence (DEFF 1.5) that could not be measured at this size.",
+  "written": "2026-10-09"
+ }
+}

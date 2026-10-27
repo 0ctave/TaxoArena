@@ -1,0 +1,114 @@
+{
+  "id": "SCHED",
+  "title": "SCHED: does Varco Arena's single-elimination tournament beat this framework's cell-stratified BT racing scheduler at matched budget? (zero calls)",
+  "question": "Synthetic arena over 12 models and 2,778 questions at the real campaign's 9,063-match budget; arm (a) replays the ACTUAL x12 schedule triple for triple; judge = LEAF-POWER noise model, flip swept 0.10 / 0.228 / 0.40; 20 seeds; global rho and top-4 violations; per-anchor mean rho. Prediction: single elim edges the framework globally, framework wins per-anchor decisively.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "a6dcb74",
+    "program_lines": "docs/judge_v2_program.md L773-L796 (registration) and L797-L832 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-13 (before running, ZERO calls) — SCHED: this framework's match-making vs Varco Arena's tournament",
+    "outcome_heading": [
+      "L797: - **SCHED (2026-09-13, zero calls): the tournament does NOT beat this framework's scheduler, and loses badly at"
+    ],
+    "date": "2026-09-13"
+  },
+  "script": {
+    "path": "tools/analysis/sched_compare.py",
+    "sha16": "c0e45d22947ee347 (at 495a3db)",
+    "commit": "495a3db"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/sched_outcome.txt",
+    "outcome_commit": "495a3db",
+    "calls": 0,
+    "cce": 0,
+    "pool": "synthetic (2,778 questions; the x12 schedule replayed)",
+    "date": "2026-09-13"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the DISCLOSED FLAW (round-robin per-anchor column not comparable) is in the outcome",
+    "commit": "495a3db",
+    "verdict": "FRAMEWORK WINS at the top (4-13x fewer top-4 violations); global rho indistinguishable at realistic noise; prediction wrong"
+  },
+  "criteria": [
+    {
+      "id": "global",
+      "text": "global rho and top-4 violations",
+      "result": "DELIVERED",
+      "value": "rho indistinguishable at realistic noise (0.983 vs 0.981 at flip 0.228, gaps within 1 sd), framework ahead at flip 0.40 (0.915 vs 0.894); top-4 violations framework 0.05 / 0.15 / 0.65 vs single elim 0.65 / 1.40 / 2.60 (4-13x fewer)",
+      "denominator": "20 seeds x 3 noise levels"
+    },
+    {
+      "id": "per-anchor",
+      "text": "per-anchor mean rho",
+      "result": "DELIVERED",
+      "value": "framework ahead by 0.02-0.03 at every noise (real, not 'decisive'); DISCLOSED FLAW: the round-robin per-anchor column is not comparable (137 questions, ~10 per anchor, 0 of 14 anchors clear the readout's own filter)",
+      "denominator": "14 anchors"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "single elim edges the framework globally; framework wins per-anchor decisively",
+      "result": "FAILED",
+      "value": "global indistinguishable / framework ahead at high noise; per-anchor +0.02-0.03 (real, not decisive)",
+      "denominator": "20 seeds"
+    }
+  ],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "racing keeps spending on undecided top pairs while a bracket lets the strongest models meet at most once; comparator arXiv:2411.01281"
+  },
+  "numbers_of_record": {
+    "global_rho": "0.983 vs 0.981 (flip 0.228); 0.915 vs 0.894 (flip 0.40)",
+    "top4_violations": "0.05 / 0.15 / 0.65 vs 0.65 / 1.40 / 2.60",
+    "per_anchor": "+0.02-0.03"
+  },
+  "sentence_of_record": "SCHED (2026-09-13, zero calls): the tournament does NOT beat this framework's scheduler: global rho indistinguishable at realistic noise (0.983 vs 0.981 at flip 0.228), framework ahead at flip 0.40 (0.915 vs 0.894), my prediction wrong; top-4 violations 0.05 / 0.15 / 0.65 vs single elim's 0.65 / 1.40 / 2.60, four to thirteen times fewer, because racing keeps spending on undecided top pairs; per-anchor rho framework ahead by 0.02-0.03 at every noise; disclosed flaw: the round-robin per-anchor column is not comparable at matched budget.",
+  "chips": [
+    "FRAMEWORK WINS at the top"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: imported quantity (c) (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM (c) 2026-09-27: the x12 schedule replay and its flip rates is a p2dca-family quantity — planning only (RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a comparable round-robin per-anchor column",
+    "a real-judge comparison (synthetic noise model)"
+  ],
+  "ledger": {
+    "row_id": "SCHED",
+    "version": "v58 (495a3db); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "LEAF-POWER",
+    "ARENA-V2"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L773-L832 (a6dcb74 / 495a3db)",
+    "experiment_results/x12_crossdomain/sched_outcome.txt (495a3db)",
+    "docs/test_ledger.html row SCHED (v58): chips verbatim, observed cell, evidence",
+    "script sha16 = sha256 of tools/analysis/sched_compare.py at 495a3db (first commit), first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ4 Price",
+    "what": "A simulated arena with 12 models was run at the real campaign's match budget, with a simulated noisy judge. It compared a single-elimination tournament with this framework's adaptive, cell-stratified match scheduler. No calls were made.",
+    "why": "It checks whether the framework's scheduler spends a fixed budget better than a simpler published tournament design.",
+    "information": "If the tournament won, the scheduler would be unnecessary. Result: done, on simulation only. The tournament does not win. The overall ranking is about equal at realistic noise and favours the framework at high noise. The framework makes 4 to 13 times fewer top-4 order errors and is slightly better per cell. The round-robin per-cell comparison was not comparable. It uses an older-family schedule, so it counts for planning only.",
+    "written": "2026-10-07"
+  }
+}

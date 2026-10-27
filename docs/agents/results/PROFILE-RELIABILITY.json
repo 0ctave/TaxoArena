@@ -1,0 +1,158 @@
+{
+  "id": "PROFILE-RELIABILITY",
+  "title": "PROFILE-RELIABILITY: is the ANCHOR-level capability profile reliable, and at what cell size does reliability arrive? (zero calls)",
+  "question": "The same instrument as PROFILE-TREE-ROBUST (5) at three granularities: disjoint half-splits of each cell's questions, profiles built on each half, correlated model-demeaned, Spearman-Brown to full length, averaged over 40 independent halvings, plus a cell-size sweep with the cell definition held fixed; registered: the anchor profile is publishable as a measured per-cell capability claim only if Spearman-Brown reliability >= 0.70; predicted anchor 0.35-0.60, key above 0.90, crossing at 250-400 q/cell.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "5dfd293",
+    "program_lines": "docs/judge_v2_program.md L2560-L2590 (registration) and L2591-L2632 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-14 (before any run, ZERO calls) — PROFILE-RELIABILITY: is the ANCHOR-level profile reliable, and at what cell size does reliability arrive?",
+    "outcome_heading": [
+      "L2591: - **PROFILE-RELIABILITY (2026-09-14, zero calls): the ANCHOR profile misses the registered bar by 0.027, and the"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "tools/analysis/profile_reliability.py",
+    "sha16": "7217ca5c5f281aa9 (at 1aa42f3)",
+    "commit": "1aa42f3"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/profile_reliability.txt",
+    "outcome_commit": "1aa42f3",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (x12 verdicts; 14 anchors, 201 q/cell; 8 leaves, 71 q/cell)",
+    "date": "2026-09-14"
+  },
+  "review": {
+    "file": "three corrections in the observed cell: [CORRECTED 2026-09-15] (ANCHOR-PROFILE-INTERVAL: the +-0.012 is re-halving spread, not sampling uncertainty; LOAO jackknife 95% [0.4932, 0.8524]); [CORRECTED 2026-09-18 by PROFILE-INTERVAL-ALL-UNION] (every R from profile_reliability.reliability is MODEL-DEMEANED and INCLUDES ANCHOR DIFFICULTY); [CORRECTED 2026-09-18 by PROFILE-RELIABILITY-INTERACTION] (the like-for-like key comparator is 0.8665 [0.8000, 0.9330] interaction-only; ratio 0.78; the sentence STANDS at the anchor level)",
+    "commit": "3dd0900",
+    "verdict": "FAIL (0.6728 vs 0.70) as a point-estimate rule; THE CEILING IS ITSELF MARGINAL; the 'shortfall is the judge's' sentence stands against a difficulty-free key (ratio 0.78, gap +0.19 [0.04, 0.35])"
+  },
+  "criteria": [
+    {
+      "id": "PRIMARY",
+      "text": "Spearman-Brown reliability >= 0.70 at the anchor level",
+      "result": "FAILED",
+      "value": "anchor R 0.6728 (14 cells, 201 q/cell); leaf R 0.2559 (8 cells, 71 q/cell); whole pool undefined by construction; FAILS by 0.0272, stable to about +-0.012 over 40 halvings [CORRECTED 2026-09-15: that spread is re-halving of the same questions, not sampling uncertainty; LOAO jackknife 95% [0.4932, 0.8524]; the FAIL stands as a point-estimate rule, 'the shortfall is larger than that spread' and 'sits on the threshold' do not]",
+      "denominator": "14 anchors x 40 halvings"
+    },
+    {
+      "id": "(2)",
+      "text": "the shortfall is the JUDGE's, not the cell's",
+      "result": "HELD",
+      "value": "at the same granularity the KEY reaches 0.9135 (ratio 0.74) [CORRECTED 2026-09-18 by PROFILE-INTERVAL-ALL-UNION: 0.9135 is model-demeaned and includes anchor difficulty] [CORRECTED 2026-09-18 by PROFILE-RELIABILITY-INTERACTION: the like-for-like interaction-only key R is 0.8665 [0.8000, 0.9330] (K12); ratio 0.78, paired LOAO gap +0.19 [0.04, 0.35], 14/14 folds; merged K20 0.8391 vs J2 0.7183: ratio 0.86, gap +0.12 [0.03, 0.21]; the sentence STANDS at the anchor level with the density caveat; the leaf ratio 0.31 remains difficulty-inclusive and unconverted]",
+      "denominator": "14 anchors"
+    },
+    {
+      "id": "size sweep",
+      "text": "at what cell size does reliability arrive",
+      "result": "DELIVERED",
+      "value": "judge 0.1919 / 0.1665 / 0.3616 / 0.4356 / 0.6891 at 50 / 75 / 100 / 150 / 200 q per cell; key 0.7143 / 0.8285 / 0.8513 / 0.9164 / 0.9283; judge reaches 0.70 at ~210 questions per cell, MMLU-Pro's anchors average 201: the anchor layer sits ON the threshold; the key clears 0.70 at 50 q/cell",
+      "denominator": "anchors subsampled to a common size"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "anchor 0.35-0.60",
+      "result": "FAILED",
+      "value": "0.6728 (too pessimistic)",
+      "denominator": "14 anchors"
+    },
+    {
+      "id": "P2",
+      "text": "key above 0.90",
+      "result": "HELD",
+      "value": "0.9135 (model-demeaned)",
+      "denominator": "14"
+    },
+    {
+      "id": "P3",
+      "text": "crossing at 250-400 q/cell",
+      "result": "FAILED",
+      "value": "~210",
+      "denominator": "size sweep"
+    }
+  ],
+  "falsifier": {
+    "text": "the consequence of failing was registered in advance: RESOLVE may not publish per-anchor capability claims as measured quantities",
+    "fired": true,
+    "note": "RESOLVE publishes the board and the routing layer; the granular profile becomes a stated aspiration carrying its questions-per-cell requirement; a corpus with slightly smaller categories would fail outright; two of three predictions wrong, both in the judge's favour, and the primary still fails"
+  },
+  "numbers_of_record": {
+    "anchor_R": "0.6728 (bar 0.70; LOAO 95% [0.4932, 0.8524])",
+    "leaf_R": "0.2559",
+    "key_R": "0.9135 model-demeaned (includes anchor difficulty); interaction-only 0.8665 [0.8000, 0.9330]; ratio 0.78; gap +0.19 [0.04, 0.35]",
+    "size_sweep": "judge 0.1919 / 0.1665 / 0.3616 / 0.4356 / 0.6891; key 0.7143 / 0.8285 / 0.8513 / 0.9164 / 0.9283 at 50 / 75 / 100 / 150 / 200; crossing ~210",
+    "no_interaction_null": "0.31 interaction-only / 0.87 model-only"
+  },
+  "sentence_of_record": "PROFILE-RELIABILITY (2026-09-14, zero calls): the ANCHOR profile misses the registered bar: leaf R 0.2559 (8 cells, 71 q/cell), anchor R 0.6728 (14 cells, 201 q/cell), PRIMARY FAILS by 0.0272; consequence as registered: RESOLVE may not publish per-anchor capability claims as measured quantities; judge reliability reaches 0.70 at about 210 questions per cell and MMLU-Pro's anchors average 201, so the anchor layer sits ON the threshold; the key clears 0.70 at 50 q/cell. [CORRECTED 2026-09-15: the +-0.012 is re-halving spread; LOAO jackknife 95% [0.4932, 0.8524]; the FAIL stands as a point-estimate rule.] [CORRECTED 2026-09-18 by PROFILE-INTERVAL-ALL-UNION: the key's 0.9135 is MODEL-DEMEANED and INCLUDES ANCHOR DIFFICULTY.] [CORRECTED 2026-09-18 by PROFILE-RELIABILITY-INTERACTION: the like-for-like key comparator is 0.8665 [0.8000, 0.9330] interaction-only; ratio 0.78, gap +0.19 [0.04, 0.35], 14/14 folds; the sentence 'the shortfall is the JUDGE's' STANDS at the anchor level against a difficulty-free key, with the density caveat.]",
+  "chips": [
+    "FAIL (0.6728 vs 0.70)",
+    "THE CEILING IS ITSELF MARGINAL"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-15",
+      "by": "ANCHOR-PROFILE-INTERVAL ([CORRECTED 2026-09-15] in the observed cell)",
+      "text": "the 'stable to about +-0.012' is the spread over re-halvings of the same questions, not sampling uncertainty; leave-one-anchor-out jackknife: x12 R 0.6728 with 95% [0.4932, 0.8524]; the FAIL stands as a point-estimate rule; 'the shortfall is larger than that spread' and 'sits on the threshold' do not."
+    },
+    {
+      "date": "2026-09-18",
+      "by": "PROFILE-INTERVAL-ALL-UNION ([CORRECTED 2026-09-18] in the observed cell; f5e447b)",
+      "text": "the key's 0.9135 and every R this row reports from profile_reliability.reliability is MODEL-DEMEANED only and INCLUDES ANCHOR DIFFICULTY; on the 18 x 52 union key table stratum difficulty is 58% of the variance; the interaction-only R there is 0.8537; the MMLU-Pro interaction-only number was left for the author."
+    },
+    {
+      "date": "2026-09-18",
+      "by": "PROFILE-RELIABILITY-INTERACTION ([CORRECTED 2026-09-18] in the observed cell; 3dd0900)",
+      "text": "the like-for-like comparator for 'the shortfall is the JUDGE's' is the 12-model key's model- AND anchor-demeaned R on the same 14 anchors and halvings: 0.8665 [0.8000, 0.9330]; ratio 0.78 (not 0.74), paired LOAO gap +0.19 [0.04, 0.35], 14/14 folds; merged K20 0.8391 vs J2 0.7183: ratio 0.86, gap +0.12 [0.03, 0.21]; the sentence STANDS at the anchor level with the density caveat; the leaf ratio 0.31 remains difficulty-inclusive; the v113 bracket's open item is answered."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: mixed row (legs) (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM (legs) 2026-09-27: the judge legs (0.6728; J1 x12; J2 merged) are p2dca judged family — history, not evidence; the key legs (0.9135) are not (RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a publishable per-anchor capability profile from the judge (RESOLVE publishes the board and the routing layer)",
+    "an interaction-only leaf ratio (0.31 remains difficulty-inclusive)"
+  ],
+  "ledger": {
+    "row_id": "PROFILE-RELIABILITY",
+    "version": "v86 (20fd4a8); corrections v93-era (2026-09-15), v113 (PROFILE-INTERVAL-ALL-UNION) and v114 (PROFILE-RELIABILITY-INTERACTION); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "PROFILE-TREE-ROBUST",
+    "PROFILE-RELIABILITY-X20",
+    "ANCHOR-PROFILE-INTERVAL",
+    "PROFILE-INTERVAL-ALL-UNION",
+    "PROFILE-RELIABILITY-INTERACTION",
+    "PROFILE-R-FILTERED"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L2560-L2632 (5dfd293 / 1aa42f3); the correction sections PROFILE-INTERVAL-ALL-UNION D1 (f5e447b) and PROFILE-RELIABILITY-INTERACTION (3dd0900)",
+    "experiment_results/x12_crossdomain/profile_reliability.txt (1aa42f3)",
+    "docs/test_ledger.html row PROFILE-RELIABILITY (v86; three CORRECTED insertions): chips verbatim, observed cell, evidence",
+    "docs/agents/results/PROFILE-RELIABILITY-INTERACTION.json and PROFILE-INTERVAL-ALL-UNION.json (the correcting records)",
+    "script sha16 = sha256 of tools/analysis/profile_reliability.py at 1aa42f3 (first commit), first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Measures how reproducible a model's capability profile across cells is (split-half reliability) at leaf level and at anchor/domain level, and how many questions per cell reliability needs. No calls.",
+    "why": "It decides whether per-cell capability claims from the judge can be published as measured quantities.",
+    "information": "Reliability of at least 0.70 would allow per-cell claims. Result: done. The anchor profile misses the bar (0.67 vs 0.70; leaves 0.26), so per-anchor judge profiles may not be published as measurements. About 210 questions per cell are needed, and anchors average 201. The answer-key profile is far more reliable. A later ruling classes the judge parts as history; the answer-key parts are not affected.",
+    "written": "2026-10-07"
+  }
+}

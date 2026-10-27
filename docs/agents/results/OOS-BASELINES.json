@@ -1,0 +1,215 @@
+{
+ "id": "OOS-BASELINES",
+ "title": "OOS-BASELINES: is S0's label-free no-match score (CLINC150 AUROC 0.974, qwen3 256) equivalent within 0.010 AUROC to standard OOS detectors fitted on TRAIN in-scope rows (label-using: nearest-class-centroid cosine, class Mahalanobis; label-free: kNN distance, marginal Mahalanobis) on the same embeddings and rows? (zero calls; REGISTERED 2026-10-02)",
+ "question": "On the same pinned qwen3 256-d S0 embeddings and the same CLINC150 EVAL rows, is S0's label-free no-match score as good as standard out-of-scope detectors fitted on TRAIN in-scope rows, and does the 0.974 belong to the cells or to the embedder's in-scope geometry?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "the commit that writes it (parent 487ac3bd)",
+  "program_lines": "docs/judge_v2_program.md L23342-L23375",
+  "program_lines_as_of": "the commit that writes them, parent 487ac3bd, re-grepped",
+  "date": "2026-10-02",
+  "heading": "## Registered 2026-10-02 (before any code or call) — OOS-BASELINES: on the SAME pinned qwen3 256-d S0 embeddings and the same CLINC150 EVAL rows, ...",
+  "provenance": "the orchestrator's brief of 2026-10-02 (arms, baselines (a)-(c), deciding contrast, asymmetry) and its pre-data addition from the second literature pass 487ac3bd (baseline (d) marginal Mahalanobis; the CLINC150 oos_plus split recorded); margin 0.010 AUROC, Support, predictions, falsifier and reading tables the registrar's, pre-data; the author's go (plan Amendment 37)"
+ },
+ "script": {
+  "path": "tools/analysis/oos_baselines.py",
+  "sha16": "blob:7e74108dedcb2d921be0da4cf8ddc842deb24d72 (LF, of record)",
+  "commit": "9b86d32d (merge of oos-gold-readouts a625a957)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_oos_gold.md",
+  "commit": "9b86d32d",
+  "verdict": "READY for --run (conditions C-1..C-6)"
+ },
+ "go": "plan Amendment 37: the author's \"register the out-of-scope baselines and gold-level embedder readout\" (0 calls; the 4k-match rule not engaged)",
+ "run": {
+  "outcome_file": "experiment_results/oos_baselines/outcome.txt (sha256 0f9869f7...; blob:8cb995cc; write-once; UNTRACKED) + oos_scores.csv (sha256 41c735da...)",
+  "outcome_commit": "run from main after 9b86d32d / d1abedce; outcome untracked",
+  "calls": 0,
+  "cce": 0,
+  "pool": "none (S0 DBs read-only; pins unchanged)",
+  "date": "2026-10-02"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_oos_baselines.md",
+  "commit": "c5416c52",
+  "verdict": "VALID (W-1..W-5)"
+ },
+ "criteria": [
+  {
+   "id": "IDENTITY",
+   "text": "precondition (refuse): S0 A per seed 0-4 0.97437 / 0.97263 / 0.97601 / 0.97446 / 0.97649, A(a) 0.97640, FPR95 0.1578 at threshold 0.74326 reproduced to 5 dp",
+   "result": "HELD",
+   "value": "reproduced (S0 per-seed A, A(a) 0.97640, FPR95 0.1578)",
+   "denominator": "n_in 6,672 / 6,672 components; n_OOS 1,350 / 1,350; DEFF 1.0000; Delta vs mean A(S0) 0.97479"
+  },
+  {
+   "id": "OB-a",
+   "text": "(a) max-cos to the nearest TRAIN class centroid (LABELLED reference). Delta = A(baseline) - mean_s A(S0 no-match, s = 0..4); SE_total = sqrt(SE_boot^2 + var_seed/5). EQUIVALENT iff Delta +/- 1.645 SE_total inside (-0.010, +0.010) (the INTERVAL decides); DIFFERENT iff |Delta| > 0.010 AND Delta +/- 1.96 SE_total excludes 0 (POINT AND INTERVAL), read BASELINE-BETTER / S0-BETTER; NEITHER otherwise. Verdict line: SCOREABLE (EQUIVALENT side; SEEN point +0.0016 <= reach 0.00284)",
+   "result": "HELD",
+   "value": "EQUIVALENT: A 0.97640, Delta +0.00161, 90% [+0.00031, +0.00290]; SE_total 0.00079 (W-3: parity within the margin, not 'no worse')",
+   "denominator": "n_in 6,672 / 6,672 components; n_OOS 1,350 / 1,350; DEFF 1.0000; Delta vs mean A(S0) 0.97479"
+  },
+  {
+   "id": "OB-b",
+   "text": "(b) shared-covariance class Mahalanobis, Ledoit-Wolf (LABELLED reference); same form. Verdict line: DESCRIPTIVE-ONLY at prediction (+0.007 between reach 0.00284 and 0.01242)",
+   "result": "HELD",
+   "value": "EQUIVALENT: A 0.97378, Delta -0.00101, 90% [-0.00260, +0.00057]; SE_total 0.00096",
+   "denominator": "n_in 6,672 / 6,672 components; n_OOS 1,350 / 1,350; DEFF 1.0000; Delta vs mean A(S0) 0.97479"
+  },
+  {
+   "id": "OB-c",
+   "text": "(c) kNN distance, cos to the 10th nearest TRAIN in-scope row, k fixed (LIKE-FOR-LIKE peer, no class labels); same form. Verdict line: SCOREABLE (EQUIVALENT side), thin (+0.002 <= 0.00284)",
+   "result": "HELD",
+   "value": "S0-BETTER: A 0.96191 (k 10), Delta -0.01288, 95% [-0.01523, -0.01053]; SE_total 0.00120 (W-2: kNN k 1 reaches 0.97707)",
+   "denominator": "n_in 6,672 / 6,672 components; n_OOS 1,350 / 1,350; DEFF 1.0000; Delta vs mean A(S0) 0.97479"
+  },
+  {
+   "id": "OB-d",
+   "text": "(d) marginal Mahalanobis, one mean and one Ledoit-Wolf covariance of all TRAIN in-scope rows, no class label (LIKE-FOR-LIKE peer; decides cells vs embedder geometry); same form. Verdict line: SCOREABLE (DIFFERENT side, S0-BETTER: -0.030 beyond reach 0.01315 at SE_total 0.00374) [2026-10-02 R-1: SE_total 0.00377; DIFFERENT reach 0.01318, EQUIVALENT reach 0.00062]",
+   "result": "HELD",
+   "value": "S0-BETTER: A 0.92757, Delta -0.04722, 95% [-0.05206, -0.04239]; SE_total 0.00247",
+   "denominator": "n_in 6,672 / 6,672 components; n_OOS 1,350 / 1,350; DEFF 1.0000; Delta vs mean A(S0) 0.97479"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "Delta_a = +0.0016 SEEN and deterministic (no numeric prediction); OB-a EQUIVALENT 0.95",
+   "result": "HELD",
+   "value": "event true (EQUIVALENT); Delta_a seen, no confirmation; Brier 0.0025",
+   "denominator": "n_in 6,672 CLINC in-scope EVAL rows / 6,672 components + n_OOS 1,350 (every kept CLINC oos_plus OOS row, all hash sides) / 1,350 components; Kish 1.0000 (S0, measured); paired stratified component bootstrap B 2,000"
+  },
+  {
+   "id": "P2",
+   "text": "Delta_b +0.007 [-0.006, +0.018]; OB-b BASELINE-BETTER 0.30, EQUIVALENT 0.20, NEITHER 0.45, S0-BETTER 0.05",
+   "result": "HELD",
+   "value": "Delta_b -0.00101 in [-0.006, +0.018]; status EQUIVALENT (p 0.20)",
+   "denominator": "n_in 6,672 CLINC in-scope EVAL rows / 6,672 components + n_OOS 1,350 (every kept CLINC oos_plus OOS row, all hash sides) / 1,350 components; Kish 1.0000 (S0, measured); paired stratified component bootstrap B 2,000"
+  },
+  {
+   "id": "P3",
+   "text": "Delta_c +0.002 [-0.006, +0.008]; OB-c EQUIVALENT 0.45, NEITHER 0.45, BASELINE-BETTER 0.07, S0-BETTER 0.03",
+   "result": "FAILED",
+   "value": "Delta_c -0.01288 outside [-0.006, +0.008]; status S0-BETTER (p 0.03)",
+   "denominator": "n_in 6,672 CLINC in-scope EVAL rows / 6,672 components + n_OOS 1,350 (every kept CLINC oos_plus OOS row, all hash sides) / 1,350 components; Kish 1.0000 (S0, measured); paired stratified component bootstrap B 2,000"
+  },
+  {
+   "id": "P4",
+   "text": "Delta_d -0.030 [-0.080, 0.000]; OB-d S0-BETTER 0.60, NEITHER 0.25, EQUIVALENT 0.10, BASELINE-BETTER 0.05",
+   "result": "HELD",
+   "value": "Delta_d -0.04722 in [-0.080, 0.000]; status S0-BETTER (p 0.60)",
+   "denominator": "n_in 6,672 CLINC in-scope EVAL rows / 6,672 components + n_OOS 1,350 (every kept CLINC oos_plus OOS row, all hash sides) / 1,350 components; Kish 1.0000 (S0, measured); paired stratified component bootstrap B 2,000"
+  },
+  {
+   "id": "P4'",
+   "text": "readings: LIKE-FOR-LIKE CELLS-NOT-BEST 0.11, CELLS-ADD 0.02, GEOMETRY-CARRIES 0.10, NOT-SHOWN 0.77; LABEL LABELS-HELP 0.30, COMPETITIVE 0.19, NOT-SHOWN 0.51",
+   "result": "n/a",
+   "value": "readings CELLS-ADD (prior 0.02, Brier sum 1.5754) / COMPETITIVE (prior 0.19, Brier sum 1.0062)",
+   "denominator": "n_in 6,672 CLINC in-scope EVAL rows / 6,672 components + n_OOS 1,350 (every kept CLINC oos_plus OOS row, all hash sides) / 1,350 components; Kish 1.0000 (S0, measured); paired stratified component bootstrap B 2,000"
+  },
+  {
+   "id": "P5",
+   "text": "FPR95 (descriptive, at the point): (a) 0.15 [0.10, 0.20]; (b) 0.13 [0.07, 0.22]; (c) 0.15 [0.09, 0.22]; (d) 0.30 [0.15, 0.50]",
+   "result": "PARTIAL",
+   "value": "3 of 4: (a), (b), (d) HELD; (c) 0.2659 FAILED",
+   "denominator": "n_in 6,672 CLINC in-scope EVAL rows / 6,672 components + n_OOS 1,350 (every kept CLINC oos_plus OOS row, all hash sides) / 1,350 components; Kish 1.0000 (S0, measured); paired stratified component bootstrap B 2,000"
+  },
+  {
+   "id": "P6",
+   "text": "measured paired SE_total for OB-a below 0.0015, p 0.70",
+   "result": "HELD",
+   "value": "SE_total(OB-a) 0.00079 < 0.0015; Brier 0.0900",
+   "denominator": "n_in 6,672 CLINC in-scope EVAL rows / 6,672 components + n_OOS 1,350 (every kept CLINC oos_plus OOS row, all hash sides) / 1,350 components; Kish 1.0000 (S0, measured); paired stratified component bootstrap B 2,000"
+  }
+ ],
+ "falsifier": {
+  "text": "F-OB fires iff any of OB-a, OB-b, OB-c, OB-d reads BASELINE-BETTER: overturns the reading that S0 C2's AUROC 0.974 is competitive OOS detection on this embedding; every S0 C2 quote then carries the baseline's A; no-match is label-free scope detection only. Through OB-c or OB-d also overturns 'label-free cells carry the OOS signal'. GEOMETRY-CARRIES (OB-d EQUIVALENT) does not fire F-OB but bars crediting 0.974 to the cells. S0 C2 HELD / F2 NOT FIRED stand.",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "S0": "mean A 0.97479 over seeds 0-4 (0.97437 / 0.97263 / 0.97601 / 0.97446 / 0.97649); var_seed 2.329e-6",
+  "OB_a": "A 0.97640; Delta +0.00161, 90% [+0.00031, +0.00290], 95% [+0.00006, +0.00315]: EQUIVALENT",
+  "OB_b": "A 0.97378; Delta -0.00101, 90% [-0.00260, +0.00057]: EQUIVALENT",
+  "OB_c": "A 0.96191 (k 10); Delta -0.01288, 95% [-0.01523, -0.01053]: S0-BETTER; kNN k 1 0.97707 (descriptive)",
+  "OB_d": "A 0.92757; Delta -0.04722, 95% [-0.05206, -0.04239]: S0-BETTER",
+  "S0_K_alt": "K 50 / 100 / 300 at seed 0: 0.94509 / 0.96529 / 0.97972 (descriptive)",
+  "FPR95": "s0 0.1578, a 0.1504, b 0.1511, c 0.2659, d 0.3681 (descriptive)",
+  "denominators": "n_in 6,672, n_OOS 1,350 (CLINC150 oos_plus), DEFF 1.0000"
+ },
+ "sentence_of_record": "OOS-BASELINES (2026-10-02, 0 calls; post-run review c5416c52 VALID): on this embedding, label-free k-means no-match (mean A 0.97479 over 5 seeds) beats the two registered label-free peers, kNN at k = 10 by 0.0129 AUROC (95% [-0.0152, -0.0105]) and a single marginal Mahalanobis ellipsoid by 0.0472 (95% [-0.0521, -0.0424]), and is equivalent within 0.010 AUROC to a labelled nearest-centroid detector (A 0.97640) and a labelled class-Mahalanobis detector (A 0.97378) on the same embedding [flat spherical k-means cells (K = 150) on qwen3-embedding 256-d RAW vectors of CLINC150 (oos_plus OOS pool, 1,350 rows; S0's CK-CLOSE-v1 hash sides), never the tree; kNN at k = 1 reaches 0.97707 and S0 at K 50 falls to 0.94509 (the lead is k- and K-conditional); (a), (b) read 150 class labels, S0 reads none but K; parity within the margin, never 'no worse' (the centroid's +0.0016 excludes 0); F-OB not fired]",
+ "chips": [
+  "REGISTERED 2026-10-02, BEFORE ANY CODE; not built",
+  "VALID (POST-RUN c5416c52): OB-a, OB-b EQUIVALENT; OB-c, OB-d S0-BETTER; CELLS-ADD / COMPETITIVE; F-OB NOT FIRED",
+  "FLAT K-MEANS CELLS ON QWEN3-256 RAW, CLINC150 OOS_PLUS, NEVER THE TREE; kNN k=1 0.97707, S0 AT K50 0.94509 (CONDITIONAL LEAD); COMPETITIVE = PARITY WITHIN 0.010, NEVER &ldquo;NO WORSE&rdquo;"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-02",
+   "by": "registrar (PRE-DATA, READY_oos_gold)",
+   "text": "R-1: OB-d SE_total 0.00377 (sum 1.372e-5, not 1.353e-5); reaches 0.00062 / 0.01318. R-3 reviewer-CONFIRMED readings: OB1 (c2 called unchanged; nomic / gemma slots hold qwen3 fits, discarded), GB1 (5 dp = |value - CSV| <= 5e-6), GB2 (nomic_selection.json written before any nomic EVAL read). section \"## Registrar's record 2026-10-02 (insertion only; zero calls; nothing run; pre-data) — READY_oos_gold.md: ...\" (L23561-L23565, _as_of the commit that writes it, parent 9b86d32d)"
+  },
+  {
+   "date": "2026-10-02",
+   "by": "registrar (POSTRUN c5416c52 W-1..W-5)",
+   "text": "outcome recorded; checkpoint_B 'AUROC 0.974' bracketed as flat cells, never the tree. docs/judge_v2_program.md L23567-L23578 (section \"## OOS-BASELINES (2026-10-02, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent c5416c52)"
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (consistency check 2026-10-04; zero calls)",
+   "text": "the 'chips' list had drifted from the ledger row's chips (wording or replaced chips); the chips of record are the ledger's, copied verbatim into 'chips_ledger_verbatim' (ledger v379); 'chips' is kept as history."
+  }
+ ],
+ "does_not_show": [
+  "OOS on real traffic or another corpus (CLINC OOS one curated set, documented mislabels)",
+  "comparability with published CLINC150 numbers (S0 read the oos_plus file, all 1,350 OOS rows, hash sides, frozen embedder; Podolskiy et al. 97.3 / 98.4 are fine-tuned, standard split)",
+  "anything about a tree, capability text or MMLU-Pro cells (flat k-means cells only)",
+  "fine-tuned, energy or logit detectors; detectors beyond the four; other embedders, slices or prompts (qwen3 256 RAW only)",
+  "that labels are unnecessary in general; parity outside +/-0.010 AUROC",
+  "that FPR95 decides anything"
+ ],
+ "ledger": {
+  "row_id": "OOS-BASELINES",
+  "version": "v349 (2026-10-02: OUTCOME bracket, OK + WARN chips) | v344 (2026-10-02: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "INTENT-TRANSFER-S0"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; Mahalanobis is a score, not a mixture LR or mode test (MIX-LRT-SITE not engaged)"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "minutes single-threaded (registrar's ESTIMATE, unsourced; the dry-run prints its timing)",
+  "agent_hours": "engine-coder about 2 h",
+  "reads_pool": false
+ },
+ "sources": [
+  "docs/judge_v2_program.md L23342-L23375 (section \"## Registered 2026-10-02 (before any code or call) — OOS-BASELINES: ...\"; _as_of the commit that writes it, parent 487ac3bd, re-grepped)",
+  "experiment_results/intent_transfer/s0_outcome.txt lines 4, 15, 29, 57-58 (S0 C2, supervised-centroid A, per-seed A, K_alt, SE_boot 0.00198, Kish)",
+  "experiment_results/intent_transfer_s0/ingest/ingest.log line 3 (raw clinc_data_oos_plus.json, sha256 bfcca9ae...)",
+  "docs/literature/2026-10-02_related_work.md (00dea46b) ranked item 1; docs/literature/2026-10-02_related_work_pass2.md (487ac3bd) §2.6",
+  "docs/plan_2026-09-15.md Amendment 37",
+  "docs/judge_v2_program.md L23567-L23578 (section \"## OOS-BASELINES (2026-10-02, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent c5416c52)",
+  "docs/reviews/POSTRUN_oos_baselines.md (c5416c52)"
+ ],
+ "last_update": "2026-10-04",
+ "chips_ledger_verbatim": [
+  "plan: REGISTERED 2026-10-02, BEFORE ANY CODE; not built",
+  "ok: VALID (POST-RUN c5416c52): OB-a, OB-b EQUIVALENT; OB-c, OB-d S0-BETTER; F-OB NOT FIRED",
+  "warn: FLAT K-MEANS CELLS (QWEN3-256 RAW, CLINC150 OOS_PLUS), NEVER THE TREE; kNN k=1 0.97707, S0 AT K50 0.94509; COMPETITIVE = PARITY WITHIN 0.010, NEVER “NO WORSE”"
+ ],
+ "plain_description": {
+  "sq": "SQ1 Use",
+  "what": "On a standard intent dataset (CLINC150) with the same embeddings, compares the label-free 'no matching cell' score from flat k-means cells with standard out-of-scope detectors. Two of these use class labels (nearest class centre, class Mahalanobis) and two do not (nearest-neighbour distance, one global ellipsoid). No judge calls.",
+  "why": "It checks whether the earlier 0.974 detection score is special to the cell approach or just reflects the embedding, by comparing with standard baselines.",
+  "information": "If simple detectors match it, the score belongs to the embedding; if the cells match labelled detectors without labels, that is a real advantage. Result: the k-means cells beat the two label-free baselines and are within 0.01 of the two labelled detectors, without using labels. The lead depends on the settings (nearest-neighbour with k=1 does slightly better). These are flat k-means cells, not the tree, on one dataset and one embedder.",
+  "written": "2026-10-07"
+ }
+}

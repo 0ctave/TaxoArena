@@ -1,0 +1,176 @@
+{
+  "id": "CAP-PRUNE",
+  "title": "CAP-PRUNE: does a capability rule that survives as a held-out-replicating PRUNE keep only the trunk? (zero judge calls, zero constructions; plan A7; a post-hoc readout of CAP-GATE-POSTHOC's sites, never a gate)",
+  "question": "A capability rule that must REPLICATE out of sample as a PRUNE (keep a site iff its LOMO key-only Brier gain beats its own train-side within-site null p95 AND is positive held-out) on the anchor-free tree af/seed_42 (69 split sites, 16 geometrically certified): does it keep only the trunk, so that the 'different sites' CAP-GATE-POSTHOC's gate accepts are small, deep sites whose gains do not replicate, and the capability-gated construction line can be closed at zero builds?",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "e803cf4",
+    "program_lines": "docs/judge_v2_program.md L6165-L6238; pre-run bracket L6388 (af176a2): node ids not Concept labels (the trunk's depth-5 site is n00000164, not n00000163), snapshots.db not opened, the held-out column's code path, the null's seed stream, builder disclosure [re-lined 2026-09-22: batch-1 lines were read at 9c1f37b-era HEAD and shifted by +6 by later insertions]",
+    "program_lines_as_of": "6aa2a0d",
+    "heading": "## Registered 2026-09-18 (before any code or call) — CAP-PRUNE: does a capability rule that survives as a held-out-replicating PRUNE keep only the trunk? (zero judge calls, zero constructions; plan docs/agents/plans/2026-09-17_continual_capability_profile_leads.md A7; lens cells.md L4; a post-hoc readout of CAP-GATE-POSTHOC's sites, never a gate)",
+    "outcome_heading": [
+      "L6522: ## CAP-PRUNE (2026-09-18, zero judge calls, zero constructions) — under the registered keep rule (train gain above the site's own null p95 AND held-out gain > 0"
+    ],
+    "date": "2026-09-18"
+  },
+  "script": {
+    "path": "tools/analysis/cap_prune.py",
+    "sha16": "1f6ed45d9ccbcabe",
+    "commit": "415c0fa (run of record; the file's last commit af176a2 carries the TRUNK_LITERAL / TRUNK_BESIDE id swap of the pre-run bracket)"
+  },
+  "ready": null,
+  "go": "n/a (0 calls, 0 constructions; window W2)",
+  "run": {
+    "outcome_file": "experiment_results/anchorfree/cap_prune_outcome.txt",
+    "outcome_commit": "17a4434",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (printed first; scored NOWHERE: train column on 5,602 keyed q of the p8a29 train side minus p2dca, held-out column on 2,193 keyed q of the tree's own held-out side minus p2dca)",
+    "date": "2026-09-18",
+    "other_files": [
+      "experiment_results/anchorfree/cap_prune_sites.csv (69 rows, 17a4434)",
+      "experiment_results/anchorfree/cap_prune_run.log"
+    ]
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-18_night_batch.md section CAP-PRUNE",
+    "commit": "17a4434 (file last at 074eb3d)",
+    "verdict": "numbers CONFIRMED (g_train = cap_gate_posthoc g_lomo, 0 diff on 69/69; the held-out column reproduced by an independent implementation on all 69; a second-seed / 1,000-rep null moves one site); (8) HIGH '20 survivors' is not '20 replicating sites' (the held-out leg is a sign test at n_ho ~79; 7 with an interval excluding 0; verdicts robust); (9) P2 HELD at chance; (10) crown of 12 + 8 islands; (12) disclosure timeline"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "the survivor count under the keep rule (g_train > null_p95 AND g_heldout > 0), with BOTH columns written per site for all 69",
+      "result": "HELD",
+      "value": "20 of 69 kept (legs: g_train > null_p95 30; g_heldout > 0 40; both 20; g_train > null median 55); by depth (sites / certified / kept) d0 1/1/1, d1 2/2/2, d2 7/3/4, d3 14/4/3, d4 24/4/7, d5 19/2/3, d6 2/0/0; only 7 of the 20 carry a held-out interval excluding 0 (checker, unregistered): n00000001 +1.94 [1.03, 2.72], n00000005 +6.28 [3.98, 8.63], n00000004 +2.04 [0.89, 3.19], n00000019 +5.31 [2.30, 8.27], n00000073 +3.20 [1.17, 5.22], n00000072 +3.75 [0.36, 7.70], n00000164 +15.93 [5.35, 27.87]",
+      "denominator": "69 split sites of af/seed_42; null 200 reps Generator(42); held-out B = 500 question bootstrap"
+    },
+    {
+      "id": "C2",
+      "text": "Jaccard between the kept set and the certified 16, with the joint count",
+      "result": "HELD",
+      "value": "7 / 29 = 0.241 (joint 7: n00000001, n00000005, n00000004, n00000017, n00000016, n00000062, n00000141); chance under the hypergeometric E[joint] 4.64, chance Jaccard 0.148, P(joint >= 7) = 0.12; kept at the null MEDIAN instead of the p95 (beside): 34 of 69, joint 10, Jaccard 0.250",
+      "denominator": "the union of the kept 20 and the certified 16 (29)"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "(plan A7) 4-6 survivors of 69",
+      "result": "FAILED",
+      "value": "20 (upward); robust to the checker's reading (7 with intervals > 6)",
+      "denominator": "69 sites"
+    },
+    {
+      "id": "P2",
+      "text": "(plan A7) Jaccard with the certified 16 ~0.25, scored as [0.15, 0.35]",
+      "result": "HELD",
+      "value": "0.241; AT CHANCE (expected 0.148, P 0.12): the PRUNE and the geometric certificate select nearly independently",
+      "denominator": "union of the two sets"
+    },
+    {
+      "id": "R1",
+      "text": "(registrar's blind addition) the trunk's four sites (root n00000001, depth-1 n00000005 and n00000004, and the replicating depth-5 site) are all kept",
+      "result": "HELD",
+      "value": "HELD on the bracketed ids (n00000001, n00000005, n00000004, n00000164 all KEPT; n00000164 g_train +13.98, held-out +15.93) as a REPRODUCTION of the checker's scratch columns, not a blind prediction; FAILED on the registration's literal n00000163 (Concept #162, k2, n_train 112: g_train -0.72 < null_p95 +0.76, held-out -0.23, PRUNED)",
+      "denominator": "4 trunk sites"
+    },
+    {
+      "id": "R2",
+      "text": "(registrar's blind addition) the kept set contains no site with n_train < 150",
+      "result": "FAILED",
+      "value": "n00000141 (141), n00000166 (144), n00000168 (100) kept",
+      "denominator": "20 kept sites"
+    }
+  ],
+  "falsifier": {
+    "text": "survivors <= 4: the capability-gated construction line closes at zero builds (a rule that replicates out of sample keeps nothing beyond the trunk the geometric certificate already certifies); overturns the reading that the gate's 'different sites' carry capability content; does not overturn CAP-GATE-POSTHOC's counts, the geometric certificate or the trunk",
+    "fired": false,
+    "note": "NOT FIRED (20); above 6 survivors the plan's claim FAILS and the kept set is what the outcome reports; a construction arm on it needs its own registration and the author's go; FRAMEWORK L53 stands (the keep rule is a readout, never a gate)"
+  },
+  "numbers_of_record": {
+    "inputs": "af/seed_42 (dag_snapshots.jsonl, sha printed), site_null_af_s42.csv (69 sites, 16 certified), mmlu_pro_dataset_cache_v2.db and embeddings_cache.db mode=ro, 46-model roster; train side 5,602 keyed q; held-out side 2,193 keyed q (median 79 per site); runtime 10 s; run 2026-09-18 17:20",
+    "survivors": "20 of 69 under the keep rule; legs train > p95 30, held-out > 0 40; at the null median 55 (train) / 34 (both)",
+    "kept_set": "n00000001 (d0, 5,602, C), n00000005 (d1, 3,340, C), n00000004 (d1, 2,262, C), n00000017 (d2, 1,261, C), n00000046 (d2, 886), n00000016 (d2, 916, C), n00000019 (d2, 551), n00000073 (d3, 556), n00000077 (d3, 372), n00000072 (d3, 330), n00000117 (d4, 340), n00000124 (d4, 242), n00000062 (d4, 182, C), n00000060 (d4, 179), n00000057 (d4, 166), n00000142 (d4, 205), n00000141 (d4, 141, C), n00000164 (d5, 228), n00000166 (d5, 144), n00000168 (d5, 100)",
+    "kept_with_heldout_interval_excluding_0": "7: the trunk's four (n00000001, n00000005, n00000004, n00000164) + n00000019, n00000073, n00000072 (checker, unregistered)",
+    "structure_of_kept_set": "a connected crown of 12 from the root (root, both depth-1, 4 of 7 depth-2, 3 depth-3, n00000117, n00000164) + 8 disconnected deep islands (d4-5, n_train 100-242) under pruned parents; 9 quantitative / 10 discursive",
+    "Jaccard_with_certified_16": "7 / 29 = 0.241; hypergeometric E[joint] 4.64, chance Jaccard 0.148, P(joint >= 7) 0.12",
+    "trunk_values": "root +1.48 train / +1.94 [1.03, 2.72] held-out; n00000005 +6.34 / +6.28 [3.98, 8.63]; n00000004 +1.29 / +2.04 [0.89, 3.19]; n00000164 +13.98 / +15.93 [5.35, 27.87]; literal n00000163 g -0.72 < p95 +0.76, held-out -0.23 PRUNED",
+    "continuity_with_checker_scratch": "null median over sites -0.55 (checker -0.54); below n_train 150 -0.92 (-0.93); held-out median +0.45 (+0.45); Spearman(g_train, g_heldout) +0.208 (+0.21); median n_heldout 79 (79)",
+    "second_seed_null_reviewer": "1,000 reps: one flip (n00000061 would be kept, 21); n00000142 a coin flip at null_p 0.050",
+    "relation_to_REDRAW_stable_set": "of the 5 stable sites, 4 are kept (n00000001, n00000005, n00000017, n00000016); n00000032 pruned on held-out -1.63"
+  },
+  "sentence_of_record": "CAP-PRUNE: under the registered keep rule (train gain above the site's own null p95 AND held-out gain > 0) 20 of 69 anchor-free sites survive (P1 4-6 FAILED upward; falsifier <= 4 not fired; the capability-gated construction line stays open as a PRUNE, never a gate); only 7 carry a held-out interval excluding 0 (the trunk's four, n00000019, n00000072, n00000073); Jaccard with the geometric certificate 0.241 (chance 0.148, P 0.12: the two select nearly independently); the kept set is a connected crown of 12 plus 8 deep islands, 3 below n_train 150 (R2 FAILED); null p95 moves one site at a second seed.",
+  "chips": [
+    "P1 FAILED (20 SURVIVORS; 7 WITH INTERVAL > 0)",
+    "FALSIFIER NOT FIRED: LINE OPEN AS A PRUNE, NEVER A GATE",
+    "P2 HELD AT CHANCE (0.24 vs 0.15)",
+    "R1 HELD ON THE BRACKETED ID (REPRODUCTION)",
+    "R2 FAILED",
+    "CROWN OF 12 + 8 ISLANDS"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-18",
+      "by": "the pre-run review, before --run (programme L6382, af176a2)",
+      "text": "(1) The record's site ids at L5088-5089 and L6168/L6196 are Concept labels, not node ids (node = label + 1): the replicating depth-5 site is n00000164 (Concept #163, k3, n_train 228, g_lomo +13.98), NOT n00000163 (Concept #162, k2, n_train 112, g_lomo -0.72); the flipping depth-4 sites are n00000125 and n00000127. The registrar's addition is scored on n00000001, n00000005, n00000004 and n00000164; n00000163 printed beside. R1 is a reproduction of the checker's scratch columns, not a blind prediction. (2) snapshots.db is not opened; the tree is read from dag_snapshots.jsonl. (3) cap_prune.heldout_gains applies site_gains' offset design with cells fit on the train members. (4) The null is one numpy Generator(42) stream in site order at 200 reps; borderline sites may flip under another seed. (5) Builder disclosure: the checker's scratch per-site null and held-out columns were read after e803cf4 and before 415c0fa while matching definitions; instrument and predictions unchanged."
+    },
+    {
+      "date": "2026-09-18",
+      "by": "the outcome section (3dd0900), consequence: CAP-GATE-POSTHOC's node ids corrected (ledger v114)",
+      "text": "the two columns CAP-GATE-POSTHOC left in scratch (within-site null p95 and held-out gain) are now a file of record (cap_prune_sites.csv); CAP-GATE-POSTHOC's site ids read as node ids per the bracket."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "CORRECTIONS_2026-09-23 (registrar)",
+      "text": "[CORRECTED 2026-09-23 by the registrar (script identity only; no result changes): \"--run (415c0fa)\" names the commit that ADDED the script, not the bytes that ran. 415c0fa (2026-09-18 03:14:06) is dry-run only; af176a2 (03:56:09) is the later and LAST commit of tools/analysis/cap_prune.py and its own message records that it swapped TRUNK_LITERAL / TRUNK_BESIDE in the script; the run is 17:20, after it. The script of record for this run is therefore the blob at af176a2, sha16 77c3e6912b4db3c8 (git show af176a2:tools/analysis/cap_prune.py | sha256sum), not 1f6ed45d9ccbcabe at 415c0fa. git log --follow on the file returns those two commits and no other, so no third version can be the run's.]"
+    },
+    {
+      "date": "2026-09-23",
+      "by": "CORRECTIONS_2026-09-23 (registrar)",
+      "text": "[CORRECTED 2026-09-23 by the registrar (line pointer only, zero calls; no number, no criterion and no sentence moves): registration.program_lines names docs/judge_v2_program.md L6165, and that was exact when it was written. After commit cd83eac inserted four one-line correction brackets mid-file (hunks @@ -3911,0 / -6535,0 / -6692,0 / -6949,0 @@), the heading of record \"## Registered 2026-09-18 (before any code or call) — CAP-PRUNE: does a capability rule that survives as a held-out-replicating PRUNE keep on ...\" stands at L6166, +1; the whole span shifts by the same +1. Verified at HEAD by sed -n '6166p' docs/judge_v2_program.md. The map for every such pointer is the programme's \"## Line-shift map, appended 2026-09-23\" section: +0 up to old L3911, +1 to L6535, +2 to L6692, +3 to L6949, +4 below. The recorded span is left standing beside this bracket, not rewritten.]"
+    }
+  ],
+  "does_not_show": [
+    "that any kept site carries capability content beyond the 7 with intervals excluding 0",
+    "a construction change (nothing built, nothing gated)",
+    "a judged or routed reading of any site",
+    "a per-site capability row (sites are construction objects)",
+    "a relation to ANCHOR-FREE-REDRAW's stable set beyond the overlap printed (a different object on the record's tree)",
+    "anything about the pool of record (scored nowhere)"
+  ],
+  "ledger": {
+    "row_id": "CAP-PRUNE",
+    "version": "v114"
+  },
+  "depends_on": [
+    "CAP-GATE-POSTHOC",
+    "ANCHOR-FREE",
+    "ANCHOR-FREE-CERT",
+    "ANCHOR-FREE-Z",
+    "ANCHOR-FREE-MCS",
+    "ANCHOR-FREE-REDRAW",
+    "SPLIT-RATIO"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L6159-L6232 (registration e803cf4) and the pre-run bracket L6382 (af176a2): question, hygiene, instrument, criteria, predictions, the registrar's additions, falsifier",
+    "docs/judge_v2_program.md L6516-L6589 (outcome section, 3dd0900): every number, C1-C2, P1-P2 and R1-R2 scored, the falsifier, defects (8)-(12), does-not-show, the sentence of record",
+    "docs/reviews/2026-09-18_night_batch.md section CAP-PRUNE (17a4434; file last at 074eb3d): CONFIRMED status, the second-seed null, the 7-interval count, chips",
+    "experiment_results/anchorfree/cap_prune_outcome.txt and cap_prune_sites.csv (17a4434)",
+    "docs/test_ledger.html row CAP-PRUNE (v114): chips verbatim, observed cell, evidence (e803cf4, af176a2, 415c0fa, 17a4434, 3dd0900)",
+    "script sha16 = sha256 of tools/analysis/cap_prune.py at 415c0fa, first 16 hex (identity, computed by the registrar 2026-09-20)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' lines to grep -n regardless of line drift; line numbers re-lined 2026-09-22 as of programme HEAD 6aa2a0d (shift +6 from the batch-1 reading)"
+  ],
+  "last_update": "2026-09-23",
+  "plain_description": {
+    "sq": "SQ3 Taxonomy",
+    "what": "Using the anchor-free tree (69 splits), this test asks which splits carry a gain in predicting which models answer correctly. A split is kept only if its gain beats its own chance level on training data and is still positive on held-out data.",
+    "why": "It asks whether model capability, not just text similarity, could be used to prune the tree, or whether only the top few splits matter.",
+    "information": "If only the trunk survived, the idea of building the tree around capability could be dropped. If more survive, the idea stays alive as a pruning step. Result: done. 20 of 69 splits survived, more than the 4 to 6 predicted, so the capability idea stays open, but only as a pruning step, never as a gate. Only 7 splits have a held-out gain clearly above zero. The splits kept this way overlap only weakly with the geometric certificate: the two select splits nearly independently of each other. Nothing was rebuilt or judged.",
+    "written": "2026-10-07"
+  }
+}

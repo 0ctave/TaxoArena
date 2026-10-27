@@ -1,0 +1,150 @@
+[POOL] p2dca21ab5f4ef3ae: pool_guard.assert_pool_of_record PASSED (the id file and the reserved_pool rows both hash to it; the guard's own read-only open of the eval DB is not in the DB-open log below)
+=== ARCH-V2 G22 SIMULATOR, leg validity-v2: RUN UNDER THE REGISTRATION ARCH-V2-G22 at d6129cf (programme L15208-L15265); v2 under rulings 83f431b, 4b25059, 97f3a1f, master ARCHV2-G22-REC-1, R 1000 ===
+  argv: tools/analysis/archv2_g22_sim.py --leg validity-v2 --workers 4 --out experiment_results/archv2/g22_g23/G22_validity_v2.txt
+  master 'ARCHV2-G22-REC-1' | data root Z:\FAC\TUBerlin\THESIS\TaxoArena | started 2026-09-24 11:31:42
+  instrument identity (git blob / sha256-lf16 of the LF rendering; working tree state):
+    archv2_g22_sim.py                  blob:1019d61d42970dbce7a529a4b0ec5d67abc9943c sha256-lf16:719723d3163e7f4f (CRLF sha256-crlf16:bc009ddbec1ca702)
+    archv2_arena/__init__.py           blob:210bd76eaff44916ea9d85b0d6dcccd711d85154 sha256-lf16:ae6a0736954a8674 (CRLF sha256-crlf16:2f57cabe6c394809)
+    archv2_arena/streams.py            blob:30c23f9700a1309cda059c76bfe6fcbc6c41d64b sha256-lf16:315a30993d340650 (CRLF sha256-crlf16:bd52a16174d485b7)
+    archv2_arena/ro.py                 blob:98cfb84a58e7844e24b73ba301c2792cddc61b7c sha256-lf16:23d4f38710e3007f (CRLF sha256-crlf16:297117b2176e7cd7)
+    archv2_arena/bt.py                 blob:8ee2e28b4fe9097f68b462562adaedea92f54813 sha256-lf16:138bd034706eb2e1 (CRLF sha256-crlf16:b9c25ce1f79d1875)
+    archv2_arena/cert.py               blob:d150ec9c3084352354bd83c4b106f7936f11d036 sha256-lf16:11e2ec7e76e0b495 (CRLF sha256-crlf16:1a5f2a861058b6d1)
+    archv2_arena/verdict_model.py      blob:418d979e3ca632340f739a9449180e653932bddf sha256-lf16:c87ef3a34e7b3a7f (CRLF sha256-crlf16:969bb9949e54a638)
+    archv2_arena/data.py               blob:7de0b135028ba96eab24b2ba998a62dd74e03247 sha256-lf16:78d3947f51dc8596 (CRLF sha256-crlf16:769163d4f95b4437)
+    archv2_arena/design.py             blob:4959cb525c8d07a26d19358c3f98342d5b28b3d2 sha256-lf16:becd63768eedb8fc (CRLF sha256-crlf16:c0e5c5ffd6dcd994)
+    archv2_arena/g22.py                blob:1d1ff47b04a94a00d34634482e25a7525f43cfa1 sha256-lf16:b7f31cd4c97db231 (CRLF sha256-crlf16:1c2cd231bf6edd23)
+    archv2_arena/report.py             blob:51639563bdd47d48e0ec8b1673eee0e7b865653a sha256-lf16:da954a3c4d1b833f (CRLF sha256-crlf16:50e5e1884a1eb849)
+    archv2_arena/synth.py              blob:02db84ba5d3ee2c819bddc1be4455ec0e186b5ca sha256-lf16:b64657775ffa4422 (CRLF sha256-crlf16:3633804b08d6b3f1)
+    archv2_arena/selftest_g22.py       blob:88adb8247e51f9231282fc421fe9b6d82ac18aff sha256-lf16:e12bf469e0071db9 (CRLF sha256-crlf16:50145f9087cd36d5)
+    archv2_arena/selftest_g22_v2.py    blob:bb1143cae99cfdc09d42d26b5f62ebbdef5c0ec3 sha256-lf16:9c8d993ddc3bc09f (CRLF sha256-crlf16:5b8d345f2d21a9c9)
+    archv2_arena/g23.py                blob:ff6a1201db9321c4379e933f1b4c9d34e4047410 sha256-lf16:882540d6ff955471 (CRLF sha256-crlf16:86d19c819e1019cc)
+  ONE SHOT: claimed Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\archv2\G22_validity_v2.ONE_SHOT.json
+  inputs (size, mtime; -wal / -journal sizes):
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\x12_crossdomain\grok_calib.db | 37879808 B | mtime 2026-09-16 05:00:28 | no sidecar
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\mmlu_pro_dataset_cache_v2.db | 974917632 B | mtime 2026-09-19 16:30:10 | -wal 0 B
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\snapshots.db | 1065541632 B | mtime 2026-09-23 04:34:26 | -wal 0 B
+  board grok: 9131 valid verdicts, 9131 routed, anchors 14, models 12; routing tree bareq512_s42 snapshot 20260909_212117_Headless_Run_Auto_ge
+
+=== (a') VALIDITY, FRESH-JUDGE v2: POST-HOC-SPECIFIED (fresh-judge v2, ruling 1 of 83f431b; specified after the R = 1 dry run); rulings 83f431b (ruling 1), 4b25059 (rulings A, B), 97f3a1f (P7) ===
+  ONE SHOT (ruling 1 (v)): a v2 FAIL is FINAL for the simulator as a board-size instrument; a PASS re-admits the design readings ONLY as readings of a post-hoc-specified simulator.
+
+=== (a) VALIDITY LEG: the simulator fitted on grok must reproduce the record ===
+  targets: edges {'f': 891, 'u': 920, 'est': 809} | f_raw_called 733, f_raw_wrong 7, f_loao_called 667, f_loao_wrong 2, f_loao_wrong_est 1, f_loao_nominal 1.11, u_raw_called 740, u_raw_wrong 8, u_loao_called 653, u_loao_wrong 2, u_loao_wrong_est 1, u_loao_nominal 1.24 | delta-deviance range must cover 4.47 and 2.26
+  rule (REGISTERED 2026-09-24 at d6129cf (ARCH-V2-G22, programme L15208-L15265), ruling (1), Bonferroni): EVERY target inside its simulated central (1 - 0.05 / T) interval of the PRIMARY (fresh-judge) mode random; T = 14 targets (12 counts + 2 delta-deviance values) -> central 0.99643 interval; R 1000 replicates per mode, B 300
+  MODE: POST-HOC-SPECIFIED (fresh-judge v2, ruling 1 of 83f431b; specified after the R = 1 dry run); keyacc under convention A over the board's judged questions; the verdict model below is the v2 model (beta fitted jointly, sigma_eps_LOMO for the fresh draws)
+  the real board through the NEW fast builder (numpy boards, stream validity-v2/real; the record's own stream is build()'s random.Random(42) through rj.mm_fit, so these are a re-draw of the bootstrap, printed beside):
+    edges f 891 / u 920 / established 809 (record 891 / 920 / 809: EDGE SETS MATCH) | f raw 738 / 7 | f LOAO 668 / 2 (1) 1.13 | u raw 745 / 8 | u LOAO 657 / 2 (1) 1.29 | est b1 +2.6386 ddev 4.30
+  POST-HOC-SPECIFIED (fresh-judge v2, ruling 1 of 83f431b; specified after the R = 1 dry run)
+  VERDICT MODEL: kappa +1.6180 | pi (first-position) +0.1829 | lam (per 1k chars) +0.1428 | tie cutpoints c = 0.106 / 0.677 / 0.468 (DEC / AGREE / NONDEC) | sigma_v (model) 0.3476 | sigma_w (anchor x model) 0.3299 | ridge sigma0 1.00
+    fit: {'nll': 10767.041653928844, 'n_obs': 18262, 'iters': 169, 'present': 168} | digest e9d78b8ea98638c6
+    model-level u (mean over anchors), lowest three: Meta-Llama-3_1-70B-Instruct -0.701, Meta-Llama-3_1-8B -0.322, arx_0314 -0.289
+    v2: beta (per unit keyacc difference, fitted jointly) +5.2445 | sigma_eps_LOMO 0.3730 over 12 held-out models (in-sample sigma_v 0.3476) | fresh draws: epsilon ~ N(0, sigma_eps_LOMO^2), w ~ N(0, sigma_w^2)
+    DIAGNOSTICS (ruling A (v), 4b25059; deciding nothing): beta-hat +5.2445 | sigma_eps_LOMO 0.3730 | the 12 LOMO errors [-0.0187, +0.0163, -0.7099, -0.3506, +0.1699, +0.1657, -0.5003, +0.1298, +0.0396, -0.2507, +0.4474, +0.6737] | corr(u-hat, keyacc) +2.14e-05 = an OPTIMISER CHECK only (zero by construction at the MAP, D5 ruling; expected |.| < 1e-3): OK
+  retest mode: r_keep 0.7694 reproduces the measured re-draw agreement 0.896 (reachable [0.623, 1.000])
+
+  mode random  (1000 replicates)   <- PRIMARY (the downstream legs' mode) [POST-HOC-SPECIFIED (fresh-judge v2, ruling 1 of 83f431b; specified after the R = 1 dry run)]
+    statistic               target      q_lo    median      q_hi pct(target)  covered
+    f_raw_called            733.00    697.78    759.00    790.43      0.064  yes
+    f_raw_wrong               7.00      1.78     13.00     39.43      0.117  yes
+    f_loao_called           667.00    462.62    620.00    730.16      0.850  yes
+    f_loao_wrong              2.00      0.00      2.00      6.00      0.499  yes
+    f_loao_wrong_est          1.00      0.00      1.00      4.00      0.641  yes
+    f_loao_nominal            1.11      0.68      1.30      2.09      0.198  yes
+    u_raw_called            740.00    710.57    772.00    805.43      0.040  yes
+    u_raw_wrong               8.00      5.00     18.00     49.43      0.022  yes
+    u_loao_called           653.00    427.35    589.00    693.08      0.925  yes
+    u_loao_wrong              2.00      0.00      2.00      6.22      0.451  yes
+    u_loao_wrong_est          1.00      0.00      0.00      3.22      0.789  yes
+    u_loao_nominal            1.24      0.91      1.46      2.39      0.178  yes
+    delta-deviance       4.47/2.26      0.00      1.13     38.80          -  yes   (finite in 1000 of 1000; not identified by the 3.84 bar in 767)
+    descriptive: wrong(established) over all edges median 31; the most-incident model's share median 0.38 (real board: Meta-Llama-3_1-70B-Instruct at 0.33); modal top model Meta-Llama-3_1-8B
+    ALL-WRONG population (printed under its own name; ties as a SET): the real board's most-incident set {Meta-Llama-3_1-70B-Instruct}; modal simulated set {Meta-Llama-3_1-8B}
+
+  mode fixed   (1000 replicates)   (printed, deciding nothing) [POST-HOC-SPECIFIED (fresh-judge v2, ruling 1 of 83f431b; specified after the R = 1 dry run)]
+    statistic               target      q_lo    median      q_hi pct(target)  covered
+    f_raw_called            733.00    737.00    756.00    774.22      0.000  NO
+    f_raw_wrong               7.00      6.78     12.00     19.22      0.004  yes
+    f_loao_called           667.00    614.70    652.00    688.22      0.886  yes
+    f_loao_wrong              2.00      0.00      2.00      4.00      0.508  yes
+    f_loao_wrong_est          1.00      0.00      1.00      3.00      0.480  yes
+    f_loao_nominal            1.11      0.80      1.05      1.36      0.715  yes
+    u_raw_called            740.00    746.78    767.00    785.00      0.000  NO
+    u_raw_wrong               8.00      9.00     15.00     24.00      0.001  NO
+    u_loao_called           653.00    597.78    637.00    678.00      0.859  yes
+    u_loao_wrong              2.00      0.00      2.00      6.00      0.376  yes
+    u_loao_wrong_est          1.00      0.00      1.00      3.00      0.561  yes
+    u_loao_nominal            1.24      0.87      1.14      1.47      0.823  yes
+    delta-deviance       4.47/2.26      0.83      5.76     15.74          -  yes   (finite in 1000 of 1000; not identified by the 3.84 bar in 218)
+    descriptive: wrong(established) over all edges median 25; the most-incident model's share median 0.31 (real board: Meta-Llama-3_1-70B-Instruct at 0.33); modal top model Meta-Llama-3_1-70B-Instruct
+    ALL-WRONG population (printed under its own name; ties as a SET): the real board's most-incident set {Meta-Llama-3_1-70B-Instruct}; modal simulated set {Meta-Llama-3_1-70B-Instruct}
+
+  mode retest  (1000 replicates)   (printed, deciding nothing) [POST-HOC-SPECIFIED (fresh-judge v2, ruling 1 of 83f431b; specified after the R = 1 dry run)]
+    statistic               target      q_lo    median      q_hi pct(target)  covered
+    f_raw_called            733.00    727.57    742.00    758.22      0.038  yes
+    f_raw_wrong               7.00      5.00      8.00     12.00      0.137  yes
+    f_loao_called           667.00    637.00    663.00    683.00      0.681  yes
+    f_loao_wrong              2.00      1.00      2.00      4.00      0.490  yes
+    f_loao_wrong_est          1.00      0.00      1.00      3.00      0.425  yes
+    f_loao_nominal            1.11      0.83      1.09      1.36      0.572  yes
+    u_raw_called            740.00    734.78    751.00    767.22      0.024  yes
+    u_raw_wrong               8.00      7.00     11.00     16.00      0.046  yes
+    u_loao_called           653.00    619.00    649.00    673.22      0.650  yes
+    u_loao_wrong              2.00      0.00      2.00      5.00      0.374  yes
+    u_loao_wrong_est          1.00      0.00      1.00      2.22      0.445  yes
+    u_loao_nominal            1.24      0.94      1.19      1.48      0.698  yes
+    delta-deviance       4.47/2.26      1.49      5.32     10.72          -  yes   (finite in 1000 of 1000; not identified by the 3.84 bar in 178)
+    descriptive: wrong(established) over all edges median 24; the most-incident model's share median 0.32 (real board: Meta-Llama-3_1-70B-Instruct at 0.33); modal top model Meta-Llama-3_1-70B-Instruct
+    ALL-WRONG population (printed under its own name; ties as a SET): the real board's most-incident set {Meta-Llama-3_1-70B-Instruct}; modal simulated set {Meta-Llama-3_1-70B-Instruct}
+
+  v2 PART A (the 14 full-board targets) [POST-HOC-SPECIFIED (fresh-judge v2, ruling 1 of 83f431b; specified after the R = 1 dry run)]: PASS
+
+  (a'-B) HELD-OUT CONJUNCT [POST-HOC-SPECIFIED (fresh-judge v2, ruling 1 of 83f431b; specified after the R = 1 dry run)]: judged questions split in halves per anchor by the registered seed 'ARCHV2-G22-V2-HALF-1' (stream 'half/<anchor>'): H1 1402, H2 1409 of 2811 judged questions | disjoint YES | complete (H1 u H2 = judged) YES; fit on H1, simulate H2
+  H2 targets (builder of record: build()'s loop + the record's fit through the LOAO driver; exact-builder witness +3300 boards): f_raw_called 550, f_raw_wrong 3, f_loao_called 500, f_loao_wrong 0, f_loao_wrong_est 0, f_loao_nominal 1.17, u_raw_called 550, u_raw_wrong 3, u_loao_called 490, u_loao_wrong 0, u_loao_wrong_est 0, u_loao_nominal 1.12
+  rule: every H2 target inside its central (1 - 0.05 / T2) interval, T2 = 12 -> 0.99583, of the v2 fresh-judge mode fitted on H1
+  POST-HOC-SPECIFIED (fresh-judge v2, ruling 1 of 83f431b; specified after the R = 1 dry run)
+  VERDICT MODEL: kappa +1.7461 | pi (first-position) +0.2187 | lam (per 1k chars) +0.1522 | tie cutpoints c = 0.102 / 0.709 / 0.493 (DEC / AGREE / NONDEC) | sigma_v (model) 0.3745 | sigma_w (anchor x model) 0.3709 | ridge sigma0 1.00
+    fit: {'nll': 4524.82623739823, 'n_obs': 7774, 'iters': 116, 'present': 120} | digest e2dc044e8c1efd46
+    model-level u (mean over anchors), lowest three: Meta-Llama-3_1-70B-Instruct -0.697, arx_0314 -0.373, Meta-Llama-3_1-8B -0.369
+    v2: beta (per unit keyacc difference, fitted jointly) +5.1007 | sigma_eps_LOMO 0.4091 over 12 held-out models (in-sample sigma_v 0.3745) | fresh draws: epsilon ~ N(0, sigma_eps_LOMO^2), w ~ N(0, sigma_w^2)
+    DIAGNOSTICS (ruling A (v), 4b25059; deciding nothing): beta-hat +5.1007 | sigma_eps_LOMO 0.4091 | the 12 LOMO errors [-0.0476, +0.0589, -0.6976, -0.4264, +0.3291, +0.2510, -0.5799, +0.0619, -0.0782, -0.1842, +0.3151, +0.8264] | corr(u-hat, keyacc) +1.31e-05 = an OPTIMISER CHECK only (zero by construction at the MAP, D5 ruling; expected |.| < 1e-3): OK
+    part B draws a FRESH judge per replicate: median SD of the drawn u 0.5280 (fresh)
+    H2 statistic            target      q_lo    median      q_hi pct(target)  covered
+    f_raw_called            550.00    511.08    554.00    585.92      0.372  yes
+    f_raw_wrong               3.00      2.00     11.00     34.00      0.012  yes
+    f_loao_called           500.00    297.24    426.00    530.92      0.978  yes
+    f_loao_wrong              0.00      0.00      2.00      5.92      0.033  yes
+    f_loao_wrong_est          0.00      0.00      0.00      3.00      0.358  yes
+    f_loao_nominal            1.17      0.73      1.24      1.82      0.355  yes
+    u_raw_called            550.00    520.08    560.00    592.84      0.210  yes
+    u_raw_wrong               3.00      3.00     13.00     35.92      0.004  yes
+    u_loao_called           490.00    294.00    415.00    516.76      0.980  yes
+    u_loao_wrong              0.00      0.00      2.00      6.00      0.038  yes
+    u_loao_wrong_est          0.00      0.00      0.00      3.00      0.381  yes
+    u_loao_nominal            1.12      0.79      1.29      1.88      0.204  yes
+    H2 edge IDENTITIES (fast builder vs builder of record; f / u / est key sets): MATCH
+
+  VALIDITY v2 [POST-HOC-SPECIFIED (fresh-judge v2, ruling 1 of 83f431b; specified after the R = 1 dry run)]: part A (14 full-board targets) PASS; part B (held-out H2, 12 targets) PASS -> PASS
+  beside the verdict, the full-board v2 model:
+    DIAGNOSTICS (ruling A (v), 4b25059; deciding nothing): beta-hat +5.2445 | sigma_eps_LOMO 0.3730 | the 12 LOMO errors [-0.0187, +0.0163, -0.7099, -0.3506, +0.1699, +0.1657, -0.5003, +0.1298, +0.0396, -0.2507, +0.4474, +0.6737] | corr(u-hat, keyacc) +2.14e-05 = an OPTIMISER CHECK only (zero by construction at the MAP, D5 ruling; expected |.| < 1e-3): OK
+  beside the verdict, the H1 v2 model:
+    DIAGNOSTICS (ruling A (v), 4b25059; deciding nothing): beta-hat +5.1007 | sigma_eps_LOMO 0.4091 | the 12 LOMO errors [-0.0476, +0.0589, -0.6976, -0.4264, +0.3291, +0.2510, -0.5799, +0.0619, -0.0782, -0.1842, +0.3151, +0.8264] | corr(u-hat, keyacc) +1.31e-05 = an OPTIMISER CHECK only (zero by construction at the MAP, D5 ruling; expected |.| < 1e-3): OK
+  D5 DIAGNOSTICS for the full-board v2 model (the D5 ruling; printed beside the verdict; NONE enters PASS / FAIL):
+    quality-alignment shares over the 12 models (model-level centred keyacc_m; T_m = beta-hat keyacc_m + mean_g u-hat_gm): IN-SAMPLE var(beta-hat keyacc) / var(T) = 0.9363 | FRESH-DRAW beta^2 var(k) / (beta^2 var(k) + sigma_eps_LOMO^2) = 0.9212 | beside: the v1 DEV reference R^2 0.933 (DEV, NOT OF RECORD) and the v1 random mode's share ~0 (v redrawn with no link to quality)
+    LOMO prediction errors vs keyacc_m (DESCRIPTIVE, n = 12): Pearson -0.0358 | two lowest-keyacc: Llama-2-7b-hf +0.0163, Llama-2-13b-hf -0.0187 | two highest-keyacc: arx_0314 -0.5003, gemini-3.1-pro_5-shots -0.2507
+    beta-hat on H1 +5.1007 beside beta-hat on the full board +5.2445: stability across question halves, NOT independent (H1 is a subset)
+  token sealed: instrument lf16 f37145df9516b7ec | record True | digest 3069666d0f5e553a
+
+  EXECUTION WITNESS (new code paths): {'edges_exact.boards': 3300, 'edges_exact.edges': 722, 'edges_fast.boards': 15907500, 'edges_fast.edges': 3483642, 'g23.exact_fit': 22, 'g23.loao_folds': 22, 'validity.v2_path': 1}
+  DB OPENS (all through pool_guard.open_ro: -wal/-journal refused, then mode=ro&immutable=1): 3
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\snapshots.db
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\x12_crossdomain\grok_calib.db
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\mmlu_pro_dataset_cache_v2.db
+  RANDOM STREAMS (master 'ARCHV2-G22-REC-1'): 58039 named streams, log sha256 0791961ee6b76940515030a72f5679d65f9d24392646975c8ddeb3446689fca6 (full list in the .streams.tsv beside this file); seed = sha256(master|name)[:8] big-endian unless 'of record'
+    half/Biology                                                  3347579164283896777  numpy.PCG64
+    half/Business                                                  246437710633005872  numpy.PCG64
+    half/Chemistry                                                 919631315006843225  numpy.PCG64
+    half/Computer science                                         4387730907925539571  numpy.PCG64
+    half/Economics                                               14002464377051961043  numpy.PCG64
+    half/Engineering                                              9427826148005337289  numpy.PCG64
+    ... 58033 more
+[G22] written: experiment_results/archv2/g22_g23/G22_validity_v2.txt (+ .streams.tsv)

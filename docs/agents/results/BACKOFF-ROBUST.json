@@ -1,0 +1,153 @@
+{
+ "id": "BACKOFF-ROBUST",
+ "title": "BACKOFF-ROBUST: HIER-FAIR-BACKOFF's words (HB1, HB2) under a fixed tau = 200 and without AF-U's cross-source filings (TRAIN-CV; EVAL analogue the 191 of R-KI1, descriptive); same tool and run (zero calls; REGISTERED 2026-10-08)",
+ "question": "Do HIER-FAIR-BACKOFF's words survive a fixed shrinkage strength and the removal of cross-source filings?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "e83b59d5",
+  "program_lines": "docs/judge_v2_program.md L24989-L25000",
+  "program_lines_as_of": "e83b59d5 (parent d8ab39fa), re-grepped",
+  "date": "2026-10-08",
+  "heading": "## Registered 2026-10-08 (before any code or call) — BACKOFF-ROBUST: do HIER-FAIR-BACKOFF's words survive ...",
+  "provenance": "the orchestrator's brief of 2026-10-08 (design); criteria, Support, predictions, falsifier the registrar's; docs/judge_v2_program.md L24950-L24956 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — six zero-call tests registered ...\"; _as_of the commit that writes it, parent d8ab39fa, re-grepped)"
+ },
+ "script": {
+  "path": "tools/analysis/hier_fair_backoff.py",
+  "blob": "blob:6d3e86b5dc04e5dfcd73e5844218983f898ca653",
+  "sha16": "sha256-lf16:83e642947d8bd5b4",
+  "commit": "db44a46a (built, branch worktree-wf_fa0ebf63-18c-3)",
+  "merged": "c5f23e7a (registrar's batch, by path; parent 17c34de9)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_hier-fair-backoff_tree-cut-granularity.md",
+  "commit": "17c34de9",
+  "verdict": "READY (C1-C3)"
+ },
+ "go": "the author's 2026-10-08 authorisation (relayed in the orchestrator's brief, words not supplied): register and run the zero-call batch a-f; no judged calls",
+ "run": {
+  "outcome_file": "experiment_results/archv2/hier_fair_backoff/outcome.txt (sha256 0214a5025bc933e569751a04a012367291e172510e0dcac27d7983b597791404, 127 lines; write-once, never committed); backup E:/TaxoArena_backup_20261008_hier_fair_backoff (SHA256SUMS 4/4 OK, review) (shared with HIER-FAIR-BACKOFF; one run)",
+  "outcome_commit": "outcome not committed (run from main after merge c5f23e7a)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "pv2_1575de61bb20e977 (content-closed under CK-CLOSE-v2, residual disclosed); gen_view c2930c60 / eval_view e35b7518 sha before = after; TRAIN-CV computed before the eval view opened; only the known -shm mtime moved (D-shm)",
+  "date": "2026-10-08"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_hier-fair-backoff_tree-cut-granularity.md",
+  "commit": "37672103",
+  "verdict": "VALID; R1 ROBUST (TAU200 and NO-XSRC both (KMEANS-BETTER, NEITHER)); F-BR NOT FIRED; W-2 (TAU200 planning SE 1.5x too small)"
+ },
+ "criteria": [
+  {
+   "id": "R1",
+   "text": "DECIDING: ROBUST iff the (HB1, HB2) words under TAU200 AND under NO-XSRC both equal HIER-FAIR-BACKOFF's; FRAGILE-TAU / FRAGILE-XSRC iff only that perturbation changes a word; FRAGILE-BOTH iff both. FRAGILE-TAU vs not SCOREABLE (TAU200 MDE80 0.41pp vs predicted -0.45); NO-XSRC side DESCRIPTIVE-ONLY (MDE80 0.55pp)",
+   "result": "HELD",
+   "value": "ROBUST (each leg below its measured MDE80; W-2): TAU200 D_final -0.00522 [-0.00947, -0.00097] KMEANS-BETTER, D_gain +0.00133 [-0.00316, +0.00600] NEITHER; NO-XSRC D_final -0.00513 [-0.00943, -0.00069] KMEANS-BETTER, D_gain +0.00097 [-0.00310, +0.00506] NEITHER; no word changed",
+   "denominator": "TAU200 11,841 / 10,781; NO-XSRC 11,530 / 10,474 (311 cross-source filings removed)"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "TAU200 D_final -0.45pp [-0.80, -0.10]; HB1 under TAU200 KMEANS-BETTER 0.60 / NEITHER 0.30 / PARITY 0.10",
+   "result": "HELD",
+   "value": "band: -0.522pp in [-0.80, -0.10] HELD; word KMEANS-BETTER (modal, 0.60) HELD, Brier 0.2600",
+   "denominator": "TRAIN-CV"
+  },
+  {
+   "id": "P2",
+   "text": "NO-XSRC D_final -0.08pp [-0.45, +0.30]; its HB1 word equal to the reference 0.80",
+   "result": "FAILED",
+   "value": "band: -0.513pp outside [-0.45, +0.30] FAILED; word equal to the reference (0.80) HELD, Brier 0.0400",
+   "denominator": "about 11,530 items"
+  },
+  {
+   "id": "P3",
+   "text": "R1 FRAGILE-TAU 0.55 / ROBUST 0.30 / FRAGILE-BOTH 0.10 / FRAGILE-XSRC 0.05",
+   "result": "FAILED",
+   "value": "observed ROBUST (forecast 0.30; modal FRAGILE-TAU 0.55); Brier 0.8050",
+   "denominator": "R1"
+  }
+ ],
+ "falsifier": {
+  "text": "F-BR fires iff R1 reads FRAGILE-XSRC or FRAGILE-BOTH (the words depend on AF-U's cross-source filings: quoted only with the D-4 filing qualifier); FRAGILE-TAU alone is TREE-BACKOFF's recorded tau-fragility, not a falsifier",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "R1": "ROBUST (each leg below its measured MDE80; W-2)",
+  "TAU200": "D_final -0.522pp [-0.947, -0.097] KMEANS-BETTER; D_gain +0.133pp [-0.316, +0.600] NEITHER; 11,841 / 10,781; SE 0.00220 (registered 0.00147), DEFF 2.074, MDE80 0.62pp (registered 0.41): registered SCOREABLE does not hold",
+  "NO-XSRC": "D_final -0.513pp [-0.943, -0.069] KMEANS-BETTER; D_gain +0.097pp [-0.310, +0.506] NEITHER; 11,530 / 10,474; SE 0.00224, DEFF 1.849, MDE80 0.63pp"
+ },
+ "sentence_of_record": "BACKOFF-ROBUST (2026-10-08, 0 calls) — VALID; R1 ROBUST (each leg below its measured MDE80): with tau fixed at 200 (D_final -0.522pp [-0.947, -0.097]) and without AF-U's 311 cross-source filings (-0.513pp [-0.943, -0.069]; 11,530 items / 10,474 components) HIER-FAIR-BACKOFF's words (KMEANS-BETTER, NEITHER) are unchanged. F-BR NOT FIRED. [POSTRUN docs/reviews/POSTRUN_hier-fair-backoff_tree-cut-granularity.md, 37672103, W-2: the TAU200 planning SE 0.147pp understated the measured 0.220pp 1.5x, so TAU200's registered SCOREABLE does not hold (0.52pp < MDE80 0.62pp); every arm [SC]; TRAIN-CV, not an independent replication.]",
+ "chips": [
+  "REGISTERED 2026-10-08, BEFORE ANY CODE",
+  "VALID (POST-RUN 37672103): R1 ROBUST; F-BR NOT FIRED",
+  "W-2: EACH LEG BELOW ITS MEASURED MDE80; TAU200 SE 0.220pp VS 0.147pp REGISTERED, ITS SCOREABLE DOES NOT HOLD"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-08",
+   "by": "registrar (docs/judge_v2_program.md L25147-L25157 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — rulings GAP-FIX-CC C-1 (B-3), SI-NULL-TRIAD B1 and SIN-2; ...\"; _as_of the commit that writes it, parent 17c34de9, re-grepped))",
+   "text": "READY; tool merged to main by path, blob verified. Same tool and run as HIER-FAIR-BACKOFF. Condition C2: an [HFB-CV-DENOM] refusal is a failed precondition (before the EVAL view), not an outcome: no re-pin, returned to the registrar."
+  },
+  {
+   "date": "2026-10-08",
+   "by": "registrar (POSTRUN 37672103, VALID; docs/judge_v2_program.md L25171-L25180 (section \"## BACKOFF-ROBUST (2026-10-08, 0 calls) — VALID (POSTRUN 37672103): ...\"; _as_of the commit that writes it, parent f4dd6292, re-grepped))",
+   "text": "OUTCOME bracket appended to READOUTS AND CRITERIA of the registration (L24994): R1 ROBUST (each leg below its measured MDE80; W-2); F-BR NOT FIRED. Relayed: future registrations transport the two-stage (seed-and-component) SE, not a component-only one."
+  },
+  {
+   "date": "2026-10-08",
+   "by": "registrar (D-2026-10-08)",
+   "text": "D-2026-10-08-1 (the author's words, now supplied verbatim): \"a. Certificates (recommended), b+c. Hierarchy tests (recommended), d. SCPB gate, e+f. GAP-FIX-CC and SuperGPQA\"; judged spend \"None for now (Recommended)\". The go of record is unchanged in substance. Source: docs/judge_v2_program.md L25317-L25327 (section \"## Author's decision 2026-10-08 (recorded by the registrar; zero calls; insertion only) — D-2026-10-08-1..6 ...\"; _as_of the commit that writes it, parent 5211616a, re-grepped); authority docs/agents/author_decisions/2026-10-08.md (5211616a); plan Amendment 40"
+  }
+ ],
+ "does_not_show": [
+  "that any tau is right (tau 200 is a perturbation)",
+  "a SCOREABLE word under either perturbation (W-2)",
+  "a filing-free comparison (NO-XSRC is a subset, [SC])",
+  "an independent replication",
+  "EVAL claims (HB3 legs descriptive)"
+ ],
+ "ledger": {
+  "row_id": "BACKOFF-ROBUST",
+  "version": "v417 (2026-10-08: OUTCOME bracket; VALID ok + W-2 warn chips beside REGISTERED) | v414 (2026-10-08: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "HIER-FAIR-BACKOFF (the reference words; same run)",
+  "TREE-BACKOFF (tau-fragility)",
+  "KEY-INFO-V2 (R-KI1's 191)"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none (as HIER-FAIR-BACKOFF)"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "minutes inside HIER-FAIR-BACKOFF's run",
+  "agent_hours": "shared with HIER-FAIR-BACKOFF",
+  "reads_pool": true
+ },
+ "outputs": "never committed: pinned by sha256, stored on E: with SHA256SUMS.txt; temp under E:/TaxoArena_tmp via scratch_dir",
+ "sources": [
+  "docs/judge_v2_program.md L24989-L25000 (_as_of the commit that writes it, parent d8ab39fa, re-grepped)",
+  "docs/judge_v2_program.md L24950-L24956 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — six zero-call tests registered ...\"; _as_of the commit that writes it, parent d8ab39fa, re-grepped)",
+  "docs/judge_v2_program.md L25147-L25157 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — rulings GAP-FIX-CC C-1 (B-3), SI-NULL-TRIAD B1 and SIN-2; ...\"; _as_of the commit that writes it, parent 17c34de9, re-grepped)",
+  "docs/judge_v2_program.md L25171-L25180 (section \"## BACKOFF-ROBUST (2026-10-08, 0 calls) — VALID (POSTRUN 37672103): ...\"; _as_of the commit that writes it, parent f4dd6292, re-grepped)",
+  "docs/judge_v2_program.md L25317-L25327 (section \"## Author's decision 2026-10-08 (recorded by the registrar; zero calls; insertion only) — D-2026-10-08-1..6 ...\"; _as_of the commit that writes it, parent 5211616a, re-grepped); authority docs/agents/author_decisions/2026-10-08.md (5211616a); plan Amendment 40"
+ ],
+ "last_update": "2026-10-08",
+ "label_status": "AF-U [SC]; every arm [SC]",
+ "pilot_disclosure": "SEEN before registration, pilot role only (never evidence): E:/TaxoArena_tmp/cert_split (results.json sha256 32fcf7cd8baa1367..., VERIFIED_HEADLINE.txt 98b32054b56bde7b...), E:/TaxoArena_tmp/hier_tests (granularity_free/results.json 2fc8ba3a99b8dc54..., nesting/results.json cb5a74cf0d870081..., test3_fair_backoff/results.json 866284ca1bb5cf98..., + review dirs), E:/TaxoArena_tmp/scpb/review_v3_synthesis.md d341748f5265229d...; 2026-10-07, zero calls, TRAIN only, not committed",
+ "plain_description": {
+  "sq": "SQ1 Use",
+  "what": "Re-reads the fair back-off comparison with the borrowing strength fixed instead of tuned, and with the items the tree files into another benchmark's cell removed. No judge calls.",
+  "why": "TREE-BACKOFF's gain depended on the tuned strength and partly on cross-benchmark filings; this checks whether the fair comparison's verdict depends on either.",
+  "information": "Shows whether the fair back-off verdict depends on the tuned blending strength or on cross-benchmark filings. Result: done, robust: with a fixed strength and without those filings the verdict (k-means slightly better, no difference in gain) is unchanged. Each difference is still below what the test could reliably call.",
+  "written": "2026-10-08"
+ }
+}

@@ -1,0 +1,192 @@
+{
+  "id": "SYSTEMATIC-BUDGET",
+  "title": "SYSTEMATIC-BUDGET: fit the continuous widener SYSTEMATIC-SIGNAL licensed; does a fitted systematic budget calibrate the certificate? (zero calls)",
+  "question": "Four functional forms (additive variance, directional shift, recalibration, conformal) derived, fitted and adversarially reviewed on the 891 x12 edges (44 wrong); a form is ADOPTABLE only if all four hold: (1) leave-one-ANCHOR-out calibration (realised wrong-direction rate at or below nominal); (2) utility >= 60% of edges still called at 95% nominal; (3) no key at inference; (4) at most 3 free parameters. Headline prediction: the adopted budget WILL withdraw the arx/iask separation.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "55fb9bf",
+    "program_lines": "docs/judge_v2_program.md L2424-L2459",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-14 (before any fit is run, ZERO calls) — SYSTEMATIC-BUDGET: fit the widener SYSTEMATIC-SIGNAL licensed",
+    "outcome_heading": [
+      "L2664: - **SYSTEMATIC-BUDGET (2026-09-14, zero calls): all four registered criteria PASS, the registered headline prediction HELD, the registered FALLBACK is falsified — and three numbers I published earlier are corrected.**",
+      "L3099: ## REVIEW of the 2026-09-14/15 session (2026-09-15, zero calls) — three headline conclusions are artefacts (criterion (1) 'PASS' carried by the 228 uncalled edges; UNDETERMINED at the operating point)"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "tools/analysis/systematic_budget.py (the shipped widener's helpers: build, mcnemar_edge, established, nll, fit, summarise)",
+    "sha16": "9ace178d5ba1724e (at be1b0d7)",
+    "commit": "be1b0d7 (later 4ec8f18 review fixes, 1ab53e0 McNemar integer fix, 1d9c779, 13f2142)"
+  },
+  "ready": null,
+  "go": "n/a (0 calls; workflow fit-systematic-budget)",
+  "run": {
+    "outcome_file": "docs/design/RESOLVE_budget.md (the derivation and the adopted budget; the fit reproduces to the digit from systematic_budget.py)",
+    "outcome_commit": "be1b0d7",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-14",
+    "other_files": [
+      "docs/design/RESOLVE_budget.md amended 7623f02 (adopted split) and 4ec8f18 (the deleted off-roster amendment restored as a bracketed correction)"
+    ]
+  },
+  "review": {
+    "file": "the four forms were adversarially verified inside the workflow (scores additive variance 76, recalibration 72, conformal 54, directional shift 47) and the winner rebuilt independently from the repo's own construction (reproduces to the digit); docs/review_session_2026-09-14.md (ba12200) later found criterion (1)'s 'PASS in aggregate' carried by the 228 uncalled edges",
+    "commit": "ba12200",
+    "verdict": "(2) (3) (4) PASS; (1) UNDETERMINED at the operating point; prediction HELD; fallback falsified; three published numbers corrected"
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "CALIBRATION under leave-one-ANCHOR-out (14 folds): realised wrong-direction rate at or below nominal",
+      "result": "UNDETERMINED",
+      "value": "in aggregate PASS (out-of-fold nominal 48.7 vs 44 observed over all 891 edges) but carried by the 228 edges the certificate never calls (41 wrong vs 47.4 nominal); at the operating point LOAO 663 called / 3 wrong / 1.27 nominal = 2.4x, Poisson P(>= 3) 0.135: neither calibrated nor detectably miscalibrated; a doubled widener also passes the aggregate, so the aggregate has no bite against over-widening: UNDETERMINED [CORRECTED 2026-09-15 by the REVIEW]; the raw certificate's 739 / 8 / 0.83 = 9.7x is miscalibrated at p < 1e-4 (consistent rows 738/7/0.75 = 9.3x or 739/8/0.76 = 10.5x)",
+      "denominator": "891 x12 edges (key gap >= 0.02), 14 anchors; unfiltered 920: LOAO 646/3/1.28 = 2.3x"
+    },
+    {
+      "id": "(2)",
+      "text": "UTILITY: still calls at least 60% of the 891 edges at 95% nominal",
+      "result": "HELD",
+      "value": "74.4% (663 of 891); unfiltered 70.2%",
+      "denominator": "891 / 920 edges"
+    },
+    {
+      "id": "(3)",
+      "text": "NO KEY AT INFERENCE",
+      "result": "HELD",
+      "value": "tau(A) = exp(b0 + b1 A) needs only the pair's answer agreement A; the two-predictor form (with reference accuracy, LOAO deviance 193.55 vs 216.94) is NOT deployable because reference accuracy is key-derived (correction (a)); criterion (3) forced the weaker model",
+      "denominator": "the adopted form"
+    },
+    {
+      "id": "(4)",
+      "text": "PARAMETER DISCIPLINE: at most 3 free parameters",
+      "result": "HELD",
+      "value": "two parameters (b0 -3.2326, b1 +3.3133), no bins, no fitted threshold",
+      "denominator": "the adopted form"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "the adopted budget WILL withdraw the arx/iask separation",
+      "result": "HELD",
+      "value": "arx/iask raw certificate 1.0000 -> 0.7805, call withdrawn",
+      "denominator": "the pooled 66-pair board"
+    },
+    {
+      "id": "P2",
+      "text": "(B) directional shift fits best in sample and fails (3)",
+      "result": "FAILED",
+      "value": "it scored last (47) and failed on mis-specification",
+      "denominator": "four forms"
+    },
+    {
+      "id": "P3",
+      "text": "(A) and (C) pass (1) in sample and at least one degrades materially under LOAO",
+      "result": "FAILED",
+      "value": "PARTLY: both survived",
+      "denominator": "four forms"
+    },
+    {
+      "id": "P4",
+      "text": "(D) conformal passes (1) and fails (2)",
+      "result": "FAILED",
+      "value": "voided for fitting label noise (f = 1.865 collapses to exactly 1.000 on established-direction edges), not utility",
+      "denominator": "four forms"
+    }
+  ],
+  "falsifier": {
+    "text": "NULL IS PUBLISHABLE: if no form clears all four, 44 wrong edges cannot support a fitted systematic budget and RESOLVE ships the conformal per-stratum threshold as a stated limitation",
+    "fired": false,
+    "note": "the FALLBACK itself was falsified (a fit to label noise); ADOPTED: tau(A) = exp(-3.2326 + 3.3133 A) added in quadrature to the bootstrap SD, call iff min(c_raw, Phi(|m| / sqrt(s^2 + tau^2))) >= 0.975; tau 0.107 / 0.288 / 0.778 at A 0.30 / 0.60 / 0.90 vs bootstrap s median 0.246; 0 of 891 edges made more confident; adoption SPLIT: the fitted widener per anchor, a plain agreement gate pooled (v87) [POOLED-RESTATE 2026-09-15 dropped the 'gate strictly dominates pooled' claim]"
+  },
+  "numbers_of_record": {
+    "adopted": "b0 -3.2326, b1 +3.3133; c = min(c_raw, Phi(|m| / sqrt(s^2 + tau^2))), call iff c >= 0.975",
+    "table": "raw 739 / 8 / 0.83 / 9.7x; in sample 665 / 2 / 1.30 / 1.5x; LOAO 663 / 3 / 1.27 / 2.4x; out-of-fold nominal 48.7 vs 44 observed",
+    "operating_point": "3 vs 1.27, Poisson P(>= 3) 0.135: UNDETERMINED; the aggregate PASS carried by the 228 uncalled edges (41 wrong vs 47.4 nominal)",
+    "corrections_to_published_numbers": "(a) reference accuracy is key-derived, not a free signal (SYSTEMATIC-SIGNAL); (b) the honest wrong-call rate is 1.47% (920 edges, 60 wrong, 748 called / 11 wrong), not 1.08%; (c) 18 of 44 wrong-direction labels are unestablished (809 established); b1 3.3133 -> 2.1430 on established edges",
+    "derivation_correction": "the pooled board carries ONE called inversion, not two (the Llama-3.1-8B / command-r pair has a key gap of -0.0018 and the arena agrees with the key); per anchor the budget dominates a gate at matched error (663/3 losing 71 correct vs the gate's 608/3 losing 126); pooled a one-line gate at A < 0.85 read as strictly dominating (61/0 losing one correct vs 57/0 losing five) -> adopted split [dropped by POOLED-RESTATE]; the three surviving wrong calls are LOW agreement (0.475 / 0.476 / 0.605) [LOW-AGREEMENT: above the median 0.441]",
+    "criterion_1_output_of_record": "experiment_results/x12_crossdomain/systematic_budget_2026-09-23_corrected.txt (sha256 55ef9b3d453bf3a656297c69dbfffb57383333094a36850c96ef0e6dd0ace66e; committed 2026-09-23, byte-identical to the M2 run's after.txt): 'CALLED set at the 0.975 operating point: UNDETERMINED (nominal < 3)'; 'wrong(established) 3(2) of 663 called vs 1.27 nominal = 2.4x (status word: FRAMEWORK L101)'. The 2026-09-14 file (sha256 c4c26a4d...) is kept unchanged as history. [RENDERING 2026-09-23 by the registrar (rule 10): the sha256 values quoted in this section, c4c26a4d... (the 2026-09-14 file) and 55ef9b3d... (the corrected file), are the CRLF WORKING-TREE renderings, which the M2 run compared. The LF renderings OF RECORD are: systematic_budget.txt LF sha256 1ded289076a43e8470e3a3baca40ab1f8350961ef472d90eccfd466de53abdab; systematic_budget_2026-09-23_corrected.txt LF sha256 ac48c9dff14429ad744439f9027e2e2c6abb01bd2465defa306890c6a4e51e0c (git blob 02f5ac7aa051165c173b46ff095d32d2b166f489, committed 00ec166). The byte-identity with after.txt holds in the CRLF rendering in which both were written.]"
+  },
+  "sentence_of_record": "SYSTEMATIC-BUDGET (2026-09-14, zero calls): ADOPTED tau(A) = exp(b0 + b1 A) with b0 = -3.2326, b1 = +3.3133, added in quadrature to the bootstrap SD; call iff min(c_raw, Phi(|m| / sqrt(s^2 + tau^2))) >= 0.975; two parameters, no bins, no fitted threshold, no key at inference; raw 739 called / 8 wrong / 0.83 nominal = 9.7x -> budget LOAO 663 / 3 / 1.27 = 2.4x; the honest claim is that it removes an established miscalibration (p < 1e-4) and replaces it with one that is no longer detectable (3 events, p = 0.13), not that it calibrates. PREDICTION HELD: arx/iask 1.0000 -> 0.7805, call withdrawn. FALLBACK FALSIFIED. Three corrections to published numbers (reference accuracy key-derived; 1.47% not 1.08%; 18 of 44 labels unestablished). [CORRECTED 2026-09-15 by the REVIEW: criterion (1) 'PASS in aggregate' is carried by the 228 uncalled edges; at the operating point it is 3 wrong vs 1.27 nominal, UNDETERMINED; a doubled widener also passes the aggregate.]",
+  "chips": [
+    "(2)(3)(4) PASS",
+    "(1) UNDETERMINED AT THE OPERATING POINT",
+    "PREDICTION HELD",
+    "FALLBACK FALSIFIED",
+    "3 PUBLISHED NUMBERS CORRECTED"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-15",
+      "by": "the adversarial REVIEW (ba12200; programme L3099) and the v94 correction by insertion (4ec8f18; ledger observed cell [CORRECTED 2026-09-15])",
+      "text": "criterion (1) 'PASS in aggregate' (48.7 nominal vs 44 observed) is carried by the 228 edges the certificate never calls; at the operating point 3 wrong vs 1.27 nominal, 2.4x, Poisson P(>= 3) 0.135: UNDETERMINED; the four-form predictions scored ((B) FAILED, (A)/(C) PARTLY, (D) FAILED); the key-gap filter declared undeployable was kept in every fit (unfiltered LOAO 646/3/1.28 = 2.3x, utility 70.2%); the raw row's 9.7x mixes an empirical called set with a Gaussian nominal."
+    },
+    {
+      "date": "2026-09-15",
+      "by": "POOLED-RESTATE (FRAMEWORK item 4)",
+      "text": "the v87 'gate strictly dominates the widener pooled' claim is dropped; on the merged pooled board of record the widener + decline wins at matched surrenders (150/0/18 vs the OOF gate's 150/2/20)."
+    },
+    {
+      "date": "2026-09-16",
+      "by": "GROK-CALIB / JUDGE-WIRING-BOARD / ITEM-26-POOLED",
+      "text": "the same widener fitted on the shipped judge reproduces the Mistral shape (b1 +3.39 vs +3.31); the established-label identification is re-draw-fragile at ~26 events and identified on the pooled draws at the registered bar only (p ~ 0.07)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar (insertion only, zero calls)",
+      "text": "CODE MERGED at 27b6879 (systematic-budget-fix: criterion (1) prints FRAMEWORK L101's status word on the CALLED set, --edges REQUIRED, status_word's home moved to calibration_status.py; review 73f2dc2, MERGEABLE-WITH-CONDITIONS). M2 BINDING: no file of record is regenerated by the new code until the real-data before/after passes (one hunk at criterion (1); sha256 of the file of record unchanged; x12 line 'UNDETERMINED (nominal < 3)', 3(2) of 663 called vs 1.27 nominal). No number of this record moves. Queue item SYSTEMATIC-BUDGET-FIX (state built)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar (insertion only, zero calls; the M2 run verified against its scratch outputs)",
+      "text": "SYSTEMATIC-BUDGET-FIX M2 MET (one hunk at criterion (1), 93 of 94 lines identical, file of record unchanged). The output of record for criterion (1) is now experiment_results/x12_crossdomain/systematic_budget_2026-09-23_corrected.txt (sha256 55ef9b3d453bf3a656297c69dbfffb57383333094a36850c96ef0e6dd0ace66e); the 2026-09-14 systematic_budget.txt is NOT overwritten and still prints the refuted 'PASS in aggregate' once, read as history. Programme L13748-L13782."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar (rule 10, insertion only)",
+      "text": "[RENDERING 2026-09-23 by the registrar (rule 10): the sha256 values quoted in this section, c4c26a4d... (the 2026-09-14 file) and 55ef9b3d... (the corrected file), are the CRLF WORKING-TREE renderings, which the M2 run compared. The LF renderings OF RECORD are: systematic_budget.txt LF sha256 1ded289076a43e8470e3a3baca40ab1f8350961ef472d90eccfd466de53abdab; systematic_budget_2026-09-23_corrected.txt LF sha256 ac48c9dff14429ad744439f9027e2e2c6abb01bd2465defa306890c6a4e51e0c (git blob 02f5ac7aa051165c173b46ff095d32d2b166f489, committed 00ec166). The byte-identity with after.txt holds in the CRLF rendering in which both were written.]"
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a calibrated certificate (UNDETERMINED at the operating point; 'calibrated' is declined by rule in FRAMEWORK)",
+    "a deployable two-predictor budget (reference accuracy is key-derived)",
+    "transfer across rosters or judges (BUDGET-TRANSFER UNDETERMINED; JUDGE-TRANSFER UNDETERMINED at the operating point)"
+  ],
+  "ledger": {
+    "row_id": "SYSTEMATIC-BUDGET",
+    "version": "v94 (row added v84 at 47bdbec as running; outcome v86 be1b0d7; adopted split v87 7623f02; [UNDER CORRECTION] v92; [CORRECTED 2026-09-15] v94 at 4ec8f18); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "SYSTEMATIC-SIGNAL",
+    "TIER-HONEST",
+    "RESOLVE-CALIB"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L2424-L2459 (registration 55fb9bf); L2664-L2729 (outcome be1b0d7); L3099-L3145 (REVIEW ba12200)",
+    "docs/design/RESOLVE_budget.md (be1b0d7 / 7623f02 / 4ec8f18): the derivation and the adopted budget",
+    "docs/test_ledger.html row SYSTEMATIC-BUDGET (v84 -> v94): chips verbatim, observed cell with its corrections, evidence (systematic_budget.py, RESOLVE_budget.md, 55fb9bf, be1b0d7)",
+    "script sha16 = sha256 of tools/analysis/systematic_budget.py at be1b0d7, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (rubric_v2_design.md / multi_corpus_design.md lines as of their last commits named in sources)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Fits four candidate forms of an extra uncertainty margin ('systematic budget') for the board's 'A beats B' certificate, using 891 model pairs with 44 known-wrong directions. Each form is checked by leaving one category out at a time. No calls.",
+    "why": "The raw certificate was overconfident, so the test asks whether a fitted margin can make it honest.",
+    "information": "Adopting a calibrated margin would make 'A beats B' calls trustworthy. Result: a two-parameter margin was adopted. It cuts the overconfidence from 9.7x to 2.4x, a level no longer detectable (3 events), but it is not shown to be calibrated. As predicted, it withdraws a disputed top-pair call. Transfer to other boards or judges is undetermined. Later ruled 'history, not evidence'.",
+    "written": "2026-10-07"
+  }
+}

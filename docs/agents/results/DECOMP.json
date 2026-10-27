@@ -1,0 +1,109 @@
+{
+  "id": "DECOMP",
+  "title": "DECOMP: is the ARENA-13 +7.9pp self-preference, or just a reference that happens to agree with one contestant? (zero calls)",
+  "question": "The 598 paired frontier matches split by which answer each reference endorses; Kitagawa decomposition into composition and residual; a byte-identical-prompt stratum where the two references give the same letter; verdict rule fixed before looking: residual < 2pp and not significant on the cell-matched McNemar => amend the claim.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "24cf708",
+    "program_lines": "docs/judge_v2_program.md L1177-L1205 (registration) and L1259-L1290 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-14 (before looking at any result, ZERO calls) — DECOMP: is the +7.9pp self-preference, or answer coincidence?",
+    "outcome_heading": [
+      "L1259: - **DECOMP OUTCOME (2026-09-14, zero calls): the ARENA-13 self-preference claim is AMENDED. The +7.9pp is"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "tools/analysis/decomp_selfpref.py",
+    "sha16": "5ad783a7f77fe8cc (at b28a475)",
+    "commit": "b28a475"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/decomp_outcome.txt",
+    "outcome_commit": "b28a475",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-14"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); TEMP-0 (2026-09-14) tested whether the 5.7% floor is a temperature default (it is not)",
+    "commit": "b28a475",
+    "verdict": "AMENDED: no self-preference survives; reference-agreement leakage; by-product: the judge's test-retest noise 5.7%"
+  },
+  "criteria": [
+    {
+      "id": "rule",
+      "text": "residual < 2pp and not significant on the cell-matched McNemar => amend the claim",
+      "result": "HELD",
+      "value": "the grok reference endorses the grok contestant on 68.7% of matches vs the ensemble's 41.3%; COMPOSITION +0.116 (CI +0.092..+0.142) = 148% of the gap; RESIDUAL -0.037 (CI -0.063..-0.011); cell-matched McNemar p = 0.45: claim amended",
+      "denominator": "598 paired frontier matches"
+    },
+    {
+      "id": "by-product",
+      "text": "the byte-identical-prompt stratum",
+      "result": "DELIVERED",
+      "value": "on the 299 matches where both references give the same letter the prompts are BYTE-IDENTICAL and the arms still disagree on 5.7%: the judge's test-retest noise, the floor under every paired result in this campaign",
+      "denominator": "299 byte-identical matches"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "the claim becomes reference-agreement leakage: a shared reference inflates whichever contestant mirrors it; vendor identity need not enter"
+  },
+  "numbers_of_record": {
+    "composition": "+0.116 (CI +0.092..+0.142) = 148% of the gap",
+    "residual": "-0.037 (CI -0.063..-0.011); McNemar p 0.45",
+    "endorsement": "68.7% vs 41.3%",
+    "test_retest_noise": "5.7% (299 byte-identical prompts)"
+  },
+  "sentence_of_record": "DECOMP (2026-09-14, zero calls): the ARENA-13 self-preference claim is AMENDED: the grok reference endorses the grok contestant on 68.7% of matches vs the ensemble's 41.3%; composition +0.116 (CI +0.092..+0.142) = 148% of the gap; residual -0.037 (CI -0.063..-0.011); cell-matched McNemar p = 0.45; no self-preference survives, the claim becomes reference-agreement leakage. By-product: on the 299 matches with byte-identical prompts the arms still disagree on 5.7%, the judge's test-retest noise, measured for the first time, and the floor under every paired result in this campaign.",
+  "chips": [
+    "AMENDED"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "vendor self-preference",
+    "a floor below 5.7% at the default temperature (TEMP-0: 5.0%, CI includes zero)"
+  ],
+  "ledger": {
+    "row_id": "DECOMP",
+    "version": "v70 (cdee03a); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "ARENA-13",
+    "CONSENSUS-FIT",
+    "TEMP-0",
+    "POSITION-DECOMP"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L1177-L1205 and L1259-L1290 (24cf708 / b28a475)",
+    "experiment_results/x12_crossdomain/decomp_outcome.txt (b28a475)",
+    "docs/test_ledger.html row DECOMP (v70): chips verbatim, observed cell, evidence",
+    "script sha16 = sha256 of tools/analysis/decomp_selfpref.py at b28a475, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Splits the 598 paired frontier matches from ARENA-13 by which answer each reference supports. It then separates the +7.9-point gap into a part caused by the reference agreeing with a contestant and a remaining part. No judge calls.",
+    "why": "Tests whether ARENA-13's apparent judge self-preference is real or just the reference siding with one contestant.",
+    "information": "A large remaining part would mean genuine self-preference. A remaining part near zero would mean the reference's agreement leaks into the verdict. Result: the claim was amended. Reference agreement explains all of the gap, and no self-preference is left. As a by-product, on 299 matches with byte-identical prompts the judge still disagreed with itself 5.7% of the time. That is the judge's repeat-noise floor. This test belongs to the older question pool, so it now counts as history, not evidence.",
+    "written": "2026-10-07"
+  }
+}

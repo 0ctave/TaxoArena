@@ -1,0 +1,175 @@
+{
+ "id": "GRANULARITY-SWEEP",
+ "title": "GRANULARITY-SWEEP: does the union routing gain of per-source k-means cells merged by Ward (about 25/50/100/200/400 cells) peak at an interior granularity chosen on GATE, with R2_int, per-cell support and the AF-U tree cut beside? (zero calls; REGISTERED 2026-10-06)",
+ "question": "Is there a best granularity for cell-level capability profiles on the content-closed v2 union split?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "9bff7e39",
+  "program_lines": "docs/judge_v2_program.md L24828-L24840",
+  "program_lines_as_of": "9bff7e39 (as registered); brackets appended to L24832, L24834, L24835 in the commit that writes this update (parent c963f646), re-grepped",
+  "date": "2026-10-06",
+  "heading": "## Registered 2026-10-06 (before any code or call) — GRANULARITY-SWEEP: ...",
+  "provenance": "the author's \"start 1 to 4\" (2026-10-06, in the chat; the four tests of the orchestrator's brief of 2026-10-06); registrar's record docs/judge_v2_program.md L24808-L24812; deciding clause, Support and predictions the registrar's, pre-data"
+ },
+ "script": {
+  "path": "tools/analysis/granularity_sweep.py (imports union_route_common.py d5473976, union_cells_io.py 92a04543, union_af_route.py bf3f17db, v2_declared_cells.py f0f56805, resp_profile_info.py 1817ec8a, construction_arms.py 5d08a5df unchanged; git blobs, LF)",
+  "sha16": "sha256-lf16:68e62892525683aa (blob:1cf20fe88993bbcdfb780fd34a1b3de38dcf6cf8, LF of record; sha256-crlf16:66012b9f5f98fb11 beside; copied from READY_granularity-sweep c963f646)",
+  "commit": "d7ab9629 (branch granularity-sweep, parent 9bff7e39); merged by path 000ae9cf (1 path; git hash-object on main = 1cf20fe8, POSTRUN 6a178741)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_granularity-sweep.md (sections '## VERDICT: READY (no blocker)' and '## Delta round 2026-10-06 (tip d7ab9629 unchanged; zero calls)')",
+  "commit": "c963f646"
+ },
+ "go": "n/a (0 calls; the 4k-match rule not engaged); the author's \"start 1 to 4\" (2026-10-06, in the chat; the four tests of the orchestrator's brief of 2026-10-06)",
+ "run": {
+  "outcome_file": "experiment_results/archv2/granularity_sweep/granularity_sweep_outcome.txt (sha256 989023540370dc4626eb9aa37e49a8e6c603b73961c68410d79dde11f2035363, LF file; write-once, never committed; 236 lines); backup E:/TaxoArena_backup_2026-10-06_granularity-sweep (outcome, READ_STARTED, run.log, dryrun.log, run_launch.log; SHA256SUMS 5/5 OK, re-checked by the registrar)",
+  "outcome_commit": "outcome not committed (run from main after merge 000ae9cf)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "pv2_1575de61bb20e977 (content-closed under CK-CLOSE-v2, residual disclosed); view sha256 before = after (gen c2930c60..., eval e35b7518...); C-1 PARTLY MET (PR-1 MEDIUM): detached PID 76908, busy_rc=1, but GAP-FIX part b (PID 61508, a pool reader) started 17:12:38 inside the window 17:01-18:33; both read-only; numbers unaffected",
+  "date": "2026-10-06"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_granularity-sweep.md",
+  "commit": "6a178741",
+  "verdict": "VALID; GS1 NOT-SHOWN (D_lo's 95% two-stage lower bound -0.00151 <= 0) as registered; F-GS NOT FIRED; points and 30 per-seed values recomputed to the digit; own two-stage bootstrap B 500 SD 0.00432 / 0.00457 vs printed 0.00429 / 0.00459; words W-1..W-4; PR-1 MEDIUM (process), PR-2..PR-5 LOW"
+ },
+ "criteria": [
+  {
+   "id": "GS1",
+   "text": "DECIDING, the POINTS AND the INTERVALS jointly, one clause: k* = argmax of mean_s G_KW(k) on GATE (ties to the smaller k); INTERIOR-MAX iff k* in {50, 100, 200} AND on EVAL both G_KW(k*) - G_KW(25) and G_KW(k*) - G_KW(400) > 0 with 95% two-stage lower bounds > 0; NOT-SHOWN otherwise (sub-reason printed). Verdict line DESCRIPTIVE-ONLY at the prediction (+0.4pp < joint MDE80 1.99pp)",
+   "result": "FAILED",
+   "value": "NOT-SHOWN (INTERIOR-MAX refuted at the planned n), sub-reason D_lo's 95% two-stage lower bound -0.00151 <= 0. k* = 100 on GATE (GATE mean G_KW +0.53 / +0.53 / +0.82 / +0.72 / -0.73pp at k 25 / 50 / 100 / 200 / 400; margin over k 200 0.10pp vs GATE SE about 1.05pp). EVAL D_lo = +0.69pp [-0.15, +1.53], D_hi = +1.55pp [+0.65, +2.45] (two-stage 95%, Wald, the registered form; PR-3). Verdict line DESCRIPTIVE-ONLY stands",
+   "denominator": "5,907 EVAL items / 5,404 CK-CLOSE components (Kish 1.311); x 5 KW seeds, paired across k"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "mean_s G_KW on EVAL: k 25 +1.5pp [+0.5, +2.5], k 50 +1.8pp [+0.8, +2.8], k 100 +1.9pp [+0.9, +2.9], k 200 +1.7pp [+0.7, +2.7], k 400 +1.5pp [+0.3, +2.5]",
+   "result": "HELD",
+   "value": "5/5: G_KW +1.571 / +1.971 / +2.262 / +2.191 / +0.711pp at k 25 / 50 / 100 / 200 / 398, each in its band",
+   "denominator": "5,907 EVAL items / 5,404 CK-CLOSE components (Kish 1.311)"
+  },
+  {
+   "id": "P2",
+   "text": "k* (GATE) in {50, 100, 200}, probability 0.60",
+   "result": "HELD",
+   "value": "TRUE: k* 100 (interior); Brier 0.16 one-sided (outcome prints two-class 0.32; PR-4)",
+   "denominator": "GATE 1,944 key-complete items"
+  },
+  {
+   "id": "P3",
+   "text": "GS1: INTERIOR-MAX 0.07, NOT-SHOWN 0.93 (Brier)",
+   "result": "HELD",
+   "value": "NOT-SHOWN at 0.93; Brier 0.0049 one-sided (outcome prints two-class 0.0098; PR-4)",
+   "denominator": "5,907 EVAL items / 5,404 CK-CLOSE components (Kish 1.311)"
+  },
+  {
+   "id": "P4",
+   "text": "descriptive: R2_int_KW(100) in [+0.045, +0.065] (informed by the seen K0 +0.0576); R2_int_KW lower at k 400 than at k 100, probability 0.60",
+   "result": "HELD",
+   "value": "band HELD (R2_int_KW(100) +0.0573 in [+0.045, +0.065]); direction TRUE (+0.0484 at 398 < +0.0573), Brier 0.16 one-sided (two-class 0.32 printed)",
+   "denominator": "5,907 EVAL items / 5,404 CK-CLOSE components (Kish 1.311)"
+  },
+  {
+   "id": "P5",
+   "text": "descriptive: share of EVAL items in cells with TRAIN >= 309: k 25 0.85 [0.65, 1.00], k 400 0.03 [0.00, 0.15]",
+   "result": "HELD",
+   "value": "2/2: 0.864 at k 25 in [0.65, 1.00]; 0.027 at k 398 in [0.00, 0.15]",
+   "denominator": "5,907 EVAL items / 5,404 CK-CLOSE components (Kish 1.311)"
+  },
+  {
+   "id": "P6",
+   "text": "descriptive: TC minus KW at k 100 -0.3pp [-1.5, +0.9]",
+   "result": "HELD",
+   "value": "TC - KW at k 100 -0.40pp (-0.00400) in [-1.5, +0.9]; descriptive, confounded (D-3)",
+   "denominator": "5,907 EVAL items / 5,404 CK-CLOSE components (Kish 1.311)"
+  }
+ ],
+ "falsifier": {
+  "text": "F-GS fires iff on EVAL G_KW(25) - G_KW(100) > 0 with 95% two-stage lower bound > 0: coarse cells route better than cells at the tree's own scale; overturns the reading that AF-U-scale cells carry routing value beyond coarse cells (UNION-AF-ROUTE U1; ROUTE-SOURCE-NULL RWS band); 123-cell routing numbers read as over-split",
+  "fired": false,
+  "observed": "NOT FIRED: G_KW(25) - G_KW(100) = -0.69pp [-1.53, +0.15] (point < 0)"
+ },
+ "numbers_of_record": {
+  "support": "DEFF 1.847 measured two-stage (ROUTE-SOURCE-NULL D_S, 6 vs 123 cells; realised SE 0.599pp); seed term from UNION-AF-ROUTE spread_K 0.58pp: sigma 0.249pp, sqrt(2/5) x 0.249 = 0.158pp (unpaired, conservative); SE(D) sqrt(0.599^2 + 0.158^2) = 0.620pp; n_eff 3,198; MDE80 one contrast 1.74pp, both jointly 1.99pp; DESCRIPTIVE-ONLY at the prediction; GATE choice of k* noisy (GATE SE about 1.05pp)",
+  "k_star": "100 on GATE (1,944 items; interior; 0.10pp ahead of k 200 vs GATE SE about 1.05pp: a noisy choice)",
+  "G_KW_EVAL": "+1.571 / +1.971 / +2.262 / +2.326 / +2.191 / +0.711pp at k 25 / 50 / 100 / 123 / 200 / 398 (seed means; EVAL 5,907 items / 5,404 components; [SC])",
+  "D_lo": "+0.69pp (+0.00691) [-0.15, +1.53] two-stage 95% (lower -0.00151); EVAL 5,907 / 5,404, 5 seeds paired",
+  "D_hi": "+1.55pp (+0.01551) [+0.65, +2.45] two-stage 95%; never read as over-splitting (D-4)",
+  "F_GS": "G_KW(25) - G_KW(100) = -0.69pp [-1.53, +0.15]; NOT FIRED",
+  "support_realised": "SE_2stage 0.429 / 0.459pp (D_lo / D_hi; reg 0.620); two-stage variance ratio 2.44 / 3.26 (reg 1.847, same kind; PR-2); component-only DEFF 1.065 / 0.989; n_eff 2,422 / 1,811 (reg 3,198); MDE80 one 1.20 / 1.28pp, joint 1.38 / 1.47pp (reg 1.74 / 1.99); DESCRIPTIVE-ONLY stands",
+  "descriptive": "KF +1.70 / +2.08 / +2.25 / +1.97 / +0.71pp; without BBH G_KW +0.21..+0.60pp at k 25-200, D_lo +0.38pp [-0.57, +1.33]; R2_int_KW +0.0573 at 100, +0.0484 at 398; TC - KW -0.40pp at 100, -0.80pp [-1.70, +0.10] at 123 (D-3 confounded); EVAL share in cells with TRAIN >= 309 0.864 at 25, 0.027 at 398",
+  "identity": "best single 0.6049, AF-U 0.6201, K0 0.6271; TC at 123 = 0.6201 (REPRODUCED)"
+ },
+ "sentence_of_record": "GRANULARITY-SWEEP (2026-10-06, 0 calls) — VALID; GS1 NOT-SHOWN, DESCRIPTIVE-ONLY; F-GS NOT FIRED. k* = 100 on GATE (interior; 0.10pp ahead of k 200 against a GATE SE of about 1.05pp: a noisy choice). On EVAL, D_lo = G_KW(100) - G_KW(25) = +0.69pp [-0.15, +1.53] (two-stage 95%; lower bound <= 0) and D_hi = G_KW(100) - G_KW(400) = +1.55pp [+0.65, +2.45]. An interior maximum of the routing gain in granularity is not shown at this support. [POSTRUN docs/reviews/POSTRUN_granularity-sweep.md, 6a178741, W-1..W-4: points and 30 per-seed values recomputed to the digit, own two-stage SE within 1%; D_hi never read as over-splitting (D-4); realised SE 0.43 / 0.46pp vs 0.62 registered, MDE80 joint 1.38 / 1.47pp vs 1.99; C-1 partly met (PR-1); EVAL 5,907 items / 5,404 components; [SC].]",
+ "chips": [
+  "REGISTERED 2026-10-06, BEFORE ANY CODE",
+  "VALID (POST-RUN 6a178741): GS1 NOT-SHOWN [SC]; AN INTERIOR MAXIMUM IS NOT SHOWN AT THIS SUPPORT; DESCRIPTIVE-ONLY; F-GS NOT FIRED",
+  "W-1..W-4: k* 100 A NOISY GATE CHOICE; D_hi NEVER READ AS OVER-SPLITTING (D-4); WALD INTERVAL ONLY (PR-3); REALISED SE 0.43 / 0.46pp; C-1 PARTLY MET (PR-1)"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-06",
+   "by": "registrar (READY_granularity-sweep c963f646, READY, no blocker)",
+   "text": "pre-data brackets in the registration: INSTRUMENT L24832 (instrument = granularity_sweep.py blob:1cf20fe8, LF; crlf16 66012b9f; build d7ab9629 on branch granularity-sweep, not merged, merge by path; GS-R1 allocation 25/50/100/123/200/398, GS-R2 skm_best n_init 5 (with D-1), GS-R5 TC counts structural TRAIN items, overshoot allowed (with D-3), GS-R8 seeds resampled with replacement on a second stream default_rng(20261006), D-2 factor 0.8 on the seed variance (total SE 0.6194 -> 0.6154pp, immaterial), GS-R10 R2_int 3PL re-fit per replicate: CONFIRMED), READOUTS AND CRITERIA L24834 (D-1: KW and KF use construction_arms.skm_best (n_init 5), not K_s's spherical_kmeans (n_init 1); G_KW(123) is not G_K, no KW-vs-K_s difference is read; D-3: TC - KW (and P6) is shape- and count-confounded and filing-asymmetric, not a tree-vs-k-means quality comparison; D-4: a D_hi lower bound > 0 is expected under the null from estimation noise and is never read as over-splitting), SUPPORT L24835 (D-5; C-1: --run launched detached (Start-Process), polled, busy.ps1 rc 1 confirmed before launch; C-2: realised DEFF, n_eff, MDE80 of D_lo and D_hi printed against 1.847 / 3,198 / 1.74pp / 1.99pp, DEFF re-measured from the replicate SDs). GS1, Support, predictions and DESCRIPTIVE-ONLY at the prediction unchanged. Record docs/judge_v2_program.md L24904-L24909."
+  },
+  {
+   "date": "2026-10-06",
+   "by": "registrar (POSTRUN 6a178741, VALID)",
+   "text": "OUTCOME brackets in the registration: READOUTS AND CRITERIA L24834 (GS1 NOT-SHOWN, F-GS NOT FIRED, W-1, W-2 / D-4, PR-3), SUPPORT L24835 (C-2 closed with the realised table, PR-2; C-1 PARTLY MET, PR-1), PREDICTIONS L24836 (P1-P6 scored, one-sided Brier, PR-4); outcome section docs/judge_v2_program.md L24910-L24922 (_as_of the commit that writes them, parent 6a178741, re-grepped); PR-1 busy.ps1 pattern fix relayed; PR-5 recorded"
+  }
+ ],
+ "does_not_show": [
+  "that there is no best granularity or that granularity does not matter (NOT-SHOWN at this support; W-1)",
+  "a peak at 100 cells (k* a noisy GATE choice, 0.10pp ahead of k 200)",
+  "that 400 cells are over-split by granularity (D-4, W-2: estimation noise as much as granularity)",
+  "a tree-vs-k-means quality ranking (TC - KW shape- and count-confounded, filing-asymmetric; D-3)",
+  "the curve without BBH (+0.21..+0.60pp; D_lo +0.38pp [-0.57, +1.33])",
+  "other rosters, corpora, embedders, splits, label-free arms or judged decisions"
+ ],
+ "ledger": {
+  "row_id": "GRANULARITY-SWEEP",
+  "version": "v411 (2026-10-06: OUTCOME bracket; READY chip replaced by VALID null + W warn chips) | v410 (READY chip, pre-data bracket)"
+ },
+ "depends_on": [
+  "UNION-AF-ROUTE (K_s, AF-U)",
+  "RESP-PROFILE-INFO (R2_int instrument)",
+  "ROUTE-SOURCE-NULL (DEFF transport)",
+  "CONSTRUCTION-ARMS (Ward on centroids)"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; sub-anchor profiles (PROFILE-TREE-ROBUST, KEY-SUBANCHOR-SCALE) checked: aggregate readouts only, no per-cell profile; an INTERIOR-MAX would not license sub-anchor rows"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "cpu": "CPU about 1-2 h (detached if > 100 min); pool reader (rule 7 slot); engine-coder about 4 h"
+ },
+ "outputs": "never committed; sha256-pinned on E:/TaxoArena_backup_<date>_<tag> with SHA256SUMS.txt; temp via scratch_dir.py",
+ "label_status": "every arm [SC] (filed through the source)",
+ "sources": [
+  "docs/judge_v2_program.md L24828-L24840 (_as_of the commit that writes them, parent 4c764a1e, re-grepped)",
+  "docs/judge_v2_program.md L24808-L24812 (registrar's record)",
+  "the orchestrator's brief of 2026-10-06; the author's \"start 1 to 4\" (2026-10-06, in the chat; the four tests of the orchestrator's brief of 2026-10-06)",
+  "docs/agents/results/UNION-AF-ROUTE.json, RESP-PROFILE-INFO.json, ROUTE-SOURCE-NULL.json, CONSTRUCTION-ARMS.json (transported SEs, identity digits, prior results)",
+  "docs/reviews/READY_granularity-sweep.md (commit c963f646): pins, verdict, conditions, defects, brackets owed",
+  "docs/judge_v2_program.md L24904-L24909 (registrar's record, _as_of the commit that writes it, parent c963f646, re-grepped)",
+  "docs/reviews/POSTRUN_granularity-sweep.md (commit 6a178741): verdict, words W-1..W-4, realised Support table, prediction scoring, defects PR-1..PR-5, registrar duties 1-5",
+  "experiment_results/archv2/granularity_sweep/granularity_sweep_outcome.txt (sha256 98902354...): GATE CURVE, k*, GS1 D_lo / D_hi, support lines, F-GS, DESCRIPTIVE and PREDICTION lines",
+  "docs/judge_v2_program.md L24910-L24922 (outcome section, _as_of the commit that writes it, parent 6a178741, re-grepped)"
+ ],
+ "last_update": "2026-10-06",
+ "plain_description": {
+  "sq": "SQ3 Taxonomy",
+  "what": "Questions were grouped into k-means cells at about 25, 50, 100, 200 and 400 cells. The routing gain at each size was measured on held-out data. No calls were made.",
+  "why": "It asks whether there is a best number of cells for model profiles, and whether finer cells route better than coarse ones.",
+  "information": "A clear peak at a middle size would identify the right granularity. Coarse cells winning would mean fine cells add nothing. Result: done, descriptive only. A best middle granularity is not shown. 100 cells beat 25 by +0.69 points, but the interval crosses 0. 100 cells beat 400 by +1.55 points (interval above zero), but this is not read as over-splitting: with 400 cells each cell's estimate rests on fewer questions and is noisier. The choice of 100 as best was itself noisy. Coarse cells did not win. The result is source-conditioned.",
+  "written": "2026-10-07"
+ }
+}

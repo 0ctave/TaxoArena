@@ -1,0 +1,205 @@
+{
+ "id": "SATURATION-IRT",
+ "title": "SATURATION-IRT: Rasch + 2PL over 18 models x 6 union benchmarks (twins dropped), bootstrap intervals; deciding: does the LOMO-chosen top-10% most discriminating items per benchmark keep Kendall tau >= 0.90 of the full macro ranking? (zero calls; REGISTERED 2026-10-08; HF post 1)",
+ "question": "Relative to these 18 models, how saturated is each benchmark, and does a discriminating 10% of items preserve the ranking?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "the commit that writes it (parent e83b59d5)",
+  "program_lines": "docs/judge_v2_program.md L25051-L25064",
+  "program_lines_as_of": "the commit that writes them, parent e83b59d5, re-grepped",
+  "date": "2026-10-08",
+  "heading": "## Registered 2026-10-08 (before any code or call) — SATURATION-IRT: relative to these 18 models, how saturated is each of the six union benchmarks ...",
+  "provenance": "the orchestrator's brief of 2026-10-08 and docs/drafts/hf/SERIES_PLAN.md (design); criteria, Support, predictions, falsifier the registrar's; docs/judge_v2_program.md L25043-L25049 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — five HF blog-series analyses registered ...\"; _as_of the commit that writes it, parent e83b59d5, re-grepped)"
+ },
+ "script": {
+  "path": "tools/analysis/saturation_irt.py",
+  "sha16": "blob:2a50e83395c94a71113df14021eab1607f51fb9d (LF, git hash-object; outcome header: sha256-lf16 a87fdb7ea86a29e5 / sha256-crlf16 6ae4629a019b8745)",
+  "commit": "fae77f6d (merge by path from 0463e92a)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_SATURATION-IRT_delta3.md",
+  "commit": "8b3790ef",
+  "verdict": "READY (delta 3) at blob 2a50e833 (tip 0463e92a): C2 pilot first; L-A launch form [earlier READY 160bc01a at 077eaf00 and NOT READY 5289d041 at 436f57f5 do not cover the run]"
+ },
+ "go": "the author's 2026-10-08 authorisation (relayed in the orchestrator's brief, words not supplied): register and build zero-call analyses for the HF blog series (docs/drafts/hf/SERIES_PLAN.md); no judged calls",
+ "run": {
+  "outcome_file": "experiment_results/hf_blog/saturation_irt/saturation_irt_outcome.txt (sha256 9fd32bb040b01b92ee4cd657a83be3c850d8720141b85ca17575945c254cd16e per backup SHA256SUMS; write-once, never committed; PILOT file beside); backup E:/TaxoArena_backup_20261009_saturation_irt (14/14 OK, review row 13)",
+  "outcome_commit": "outcome not committed (run from main after merge fae77f6d)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "paeec37aa28063c75 verified (R1's object, id-disjoint only); v2 views gen c2930c60 / eval e35b7518 and multicorpus_cache_v1.db ad66e30a equal before and after; busy 1 / selftest rc 0 / busy 1 / dry rc 0 / pilot rc 0 / busy 1 / run rc 0 (L-2: no outer busy line between dry-run and pilot; in-script rule-7 check exit 1 printed)",
+  "date": "2026-10-09"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_SATURATION-IRT.md",
+  "commit": "b453cedd",
+  "verdict": "VALID; own fitter (no import of saturation_irt.py), every deciding number to the digit; C-1 MEDIUM (planned SE 0.0146 vs realised 0.0337: planning model, not DEFF), C-2 MEDIUM (SI1 word depends on the MATH scorer; print the H line beside), C-3 LOW (P6 non-monotone), L-1 LOW (P5 vacuous), L-2 LOW (no outer busy line before --pilot), L-3 LOW carried (MAP a_i)"
+ },
+ "criteria": [
+  {
+   "id": "SI1",
+   "text": "DECIDING (the POINT decides; bootstrap interval printed, decides nothing): KEEPS-RANKING iff tau_LOMO >= 0.90, LOSES-RANKING otherwise. DESCRIPTIVE-ONLY by Support (predicted 0.93, distance 0.03 < MDE80 0.041; DEFF 1.2 transported from G13's measured 1.214; SE 0.0146)",
+   "result": "FAILED",
+   "value": "LOSES-RANKING (descriptive-only by support): tau_LOMO 0.8824, 9 discordant of 153; bootstrap 95% [0.8036, 0.9219], SE 0.0337; rule 8 refutes KEEPS-RANKING; H sensitivity (decides nothing) tau_LOMO_H 0.9216, 6 discordant",
+   "denominator": "LOMO top-decile subsets, 2,056 items (MMLU_PRO 1,164, BBH 576, MATH 131, MUSR 76, GPQA 55, IFEVAL 54) of 20,546 deduplicated; 18 models, 153 pairs"
+  },
+  {
+   "id": "SI2",
+   "text": "SCORED, CONFIRMATORY OF A SEEN PATTERN (POINT decides): GPQA-OPEN iff NEFF_GPQA > NEFF_MMLU_PRO_LB (share of items with 2PL information >= 0.10 at the top-4 mean ability); NOT-SHOWN otherwise. SCOREABLE (MDE80 0.04 vs predicted difference 0.20)",
+   "result": "HELD",
+   "value": "GPQA-OPEN: NEFF_GPQA 0.9487 vs NEFF_MMLU_PRO_LB 0.7176 (margin 0.231)",
+   "denominator": "per-benchmark deduplicated items: GPQA 546, MMLU_PRO 11,637"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "SI1 KEEPS-RANKING 0.70 / LOSES-RANKING 0.30; tau_LOMO 0.93 [0.86, 0.97]",
+   "result": "HELD",
+   "value": "tau_LOMO 0.8824 in [0.86, 0.97]; modal word KEEPS (0.70) did not occur, Brier 0.9800",
+   "denominator": "153 pairs"
+  },
+  {
+   "id": "P2",
+   "text": "tau_in-sample >= tau_LOMO (0.80)",
+   "result": "FAILED",
+   "value": "tau_in-sample 0.8431 < tau_LOMO 0.8824; Brier 1.2800",
+   "denominator": "153 pairs"
+  },
+  {
+   "id": "P3",
+   "text": "SI2 GPQA-OPEN 0.90; NEFF_GPQA 0.45 [0.30, 0.60]; NEFF_MMLU_PRO_LB 0.25 [0.15, 0.35]",
+   "result": "FAILED",
+   "value": "word GPQA-OPEN occurred (Brier 0.0200) but both bands missed: NEFF_GPQA 0.9487 outside [0.30, 0.60]; NEFF_MMLU_PRO_LB 0.7176 outside [0.15, 0.35]",
+   "denominator": "per benchmark"
+  },
+  {
+   "id": "P4",
+   "text": "SAT4 MMLU_PRO_LB 0.35 [0.28, 0.42]; GPQA 0.08 [0.04, 0.14]",
+   "result": "HELD",
+   "value": "SAT4 MMLU_PRO_LB 0.2940 in [0.28, 0.42]; GPQA 0.0806 in [0.04, 0.14]",
+   "denominator": "per benchmark"
+  },
+  {
+   "id": "P5",
+   "text": "2PL beats Rasch by penalised log-likelihood on >= 5 of 6 benchmarks (0.80)",
+   "result": "HELD",
+   "value": "6 of 6; VACUOUS (L-1): the 2PL nests Rasch at log a = 0 with zero penalty, holds by construction; not counted as a held prediction",
+   "denominator": "6 benchmarks"
+  },
+  {
+   "id": "P6",
+   "text": "subset share needed for tau_LOMO >= 0.90: 10% [5%, 25%]",
+   "result": "HELD",
+   "value": "smallest share 15% in [5%, 25%]; non-monotone curve (C-3): 5% 0.8824, 10% 0.8824, 15% 0.9085, 20% 0.8954, 25% 0.9346; quote the curve",
+   "denominator": "curve"
+  }
+ ],
+ "falsifier": {
+  "text": "F-SI fires iff SI1 LOSES-RANKING with the 95% bootstrap upper bound < 0.90; overturns the post's 'the discriminating 10% suffices' claim for this roster",
+  "fired": false,
+  "value": "NOT FIRED: LOSES-RANKING with UB95 0.9219 >= 0.90 (>= 0.90 under every percentile rule; review row 5)"
+ },
+ "numbers_of_record": {
+  "SI1": "LOSES-RANKING (descriptive-only by support; tau_LOMO 0.8824, 95% [0.8036, 0.9219]; under the H MATH scorer, a sensitivity line that decides nothing, tau_LOMO_H 0.9216, 6 discordant)",
+  "tau_LOMO": "0.8824 (Kendall tau-b, 18 models, 153 pairs, 9 discordant); bootstrap 95% [0.8036, 0.9219] (B 200, CK-CLOSE components within benchmark, default_rng(20261008)); SE 0.0337",
+  "tau_in-sample": "0.8431 (circular, descriptive; 12 discordant)",
+  "NEFF": "GPQA 0.9487 vs MMLU_PRO_LB 0.7176 (share with 2PL information >= 0.10 at theta_top4; ALL / NONE count 0); BBH 0.6239, MATH 0.3690, MUSR 0.6918, IFEVAL 0.3161",
+  "SAT4": "MMLU_PRO 0.2940 [0.2858, 0.3023], GPQA 0.0806 [0.0606, 0.1065] (Wilson 95%; n 11,637 / 546)",
+  "support_realised": "2,056 items, 20,544 stem_key clusters, Kish 1.0002, n_eff 2,056; SE 0.0337, MDE80 0.0945; |tau_LOMO - 0.90| 0.0176 (registered: about 2,100, DEFF 1.2 transported, n_eff 1,750, SE 0.0146, MDE80 0.041)",
+  "H_sensitivity": "DESCRIPTIVE, decides nothing: tau_LOMO_H 0.9216 (6 discordant), tau_in-sample_H 0.8954; tau-b(official full macro, H full macro) 0.7908, max rank shift 4; MATH correct 2,270 official vs 6,976 H of 23,562 cells; MATH NEFF_H 0.5844, SAT4_H 0.2536; H table sha256-lf 6b010fa6...",
+  "denominators": "20,546 deduplicated items (MMLU_PRO 11,637, BBH 5,757, MATH 1,309, MUSR 756, GPQA 546, IFEVAL 541) after R1 471 ids / 427 texts and 589 collapsed duplicates; 22,596 fits, 0 not converged"
+ },
+ "sentence_of_record": "SATURATION-IRT (2026-10-09, 0 calls) — VALID; relative to these 18 models, the top 10% most discriminating items per union benchmark, chosen without the ranked model's own responses (LOMO 2PL), give Kendall tau_LOMO 0.8824 against the full macro ranking (9 of 153 pairs discordant; bootstrap 95% [0.8036, 0.9219]): LOSES-RANKING; rule 8 refutes KEEPS-RANKING; F-SI NOT FIRED. GPQA keeps more information at the top-4 ability than MMLU-Pro (NEFF 0.9487 vs 0.7176): GPQA-OPEN. [POSTRUN docs/reviews/POSTRUN_SATURATION-IRT.md, b453cedd: SI1 DESCRIPTIVE-ONLY by support (realised SE 0.0337, MDE80 0.0945; the planned 0.0146 was understated 2.3x by the planning model, not DEFF); MATH scored by the official scorer of record (D-2026-10-08-5); under the H sensitivity line, which decides nothing, tau_LOMO_H 0.9216 (6 discordant), the KEEPS side; SI2 confirmatory of a seen pattern (GPQA-HEADROOM); pool paeec37aa28063c75 id-disjoint only.]",
+ "chips": [
+  "REGISTERED 2026-10-08, BEFORE ANY CODE",
+  "VALID (POST-RUN b453cedd): SI1 LOSES-RANKING (DESCRIPTIVE-ONLY BY SUPPORT; H LINE 0.9216, KEEPS SIDE, DECIDES NOTHING); SI2 GPQA-OPEN; F-SI NOT FIRED"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-08",
+   "by": "registrar (pre-data rulings; docs/judge_v2_program.md L25212-L25219 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — rulings GAP-FIX-CC P-1 (seed replacement), the R1 twin rule ...\"; _as_of the commit that writes it, parent 8daf8220, re-grepped))",
+   "text": "RULING R1 (binds ADAPTIVE-PROFILE, WIN-MAP, SATURATION-IRT): twin items are dropped wherever they fall and the registered denominators stand; the scored EVAL set (5,907 items / 5,404 components) carries 0 twin items (twin v2 items have n_q >= 2 and are unscored; WIN-MAP reviews 12f42190 row 8, 7e2673d4 row 7); an instrument refuses iff a twin is among its SCORED EVAL items; the 115 EVAL-side twin items (TRAIN 265 / GATE 47 / EVAL 115 of 427) are unscored, dropped and counted. EVAL 5,792 is NOT of record; R1 stays applicable on the v2 EVAL side. Support unchanged. SATURATION-IRT reads every item of every side after R1 (no scored EVAL split): its drop is unchanged; READY_SATURATION-IRT.md row 1 confirmed 471 / 427."
+  },
+  {
+   "date": "2026-10-08",
+   "by": "registrar (HARNESS-EXTRACTOR)",
+   "text": "MATH scorer of record: MATH-FIX STAYS (ruling L15137, R2) pending the author's decision on the audit's hybrid H (recommended, not adopted; eligible only after HARNESS-EXTRACTOR READY). Not re-pinned now. CONDITIONAL: if the author adopts H, re-pin the MATH label source to H before --run (registrar's record + builder delta + delta READY; denominators unchanged). A MATH-reading outcome discloses the pilot: MATH-FIX false credits about 368 of 7,516 (4.9%, MC 95% 338-686); ranks below 12th move under H. Source: docs/judge_v2_program.md L25221-L25227 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — HARNESS-EXTRACTOR amended to the MATH + IFEval scorer-gap study ...\"; _as_of the commit that writes it, parent cc49fc6a, re-grepped)"
+  },
+  {
+   "date": "2026-10-08",
+   "by": "registrar (D-2026-10-08)",
+   "text": "D-2026-10-08-5 (the author, verbatim: \"Official scorer, H as sensitivity (Recommended)\"): the MATH scorer of record for this run is the official scorer eval_results.is_correct (the imported leaderboard/harness verdict), with NO MATH-FIX overlay; this supersedes MATH-FIX and voids the conditional re-pin to H. H (pinned definition, with corrected refs 2060002 / 2060129 / 2000164 for H only) is a sensitivity line read from a per-row table that must be sha256-pinned (LF) before --run; it decides nothing. Declared pre-run deviation: every outcome header carries the scorer line; criteria, Support, denominators and predictions stand as registered. Not retroactive. CONDITION: the READY blob 077eaf00 (da50fe86) reads is_correct_mathfix (saturation_irt.py L1010); builder delta + delta READY owed before --run. Source: docs/judge_v2_program.md L25317-L25327 (section \"## Author's decision 2026-10-08 (recorded by the registrar; zero calls; insertion only) — D-2026-10-08-1..6 ...\"; _as_of the commit that writes it, parent 5211616a, re-grepped); authority docs/agents/author_decisions/2026-10-08.md (5211616a); plan Amendment 40"
+  },
+  {
+   "date": "2026-10-09",
+   "by": "registrar (docs/judge_v2_program.md L25352-L25361 (section \"## Registrar's record 2026-10-09 (insertion only; zero calls; nothing run) — H table pinned ...\"; _as_of the commit that writes it, parent 38eac1c8, re-grepped))",
+   "text": "Not run (no run commit, backup or output). Delta READY 2 (5289d041; blob 436f57f5, tip 04b1e5aa) NOT READY / BLOCKED: B1 mutant Y2 (top 4 by micro) survives; B2 busy.ps1 matches saturation_irt, so the in-script rule-7 check refuses itself. H table PINNED (D-2026-10-08-5 deviation (2)): experiment_results/math_scorer_h/math_h_table.csv sha256-lf 6b010fa60dde727816b91196d2cb3045094082c3800fe738adebe21d19eeb1d1, 23,832 rows, H 7,126 / official 2,335 (READY f4f7e0a0, run 62d269af); decides nothing (meets C1). State registered (blocked)."
+  },
+  {
+   "date": "2026-10-09",
+   "by": "registrar (docs/judge_v2_program.md L25374-L25384 (section \"## SATURATION-IRT (2026-10-09, 0 calls) — VALID (POSTRUN b453cedd): SI1 LOSES-RANKING ...\"; _as_of the commit that writes it, parent b453cedd, re-grepped))",
+   "text": "OUTCOME of record (VALID b453cedd). OUTCOME bracket appended to READOUTS AND CRITERIA (L25057) and a CORRECTED support-as-realised bracket to SUPPORT (L25058) of the registration: realised SE 0.0337, MDE80 0.0945 (planned 0.0146 / 0.041; planning model, not DEFF); verdict line unchanged. C-2: the SI1 word is never quoted without the H line."
+  }
+ ],
+ "does_not_show": [
+  "anything beyond these 18 models",
+  "that the SI1 word is scorer-robust (under the H MATH scorer tau_LOMO_H 0.9216 reads on the KEEPS side)",
+  "that any one subset share suffices (the curve is non-monotone)",
+  "2PL over Rasch as evidence (P5 vacuous by construction)",
+  "item quality, human difficulty, or the ranks of future models",
+  "a content-closed claim (paeec37aa28063c75 is id-disjoint only)"
+ ],
+ "ledger": {
+  "row_id": "SATURATION-IRT",
+  "version": "v422 (2026-10-09: OUTCOME bracket; VALID ok chip beside REGISTERED) | v419 (2026-10-08: D-5 bracket) | v415 (2026-10-08: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "GPQA-HEADROOM (SAT4 metric, seen)",
+  "MC-ROUTER (union roster)",
+  "CONTENT-DISJOINT-SPLIT-AUDIT (the 471 twins)",
+  "the G14 reader (union correctness)"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; no closed line touched (LCB-STAGE0-INTERACTION's Rasch null is a different object)"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "about 1-3 h",
+  "agent_hours": "about 4 h",
+  "reads_pool": true
+ },
+ "outputs": "never committed: pinned by sha256, stored on E: with SHA256SUMS.txt; temp under E:/TaxoArena_tmp via scratch_dir",
+ "sources": [
+  "docs/judge_v2_program.md L25051-L25064 (_as_of the commit that writes it, parent e83b59d5, re-grepped)",
+  "docs/judge_v2_program.md L25043-L25049 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — five HF blog-series analyses registered ...\"; _as_of the commit that writes it, parent e83b59d5, re-grepped)",
+  "docs/judge_v2_program.md L25212-L25219 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — rulings GAP-FIX-CC P-1 (seed replacement), the R1 twin rule ...\"; _as_of the commit that writes it, parent 8daf8220, re-grepped)",
+  "docs/judge_v2_program.md L25221-L25227 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — HARNESS-EXTRACTOR amended to the MATH + IFEval scorer-gap study ...\"; _as_of the commit that writes it, parent cc49fc6a, re-grepped)",
+  "docs/judge_v2_program.md L25317-L25327 (section \"## Author's decision 2026-10-08 (recorded by the registrar; zero calls; insertion only) — D-2026-10-08-1..6 ...\"; _as_of the commit that writes it, parent 5211616a, re-grepped); authority docs/agents/author_decisions/2026-10-08.md (5211616a); plan Amendment 40",
+  "docs/judge_v2_program.md L25352-L25361 (section \"## Registrar's record 2026-10-09 (insertion only; zero calls; nothing run) — H table pinned ...\"; _as_of the commit that writes it, parent 38eac1c8, re-grepped)",
+  "docs/reviews/READY_SATURATION-IRT_delta2.md (5289d041)",
+  "docs/judge_v2_program.md L25374-L25384 (section \"## SATURATION-IRT (2026-10-09, 0 calls) — VALID (POSTRUN b453cedd): SI1 LOSES-RANKING ...\"; _as_of the commit that writes it, parent b453cedd, re-grepped)",
+  "docs/reviews/POSTRUN_SATURATION-IRT.md (b453cedd)",
+  "docs/reviews/READY_SATURATION-IRT_delta3.md (8b3790ef)",
+  "experiment_results/hf_blog/saturation_irt/saturation_irt_outcome.txt (backup E:/TaxoArena_backup_20261009_saturation_irt)"
+ ],
+ "last_update": "2026-10-09",
+ "label_status": "correctness matrix (no labels beyond source)",
+ "data_disclosure": "DATA ALREADY LOOKED AT (disclosed): GPQA-HEADROOM 7.2% vs 36.7%, MC-ROUTER oracle 0.907 / best 0.553, UNION-AF-ROUTE best 0.6049 / AF 0.6201 / declared 0.6316, CELL-FLIPS 7/101, MODEL-VINTAGE-CANARY 5/12, K46-KEY-READ 0.9249 / 0.2632; [P-FAM] 2.7:1, +16.4pp, 5.7%, 42:1, +0.39/1k as motivation only",
+ "shared_rules": "shared rules R1-R6: drop the 471 union twins (CONTENT-DISJOINT-SPLIT-AUDIT; recomputed, refusal unless 471 / 427) and collapse exact duplicates; one documented extractor per harness; GPQA text never shown; release ids + 0/1 (and verdicts) only; claims relative to these 18 models",
+ "null_means_for_post": "LOSES-RANKING: the post leads with saturation (NEFF, SAT4, the hard-tail UpSet) and says a discriminating 10% does not preserve the ranking of these 18 models; GPQA NOT-SHOWN withdraws 'GPQA isn't full' from the title",
+ "series": "HF blog series (docs/drafts/hf/SERIES_PLAN.md)",
+ "plain_description": {
+  "sq": "SQ1 Use",
+  "what": "Fits item response models (Rasch and 2PL) to the 18 models' right/wrong answers on six benchmarks, measures how saturated each benchmark is, and checks whether the 10% most discriminating items reproduce the full ranking. No judge calls.",
+  "why": "Shows which benchmarks still separate today's models and whether a small item subset is enough.",
+  "information": "Shows saturation per benchmark relative to these 18 models. Result: the discriminating 10% does not keep the ranking (tau 0.88 vs bar 0.90, descriptive-only; 0.92 under the alternative MATH scorer); GPQA still separates the top models more than MMLU-Pro.",
+  "written": "2026-10-08"
+ }
+}

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="taxonomy.EmbedderReadGuardTest" tests="14" skipped="0" failures="0" errors="0" timestamp="2026-10-01T07:09:00" hostname="HORTENSIA" time="24.357">
+  <properties/>
+  <testcase name="F1 a variant tag of the manifest's model is a contradiction()" classname="taxonomy.EmbedderReadGuardTest" time="0.004"/>
+  <testcase name="P-2 (iii) absent resolves to the historical file unvalidated, a present value is validated fail-closed()" classname="taxonomy.EmbedderReadGuardTest" time="2.412"/>
+  <testcase name="a vmfMu of the wrong length and an unknown model refuse()" classname="taxonomy.EmbedderReadGuardTest" time="2.493"/>
+  <testcase name="F1 a correct two-site tree is ADMITTED, each site read on its own region()" classname="taxonomy.EmbedderReadGuardTest" time="2.384"/>
+  <testcase name="P-2 (ii) a wrong embedder (other vectors, 768-d) is REFUSED, cosines printed below 0_2()" classname="taxonomy.EmbedderReadGuardTest" time="2.603"/>
+  <testcase name="the cosine branch alone refuses (right dimension, wrong vectors)()" classname="taxonomy.EmbedderReadGuardTest" time="2.367"/>
+  <testcase name="F1 a NaN cosine at one site REFUSES on the undefined branch alone, and a tree with no split site REFUSES()" classname="taxonomy.EmbedderReadGuardTest" time="2.364"/>
+  <testcase name="the dimension branch alone refuses (right vectors, model with another native dimension)()" classname="taxonomy.EmbedderReadGuardTest" time="2.573"/>
+  <testcase name="P-2 (v) a manifest without embedding_model and no -D refuses, and the other naming branches()" classname="taxonomy.EmbedderReadGuardTest" time="0.002"/>
+  <testcase name="an arm without the vmfMu guard refuses -DembeddingCacheFile and -DembeddingModel()" classname="taxonomy.EmbedderReadGuardTest" time="0.005"/>
+  <testcase name="the native dimension table is the declared one()" classname="taxonomy.EmbedderReadGuardTest" time="0.001"/>
+  <testcase name="P-2 (i) the right embedder is ADMITTED, min cos and budget printed()" classname="taxonomy.EmbedderReadGuardTest" time="2.364"/>
+  <testcase name="a mixed-length read refuses (the vacuous full size below slice check is replaced)()" classname="taxonomy.EmbedderReadGuardTest" time="2.435"/>
+  <testcase name="F1 a wrong vmfMu at the SECOND site REFUSES and names it as the minimum while the root alone admits()" classname="taxonomy.EmbedderReadGuardTest" time="2.344"/>
+  <system-out><![CDATA[[EMB-GUARD] REFUSING: -DembeddingModel='qwen3-embedding:8b' contradicts the snapshot manifest's embedding_model='qwen3-embedding:latest'
+[EMB-CACHE] REFUSING: -DembeddingCacheFile is present but blank (absent -> embeddings_cache.db)
+[EMB-CACHE] REFUSING: -DembeddingCacheFile is present but blank (absent -> embeddings_cache.db)
+[EMB-CACHE] REFUSING: -DembeddingCacheFile='C:\Users\octav\AppData\Local\Temp\junit-3665656577713815904\absent.db' does not exist
+[EMB-CACHE] REFUSING: -DembeddingCacheFile='C:\Users\octav\AppData\Local\Temp\junit-3665656577713815904' is not a regular file
+[EMB-CACHE] REFUSING: -DembeddingCacheFile='C:\Users\octav\AppData\Local\Temp\junit-3665656577713815904\not_sqlite.db' is not a SQLite database (header mismatch)
+[EMB-CACHE] REFUSING: -DembeddingCacheFile='C:\Users\octav\AppData\Local\Temp\junit-3665656577713815904\noemb.db' lacks the table(s) [embeddings] the harness joins (has [queries])
+[EMB-CACHE] REFUSING: -DembeddingCacheFile='C:\Users\octav\AppData\Local\Temp\junit-3665656577713815904\noq.db' lacks the table(s) [queries] the harness joins (has [embeddings])
+[EMB-GUARD] model=qwen3-embedding:latest (test); cache=C:\Users\octav\AppData\Local\Temp\junit-376964497723830751\right3.db; native dim expected 4096; vectors read 120 of 120 ids, raw dims {4096=120}; slice width 256
+[EMB-GUARD] vmfMu cosine over 1 sites: min NaN (site -), median NaN; budget 0.99 -> REFUSE
+[EMB-GUARD]   site n1         n=120   found=120   cos=NaN  ROOT
+[EMB-GUARD] REFUSING before any replicate: site n1 vmfMu length 512 != slice width 256; the cosine is undefined on 1 site(s)
+[EMB-GUARD] model=some-new-embedder:v1 (test); cache=C:\Users\octav\AppData\Local\Temp\junit-376964497723830751\right3.db; native dim expected UNKNOWN; vectors read 120 of 120 ids, raw dims {4096=120}; slice width 256
+[EMB-GUARD] vmfMu cosine over 1 sites: min 1.0000 (site n1 'ROOT' n=120), median 1.0000; budget 0.99 -> REFUSE
+[EMB-GUARD]   site n1         n=120   found=120   cos=1.0000  ROOT
+[EMB-GUARD] REFUSING before any replicate: model 'some-new-embedder:v1' has no declared native dimension (EmbedderReadGuard.NATIVE_DIM: [qwen3-embedding:latest, nomic-embed-text:latest, embeddinggemma:latest, mxbai-embed-large:latest])
+[EMB-GUARD] model=qwen3-embedding:latest (test); cache=C:\Users\octav\AppData\Local\Temp\junit-14711205773334711349\two_site.db; native dim expected 4096; vectors read 120 of 120 ids, raw dims {4096=120}; slice width 256
+[EMB-GUARD] vmfMu cosine over 2 sites: min 1.0000 (site n1 'ROOT' n=120), median 1.0000; budget 0.99 -> ADMIT
+[EMB-GUARD]   site n1         n=120   found=120   cos=1.0000  ROOT
+[EMB-GUARD]   site n3         n=60    found=60    cos=1.0000  B
+[EMB-GUARD] model=qwen3-embedding:latest (test); cache=C:\Users\octav\AppData\Local\Temp\junit-2282924840478618246\embeddings_cache_nomic-embed-text_latest.db; native dim expected 4096; vectors read 120 of 120 ids, raw dims {768=120}; slice width 256
+[EMB-GUARD] vmfMu cosine over 1 sites: min -0.1753 (site n1 'ROOT' n=120), median -0.1753; budget 0.99 -> REFUSE
+[EMB-GUARD]   site n1         n=120   found=120   cos=-0.1753  ROOT
+[EMB-GUARD] REFUSING before any replicate: raw vector dimensions {768=120} != {4096} (the native dimension of qwen3-embedding:latest); min cosine -0.1753 < budget 0.99
+[EMB-GUARD] model=qwen3-embedding:latest (test); cache=C:\Users\octav\AppData\Local\Temp\junit-6826384860111624789\wrong4096.db; native dim expected 4096; vectors read 120 of 120 ids, raw dims {4096=120}; slice width 256
+[EMB-GUARD] vmfMu cosine over 1 sites: min 0.0222 (site n1 'ROOT' n=120), median 0.0222; budget 0.99 -> REFUSE
+[EMB-GUARD]   site n1         n=120   found=120   cos=0.0222  ROOT
+[EMB-GUARD] REFUSING before any replicate: min cosine 0.0222 < budget 0.99
+[EMB-GUARD] model=qwen3-embedding:latest (test); cache=C:\Users\octav\AppData\Local\Temp\junit-10908794052268252447\two_site_nan.db; native dim expected 4096; vectors read 120 of 120 ids, raw dims {4096=120}; slice width 256
+[EMB-GUARD] vmfMu cosine over 2 sites: min NaN (site n1 'ROOT' n=120), median 1.0000; budget 0.99 -> REFUSE
+[EMB-GUARD]   site n1         n=120   found=120   cos=1.0000  ROOT
+[EMB-GUARD]   site n3         n=60    found=60    cos=NaN  B
+[EMB-GUARD] REFUSING before any replicate: the cosine is undefined on 1 site(s)
+[EMB-GUARD] model=qwen3-embedding:latest (test); cache=C:\Users\octav\AppData\Local\Temp\junit-10908794052268252447\two_site_nan.db; native dim expected 4096; vectors read 0 of 0 ids, raw dims {}; slice width 256
+[EMB-GUARD] vmfMu cosine over 0 sites: min NaN (site -), median NaN; budget 0.99 -> REFUSE
+[EMB-GUARD] REFUSING before any replicate: no site to check; raw vector dimensions {} != {4096} (the native dimension of qwen3-embedding:latest)
+[EMB-GUARD] model=nomic-embed-text (test); cache=C:\Users\octav\AppData\Local\Temp\junit-17956208855024105662\right2.db; native dim expected 768; vectors read 120 of 120 ids, raw dims {4096=120}; slice width 256
+[EMB-GUARD] vmfMu cosine over 1 sites: min 1.0000 (site n1 'ROOT' n=120), median 1.0000; budget 0.99 -> REFUSE
+[EMB-GUARD]   site n1         n=120   found=120   cos=1.0000  ROOT
+[EMB-GUARD] REFUSING before any replicate: raw vector dimensions {4096=120} != {768} (the native dimension of nomic-embed-text:latest)
+[EMB-GUARD] REFUSING: the snapshot manifest has no embedding_model and no -DembeddingModel names the model
+[EMB-GUARD] REFUSING: the snapshot manifest has no embedding_model and no -DembeddingModel names the model
+[EMB-GUARD] REFUSING: -DembeddingCacheFile is set but neither a snapshot manifest's embedding_model nor -DembeddingModel names the model its vectors must come from
+[EMB-GUARD] REFUSING: -DembeddingModel is present but blank
+[EMB-GUARD] REFUSING: -DembeddingModel='nomic-embed-text:latest' contradicts the snapshot manifest's embedding_model='qwen3-embedding:latest'
+[EMB-GUARD] model=qwen3-embedding:latest (test); cache=C:\Users\octav\AppData\Local\Temp\junit-7260074077348750385\right.db; native dim expected 4096; vectors read 120 of 120 ids, raw dims {4096=120}; slice width 256
+[EMB-GUARD] vmfMu cosine over 1 sites: min 1.0000 (site n1 'ROOT' n=120), median 1.0000; budget 0.99 -> ADMIT
+[EMB-GUARD]   site n1         n=120   found=120   cos=1.0000  ROOT
+[EMB-GUARD] model=qwen3-embedding:latest (test); cache=C:\Users\octav\AppData\Local\Temp\junit-14362911400476453579\mixed.db; native dim expected 4096; vectors read 120 of 120 ids, raw dims {768=1, 4096=119}; slice width 256
+[EMB-GUARD] vmfMu cosine over 1 sites: min 0.9999 (site n1 'ROOT' n=120), median 0.9999; budget 0.99 -> REFUSE
+[EMB-GUARD]   site n1         n=120   found=120   cos=0.9999  ROOT
+[EMB-GUARD] REFUSING before any replicate: raw vector dimensions {768=1, 4096=119} != {4096} (the native dimension of qwen3-embedding:latest)
+[EMB-GUARD] model=qwen3-embedding:latest (test); cache=C:\Users\octav\AppData\Local\Temp\junit-6497192651224458898\two_site_bad.db; native dim expected 4096; vectors read 120 of 120 ids, raw dims {4096=120}; slice width 256
+[EMB-GUARD] vmfMu cosine over 2 sites: min -0.1001 (site n3 'B' n=60), median 1.0000; budget 0.99 -> REFUSE
+[EMB-GUARD]   site n1         n=120   found=120   cos=1.0000  ROOT
+[EMB-GUARD]   site n3         n=60    found=60    cos=-0.1001  B
+[EMB-GUARD] REFUSING before any replicate: min cosine -0.1001 < budget 0.99
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

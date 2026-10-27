@@ -1,0 +1,124 @@
+{
+  "id": "J1-R",
+  "title": "J1-R: the reasoning judge WITH the reasoning reference: the ceiling of verify-then-judge at reference accuracy 0.86 (3,956 calls)",
+  "question": "grok-4-1-fast-reasoning, R3's 1,980 matches, v1 template, frozen-tree cell prompt as in J1, J2-R reference; comparator = J1's cached verdicts (same judge, no reference); all-decidable gain > 0 at p < 0.05; DESCRIPTIVE distance of STACK-v2 (0.865) to the ceiling; prediction 0.87-0.89.",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "218df92",
+    "program_lines": "docs/judge_v2_program.md L311-L315 (registration bullet) and L390-L401 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "- **J1-R — the reasoning judge WITH the reasoning reference** (ceiling of verify-then-judge at reference",
+    "outcome_heading": [
+      "L390: - **J1-R (2026-09-10 15:20): PASS — the reasoning judge gains from the reference too, and the ceiling of"
+    ],
+    "date": "2026-09-10"
+  },
+  "script": {
+    "path": "tools/analysis/rejudge_reasoning.py --reference grok-reasoning",
+    "sha16": "780c312dc390b5fe (at ef3801d)",
+    "commit": "ef3801d"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (3,956 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/j1r_outcome.txt",
+    "outcome_commit": "281c37e",
+    "calls": 3956,
+    "cce": "not stated",
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-10",
+    "other_files": [
+      "experiment_results/x12_crossdomain/j1r_refgrok.log (untracked)"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/)",
+    "commit": "281c37e",
+    "verdict": "PASS (+3.3pp, p = 0.0002); STACK-v2 recovers ~95% of the reasoning judge"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "all-decidable gain > 0 at p < 0.05",
+      "result": "HELD",
+      "value": "1,974 judged (0 invalid), 944 decidable: with reference 0.879 vs without 0.846 (48:17, +3.3pp, p = 0.0002); top cluster 0.748 vs 0.647 (+10.2, 35:8, p < 0.0001); ties 2.3%, flips 2.2%; board unchanged (1 violation)",
+      "denominator": "944 key-decidable R3 pairs"
+    },
+    {
+      "id": "descriptive",
+      "text": "distance of STACK-v2 (0.865) to the ceiling",
+      "result": "DELIVERED",
+      "value": "ceiling 0.879; STACK-v2 1.4pp below overall, 4.9pp on the top cluster",
+      "denominator": "944"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "0.87-0.89",
+      "result": "HELD",
+      "value": "0.879",
+      "denominator": "944"
+    }
+  ],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "the cheap stack recovers ~95% of the reasoning judge at a fraction of the cost"
+  },
+  "numbers_of_record": {
+    "accuracy": "0.879 vs 0.846 (48:17, p = 0.0002)",
+    "top_cluster": "0.748 vs 0.647 (+10.2, 35:8, p < 0.0001)",
+    "ties_flips": "2.3% / 2.2%",
+    "ceiling_gap": "STACK-v2 -1.4pp overall, -4.9pp top cluster"
+  },
+  "sentence_of_record": "J1-R (2026-09-10, 3,956 calls): PASS: 944 decidable: the reasoning judge with the reasoning reference 0.879 vs without 0.846 (48:17, +3.3pp, p = 0.0002); top cluster 0.748 vs 0.647 (+10.2, p < 0.0001); ties 2.3%, flips 2.2%; board unchanged (1 violation). The ceiling of verify-then-judge at reference accuracy 0.86 is 0.879; STACK-v2 (Mistral) 0.865 sits 1.4pp below it overall and 4.9pp on the top cluster: the cheap stack recovers ~95% of the reasoning judge at a fraction of the cost.",
+  "chips": [
+    "PASS (+3.3pp, p=0.0002)"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-23",
+      "by": "INCONSISTENCIES-PASS (registrar, zero calls; insertion only)",
+      "text": "NO-FILE 2026-09-23 by INCONSISTENCIES-PASS (registrar, zero calls; insertion only): j1r_refgrok.log is on disk at experiment_results/x12_crossdomain/ but gitignored (*.log) and untracked; the readout of record is experiment_results/x12_crossdomain/j1r_outcome.txt, which IS tracked. [ledger: evidence cell of row J1-R, v132]"
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a ceiling above reference accuracy 0.86 (ORACLE later measured the perfect-reference ceiling)"
+  ],
+  "ledger": {
+    "row_id": "J1-R",
+    "version": "v33 (1b9312f) [v132 2026-09-23: INCONSISTENCIES-PASS insertion in this row]; [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "J1",
+    "J2-R",
+    "STACK-v2",
+    "ORACLE"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L311-L315 and L390-L401 (218df92 / ef3801d)",
+    "experiment_results/x12_crossdomain/j1r_outcome.txt (281c37e)",
+    "docs/test_ledger.html row J1-R (v33): chips verbatim, observed cell, evidence",
+    "script sha16 = sha256 of tools/analysis/rejudge_reasoning.py at ef3801d, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "A reasoning judge (grok) re-judged about 2,000 matches with a reasoning model's reference answer, which is right 86% of the time. The comparison was the same judge without a reference.",
+    "why": "It sets the ceiling for the 'check against a reference, then judge' design, so the cheaper production judge can be measured against it.",
+    "information": "It shows how much a reference adds and how close the cheap judge gets to the best design. Result: done. The reference raises accuracy on decidable pairs from 0.846 to 0.879, and from 0.65 to 0.75 on the strongest models. The cheap judge (0.865) sits about 1.4 points below this ceiling, recovering about 95% of it at a fraction of the cost. Later ruled history rather than evidence, because it ran on the older question pool.",
+    "written": "2026-10-07"
+  }
+}

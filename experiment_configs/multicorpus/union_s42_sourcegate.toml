@@ -1,0 +1,91 @@
+# MULTI-CORPUS STAGE 1c — union root routing rule "sourceGate" (docs/multi_corpus_design.md, stage 1c). Same graft as union_s42.toml
+# (the six per-corpus snapshots, nothing rebuilt); only the union ROOT step of the readout changes:
+#   flatLeaf   = nearest leaf centroid over all 143 grafted leaves (the readout sweep), source/domain from the leaf;
+#   sourceGate = nearest per-corpus root vMF picks the corpus, then the production descent inside that tree.
+# Default (key absent) = "descent" = the stage-1b behaviour. Zero LLM calls; embeddings from the cache only.
+unionRootRouting = "sourceGate"
+
+# MULTI-CORPUS STAGE 1b — UNION ASSEMBLY (docs/multi_corpus_design.md, "Stage 1 certification result ...
+# design adjustment"): FEDERATED construction. Nothing is grown here: the six per-corpus snapshots (each built
+# alone by <corpus>_s42.toml with its own loop, split and site null) are grafted under a union root — depth-1
+# children = the per-corpus roots (node ids prefixed "<SOURCE>:", depths shifted by 1), depth-2 = their designed
+# domain anchors, everything below byte-identical to the per-corpus trees. The union adds only routing state at
+# the new root (its vMF, shrinkage) and ONE reserved pool = the union of the per-corpus pools, recorded and
+# activated on the multi-corpus DB and pinned by the saved snapshot. Certified sites = the SUM of the per-corpus
+# site-null certifications (the union adds no split sites). Zero LLM calls. Body keys below = the mc6/per-corpus
+# body, kept for provenance (routing keys are read; construction keys are inert with runPipeline = false).
+unionSnapshots = [
+    "20260911_135229_Headless_Run_Auto_ge",   # BBH          (bbh_s42)
+    "20260911_140810_Headless_Run_Auto_ge",   # MATH         (math_s42)
+    "20260911_141022_Headless_Run_Auto_ge",   # MUSR         (musr_s42)
+    "20260911_141054_Headless_Run_Auto_ge",   # IFEVAL       (ifeval_s42)
+    "20260911_140945_Headless_Run_Auto_ge",   # GPQA         (gpqa_s42)
+    "20260911_135112_Headless_Run_Auto_ge"    # MMLU_PRO_LB  (mmlu_pro_lb_s42)
+]
+
+corpora      = ["BBH", "MATH", "MUSR", "IFEVAL", "GPQA", "MMLU_PRO_LB"]
+corpusDbPath = "multicorpus_cache_v1.db"
+
+models        = [
+    "DeepSeek-R1-Distill-Llama-8B",
+    "DeepSeek-R1-Distill-Qwen-32B",
+    "Falcon3-10B-Instruct",
+    "Llama-3.1-70B-Instruct",
+    "Llama-3.2-3B-Instruct",
+    "Llama-3.3-70B-Instruct",
+    "Mistral-Small-Instruct-2409",
+    "Mixtral-8x7B-Instruct-v0.1",
+    "OLMo-2-1124-7B-Instruct",
+    "Phi-3.5-mini-instruct",
+    "Qwen2.5-32B-Instruct",
+    "Qwen2.5-72B-Instruct",
+    "Qwen2.5-7B-Instruct",
+    "Qwen2.5-Coder-7B-Instruct",
+    "Qwen2.5-Math-7B-Instruct",
+    "Yi-1.5-34B-Chat-16K",
+    "c4ai-command-r-plus-08-2024",
+    "internlm2_5-20b-chat"
+]
+
+category      = ""
+queryLimit    = 0
+outputDir     = "experiment_results/multicorpus/union_s42_sourcegate"
+testRatio     = 0.30
+seed          = 42
+
+runPipeline        = false
+runBenchmark       = false
+runTrickle         = true
+runBaselines       = false
+enableFinalMetrics = false
+enableLabeling     = false
+judgeInduction     = false
+
+dagMode = "DAG_MAX"
+
+maxDepth              = 8
+minClusterSize        = 55
+proposalSeparationBar = 0.0145
+tau                   = 1e-6
+acceptanceZ           = 2.0
+enableRefitGate       = false
+
+membershipFloor       = 0.25
+routingBeamGamma      = 0.2
+descentMargin         = 0.12
+
+effectiveSupportFloor = 2.0
+defaultKappaPrior     = 10.0
+
+numIterations         = 50
+maxLeafAssignments    = 5
+
+fusionSimilarityThreshold = 0.90
+enableGtWarmStart         = false
+
+enableProfiling           = true
+
+# -- geometry (D1/D2 keys) --
+embeddingSliceDim = 512
+splitDropTopPcs   = 0
+splitWhiten       = false

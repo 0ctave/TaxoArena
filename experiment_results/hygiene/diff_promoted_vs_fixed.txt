@@ -1,0 +1,21 @@
+== experiment_results\promoted\bareq512_s42\seed_42 vs experiment_results\hygiene\bareq512_s42_labelfree3\seed_42 ==
+  -- STRUCTURE (must be identical)
+     dag_snapshots.jsonl                           DIFFERS  first diff: (1, '{"iteration":1,"nodes":[{"id":"n00000001","label":"MMLU_PRO","depth":0,"isLeaf":false,"isBridge":false,"kappa"', '{"iteration":1,"nodes":[{"id":"n00000001","label":"MMLU_PRO","depth":0,"isLeaf":false,"isBridge":false,"kappa"')
+     diagnostics/dag_snapshots.jsonl               DIFFERS  first diff: (1, '{"iteration":1,"nodes":[{"id":"n00000001","label":"MMLU_PRO","depth":0,"isLeaf":false,"isBridge":false,"kappa"', '{"iteration":1,"nodes":[{"id":"n00000001","label":"MMLU_PRO","depth":0,"isLeaf":false,"isBridge":false,"kappa"')
+  -- EVALUATION PATH (P7 caveat)
+     diagnostics/proposals.csv                     DIFFERS  first diff: (2, '1,GROW,n00000011,Math,0.006797653,0.000273408,24.8627,2,ACCEPTED,,0', '1,GROW,n00000011,Math,0.006797653,0.000263356,25.8117,2,ACCEPTED,,0')
+     fixed_point_certificate.txt                   DIFFERS  first diff: (4, 'final iteration : 18', 'final iteration : 13')
+     diagnostics/iteration_metrics.csv             DIFFERS  first diff: (2, '1,42,28,2,0.166571,0.166571,0.000000000000,0.058418629784,0,0,20,13,4,3,8278.000,0', '1,41,27,2,0.165524,0.165524,0.000000000000,0.057372027903,0,0,19,13,3,3,8278.000,0')
+     diagnostics/rank_history.csv                  IDENTICAL
+     validation\MAIN_bridge_quality.csv            IDENTICAL
+     validation\MAIN_centroid_routing_results.csv  DIFFERS  first diff: (3, 'Top1Accuracy,0.783828841344818', 'Top1Accuracy,0.7816060016671298')
+     validation\MAIN_graph_validity.csv            DIFFERS  first diff: (6, 'DepthDistribution,0:1;1:14;2:29;3:52;4:48;5:12;6:2', 'DepthDistribution,0:1;1:14;2:28;3:50;4:48;5:14;6:2')
+     validation\MAIN_heldout_leaf_support.csv      DIFFERS  first diff: (2, 'n00000144,Advanced Algebraic Function Analysis,36,42', 'n00000133,Emergent Concept #118,42,44')
+     validation\MAIN_migration_flow_matrix.csv     DIFFERS  first diff: (4, 'Chemistry,0,1,287,3,0,1,0,0,0,6,1,0,41,0,1', 'Chemistry,0,1,288,3,0,1,0,0,0,6,1,0,40,0,1')
+     validation\MAIN_routing_calibration.csv       DIFFERS  first diff: (2, 'RoutingECE,0.1925152601892235', 'RoutingECE,0.19439618687957747')
+     validation\MAIN_routing_diagnostics.txt       DIFFERS  first diff: (6, 'Top-1 Leaf: Monetary Policy Mechanisms and Money Supply Dynamics (ID: n00000190) | Dominant: Economics | Conf:', 'Top-1 Leaf: Emergent Concept #170 (ID: n00000185) | Dominant: Economics | Conf: 1,0000')
+     validation\MAIN_taxonomy_quality.csv          DIFFERS  first diff: (2, 'SeparationJ,0.23562815796604997', 'SeparationJ,0.23554333135868777')
+     validation\MAIN_trickle_validation_results.csv DIFFERS  first diff: (3, 'Top1Accuracy,0.7702139483189775', 'Top1Accuracy,0.7704918032786885')
+     validation\bridge_nodes.csv                   IDENTICAL
+     validation\bridge_residuals.csv               IDENTICAL
+  GATE: FAIL

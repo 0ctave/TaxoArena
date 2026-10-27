@@ -1,0 +1,177 @@
+{
+ "id": "TREE-CUT-GRANULARITY",
+ "title": "TREE-CUT-GRANULARITY: the anchor-free tree cut at each depth vs dedicated flat spherical k-means at the same cell count (held-out purity averaged over depths; NMI, R2_int, bisecting k-means beside) on the three content-closed MMLU-Pro re-draw trees Q_e1sd1-3 (not used in the pilot) (zero calls; REGISTERED 2026-10-08)",
+ "question": "Does the tree's hierarchy cost partition quality at its coarse levels against a flat fit at the same granularity?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "e83b59d5",
+  "program_lines": "docs/judge_v2_program.md L25002-L25014",
+  "program_lines_as_of": "e83b59d5 (parent d8ab39fa), re-grepped",
+  "date": "2026-10-08",
+  "heading": "## Registered 2026-10-08 (before any code or call) — TREE-CUT-GRANULARITY: on three content-closed MMLU-Pro re-draw trees ...",
+  "provenance": "the orchestrator's brief of 2026-10-08 (design); criteria, Support, predictions, falsifier the registrar's; docs/judge_v2_program.md L24950-L24956 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — six zero-call tests registered ...\"; _as_of the commit that writes it, parent d8ab39fa, re-grepped)"
+ },
+ "script": {
+  "path": "tools/analysis/tree_cut_granularity.py",
+  "blob": "blob:c80c3c1023ab62193483c1a4387000b532620640",
+  "sha16": "sha256-lf16:b1c3d18d2f489423",
+  "commit": "db44a46a (built, branch worktree-wf_fa0ebf63-18c-3)",
+  "merged": "c5f23e7a (registrar's batch, by path; parent 17c34de9)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_hier-fair-backoff_tree-cut-granularity.md",
+  "commit": "17c34de9",
+  "verdict": "READY (C1-C3)"
+ },
+ "go": "the author's 2026-10-08 authorisation (relayed in the orchestrator's brief, words not supplied): register and run the zero-call batch a-f; no judged calls",
+ "run": {
+  "outcome_file": "experiment_results/tree_cut_granularity/tree_cut_granularity_outcome.txt (sha256 264788bdc781b2abd83d0870a9147f7b0f80514c89d9485f61ad7c1d1ac247f1, 130 lines; write-once, never committed); backup E:/TaxoArena_backup_20261008_tree_cut_granularity (SHA256SUMS 3/3 OK, review)",
+  "outcome_commit": "outcome not committed (run from main after merge c5f23e7a)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "p5fb86f1075d76e34 / p6d15d913354f256d / p69d2762ac6223d93 (e1sd splits, content-closed CK-CLOSE-v1; pool_guard passed; never pools of record); no DB of record written (review row 18)",
+  "date": "2026-10-08"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_hier-fair-backoff_tree-cut-granularity.md",
+  "commit": "37672103",
+  "verdict": "VALID; TC CUT-WORSE 3/3; every number reproduced to 5 dp by own code; C1 [SCRIPT] blob c80c3c10 confirmed"
+ },
+ "criteria": [
+  {
+   "id": "TC1",
+   "text": "per tree (POINT and 95% INTERVAL jointly): CUT-WORSE iff UB(D_cut) < 0 AND |D_cut| > max(MDE80, spread_KM); CUT-BETTER iff LB > 0 AND |D_cut| > the same bar; NEITHER otherwise",
+   "result": "HELD",
+   "value": "CUT-WORSE x3: Q_e1sd1 -0.02976 [-0.03826, -0.02089] (bar 0.01232); Q_e1sd2 -0.02626 [-0.03434, -0.01886] (bar 0.00830); Q_e1sd3 -0.03154 [-0.03969, -0.02288] (bar 0.01046); each also above its realised MDE80 0.01239 / 0.01133 / 0.01197",
+   "denominator": "held-out 3,598 / 3,522 / 3,500 in 3,546 / 3,479 / 3,442 stem_key groups (Kish 1.0295 / 1.0250 / 1.0331)"
+  },
+  {
+   "id": "TC",
+   "text": "DECIDING: the TC1 word holding on >= 2 of 3 trees; MIXED otherwise. SCOREABLE (predicted -0.025 vs bar max(0.0083, spread_KM planning 0.010); SE 0.0030 transported from the pilot, DEFF 1.0 transported from GAP-FIX PR-1)",
+   "result": "HELD",
+   "value": "CUT-WORSE (3 of 3 trees); rule 8 not refuted (0 of 3 with UB >= 0 or |D_cut| <= bar)",
+   "denominator": "3 trees"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "D_cut per tree -0.025 [-0.045, -0.008]",
+   "result": "HELD",
+   "value": "x3: -0.02976, -0.02626, -0.03154 in [-0.045, -0.008]",
+   "denominator": "per tree"
+  },
+  {
+   "id": "P2",
+   "text": "TC CUT-WORSE 0.75 / NEITHER 0.12 / MIXED 0.10 / CUT-BETTER 0.03",
+   "result": "HELD",
+   "value": "CUT-WORSE (forecast 0.75); Brier 0.0878",
+   "denominator": "3 trees"
+  },
+  {
+   "id": "P3",
+   "text": "(descriptive) NMI difference < 0 on 3 of 3, probability 0.75",
+   "result": "HELD",
+   "value": "NMI difference -0.01298 / -0.01446 / -0.01304 (< 0 on 3 of 3); Brier 0.0625",
+   "denominator": "3 trees"
+  },
+  {
+   "id": "P4",
+   "text": "(descriptive) |R2_int difference| < 0.0025 on 3 of 3, probability 0.70",
+   "result": "HELD",
+   "value": "|R2_int difference| 0.00080 / 0.00038 / 0.00041 (< 0.0025 on 3 of 3); Brier 0.0900",
+   "denominator": "3 trees"
+  },
+  {
+   "id": "P5",
+   "text": "(descriptive) tree minus BKM purity > 0 on >= 2 of 3, probability 0.70",
+   "result": "HELD",
+   "value": "tree minus BKM purity +0.00587 / +0.00875 / +0.00067 (> 0 on 3 of 3); Brier 0.0900",
+   "denominator": "3 trees"
+  }
+ ],
+ "falsifier": {
+  "text": "F-TC fires iff TC reads CUT-BETTER; overturns the reading that the greedy top-down cuts cost partition quality against a flat fit at matched count",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "TC": "CUT-WORSE on 3 of 3 trees",
+  "D_cut": "Q_e1sd1 -0.02976 [-0.03826, -0.02089]; Q_e1sd2 -0.02626 [-0.03434, -0.01886]; Q_e1sd3 -0.03154 [-0.03969, -0.02288] (depth-averaged held-out purity, tree cut minus mean_s flat spherical k-means at the same cell count; 95% stem_key-group bootstrap, B 1,000)",
+  "bars": "max(0.0083, spread_KM): 0.01232 / 0.00830 / 0.01046; realised MDE80 0.01239 / 0.01133 / 0.01197",
+  "support_realised": "SE(D_cut) 0.00442 / 0.00405 / 0.00427 vs registered 0.0030 (W-4); n_eff 3,495 / 3,436 / 3,388",
+  "descriptive": "NMI tree minus KM -0.01298 / -0.01446 / -0.01304; R2_int -0.00080 / -0.00038 / -0.00041; tree minus BKM purity +0.00587 / +0.00875 / +0.00067; af_clean_s42 (pilot-seen) -0.03835 [-0.04614, -0.03029]"
+ },
+ "sentence_of_record": "TREE-CUT-GRANULARITY (2026-10-08, 0 calls) — VALID; TC CUT-WORSE on 3 of 3 content-closed MMLU-Pro re-draw trees: the anchor-free tree cut at each depth is a worse held-out partition than flat spherical k-means at the same cell count (depth-averaged purity D_cut -0.0298 [-0.0383, -0.0209], -0.0263 [-0.0343, -0.0189], -0.0315 [-0.0397, -0.0229]; every |D_cut| above its bar and its realised MDE80). F-TC NOT FIRED. [POSTRUN docs/reviews/POSTRUN_hier-fair-backoff_tree-cut-granularity.md, 37672103, W-4: realised SE 0.0040-0.0044 vs registered 0.0030; held-out 3,598 / 3,522 / 3,500; label-scored purity; one recipe, MMLU-Pro, qwen3; no routing or EVAL quantity.]",
+ "chips": [
+  "REGISTERED 2026-10-08, BEFORE ANY CODE",
+  "VALID (POST-RUN 37672103): TC CUT-WORSE 3/3; F-TC NOT FIRED",
+  "W-4: REALISED SE 0.0040-0.0044 VS 0.0030 REGISTERED; EVERY WORD CLEARS ITS REALISED MDE80; ONE RECIPE, MMLU-PRO, QWEN3"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-08",
+   "by": "registrar (docs/judge_v2_program.md L25147-L25157 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — rulings GAP-FIX-CC C-1 (B-3), SI-NULL-TRIAD B1 and SIN-2; ...\"; _as_of the commit that writes it, parent 17c34de9, re-grepped))",
+   "text": "READY; tool merged to main by path, blob verified. Declared deviations recorded (READY C3): D1 AF-U per-benchmark re-print NOT DONE; D2 R2_int on the MMLU-Pro key of record (46 models, 10,925 key-complete questions); D4 KWF = per-source K_s cells ([SC], tau 0); no criterion reads them. C1 run blob c80c3c10 exactly ([SCRIPT] line)."
+  },
+  {
+   "date": "2026-10-08",
+   "by": "registrar (POSTRUN 37672103, VALID; docs/judge_v2_program.md L25182-L25192 (section \"## TREE-CUT-GRANULARITY (2026-10-08, 0 calls) — VALID (POSTRUN 37672103): ...\"; _as_of the commit that writes it, parent f4dd6292, re-grepped))",
+   "text": "OUTCOME bracket appended to READOUTS AND CRITERIA of the registration (L25008): TC CUT-WORSE on 3 of 3 trees; F-TC NOT FIRED."
+  },
+  {
+   "date": "2026-10-08",
+   "by": "registrar (D-2026-10-08)",
+   "text": "D-2026-10-08-1 (the author's words, now supplied verbatim): \"a. Certificates (recommended), b+c. Hierarchy tests (recommended), d. SCPB gate, e+f. GAP-FIX-CC and SuperGPQA\"; judged spend \"None for now (Recommended)\". The go of record is unchanged in substance. Source: docs/judge_v2_program.md L25317-L25327 (section \"## Author's decision 2026-10-08 (recorded by the registrar; zero calls; insertion only) — D-2026-10-08-1..6 ...\"; _as_of the commit that writes it, parent 5211616a, re-grepped); authority docs/agents/author_decisions/2026-10-08.md (5211616a); plan Amendment 40"
+  }
+ ],
+ "does_not_show": [
+  "any routing, EVAL or judged quantity",
+  "that k-means is a better taxonomy (it does not nest: NESTING)",
+  "the leaf level (FLAT-MIX-MMLU, GAP-FIX-CC)",
+  "other embedders, recipes or corpora",
+  "anything about af_clean_s42 or AF-U beyond description"
+ ],
+ "ledger": {
+  "row_id": "TREE-CUT-GRANULARITY",
+  "version": "v417 (2026-10-08: OUTCOME bracket; VALID ok + W-4 warn chips beside REGISTERED) | v414 (2026-10-08: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "E1-SPLIT-DRAWS (the trees Q_e1sd1-3)",
+  "FLAT-MIX-MMLU (M1 scorer)",
+  "RESP-PROFILE-INFO (R2_int)",
+  "GAP-FIX (DEFF transport)"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; label-free geometry; no judge, rubric, GMM LR / BIC or sub-anchor profile"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "about 10-20 min",
+  "agent_hours": "about 3 h",
+  "reads_pool": true
+ },
+ "outputs": "never committed: pinned by sha256, stored on E: with SHA256SUMS.txt; temp under E:/TaxoArena_tmp via scratch_dir",
+ "sources": [
+  "docs/judge_v2_program.md L25002-L25014 (_as_of the commit that writes it, parent d8ab39fa, re-grepped)",
+  "docs/judge_v2_program.md L24950-L24956 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — six zero-call tests registered ...\"; _as_of the commit that writes it, parent d8ab39fa, re-grepped)",
+  "docs/judge_v2_program.md L25147-L25157 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — rulings GAP-FIX-CC C-1 (B-3), SI-NULL-TRIAD B1 and SIN-2; ...\"; _as_of the commit that writes it, parent 17c34de9, re-grepped)",
+  "docs/judge_v2_program.md L25182-L25192 (section \"## TREE-CUT-GRANULARITY (2026-10-08, 0 calls) — VALID (POSTRUN 37672103): ...\"; _as_of the commit that writes it, parent f4dd6292, re-grepped)",
+  "docs/judge_v2_program.md L25317-L25327 (section \"## Author's decision 2026-10-08 (recorded by the registrar; zero calls; insertion only) — D-2026-10-08-1..6 ...\"; _as_of the commit that writes it, parent 5211616a, re-grepped); authority docs/agents/author_decisions/2026-10-08.md (5211616a); plan Amendment 40"
+ ],
+ "last_update": "2026-10-08",
+ "label_status": "trees [LF]; k-means [LF]",
+ "pilot_disclosure": "SEEN before registration, pilot role only (never evidence): E:/TaxoArena_tmp/cert_split (results.json sha256 32fcf7cd8baa1367..., VERIFIED_HEADLINE.txt 98b32054b56bde7b...), E:/TaxoArena_tmp/hier_tests (granularity_free/results.json 2fc8ba3a99b8dc54..., nesting/results.json cb5a74cf0d870081..., test3_fair_backoff/results.json 866284ca1bb5cf98..., + review dirs), E:/TaxoArena_tmp/scpb/review_v3_synthesis.md d341748f5265229d...; 2026-10-07, zero calls, TRAIN only, not committed",
+ "plain_description": {
+  "sq": "SQ3 Taxonomy",
+  "what": "Cuts each of three fresh content-closed trees at every depth and compares each cut with a flat k-means clustering that has the same number of cells, by how well cells match the held-out subject labels. No judge calls.",
+  "why": "The tree was only compared with flat clustering at its finest level; a tree's value includes its coarser levels, so each level is checked against a flat fit of the same size.",
+  "information": "Shows whether the tree's coarser levels are worse, equal or better partitions than flat clustering of the same size. Result: done. On all three fresh trees, cutting the tree at a level gives a worse grouping (by subject labels on unseen items) than a flat k-means of the same size, by about 3 points of purity.",
+  "written": "2026-10-08"
+ }
+}

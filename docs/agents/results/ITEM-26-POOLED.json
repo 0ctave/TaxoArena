@@ -1,0 +1,210 @@
+{
+  "id": "ITEM-26-POOLED",
+  "title": "ITEM-26-POOLED + RE-JUDGE-RULE: does pooling the established labels of the two draws of the same judge on identical bytes identify b1, and which re-judge triggers does the record support? (zero calls; plan A3; plan Amendment 4 in the same commit)",
+  "question": "FRAMEWORK item 26's criterion 'b1 identified on established labels' was met on GROK-CALIB's draw (b1 +2.72, delta-deviance 4.47 > 3.84) and NOT on the Kotlin draw of the identical judge on identical bytes (+2.05, 2.26), at ~26 established wrong-direction events each. On the pooled established labels of BOTH draws (~52 events), fitted with a draw indicator as a scale term and a bootstrap clustered by question, is b1 identified at 3.84, and with what power? Second half, a rule: the re-judge triggers the record supports (plan Amendment 4).",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "62c4084",
+    "program_lines": "docs/judge_v2_program.md L5460-L5523; pre-run note 1534a4a (outcome file name; LOAO folds on the other 13 anchors' established edges, both draws; 'nominal ~2.2' read on the pooled unfiltered LOAO within [1.5, 3.0]; established labels per draw, pooled = the intersection; INVALID as the cache column; outer bootstrap with each resampled question its own cluster) [re-lined 2026-09-22: batch-1 lines were read at 9c1f37b-era HEAD and shifted by +2 by later insertions]",
+    "program_lines_as_of": "6aa2a0d",
+    "heading": "## Registered 2026-09-17 (before any code or call) — ITEM-26-POOLED + RE-JUDGE-RULE: does pooling the established labels of the two draws of the same judge on identical bytes identify b1, and which re-judge triggers does the record support? (zero calls; plan A3, one registration merging arena L3 B1-POOLED-DRAWS, judge Lead 1, refuter §3.3; plan Amendment 4 in the same commit)",
+    "outcome_heading": [
+      "L6597: ## ITEM-26-POOLED + RE-JUDGE-RULE (2026-09-18, zero judge calls) — on the registered pooled fit (each established edge once per draw: 1,620 edge-draws, 46 wrong"
+    ],
+    "date": "2026-09-17"
+  },
+  "script": {
+    "path": "tools/analysis/item26_pooled.py",
+    "sha16": "d40e0c8e64a3cf6a",
+    "commit": "72b3b25"
+  },
+  "ready": null,
+  "go": "n/a (0 calls; CPU 8,903 s)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/item26_pooled_outcome.txt",
+    "outcome_commit": "17a4434",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-18",
+    "other_files": [
+      "experiment_results/x12_crossdomain/item26_pooled_run.log",
+      "experiment_results/x12_crossdomain/item26_pooled_run_crashed_866812d.log (the first run's crash in the outer bootstrap's key map; fixed before the run of record)",
+      "docs/plan_2026-09-15.md Amendment 4 (re-judge triggers; on disk since 62c4084)"
+    ]
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-18_night_batch.md section ITEM-26-POOLED (the batch-1 file docs/reviews/2026-09-18_profile_batch1.md records the crashed first run)",
+    "commit": "17a4434 (file last at 074eb3d)",
+    "verdict": "numbers CONFIRMED to the digit; the independence premise REFUTED: the 46 events are 29 distinct edges (17 wrong in both draws, phi 0.735); under a correlation-preserving null the 3.84 bar has size 0.14 and 6.51 sits at the null's 0.066 quantile; one-row-per-edge refits 3.34 / 3.25; power 0.856 pooled is an independence upper bound (~0.81 honest)"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "pooled delta-deviance >= 3.84: b1 identified on the pooled established labels, 'ORDERED-JUDGED available for grok' rests on the pooled evidence of both draws; < 3.84: every grok cell BANDED-JUDGED",
+      "result": "HELD",
+      "value": "6.51 >= 3.84 on the registered statistic (b0 -3.1616, b1 +2.4446, b2 -0.0871; nll 116.228 vs null 119.481) WITH the correlation caveat: identified at the registered bar, NOT at a correlation-honest 0.05 (p ~ 0.07; the GROK-CALIB ledger row takes this bracket)",
+      "denominator": "1,620 edge-draws (810 established edges x 2 draws), 46 wrong-direction events = 29 distinct edges"
+    },
+    {
+      "id": "C2",
+      "text": "the power statement at ~26 and ~52 events, printed whatever C1 does",
+      "result": "HELD",
+      "value": "parametric at true b1 = +2.7, 1,000 label sets: single draw 0.622 (D=0, 29.4 mean events) / 0.569 (D=1, 26.9); pooled 0.856 (56.4 events) as an INDEPENDENCE upper bound; ~0.81 at the observed correlation, against a bar whose size is 0.14 (reviewer)",
+      "denominator": "810 established edges per draw"
+    },
+    {
+      "id": "C3",
+      "text": "LOAO on the pooled fit at 0.975: called / wrong(established) / nominal per draw and pooled; status by the power rule (nominal < 3 -> UNDETERMINED)",
+      "result": "UNDETERMINED",
+      "value": "D=0 called 688 of 918, wrong 4, wrong(established) 2, nominal 1.12; D=1 686 / 3 / 1 / 1.03; pooled 1,374 of 1,836 / 7 / 3 / 2.16 (each edge twice); key gap >= 0.02 beside 682 / 3 / 2 / 1.05 and 683 / 2 / 1 / 1.00; UNDETERMINED per draw and pooled",
+      "denominator": "918 unfiltered edges per draw (the adopted denominator)"
+    },
+    {
+      "id": "C4",
+      "text": "utility >= 60% per draw (D6: LOAO-called over ALL edges)",
+      "result": "HELD",
+      "value": "74.9% (D=0) / 74.7% (D=1); key-gap filtered beside 76.6% / 76.7%",
+      "denominator": "918 edges per draw"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "(plan) pooled delta-deviance in [3.5, 5.5]",
+      "result": "FAILED",
+      "value": "6.51 (upward)",
+      "denominator": "1,620 edge-draws"
+    },
+    {
+      "id": "P2",
+      "text": "(plan) LOAO wrong 2-4 (established 1-2) per draw",
+      "result": "HELD",
+      "value": "4 (2) / 3 (1)",
+      "denominator": "688 / 686 called"
+    },
+    {
+      "id": "P3",
+      "text": "(plan) nominal ~2.2 within [1.5, 3.0] on the pooled unfiltered LOAO",
+      "result": "HELD",
+      "value": "2.16; on the doubled count (1.1 per draw; checker D2)",
+      "denominator": "pooled LOAO, 1,374 called"
+    },
+    {
+      "id": "P4",
+      "text": "(plan) status UNDETERMINED",
+      "result": "HELD",
+      "value": "UNDETERMINED everywhere",
+      "denominator": "per draw and pooled"
+    },
+    {
+      "id": "P5",
+      "text": "(registrar's blind addition) b2 within [-1, +1] (the two draws are one instrument inside the 1.9pp floor)",
+      "result": "HELD",
+      "value": "-0.0871; the SAME FACT as phi 0.735 (checker D3): both cannot be read favourably",
+      "denominator": "pooled fit"
+    }
+  ],
+  "falsifier": {
+    "text": "pooled delta-deviance < 2.5: overturns GROK-CALIB's consequence 'ORDERED-JUDGED available for grok'; every grok-judged cell is BANDED-JUDGED and FRAMEWORK item 26 / Stage 6 carry that bracket until a larger established population exists (which needs new questions, not re-draws)",
+    "fired": false,
+    "note": "NOT TRIGGERED under the registered statistic (6.51) and under none of the reviewer's corrections (3.75 / 3.34 / 3.25 all >= 2.5); no grok cell falls to BANDED-JUDGED by this test"
+  },
+  "numbers_of_record": {
+    "draws": "D=0 GROK-CALIB grok_calib.db 9,142 rows (INVALID 11); D=1 Kotlin kotlin_c0d3f708cbc3930e.db 9,123 (INVALID 17); both restricted to the 9,123 shared matches (19 reference-less rows on 10 questions dropped); build_edges reproduces systematic_budget.build edge for edge (918; max |dm| + |ds| + |dA| 0)",
+    "edges_per_draw": "918 unfiltered / 890 filtered / 810 established, identical across draws (0 label disagreements); wrong-direction among the established 21 (D=0) / 25 (D=1); of all edges 51 / 57",
+    "single_draw_identification_on_810": "D=0 b1 +2.7680, delta-deviance 4.34 (record 4.47 / +2.7194 on 891); D=1 +2.0451, 2.26 (the record exactly)",
+    "pooled_fit": "tau(A, D) = exp(b0 + b1 A + b2 D): b0 -3.1616, b1 +2.4446, b2 -0.0871, nll 116.228; null (b1 = 0) nll 119.481; delta-deviance 6.51; tau at A = 0.30 / 0.60 / 0.90: 0.088 / 0.184 / 0.382 (D=0), 0.081 / 0.168 / 0.350 (D=1); 3 free parameters",
+    "question_clustered_bootstrap": "inner B 300, outer B 300, 0 degenerate: b1 [+0.230, +7.990], b2 [-0.263, +0.128], delta-deviance median 7.91, share >= 3.84 0.757; reviewer beside: profile-likelihood b1 [~0.52, ~6.8]; edge-pair-clustered bootstrap b1 [-0.07, +10.48], share >= 3.84 0.66",
+    "correlation_refutation_reviewer": "46 events = 29 distinct edges (17 wrong in BOTH draws, 4 D=0-only, 8 D=1-only; phi 0.735; sign(m) agrees on 799 of 810); delta-deviance / (1 + phi) = 3.75; one-row-per-edge refits wrong-in-either (29) 3.34, wrong-in-both (17) 3.25; null-size simulation preserving phi 0.73: P(dd >= 3.84 | H0) = 0.141, P(dd >= 6.51 | H0) = 0.066; single-draw null size 0.04-0.06",
+    "power": "single draw 0.622 / 0.569; pooled 0.856 (independence upper bound); ~0.81 at the observed correlation against a bar of size 0.14",
+    "LOAO": "D=0 688 / 4 / 2 / 1.12 (utility 74.9%); D=1 686 / 3 / 1 / 1.03 (74.7%); pooled 1,374 / 7 / 3 / 2.16",
+    "runtime": "8,903 s, zero judge calls",
+    "RE-JUDGE-RULE_Amendment_4": "TRIGGERS = judge fingerprint change; reference vintage change on a question; canary alarm (CANARY-BASELINE pass 2 >= 2026-09-22). NOT a trigger = tree re-celling with the anchor-rubric bytes held fixed (STACK-NORUBRIC +0.2pp); NOT a trigger = provider re-draw alone (JUDGE-WIRING-BOARD, inside 1.9pp); every re-judge read on identical matches, both conventions, question-clustered CI, floor ~1.9pp below 1,000 matches"
+  },
+  "sentence_of_record": "ITEM-26-POOLED: on the registered pooled fit (each established edge once per draw) delta-deviance 6.51 >= 3.84, C1 HELD as registered (prediction band 3.5-5.5 FAILED upward). The 46 events are 29 distinct edges (17 wrong in both draws, phi 0.735); under a null preserving that correlation the 3.84 bar has size 0.14 and 6.51 sits at the null's 0.066 quantile; one-row-per-edge refits 3.34 / 3.25; question-clustered bootstrap b1 [+0.23, +7.99], 75.7% of replicates >= 3.84. b1 is identified at the registered bar and NOT at a correlation-honest 0.05 (p ~ 0.07); ORDERED-JUDGED for grok rests on that, with power 0.62 on one draw and at most ~0.8 pooled; no cell falls to BANDED-JUDGED by this test (falsifier < 2.5 not triggered). LOAO UNDETERMINED everywhere (nominal 1.0-1.1 per draw).",
+  "chips": [
+    "C1 HELD (REGISTERED STATISTIC 6.51)",
+    "NOT INDEPENDENT: 29 DISTINCT EDGES, PHI 0.74; p ~ 0.07 CORRELATION-HONEST",
+    "PREDICTION BAND FAILED UPWARD",
+    "POWER 0.62 SINGLE / <= 0.8 POOLED",
+    "LOAO UNDETERMINED",
+    "FALSIFIER SILENT"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-18",
+      "by": "the pre-run note (1534a4a)",
+      "text": "outcome file name item26_pooled_outcome.txt; LOAO folds fitted on the established edges of the other 13 anchors, both draws; 'nominal ~2.2' read on the pooled unfiltered LOAO within [1.5, 3.0]; established labels per draw, pooled = the intersection; INVALID as the cache column; outer bootstrap with each resampled question its own cluster."
+    },
+    {
+      "date": "2026-09-18",
+      "by": "the adversarial reviewer (docs/reviews/2026-09-18_night_batch.md, 17a4434), of record in the outcome section L6621-L6626; consequence: the GROK-CALIB ledger row bracketed and its chip qualified (v114)",
+      "text": "the independence premise the registration carried is refuted: the 46 events are 29 distinct edges (phi 0.735); b1 is identified at the registered bar and not at a correlation-honest 0.05 (p ~ 0.07); ORDERED-JUDGED for grok rests on that with power 0.62 single / <= 0.8 pooled and the bar's honest size 0.14."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "CORRECTIONS_2026-09-23 (registrar)",
+      "text": "[CORRECTED 2026-09-23 by the registrar (line pointer only, zero calls; no number, no criterion and no sentence moves): registration.program_lines names docs/judge_v2_program.md L5460, and that was exact when it was written. After commit cd83eac inserted four one-line correction brackets mid-file (hunks @@ -3911,0 / -6535,0 / -6692,0 / -6949,0 @@), the heading of record \"## Registered 2026-09-17 (before any code or call) — ITEM-26-POOLED + RE-JUDGE-RULE: does pooling the established labels of the two draws of ...\" stands at L5461, +1; the whole span shifts by the same +1. Verified at HEAD by sed -n '5461p' docs/judge_v2_program.md. The map for every such pointer is the programme's \"## Line-shift map, appended 2026-09-23\" section: +0 up to old L3911, +1 to L6535, +2 to L6692, +3 to L6949, +4 below. The recorded span is left standing beside this bracket, not rewritten.]"
+    },
+    {
+      "date": "2026-09-23",
+      "by": "INCONSISTENCIES-PASS (registrar, zero calls; insertion only)",
+      "text": "NAME 2026-09-23 by INCONSISTENCIES-PASS (registrar, zero calls; insertion only): the registration wrote item26_pooled.txt; the file of record is experiment_results/x12_crossdomain/item26_pooled_outcome.txt (tracked), fixed before the run by the [NOTE 2026-09-18 by REVIEW (pre-run, ITEM-26-POOLED)], 1534a4a. [ledger: evidence cell of row ITEM-26-POOLED, v132]"
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a b1 identified at 0.05 once the draw correlation is honoured",
+    "a calibration at the operating point (UNDETERMINED everywhere, nominal 1.0-1.1 per draw)",
+    "anything about a second judge, vintage or cache (nothing else is pooled; guard 12 honoured)",
+    "a transfer (JUDGE-TRANSFER / BUDGET-TRANSFER untouched)",
+    "that a larger established population exists anywhere in the record (it needs new questions)"
+  ],
+  "ledger": {
+    "row_id": "ITEM-26-POOLED",
+    "version": "v114 [v132 2026-09-23: INCONSISTENCIES-PASS insertion in this row]; [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "GROK-CALIB",
+    "JUDGE-WIRING-BOARD",
+    "JUDGE-WIRING",
+    "SYSTEMATIC-BUDGET",
+    "SYSTEMATIC-SIGNAL",
+    "UNFILTERED-ADOPT",
+    "DECOMP",
+    "TEMP-0",
+    "JUDGE-TRANSFER",
+    "BUDGET-TRANSFER",
+    "STACK-NORUBRIC",
+    "CANARY-BASELINE",
+    "REF-SC"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L5458-L5521 (registration 62c4084): question, hygiene, instrument, criteria C1-C4, predictions, the registrar's addition, falsifier, Amendment 4 text",
+    "docs/judge_v2_program.md L6591-L6671 (outcome section, 3dd0900): every number, (2)-(6), the reviewer's refutation, criteria and predictions scored, defects D1-D4, does-not-show, the sentence of record",
+    "docs/reviews/2026-09-18_night_batch.md section ITEM-26-POOLED (17a4434; file last at 074eb3d): CONFIRMED status, the phi / one-row-per-edge / null-size / profile-likelihood numbers, chips; docs/reviews/2026-09-18_profile_batch1.md (46f44e8): the crashed first run",
+    "experiment_results/x12_crossdomain/item26_pooled_outcome.txt (17a4434)",
+    "docs/plan_2026-09-15.md Amendment 4 (62c4084)",
+    "docs/test_ledger.html row ITEM-26-POOLED (v114): chips verbatim, evidence (62c4084, 1534a4a, 72b3b25, 17a4434, 3dd0900)",
+    "script sha16 = sha256 of tools/analysis/item26_pooled.py at 72b3b25, first 16 hex (identity, computed by the registrar 2026-09-20)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' lines to grep -n regardless of line drift; line numbers re-lined 2026-09-22 as of programme HEAD 6aa2a0d (shift +2 from the batch-1 reading)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Pools two repeated runs of the same judge (grok) on identical inputs to test whether a calibration parameter of the judge's error model can be estimated reliably. The pooled data holds 46 cases where the board ordered a model pair in the wrong direction, which are only 29 distinct pairs. It also sets rules for when a re-judge is needed. No calls.",
+    "why": "One run met the bar and the other did not; pooling asks whether the judge's error calibration is actually identified, which underpins trusting ordered per-cell judged rankings.",
+    "information": "Identification would support ordered judged rankings for this judge; failure would downgrade them. Result: done. It passes the registered bar, but the two runs share most of the same errors (the 46 wrong orderings are only 29 distinct model pairs). Once that overlap is accounted for, it is not significant at the usual 5% level (p about 0.07). No cell is downgraded. Older p2dca question family, later ruled 'history, not evidence'.",
+    "written": "2026-10-07"
+  }
+}

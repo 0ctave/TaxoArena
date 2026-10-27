@@ -1,0 +1,21 @@
+# RP12 ARCH-V2-E-T G12 (certificate; = F-TAX N-1), docs/judge_v2_program.md L22028-L22060 (0a0361b): the site null on B0's
+# MMLU-Pro member (MMLU_PRO_LB, built on the multi-corpus DB, pool pv2_1575de61bb20e977), 300 reps, read by cert_resolution.py's
+# hierarchical BH. NOT a HeadlessBenchmarkRunner config: tools/analysis/g12_site_null.py reads it (strict keys), resolves the
+# member's snapshot through the pointer file, checks its stamp, prints the sites, the top family m (<= 15 against the 14
+# declared MMLU-Pro domains) and the heap estimate, and prints the exact `gradlew siteNull` command (--dry-run; zero calls).
+# LANE R2 (tools/analysis/rp12_lane.py; rp12-r2-lane): R1's copy is experiment_configs/rp12/B0/g12_site_null.sitenull.
+# TOML syntax; the .sitenull extension keeps it out of ConfigParsesTest's walk of HeadlessBenchmarkRunner configs (*.toml).
+pointerFile     = "experiment_configs/rp12_r2/objects_of_record.json"
+pointerEntry    = "B0/mmlu_pro_lb"
+poolId          = "pv2_1575de61bb20e977"
+enginePoolSha256Lf = "79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6"
+namespace       = "MMLU_PRO"
+sliceDim        = 512
+sepBar          = 0.0145
+dropTop         = 0
+whiten          = false
+nullReps        = 300
+jvmThreads      = 12
+declaredDomains = 14
+mTopMax         = 15
+outCsv          = "experiment_results/archv2/rp12_r2/g12/site_null_B0_mmlu_pro_lb.csv"

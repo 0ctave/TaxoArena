@@ -1,0 +1,98 @@
+{
+  "id": "MC-FED",
+  "title": "MC-FED: multi-corpus stage 1b: federated construction (per-corpus trees, each with its own loop, split and site null; union = graft under a root; zero calls)",
+  "question": "Six label-free builds on the union DB, promoted body, seed 42; site null per corpus; then the union graft and its held-out routing; descriptive: certified sites summed over corpora vs the one-loop union (5); union Top-1 per source.",
+  "kind": "build",
+  "state": "done",
+  "registration": {
+    "commit": "511937e",
+    "program_lines": "docs/multi_corpus_design.md L357-L375 (per-corpus half) and L376-L406 (union graft); no programme section",
+    "program_lines_as_of": "docs/multi_corpus_design.md at 4ec8f18",
+    "heading": "## Stage 1b result (2026-09-11, zero calls): federated construction + union graft",
+    "outcome_heading": [
+      "docs/multi_corpus_design.md L357: ## Stage 1b result, per-corpus half (2026-09-11 14:15, zero calls) — federated construction recovers certification",
+      "docs/multi_corpus_design.md L376: ## Stage 1b result (2026-09-11, zero calls): federated construction + union graft"
+    ],
+    "date": "2026-09-11"
+  },
+  "script": {
+    "path": "experiment_configs/multicorpus/*_s42.toml (six builds; unionSnapshots graft)",
+    "sha16": "n/a (construction chain; 287 tests, replay bit-identical)",
+    "commit": "c1eacd2"
+  },
+  "ready": null,
+  "go": "n/a (0 LLM calls)",
+  "run": {
+    "outcome_file": "experiment_results/multicorpus/site_null_*_s42.csv and the union readout (recorded in multi_corpus_design.md L357-L406)",
+    "outcome_commit": "c1eacd2",
+    "calls": 0,
+    "cce": 0,
+    "pool": "per-corpus 0.30 splits at seed 42; union pool = the union of the six pools (paeec37aa28063c75 after the graft)",
+    "date": "2026-09-11"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/)",
+    "commit": "c1eacd2",
+    "verdict": "CERTIFICATION RECOVERED (13 vs 5); UNION ROOT DESCENT LOSES ROUTING (72.1% vs a flat sweep's 81.6%) => stage 1c (MC-ROOT)"
+  },
+  "criteria": [
+    {
+      "id": "descriptive",
+      "text": "certified sites summed over corpora vs the one-loop union (5); union Top-1 per source",
+      "result": "DELIVERED",
+      "value": "certified MMLU-Pro 8/66 (= the original DB's 8), BBH 4/15, IFEval 1/2, MATH 0/4, GPQA 0/2, MuSR 0/0: 13 vs 5; leaves 81+39+11+5+4+3 = 143; MATH / GPQA / MuSR too small for the site null at mcs 55; union graft (239 nodes, 143 leaves): Top-1 72.1%, routed source 84.2%; MMLU-Pro inside the union 59.5% vs 75.8% alone: the six-way root descent under the production beam gate sends 22% of MMLU-Pro held-out to other subtrees while a flat nearest-centroid sweep over the same leaves scores 81.6%: the loss is in the root descent, not the leaves; 287 tests, replay bit-identical",
+      "denominator": "six corpora; the union held-out set"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "the loss is in the root descent; stage 1c tests union root rules"
+  },
+  "numbers_of_record": {
+    "certified": "13 (8 / 4 / 1 / 0 / 0 / 0) vs 5",
+    "leaves": "143 (81+39+11+5+4+3)",
+    "union_routing": "Top-1 72.1%; source 84.2%; MMLU-Pro 59.5% inside vs 75.8% alone; flat sweep 81.6%"
+  },
+  "sentence_of_record": "MC-FED (2026-09-11, zero calls): federated construction recovers certification (13 vs 5 for the joint loop: MMLU-Pro 8/66, BBH 4/15, IFEval 1/2; MATH / GPQA / MuSR too small for the site null at mcs 55); the union graft (239 nodes, 143 leaves) routes at Top-1 72.1% / source 84.2%, with MMLU-Pro inside the union at 59.5% vs 75.8% alone because the six-way root descent sends 22% of its held-out to other subtrees, while a flat nearest-centroid sweep over the same leaves scores 81.6%: the loss is in the root descent, not the leaves; 287 tests, replay bit-identical.",
+  "chips": [
+    "CERTIFICATION RECOVERED (13 vs 5)",
+    "UNION ROOT DESCENT LOSES ROUTING"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-23",
+      "by": "INCONSISTENCIES-PASS (registrar, zero calls; insertion only)",
+      "text": "NO-FILE 2026-09-23 by INCONSISTENCIES-PASS (registrar, zero calls; insertion only): no scored outcome .txt: the evidence is the TRACKED experiment_results/multicorpus/site_null_{bbh,gpqa,ifeval,math,mmlu_pro_lb,musr}_s42.csv, and the readout of record is docs/multi_corpus_design.md '## Stage 1b result, per-corpus half (2026-09-11 14:15, zero calls) — federated construction recovers certification' and '## Stage 1b result (2026-09-11, zero calls): federated construction + union graft'. [ledger: evidence cell of row MC-FED, v132]"
+    }
+  ],
+  "does_not_show": [
+    "a routing rule for the union root (MC-ROOT)"
+  ],
+  "ledger": {
+    "row_id": "MC-FED",
+    "version": "v49 (c1eacd2) [v132 2026-09-23: INCONSISTENCIES-PASS insertion in this row]"
+  },
+  "depends_on": [
+    "MC-BUILD",
+    "MC-ROOT"
+  ],
+  "supersedes": "MC-BUILD",
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/multi_corpus_design.md L357-L406 (511937e / c1eacd2)",
+    "experiment_configs/multicorpus/*_s42.toml; experiment_results/multicorpus/site_null_*_s42.csv",
+    "docs/test_ledger.html row MC-FED (v49): chips verbatim, observed cell, evidence",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)"
+  ],
+  "last_update": "2026-09-23",
+  "plain_description": {
+    "sq": "SQ3 Taxonomy",
+    "what": "Builds a separate tree for each of six benchmarks, each with its own certification, then grafts them under one root. The result is compared with a single tree built on all six at once: how many splits are certified, and how well held-out questions are routed to the right cell (no judge calls).",
+    "why": "It tests whether building per corpus and then merging gives a better multi-benchmark taxonomy than one joint build.",
+    "information": "More certified splits and good routing would favour the federated design. Result: per-corpus building recovers certification (13 certified splits vs 5 for the joint build). The grafted tree routes 72% of questions to the right cell. The loss comes from the top-level choice of which benchmark subtree to enter: assigning each question straight to the nearest cell scores 82%. No rule for the top level is shown.",
+    "written": "2026-10-07"
+  }
+}

@@ -1,0 +1,172 @@
+{
+ "id": "CELL-STRATA-EVAL",
+ "title": "CELL-STRATA-EVAL: leave-one-model-out accuracy estimation from n sampled EVAL items: AF-U-cell strata vs random, source and K_0 strata (n 100 deciding), IRT-anchor [TS] ceiling; exploratory union-DB look disclosed (zero calls; REGISTERED 2026-10-04)",
+ "question": "Does cell-stratified sampling cut evaluation cost beyond random or source strata?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "the commit that writes it (parent b7fb6bc8)",
+  "program_lines": "docs/judge_v2_program.md L24416-L24428",
+  "program_lines_as_of": "the commit that writes them, parent b7fb6bc8, re-grepped",
+  "date": "2026-10-04",
+  "provenance": "docs/literature/2026-10-04_response_structure.md (a8fb1be4; blob 0230843b); docs/agents/plans/2026-10-04_literature_shortlist.md (68a3d731); the author's Go (docs/agents/plans/2026-10-04_W1_W2_schedule.md (be8e54d3))"
+ },
+ "script": {
+  "path": "tools/analysis/cell_strata_eval.py",
+  "sha16": "4ded0e2cc01de5dc (sha256-lf16)",
+  "blob": "e76f9a6d (LF); resp_structure_common blob ba67f78f",
+  "commit": "14ab172d (merge of resp-structure-fix1 b2d05f34)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_resp_structure.md",
+  "commit": "fdfe0543",
+  "blob": "19acccf1 (LF)",
+  "verdict": "READY (D-CS1 fixed; B-CS bracketed)"
+ },
+ "go": "the author's Go for zero-call windows (2026-10-04)",
+ "run": {
+  "outcome_file": "experiment_results/archv2/cell_strata_eval/cell_strata_eval_outcome.txt (sha256 7966eebc56fe4dd6c0c7884a824566b1b6e7a00b0bf6a2c5c8296ad14feedda1; write-once, never committed); backup E:/TaxoArena_backup_2026-10-04_cell_pair (SHA256SUMS.txt, 12 OK)",
+  "outcome_commit": "run from main (code merged 14ab172d); outcome not committed",
+  "calls": 0,
+  "cce": 0,
+  "pool": "reader: pv2_1575de61bb20e977 (B0-2 rc 0; views sha256 before = after; IDENTITY REPRODUCED)",
+  "date": "2026-10-04",
+  "concurrency": "sequential zero-call readers after RESP-PROFILE-INFO (N-CONC; rule 7 not engaged): NOT AFFECTING"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_cell_pair.md",
+  "commit": "a6daf4a9",
+  "blob": "461e4515 (LF)",
+  "verdict": "VALID with word conditions R-CS-K (MEDIUM) and R-CS-X (LOW); R-IRT discharged"
+ },
+ "criteria": [
+  {
+   "id": "CS1",
+   "text": "DECIDING: BEATS-RAND iff MAE ratio STRAT-AF / RAND has its model-clustered 95% interval wholly below 1; NOT-SHOWN otherwise. Verdict line: SCOREABLE (SE 0.024 log; MDE80 0.066)",
+   "result": "HELD",
+   "value": "BEATS-RAND: MAE ratio 0.9447, 95% [0.9206, 0.9676] (0.03695 / 0.03912); a design contrast (R-CS-K)",
+   "denominator": "18 models x 500 draws at n 100; two-level bootstrap B 2,000"
+  },
+  {
+   "id": "CS2",
+   "text": "deciding vs STRAT-SRC and STRAT-K0: AF-BETTER iff 95% interval < 0 AND |D| > spread_K; AF-NOT-BETTER iff point D >= 0; UNDETERMINED otherwise. DESCRIPTIVE-ONLY vs STRAT-SRC at the prediction",
+   "result": "UNDETERMINED",
+   "value": "vs STRAT-SRC UNDETERMINED (D -0.00069, 95% [-0.00182, +0.00042]; spread_K 0.00043; below the MDE); vs STRAT-K0 AF-NOT-BETTER (D +0.00030 >= 0); R-CS-X",
+   "denominator": "18 models x 500 draws"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "MAE ratio 0.85 [0.70, 0.97]; CS1 BEATS-RAND 0.75",
+   "result": "HELD",
+   "value": "0.9447 in [0.70, 0.97]; CS1 BEATS-RAND at 0.75: Brier 0.0625",
+   "denominator": "18 models"
+  },
+  {
+   "id": "P2",
+   "text": "CS2 vs SRC: AF-BETTER 0.15, UNDETERMINED 0.55, AF-NOT-BETTER 0.30",
+   "result": "n/a",
+   "value": "UNDETERMINED occurred (probability 0.55); three-way Brier 0.3150",
+   "denominator": "18 models"
+  },
+  {
+   "id": "P3",
+   "text": "IRT-ANCHOR ratio 0.70 [0.50, 0.90] (ceiling)",
+   "result": "HELD",
+   "value": "IRT-ANCHOR 0.8523 in [0.50, 0.90] (descriptive; R-IRT words)",
+   "denominator": "18 models"
+  }
+ ],
+ "falsifier": {
+  "text": "F-CS fires iff CS2 vs STRAT-SRC AF-NOT-BETTER: no sampling-efficiency gain beyond source strata.",
+  "fired": false,
+  "outcome": "F-CS NOT FIRED (CS2 vs STRAT-SRC UNDETERMINED); no SQ4 cost sentence either (R-CS-K)"
+ },
+ "numbers_of_record": {
+  "CS1": "MAE ratio STRAT-AF / RAND 0.9447, 95% [0.9206, 0.9676] (MAE 0.03695 / 0.03912; 18 models x 500 draws, n 100); 17 of 18 models < 1",
+  "CS2_SRC": "D -0.00069, 95% [-0.00182, +0.00042]; spread_K 0.00043; SE(D) about 0.00057, MDE80 about 0.0016: UNDETERMINED",
+  "CS2_K0": "D +0.00030, 95% [-0.00045, +0.00110]: AF-NOT-BETTER; K_s MAEs 0.03642/0.03647/0.03674/0.03685/0.03681",
+  "Support": "SE log ratio measured 0.0129 (planning 0.024); MDE80 0.0362 (registered 0.066)",
+  "own_source": "5,716 own-source items (unregistered, descriptive): ratio 0.9434 [0.9114, 0.9770]; vs SRC D -0.0014 [-0.0025, -0.0003]; vs K0 D -0.00032 [-0.00113, +0.00052] (R-CS-X)",
+  "IRT_ANCHOR": "MAE ratio vs RAND 0.8523 (descriptive, [TS] ceiling; R-IRT words)"
+ },
+ "sentence_of_record": "CELL-STRATA-EVAL (2026-10-04, 0 calls) \u2014 VALID; CS1 BEATS-RAND, CS2 UNDETERMINED vs SRC / AF-NOT-BETTER vs K0, F-CS not fired (R-CS-K, R-CS-X). On the content-closed v2 union EVAL (5,907 items / 5,404 components; 18 held-out models x 500 draws), AF-U-cell strata beat simple random sampling at n 100 (MAE ratio 0.945 [0.921, 0.968]); they are not better than per-source k-means strata and not separated from source strata (UNDETERMINED, below the MDE), for AF-U as built; on the 5,716 own-source-filed items, versus SRC D -0.0014 [-0.0025, -0.0003] (unregistered, descriptive, a different population). No SQ4 'the tree cuts evaluation cost' sentence. [POSTRUN docs/reviews/POSTRUN_cell_pair.md, a6daf4a9; outcome not committed, sha256 7966eebc...]",
+ "chips": [
+  "REGISTERED 2026-10-04, BEFORE ANY CODE; not built",
+  "VALID (POST-RUN a6daf4a9): CS1 BEATS-RAND (MAE RATIO 0.9447 [0.9206, 0.9676]); F-CS NOT FIRED",
+  "CS2 UNDETERMINED VS SRC (BELOW THE MDE), AF-NOT-BETTER VS K_0; R-CS-K: NO SQ4 &#x27;THE TREE CUTS EVALUATION COST&#x27; SENTENCE; R-CS-X (OWN-SOURCE DESCRIPTIVE)"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-04",
+   "by": "registrar (pre-data; READY_resp_structure)",
+   "text": "NOT READY: D-CS1 blocker (within-source cell shuffle on every draw, every stratified arm) and a delta review owed; B-CS brackets to follow the fix. L24421."
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (pre-data; READY_resp_structure.md)",
+   "text": "B-CS readings of record: CS-R1 as amended by D-CS1 (within-source cell permutation per draw, every stratified arm; permutations -> u -> keys; HT pi, CS-R2 seeds unchanged), CS-R3 (IRT-ANCHOR k-means on (a, b)), CS-R4 ('gp-IRT-style (reading)', not tinyBenchmarks' exact estimator), CS-R5 (NEYMAN S_h floor 0.05, cap, re-allocation), CS-R7 (two-level model x draw bootstrap, draw indices shared across arms). READY. L24421, L24423."
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (post-run duty; POSTRUN 6cb817b6)",
+   "text": "R-IRT carried from POSTRUN_resp_profile_info.md (6cb817b6): shares resp_structure_common.fit_train (alternating JML, not the penalised optimum); the post-run review re-fits the deciding numbers under the constrained optimum and flags any verdict change; the IRT is quoted as 'a 3PL fitted by alternating JML with standardised theta (not the penalised optimum; verdicts robust to the constrained optimum, POSTRUN_resp_profile_info.md)'. INSTRUMENT L24421."
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (outcome; POSTRUN a6daf4a9)",
+   "text": "OUTCOME: CS1 BEATS-RAND (design contrast); CS2 UNDETERMINED vs SRC, AF-NOT-BETTER vs K0; F-CS not fired; R-CS-K (no SQ4 cost sentence), R-CS-X (own-source descriptive); R-IRT discharged. Brackets L24421, L24423, L24426; section L24588-L24600 (_as_of 0d76dc87)."
+  }
+ ],
+ "does_not_show": [
+  "that the tree cuts evaluation cost (R-CS-K)",
+  "that AF-U strata beat per-source k-means or source strata",
+  "a price for judged evaluation",
+  "other rosters (leave-one-model-out within 18)",
+  "a ranking against the [TS] ceiling",
+  "a registered own-source reading (R-CS-X descriptive)"
+ ],
+ "ledger": {
+  "row_id": "CELL-STRATA-EVAL",
+  "version": "v390 (2026-10-04: OUTCOME bracket, OK + WARN chips) | v383 (2026-10-04: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "UNION-AF-ROUTE",
+  "CELL-DIFFICULTY (related)"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; no Gaussian-mixture LR / BIC, MDL or Bayesian evidence (MIX-LRT-SITE untouched); no judge, rubric, reference, frontier, temperature"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "CPU about 1 h (pool reader)",
+  "agent_hours": "about 3 h",
+  "reads_pool": true
+ },
+ "outputs": "never committed: stored on E: with SHA256SUMS.txt; temp under E:/TaxoArena_tmp via scratch_dir",
+ "sources": [
+  "docs/judge_v2_program.md L24416-L24428 (_as_of the commit that writes it, parent b7fb6bc8, re-grepped)",
+  "docs/literature/2026-10-04_response_structure.md (a8fb1be4; blob 0230843b)",
+  "docs/agents/plans/2026-10-04_literature_shortlist.md (68a3d731)",
+  "docs/reviews/READY_resp_structure.md delta (fdfe0543; blob 19acccf1, LF)",
+  "docs/judge_v2_program.md section \"## Registrar's record 2026-10-04 (insertion only; zero calls; nothing run; pre-data) \u2014 CELL-STRATA-EVAL and CELL-DIFFICULTY READY ...\" (L24530-L24534, _as_of 14ab172d, re-grepped)",
+  "docs/reviews/POSTRUN_cell_pair.md (a6daf4a9; blob 461e4515, LF); the outcome file (sha256 7966eebc...); docs/judge_v2_program.md section '## CELL-STRATA-EVAL (2026-10-04, 0 calls) ...' L24588-L24600 (_as_of 0d76dc87)"
+ ],
+ "last_update": "2026-10-04",
+ "disclosure": "exploratory read-only look at the union DB (TRAIN + EVAL; no cell or label quantity) during the response-structure pass (docs/literature/2026-10-04_response_structure.md (a8fb1be4; blob 0230843b) section 0)",
+ "label_status": "AF-U [SC] where used",
+ "review_pending": "READY_resp_structure (c7506ede): NOT READY (D-CS1 BLOCKER); delta review owed",
+ "plain_description": {
+  "sq": "SQ4 Price",
+  "what": "Estimating each model's accuracy from only 100 sampled questions. Sampling is spread evenly across the tree's cells, then compared with plain random sampling, sampling by benchmark source, and sampling by per-source k-means groups. Done on 5,907 held-out questions with 18 models, each model left out in turn.",
+  "why": "If the tree's cells capture what makes questions differ, sampling by cell should give accurate scores from fewer questions, which would make evaluation cheaper.",
+  "information": "A clear win over source sampling would support 'the tree cuts evaluation cost'. Result (no new calls): sampling by tree cell beats plain random sampling (about 5% lower error). It is not better than per-source k-means groups, and it cannot be told apart from sampling by source (undetermined, below what the test could detect), for the tree as built. So no 'the tree makes evaluation cheaper' claim is made.",
+  "written": "2026-10-07"
+ }
+}

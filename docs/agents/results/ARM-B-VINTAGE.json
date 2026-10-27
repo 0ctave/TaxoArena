@@ -1,0 +1,212 @@
+{
+  "ready": {
+    "file": "docs/reviews/READY_arm_b_vintage.md",
+    "commit": "948c69f"
+  },
+  "go": "plan Amendment 6 item 6 (200 reasoning solves, ~2,000 cce; creates a second vintage)",
+  "run": {
+    "outcome_file": "experiment_results/judge_solve/ref_remint_outcome.txt",
+    "outcome_commit": "2693665",
+    "calls": 200,
+    "cce": "~2,000 (200 grok-4-1-fast-reasoning solves at ~10 cce; 0 judge calls)",
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-19",
+    "other_files": [
+      "experiment_results/judge_solve/grok-reasoning_v0_stamp.json (sidecar, 2693665)",
+      "experiment_results/judge_solve/grok-reasoning-v1.db (200 rows, untracked)",
+      "experiment_results/judge_solve/arm_b_run.log"
+    ]
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-19_arm_b_vintage_post.md",
+    "commit": "edf94ac",
+    "verdict": "outcome READY; every headline number reproduces; the READY is NOT void (sha = CRLF rendering); NO ALARM gate for PLACEMENT-STEPS EARNED; canary pass 2 hold lifted, date gate stands"
+  },
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "depends_on": [
+    "REF-SC",
+    "CANARY-BASELINE",
+    "REF-QUALITY-MONITOR",
+    "ITEM-26-POOLED",
+    "JUDGE-WIRING"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "id": "ARM-B-VINTAGE",
+  "title": "ARM-B-VINTAGE: the ARM-B reference re-mint — does a second vintage of the cached grok-4-1-fast-reasoning reference, minted on 200 canary questions under the legacy protocol, agree with vintage v0 above the 0.89 alarm?",
+  "question": "Mint vintage v1 on 200 of the 279 canary questions under v0's protocol, stamp it with the ten FRAMEWORK L37 fields, read its agreement with v0 against the 0.89 alarm bar (FRAMEWORK L141), stamp v0 as legacy in a sidecar, and record what an alarm triggers.",
+  "kind": "solve",
+  "state": "done",
+  "registration": {
+    "commit": "c8e0c3f",
+    "program_lines": "docs/judge_v2_program.md L8552-L8733; pre-run bracket 1da84e7 L8737-L8750",
+    "date": "2026-09-19"
+  },
+  "script": {
+    "path": "tools/analysis/arm_b_vintage.py",
+    "sha16": "9292e670ddfcb329 (LF, c3f7b53 = cache meta; READY's 250b10776b5c97b9 is the CRLF rendering of 4c7cd8b)",
+    "commit": "c3f7b53"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "AGREEMENT: v1 agrees with v0 on >= 0.89 of the 200 under convention A",
+      "result": "HELD",
+      "value": "0.9450 [0.9042, 0.9690] (189 of 200; B identical)",
+      "denominator": "200 canary questions (set 60b1ef3a859abceb)"
+    },
+    {
+      "id": "C2",
+      "text": "STAMPS: 200 of 200 v1 rows carry all ten L37 fields with finish_reason; the v0 sidecar exists with every unknown printed as unknown",
+      "result": "DELIVERED",
+      "value": "200 / 200; finish_reason stop 200; fingerprint azure:grok-4-1-fast-reasoning 200; prompt_hash 200 distinct = v0's reconstructed; sidecar written",
+      "denominator": "200 rows"
+    },
+    {
+      "id": "C3",
+      "text": "GUARD: NON_TERMINATED + NO-YIELD + unusable <= 5% of 200",
+      "result": "HELD",
+      "value": "0 of 200 (0.0%); states {YIELD: 200}",
+      "denominator": "200 rows"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "(plan) agreement in [0.92, 0.95] under A",
+      "result": "HELD",
+      "value": "0.9450",
+      "denominator": "200"
+    },
+    {
+      "id": "P2",
+      "text": "(registrar) B - A <= 0.02",
+      "result": "HELD",
+      "value": "0.0000 (vacuous: 0 non-yield rows)",
+      "denominator": "200"
+    },
+    {
+      "id": "P3",
+      "text": "(registrar) v1 key-correct within +-3pp of v0",
+      "result": "HELD",
+      "value": "0.850 vs 0.845 (+0.5pp; discordant 4:5; exact McNemar p 1.0)",
+      "denominator": "200"
+    },
+    {
+      "id": "P4",
+      "text": "(registrar) contested-half agreement lower than cross-tier by 2-6pp",
+      "result": "FAILED",
+      "value": "contested 0.9619 [0.9061, 0.9851] > cross 0.9263 [0.8556, 0.9639]: opposite sign (-3.56pp), CIs overlap, no mechanism",
+      "denominator": "105 / 95"
+    },
+    {
+      "id": "P5",
+      "text": "(registrar) NO-YIELD 0-2 of 200",
+      "result": "HELD",
+      "value": "0",
+      "denominator": "200"
+    },
+    {
+      "id": "P6",
+      "text": "(registrar) median completion_tokens in [400, 1,200] and p95 < 4,000",
+      "result": "FAILED",
+      "value": "FAILED-BY-INSTRUMENT (pre-run bracket): median 6 / p95 402 / max 717; completion_tokens counts VISIBLE tokens only on this deployment (151 of 200 rows = 6 tokens, 7 of them took 34-137 s); cap hits read from finish_reason (0/200 length)",
+      "denominator": "200"
+    },
+    {
+      "id": "P7",
+      "text": "(registrar) the disagreements' canary pass-1 matches decided at a rate within 10pp of the set's",
+      "result": "HELD",
+      "value": "|0.273 - 0.250| = 0.023 (8 decided / 3 TIE of 11; the 200's own 218 matches 0.261 beside)",
+      "denominator": "11 disagreements"
+    }
+  ],
+  "falsifier": {
+    "text": "F1: agreement under A < 0.85; overturns FRAMEWORK L141's null assumption (REF-SC's 0.94) and Amendment 4's 'reusable across epochs' sentence",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "alarm_state": "NO ALARM (outcome line 2, byte-exact; PLACEMENT-STEPS' fail-closed gate reads it by exact equality: EARNED)",
+    "agreement_A": "0.9450 [0.9042, 0.9690] Wilson (189 / 200); B 0.9450 (both-yielded 200); bar 0.89 (unrounded 0.8896); F1 0.85; distance to alarm 12 more disagreements",
+    "agreement_by_half": "contested n 105 0.9619 [0.9061, 0.9851]; cross n 95 0.9263 [0.8556, 0.9639]",
+    "agreement_by_anchor": "Law 5/8 0.625, Engineering 8/10 0.800, Other 14/17 0.824, Biology 15/16 0.938, Computer science 19/20 0.950, Math 31/32 0.969, other 8 anchors 1.000 (n 4-23; descriptive)",
+    "key_correct": "v0 169/200 = 0.845, v1 170/200 = 0.850; discordant 4 : 5; exact McNemar p 1.0000",
+    "stamps": "200/200 ten L37 fields; finish_reason {stop: 200}; fingerprint {azure:grok-4-1-fast-reasoning: 200}; prompt_hash 200 distinct = sidecar's reconstructed v0 prompt_hash on 200/200; completion_tokens median 6 / p95 402 (index int(0.95n); nearest-rank 397) / max 717",
+    "set": "200 of 279 canary q, seed 42, stratified 105 contested / 95 cross (10 dual-half q counted contested), sorted by id, sha256 60b1ef3a859abceb7faa737423876bd58e76261fb9c0ee9654f2f81086352386",
+    "instrument": "model grok-4-1-fast-reasoning; protocol solve_json_v1; SYSTEM sha256 741a6386599cd5e8d0f0c073eca9ab2ac02b6c2d897304bd37656ce1c3bd7f6e; cap 4,096; temperature omitted; first-payload sha 9cf9d535...2e0e; 12 + 188 = 200 posts, 200 distinct response ids, no re-post",
+    "v0_sidecar": "grok-reasoning_v0_stamp.json: 200 ids; fingerprint unknown; finish_reason unknown (pre-rule-9); cap 4096 (judge_solve_map.call default); prompt_hash reconstructed; agreement 'legacy, agreement with v1 = A 0.9450 [0.9042, 0.9690] (B 0.9450) on 200 canary questions, alarm state NO ALARM, 2026-09-19'; v0 completion_tokens on the 200 median 6 / p95 416 / max 598",
+    "disagreements": "11 ids 1032 1164 1625 3378 5509 5753 5861 7852 8624 9188 11411 (3 Law, 3 Other, 2 Engineering, 1 Biology / CS / Math; 4 contested / 7 cross; 2 both wrong, 4 v0-only-right, 5 v1-only-right); pass-1 matches 8 decided / 3 TIE",
+    "timeline": "c8e0c3f registration 13:35:59 -> 4c7cd8b script 13:57:57 -> 948c69f READY 14:11:35 -> 1da84e7 bracket 14:19:55 -> c3f7b53 hash edit 14:21:42 -> pilot 14:21:43 -> run 14:22:17 -> last row 14:28:34.563 -> outcome 14:28:34.705 -> 2693665 14:30:44"
+  },
+  "sentence_of_record": "ARM-B-VINTAGE (2026-09-19; 200 grok-4-1-fast-reasoning solves, 0 judge calls; script c3f7b53 sha 9292e670ddfcb329 LF = READY 4c7cd8b sha 250b10776b5c97b9 CRLF + the SET_HASH line): vintage v1, minted under v0's protocol (solve_json_v1, SYSTEM sha 741a6386...7f6e, cap 4,096, temperature omitted, fingerprint azure:grok-4-1-fast-reasoning, prompt bytes identical to v0's on 200/200) on 200 of the 279 canary questions (set 60b1ef3a859abceb; 105 contested / 95 cross), agrees with legacy v0 on 189/200 = 0.9450 [0.9042, 0.9690] under convention A (= B; 200/200 YIELD, finish_reason stop 200/200, guard 0/200): NO ALARM at the 0.89 bar (unrounded 0.8896; F1 0.85 not fired; CI lower bound above both). Key-correct v0 0.845 vs v1 0.850, discordant 4:5, exact McNemar p = 1.0. Contested 0.962 [0.906, 0.985] vs cross 0.926 [0.856, 0.964] (P4 FAILED, opposite sign). 200/200 rows carry the ten L37 stamps; completion_tokens median 6 / p95 402 / max 717 counts VISIBLE tokens only (P6 FAILED-BY-INSTRUMENT). v0 stamped in experiment_results/judge_solve/grok-reasoning_v0_stamp.json as \"legacy, agreement with v1 = A 0.9450 [0.9042, 0.9690] on 200 canary questions, 2026-09-19\". The 11 disagreements' canary pass-1 matches: 8 decided / 3 TIE (0.273 vs 0.250). One re-mint over 9-10 days: no drift rate; nothing per cell (n 4-32); nothing about the deployed judge; v1 enters no board.",
+  "chips": [
+    "NO ALARM",
+    "C1 HELD 0.9450 [0.9042, 0.9690] (A = B)",
+    "C2 DELIVERED 200/200",
+    "C3 HELD 0/200",
+    "P1 HELD",
+    "P2 HELD (vacuous, 0 non-yield)",
+    "P3 HELD (+0.5pp, 4:5, p 1.0)",
+    "P4 FAILED (opposite sign)",
+    "P5 HELD",
+    "P6 FAILED-BY-INSTRUMENT (visible tokens)",
+    "P7 HELD",
+    "F1 NOT FIRED",
+    "ARM B LIVE (next pass four epochs)",
+    "v0 LEGACY, STAMPED",
+    "ONE RE-MINT, NO DRIFT RATE",
+    "PILOT FILE NOT WRITTEN (process)",
+    "READY SHA = CRLF RENDERING (process)"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-19",
+      "by": "ARM-B-VINTAGE pre-run review (1da84e7, before the first call)",
+      "text": "set of record 200 of 279, sha256 60b1ef3a859abceb...; cap 4,096 of record; the 13 content-filter questions are ABSENT rows, none in the set; P6 FAILED-BY-INSTRUMENT if the median reads ~6; fingerprint azure:<model>; runs before PLACEMENT-STEPS."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "ARM-B-VINTAGE post-run review defects 1-3 (docs/reviews/2026-09-19_arm_b_vintage_post.md, edf94ac)",
+      "text": "(1) READY sha 250b10776b5c97b9 is the CRLF rendering of 4c7cd8b; the LF chain c3f7b53 = 9292e670ddfcb329 = cache meta; 1-line diff (SET_HASH_OF_RECORD); the READY is NOT void; future READYs record the LF-normalised sha. (2) ref_remint_PILOT.txt never written; pilot evidence from the cache: the 12 smallest ids, minted 12:21:43-47Z, all YIELD. (3) a silent first --analyze printed only [POOL] in arm_b_run.log; numbers unaffected; run logs are to capture stderr."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "ARM-B-VINTAGE (FRAMEWORK L37 bracket, this commit)",
+      "text": "v0 stamped legacy 2026-09-19, agreement 0.9450 [0.9042, 0.9690] on 200 canary q, arm B live, next pass four epochs; the completion_tokens stamp counts visible tokens only on this deployment (cap hits are finish_reason's job)."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "that v0 is RIGHT more often than the record says (agreement is not accuracy; n = 200, SE ~0.02)",
+    "anything per cell (n 4-32 per anchor, descriptive)",
+    "a drift RATE (one re-mint over 9-10 days; the four-epoch cadence starts now)",
+    "anything about the deployed JUDGE (arm A, CANARY-BASELINE pass 2, not authorised here)",
+    "the reasoning length or cap proximity of either vintage (completion_tokens is visible tokens on this deployment)",
+    "any board use of v1 (a canary object; vintages are never pooled; a judged use of v1 is its own registration)",
+    "a mechanism for the contested / cross difference (P4's CIs overlap)",
+    "the pilot's guard line as printed (not preserved; the cache is the evidence)"
+  ],
+  "ledger": {
+    "row_id": "ARM-B-VINTAGE",
+    "version": "v116; [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "sources": [
+    "experiment_results/judge_solve/ref_remint_outcome.txt (2693665): alarm state, agreement, halves, anchors, key-correct, stamps, cross-read, criteria and predictions as printed",
+    "experiment_results/judge_solve/grok-reasoning_v0_stamp.json (2693665): sidecar fields",
+    "docs/reviews/2026-09-19_arm_b_vintage_post.md (edf94ac): CONFIRMED status, sha renderings, pilot evidence, completion_tokens semantics, timeline, defects 1-8, sentence of record, chips",
+    "docs/judge_v2_program.md §ARM-B-VINTAGE registration L8552-L8733, pre-run bracket L8737-L8750, outcome section (this commit); docs/design/FRAMEWORK.md L37 bracket (this commit)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "The judge is given a cached 'reference answer' written by grok-4-1-fast-reasoning. This test re-generated that reference on 200 canary questions with exactly the original protocol and measured how often the new copy agrees with the old one.",
+    "why": "The reference is reused for weeks. If the same model under the same prompt now answers differently, the old cached references could silently drift out of date.",
+    "information": "High agreement means the cached reference can be treated as stable over time. Agreement below the 0.89 alarm bar would trigger a re-mint and doubt about reuse. Result: done. The two copies agreed on 189 of 200 questions (94.5%, 95% interval 90.4% to 96.9%), so no alarm. Both copies were right about equally often (84.5% vs 85.0%). This is agreement, not accuracy, from one re-mint, so it gives no drift rate. Older question family, later ruled 'history, not evidence'.",
+    "written": "2026-10-07"
+  }
+}

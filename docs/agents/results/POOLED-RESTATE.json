@@ -1,0 +1,129 @@
+{
+  "id": "POOLED-RESTATE",
+  "title": "POOLED-RESTATE: FRAMEWORK item 4 (review verify item 7): restate the pooled gate-vs-widener comparison on the board of record; does the widener still win at matched surrenders? (zero calls)",
+  "question": "Widener vs agreement gate on the merged pooled 20-model board of record (190 pairs; 183 established), OOF, 400 draws, 5 seeds, gate at every grid threshold; the 66-pair x12 pooled object v87 scored on (65 established, 300 draws); full-board context rows; the command-r pooled p over five seeds per board.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "eaf1dbf",
+    "program_lines": "docs/judge_v2_program.md L3603-L3611 (by reference; docs/design/FRAMEWORK.md L357 item 4); the Block 1 record bullet at L3696",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-15 (before any run) — BY REFERENCE: the 26 tests in docs/design/FRAMEWORK.md \"Tests to register before shipping\" (commit 8d77f7b), with the criteria, predictions and call counts stated there, scheduled in docs/plan_2026-09-15.md",
+    "outcome_heading": [
+      "L3662: ## Block 1 record (2026-09-15/16, zero calls) — FRAMEWORK items 1-12, 14-16: fourteen zero-call tests built, each adversarially checked; verdicts of record below (checker's number wins where it refutes the builder)",
+      "L3696: - **POOLED-RESTATE (2026-09-15, zero calls): PASS on the pooled 20-model board of record; the v87 \"gate strictly dominates the widener pooled\" claim is dropped; the PASS rests on five wrong events and is recorded as a frontier statement.**"
+    ],
+    "date": "2026-09-15"
+  },
+  "script": {
+    "path": "tools/analysis/pooled_restate.py",
+    "sha16": "3c1533838eac8273",
+    "commit": "7076615"
+  },
+  "ready": null,
+  "go": "n/a (0 calls; Block 1)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/pooled_restate.txt",
+    "outcome_commit": "7076615",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (pool_guard.assert_pool_of_record() first; union pool paeec37aa28063c75 by explicit id where used)",
+    "date": "2026-09-15/16"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); each Block 1 test was 'adversarially checked' at build time and the checker's number wins where it refutes the builder (Block 1 record header L3662-L3663); the checker-confirmed defects are listed in the bullet",
+    "commit": "7076615",
+    "verdict": ""
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "fewer established wrong calls at matched correct surrenders, OOF, merged board",
+      "result": "HELD",
+      "value": "raw-called established 173-175 with the same 5 wrong at every seed (arx/iask A 0.880, arx/sonnet 0.822, deepseek/gpt-4o-mini 0.682, haiku/deepseek 0.650, Qwen-14B/command-r 0.444); widener SHIPPED 150/0/18 vs OOF gate rule M 150/2/20, rule P 158/3/13; LBO-refit widener 139/0/29 vs gate M 137/1/32; matched rules M and P hold in 20 of 20 cells (CONFIRMED; the checker's stronger statement: on the 173 raw-called established pairs the exact in-sample gate frontier gives min 3 wrong at <= 18 surrenders, 2 at <= 29, 0 wrong only at 83 surrenders, against the widener's 0 at 18)",
+      "denominator": "190 merged pooled pairs, 183 established; 400 draws x 5 seeds"
+    },
+    {
+      "id": "C1b",
+      "text": "the same on the 66-pair x12 pooled object v87 scored on",
+      "result": "UNDETERMINED",
+      "value": "65 established; raw-called 62 / 1 wrong (arx/iask); widener 0 wrong / 4-6 surr; OOF gate M 0 wrong / 1-9 surr (tie at 0), B 1 wrong / 0 surr, P 0 / 3-4 (tie); the gate never has fewer wrong",
+      "denominator": "66-pair x12 pooled object, 300 draws"
+    },
+    {
+      "id": "item-7",
+      "text": "review item 7 sub-claim: three seeds for the command-r pooled p",
+      "result": "HELD",
+      "value": "five seeds per board: arena p(8B ahead) 0.0000, c_raw 1.0000; McNemar 430:435 p 0.8918 on the judged denominator (unestablished); 'wrong' only on the 3,445-pool denominator; excluded regardless",
+      "denominator": "Llama-3.1-8B / command-r pair"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "widener + decline",
+      "result": "HELD",
+      "value": "HELD on the pooled 20-model board of record; on the 66-pair x12 object the rules tie at 0 established wrong",
+      "denominator": "190 / 66 pairs"
+    }
+  ],
+  "falsifier": {
+    "text": "none beyond the criterion (registered by reference)",
+    "fired": false,
+    "note": "the v87 'gate strictly dominates the widener pooled' claim (SYSTEMATIC-BUDGET's adopted split) is dropped; the PASS rests on five wrong events and is a frontier statement"
+  },
+  "numbers_of_record": {
+    "merged_board": "raw-called established 173-175 / 5 wrong (seed-invariant); widener SHIPPED 150/0/18; gate M 150/2/20; gate P 158/3/13; LBO-refit widener 139/0/29 vs gate M 137/1/32; 20 of 20 matched cells",
+    "gate_frontier_checker": "on the 173 raw-called established pairs: min 3 wrong at <= 18 surrenders, 2 at <= 29, 0 wrong only at 83 surrenders (A < 0.444)",
+    "x12_66": "raw-called 62 / 1 wrong; widener 0 / 4-6; gate M 0 / 1-9 (tie), B 1 / 0, P 0 / 3-4; with ties -> smaller t the seed-43 gate is 57/0/4, an exact tie",
+    "context_rows": "raw 178/8(5) -> 173/5(5); widener SHIPPED 153/1(0) -> 150/0(0) = FRAMEWORK; gate A < 0.85 176/7(4) -> 171/4(4)",
+    "denominator_note": "the merged board's 124 novel pairs carry verdicts on 2,646 x20-judged questions while the denominator is 2,811"
+  },
+  "sentence_of_record": "POOLED-RESTATE (2026-09-15, zero calls): PASS on the pooled 20-model board of record (widener + decline 150/0/18 vs the OOF gate's 150/2/20 or 158/3/13 at matched surrenders, 20 of 20 matched cells); C1b UNDETERMINED on the 66-pair x12 object (the rules tie at 0 established wrong); item-7 sub-claim PASS (command-r pooled p 0.0000 across five seeds, the 8B/command-r pair excluded regardless). The v87 'gate strictly dominates the widener pooled' claim is dropped; the PASS rests on five wrong events and is a frontier statement: on the 173 raw-called established pairs the exact gate frontier reaches 0 wrong only at 83 surrenders against the widener's 0 at 18.",
+  "chips": [
+    "PASS (MERGED BOARD OF RECORD)",
+    "C1b UNDETERMINED (x12 66-PAIR OBJECT)",
+    "ITEM-7 SUB-CLAIM PASS"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a significance result (0 vs 1-2 events of 5)",
+    "'30 of 30 cells' (20 of 20 matched is the supported count)",
+    "a gate that surrenders fewer on x12 except on the 0.05 grid with the larger-t tie-break at 2 of 5 seeds"
+  ],
+  "ledger": {
+    "row_id": "POOLED-RESTATE",
+    "version": "v103 (684be03); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "SYSTEMATIC-BUDGET",
+    "TIER-HONEST-X20",
+    "KEY-TIE-DECLINE"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L3603-L3611 (by-reference registration eaf1dbf) and docs/design/FRAMEWORK.md L357 item 4: criterion, prediction, call count",
+    "docs/judge_v2_program.md L3696 ff. (Block 1 record bullet, 7076615): the criterion table, predictions scored, checker-confirmed defects, script and output",
+    "experiment_results/x12_crossdomain/pooled_restate.txt (7076615)",
+    "docs/test_ledger.html row POOLED-RESTATE (v103 684be03): chips verbatim, design / criteria / observed cells, evidence",
+    "script sha16 = sha256 of tools/analysis/pooled_restate.py at 7076615 (its first commit), first 16 hex (identity, computed by the registrar 2026-09-22; later edited at 13f2142 for the pool_guard change)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' heading and the '- **ID (...)**' bullet line inside the Block 1 record, to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Re-scores, on the merged 20-model board, two rules for deciding which model pairs the board may call as ordered: a fitted uncertainty widener and an agreement gate. It compares wrong calls at a matched number of withheld pairs. No calls.",
+    "why": "An earlier claim that the gate always beats the widener had to be rechecked on the board of record.",
+    "information": "It decides which safety rule to ship for declaring 'A beats B'. Result: the widener (with declines) wins. It makes 0 wrong calls against 2 to 3 for the gate at matched withholding, in 20 of 20 settings. This rests on only five wrong events and is not a significance result. The 'gate dominates' claim was dropped. Later ruled 'history, not evidence'.",
+    "written": "2026-10-07"
+  }
+}

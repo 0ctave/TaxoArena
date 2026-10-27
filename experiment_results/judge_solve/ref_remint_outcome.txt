@@ -1,0 +1,42 @@
+[POOL] p2dca21ab5f4ef3ae
+ALARM STATE: NO ALARM
+=== ARM-B-VINTAGE: v1 vs v0 on 200 canary questions (registration c8e0c3f; Amendment 6 item 6; FRAMEWORK L37 / L141) ===
+  v1 cache experiment_results\judge_solve\grok-reasoning-v1.db (mode=ro): model grok-4-1-fast-reasoning | protocol solve_json_v1 | system sha256 741a6386599cd5e8d0f0c073eca9ab2ac02b6c2d897304bd37656ce1c3bd7f6e | max_tokens 4096 | temperature omitted | set 60b1ef3a859abceb | started 2026-09-19 14:21:43 | resumed 2026-09-19 14:22:17 | script 9292e670ddfcb329 (this 9292e670ddfcb329) | override_guard no
+  v0 experiment_results\judge_solve\grok-reasoning.db (mode=ro): 3432 rows, cap 4096 by judge_solve_map.call's default (no row carries it), SYSTEM sha256 741a6386599cd5e8d0f0c073eca9ab2ac02b6c2d897304bd37656ce1c3bd7f6e, minted 2026-09-09 .. 2026-09-10, 13 content-filter questions absent
+  set: 200 of the 279 canary questions (hash 60b1ef3a859abceb; contested 105, cross 95; 0 content-filter questions excluded)
+  v1 states on 200 rows: {'YIELD': 200} | guard NON_TERMINATED + NO_YIELD + UNUSABLE = 0 (0.0%)
+(1) AGREEMENT v1 vs v0: convention A (same letter / 200; non-yielded v1 rows = disagreement) 0.9450 [0.9042, 0.9690] (189 of 200) | convention B (same / both-yielded 200) 0.9450 [0.9042, 0.9690]
+    alarm bar 0.89 as written (unrounded 0.8896 at n = 200) | falsifier 0.85
+    by half contested n 105: A 0.9619 [0.9061, 0.9851] | B 0.9619 (n 105)
+    by half cross     n  95: A 0.9263 [0.8556, 0.9639] | B 0.9263 (n 95)
+    by anchor Biology            n  16: A 0.938 | B 0.938 (n 16)  (descriptive)
+    by anchor Business           n   5: A 1.000 | B 1.000 (n 5)  (descriptive)
+    by anchor Chemistry          n  15: A 1.000 | B 1.000 (n 15)  (descriptive)
+    by anchor Computer science   n  20: A 0.950 | B 0.950 (n 20)  (descriptive)
+    by anchor Economics          n  17: A 1.000 | B 1.000 (n 17)  (descriptive)
+    by anchor Engineering        n  10: A 0.800 | B 0.800 (n 10)  (descriptive)
+    by anchor Health             n  12: A 1.000 | B 1.000 (n 12)  (descriptive)
+    by anchor History            n   4: A 1.000 | B 1.000 (n 4)  (descriptive)
+    by anchor Law                n   8: A 0.625 | B 0.625 (n 8)  (descriptive)
+    by anchor Math               n  32: A 0.969 | B 0.969 (n 32)  (descriptive)
+    by anchor Other              n  17: A 0.824 | B 0.824 (n 17)  (descriptive)
+    by anchor Philosophy         n   9: A 1.000 | B 1.000 (n 9)  (descriptive)
+    by anchor Physics            n  23: A 1.000 | B 1.000 (n 23)  (descriptive)
+    by anchor Psychology         n  12: A 1.000 | B 1.000 (n 12)  (descriptive)
+(2) KEY-CORRECT on the 200: v0 0.845, v1 0.850 (A: non-yielded = wrong) | discordant v0-only-right 4, v1-only-right 5, exact McNemar p 1.0000 | B (both-yielded 200): v0 0.845, v1 0.850, p 1.0000
+(3) STAMPS: 200 of 200 v1 rows carry all ten L37 fields with finish_reason | finish_reason {'stop': 200} | completion_tokens median 6 p95 402 max 717 | deployment fingerprint(s) {'azure:grok-4-1-fast-reasoning': 200} | prompt_hash per row: 200 distinct
+(4) DESCRIPTIVE cross-read (no criterion): 11 disagreements -> their canary pass-1 matches: 8 decided, 3 TIE (tie rate 0.273 vs the set's 0.250); ids [1032, 1164, 1625, 3378, 5509, 5753, 5861, 7852, 8624, 9188, 11411]
+=== criteria ===
+  C1 AGREEMENT >= 0.89 under A: 0.9450 -> HELD
+  C2 STAMPS: 200 of 200 rows complete; v0 sidecar written by this analysis -> DELIVERED
+  C3 GUARD: 0 of 200 (0.0%) <= 5% -> HELD
+  VERDICT: C1 HELD and C3 HELD -> "no alarm; the legacy vintage is stamped; arm B is live"
+=== predictions (blind, labelled) ===
+  P1 (plan) A in [0.92, 0.95]: 0.9450 -> HELD
+  P2 B - A <= 0.02: 0.0000 -> HELD
+  P3 v1 key-correct within +-3pp of v0: 0.850 vs 0.845 -> HELD
+  P4 contested-half agreement lower than cross-tier by 2-6pp: cross - contested = -0.0356 -> FAILED
+  P5 NO_YIELD 0-2 of 200: 0 -> HELD
+  P6 completion_tokens median in [400, 1200] and p95 < 4000: median 6, p95 402 -> FAILED
+  P7 disagreements' matches decided at a rate within 10pp of the set's: |0.273 - 0.250| = 0.023 -> HELD
+  not shown by a HELD verdict: that v0 is right more often than the record says; anything per cell; a drift rate; anything about the deployed judge

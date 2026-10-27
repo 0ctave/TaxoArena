@@ -1,0 +1,157 @@
+{
+ "id": "TREE-LIKE",
+ "title": "TREE-LIKE: Gromov delta / ultrametricity / cophenetic z-scores against the moment-matched Gaussian null on intent embeddings (qwen3 deciding), planted-hierarchy positive control gate (zero calls; REGISTERED 2026-10-04)",
+ "question": "Is the embedding space hierarchical beyond its covariance?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "633255f2",
+  "program_lines": "docs/judge_v2_program.md L24362-L24373",
+  "program_lines_as_of": "the commit that writes them, parent b7fb6bc8, re-grepped",
+  "date": "2026-10-04",
+  "provenance": "docs/literature/2026-10-04_embedding_structure_tests.md (ea418fcb; blob 6623b828); docs/agents/plans/2026-10-04_literature_shortlist.md (68a3d731); the author's Go (docs/agents/plans/2026-10-04_W1_W2_schedule.md (be8e54d3))"
+ },
+ "script": {
+  "path": "tools/analysis/tree_like.py",
+  "sha16": null,
+  "blob": "82f79b9d (LF; sha256-lf16 ad23dd9ba2cf3f43)",
+  "helper": "tools/analysis/zc_common.py blob c912dccf (LF; sha256-lf16 8fe96303de21504e)",
+  "commit": "e8504eb2"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_zero_call_trio.md",
+  "commit": "10a5aa3d",
+  "blob": "4dd640a1 (LF)",
+  "verdict": "READY-WITH-CONDITIONS; C-TL1 discharged by the registrar's bracket (this batch)"
+ },
+ "go": "the author's Go for zero-call windows (2026-10-04)",
+ "run": {
+  "outcome_file": "E:/TaxoArena_backup_2026-10-04_tree_like/tree_like_outcome.txt (sha256 6a73f417f2dd8898bb40dc4411bb1034013fa5876c08b7bd2467aa05f897e5e7; write-once, never committed; SHA256SUMS.txt 3/3 OK with tree_like_run.log e21b4104... and chain_sa_tl.log 39c079c8...)",
+  "outcome_commit": "run from main (code merged e8504eb2); outcome not committed",
+  "calls": 0,
+  "cce": 0,
+  "pool": "none read (intent DBs mode=ro&immutable=1); the MMLU-Pro pool-reader arm not run",
+  "date": "2026-10-04 21:01:03 to 2026-10-05 01:04:21, rc 0 (chain_sa_tl.log)"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_tree_like.md",
+  "commit": "cbeb2644",
+  "blob": "3a766af2 (LF)",
+  "verdict": "VALID; words C-TL1 + C-TL3 (MEDIUM); C-TL4, C-TL5, Support row (LOW)"
+ },
+ "criteria": [
+  {
+   "id": "TL0",
+   "text": "gate: planted hierarchy reaches z(delta_rel) < -2 in >= 4/5 subsamples on both corpora, else TL1 NOT EVALUABLE",
+   "result": "HELD",
+   "value": "PASS: control 5/5 on both corpora (z -12.2 to -16.7)",
+   "denominator": "positive control"
+  },
+  {
+   "id": "TL1",
+   "text": "DECIDING (qwen3 q4, native): TREE-LIKE iff z(delta_rel) < -2 in >= 4/5 subsamples on both MASSIVE and CLINC; NOT-TREE-LIKE iff on neither; MIXED otherwise. SCOREABLE as a classification",
+   "result": "FAILED",
+   "value": "word of record: MIXED (TREE-LIKE refuted by 0 of 5 on MASSIVE, rule 8 FAILS clause); MIXED: MASSIVE 0 of 5 below -2 (extreme -1.386), CLINC 5 of 5 (z -2.5 to -3.6), by the registered max-four-point estimator; not a corpus contrast in structure (C-TL3)",
+   "denominator": "5 subsamples x 2,000 TRAIN points per corpus; 200 null draws"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "TL0 passes 0.85",
+   "result": "HELD",
+   "value": "TL0 passed; Brier 0.0225",
+   "denominator": "control"
+  },
+  {
+   "id": "P2",
+   "text": "TREE-LIKE MASSIVE 0.60, CLINC 0.60; TL1 TREE-LIKE 0.45, MIXED 0.30, NOT 0.25",
+   "result": "FAILED",
+   "value": "per corpus: CLINC HELD (Brier 0.1600), MASSIVE FAILED (0.3600); TL1 three-way: MIXED occurred, modal TREE-LIKE did not (terms 0.2025, 0.4900, 0.0625)",
+   "denominator": "2 corpora"
+  },
+  {
+   "id": "P3",
+   "text": "TL2 ordering agrees 0.70 (descriptive)",
+   "result": "HELD",
+   "value": "TL2 AGREES (descriptive); Brier 0.0900",
+   "denominator": "arms"
+  }
+ ],
+ "falsifier": {
+  "text": "F-TL fires iff TL1 NOT-TREE-LIKE: hierarchy imposed by the algorithm; GR2's random-tree comparison is the only defensible hierarchy claim.",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "TL0": "control z(delta_rel) < -2 in 5/5 subsamples on both corpora (z -12.2 to -16.7)",
+  "TL1_massive": "0 of 5 subsamples with z < -2 (extreme -1.386; sub 0 -1.234, sub 1 +1.473); 5 x 2,000 of 9,870 TRAIN rows; 200 null draws",
+  "TL1_clinc": "5 of 5 with z < -2 (z -2.5 to -3.6; sub 0 -2.535); 5 x 2,000 of 13,487 TRAIN rows; 200 null draws",
+  "TL2": "mean z qwen3 -0.492 vs gemma +0.360 (MASSIVE); -2.956 vs +0.743 (CLINC); descriptive",
+  "C-TL3_diagnostic": "max dq / own p99.99 1.37-1.58 on data vs 1.22-1.33 on null draw 0; at p99.99 data below null (MASSIVE 0.193 / 0.196 vs 0.212 / 0.223; CLINC 0.174 vs 0.217); mean four-point delta z -12 to -14 on both corpora (descriptive, not of record as a statistic)",
+  "Support": "n_eff about 5 (overlapping subsamples; DEFF slightly above 1)"
+ },
+ "sentence_of_record": "TREE-LIKE (2026-10-04, 0 calls) — VALID; TL0 PASS, TL1 MIXED, F-TL NOT FIRED. Against the moment-matched Gaussian null, qwen3 (native) is Gromov-tree-like on CLINC (5 of 5 subsamples, z -2.5 to -3.6) and not on MASSIVE (0 of 5) by the registered max-four-point estimator. A flat cluster mixture also reads tree-like under this test, so neither corpus's reading is evidence of hierarchy, and MIXED is not 'CLINC is hierarchical, MASSIVE is flat'. F-TL did not fire: the test does not show that a tree imposed on MASSIVE / CLINC is an artefact. [POSTRUN docs/reviews/POSTRUN_tree_like.md, cbeb2644; C-TL1, C-TL3; MMLU-Pro descriptive arm not delivered (C-TL5); outcome not committed, sha256 6a73f417...]",
+ "chips": [
+  "REGISTERED 2026-10-04, BEFORE ANY CODE; not built",
+  "VALID (POST-RUN cbeb2644): TL0 PASS; TL1 MIXED (MASSIVE 0/5, CLINC 5/5; MAX-FOUR-POINT ESTIMATOR); F-TL NOT FIRED",
+  "C-TL1 / C-TL3: NO HIERARCHY CLAIM (A FLAT MIXTURE READS TREE-LIKE); MIXED IS NOT A CORPUS CONTRAST; TL2 AGREES (DESCRIPTIVE); MMLU-PRO ARM NOT DELIVERED"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-04",
+   "by": "registrar (pre-data; READY_zero_call_trio)",
+   "text": "READY after C-TL1: TREE-LIKE = Gromov-tree-like relative to the Gaussian null; a flat cluster structure qualifies (flat 27-cluster mixture z(delta_rel) -6.15, D-2); no hierarchy claim. TT-R1 two JVM-fixture sites; TT-R4 control scales fixed pre-data; run alone (4.6 h, D-5). L24364, L24366, L24368, L24370, L24372."
+  },
+  {
+   "date": "2026-10-05",
+   "by": "registrar (POSTRUN cbeb2644)",
+   "text": "outcome recorded in the C-TL1 + C-TL3 words; OUTCOME brackets on READOUTS AND CRITERIA (L24368), PREDICTIONS (L24370), FALSIFIER (L24371); outcome section L24673-L24685 ('## TREE-LIKE (2026-10-04, 0 calls) — VALID (POSTRUN cbeb2644) ...'; _as_of the commit that writes it, parent 05987e4c, re-grepped). C-TL4 recorded; C-TL5 MMLU-Pro arm not delivered (scheduling is the experiment-manager's)."
+  }
+ ],
+ "does_not_show": [
+  "hierarchy on either corpus (a flat mixture reads tree-like, C-TL1)",
+  "a difference in structure between MASSIVE and CLINC (C-TL3: the max estimator's tail)",
+  "that a tree on MASSIVE / CLINC is an artefact (F-TL not fired)",
+  "anything on MMLU-Pro (arm not run)",
+  "that any particular tree is right; quantile / mean versions as statistics of record"
+ ],
+ "ledger": {
+  "row_id": "TREE-LIKE",
+  "version": "v394 (2026-10-05: OUTCOME bracket, NULL + WARN chips) | v383 (2026-10-04: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "INTENT-TRANSFER-S1 (objects)"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; no Gaussian-mixture LR / BIC, MDL or Bayesian evidence (MIX-LRT-SITE untouched); no judge, rubric, reference, frontier, temperature"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "CPU about 3 h (MMLU-Pro descriptive arm is a pool reader)",
+  "agent_hours": "about 4 h",
+  "reads_pool": false
+ },
+ "outputs": "never committed: stored on E: with SHA256SUMS.txt; temp under E:/TaxoArena_tmp via scratch_dir",
+ "sources": [
+  "docs/judge_v2_program.md L24362-L24373 (_as_of the commit that writes it, parent b7fb6bc8, re-grepped)",
+  "docs/literature/2026-10-04_embedding_structure_tests.md (ea418fcb; blob 6623b828)",
+  "docs/agents/plans/2026-10-04_literature_shortlist.md (68a3d731)",
+  "docs/reviews/READY_zero_call_trio.md (10a5aa3d; blob 4dd640a1, LF); merge e8504eb2",
+  "docs/reviews/POSTRUN_tree_like.md (cbeb2644; blob 3a766af2, LF): every number above copied",
+  "docs/judge_v2_program.md L24673-L24685 and brackets L24368, L24370, L24371 (_as_of the commit that writes them, parent 05987e4c, re-grepped)"
+ ],
+ "last_update": "2026-10-05",
+ "label_status": "AF-U [SC] where used",
+ "plain_description": {
+  "sq": "SQ3 Taxonomy",
+  "what": "Measures whether intent-dataset embeddings (CLINC, MASSIVE; qwen3 embedder) are geometrically tree-like (Gromov delta and related measures). This is compared with a Gaussian null of matched mean and covariance, after a planted-hierarchy positive control. No calls.",
+  "why": "Asks whether the embedding space has hierarchy beyond its covariance, or whether any tree built on it is imposed by the algorithm.",
+  "information": "Not tree-like would mean the hierarchy is an artefact. Tree-like would support, but not prove, hierarchy. Result: done, mixed. CLINC reads tree-like in 5 of 5 subsamples, MASSIVE in 0 of 5. But a flat cluster mixture also reads tree-like under this test, so neither reading is evidence of hierarchy, and it is not 'CLINC hierarchical, MASSIVE flat'. The falsifier did not fire. The MMLU-Pro arm was not run.",
+  "written": "2026-10-07"
+ }
+}

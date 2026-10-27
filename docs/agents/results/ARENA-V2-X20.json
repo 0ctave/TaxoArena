@@ -1,0 +1,148 @@
+{
+  "id": "ARENA-V2-X20",
+  "title": "ARENA-V2-X20: how does the deployed judge behave when the board grows from 12 to 20 models, with two new frontier entrants inside the top cluster? (12,400 matches, 24.8k Mistral calls)",
+  "question": "Eight more models (arx_3, claude-3-5-sonnet, gpt-4o-mini, claude-3-5-haiku, Qwen1.5-110B, Mixtral-8x7B-Instruct, Qwen1.5-14B-Chat, gemma-7b) on a Python schedule mirroring x12 MAIN (per-leaf share, x12's own questions, 100 matches per new pair), STACK-v2 as ARENA-V2, the 12-model verdicts from ARENA-V2's cache: (1) 20-model rho >= 0.95; (2) the 12 keep their order (tau >= 0.90); (3) new-pair key-decidable accuracy >= 0.85; (4) top-6 violations <= 3; (5) anchor LRT p < 0.05.",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "e7b086e",
+    "program_lines": "docs/judge_v2_program.md L481-L505 (registration) and L552-L570 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-10 20:45 (before any call) — ARENA-V2-X20: eight more models on the ARENA-V2 board",
+    "outcome_heading": [
+      "L552: - **ARENA-V2-X20 (2026-09-11 00:40): FAIL on (4), PASS on (1)(2)(3)(5).** 12,391 new matches judged (4 skipped, ..."
+    ],
+    "date": "2026-09-10"
+  },
+  "script": {
+    "path": "tools/analysis/arena_v2_x20.py",
+    "sha16": "60efc29f0d075006 (at e7b086e)",
+    "commit": "e7b086e"
+  },
+  "ready": null,
+  "go": "above the 4,000-match rule (12,400 matches / 24.8k calls); registered and launched 2026-09-10 20:45 (e7b086e) before the rule's formal adoption in the plan of 2026-09-15, so NO GO WAS OWED AND NONE IS MISSING: the rule binds from 2026-09-15 forward and is not applied backward (registrar 2026-09-23, per docs/plan_2026-09-15.md and CONTEXT.md section 4 rule 5).",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/arena_v2_x20_outcome.txt",
+    "outcome_commit": "f9a1007",
+    "calls": "24.8k (12,391 judged, 2 filtered)",
+    "cce": "not stated",
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-11",
+    "other_files": [
+      "experiment_results/x12_crossdomain/stack_v2_promptv2_x20.db (12,394 verdicts; the x20 cache: ZERO verdicts on the 66 original pairs)",
+      "arena_v2_x20.log"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the REVIEW of 2026-09-14/15 (ba12200) found that the x20 cache ALONE is not the board of record (0 verdicts on the 66 original pairs): the merged board x12 + x20 = 21,536 verdicts this row registered is",
+    "commit": "ba12200",
+    "verdict": "FAIL (4) top-6 board; PASS (1) (2) (3) (5); the merged 20-model board is the board of record for the profile line"
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "20-model rho >= 0.95",
+      "result": "HELD",
+      "value": "0.963 (predicted 0.96-0.97)",
+      "denominator": "20-model board from 21,536 verdicts"
+    },
+    {
+      "id": "(2)",
+      "text": "the 12 keep their order (tau >= 0.90)",
+      "result": "HELD",
+      "value": "tau 0.970 (predicted >= 0.95)",
+      "denominator": "12 original models"
+    },
+    {
+      "id": "(3)",
+      "text": "new-pair key-decidable accuracy >= 0.85",
+      "result": "HELD",
+      "value": "0.884 (n 4,310; predicted 0.86)",
+      "denominator": "4,310 key-decidable new-pair matches"
+    },
+    {
+      "id": "(4)",
+      "text": "top-6 violations <= 3",
+      "result": "FAILED",
+      "value": "iask > gemini > sonnet > arx_0314 > arx_3 > gpt-4o vs key gemini > arx_0314 > iask > arx_3 > sonnet > gpt-4o = 4 violations (bar 3, predicted 2); iask and sonnet over-ranked; judge right on 40-71% of frontier pairs",
+      "denominator": "top-6"
+    },
+    {
+      "id": "(5)",
+      "text": "anchor LRT p < 0.05",
+      "result": "HELD",
+      "value": "LRT 208.3, p <= 0.001* (predicted < 0.01)",
+      "denominator": "14 anchors"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "rho 0.96-0.97, tau >= 0.95, new-pair accuracy 0.86, 2 violations, p < 0.01",
+      "result": "FAILED",
+      "value": "rho 0.963 HELD; tau 0.970 HELD; 0.884 HELD; 4 violations FAILED; p HELD",
+      "denominator": "the five criteria"
+    }
+  ],
+  "falsifier": {
+    "text": "none beyond the criteria",
+    "fired": false,
+    "note": "growing the board is safe for the ranking and the existing models; the frontier cluster stays at the reference ceiling"
+  },
+  "numbers_of_record": {
+    "board": "rho 0.963; tau 0.970; new-pair accuracy 0.884 (n 4,310); LRT 208.3 p <= 0.001; top-6 4 violations",
+    "run": "12,391 judged (2 filtered, 4 skipped); 24.8k Mistral calls",
+    "cache_note": "stack_v2_promptv2_x20.db carries 12,394 verdicts on the 124 pairs involving a new model and ZERO on the 66 original pairs (SQL: CROSS 9,594, INTERNAL 2,800, SHARED 0); the merged board x12 + x20 = 21,536 is the board of record (REVIEW 2026-09-15)"
+  },
+  "sentence_of_record": "ARENA-V2-X20 (2026-09-11, 24.8k calls): FAIL on (4), PASS on (1) (2) (3) (5): 12,391 judged; the 20-model board from 21,536 verdicts reads rho 0.963, the 12 keep their order (tau 0.970), new-pair key-decidable accuracy 0.884, LRT p <= 0.001; top-6 iask > gemini > sonnet > arx_0314 > arx_3 > gpt-4o vs the key's gemini > arx_0314 > iask > arx_3 > sonnet > gpt-4o = 4 violations (bar 3, predicted 2); growing the board is safe for the ranking and the existing models; the frontier cluster stays at the reference ceiling.",
+  "chips": [
+    "FAIL (4) top-6 board",
+    "PASS (1)(2)(3)(5)"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-15",
+      "by": "the adversarial REVIEW (ba12200; programme L3099 finding (1))",
+      "text": "the x20 cache alone holds 0 verdicts on the 66 original pairs; every x20 analysis that ran on it alone (BUDGET-TRANSFER, TIER-HONEST-X20, PROFILE-RELIABILITY-X20) inherited that; ARENA-V2-X20 registered the merged board, x12 9,142 + x20 12,394 = 21,536, which is the board of record."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a top-6 order inside the frontier (4 violations; closed by rule)",
+    "direct verdicts among the 12 originals in the x20 cache (0; the merged board supplies them)"
+  ],
+  "ledger": {
+    "row_id": "ARENA-V2-X20",
+    "version": "v43 (4dfa56c; the row's outcome dates 2026-09-11 00:40); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "ARENA-V2",
+    "STACK-v2",
+    "X20-MERGED",
+    "TIER-HONEST-X20",
+    "PROFILE-RELIABILITY-X20"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L481-L505 (registration e7b086e) and L552-L570 (outcome)",
+    "experiment_results/x12_crossdomain/arena_v2_x20_outcome.txt (f9a1007)",
+    "docs/test_ledger.html row ARENA-V2-X20 (v43): chips verbatim, evidence (arena_v2_x20.py, arena_v2_x20.log, stack_v2_promptv2_x20.db, e7b086e)",
+    "script sha16 = sha256 of tools/analysis/arena_v2_x20.py at e7b086e, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Adds eight models to the 12-model arena, so 20 in total, about 12,400 new matches judged by Mistral-Large, and checks the merged board against the answer key on five criteria.",
+    "why": "It tests whether the deployed judge stays trustworthy as the board grows, including two new models that land in the top group.",
+    "information": "Passing would mean the board can grow without breaking. Failing on the top group would mean the judge cannot order the strongest models. Result: passed 4 of 5. Correlation with the key is 0.963, the original 12 keep their order, and new pairs are judged correctly 88% of the time. It failed on the top-6 order (4 inversions where at most 3 were allowed). Later ruled 'history, not evidence' because it ran on the earlier, contaminated question pool.",
+    "written": "2026-10-07"
+  }
+}

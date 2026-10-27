@@ -1,0 +1,186 @@
+{
+ "id": "DRIFT-REPLAY",
+ "title": "DRIFT-REPLAY: synthetic source-mix shifts replayed from the content-closed v2 union EVAL; OOS-rate and cell-occupancy chi-square detectors at a GATE-calibrated false-alarm rate; AF-U [SC] vs matched-k k-means [LF] (zero calls; REGISTERED 2026-10-05)",
+ "question": "Does cell occupancy detect an in-scope source-mix shift better than the GATE-calibrated OOS rate, and do AF-U cells differ from matched-k k-means?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "8e681387",
+  "program_lines": "docs/judge_v2_program.md L24639-L24651",
+  "program_lines_as_of": "the commit that writes them, parent 07bc237f, re-grepped",
+  "date": "2026-10-05",
+  "heading": "## Registered 2026-10-05 (before any code or call) — DRIFT-REPLAY: replaying the content-closed v2 union EVAL as SYNTHETIC streams whose source mix shifts by registered amounts, ...",
+  "provenance": "the author's \"Start them\" (relayed in the orchestrator's brief of 2026-10-05); registrar's record docs/judge_v2_program.md L24618-L24623"
+ },
+ "script": {
+  "path": "tools/analysis/drift_replay.py",
+  "sha16": "blob:a59389e2 (LF of record; sha256-lf16 cfd78067357299db, sha256-crlf16 26f853888abaf079)",
+  "commit": "942d306b (branch drift-escalation; build 823f6148 + fix (a)); merged by path e304ffe9"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_drift_escalation.md",
+  "commit": "8b303773",
+  "verdict": "READY (delta review on blob a59389e2; B-1 and M-1 discharged, C-1 confirmed; conditions D-C1 MEDIUM OOS-leg words, D-C2 LOW selftest note); earlier NOT READY ec880315"
+ },
+ "go": "the author's \"Start them\" (2026-10-05; zero calls, no 4k-match go needed); B-1 fix (a) the orchestrator's choice under the autonomous go, flagged for the author; D-C1 adopted by the orchestrator's brief of 2026-10-05",
+ "run": {
+  "outcome_file": "experiment_results/archv2/drift_replay/outcome.txt (sha256 cf732363e94696bc397bb430e9d4e85d4ecd80b2067b9ea33cb1995833ddac92; write-once, never committed; 157 lines); backup E:/TaxoArena_backup_2026-10-05_drift_replay (SHA256SUMS.txt 8/8 OK)",
+  "outcome_commit": "outcome not committed (run from main after merge e304ffe9)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "pv2_1575de61bb20e977 (content-closed, CK-CLOSE-v2, residual disclosed); union EVAL 5,907 items / 5,404 components; GATE 2,033; TRAIN 12,334 bundle rows; structure only, no key",
+  "date": "2026-10-05; dr_dry.log rc 0 (no EVAL read), dr_run.log = outcome (review)"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_drift_replay.md",
+  "commit": "3566a83b",
+  "verdict": "VALID; DR0, DR2, DR1, F-DR reproduced to the digit (re-execution of the merged blob's functions); words W-1..W-3 (HIGH), W-4, W-5 (MEDIUM); D-1 (MEDIUM) realised MDE from the stream SE, D-2 (LOW) Kish 1.311"
+ },
+ "criteria": [
+  {
+   "id": "DR0",
+   "text": "DECIDING precondition (point decides): CALIBRATED iff the realised false-alarm rate on 1,200 unshifted EVAL streams <= 0.10 for OCC-CHI and OOS-RATE on AF-U; MISCALIBRATED otherwise (DR1/DR2 then UNDETERMINED). SE 0.0077; MDE80 0.019; SCOREABLE [CORRECTED 2026-10-05: B-1 fix (a), OCC-CHI reference occupancy from bundle TRAIN (12,334 rows), alarm levels GATE-calibrated; the original design's GATE-only emulation (EVAL FAR median 0.438, 30/30 > 0.10) was seen pre-data; fix (a) simulated 0.023; DR0 is informed, not blind] [CORRECTED 2026-10-05 (delta review 8b303773): delta simulation of fix (a) as built, GATE only: OCC-CHI EVAL FAR median 0.025, 0/30 > 0.10 (replaces 0.023, 0/15); OOS-RATE kept as registered, exact model share > 0.10 about 0.140 (median 0.030). D-C1: a MISCALIBRATED DR0 names the failing leg and its FAR; an OOS-only failure is worded 'GATE-to-EVAL transport of the p5 operating point (about 14% expected under split noise alone)', never 'cells fail']",
+   "result": "HELD",
+   "value": "CALIBRATED: AF-U FAR OCC-CHI 0.0325 (39 of 1,200; CP upper 0.0442), OOS-RATE 0.0058 (7 of 1,200; CP upper 0.0120); bar 0.10 (point decides)",
+   "denominator": "1,200 unshifted streams; 5,907 items / 5,404 components"
+  },
+  {
+   "id": "DR2",
+   "text": "DECIDING (interval decides): AF-U at s 0.20, D_det = DET(OCC-CHI) - DET(OOS-RATE), stream-paired; OCC-BETTER iff 95% lower > 0; OOS-BETTER iff upper < 0; NEITHER otherwise. DEFF 1.5 declared; SE 0.0250; MDE80 0.070; SCOREABLE [OUTCOME 2026-10-05: W-1, the stream interval is Monte-Carlo only; quote the item-level width]",
+   "result": "HELD",
+   "value": "OCC-BETTER: D_det +0.3942 = 0.6075 - 0.2133; registered stream interval [+0.3767, +0.4125] (Monte-Carlo only, conditional on these items and GATE; never quoted alone, W-1); item level about [+0.30, +0.49] (EVAL components, fresh streams, B 200; SD 0.0486), [+0.20, +0.44] with GATE also resampled (SD 0.0651); lower bound >= +0.195 in every variant",
+   "denominator": "1,200 shifted streams (6 members x 200, fixed strata)"
+  },
+  {
+   "id": "DR1",
+   "text": "DECIDING (interval decides): OCC-CHI at s 0.20, D_arm = DET(AF-U) - DET(KM-U); TREE-BETTER iff 95% lower > 0; KM-BETTER iff upper < 0; NEITHER otherwise. SE 0.0192; MDE80 0.054; DESCRIPTIVE-ONLY at the prediction; seed floor MDE80 >= 0.038",
+   "result": "FAILED",
+   "value": "NEITHER (TREE-BETTER refuted): D_arm -0.0080 = 0.6075 - 0.6155 (KM-U mean over seeds 0.6408 / 0.6467 / 0.6083 / 0.5492 / 0.6325), [-0.0403, +0.0320]; item level [-0.064, +0.027], with GATE [-0.105, +0.067] (review); no better than matched-k k-means, no equivalence claimed (W-5)",
+   "denominator": "1,200 shifted streams x 5 k-means seeds (crossed)"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "FAR on AF-U: OCC-CHI 0.06 [0.03, 0.10], OOS-RATE 0.06 [0.03, 0.10]; DR0 CALIBRATED 0.80 [CORRECTED 2026-10-05: informed by the pre-data GATE-only emulation (fix (a) OCC-CHI 0.023; OOS-RATE median 0.052); DR0 Brier printed, not credited] [CORRECTED 2026-10-05 (delta review 8b303773): informing numbers now OCC-CHI 0.025 (0/30 > 0.10), OOS-RATE median 0.030, share > 0.10 about 0.140 (exact model)]",
+   "result": "FAILED",
+   "value": "OCC-CHI 0.0325 HELD (band edge; informed by the pre-data emulation, median 0.025); OOS-RATE 0.0058 FAILED, in the safe (conservative) direction: h 20 flags discrete, GATE alarming 0.024; cannot reverse DR2 (D_det >= +0.273 under full OOS detection of GPQA at a matched FAR; W-4); DR0 CALIBRATED 0.80, Brier 0.0800 printed, not credited",
+   "denominator": "1,200 unshifted streams"
+  },
+  {
+   "id": "P2",
+   "text": "s 0.20 AF-U: DET(OCC-CHI) 0.75 [0.50, 0.95], DET(OOS-RATE) 0.30 [0.10, 0.55], D_det +0.45 [+0.20, +0.75]; DR2 OCC-BETTER 0.85, NEITHER 0.12, OOS-BETTER 0.03",
+   "result": "HELD",
+   "value": "DET(OCC-CHI) 0.6075 HELD; DET(OOS-RATE) 0.2133 HELD; D_det +0.3942 HELD; DR2 probabilities Brier 0.0378",
+   "denominator": "1,200 shifted streams"
+  },
+  {
+   "id": "P3",
+   "text": "D_arm 0.00 [-0.05, +0.05]; DR1 NEITHER 0.70, TREE-BETTER 0.20, KM-BETTER 0.10",
+   "result": "HELD",
+   "value": "D_arm -0.0080 HELD ON THE POINT ONLY (item-level 95% [-0.064, +0.027] exceeds the band [-0.05, +0.05]); DR1 probabilities Brier 0.1400",
+   "denominator": "1,200 shifted streams"
+  },
+  {
+   "id": "P4",
+   "text": "(descriptive) AF-U OCC-CHI median delay at s 0.40: 70 [30, 150] items; DET at s 0.05: 0.15 [0.05, 0.30]",
+   "result": "FAILED",
+   "value": "delay at s 0.40 120 items HELD; DET at s 0.05 0.0275 FAILED (no detection at s 0.05: no higher than the unshifted FAR 0.0325; source oracle 0.595)",
+   "denominator": "1,200 streams per s"
+  },
+  {
+   "id": "P5",
+   "text": "(descriptive) source oracle minus AF-U OCC-CHI DET at s 0.20: +0.10 [0.00, +0.30]",
+   "result": "HELD",
+   "value": "+0.2950 (source oracle 0.9025 - AF-U 0.6075) HELD, band edge 0.30",
+   "denominator": "1,200 shifted streams"
+  }
+ ],
+ "falsifier": {
+  "text": "F-DR fires iff DR0 CALIBRATED and DR2 NEITHER or OOS-BETTER: cells add no in-scope drift signal beyond the OOS trigger the online design already uses (memo v3 L84-L87; ONLINE-STAGE2); DR1 KM-BETTER narrows any claim to 'cells of any kind'.",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "DR0_FAR_AF-U": "OCC-CHI 0.0325 (39 / 1,200 unshifted streams; CP upper 0.0442); OOS-RATE 0.0058 (7 / 1,200; CP upper 0.0120); bar 0.10",
+  "DR2_D_det": "+0.3942 (DET OCC-CHI 0.6075 - DET OOS-RATE 0.2133; AF-U, s 0.20, 1,200 shifted streams); item-level 95% about [+0.30, +0.49] (EVAL components resampled, fresh streams, B 200), [+0.20, +0.44] with GATE also resampled; registered stream interval [+0.3767, +0.4125] is Monte-Carlo only, never quoted alone",
+  "DR1_D_arm": "-0.0080 (AF-U 0.6075 - KM-U 0.6155, seeds 0-4, range 0.5492-0.6467); stream interval [-0.0403, +0.0320]; item level [-0.064, +0.027], with GATE [-0.105, +0.067]; no equivalence claimed",
+  "per_member_D_det": "BBH +0.09, GPQA +0.57, IFEVAL 0.00 (1.00 vs 1.00), MATH +0.675, MMLU_PRO +0.03, MUSR +1.00 (descriptive; tracks the per-member shift multiplier x1.5 / x35 / x8.1 / x3.8 / x1.1 / x6.0, not source-pure cells: W-2)",
+  "OOS_one_sided": "EVAL OOS rate (AF-U) BBH 0.0000, GPQA 0.1765, IFEVAL 0.5309, MATH 0.0308, MMLU_PRO 0.0468, MUSR 0.0000 (pooled 0.0444); OOS-RATE blind by construction to the BBH, MUSR, MATH, MMLU_PRO directions (W-3)",
+  "source_oracle": "OCC-CHI DET at s 0.20 0.9025; minus AF-U +0.2950 (descriptive ceiling)",
+  "AF-U_OCC_DET_by_s": "0.0275 / 0.2050 / 0.6075 / 0.7933 at s 0.05 / 0.10 / 0.20 / 0.40; median delay at s 0.40 120 items",
+  "support_realised": "run: stream SE DR2 0.0092, DEFF_reuse 33.321, n_eff 36 (registered DEFF 1.5, n_eff 800); review: DEFF 27.9-50.1, n_eff 43-24, MDE80 0.136-0.182 (component SE); outcome's MDE80 0.0258 from the stream SE, not of record (D-1); Kish 1.311 not 1.09 (D-2); DR2 still SCOREABLE (0.45 > 0.182)"
+ },
+ "sentence_of_record": "DRIFT-REPLAY (2026-10-05, 0 calls) — VALID; DR0 CALIBRATED, DR2 OCC-BETTER, DR1 NEITHER, F-DR NOT FIRED. On SYNTHETIC source-mix shifts replayed from the content-closed union EVAL (5,907 items / 5,404 components), a chi-square on AF-U's pooled occupancy detects a shift of s 0.20 more often than the GATE-calibrated OOS rate: D_det +0.39 (DET 0.61 vs 0.21), item-level 95% about [+0.30, +0.49], [+0.20, +0.44] with the GATE calibration also resampled. The advantage is carried by the small members, whose shift multiplies their share, not by source-pure cells, and the OOS rate is blind by construction to shifts toward members with few OOS flags; AF-U cells detect the shift no better than matched-k k-means (D_arm -0.008, 95% [-0.064, +0.027] at item level; no equivalence claimed). [POSTRUN docs/reviews/POSTRUN_drift_replay.md, 3566a83b, W-1..W-5; the registered stream interval [+0.377, +0.413] is Monte-Carlo only and never quoted alone; realised DEFF 28-50, n_eff 24-43, MDE80 0.14-0.18; P1 OOS FAILED conservative; no detection at s 0.05; the shift is synthetic; outcome not committed, sha256 cf732363...]",
+ "chips": [
+  "VALID (POST-RUN 3566a83b): CALIBRATED; OCC-BETTER (item-level [+0.30, +0.49]); TREE = K-MEANS NOT SHOWN, NO BETTER",
+  "W-1..W-5: SYNTHETIC SHIFT; STREAM INTERVAL MONTE-CARLO ONLY; SMALL-MEMBER SHIFT SIZE, NOT SOURCE-PURE CELLS; OOS-RATE ONE-SIDED; NO DETECTION AT s 0.05"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-05",
+   "by": "registrar (pre-data; docs/reviews/READY_drift_escalation.md (ec880315))",
+   "text": "NOT READY on B-1 (reference occupancy and alarm level both from the same 2,033 GATE items; EVAL streams non-central). Fix (a) adopted (orchestrator's choice under the autonomous go, FLAGGED FOR THE AUTHOR): OCC-CHI reference occupancy from the bundle's 12,334 TRAIN rows filed by each arm's own rule, rare bins by TRAIN share; alarm levels stay GATE-calibrated; review's simulated EVAL FAR 0.023 (0/15 > 0.10). Disclosed: the GATE-only emulation of the original design was seen, median FAR 0.438 (p10 0.276, p90 0.570, 30/30 > 0.10). M-1: words say 'pooled occupancy' (at w 200, 35 bins, 33 pooled, max 8 cells per bin). C-1: the source-blind rule decides tau_oos (0.542658); 0.540800 is ESCALATION-RC's candidate-form value, a transcription, checked only as an identity. DR-R14 / C-EC2: escalation_rc a17f6821 -> 8f99db7d, selftest lines only. DR-R10 / C-EC3: seed 20261008 descriptive only. Support (g) corrected. OOS-RATE leg unchanged (emulated median 0.052, 9/30 > 0.10), open and flagged. State stays built until a delta review of the fix."
+  },
+  {
+   "date": "2026-10-05",
+   "by": "registrar (pre-data; docs/reviews/READY_drift_escalation.md DELTA REVIEW section (8b303773))",
+   "text": "READY on blob a59389e2 (fix 942d306b, branch drift-escalation, not merged). B-1 discharged: delta simulation (GATE only) OCC-CHI EVAL FAR median 0.025, p90 0.048, max 0.078, 0 of 30 > 0.10 (pessimistic variant 0.070, 1/30); M-1 discharged (33 TRAIN-reference bins per arm); C-1 confirmed (tau 0.542658). D-C1 (MEDIUM): OOS-RATE leg kept as registered; the record's '0.052, 9 of 30' corrected to 'share > 0.10 about 0.140 (exact model)'; a MISCALIBRATED DR0 names the failing leg and its FAR; OOS-only failure = 'GATE-to-EVAL transport of the p5 operating point (about 14% expected under split noise alone)', never 'cells fail'. D-C2 (LOW): the end-to-end selftest no longer exercises the registered 0.10 bar (first run_e2e leg forces MISCALIBRATED, far_max -1); covered by value in 'branches'. Selftest 8/8, mutants 61/61, dry-run rc 0."
+  },
+  {
+   "date": "2026-10-05",
+   "by": "registrar (POSTRUN 3566a83b, VALID)",
+   "text": "W-1: DR2's width is the item-level one, about [+0.30, +0.49] ([+0.20, +0.44] with GATE resampled); the registered stream interval is Monte-Carlo only, never quoted alone; DEFF 28-50, n_eff 24-43, MDE80 0.14-0.18. W-2: not source-pure cells; the unevenness tracks the per-member shift multiplier. W-3: OOS-RATE sees only shifts toward more OOS flags. W-4: P1 OOS FAILED in the safe direction, cannot reverse DR2. W-5: DR1 = no better than matched-k k-means, no equivalence; P3 HELD on the point only; P4 s 0.40 delay HELD, s 0.05 detection FAILED. D-1: the realised MDE80 0.0258 was from the stream SE (component SE gives 0.136-0.182). D-2: Kish 1.311, not 1.09. Brackets in the registration's READOUTS AND CRITERIA, SUPPORT, PREDICTIONS lines (L24645-L24647); outcome section L24743-L24755."
+  }
+ ],
+ "does_not_show": [
+  "real traffic or real drift (the shift is SYNTHETIC)",
+  "a cell property behind the per-member pattern (it tracks the relative size of the synthetic shift; pooled bins are impure, W-2)",
+  "occupancy beating the OOS rate on its merits in all six directions (OOS-RATE blind by construction to four, W-3)",
+  "a tree advantage, or tree = k-means equivalence (W-5)",
+  "detection of a small shift (s 0.05)",
+  "new-domain detection, accuracy or routing consequences, other detectors, windows, draws or items"
+ ],
+ "ledger": {
+  "row_id": "DRIFT-REPLAY",
+  "version": "v400 (2026-10-05: OUTCOME bracket, OK + WARN chips) | v399 (2026-10-05: READY bracket, chip READY)"
+ },
+ "depends_on": [
+  "UNION-AF-ROUTE (AF-U cells; AK1 U-global k-means)",
+  "ESCALATION-RC (tau_oos operating point)",
+  "ONLINE-STAGE2"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; no judge, rubric, reference, frontier, temperature, LR / BIC (MIX-LRT-SITE untouched)"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "CPU about 30-90 min (8,000 streams x 6 arm instances x 2 detectors)",
+  "agent_hours": "about 3 h",
+  "reads_pool": true
+ },
+ "outputs": "never committed: stored on E: with SHA256SUMS.txt; temp under E:/TaxoArena_tmp via scratch_dir",
+ "sources": [
+  "docs/judge_v2_program.md L24639-L24651 (_as_of the commit that writes them, parent 07bc237f, re-grepped)",
+  "docs/judge_v2_program.md L24618-L24623 (registrar's record; _as_of the commit that writes them, parent 07bc237f, re-grepped)",
+  "the orchestrator's brief of 2026-10-05 (the author's \"Start them\")",
+  "docs/reviews/READY_drift_escalation.md (ec880315); programme brackets in the DRIFT-REPLAY registration L24642, L24643, L24645, L24646, L24647 (_as_of ec880315 + this commit, re-grepped)",
+  "docs/judge_v2_program.md L24714-L24719 (registrar's record '## Registrar's record 2026-10-05 (insertion only; zero calls; nothing run; pre-data) — READY_drift_escalation ec880315: ...'; _as_of ec880315 + this commit, re-grepped)",
+  "docs/reviews/READY_drift_escalation.md DELTA REVIEW section (8b303773); programme brackets in the DRIFT-REPLAY registration L24643, L24645, L24646, L24647 and on L24718 (_as_of 8b303773 + this commit, re-grepped)",
+  "docs/judge_v2_program.md L24735-L24741 (registrar's record '## Registrar's record 2026-10-05 (insertion only; zero calls; nothing run; pre-data) — DRIFT-REPLAY READY on blob a59389e2 ...'; _as_of 8b303773 + this commit, re-grepped)",
+  "docs/reviews/POSTRUN_drift_replay.md (3566a83b); outcome sha256 cf732363...; docs/judge_v2_program.md '## DRIFT-REPLAY (2026-10-05, 0 calls) — VALID (POSTRUN 3566a83b): ...' L24743-L24755 and brackets L24645-L24647 (_as_of the commit that writes them, parent 3566a83b, re-grepped)"
+ ],
+ "last_update": "2026-10-05",
+ "label_status": "AF-U [SC]; KM-U [LF]; source oracle [SRC] (ceiling); source read only to build the mixture; correctness never read",
+ "plain_description": {
+  "sq": "SQ1 Use",
+  "what": "Simulates shifts in the mix of question sources on held-out data. It compares two drift alarms tuned to the same false-alarm rate: a chi-square test on how questions fill the tree's cells, and the existing out-of-scope flag rate. It also compares the anchor-free tree's cells with k-means cells of the same number (no judge calls).",
+  "why": "It tests whether the cells are useful for monitoring, by detecting when incoming traffic changes, and whether a tree does this better than plain clustering.",
+  "information": "If watching cell occupancy beats the out-of-scope rate, cells add a practical monitoring use; a tree beating k-means would favour the tree. Result: on synthetic shifts of moderate size, the cell-occupancy alarm detects more often than the out-of-scope rate (61% vs 21%). This comes from small sources whose share is multiplied, not from pure cells, and the out-of-scope rate is blind by construction to some directions. The tree's cells do no better than k-means (no equivalence claimed). Small shifts were not detected. The shifts are synthetic, not real traffic.",
+  "written": "2026-10-07"
+ }
+}

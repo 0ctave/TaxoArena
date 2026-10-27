@@ -1,0 +1,59 @@
+POOL pv2_41dbd3dbcd399df0 (K46-REPOST; leg one; the first line of every mode)
+  store Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\archv2\pilot_k46\pilot_k46_verdicts_run2.db | sha256 BEFORE 44724d25aa8653b49cef5ea85e99016f4e27f1c99819edc62073416eeec27793 (= the pin)
+IDENTITY GATE (refused on any mismatch, before any body is decoded):
+  scheduled matches                                  2664 (registered   2664) OK
+  ONE (reference)                                     818 (registered    818) OK
+  NONE (no reference)                                1846 (registered   1846) OK
+  usable (A / B / TIE)                               2661 (registered   2661) OK
+  INVALID                                               3 (registered      3) OK
+  INVALID with NONE                                     3 (registered      3) OK
+  both order verdicts                                2664 (registered   2664) OK
+  the view's combined = this script's combine()      2664 (registered   2664) OK
+  run_meta pool_id                                pv2_41dbd3dbcd399df0 OK
+  run_meta run_id                                 ARCH-V2-PILOT-K46-run1 OK
+  run_meta judge_requested                        grok-4-1-fast-non-reasoning OK
+  run_meta max_tokens                             8192 OK
+  run_meta temperature_label                      omitted OK
+  run_meta parse_version                          jv2-classify-1+rj.parse_judge:ast16:e5e7f1b021ab8c0e+rr.strip_think:ast16:068a08dda1bf9b1b OK
+  -> IDENTITY GATE: PASS
+  N1: pair_noref.py blob 2696e2340e7c3cd9 | REF_SENTENCE sha256 909460cd3c351143 | NOREF_SENTENCE sha256 a031906668b848bc
+  eval_view Z:\FAC\TUBerlin\THESIS\TaxoArena\data_v2\REG_ARCHV2-SPLIT-2_2929bd46aa271d883050bfe735f96e621ed55fd2\eval_view_REG.db | sha256-bytes BEFORE e35b7518878205837bfd16266dfdd8a6e76a226ed67957796d1d33cb72b5e369 (= the pinned sha) | sidecars: -wal absent, -journal absent, -shm absent
+  KEYS (K46-KEY-READ's sealed read): 818 matches, key-decidable 544, refused sides 0
+[ACCOUNT] REF-PAIRED-V2 (outcome): (i) own 3272 (caches 3272, ledgers 3272) + 0 = 3272 of 3440 | (ii) matches 1636 of 4000 | (iii) day 2026-10-02: 10656 + 0 = 10656 of 14000 | (iv) budget None -> OK
+  store sha256 AFTER 44724d25aa8653b49cef5ea85e99016f4e27f1c99819edc62073416eeec27793 (EQUAL)
+=== REF-PAIRED-V2 (RP20's ONE leg) | K46-REPOST | registered L22786-L22810 (767ebb79) section 2b; interval form NORMAL (C-K1) ===
+POOL pv2_41dbd3dbcd399df0 | store 44724d25aa8653b4 | ONE matches 818 | arms T1 / C1 | judge grok-4-1-fast-non-reasoning | cap 8192 | temperature omitted | N1 sha a031906668b848bc | script sha256-lf16 58f621dc4582616b | interval form normal
+(C0) VALIDITY, FIRST:
+     (a) store sha256 equal before and after                                        PASS  checked at the end
+     (b) identity: ONE scheduled 818; key-decidable 544 in 160 components           PASS  818 scheduled; key-decidable 544 in 160
+     (c) C1 bodies byte-identical to the stored bodies                              PASS  1636 of 1636 (registered 1636)
+     (d) T1 bodies differ from C1 exactly in the swapped span / the stripped reference FAIL  0 of 1636
+     (e) every call fingerprinted azure:grok-4-1-fast-non-reasoning                 PASS  {'azure:grok-4-1-fast-non-reasoning': 3272}
+     (f) the pilot's truncation guard (all rows and key-decidable rows <= 5%)       PASS  all 0 of 24, key-decidable 0 of 18
+
+(C1) Delta_A = acc_A(T1) - acc_A(C1), paired by match, on 544 key-decidable ONE matches in 160 components: acc 0.7169 - 0.8768 = -0.1599 | 90% normal [-0.2015, -0.1183] percentile [-0.2025, -0.1185] | 95% normal [-0.2095, -0.1103] percentile [-0.2098, -0.1104] | SE 0.0253
+     convention B (committed in both arms, paired; 411 matches): Delta_B = -0.0292, beside, deciding nothing
+     LOSS (the reference helps) iff the 95% upper bound < 0; GAIN iff the 95% lower bound > 0
+C1: UNDETERMINED BY VALIDITY
+     SUPPORT (C1, MEASURED): n 544 in 160 CK-CLOSE components (Kish mean cluster size 4.934) | DEFF 2.007 (ANALYTIC: linearised component-clustered variance / iid variance) | n_eff 271.0 | SE 0.0253 (component-clustered bootstrap, deciding) | MDE80 (2.80 x SE) 0.0708 | beside, NOT a measurement: the bootstrap SE ratio squared 2.099 (0.0253 vs 0.0175 iid; Monte-Carlo noise between two streams)
+     bootstrap SE at seeds 43-62: 43:0.0256, 44:0.0248, 45:0.0255, 46:0.0254, 47:0.0254, 48:0.0253, 49:0.0248, 50:0.0254, 51:0.0257, 52:0.0251, 53:0.0252, 54:0.0248, 55:0.0252, 56:0.0259, 57:0.0246, 58:0.0248, 59:0.0248, 60:0.0251, 61:0.0253, 62:0.0250
+
+(C2) DESCRIPTIVE: TIE share T1 - C1 on all 818 = 0.2653 - 0.1589 = +0.1064
+     d(T1, C1) on all 818 = 214/818 = +0.2616 | 90% normal [+0.2287, +0.2945] percentile [+0.2286, +0.2943] | 95% normal [+0.2224, +0.3008] percentile [+0.2234, +0.3008] | SE 0.0200
+     d(C1, K46) (a second v2 time point) = 65/818 = +0.0795 | 90% normal [+0.0628, +0.0961] percentile [+0.0635, +0.0974] | 95% normal [+0.0596, +0.0993] percentile [+0.0607, +0.1004] | SE 0.0101
+     reversals (T1 vs C1, decisive in both, opposite) 21
+STRATA (descriptive): K46 TIE n 35 Delta_A +0.0286; K46 decisive n 509 Delta_A -0.1729; health n 274 Delta_A -0.2080; math n 270 Delta_A -0.1111; reference-correct n 506 Delta_A -0.1779; reference-wrong (DESCRIPTIVE-ONLY) n 38 Delta_A +0.0789
+LEAKAGE (descriptive): per-contestant key accuracy and change share (T1 / C1): Llama-2-13b-hf n 26 acc 0.808/0.885 chg 0.154, Llama-2-70b-hf n 24 acc 0.583/0.833 chg 0.375, Llama-2-7b-hf n 18 acc 0.833/0.944 chg 0.167, Meta-Llama-3-70B n 28 acc 0.607/0.929 chg 0.429, Meta-Llama-3-8B n 24 acc 0.792/0.875 chg 0.167, Meta-Llama-3-8B-Instruct n 42 acc 0.762/0.881 chg 0.190, Meta-Llama-3_1-70B n 32 acc 0.594/0.875 chg 0.375, Meta-Llama-3_1-70B-Instruct n 31 acc 0.710/0.903 chg 0.258, Meta-Llama-3_1-8B n 22 acc 0.682/0.864 chg 0.318, Meta-Llama-3_1-8B-Instruct n 36 acc 0.528/0.750 chg 0.417, Mistral-7B-Instruct-v0.1 n 25 acc 0.640/0.880 chg 0.240, Mistral-7B-Instruct-v0.2 n 24 acc 0.500/0.792 chg 0.333, Mistral-7B-v0.1 n 25 acc 0.760/0.880 chg 0.320, Mistral-7B-v0.2-hf n 21 acc 0.667/0.905 chg 0.286, Mixtral-8x7B-Instruct-v0.1 n 30 acc 0.667/0.933 chg 0.267, Mixtral-8x7B-v0.1 n 26 acc 0.654/0.769 chg 0.269, Phi-3-mini-4k-instruct n 22 acc 0.591/0.864 chg 0.318, Qwen1.5-110B n 28 acc 0.821/0.857 chg 0.143, Qwen1.5-14B-Chat n 28 acc 0.571/0.643 chg 0.357, Qwen1.5-72B-Chat n 31 acc 0.710/0.806 chg 0.226, Qwen1.5-7B-Chat n 31 acc 0.581/0.806 chg 0.258, Yi-34B n 35 acc 0.771/0.943 chg 0.200, Yi-6B n 32 acc 0.688/0.844 chg 0.219, Yi-6b-Chat n 22 acc 0.909/0.909 chg 0.136, arx_0314 n 32 acc 0.656/0.875 chg 0.344, arx_3 n 28 acc 0.821/0.964 chg 0.179, c4ai-command-r-v01 n 31 acc 0.581/0.839 chg 0.355, claude-3-5-haiku-20241022 n 34 acc 0.647/0.853 chg 0.382, claude-3-5-sonnet-20241022 n 29 acc 0.759/1.000 chg 0.241, claude-3.5-sonnet n 29 acc 0.793/0.931 chg 0.207, deepseek-chat-v2_5 n 30 acc 0.800/0.833 chg 0.167, gemini-3.1-pro_5-shots n 43 acc 0.814/0.860 chg 0.233, gemma-7b n 31 acc 0.806/0.968 chg 0.161, gpt-4o-2024-08-06 n 36 acc 0.917/0.944 chg 0.083, gpt-4o-mini n 31 acc 0.710/0.839 chg 0.258, iask_pro n 37 acc 0.919/0.973 chg 0.108, mathstral-7B n 34 acc 0.765/0.971 chg 0.235
+     CONSENSUS-FIT [T1]: KEY +1.503 +- 0.111 (n 1035 rows) | REF NOT ESTIMABLE (no reference in the arm)
+     CONSENSUS-FIT [C1]: KEY +2.326 +- 0.151 (n 948 rows) | REF NOT ESTIMABLE (no reference in the arm)
+     per-contestant agreement with the reference side (C1 vs T1): NOT BUILT (needs the responses' pred column, refused by the K46 key tripwire; registrar b3dd18ab)
+     CONSENSUS-FIT REF coefficient: NOT BUILT (the reference-agreement contrast needs the pred column, refused by the key tripwire)
+
+PREDICTIONS (draft; scored on the points):
+  P1 Delta1_A = -10pp [-15, -5]                           -0.1599                                      -> UNDETERMINED BY VALIDITY
+  P2 reference-wrong stratum Delta1 = +35pp [+10, +55]    +0.0789 (n 38)                               -> UNDETERMINED BY VALIDITY
+
+FALSIFIER: NOT FIRED (not evaluated: C0 failed).
+ACCOUNTING (day ledgers): REF-PAIRED-V2 3272 of 3440 calls (cache 3272, ledgers 3272) | registered 3272
+
+[ANALYZE] wrote Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\archv2\k46_repost\ref_paired_v2_outcome.txt (write-once)

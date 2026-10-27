@@ -1,0 +1,64 @@
+=== TIER-HONEST-X20: does the finding the whole budget line rests on replicate? ===
+  x12 gave: across-tier 62 of 64 separated with ZERO wrong; within-tier 2 of 2 separated, ONE of
+  them wrong (arx/iask). That headline rests on TWO within-tier events. Here: 20 models, 190 pairs,
+  12394 verdicts.
+
+  the key's 13 tiers at a 0.017 gap:
+    tier 0: gemini-3.1-pro_5-shots (0.913)
+    tier 1: arx_0314 (0.834), iask_pro (0.817)
+    tier 2: arx_3 (0.790), claude-3-5-sonnet-202410 (0.779)
+    tier 3: gpt-4o-2024-08-06 (0.750)
+    tier 4: deepseek-chat-v2_5 (0.657)
+    tier 5: gpt-4o-mini (0.633), Meta-Llama-3_1-70B-Instr (0.630), claude-3-5-haiku-2024102 (0.630)
+    tier 6: Qwen1.5-110B (0.487), Qwen1.5-72B-Chat (0.474)
+    tier 7: Mixtral-8x7B-Instruct-v0 (0.412)
+    tier 8: Meta-Llama-3_1-8B (0.371), c4ai-command-r-v01 (0.363), Qwen1.5-14B-Chat (0.355)
+    tier 9: gemma-7b (0.312)
+    tier 10: Yi-6b-Chat (0.271)
+    tier 11: Llama-2-13b-hf (0.235)
+    tier 12: Llama-2-7b-hf (0.178)
+
+  separations at 95% confidence:
+  ALL 190 pairs              within-tier   8/  9 separated,  6 WRONG (75.0%) | across-tier 173/181,  5 WRONG (2.9%)
+  SHARED (in x12, not new)   within-tier   2/  2 separated,  2 WRONG (100.0%) | across-tier  62/ 64,  1 WRONG (1.6%)
+  NOVEL (independent)        within-tier   6/  7 separated,  4 WRONG (66.7%) | across-tier 111/117,  4 WRONG (3.6%)
+
+  (1) PRIMARY: is the within-tier rate disproportionately wrong against across-tier?
+      within-tier 75.0% wrong against across-tier 2.9% -> REPLICATES: within-tier separations are where the board is dishonest
+      on the NOVEL pairs alone (the only independent test): within 66.7%, across 3.6%
+
+      every WITHIN-TIER separation that points the wrong way:
+        Meta-Llama-3_1-8B          vs Qwen1.5-14B-Chat           p=0.000 but key says 0.371 vs 0.355
+        Meta-Llama-3_1-8B          vs c4ai-command-r-v01         p=0.005 but key says 0.371 vs 0.363
+        Qwen1.5-110B               vs Qwen1.5-72B-Chat           p=0.000 but key says 0.487 vs 0.474
+        Qwen1.5-14B-Chat           vs c4ai-command-r-v01         p=0.993 but key says 0.355 vs 0.363
+        arx_0314                   vs iask_pro                   p=0.000 but key says 0.834 vs 0.817
+        arx_3                      vs claude-3-5-sonnet-20241022 p=0.000 but key says 0.790 vs 0.779
+
+  (2) THE ARENA'S OWN TIERING, by its own intervals:
+      the arena separates itself into 11 tiers (x12 gave 10)
+      cross-tier key inversions in its own tiering: 9 (x12 gave 2)
+        iask_pro                   tiered ABOVE arx_0314                   but scores 0.817 against 0.834
+        claude-3-5-sonnet-20241022 tiered ABOVE arx_0314                   but scores 0.779 against 0.834
+        gpt-4o-2024-08-06          tiered ABOVE arx_0314                   but scores 0.750 against 0.834
+        arx_3                      tiered ABOVE arx_0314                   but scores 0.790 against 0.834
+        gpt-4o-mini                tiered ABOVE deepseek-chat-v2_5         but scores 0.633 against 0.657
+        claude-3-5-haiku-20241022  tiered ABOVE deepseek-chat-v2_5         but scores 0.630 against 0.657
+        Qwen1.5-72B-Chat           tiered ABOVE Qwen1.5-110B               but scores 0.474 against 0.487
+        Qwen1.5-14B-Chat           tiered ABOVE Meta-Llama-3_1-8B          but scores 0.355 against 0.371
+
+=== PROFILE-RELIABILITY-X20: does a bigger roster rescue the anchor profile? ===
+  x12 gave anchor R = 0.6728 against a registered 0.70 bar, and the deliverable was closed on it.
+  pool 2646 questions | 87 leaves | 14 anchors | 20 models | 12394 verdicts
+
+  level        cells    q/cell      judge r  judge R(SB)    key R(SB)
+  leaf             7        64      -0.0160      -0.0326       0.8248
+             (split-half SD 0.0684 over 40 halvings)
+  anchor          14       189       0.4580       0.6283       0.9045
+             (split-half SD 0.0351 over 40 halvings)
+
+  REGISTERED BAR 0.70, the same one x12 failed at 0.6728:
+    x20 anchor R = 0.6283  ->  FAIL
+    against x12's 0.6728: -0.0445
+    -> NOT RESCUED. The finding is roster-independent on this corpus: 20 models does not
+       clear the bar either, so the deliverable is CLOSED rather than postponed.

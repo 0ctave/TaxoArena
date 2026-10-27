@@ -1,0 +1,54 @@
+[SLOTSWAP-MECH] pool of record: none read (S0's own DBs); zero calls
+[SLOTSWAP-MECH] heavy foreign processes: none
+[INTENT-S0] pin intent_transfer_corpora_v1.db: sha256 487e0093719c184c98bca53bc9bc61c193559690abb206d77010fd77f81c09a2 [PIN OK]
+[INTENT-S0] raw provenance amazon-massive-dataset-1.1.tar.gz: sha256 4cba5faa11c71437928e17cb1b9b3d8b8e727e7ea363a3a9a8045e19c0491577 [PIN OK]
+[INTENT-S0] raw provenance banking77_test.csv: sha256 d12d6e3bc4c3103966ae786dc435913c0c563dfa328f5a3646d0e62cfeeb474d [PIN OK]
+[INTENT-S0] raw provenance banking77_train.csv: sha256 b06e26ac675513959a63135f11b94ea7786ed02da65db93a5650d8838cbc664b [PIN OK]
+[INTENT-S0] raw provenance clinc_data_oos_plus.json: sha256 bfcca9ae515623541dc1983c94c4ed7cae9d26b42ae47d74b972e51bb6f7a21f [PIN OK]
+[INTENT-S0] raw provenance clinc_domains.json: sha256 b947b579d3b8e74b06f93b01083d8efaff2888b43a3e362533bd88a6e1211b3a [PIN OK]
+[INTENT-S0] pin intent_emb_qwen3.db: sha256 9e100e04fc91b137a075b8abedbc87d2b29a6dc2244c5f242b1c587004a4ee74 [PIN OK]
+[INTENT-S0] pin intent_emb_nomic.db: sha256 4aafd6c7fa5f779ee21f152eb7e935774323903b32117f48f6acd24d1ccf11ad [PIN OK]
+[INTENT-S0] pin intent_emb_gemma.db: sha256 b187b82f90ce98376ba3ffac100157493fd8c5ee52dfa88f707738dde2acf512 [PIN OK]
+[SLOTSWAP-MECH] R-2 precondition: 3222 of 3222 variants have a vector in intent_emb_qwen3.db
+[SLOTSWAP-MECH] R-2 precondition: 3222 of 3222 variants have a vector in intent_emb_nomic.db
+[SLOTSWAP-MECH] R-2 precondition: 3222 of 3222 variants have a vector in intent_emb_gemma.db
+[SLOTSWAP-MECH] variants: 3222 (rows equal to s0_c4_variants.csv); components 3207
+[INTENT-S0] qwen3: 57350 of 57350 texts have a 4096-d vector (dims seen {4096: 57350})
+[INTENT-S0] nomic: 57350 of 57350 texts have a 768-d vector (dims seen {768: 57350})
+[INTENT-S0] gemma: 57350 of 57350 texts have a 768-d vector (dims seen {768: 57350})
+[SLOTSWAP-MECH] S0-C4 reproduction: S 0.75978 over n 3222 in 3207 components (record S 0.75978, n 3222)
+INTENT-S0-SLOTSWAP-MECH outcome (tools/analysis/intent_s0_slotswap_mech.py, blob 7821815544e47679f611204d9bbd02a039bd46d4; S0 machinery intent_transfer_s0.py blob f662ceb19738f515972871f5963f5dcfc764a271, imported unchanged)
+registration: docs/judge_v2_program.md "## Registered 2026-10-01 (before any code or call) — INTENT-S0-SLOTSWAP-MECH: ..." L22301-L22330 _as_of b909414; kind zero-call (R-4)
+zero judge calls; no build; no Ollama; pool of record: none read; pins re-checked before and after, unchanged: {'ingest_db': '487e0093719c184c', 'qwen3': '9e100e04fc91b137', 'nomic': '4aafd6c7fa5f779e', 'gemma': 'b187b82f90ce9837'}
+builder's readings: SB1 mid-rank groups (ties together; an empty group gives no interval -> UNDETERMINED); SB2 whitespace tokens, variant-side share (origin side printed, NOT OF RECORD); SB3 values from c4_variants' draw re-run, asserted; SB4 bootstrap seed 20261003, undefined draws dropped and counted; SB5 selective = margin quintiles 2-5
+R-2 precondition: 3222 of 3222 variants present in each of intent_emb_qwen3 / nomic / gemma
+S0-C4 reproduced: S 0.75978 over n 3222 variants in 3207 components (record 0.75978 / 3,222 / 3,207)
+R-2 (disclosure): S by slots in the item was in the record before registration (c9c2fed W-5); M2 (token share) is not blind to it
+SUPPORT (a) deciding denominator: 3222 variants in 3207 CK-CLOSE components (registered 3,222 / 3,207), Kish mean cluster size 1.0093; (b) DEFF 1.0093 measured on this cache (registered 1.0093); (c) n_eff = 3222 / 1.0093 = 3192
+SUPPORT (d) R-1 M1 at the realised quintile sizes [644, 645, 644, 645, 644]: SE = sqrt(0.24/644 + 0.09/644) x sqrt(DEFF) = 0.0227 (registered 0.0228), MDE80 0.0637 (bar 0.10)
+SUPPORT (d) R-1 M2 at the realised tercile sizes [1027, 1027, 1168]: SE = sqrt(0.21/1168 + 0.21/1027) x sqrt(DEFF) = 0.0197 (registered 0.0199), MDE80 0.0551 (bar 0)
+SUPPORT measured: bootstrap SE(D_Q) 0.0221, SE(D_T) 0.0176 (B 2000; undefined draws 0 / 0)
+TRAIN-ONLY: 20 fits audited (20 on TRAIN, 0 on GATE), 0 with an EVAL row, 0 OOS rows, 0 dropped rows (fit_rows refuses otherwise)
+M1 (margin): D_Q = flip(lowest origin-margin quintile) - flip(highest) = 0.4689, 95% CI [0.4253, 0.5123]: HELD (HELD iff lower >= 0.10; FAILED iff upper < 0.10)
+M2 (surface share): D_T = flip(top swap-share tercile) - flip(bottom) = 0.1411, 95% CI [0.1067, 0.1752]: HELD (HELD iff lower > 0; FAILED iff upper <= 0)
+M3 (DESCRIPTIVE-ONLY, never scored): S_gemma - S_qwen3 = +0.0664, paired 95% CI [+0.0515, +0.0820]; outside the seed spread 0.0335
+M3 (DESCRIPTIVE-ONLY, never scored): S_nomic - S_qwen3 = -0.0667, paired 95% CI [-0.0843, -0.0497]; outside the seed spread 0.0335
+F-SM1: NOT FIRED
+F-SM2: NOT FIRED
+PREDICTION D_Q 0.30 [0.20, 0.40] (80%): FAILED (point 0.4689)
+PREDICTION M1 HELD p 0.80: event HELD, Brier 0.0400
+PREDICTION D_T +0.12 [+0.04, +0.20] (80%): HELD (point 0.1411)
+PREDICTION M2 HELD p 0.65: event HELD, Brier 0.1225
+PREDICTION S_gemma - S_qwen3 +0.04 [+0.00, +0.08] (80%): HELD (point +0.0664)
+PREDICTION S_nomic - S_qwen3 -0.04 [-0.08, +0.00] (80%): HELD (point -0.0667)
+DESCRIPTIVE realised groups (R-1, SB1): margin quintiles sizes [644, 645, 644, 645, 644], flip rates ['0.5512', '0.2791', '0.1894', '0.0992', '0.0823']; swap-share terciles sizes [1027, 1027, 1168], flip rates ['0.1714', '0.2269', '0.3125']
+DESCRIPTIVE origin-side swap share (NOT OF RECORD; SB2): D_T' = 0.1372 (terciles [1083, 1077, 1062])
+DESCRIPTIVE joint logistic flip ~ 1 + z(margin) + z(share) (n 3222): b_margin -1.1187 (SE 0.0636), b_share 0.3431 (SE 0.0427)
+DESCRIPTIVE qwen3: S 0.7598; centroid stability 0.8343; co-filing 0.6924; ceiling-normalised (S - co-filing) / (centroid - co-filing) = 0.4748
+DESCRIPTIVE nomic: S 0.6930; centroid stability 0.7964; co-filing 0.5791; ceiling-normalised (S - co-filing) / (centroid - co-filing) = 0.5243
+DESCRIPTIVE gemma: S 0.8262; centroid stability 0.8827; co-filing 0.7114; ceiling-normalised (S - co-filing) / (centroid - co-filing) = 0.6703
+DESCRIPTIVE qwen3 S at K 18/60/120: 0.8340 / 0.7598 / 0.6322
+DESCRIPTIVE selective stability (SB5): S over the top 80% of origin margins = 0.8375 (n 2578) vs all 0.7598
+DESCRIPTIVE slot types with >= 80 variants (flip rate, n): date 0.2632 (760); event_name 0.4187 (418); place_name 0.1771 (401); person 0.2527 (368); time 0.2110 (308); media_type 0.2850 (207); business_name 0.1933 (150); weather_descriptor 0.3058 (121); food_type 0.2719 (114); timeofday 0.2286 (105); relation 0.1443 (97); list_name 0.2747 (91); definition_word 0.2472 (89); artist_name 0.1364 (88); device_type 0.1379 (87); transport_type 0.2346 (81); news_topic 0.5250 (80)
+DOES NOT SHOW: anything about a tree leaf (k-means cells only); capability text; natural paraphrase (slot swaps only); a causal mechanism (M1 and M2 are associations over fixed variants); embedder parity (M3 descriptive, no TOST); a second split draw or k-means seeds beyond seed 0 for M1 / M2
+[SLOTSWAP-MECH] wrote Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\intent_transfer\slotswap_mech_outcome.txt (write-once, of record)

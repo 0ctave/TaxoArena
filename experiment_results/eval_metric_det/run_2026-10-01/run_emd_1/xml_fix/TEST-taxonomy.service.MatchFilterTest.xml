@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="taxonomy.service.MatchFilterTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-10-01T07:10:14" hostname="HORTENSIA" time="0.009">
+  <properties/>
+  <testcase name="no key inputs - the predicate takes exactly two predictions and nothing else()" classname="taxonomy.service.MatchFilterTest" time="0.0"/>
+  <testcase name="a blank or missing prediction on either side keeps the question()" classname="taxonomy.service.MatchFilterTest" time="0.001"/>
+  <testcase name="already-used questions are not offered to the filter twice()" classname="taxonomy.service.MatchFilterTest" time="0.001"/>
+  <testcase name="a corpus with no extractable answers leaves the filter inert()" classname="taxonomy.service.MatchFilterTest" time="0.0"/>
+  <testcase name="comparison is trimmed and case-insensitive()" classname="taxonomy.service.MatchFilterTest" time="0.001"/>
+  <testcase name="no key inputs - neither the filter nor its call sites mention the answer key()" classname="taxonomy.service.MatchFilterTest" time="0.005"/>
+  <testcase name="matchFilter parses its two values and rejects anything else()" classname="taxonomy.service.MatchFilterTest" time="0.0"/>
+  <testcase name="filter off is the historical path and touches nothing()" classname="taxonomy.service.MatchFilterTest" time="0.001"/>
+  <testcase name="filter on schedules only the question the two answers differ on()" classname="taxonomy.service.MatchFilterTest" time="0.0"/>
+  <testcase name="a slot the filter would starve falls back to the unfiltered pool()" classname="taxonomy.service.MatchFilterTest" time="0.0"/>
+  <testcase name="agreeing answers are dropped, disagreeing ones kept()" classname="taxonomy.service.MatchFilterTest" time="0.0"/>
+  <system-out><![CDATA[09:10:14.268 [INFO ] MatchFilter - [MATCH-FILTER] fallback: cell leaf-1, pair a vs b — answer-disagreement filtering left 0 candidate question(s), below the 1 the scheduler needs; using the unfiltered 1 for this slot.
+09:10:14.268 [WARN ] MatchFilter - [MATCH-FILTER] matchFilter=answerDisagreement is INERT on this corpus: no question in cell leaf-1 has an extracted answer for BOTH a and b, so every question is UNDETERMINED and kept. Scheduling proceeds exactly as matchFilter="none". Expected on free-form/generative corpora, where "the same answer" is undefined.
+09:10:14.275 [INFO ] MatchFilter - [MATCH-FILTER] fallback: cell leaf-1, pair a vs b — answer-disagreement filtering left 0 candidate question(s), below the 1 the scheduler needs; using the unfiltered 5 for this slot.
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,221 @@
+{
+  "id": "TRACE-TRUNCATION",
+  "title": "TRACE-TRUNCATION: is a judge holding an exact outcome reference an outcome judge, or still a reasoning-content judge? (ceiling 2,184 calls)",
+  "question": "With the checker's exact final answer as the reference, does truncating the correct response's trace still move the deployed judge's verdict (drop vs 0.10; truncate rate vs 0.70), with a pad control?",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "fad9ea2 (the registration commit; it adds this record, the programme section and plan Amendment 12, and precedes all code and every call)",
+    "program_lines": "docs/judge_v2_program.md L14972-L15011",
+    "program_lines_as_of": "fad9ea2",
+    "heading": "## Registered 2026-09-23 (before any code or call) — TRACE-TRUNCATION: is a judge holding an exact outcome reference an outcome judge, or still a reasoning-content judge? (ceiling 2,184 calls)",
+    "date": "2026-09-23"
+  },
+  "script": {
+    "path": "tools/analysis/trace_truncation.py + accepted_tests_ledger.py (MERGED on main at ca417f8)",
+    "sha16": "trace_truncation.py blob:f6dfb4b2aec6db4c58a81fdec57b3ff8c1a67b79 / sha256-lf16:633384b658105e1f; accepted_tests_ledger.py blob:7fb20f64c387723a7214d3698e37b5401c70a82c / sha256-lf16:831af6b1f0ee4697",
+    "commit": "ca417f8"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_trace_truncation.md",
+    "commit": "7b102ad",
+    "verdict": "READY-WITH-CONDITIONS at 252f765 (conditions 1-8; condition 5 the DECOMP ruling, inserted)",
+    "script": "trace_truncation.py blob:f6dfb4b2aec6db4c58a81fdec57b3ff8c1a67b79 / sha256-lf16:633384b658105e1f; accepted_tests_ledger.py blob:7fb20f64c387723a7214d3698e37b5401c70a82c / sha256-lf16:831af6b1f0ee4697",
+    "record": "docs/judge_v2_program.md L15320-L15339"
+  },
+  "go": "the author's acceptance of 2026-09-23, verbatim: \"the paid tests are fine I accept them\" (relayed by the coordinator; docs/plan_2026-09-15.md Amendment 12); below the 4,000-match rule; if the run falls past the night of 2026-09-23, the acceptance authorises it on its own under its ceiling",
+  "run": {
+    "outcome_file": "experiment_results/multicorpus/trace_truncation_outcome.txt blob:d808d335cb9a2ee5a86a34fe0f24dc1080265733 / sha256-lf16:5b2cc8dd867d84e5 (3ba891d); cache experiment_results/multicorpus/trace_truncation.db sha256 d6266e5431574feda5ac1935a284e49891cce14cba647511cee21300e103bb68 (2107300)",
+    "outcome_commit": "3ba891de (cache and day ledger 2107300)",
+    "calls": 2178,
+    "date": "2026-09-24",
+    "cce": null,
+    "pool": "MATH pairs (360 over 185 questions; stage3_math_grok_v2_capfree.db, pinned)"
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-24_trace_truncation_post.md",
+    "commit": "37563c8",
+    "verdict": "CONFIRMED, RECORDABLE WITH CONDITIONS (D-b, D-c, condition 6); every figure reproduces to the digit; no BLOCKER, no HIGH"
+  },
+  "criteria": [
+    {
+      "id": "C0",
+      "text": "VALIDITY first: eligible list = the committed evidence; arms byte-identical outside the span; reference intact; pilot guard",
+      "result": "HELD",
+      "value": "PASS: anchor ddb22cc91bc1aa23 = pin; 1,080 rows = 360 pairs x 3 arms",
+      "denominator": "eligible pairs"
+    },
+    {
+      "id": "C1",
+      "text": "OUTCOME-JUDGE TEST: drop = acc(original) - acc(truncate); HELD iff interval wholly below 0.10, FAILED iff wholly above, UNDETERMINED if it contains 0.10; the interval decides",
+      "result": "UNDETERMINED",
+      "value": "drop 0.069 [0.039, 0.100] (upper 0.10033, seed 42), SE 0.0158, 26:1; knife-edge: upper limit 0.1003 at seed 42; integrated 0.1000 +- 0.0005 (MC); UND at 10 of 21 seeds, HELD at 11; integrated: 21-seed mean 0.10004 UND, B 100,000 0.10002 UND, analytic 0.09996 HELD; descriptive-only; neither HELD nor FAILED citable",
+      "denominator": "about 360 pairs, clustered by question"
+    },
+    {
+      "id": "C2",
+      "text": "THE FLOOR: acc(truncate) vs 0.70; FAILED iff interval wholly below, HELD iff wholly above, else UNDETERMINED",
+      "result": "HELD",
+      "value": "acc(truncate) 0.914 [0.881, 0.947] vs 0.70; HELD at all 21 seeds and every estimator",
+      "denominator": "about 360 pairs"
+    },
+    {
+      "id": "C3",
+      "text": "PAD CONTROL, descriptive: acc(pad) - acc(original)",
+      "result": "n/a",
+      "value": "DESCRIPTIVE, QUALIFIED: pad -0.131 [-0.169, -0.092] (48:1): edit-sensitivity, not content-reading",
+      "denominator": "about 360 pairs"
+    },
+    {
+      "id": "C4",
+      "text": "NOISE-FLOOR READING, descriptive: the drop beside the per-match retest floors (0.087, 0.057, the rung's if recorded); no floor from a pooled per-call rate",
+      "result": "n/a",
+      "value": "DESCRIPTIVE, CORRECTED: DECOMP line VOID; drop 0.069 BELOW the CANARY-BASELINE per-match floor 0.087, not attributed to truncation; caveat (unregistered): net vs gross comparison, 26:1 discordance, 'not attributed' never means 'is noise'",
+      "denominator": "about 360 pairs"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "acc(original) 0.95 [0.90, 0.98]",
+      "result": "FAILED",
+      "value": "0.983 above [0.90, 0.98]",
+      "denominator": "pairs"
+    },
+    {
+      "id": "P2",
+      "text": "acc(truncate) 0.87 [0.80, 0.93]",
+      "result": "HELD",
+      "value": "0.914 in [0.80, 0.93]",
+      "denominator": "pairs"
+    },
+    {
+      "id": "P3",
+      "text": "drop 0.07 [0.02, 0.12]",
+      "result": "HELD",
+      "value": "0.069 in [0.02, 0.12]",
+      "denominator": "pairs"
+    },
+    {
+      "id": "P4",
+      "text": "acc(pad) - acc(original) 0.00 [-0.03, +0.03]",
+      "result": "FAILED",
+      "value": "-0.131 outside [-0.03, +0.03]",
+      "denominator": "pairs"
+    },
+    {
+      "id": "P5",
+      "text": "C1 UNDETERMINED (point probability 0.6)",
+      "result": "HELD",
+      "value": "HELD, knife-edge: C1 UNDETERMINED at seed 42; knife-edge: upper limit 0.1003 at seed 42; integrated 0.1000 +- 0.0005 (MC); UND at 10 of 21 seeds, HELD at 11",
+      "denominator": "pairs"
+    },
+    {
+      "id": "P6",
+      "text": "unusable <= 1% of posted calls",
+      "result": "HELD",
+      "value": "0 unusable of 2,178 posted and of 2,160 cached; 18 HTTP 429 calls without verdict (0.83% if counted)",
+      "denominator": "calls"
+    }
+  ],
+  "falsifier": {
+    "text": "C2 FAILED fires the lead's falsifier (an exact outcome reference does not make the judge an outcome judge; overturns the leads' C4 reading); C1 FAILED overturns 'outcome judge' for this judge and reference. NOT OVERTURNED: L1 / L1-V / L1-V2, STACK-v2, H7's closure.",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "accuracies": "original 0.983 (354/360), truncate 0.914 (329/360) [0.881, 0.947], pad 0.853 (307/360); convention B 1.000 / 0.985 / 0.984",
+    "drop": "0.069 [0.039, 0.100] (upper 0.10033), SE 0.0158, 26:1 (exact McNemar p 4.2e-7); integrated upper 0.1000 +- 0.0005",
+    "pad": "-0.131 [-0.169, -0.092], 48:1",
+    "support": "Kish 2.4833 / 185 q; DEFF 1.274 / 1.301; n_eff 282.6 / 276.7; MDE 0.0441 / 0.0472",
+    "d4_stratum_unregistered": "malformed 0.034 [-0.015, 0.082] (89 pairs) vs clean 0.081 [0.045, 0.117] (271 pairs)",
+    "ties_unregistered": "truncate 26 TIE + 5 wrong-side; original 6 TIE + 0; wrong-side 5:0 p 0.0625",
+    "calls": "2,178 posted of 2,184; 2,160 cached; 18 HTTP 429 errored (10 jobs, 13 retries)"
+  },
+  "sentence_of_record": "TRACE-TRUNCATION (grok-4-1-fast-non-reasoning, exact checker answer as reference, 360 MATH pairs over 185 questions, 2,178 calls): cutting the correct trace to its final line lowers the correct-verdict rate from 0.983 to 0.914 (drop 0.069 [0.039, 0.100], exact McNemar 26:1). The drop is almost entirely TIEs (order flips): 26 TIE + 5 wrong-side against 6 TIE + 0. The upper limit coincides with the 0.10 bar to within 0.0005 at every seed and estimator, so C1 is UNDETERMINED (descriptive by registration). The floor holds (C2 HELD, 0.914 [0.881, 0.947] against 0.70). Padding back with spaces costs more than truncation (-0.131 [-0.169, -0.092]), so the sensitivity reads as edit-sensitivity, not content-reading (C3). [run 3ba891d (cache and day ledger 2107300), review 37563c8 CONFIRMED, RECORDABLE WITH CONDITIONS; zero reviewer calls; denominators: 360 MATH pairs over 185 questions (Kish mean cluster 2.483), 2,178 calls posted / 2,160 cached (18 HTTP 429 errored, no verdict); C1 knife-edge: upper limit 0.1003 at seed 42; integrated 0.1000 +- 0.0005 (MC); UND at 10 of 21 seeds, HELD at 11 (neither HELD nor FAILED may be cited); C4: the DECOMP line of the outcome is VOID]",
+  "chips": [
+    "REGISTERED 2026-09-23, BEFORE ANY CODE OR CALL",
+    "C0 PASS",
+    "C1 UNDETERMINED (KNIFE-EDGE; DESCRIPTIVE-ONLY)",
+    "C2 HELD",
+    "C3 QUALIFIED (EDIT-SENSITIVITY)",
+    "C4 BELOW THE CANARY-BASELINE PER-MATCH FLOOR (DECOMP LINE VOID)",
+    "P1, P4 FAILED; P2, P3, P5 (KNIFE-EDGE), P6 HELD; FALSIFIER NOT FIRED",
+    "<= 2,184 CALLS; ACCEPTED BY THE AUTHOR"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-24",
+      "by": "registrar",
+      "text": "Built at f0112d1. Rulings: reference = the raw pool target in the '[Verified reference answer]' block; pad = ASCII spaces (byte length, not token length: a recorded limit of C3); the final-answer span rule; span-at-0 pairs excluded and counted; dataset-text strings counted, not refused. Pair list to be committed as evidence before any call, then PINNED_PAIRS_SHA256 set. Accounting: the posting-date ledger; guard checks 2,184, the 4,000-match rule and 4,060 + both tests' calls <= 14,000. docs/judge_v2_program.md L15188-L15206."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar",
+      "text": "Pair list committed as evidence before any call (360 pairs, 185 questions; population 2,996 -> 1,540 -> 828 -> 360); pinned at 252f765; dry-run scan on 2,160 payloads; Support restated for Kish 2.483: C2 stays SCOREABLE, C1 descriptive. docs/judge_v2_program.md L15302-L15318."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (READY 7b102ad; merge ca417f8)",
+      "text": "READY-WITH-CONDITIONS; merged ca417f8; dry-run, pilot and run launched. Condition 5: DECOMP's 0.057 is per-call, single-order background for C4, not a per-match floor (bracketed at C4). The restated ICC 0.510 is not sound; only the rho = 1 bound is defensible (C2 stays SCOREABLE). 118 / 360 pairs share a byte-identical correct trace; pad restores character length (2 / 360 differ in bytes); 89 / 360 truncated spans keep a dangling delimiter (a descriptive, unregistered stratum). docs/judge_v2_program.md L15320-L15339."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (the coordinator's relay)",
+      "text": "RAN (3ba891de); review pending; no outcome recorded. docs/judge_v2_program.md L15764-L15770."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (run 3ba891d; review 37563c8)",
+      "text": "OUTCOME recorded: C0 PASS; C1 UNDETERMINED knife-edge (neither HELD nor FAILED citable); C2 HELD; C3 QUALIFIED; C4 corrected (DECOMP line void; below the 0.087 floor, net-vs-gross caveat); condition 6 recorded. docs/judge_v2_program.md L15788-L15814."
+    }
+  ],
+  "does_not_show": [
+    "That the judge is an outcome judge (C1 is not HELD).",
+    "That it reads reasoning content (C3 qualifies the drop as edit-sensitivity, and the drop is TIEs rather than preferences for the wrong side: wrong-side verdicts 5:0, exact p 0.0625, not established).",
+    "Anything about token length (the pad restores characters).",
+    "Anything about other judges, references, corpora, or traces cut at a point other than the final line.",
+    "That the drop is retest noise: C4's \"not attributed\" is a net-vs-gross comparison (below).",
+    "A mechanism for the malformed-delimiter stratum (UNREGISTERED, and it points the other way).",
+    "any other judge, corpus or reference type",
+    "why truncation moves the verdict (content vs edit: C3 is the control)",
+    "a fidelity number for the deployed recipe",
+    "anything H7's closed 'ignore length' clause covered"
+  ],
+  "ledger": {
+    "row_id": "TRACE-TRUNCATION",
+    "version": "v223 (adjudicated; chips replaced; audit OK)"
+  },
+  "depends_on": [
+    "CANARY-BASELINE",
+    "TIE-MECHANICS",
+    "POSITION-INDEX-ALL"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing and reopens nothing (closed lines checked in the registration)"
+  },
+  "support": "about 360 pairs clustered by MATH question; DEFF 1.18 MEASURED on this corpus's cache family (POSITION-INDEX-ALL MATH / grok-nr) and TRANSPORTED (different statistic); n_eff 305; SE C1 sqrt((0.15 - 0.01) / 360) x sqrt(1.18) = 0.0214 (match-level paired variance, declared pilot discordance 0.15; no per-call independence); C2 0.0193; MDE C1 0.060, C2 0.054; C1 DESCRIPTIVE-ONLY (0.03 < 0.060), C2 SCOREABLE (0.17 > 0.054); structural: finite population, C1 descriptive at any budget. Random streams pinned and reported (selection, bootstrap with 20-seed robustness, judge sampling, posting order). docs/judge_v2_program.md L14972-L15011",
+  "sources": [
+    "docs/judge_v2_program.md L14972-L15011",
+    "docs/plan_2026-09-15.md Amendment 12",
+    "the coordinator's relay of the author's acceptance (2026-09-23)",
+    "docs/judge_v2_program.md L15188-L15206",
+    "docs/judge_v2_program.md L15302-L15318",
+    "docs/judge_v2_program.md L15320-L15339",
+    "docs/judge_v2_program.md L15764-L15770",
+    "docs/judge_v2_program.md L15788-L15814",
+    "docs/reviews/2026-09-24_trace_truncation_post.md (37563c8)"
+  ],
+  "last_update": "2026-09-24 (registrar: outcome; docs/judge_v2_program.md L15788-L15814)",
+  "pairs_evidence": "docs/agents/results/evidence/TRACE-TRUNCATION_pairs.txt (sha256-lf 08a0f84f61718b32...; blob:928917eadcbea075; 360 pairs over 185 questions; committed before any call)",
+  "support_restated": "Kish 2.483 (360 pairs / 185 questions) vs planning 1.353: DEFF middle 1.756 (ICC 0.510 implied by the family's 1.18 at Kish 1.353) / bound 2.483; n_eff 205.0 / 145.0; C1 SE 0.0261 / 0.0311, MDE 0.073 / 0.087 (DESCRIPTIVE-ONLY); C2 SE 0.0235 / 0.0279, MDE 0.066 / 0.078 (SCOREABLE at the bound: 0.17 > 0.078). docs/judge_v2_program.md L15302-L15318",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "The judge was given the exact correct final answer as a reference. The correct answer's reasoning was then cut down to its final line. The test checked whether verdicts change, using 360 MATH pairs and about 2,200 calls, with a control that pads the text back with spaces.",
+    "why": "It asks whether a judge with an exact reference just checks the outcome or still reacts to the reasoning text.",
+    "information": "No drop would make it an outcome judge. A drop would mean the reasoning still matters. Result: done. Accuracy fell from 0.983 to 0.914, mostly into ties rather than wrong verdicts. Whether this crosses the 0.10 bar is undetermined. The 0.70 floor held. Padding hurt even more, so the effect reads as sensitivity to edits, not to content. It is not shown to be an outcome judge.",
+    "written": "2026-10-07"
+  }
+}

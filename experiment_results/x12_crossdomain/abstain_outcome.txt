@@ -1,0 +1,21 @@
+=== TEST 4: confidence-gated abstention on the 242 discriminating questions with a confidence score ===
+  reference accuracy by its OWN confidence bin:
+    conf   0- 89: n= 44 | reference correct 0.477
+    conf  90- 99: n=131 | reference correct 0.718
+    conf 100-100: n= 67 | reference correct 0.896
+
+  pairwise — policy: abstain (score 0.5) when the reference's confidence is below T, else use the verdict
+    T=  0 abstain   0/242 ( 0.0%) | expected score 0.698
+    T= 90 abstain  44/242 (18.2%) | expected score 0.686
+    T= 95 abstain  79/242 (32.6%) | expected score 0.655
+    T=100 abstain 175/242 (72.3%) | expected score 0.576
+    T=101 abstain 242/242 (100.0%) | expected score 0.500
+    (T=0 is never abstain; T=101 is always abstain, which scores 0.500 by definition)
+
+  pointwise — policy: abstain (score 0.5) when the reference's confidence is below T, else use the verdict
+    T=  0 abstain   0/240 ( 0.0%) | expected score 0.733
+    T= 90 abstain  43/240 (17.9%) | expected score 0.700
+    T= 95 abstain  78/240 (32.5%) | expected score 0.671
+    T=100 abstain 173/240 (72.1%) | expected score 0.583
+    T=101 abstain 240/240 (100.0%) | expected score 0.500
+    (T=0 is never abstain; T=101 is always abstain, which scores 0.500 by definition)

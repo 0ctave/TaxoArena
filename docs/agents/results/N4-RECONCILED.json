@@ -1,0 +1,106 @@
+{
+  "id": "N4-RECONCILED",
+  "title": "N4-RECONCILED: does the multi-corpus union really cost MMLU-Pro its certified structure? (zero calls; the two existing site-nulls paired anchor by anchor)",
+  "question": "The standing claim 'MMLU-Pro depth-1 certification roughly halved in the union build' (multi_corpus_design.md open item N4): pair site_null_mc6_s42.csv against site_null_mmlu_pro_lb_s42.csv on the 14 shared MMLU-Pro depth-1 labels (certification q_site <= 0.05) and read what the union actually costs.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "afc62fb",
+    "program_lines": "docs/multi_corpus_design.md L309-L331 ('N4 RECONCILED (2026-09-14, zero calls)') and L332 ff. ('N4 MECHANISM CORRECTED (2026-09-15 ...)'); no programme section (the open item N4 was a multi-corpus design item, recorded there; the ledger row was added at v84)",
+    "program_lines_as_of": "docs/multi_corpus_design.md at 4ec8f18",
+    "heading": "N4 RECONCILED (2026-09-14, zero calls): what the union actually costs is SUPPORT, not separation.",
+    "outcome_heading": [
+      "docs/multi_corpus_design.md L332: N4 MECHANISM CORRECTED (2026-09-15, from the session review, verified in the build logs): ..."
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "n/a (pairing of two existing site-null CSVs; 'Reproduce: pair experiment_results/multicorpus/site_null_mc6_s42.csv against site_null_mmlu_pro_lb_s42.csv on the 14 MMLU_PRO_LB/* depth-1 labels; certification is q_site <= 0.05')",
+    "sha16": "n/a",
+    "commit": "afc62fb"
+  },
+  "ready": null,
+  "go": "n/a (0 calls; no rerun was needed)",
+  "run": {
+    "outcome_file": "docs/multi_corpus_design.md L309-L345 (the reconciliation and the corrected mechanism; the two site-null CSVs are the inputs)",
+    "outcome_commit": "afc62fb (mechanism corrected 4ec8f18)",
+    "calls": 0,
+    "cce": 0,
+    "pool": "paeec37aa28063c75 (union) vs the solo MMLU-Pro build; 14 shared depth-1 labels",
+    "date": "2026-09-14 / corrected 2026-09-15",
+    "other_files": [
+      "experiment_results/multicorpus/site_null_mc6_s42.csv",
+      "experiment_results/multicorpus/site_null_mmlu_pro_lb_s42.csv",
+      "mc6_s42.build.out (the build logs the corrected mechanism is verified in)"
+    ]
+  },
+  "review": {
+    "file": "docs/review_session_2026-09-14.md (ba12200): 'N4's withdrawal stands but its mechanism is wrong (MMLU-Pro math migrates into the MATH anchors, 946 to 367, and r = 0.598 is carried by that point)'; corrected by insertion at 4ec8f18 (v94)",
+    "commit": "ba12200",
+    "verdict": "WITHDRAWN and REPLACED: the 'roughly halved' claim is withdrawn; the union costs SUPPORT through cross-corpus absorption, not separation; the federated conclusion stands for a different reason"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "the standing claim 'MMLU-Pro depth-1 certification roughly halved' in the union build",
+      "result": "FAILED",
+      "value": "on the same 14 anchors the union certifies 3 and the solo build 5, with 4 discordant anchors (1 union-only, 3 solo-only): exact McNemar two-sided p 0.625; two anchors of fourteen is not a halving and is not distinguishable from noise; one of the baseline's 5 is a boundary case (math at observed_sep 0.0377 vs p95 0.0377, margin exactly 0.0000, q_site exactly 0.0500): the comparison rests on a 4-or-5 baseline; WITHDRAWN",
+      "denominator": "14 shared MMLU-Pro depth-1 anchors; certification q_site <= 0.05"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none (a reconciliation of an open item)",
+    "fired": false,
+    "note": "REPLACED by a support effect: MMLU-Pro loses 1,057 questions of depth-1 support (8,501 -> 7,444, -12.4%), concentrated in math -59.4%, biology -15.3%, physics -14.9%, philosophy -12.9%, chemistry -11.5%; the per-anchor margin shift tracks the support loss at r = +0.598 (t 2.59, df 12) [MECHANISM CORRECTED: cross-corpus ABSORPTION during the joint loop (MATH anchors 926 -> 1,586, GPQA 495 -> 762, MMLU-Pro 8,236 -> 7,444, math alone 945 -> 367; solo 945 -> 904), not a budget spread; r = +0.598 is carried by the math point (drop math: +0.39, t 1.40); 'four gain' is two; '+0.0002, not at all' is a cancelling mean]; only chemistry collapses structurally (0.0882 -> 0.0478); the federated conclusion stands because per-corpus loops prevent absorption (13 certified sites vs the joint loop's 5)"
+  },
+  "numbers_of_record": {
+    "certified_on_14": "union 3 vs solo 5; discordant 4 (1 union-only, 3 solo-only); McNemar p 0.625",
+    "support_loss": "8,501 -> 7,444 (-1,057, -12.4%); math -59.4%, biology -15.3%, physics -14.9%, philosophy -12.9%, chemistry -11.5%, other -10.4%; margin shift vs support loss r +0.598 (t 2.59, df 12); six anchors losing > 10% shift -0.0148 on average",
+    "absorption_corrected": "MATH anchors 926 -> 1,586 (+660), GPQA 495 -> 762 (+267), MMLU_PRO_LB 8,236 -> 7,444 (-792), math 945 -> 367 (-578), physics 906 -> 773; solo math 945 -> 904, MATH solo 926 -> 962; r without math +0.39 (t 1.40), without math and chemistry +0.36",
+    "structural_collapse": "chemistry 0.0882 -> 0.0478 (margin +0.0432 -> -0.0021); history +0.0013 and math +0.0000 were boundary cases"
+  },
+  "sentence_of_record": "N4-RECONCILED (2026-09-14, zero calls): the claim 'MMLU-Pro depth-1 certification roughly halved in the union' does not survive being paired and is WITHDRAWN (union 3 vs solo 5 of the same 14 anchors, McNemar p = 0.625, on a 4-or-5 baseline); what the union costs is SUPPORT, not separation: MMLU-Pro loses 1,057 questions of depth-1 support (-12.4%), and the per-anchor margin shift tracks the support loss (r = +0.598); only chemistry collapses structurally. [MECHANISM CORRECTED 2026-09-15: the support loss is CROSS-CORPUS ABSORPTION during the joint loop (MMLU-Pro math migrates into the MATH anchors, 945 -> 367), not a budget spread; r = +0.598 is carried by that one point (drop math: +0.39); 'four gain' is two; the withdrawal stands and the federated conclusion stands because per-corpus loops prevent absorption.]",
+  "chips": [
+    "WITHDRAWN",
+    "REPLACED"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-15",
+      "by": "the adversarial REVIEW (ba12200) and the v94 correction by insertion (docs/multi_corpus_design.md L332 'N4 MECHANISM CORRECTED', 4ec8f18; ledger observed cell [MECHANISM CORRECTED 2026-09-15])",
+      "text": "the support loss is cross-corpus absorption (MATH 926 -> 1,586, GPQA 495 -> 762, MMLU-Pro 8,236 -> 7,444, math 945 -> 367), not a budget spread; r = +0.598 is carried by the math point; 'four gain' is two; '+0.0002, not at all' is a cancelling mean; the withdrawal of 'roughly halved' stands; the federated conclusion stands because per-corpus loops prevent absorption."
+    }
+  ],
+  "does_not_show": [
+    "a structural cost of the union beyond chemistry",
+    "a budget-spread mechanism (refuted by the build logs)"
+  ],
+  "ledger": {
+    "row_id": "N4-RECONCILED",
+    "version": "v94 (row added v84 at 47bdbec; [UNDER CORRECTION] v92; [MECHANISM CORRECTED 2026-09-15] v94 at 4ec8f18)"
+  },
+  "depends_on": [
+    "MC-BUILD",
+    "MC-FED",
+    "MC-ROOT",
+    "N4"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/multi_corpus_design.md L309-L345 (afc62fb; corrected 4ec8f18): the reconciliation, the numbers, the corrected mechanism, the reproduce line",
+    "docs/review_session_2026-09-14.md (ba12200)",
+    "docs/test_ledger.html row N4-RECONCILED (v84 -> v94): chips verbatim, observed cell with its correction, evidence (docs/multi_corpus_design.md, afc62fb)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (rubric_v2_design.md / multi_corpus_design.md lines as of their last commits named in sources)"
+  ],
+  "last_update": "2026-09-22",
+  "plain_description": {
+    "sq": "SQ3 Taxonomy",
+    "what": "It paired two existing analyses anchor by anchor. One built the tree on MMLU-Pro alone, the other on several benchmarks pooled together. It counted how many of the 14 MMLU-Pro topics certify in each. No calls were made.",
+    "why": "It tests a standing claim that pooling benchmarks roughly halves MMLU-Pro's certified structure.",
+    "information": "If true, multi-benchmark trees would lose structure. If false, the cost lies elsewhere. Result: done. The 'halved' claim is withdrawn: 3 vs 5 of 14, p = 0.625. What pooling costs is questions, not separation. MMLU-Pro math questions get absorbed into the MATH benchmark's cells. This supports building each benchmark separately and then combining them.",
+    "written": "2026-10-07"
+  }
+}

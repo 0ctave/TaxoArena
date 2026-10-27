@@ -1,0 +1,162 @@
+  [SELFTEST-G1] PASS mmlu-pro-v2: source DB unchanged since the build (sha256-bytes 1c1bda437aac36d0) (built from 1c1bda437aac36d0)
+  [SELFTEST-G1] PASS mmlu-pro-v2: 64 content-addressed option lists, each hashing back to its key (0 bad)
+  [SELFTEST-G1] PASS mmlu-pro-v2: variant contracts ['MC_LETTER'] all in the closed list
+  [SELFTEST-G1] PASS mmlu-pro-v2: the response table carries no retired column
+  [SELFTEST-G1] PASS mmlu-pro-v2: legacy references grok-reasoning-v0: 40 cache rows -> reference + unresolved 1:1 (unmapped 0, extra 0, doubly mapped 0) {"solver_row": 29, "unique_active_variant": 10, "unresolved": 1}
+  [SELFTEST-G1] PASS mmlu-pro-v2: legacy references grok-reasoning-v1: 5 cache rows -> reference + unresolved 1:1 (unmapped 0, extra 0, doubly mapped 0) {"solver_row": 5}
+  [SELFTEST-G1] PASS mmlu-pro-v2: every source row and response points to the options list of its OWN verbatim options_json (0 differ; the rows' lists are rebuilt verbatim through data_v2.common.options_raw)
+  [SELFTEST-G1] PASS mmlu-pro-v2: 63 upstream corpus rows -> 63 source rows, 1:1 (unmapped 0, extra 0, doubly mapped 0, variant differs 0)
+  [SELFTEST-G1] PASS mmlu-pro-v2: 209 upstream response rows -> 209 responses, 1:1 (unmapped 0, extra 0, doubly mapped 0, seen_ck differs 0)
+  [SELFTEST-G1] PASS mmlu-pro-v2: every source row / response has its variant, every variant its item (0 orphan variants, 0 orphan items)
+  [SELFTEST-G1] PASS mmlu-pro-v2: source_rows = 63, record 63 (MATCH)
+  [SELFTEST-G1] PASS mmlu-pro-v2: responses = 209, record 209 (MATCH)
+  [SELFTEST-G1] PASS mmlu-pro-v2: items_corpus = 60, record 60 (MATCH)
+  [SELFTEST-G1] info mmlu-pro-v2: items 62 (corpus 60, response-only 2), variants 64
+  [SELFTEST-G1] PASS mc6-2026-09-11: source DB unchanged since the build (sha256-bytes 8bf90936c0004468) (built from 8bf90936c0004468)
+  [SELFTEST-G1] PASS mc6-2026-09-11: 64 content-addressed option lists, each hashing back to its key (0 bad)
+  [SELFTEST-G1] PASS mc6-2026-09-11: variant contracts ['IMPORTED:acc_norm', 'IMPORTED:exact_match', 'MC_LETTER'] all in the closed list
+  [SELFTEST-G1] PASS mc6-2026-09-11: the response table carries no retired column
+  [SELFTEST-G1] PASS mc6-2026-09-11: every source row and response points to the options list of its OWN verbatim options_json (0 differ; the rows' lists are rebuilt verbatim through data_v2.common.options_raw)
+  [SELFTEST-G1] PASS mc6-2026-09-11: 86 upstream corpus rows -> 86 source rows, 1:1 (unmapped 0, extra 0, doubly mapped 0, variant differs 0)
+  [SELFTEST-G1] PASS mc6-2026-09-11: 172 upstream response rows -> 172 responses, 1:1 (unmapped 0, extra 0, doubly mapped 0, seen_ck differs 0)
+  [SELFTEST-G1] PASS mc6-2026-09-11: every source row / response has its variant, every variant its item (0 orphan variants, 0 orphan items)
+  [SELFTEST-G1] PASS mc6-2026-09-11: source_rows = 86, record 86 (MATCH)
+  [SELFTEST-G1] PASS mc6-2026-09-11: responses = 172, record 172 (MATCH)
+  [SELFTEST-G1] PASS mc6-2026-09-11: items_corpus = 66, record 66 (MATCH)
+  [SELFTEST-G1] PASS mc6-2026-09-11: gpqa_items = 20, record 20 (MATCH)
+  [SELFTEST-G1] info mc6-2026-09-11: items 66 (corpus 66, response-only 0), variants 66
+[GATE SELFTEST-G1] PASS
+  [SELFTEST-G1neg] PASS G1 FAILS on a source with one extra upstream row (3 failing checks: mmlu-pro-v2: source DB unchanged since the build (sha256-bytes efc3591c5412e3d8); mmlu-pro-v2: every source row and response points to the options list of its O)
+[GATE SELFTEST-G1neg] PASS
+  [SELFTEST-G2] PASS the sealed side table agrees item for item with an INDEPENDENT implementation of the draw (gates.independent_draw, not split.compute) under the seed 'DEV-selftest' (0 items differ, 0 in one only)
+  [SELFTEST-G2] PASS (consistency, NOT independent) the sealed side table equals the builder's own split.compute on the seed 'DEV-selftest' (0 items differ, 0 items not in both)
+  [M2] CK-CLOSE-v1 condition 2 (global): one build_closure over 2 corpora, 151 units: gen 105, reserved 45, sentinel 1 -> moved 0 (must be 0)
+  [M2] [CK-CLOSE] content-disjoint v2 split (condition 1: sentinels explicit): PASS, 105 train / 45 reserved / 1 sentinel ids; 0 twins under split_side.stem_key (norm-v1, ck-v1, options-free); 0 shared families (no families given)
+  [M2] CK-CLOSE-v1 condition 3 (family): 146 families (declared + legacy-qid), 0 crossing the EVAL boundary (must be 0)
+  [M2] CK-CLOSE-v1 condition 4 (cluster, never drop): 46 EVAL units (45 judgeable + 1 routing-only sentinels), 0 dropped; clusters by key 39 (ids in twin groups 14, max 2), Kish sum(n^2)/n 1.3043 -> n_eff(rho=1) 35.3; by component 38 clusters, Kish 1.3478 -> n_eff(rho=1) 34.1 [DEFF at rho = 1 (upper bound), not a measured DEFF]
+  [M2]   (the pooled figure counts an MMLU-Pro item once per corpus that carries it; the per-corpus figures are the ones a per-corpus board uses)
+  [M2]   mc6-2026-09-11   EVAL units    26 (judgeable    26, sentinels    0); clusters by key    20, Kish 1.4615 -> n_eff(rho=1) 17.8; by component    20, Kish 1.4615 -> n_eff(rho=1) 17.8
+  [M2]   mmlu-pro-v2      EVAL units    20 (judgeable    19, sentinels    1); clusters by key    19, Kish 1.1000 -> n_eff(rho=1) 18.2; by component    18, Kish 1.2000 -> n_eff(rho=1) 16.7
+  [SELFTEST-G2] PASS CK-CLOSE-v1 on the sealed split through content_closure: moved 0, content-disjoint with the sentinels explicit, 0 families crossing, no EVAL unit dropped
+  [SELFTEST-G2] PASS EVAL keys (eval_view) intersect generation keys (gen_view) = 0; gen_view keys 88, eval_view keys 39
+  [SELFTEST-G2] PASS gen_view keys intersect the split's EVAL items = 0
+  [SELFTEST-G2] PASS eval_view keys are all EVAL items of the split (0 outside)
+  [SELFTEST-G2] PASS gen_view's salted EVAL hash set has one entry per EVAL item (39 / 39)
+  [SELFTEST-G2] PASS side rows: gen_view ['GATE', 'TRAIN'], eval_view ['EVAL']
+  [SELFTEST-G2] PASS gen_view_DEV.db: EVERY key-bearing column re-keyed (2764 values over item ids, stem keys, texts, variant ids, source-row ids, component ids, alias targets, representative rows): 0 off-side or dangling
+  [SELFTEST-G2] PASS eval_view_DEV.db: EVERY key-bearing column re-keyed (1228 values over item ids, stem keys, texts, variant ids, source-row ids, component ids, alias targets, representative rows): 0 off-side or dangling
+  [SELFTEST-G2] PASS a shuffled twin collapses to one variant
+  [SELFTEST-G2] PASS a norm-v1 twin is one item, two variants
+  [SELFTEST-G2] PASS BBH harness pairs rendered in two chat templates key to ONE variant (opt-v1)
+  [SELFTEST-G2] PASS GPQA diamond + main copies collapse to one item with two subset tags (20 items)
+  [SELFTEST-G2] PASS a legacy qid whose active rows carry two stems is ONE component (2 items -> 1 component)
+  [SELFTEST-G2] PASS the quarantined model's id-shifted rows add no family edge (Llama rows keyed by their own text)
+  [SELFTEST-G2] PASS closure_checks REFUSES a split where a legacy-qid family straddles the EVAL boundary
+  [SELFTEST-G2] PASS closure_checks REFUSES a split where two units of one stem_key straddle the sides (content_closure)
+  [SELFTEST-G2] PASS SYNTHETIC old split: every listed id resolves through the alias rows (0 missing)
+  [SELFTEST-G2] PASS SYNTHETIC old split: judgeable ids with a generation-side twin, exact text = 1 (record 1) (MATCH)
+  [SELFTEST-G2] PASS SYNTHETIC old split: judgeable ids with a generation-side twin, norm-v1 = 2 (record 2) (MATCH)
+    [CK-CLOSE] content-disjoint SYNTHETIC old split (the old split; must REFUSE): REFUSED, 2 train id(s) over 2 key(s) are content twins of held ids (2 of reserved, 0 of sentinels only; e.g. [-1000063, -1000062]); 0 train id(s) share a family with them; apply closed_complement first
+  [SELFTEST-G2] PASS SYNTHETIC old split: the guard REFUSES the old split (not vacuous) (refusal counts {"n_family": 0, "n_keys": 2, "n_overlap": 0, "n_twins": 2, "n_twins_reserved": 2, "n_twins_sentinel_only": 0})
+  [SELFTEST-G2] PASS SYNTHETIC old split: content_closure moves 2 generation-side rows (record 2) (by reason {"twin_of_reserved": 2})
+[GATE SELFTEST-G2] PASS
+  [SELFTEST-5618b78-FIXES] PASS (1) a response's ordered options are rebuilt VERBATIM from options_ordered: mA ["w5", "x5", "y5"] / mB ["y5", "x5", "w5"], one variant
+  [SELFTEST-5618b78-FIXES] PASS (1) a NULL options_json (MATH) is stored as NULL, distinct from an empty string (1 NULL rows)
+  [SELFTEST-5618b78-FIXES] PASS (2) v0: 29 solver_row, 10 unique_active_variant, 1 unresolved (the 2-stem qid 107); v1: 5 solver_row; got {('grok-reasoning-v0', 'solver_row'): 29, ('grok-reasoning-v0', 'unique_active_variant'): 10, ('grok-reasoning-v1', 'solver_row'): 5}, unresolved [('grok-reasoning-v0', 'qid:107')]
+  [SELFTEST-5618b78-FIXES] PASS (2) the reference of qid 105 is keyed to the variant of the SOLVER's row
+  [SELFTEST-5618b78-FIXES] PASS (2) side_at_mint: v0 derived from the pool file (qid 101 EVAL, qid 125 NOT_LISTED); v1 copied (EVAL(copied))
+  [SELFTEST-5618b78-FIXES] PASS (2) references follow their variant's side into the views (gen 27 all TRAIN/GATE, eval 17 all EVAL)
+  [SELFTEST-5618b78-FIXES] PASS (3) variant.contract_id CHECK refuses a contract outside the closed list
+  [SELFTEST-5618b78-FIXES] PASS (3) ... and admits one on the list
+  [SELFTEST-5618b78-FIXES] PASS (5) corpus_v2_mmlu_pro_v2.db: no retired column in the response table, retired table present only in the corpus DB
+  [SELFTEST-5618b78-FIXES] PASS (5) gen_view_DEV.db: no retired column in the response table, retired table present only in the corpus DB
+  [SELFTEST-5618b78-FIXES] PASS (5) eval_view_DEV.db: no retired column in the response table, retired table present only in the corpus DB
+  [SELFTEST-5618b78-FIXES] PASS (5) split.py never names a retired column or table []
+  [SELFTEST-5618b78-FIXES] PASS (5) views.py never names a retired column or table []
+  [SELFTEST-5618b78-FIXES] PASS (5) guard_retired REFUSES a response table that carries the retired column (split.load_corpora calls it)
+[GATE SELFTEST-5618b78-FIXES] PASS
+  [SELFTEST-READY-ED] PASS D1: the pinned pair (ARCH-V2-SPLIT-DRAW-1, ARCHV2-SPLIT-1:c030315...) is ADMITTED by check_draw (not drawn here)
+  [SELFTEST-READY-ED] PASS D1: check_draw REFUSES a wrong seed under the pinned entry
+  [SELFTEST-READY-ED] PASS D1: check_draw REFUSES the pinned seed under another entry
+  [SELFTEST-READY-ED] PASS D1: check_draw REFUSES an arbitrary seed and entry (probe P2)
+  [SELFTEST-READY-ED] PASS D1: check_draw REFUSES the pinned seed without an entry
+  [SELFTEST-READY-ED] PASS D1: check_draw REFUSES a DEV seed carrying a registration
+  [SELFTEST-READY-ED] PASS D1: build_split REFUSES a wrong pair before drawing
+  [SELFTEST-READY-ED] PASS D2: two DEV seeds move components (split.compute 66 of 125 components; independent_draw 67 items)
+  [SELFTEST-READY-ED] PASS D2: the fixture side table sha (seed DEV-selftest) equals the pinned golden 292c6fa70f9751af (got 292c6fa70f9751af67deb839b4cb2cd2e05d3679f5608e4a5f953a1face1f524, 127 rows)
+  [SELFTEST-READY-ED] PASS D2: the 5-component MUSR stratum rounds half up (EVAL 2 = floor(1.5 + 0.5), GATE 1 = floor(0.5 + 0.5); floor would give 1 / 0): got (5, 2, 1)
+  [SELFTEST-READY-ED] PASS D3: the side export (127 rows) re-hashes from its TEXT to the sealed DB's table_sha
+  [SELFTEST-READY-ED] PASS D3: verify_side_export REFUSES a tampered (one side flipped) copy
+  [SELFTEST-READY-ED] PASS D3: verify_side_export REFUSES a CRLF copy
+  [SELFTEST-READY-ED] PASS D3: export_side is write-once (an existing path is refused)
+  [SELFTEST-READY-ED] PASS D6: qid 120's reference is keyed to the SOLVER's variant, which differs from the modal active variant (resolution solver_row)
+  [SELFTEST-READY-ED] PASS D9: the five DBs built at a different absolute path are byte-identical (5 of 5)
+[GATE SELFTEST-READY-ED] PASS
+  [SELFTEST-G4] PASS open_generation('construct') on gen_view is ADMITTED (admitted)
+  [SELFTEST-G4] PASS open_eval('construct') on eval_view is REFUSED ([DATA-V2-VIEW] open_eval(stage='construct') REFUSED: stage 'construct' may open only the generation view)
+  [SELFTEST-G4] PASS open_generation('label') on gen_view is ADMITTED (admitted)
+  [SELFTEST-G4] PASS open_eval('label') on eval_view is REFUSED ([DATA-V2-VIEW] open_eval(stage='label') REFUSED: stage 'label' may open only the generation view)
+  [SELFTEST-G4] PASS open_generation('induce') on gen_view is ADMITTED (admitted)
+  [SELFTEST-G4] PASS open_eval('induce') on eval_view is REFUSED ([DATA-V2-VIEW] open_eval(stage='induce') REFUSED: stage 'induce' may open only the generation view)
+  [SELFTEST-G4] PASS open_generation('policy_fit') on gen_view is ADMITTED (admitted)
+  [SELFTEST-G4] PASS open_eval('policy_fit') on eval_view is REFUSED ([DATA-V2-VIEW] open_eval(stage='policy_fit') REFUSED: stage 'policy_fit' may open only the generation view)
+  [SELFTEST-G4] PASS open_eval('judge') on eval_view is ADMITTED (admitted)
+  [SELFTEST-G4] PASS open_generation('judge') on gen_view is REFUSED ([DATA-V2-VIEW] open_generation(stage='judge') REFUSED: stage 'judge' may open only the eval view)
+  [SELFTEST-G4] PASS open_eval('arena') on eval_view is ADMITTED (admitted)
+  [SELFTEST-G4] PASS open_generation('arena') on gen_view is REFUSED ([DATA-V2-VIEW] open_generation(stage='arena') REFUSED: stage 'arena' may open only the eval view)
+  [SELFTEST-G4] PASS open_eval('route') on eval_view is ADMITTED (admitted)
+  [SELFTEST-G4] PASS open_generation('route') on gen_view is REFUSED ([DATA-V2-VIEW] open_generation(stage='route') REFUSED: stage 'route' may open only the eval view)
+  [SELFTEST-G4] PASS open_generation('construct') handed the EVAL file is REFUSED by the file's own meta ([DATA-V2-VIEW] open_generation(stage='construct') REFUSED: C:\Users\octav\AppData\Local\Temp\dv2_selftest_9gnd7mh_\build)
+  [SELFTEST-G4] PASS open_eval('route') handed the GEN file is REFUSED by the file's own meta ([DATA-V2-VIEW] open_eval(stage='route') REFUSED: C:\Users\octav\AppData\Local\Temp\dv2_selftest_9gnd7mh_\build\gen_view_)
+  [SELFTEST-G4] PASS open_generation('rubric_writer') (an unknown stage) is REFUSED ([DATA-V2-VIEW] open_generation(stage='rubric_writer') REFUSED: unknown stage (admitted: construct, l)
+  [SELFTEST-G4] PASS open_eval('rubric_writer') (an unknown stage) is REFUSED ([DATA-V2-VIEW] open_eval(stage='rubric_writer') REFUSED: unknown stage (admitted: judge, arena, rout)
+  [SELFTEST-G4] PASS open_generation with a wrong pinned sha256 is REFUSED ([DATA-V2-RO] C:\Users\octav\AppData\Local\Temp\dv2_selftest_9gnd7mh_\build\gen_view_DEV.db: sha256 0)
+  [SELFTEST-G4] PASS assert_not_eval refuses a generation artefact carrying an EVAL text
+  [SELFTEST-G4] PASS assert_not_eval admits a TRAIN/GATE text
+  [SELFTEST-G4] PASS open_generation refuses a corpus_v2 DB (no view_kind) ([DATA-V2-VIEW] open_generation(stage='construct') REFUSED: C:\Users\octav\AppData\Local\Temp\dv2_sel)
+[GATE SELFTEST-G4] PASS
+  [SELFTEST-G5] PASS first launch posts every scheduled slot (6 of 6)
+  [SELFTEST-G5] PASS R7: one payload body posted in two draws and two orders is stored 4 times (the key is the slot)
+  [SELFTEST-G5] PASS UPDATE on run_meta aborts
+  [SELFTEST-G5] PASS DELETE on run_meta aborts
+  [SELFTEST-G5] PASS UPDATE on schedule aborts
+  [SELFTEST-G5] PASS DELETE on schedule aborts
+  [SELFTEST-G5] PASS UPDATE on attempt aborts
+  [SELFTEST-G5] PASS DELETE on attempt aborts
+  [SELFTEST-G5] PASS UPDATE on verdict aborts
+  [SELFTEST-G5] PASS DELETE on verdict aborts
+  [SELFTEST-G5] PASS INSERT OR REPLACE / REPLACE / OR IGNORE on an existing verdict key ABORTS by the no-rekey trigger (v2 verdict store is append-only: key already present in verdict (REPLACE refused))
+  [SELFTEST-G5] PASS INSERT OR REPLACE / REPLACE / OR IGNORE on an existing run_meta key ABORTS by the no-rekey trigger (v2 verdict store is append-only: key already present in run_meta (REPLACE refused))
+  [SELFTEST-G5] PASS INSERT OR REPLACE / REPLACE / OR IGNORE on an existing run_meta (REPLACE INTO) key ABORTS by the no-rekey trigger (v2 verdict store is append-only: key already present in run_meta (REPLACE refused))
+  [SELFTEST-G5] PASS INSERT OR REPLACE / REPLACE / OR IGNORE on an existing attempt key ABORTS by the no-rekey trigger (v2 verdict store is append-only: key already present in attempt (REPLACE refused))
+  [SELFTEST-G5] PASS INSERT OR REPLACE / REPLACE / OR IGNORE on an existing verdict (OR IGNORE) key ABORTS by the no-rekey trigger (v2 verdict store is append-only: key already present in verdict (REPLACE refused))
+  [SELFTEST-G5] PASS ... and the rows are unchanged (verdict ('FIRST', 'raw'), run_meta registration 'G5-SELFTEST (no registration: a scratch store)')
+  [SELFTEST-G5] PASS a schedule insert after the first call aborts
+  [SELFTEST-G5] PASS a verdict for a slot not in the schedule aborts
+  [SELFTEST-G5] PASS the CHECKs refuse a truncated call stored as TIE
+  [SELFTEST-G5] PASS the CHECKs refuse NON_TERMINATED without finish_reason length
+  [SELFTEST-G5] PASS the CHECKs refuse a temperature sent while labelled omitted
+  [SELFTEST-G5] PASS a payload_sha256 that is not sha256(body) is refused
+  [SELFTEST-G5] PASS a vote outside the six-way enum is refused (LEFT)
+  [SELFTEST-G5] PASS the verdict_equals_schedule trigger refuses a stem_key that differs from the schedule slot
+  [SELFTEST-G5] PASS the verdict_equals_schedule trigger refuses a reference_row_id the schedule slot does not carry
+  [SELFTEST-G5] PASS the verdict_equals_schedule trigger refuses a reference_vintage the schedule slot does not carry
+  [SELFTEST-G5] PASS denominators: match_status lists all 3 scheduled matches (m2/0 PENDING while its order 2 errored); the inner join match_verdict has 2
+  [SELFTEST-G5] PASS relaunch anti-join: pending = the errored slot only [('m2', 2, 0)] (the cached CONTENT_FILTER is not pending)
+  [SELFTEST-G5] PASS the relaunch posts exactly the pending slot (1 post: [('m2', 2, 0)])
+  [SELFTEST-G5] PASS the relaunch's verdict counts both attempts (n_attempts 2)
+  [SELFTEST-G5] PASS a COMPLETED run's relaunch posts NOTHING (0 posts)
+  [SELFTEST-G5] PASS match_verdict: FIRST/SECOND over the two orders is A twice -> A; CONTENT_FILTER propagates; NON_TERMINATED propagates {"m1/0": "A", "m1/1": "NON_TERMINATED", "m2/0": "CONTENT_FILTER"}
+  [SELFTEST-G5] PASS seal: the run DB is sealed and read-only (sha256-bytes 380b4946ce8a7acf)
+  [SELFTEST-G5] PASS a sealed run refuses a writer
+  [SELFTEST-G5] PASS open_run_writer refuses a missing file
+  [SELFTEST-G5] PASS open_run_writer refuses a DB that is not a v2 verdict DB (read-only probe first)
+  [SELFTEST-G5] PASS create_new refuses an existing path (write-once)
+[GATE SELFTEST-G5] PASS
+  [SELFTEST-RO] PASS ro.open_ro refuses a DB with a non-empty -wal ([DATA-V2-RO] C:\Users\octav\AppData\Local\Temp\dv2_selftest_9gnd7mh_\walled.db-wal is non-)
+  [SELFTEST-RO] PASS ro.open_ro(require_sealed) refuses an unsealed DB ([DATA-V2-RO] C:\Users\octav\AppData\Local\Temp\dv2_selftest_9gnd7mh_\walled.db is not seal)
+  [SELFTEST-RO] PASS ro.open_ro sets query_only (a write through it fails)
+  [SELFTEST-RO] PASS split refuses a non-DEV seed without a registration
+  [SELFTEST-RO] PASS a gate with a failing check REFUSES on close (raise SystemExit, the -O-proof branch)
+[GATE SELFTEST-RO] PASS
+[SELFTEST] data_v2: ALL PASS (143 checks; synthetic fixture; no DB of record opened)

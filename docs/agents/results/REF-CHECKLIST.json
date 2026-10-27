@@ -1,0 +1,172 @@
+{
+  "id": "REF-CHECKLIST",
+  "title": "REF-CHECKLIST: a per-question verification checklist (facts and steps a correct answer must contain, no answer) as a reference in rubric form (782 reasoning + 4,956 cheap calls)",
+  "question": "Does a reference that states the facts and steps a correct answer must contain, WITHOUT the answer, carry the reference's value with less of its leakage, and help where the answer reference is wrong? Three fresh interleaved arms REF / CHECKLIST / BOTH on the 826 eligible of the 944 key-decidable R3 matches, grok-4-1-fast-non-reasoning under STACK-v2; comparators RECIPE-GROK and PAIR-NOREF from cache.",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "f28a3bb",
+    "program_lines": "docs/judge_v2_program.md (lines as of 5dc8a06) L4350-L4386",
+    "date": "2026-09-17",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-17 (before any code or call) — REF-CHECKLIST: a per-question verification checklist as a reference in rubric form",
+    "outcome_heading": [
+      "L4421: ## REF-CHECKLIST (2026-09-17, 782 reasoning + 4,956 cheap calls) — PRIMARY FAIL; the value of a reference is the ANSWER, not the verification structure; the leakage is not avoidable by this route"
+    ]
+  },
+  "script": {
+    "path": "tools/analysis/ref_checklist.py (judging; with tools/analysis/checklist_gen.py sha16 2883025de74483f6 for the checklists)",
+    "sha16": "19f422d212d338fc",
+    "commit": "efd5d42"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (3 x 944 x 2 = 5,664 cheap + ~900 reasoning calls registered; 782 + 4,956 posted); no amendment needed",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/ref_checklist_outcome.txt",
+    "outcome_commit": "d0e4f6f",
+    "calls": "782 grok-4-1-fast-reasoning (checklists) + 4,956 grok-4-1-fast-non-reasoning (judge)",
+    "cce": "not stated in the programme",
+    "pool": "p2dca21ab5f4ef3ae (the R3 sample's 944 key-decidable matches)",
+    "date": "2026-09-17",
+    "other_files": [
+      "experiment_results/judge_solve/checklist_audit.txt (d0e4f6f)",
+      "caches ref_checklist.db and judge_solve/checklist_grok-reasoning.db (gitignored)"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the adversarial check of record is the one the programme names (the checklist leakage audit, checklist_audit.txt, is the hygiene instrument of record; no post-run recomputation file exists)",
+    "commit": "d0e4f6f",
+    "verdict": "PRIMARY FAIL; falsifier NOT FIRED; no recipe change"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "PRIMARY: BOTH vs REF on key-decidable, p < 0.05 either direction, reported with the session floor (REF-fresh vs RECIPE-GROK) beside it",
+      "result": "FAILED",
+      "value": "+0.6pp [-1.5, +2.7], 37:32, p = 0.63; inside the session floor (-1.2pp [-2.9, +0.4]; verdict disagreement 0.071 vs DECOMP 0.057) -> FAIL (no gain)",
+      "denominator": "826 key-decidable R3 matches, convention A; question-clustered bootstrap B = 2,000"
+    },
+    {
+      "id": "C2",
+      "text": "CHECKLIST vs REF (the falsifier line)",
+      "result": "DELIVERED",
+      "value": "-9.6pp [-12.5, -6.7], 34:113, p = 4e-11; vs PAIR-NOREF +1.6pp [-1.6, +4.6], p = 0.32: the checklist is worth about as much as no reference at all",
+      "denominator": "826"
+    },
+    {
+      "id": "C3",
+      "text": "reference-WRONG stratum: CHECKLIST and BOTH vs REF, paired",
+      "result": "FAILED",
+      "value": "n = 119: CHECKLIST +2.5pp [-6.6, +12.4], p = 0.71; BOTH -5.0pp [-12.5, +1.7], p = 0.24: the predicted >= 5pp rescue is NOT there; reference-CORRECT stratum (n = 707) CHECKLIST -11.6pp, BOTH +1.6pp [-0.3, +3.6]",
+      "denominator": "119 reference-wrong / 707 reference-correct matches"
+    },
+    {
+      "id": "C4",
+      "text": "leakage: gemini-agreement delta of CHECKLIST vs REF, expected NEGATIVE",
+      "result": "DELIVERED",
+      "value": "CHECKLIST - REF -1.9pp; BOTH - REF -5.6pp; CONSENSUS-FIT REF coefficient +2.22 (REF) -> +1.23 (CHECKLIST) -> +2.52 (BOTH); reference-mirroring 0.976 / 0.924 / 0.982; the leakage falls only with decisiveness (ties double 0.080 -> 0.161)",
+      "denominator": "826; per-contestant agreement"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "CHECKLIST below REF overall by 3-6pp",
+      "result": "FAILED",
+      "value": "-9.6pp (worse)",
+      "denominator": "826"
+    },
+    {
+      "id": "P2",
+      "text": "BOTH within the session floor of REF",
+      "result": "HELD",
+      "value": "+0.6pp inside -1.2pp floor",
+      "denominator": "826"
+    },
+    {
+      "id": "P3",
+      "text": "on the reference-wrong stratum CHECKLIST and BOTH above REF by >= 5pp",
+      "result": "FAILED",
+      "value": "+2.5pp n.s. / -5.0pp n.s.",
+      "denominator": "119"
+    },
+    {
+      "id": "P4",
+      "text": "gemini agreement lower under CHECKLIST by >= 2pp",
+      "result": "FAILED",
+      "value": "-1.9pp (borderline)",
+      "denominator": "826"
+    }
+  ],
+  "falsifier": {
+    "text": "of the reference line as the record states it: CHECKLIST alone at or above REF on key-decidable (then the value of a reference is verification structure, not the answer, and the leakage is avoidable)",
+    "fired": false,
+    "note": "NOT FIRED (-9.6pp); consequence: no recipe change; the reference line's statement is sharper: the value of a reference is its correctness as an ANSWER, its leakage the price, and no rubric-shaped substitute exists at any granularity"
+  },
+  "numbers_of_record": {
+    "generation_and_audit": "checklists for 782 questions (781 stop / 1 content_filter, 11 unparsed = 1.4%); audit dropped 96 (letter 3, n-gram 22, short-option 59, numeral 12), 675 usable; 826 of 944 key-decidable R3 matches eligible, the same 826 in all three arms",
+    "arm_table_n826": "conv A / conv B / ties: PAIR-NOREF (cache) 0.734 / 0.887 / 0.173; CHECKLIST 0.749 / 0.893 / 0.161; REF (fresh) 0.845 / 0.921 / 0.080; BOTH 0.851 / 0.919 / 0.074; RECIPE-GROK (cache) 0.857 / 0.925 / 0.074",
+    "guards": "0.2% / 0 / 0 unparsed per arm; session floor REF-fresh vs RECIPE-GROK -1.2pp [-2.9, +0.4], verdict disagreement 0.071",
+    "primary": "BOTH vs REF +0.6pp [-1.5, +2.7], 37:32, p 0.63",
+    "checklist_vs_ref": "-9.6pp [-12.5, -6.7], 34:113, p 4e-11; vs PAIR-NOREF +1.6pp [-1.6, +4.6], p 0.32",
+    "strata": "reference-wrong n 119: CHECKLIST +2.5pp [-6.6, +12.4] p 0.71, BOTH -5.0pp [-12.5, +1.7] p 0.24; reference-correct n 707: CHECKLIST -11.6pp, BOTH +1.6pp [-0.3, +3.6]",
+    "leakage": "gemini agreement CHECKLIST - REF -1.9pp, BOTH - REF -5.6pp; CONSENSUS-FIT REF coefficient 2.22 / 1.23 / 2.52; mirroring 0.976 / 0.924 / 0.982",
+    "selection_effect": "the 118 excluded matches are the ones whose checklist named the answer; excluded from all three arms alike"
+  },
+  "sentence_of_record": "REF-CHECKLIST (2026-09-17, 782 reasoning + 4,956 cheap calls): PRIMARY FAIL; the value of a reference is the ANSWER, not the verification structure; the leakage is not avoidable by this route. A list of the facts and steps a correct answer must contain, produced by the same model whose answer letter is worth +11.1pp, is worth +1.6pp n.s.; the judge does not use verification structure, it uses the answer; where the answer is wrong, the checklist does not rescue it either, because the model that wrote the wrong answer wrote the checklist. The reference line's statement is now sharper: the value of a reference is its correctness as an ANSWER, its leakage is the price of that value, and no rubric-shaped substitute has been found at any granularity, cell or question.",
+  "chips": [
+    "PRIMARY FAIL (+0.6pp, p=0.63)",
+    "CHECKLIST -9.6pp UNDER REF",
+    "NO RESCUE WHERE THE ANSWER IS WRONG",
+    "LEAKAGE FALLS ONLY WITH DECISIVENESS",
+    "FALSIFIER NOT FIRED"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a rubric-shaped substitute for the answer reference at any granularity",
+    "a leakage reduction that is not bought with decisiveness"
+  ],
+  "ledger": {
+    "row_id": "REF-CHECKLIST",
+    "version": "v110 (3b7518a); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "RECIPE-GROK",
+    "PAIR-NOREF",
+    "ORACLE",
+    "JUDGE-2x2",
+    "FORMAT-REF",
+    "CONSENSUS-FIT",
+    "DECOMP",
+    "ARENA-13"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "rubric-shaped references (CONTEXT.md section 5: REF-CHECKLIST); REF-FORM-BY-CELL (2026-09-19) named this row as the closed prompt-form comparator"
+  },
+  "sources": [
+    "docs/judge_v2_program.md (lines as of 5dc8a06) L4350-L4386 (registration f28a3bb): question, hygiene, instrument, criteria (1)-(4), predictions, falsifier, consequence",
+    "docs/judge_v2_program.md (lines as of 5dc8a06) L4421-L4455 (outcome section d0e4f6f): the run, the arm table, criteria and predictions scored, the falsifier, the reading",
+    "experiment_results/x12_crossdomain/ref_checklist_outcome.txt and experiment_results/judge_solve/checklist_audit.txt (d0e4f6f)",
+    "docs/test_ledger.html row REF-CHECKLIST (v110): chips verbatim, evidence (checklist_gen.py, ref_checklist.py, outcome, audit, f28a3bb, d0e4f6f)",
+    "script sha16 = sha256 of tools/analysis/ref_checklist.py at efd5d42 (its only commit), first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' lines (grep -n them regardless of line drift); line numbers are as of programme HEAD 5dc8a06",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Compares three judge setups on 826 matches with a known key: (a) a reference answer, (b) a checklist of facts and steps a correct answer needs, without the answer, and (c) both. Uses about 5,700 calls.",
+    "why": "Reference answers help the judge but leak the answer. This tests whether a checklist gives the same help with less leakage, or rescues cases where the reference is wrong.",
+    "information": "A useful checklist would offer a safer reference format; a useless one shows that the value is in the answer itself. Result: failed. The checklist adds about +1.6 points (not significant) against +11 for the answer, and it does not rescue cases where the reference is wrong. The value of a reference is its correct answer, and its leakage is the price of that value. Ruled history rather than evidence (older question pool).",
+    "written": "2026-10-07"
+  }
+}

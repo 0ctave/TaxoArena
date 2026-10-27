@@ -1,0 +1,115 @@
+[POOL] p2dca21ab5f4ef3ae (pool of record; active pool verified by pool_guard)
+[PIN] dry-run --pass 4: pass 1 5142795bdc8c5a8e (pin 5142795bdc8c5a8e) | pass 2 9e2f4b7cb2b30b3a (pin 9e2f4b7cb2b30b3a) -> UNCHANGED
+[DRY-RUN] pass 4 | matches 300 (contested 150, cross 150) | calls 600 (dual order) | cap 600 calls per pass, 1,200 for both passes
+[DRY-RUN] protocol: STACK-v2 | judge grok-4-1-fast-non-reasoning (azure chat completions via rejudge_reasoning, api-version 2024-05-01-preview) | prompt v2 verify-first + ladder anchor rubric (bareq512_s42 depth-1 anchor) + schema instruction | reference block = grok-reasoning cached solve | dual order, TIE on flip, INVALID if either order unparsed or finish_reason=length | max_tokens 8192 | temperature omitted (provider default)
+[DRY-RUN] judge grok-4-1-fast-non-reasoning | max_tokens 8192 | temperature omitted (Amendment 1 D2) | key: rr.load_env (AZURE_GROK_API_KEY, else AZURE_AI_API_KEY), no override
+[DRY-RUN] cache: experiment_results\x12_crossdomain\canary_baseline_pass4.db (exists: False) | set: experiment_results\x12_crossdomain\canary_set.json (hash 50af669ac6997f9f = hash of record 50af669ac6997f9f)
+[DRY-RUN] pass 2 allowed from 2026-09-22 | script sha256[:16] e573f3822aaed5cc
+[RUNG] pass 3's last row 2026-09-24 13:47:56 | pass 4 start = now (the first pass-4 launch) | gap 1087 s against the 7200 s window -> WITHIN
+[DRY-RUN] pass-4 pre-flight (read-only; C0: the 1 -> 2 floor 26/300 reproduced; pass 3 complete and the 2 h rung window): would GO
+[SCAN] pre-call full-payload scan over 600 payloads: decomposition 600 | frame identical across orders 600 | frame clean 600 | reported, not refused: contestant names inside trace slots 0, key-side tokens in the question + reference slot 0 -> PASS
+[ANCHOR] payload anchor sha16 3501e6aef27aad68 over 300 matches (match id | system | user order 1 | user order 2, the set's order) | first payload sha16 83f4827ee1b58055 | system prompts 14 distinct | posting order sha16 20b51354c05c5ad4 (the set's order = pass 2's; first ids [5313, 2299, 4653])
+[CEILING] this pass: 300 matches x 2 orders = 600 calls (pilot 12 matches = 24 calls INSIDE it) | CANARY-EPOCH2-RUNG ceiling 1248 (passes 3 + 4)
+[ACCOUNT] CANARY-EPOCH2-RUNG (--dry-run --pass 4 (a full pass, 0 posted)): (i) own 622 (cache 600, ledgers 622) + 600 = 1222 of 1248 | (ii) matches 611 of 4000 | (iii) 4060 + CANARY-EPOCH2-RUNG 622 + TRACE-TRUNCATION 2178 + 600 = 7460 of 14000 | ledger of record for today's posts: Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\day_calls_2026-09-24.json -> OK
+[GATE] (a dry run is never gated; a posting launch needs --go and the committed READY) --go False | docs\reviews\READY_canary_epoch2_rung.md exists (tracked True, clean True) | verdict 'READY-WITH-CONDITIONS'
+[DRY-RUN] first payload: match 5313 | qid 2702 | Llama-2-13b-hf vs Meta-Llama-3_1-8B | anchor Health | cross/cross | order 1 | model field 'grok-4-1-fast-non-reasoning' | max_tokens 8192 | keys ['model', 'max_tokens', 'messages']
+----- SYSTEM -----
+You are an expert AI judge specializing in evaluating multiple-choice questions in the domain of Health, with a focus on clinical medicine, pathophysiology, diagnostics, therapeutics, and evidence-based practice. Your expertise spans molecular mechanisms, anatomical correlations, biochemical pathways, clinical guidelines, and epidemiological principles. You apply rigorous pathophysiological reasoning to eliminate biologically implausible options, validate causal and temporal sequences, and ensure alignment with established medical knowledge. Your role is to distinguish correct answers from plausible-but-incorrect ones by identifying subtle misconceptions, logical inconsistencies, or violations of fundamental biological laws. You prioritize evidence-based justification, diagnostic precision, and therapeutic appropriateness while accounting for patient-specific factors, confounding variables, and contextual relevance. Common pitfalls you guard against include overgeneralization of symptoms, misattribution of laboratory findings, conflation of correlation with causation, and failure to reconcile contradictions in clinical scenarios. Your evaluations are grounded in clinical guidelines, mechanistic pathways, and hierarchical biological organization (molecular to systemic levels).
+
+────────────────────────────────────────
+EVALUATION MECHANICS (non-negotiable)
+────────────────────────────────────────
+Bias suppression — ignore completely:
+• Response length, verbosity, or token count
+• Formatting: markdown, LaTeX, bullet points, plain prose — all equal
+• Model name, model family, or any identity signal
+• Stylistic elegance or fluency unrelated to correctness
+
+Evaluation order — follow exactly:
+1. CRITIQUE Model A: assess its reasoning against the rubric. Identify correct steps, errors, gaps.
+2. CRITIQUE Model B: same process, independently of Model A.
+3. COMPARE: identify the decisive difference between A and B.
+4. DECIDE: declare the winner — either "Model A", "Model B", or "TIE".
+
+Correctness first — verify before you compare:
+The question carries a reference solution (marked as produced independently; it may be wrong).
+Before critiquing, extract each model's FINAL ANSWER and check it against the reference and
+against your own reading of the question. A response whose final answer is wrong cannot win
+against a response whose final answer is right, whatever its reasoning looks like.
+
+When BOTH final answers are right:
+Prefer the response with fewer errors or unsupported steps in its reasoning. If neither has
+any, output TIE. Depth, breadth, scope, edge cases and elaboration are NOT criteria — a short
+correct response ties a long correct response.
+Reserve confidence 0.95–1.0 only for cases with overwhelming evidence. Default to 0.7–0.85 for clear wins.
+
+Your rubric:
+- **Pathophysiological Alignment**: Does the response eliminate options that violate fundamental biological laws, conservation principles, or established pathophysiological constraints?
+- **Pathophysiological Alignment**: Does the reasoning validate the temporal and causal sequence of events against known disease progression models or mechanistic pathways?
+- **Evidence-Based Justification**: Are diagnostic or therapeutic decisions justified by referencing established clinical guidelines, evidence-based protocols, or gold-standard practices?
+- **Logical Consistency**: Does the reasoning explicitly link clinical signs, symptoms, or laboratory findings to underlying pathophysiological or anatomical mechanisms?
+- **Logical Consistency**: Are statistical or epidemiological concepts (e.g., sensitivity, specificity, prevalence) applied with precise definitions and correct mathematical formulations?
+- **Contextual Relevance**: Does the response differentiate between acute and chronic effects of interventions or exposures, ensuring alignment with expected biological or clinical timeframes?
+- **Contextual Relevance**: Are confounding variables, comorbidities, or patient-specific factors (e.g., demographics, history) accounted for in the reasoning?
+- **Diagnostic Precision**: Are diagnostic or laboratory criteria applied correctly, with findings matching established clinical guidelines or reference standards?
+- **Diagnostic Precision**: Is the specificity and sensitivity of clinical signs, symptoms, or diagnostic tests evaluated to avoid overgeneralization or misattribution?
+- **Therapeutic Appropriateness**: Are pharmacological interventions justified by their mechanism of action, contraindications, and patient-specific factors (e.g., drug interactions, comorbidities)?
+- **Therapeutic Appropriateness**: Does the response distinguish between acute management and long-term treatment strategies, including follow-up and monitoring requirements?
+- **Logical Consistency**: Are apparent contradictions in the question reconciled by identifying implicit assumptions, missing contextual details, or alternative explanations?
+- **Parsimony and Simplicity**: Does the response prioritize the most parsimonious explanation, avoiding unnecessary complexity unless supported by the scenario?
+- **Epidemiological Reasoning**: Are epidemiological principles (e.g., prevalence, risk factors) incorporated to inform the likelihood of a diagnosis or outcome?
+- **Epidemiological Reasoning**: Is the distinction between correlation and causation maintained, particularly in observational or associative contexts?
+- **Diagnostic Precision**: Is the interpretation of laboratory or imaging results aligned with their clinical context, avoiding overgeneralization or misattribution?
+- **Therapeutic Appropriateness**: Are interventions or diagnostic tests evaluated for feasibility, contraindications, and clinical utility in the given context?
+- **Contextual Relevance**: Is the hierarchical organization of biological systems (e.g., molecular, cellular, tissue, organ) considered when evaluating mechanisms or outcomes?
+- **Logical Consistency**: Are logical fallacies (e.g., circular reasoning, post hoc ergo propter hoc) avoided when inferring relationships between events or findings?
+
+You MUST respond with a single valid JSON object and nothing else. Required shape: { "critique_a": <Critique of Model A's response against the rubric>, "critique_b": <Critique of Model B's response against the rubric>, "comparison": <The decisive difference in reasoning quality between A and B>, "winner": <Model A, Model B, or TIE>, "confidence": <string> }
+----- USER -----
+[Question]
+When the corpus callosum is cut in a right-handed patient, often the patient
+
+[Reference solution — produced independently, may be wrong]
+(C) cannot name objects placed in the left hand if the patient cannot see them
+
+[Model A's Response]
+ We refer to Wikipedia articles on psychology for help. The corpus callosum connects the two hemispheres of the brain. When the corpus callosum is cut, the patient cannot name objects placed in the right hand if the patient cannot see them. The answer is (G).
+
+
+
+[This model's selected answer: (G) Cannot name objects placed in the right hand if the patient cannot see them]
+
+[Model B's Response]
+ We refer to Wikipedia articles on psychology for help. The corpus callosum is a bundle of nerve fibers that connects the two hemispheres of the brain. Cutting the corpus callosum in a right-handed patient will result in the patient losing the ability to name objects placed in the right hand if the patient cannot see them. The answer is (G).
+
+
+
+[This model's selected answer: (G) Cannot name objects placed in the right hand if the patient cannot see them]
+
+────────────────────────────────────────
+Your task is to determine superior reasoning quality based solely on the logical rigour and domain
+soundness of its response.
+
+If both models are genuinely equivalent, output winner: "TIE" with confidence ≤ 0.5.
+
+Evaluate following the mandatory sequence:
+
+Step 1 — Critique Model A (2–4 sentences referencing your rubric)
+Step 2 — Critique Model B (2–4 sentences referencing your rubric)
+Step 3 — Compare: what is the decisive difference in reasoning quality?
+Step 4 — Verdict
+
+Output ONLY the following JSON. No prose before or after. No markdown fences.
+
+{
+  "critique_a": "<your critique of Model A>",
+  "critique_b": "<your critique of Model B>",
+  "comparison": "<decisive difference in reasoning quality>",
+  "winner": "Model A, Model B, or TIE",
+  "confidence": <0.0 to 1.0 (default to 0.7-0.85 for clear wins, reserve 0.95-1.0 only for overwhelming evidence)>
+}
+----- END -----
+[DRY-RUN] first payload model field: grok-4-1-fast-non-reasoning
+[DRY-RUN] 600 payloads assembled, 0 posted
+[PIN] end of dry-run --pass 4: pass 1 5142795bdc8c5a8e (pin 5142795bdc8c5a8e) | pass 2 9e2f4b7cb2b30b3a (pin 9e2f4b7cb2b30b3a) -> UNCHANGED
+[DBGUARD] 13 connect(s): ro-immutable mmlu_pro_dataset_cache_v2.db; ro-immutable experiment_results\judge_solve\grok-reasoning.db; ro-immutable experiment_results\x12_crossdomain\rubric_ladder.db; ro-immutable experiment_results\x12_crossdomain\canary_baseline_pass1.db; ro-immutable experiment_results\x12_crossdomain\canary_baseline_pass2.db; ro-immutable experiment_results\x12_crossdomain\canary_baseline_pass3.db; ro-immutable experiment_results\multicorpus\trace_truncation.db

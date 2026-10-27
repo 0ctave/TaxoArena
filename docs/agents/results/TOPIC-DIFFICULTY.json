@@ -1,0 +1,195 @@
+{
+  "id": "TOPIC-DIFFICULTY",
+  "title": "TOPIC-DIFFICULTY: does a difficulty axis inside a cell change the judge and the model order? (zero judge calls)",
+  "question": "Inside a cell (the 14 bareq512_s42 anchors) the questions span the whole difficulty range (roster accuracy on the key, quartiles 0.283 / 0.500 / 0.739). Does the judge behave differently on the easy and hard terciles of the SAME cell (verification fidelity, tie rate, length preference), and is the within-cell model order on hard questions the order on easy ones? Claim under test: per-cell boards are NOT difficulty-invariant.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "7073c97",
+    "program_lines": "docs/judge_v2_program.md L4856-L4936 (brackets by insertion at L4883: 2026-09-17 by TOPIC-DIFFICULTY on 'the schedule is answer-disagreement filtered'; 2026-09-18 by PROFILE-R-FILTERED on the 34.3% / 48.2% same-letter shares)",
+    "program_lines_as_of": "6aa2a0d",
+    "heading": "## Registered 2026-09-17 (before running) — TOPIC-DIFFICULTY: does a difficulty axis inside a cell change the judge and the model order? (zero judge calls; tools/analysis/topic_difficulty.py)",
+    "outcome_heading": [
+      "L5124: ## TOPIC-DIFFICULTY (2026-09-17, zero judge calls) — C1 and C2 HELD (key-decidable accuracy A -15.5pp, tie rate +6.6pp easy -> hard, same sign on x12, grok, Kot"
+    ],
+    "date": "2026-09-17"
+  },
+  "script": {
+    "path": "tools/analysis/topic_difficulty.py",
+    "sha16": "48a64e01a03df7d6",
+    "commit": "7073c97"
+  },
+  "ready": null,
+  "go": "n/a (0 calls; ~85,000 BT refits, 406 s)",
+  "run": {
+    "outcome_file": "experiment_results/topic_difficulty/topic_difficulty_outcome.txt",
+    "outcome_commit": "719c671",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-17",
+    "other_files": [
+      "experiment_results/topic_difficulty/topic_difficulty_outcome_rows.csv (719c671; the registration names it '_rows.csv')",
+      "run.log (gitignored, on disk)"
+    ]
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-17_zero_call_batch.md section TOPIC-DIFFICULTY",
+    "commit": "46f44e8",
+    "verdict": "numbers CONFIRMED (168 of 168 strata reproduced); outcome NOT READY as worded: C3's interpretation and C5's chip change by bracket (C3 a both-right composition artefact, UNDETERMINED on key-decidable; C5 'HELD' rests on 5 events, UNDETERMINED by the power rule); C1 carries its reference attribution (72-79% of the drop is the reference's); consequence cut to what is supported"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "accA hard - easy, pooled over anchors, question-clustered 95% interval excludes 0 (negative)",
+      "result": "HELD",
+      "value": "0.938 -> 0.783, -15.5pp [-18.5, -12.4] (x12 -16.7 [-20.2, -13.7]; grok -16.5 [-19.7, -13.6]; Kotlin -15.6 [-18.4, -11.9]); attribution (checker, of record): reference-correct rate 98.4% -> 93.7% -> 77.7%; accA within reference-correct 0.948 / 0.934 / 0.903, within reference-wrong 0.355 / 0.393 / 0.364; holding the reference-correct rate at easy's the drop is -4.3pp (the reference explains 72%); holding the within-reference accuracies -12.2pp (79%); the judge's own residual within reference-correct -4.5pp [-6.7, -2.5]; pair composition 13% (7% on x12)",
+      "denominator": "MISTRAL-MERGED key-decidable matches easy 1,979 / mid 3,782 / hard 3,056; terciles within the 14 anchors by 46-model key accuracy (pooled easy 942 / mid 936 / hard 933 questions)"
+    },
+    {
+      "id": "C2",
+      "text": "key-decidable tie rate hard - easy, interval excludes 0 (positive)",
+      "result": "HELD",
+      "value": "0.035 -> 0.101, +6.6pp [+5.0, +8.3] (x12 +6.7 [+4.6, +8.5]; grok +5.7 [+3.8, +7.7]; Kotlin +4.5 [+2.6, +6.6])",
+      "denominator": "key-decidable matches per tercile as above"
+    },
+    {
+      "id": "C3",
+      "text": "beta_len(hard) - beta_len(easy) z >= 1.96 (independent strata, Hessian SEs)",
+      "result": "FAILED",
+      "value": "on all decisive matches +0.556 - +1.525 = -0.969 / 1k chars, z -12.86: FAILED on the registered statistic (opposite sign); a both-right composition artefact (easy tercile 66% both-right pairs, 4,484 of 6,764, on which the judge takes the longer answer at +3.44 / 1k; hard 551 of 7,355 = 7.5%); on KEY-DECIDABLE decisive matches merged easy +0.145 (SE 0.069, n 1,910) vs hard +0.294 (SE 0.041, n 2,747), z +1.86; x12 z +1.63; grok z -0.46; Kotlin z +0.04: UNDETERMINED on the verification-relevant statistic",
+      "denominator": "decisive matches per tercile (all: easy 6,764 / hard 7,355; key-decidable easy 1,910 / hard 2,747)"
+    },
+    {
+      "id": "C4",
+      "text": "rho(easy order, hard order) below the 5th percentile of the within-cell permutation null (200 perms) in >= 7 of 14 anchors",
+      "result": "FAILED",
+      "value": "5 of 14 (Business, Computer science, Economics, Math, Psychology); median rho judge +0.898, key +0.809; checker: 4-5 of 14 over seeds (Economics flips), P(>= 4 at alpha 0.05) ~0.004, above chance but below the bar; the judge-vs-key rho comparison is ceiling-compressed (top model at 1.00 in 13 of 14 easy strata); replications x12 3 / grok 2 / Kotlin 4 of 14",
+      "denominator": "14 anchors; within-cell permutation null, 200 perms"
+    },
+    {
+      "id": "C5",
+      "text": "Llama-3.1-70B wrong-direction rate (judge gives the opponent on pairs the key gives to Llama) rises >= 10pp from the easiest to the hardest tercile carrying >= 20 such pairs",
+      "result": "UNDETERMINED",
+      "value": "easy 1 of 31 (3.2%), mid 5 of 32 (15.6%), hard 3 pairs (0 of 3; UNDETERMINED by support); the readout's '+12.4pp HELD' rests on 5 events (Fisher p 0.196; bootstrap +12.4pp [-0.7, +27.3]); convention A 6.5% vs 31.3% (p 0.022) carried by 5 ties: UNDETERMINED by the registration's own power rule (the readout prints C5 HELD; the checker's chip UNDETERMINED is the chip of record); 'the residue is a harder-stratum effect' NOT supported",
+      "denominator": "Llama-3.1-70B vs every opponent in Law + Philosophy on pairs the key gives to it: easy 31, mid 32, hard 3"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P-orch",
+      "text": "(orchestrator, blind) accA falls 10-20pp easy -> hard; tie rate +5-10pp; beta_len larger on hard; rho(easy, hard) 0.6-0.8 within anchors with the interval excluding 1; the Law/Philosophy under-rating is a hard-stratum effect",
+      "result": "FAILED",
+      "value": "accA HELD (-15.5); tie HELD (+6.6); beta_len FAILED on the registered statistic (z -12.86), UNDETERMINED on key-decidable (z +1.86); rho FAILED (median +0.898; 5 of 14 below the null); Law/Philosophy UNDETERMINED (C5)",
+      "denominator": "MISTRAL-MERGED"
+    },
+    {
+      "id": "P-builder",
+      "text": "(builder, blind) C1 HELD at -8 to -15pp with the same sign on all three replications; reference-correct ~0.95 -> ~0.65 and the within-reference-correct drop under half; C2 HELD at +3 to +8pp; C3 FAILED or borderline (z 1-2); C4 HELD in 7-10 of 14 with median rho 0.55-0.75 and the key's own rho 0.5-0.7; C5 easy -> mid rise under 10pp (FAILED) and hard UNDETERMINED; leaves: accuracy readable on 13, order REFUSED or within null; Spearman(difficulty, plurality agreement) 0.6-0.8",
+      "result": "FAILED",
+      "value": "C1 HELD on sign and replication, the point -15.5 just outside the range (FAILED on the interval); reference 98.4% -> 77.7% and within-reference drop -4.5pp of -15.5 HELD; C2 HELD (+6.6); C3 HELD (FAILED on the registered statistic; z +1.86 on key-decidable); C4 FAILED (5 of 14; median rho 0.898; key 0.809); C5 FAILED on the point (+12.4pp) but the whole criterion UNDETERMINED; leaves HELD; Spearman(difficulty, plurality) +0.785 HELD",
+      "denominator": "MISTRAL-MERGED"
+    }
+  ],
+  "falsifier": {
+    "text": "if C1 fails AND C4 fails the claim is overturned: per-cell boards are difficulty-invariant and no difficulty term belongs in the board or the widener; if C1 or C4 holds, the record's implicit statement that a per-cell board is one homogeneous object (FRAMEWORK Stage 4, widener on A_e alone) is overturned at the reading level; consequence = a registered difficulty-stratified reading or the key-free proxy as a second widener covariate, never a key input at inference",
+    "fired": false,
+    "note": "NOT TRIGGERED (C1 HELD); the registered consequence is cut to what is supported: the accuracy contrast is real and mostly the reference's; every difficulty-stratified board is UNDETERMINED (nominal < 3), so a stratified reading certifies nothing the whole-cell board does not; the key-free plurality proxy as a widener covariate needs its own registration (-> REF-QUALITY-MONITOR's DIFFICULTY-PROXY-WIDENER leg)"
+  },
+  "numbers_of_record": {
+    "run": "2026-09-17 19:41-19:47, 406 s; MISTRAL-MERGED primary 21,536 verdicts, 20 models, 2,811 judged q (x12 9,142 + x20 12,394); replications MISTRAL-X12 9,142, GROK-CALIB 9,142 (12 INVALID incl. 1 by rule 10), KOTLIN 9,123 (17 INVALID)",
+    "instrument_checks": "outside-only roster (26 non-contestants) reproduces C1 at -13.2pp [-15.8, -10.4] with tercile agreement 0.905; Spearman(primary, secondary instrument) +0.986",
+    "C1": "accA 0.938 -> 0.783, -15.5pp [-18.5, -12.4]; reference-correct 98.4% -> 93.7% -> 77.7%; judge residual within reference-correct -4.5pp [-6.7, -2.5]; reference share 72-79%",
+    "C2": "key-decidable tie 0.035 -> 0.101, +6.6pp [+5.0, +8.3]",
+    "C3": "all decisive: easy +1.525 vs hard +0.556 / 1k (z -12.86); both-right share easy 66% / hard 7.5%; both-right length preference +3.44 / +2.69 / +1.32 per 1k; key-decidable easy +0.145 vs hard +0.294 (z +1.86); comparator +0.39 / 1k is a different judge and cache (STACK-v2 x12 whole-board +0.318; merged +0.811 because x20 is 38.9% both-right)",
+    "C4": "below-null 5 of 14 (4-5 over seeds); median rho judge 0.898, key 0.809",
+    "C5": "Llama-3.1-70B wrong-direction easy 1 / 31, mid 5 / 32, hard 0 / 3; Fisher p 0.196; +12.4pp [-0.7, +27.3]; convention A 6.5% vs 31.3% (p 0.022) carried by 5 ties",
+    "stratum_boards": "every merged stratum board UNDETERMINED (nominal < 3 in 42 of 42 anchor strata; 5,233 called, 181 raw wrong, 11 established); the 13 leaves read accuracy only",
+    "deployability": "Spearman(difficulty, key-free plurality agreement) +0.785 over 2,811 questions; the proxy has tercile agreement 0.745 with the key instrument (77 easy <-> hard swaps) and recovers -6.8pp [-9.5, -4.0] of the C1 contrast (44%); no edge-level test",
+    "same_letter_shares": "x12 34.3% / x20 48.2% of matches share the predicted letter (the caches are NOT answer-disagreement filtered) [CORRECTED 2026-09-18 by PROFILE-R-FILTERED: same-letter proper 33.6% / 47.2%; the 34.3% / 48.2% counted 64 / 134 both-missing matches as equal]"
+  },
+  "sentence_of_record": "TOPIC-DIFFICULTY (zero calls; MISTRAL-MERGED, 21,536 verdicts, 2,811 judged questions, terciles within the 14 bareq512_s42 anchors by 46-model key accuracy): key-decidable accuracy A falls 15.5pp [-18.5, -12.4] and the key-decidable tie rate rises 6.6pp [+5.0, +8.3] from the easy to the hard tercile (same sign on x12, grok, Kotlin), but 72-79% of the accuracy drop is the reference's (reference-correct rate 98.4% -> 77.7%; within reference-correct the judge's own drop is -4.5pp [-6.7, -2.5]): REF-BY-CELL inside a cell, not a new judge effect. The registered length contrast on all decisive matches reads easy +1.525 > hard +0.556/1k (z -12.9) and is a composition artefact (66% of easy matches are both-right pairs on which the judge takes the longer answer at +3.4/1k); on key-decidable matches it is easy +0.145 vs hard +0.294 (z +1.9; x12 +1.6, grok -0.5, Kotlin 0.0): C3 FAILED on the registered statistic, UNDETERMINED on the verification-relevant one. The easy-vs-hard order is below the within-cell permutation null in 4-5 of 14 anchors (seed-dependent at Economics), median rho 0.898; C4 FAILED; the key's 0.809 is ceiling-compressed and not a capability benchmark. C5 is a count, not a finding: 1 of 31 vs 5 of 32 wrong-direction (Fisher p 0.20, [-0.7, +27.3]pp; convention A 6.5% vs 31.3% carried by 5 ties), hard stratum 3 pairs: UNDETERMINED. Every stratum board is UNDETERMINED (nominal < 3; 11 established wrong of 5,233 called), so a difficulty-stratified reading certifies nothing the whole-cell board does not; the key-free plurality proxy (Spearman 0.785, tercile agreement 0.745) recovers -6.8pp [-9.5, -4.0] of the contrast and has no edge-level test; its use in the widener needs its own registration.",
+  "chips": [
+    "C1 HELD, C2 HELD",
+    "72-79% OF THE DROP IS THE REFERENCE'S (REF-BY-CELL INSIDE A CELL)",
+    "C3 FAILED ON THE REGISTERED STATISTIC (COMPOSITION ARTEFACT); UNDETERMINED ON KEY-DECIDABLE",
+    "C4 FAILED (5 OF 14)",
+    "C5 UNDETERMINED (POWER RULE)",
+    "EVERY STRATUM BOARD UNDETERMINED"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-17",
+      "by": "TOPIC-DIFFICULTY (registration L4883, 719c671)",
+      "text": "'the schedule is answer-disagreement filtered' is false for these caches: x12 34.3% of matches have the same predicted letter, x20 48.2% (checker); the easy tercile is thin on key-decidable pairs because both contestants are usually right, not because of any filter."
+    },
+    {
+      "date": "2026-09-18",
+      "by": "PROFILE-R-FILTERED (registration L4883 and outcome defect (6) L5201, 3dd0900)",
+      "text": "the 34.3% / 48.2% same-letter shares counted both-missing predictions as equal (64 matches on x12, 134 on x20); same-letter proper is 33.6% / 47.2%; under the shipped MatchFilter rule (missing kept) the kept share is 66.4% / 52.8%."
+    },
+    {
+      "date": "2026-09-17",
+      "by": "the adversarial reviewer (1) / (2) (docs/reviews/2026-09-17_zero_call_batch.md, 46f44e8), recorded in the outcome section as the readings of record",
+      "text": "C3 is FAILED on the registered statistic and UNDETERMINED on the verification-relevant one (both-right composition artefact); C5 'HELD' in the readout rests on 5 events and is UNDETERMINED by the registration's own power rule (the checker's chip is the chip of record); C1 carries the reference decomposition (72-79%)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "CORRECTIONS_2026-09-23 (registrar)",
+      "text": "[CORRECTED 2026-09-23 by the registrar (line pointer only, zero calls; no number, no criterion and no sentence moves): registration.program_lines names docs/judge_v2_program.md L4856, and that was exact when it was written. After commit cd83eac inserted four one-line correction brackets mid-file (hunks @@ -3911,0 / -6535,0 / -6692,0 / -6949,0 @@), the heading of record \"## Registered 2026-09-17 (before running) — TOPIC-DIFFICULTY: does a difficulty axis inside a cell change the judge and the model order? (ze ...\" stands at L4857, +1; the whole span shifts by the same +1. Verified at HEAD by sed -n '4857p' docs/judge_v2_program.md. The map for every such pointer is the programme's \"## Line-shift map, appended 2026-09-23\" section: +0 up to old L3911, +1 to L6535, +2 to L6692, +3 to L6949, +4 below. The recorded span is left standing beside this bracket, not rewritten.]"
+    },
+    {
+      "date": "2026-09-23",
+      "by": "INCONSISTENCIES-PASS (registrar, zero calls; insertion only)",
+      "text": "NAME 2026-09-23 by INCONSISTENCIES-PASS (registrar, zero calls; insertion only): the registration names the rows file '_rows.csv'; the file of record is experiment_results/topic_difficulty/topic_difficulty_outcome_rows.csv (719c671, tracked), as the outcome section already says. [ledger: evidence cell of row TOPIC-DIFFICULTY, v132]"
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a difficulty-stratified board (all UNDETERMINED)",
+    "a judge-level difficulty effect beyond the reference's (-4.5pp within reference-correct is the judge's own, small)",
+    "a length-preference difference on key-decidable matches (z +1.9 at best)",
+    "a hard-stratum residue (3 pairs)",
+    "any change to the widener"
+  ],
+  "ledger": {
+    "row_id": "TOPIC-DIFFICULTY",
+    "version": "v112 [v132 2026-09-23: INCONSISTENCIES-PASS insertion in this row]; [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "DESIGN-PROBES",
+    "CONSENSUS-FIT",
+    "KTD-CHECK",
+    "ESCALATE-LLAMA-LAW",
+    "STACK-v2",
+    "GROK-CALIB",
+    "JUDGE-WIRING-BOARD",
+    "ARENA-V2-X20",
+    "SYSTEMATIC-BUDGET"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L4856-L4936 (registration 7073c97; brackets L4883): question, instrument, hygiene, criteria C1-C5, the two blind prediction sets, falsifier, cost",
+    "docs/judge_v2_program.md L5122-L5225 (outcome section, 719c671; PROFILE-R-FILTERED bracket L5201 at 3dd0900): every number, criteria and predictions scored, the falsifier's consequence, defects (1)-(7), does-not-show, the sentence of record",
+    "docs/reviews/2026-09-17_zero_call_batch.md section TOPIC-DIFFICULTY (46f44e8): CONFIRMED status, defects, the sentence of record",
+    "experiment_results/topic_difficulty/topic_difficulty_outcome.txt and topic_difficulty_outcome_rows.csv (719c671)",
+    "docs/test_ledger.html row TOPIC-DIFFICULTY (v112): chips verbatim, evidence (7073c97, 719c671)",
+    "script sha16 = sha256 of tools/analysis/topic_difficulty.py at 7073c97, first 16 hex (identity, computed by the registrar 2026-09-20; script unchanged since registration)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' lines to grep -n regardless of line drift; line numbers re-lined 2026-09-22 as of programme HEAD 6aa2a0d (shift +0 from the batch-1 reading)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Re-reads about 21,500 existing verdicts (no new calls), splitting each cell's questions into easy, middle and hard thirds, and compares judge accuracy, ties, length preference and model order between easy and hard.",
+    "why": "Tests whether a single per-cell ranking is misleading because the judge behaves differently on hard questions within the same cell.",
+    "information": "A difference would require difficulty-split rankings. Result: done; judge accuracy drops 15.5 points on hard questions, but 72-79% of that is because the reference answer is more often wrong there, not a new judge effect; no reliable length or model-order difference; every difficulty-split ranking is undetermined. On the older p2dca question family, later ruled 'history, not evidence'.",
+    "written": "2026-10-07"
+  }
+}

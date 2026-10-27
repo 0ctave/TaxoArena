@@ -1,0 +1,56 @@
+INTENT-S0-CARD-PROTOCOL outcome (tools/analysis/card_protocol.py blob cdcc1dbb4ece15b150988f43913e757432e90e77; writer card_protocol_writer.py blob 2788d7214df86dd8aabdb67d9b1b373ba3ec49fe; S0 machinery intent_transfer_s0.py blob f662ceb19738f515972871f5963f5dcfc764a271, imported unchanged)
+registration: docs/judge_v2_program.md "## Registered 2026-10-01 (before any code or call) — INTENT-S0-CARD-PROTOCOL: at each embedder's EMBED-DIM-SLICE-selected slice, ..." L22655-L22680 _as_of 46954215; kind zero-call CPU reader
+zero judge calls; zero embeddings; no build; no GATE row; pool of record: none read; pins re-checked before and after, unchanged: {'ingest_db': '487e0093719c184c', 'qwen3': '9e100e04fc91b137', 'gemma': 'b187b82f90ce9837', 'qwen3_card': 'e8dd85afc2afc075', 'gemma_card': '9396cb1bbb2352cb'}
+prompts: experiment_configs/card_protocol_prompts.json sha256 (LF) 19c3d1f888ba3a99cd4f91f917f3ce47dee41f8f2f8fe7177fe851e71e6e7e76; qwen3 "Instruct: Given a user utterance to a virtual assistant, identify the user's intent\nQuery:" sha256 e92a9484a87ad9d2; gemma 'task: clustering | query: ' sha256 11ab9b678a16b258; nomic 'clustering: ' sha256 1885ff312b2a4250
+arms: qwen3 RAW, gemma RAW, qwen3 CARD, gemma CARD; slices d_q* 1024, d_g* 768 from selection.json sha256 f1b508cfa889021e6a4d8dac5e82a2188399373996818db0d622aad076bf400d; nomic @256 (CB6); seeds 0-4; EVAL read 12 times (once per arm per corpus, plus c4's co-filing read on MASSIVE)
+EMBED-DIM-SLICE DS1 VERDICT of record: REOPEN-CANDIDATE
+builder's readings: CB1 two new scripts importing S0 and embedder_arms unchanged; CB2 S0's route-parity bars on the RAW route and on the CARD route's repeatability / resume parity, cos(CARD, RAW) printed with no bar, no transform (CW1), the tag's digest = S0's RAW file's digest (CW3); CB3 DS1's bootstrap stream, paired over arms, CP2 joint draws averaged per draw index over independent per-corpus streams; CB4 SE = SD of draws, MDE80 = 2.8 SE, BASIC intervals; CB5 CP3 S on the CP1 fits, c4's ceiling and floor per arm, percentile interval (DS3's EB4); CB6 CP4 nomic at 256; CB7 the dry-run reads RAW EVAL only; CB8 closed 80% intervals, KEEP-STRONG inside the KEEP event; CB9 no shifted-CP1-points bracket at build, points scored as registered
+TRAIN-ONLY: 84 fits audited (84 on TRAIN, 0 on GATE), 0 with an EVAL row, 0 OOS rows, 0 dropped rows (fit_rows refuses otherwise)
+IDENTITY: RAW qwen3@1024 seed-mean EVAL fine NMI 0.76554 / 0.92810 / 0.84900 (EMBED-DIM-SLICE 0.76554 / 0.92810 / 0.84900), spread 0.01428 / 0.00417 / 0.01043 (0.01428 / 0.00417 / 0.01043); RAW gemma@768 0.79883 / 0.92566 / 0.89286 (0.79883 / 0.92566 / 0.89286), spread 0.01277 / 0.00968 / 0.01216 (0.01277 / 0.00968 / 0.01216); DS1 D* +0.03329 / -0.00244 / +0.04386 (+0.03329 / -0.00244 / +0.04386); 95% BASIC CI [+0.02961, +0.03998] / [-0.00560, -0.00048] / [+0.04108, +0.04990] ([+0.02961, +0.03998] / [-0.00560, -0.00048] / [+0.04108, +0.04990]) -> REPRODUCED
+== SUPPORT (measured in-run; planning values beside) ==
+  CP1 massive: n 4946 EVAL items in 4923 components, Kish DEFF 1.0093 (planned 1.0093), n_eff 4900; SE(D_card) 0.00300 (planned 0.00289), MDE80 2.8 x SE 0.00840, bar 0.01120 (planning 0.0246); at the predicted +0.010: |P| - bar = -0.00120 vs MDE80 -> DESCRIPTIVE-ONLY
+  CP1 clinc: n 6672 EVAL items in 6672 components, Kish DEFF 1.0000 (planned 1.0000), n_eff 6672; SE(D_card) 0.00169 (planned 0.00137), MDE80 2.8 x SE 0.00472, bar 0.01262 (planning 0.0094); at the predicted -0.025: |P| - bar = +0.01238 vs MDE80 -> SCOREABLE
+  CP1 banking77: n 3908 EVAL items in 3905 components, Kish DEFF 1.0015 (planned 1.0015), n_eff 3902; SE(D_card) 0.00329 (planned 0.00247), MDE80 2.8 x SE 0.00922, bar 0.01991 (planning 0.0143); at the predicted +0.035: |P| - bar = +0.01509 vs MDE80 -> SCOREABLE
+  CP2: SE(D-bar) 0.00143 (planned 0.00135; joint draws), MDE80 0.00401, spread term 0.01560, bar_pool 0.01560 (planning 0.0161); at the predicted +0.020: |P| - bar_pool = +0.00440 vs MDE80 -> SCOREABLE
+  STRUCTURAL LEG (registered (g)): CP1 and CP2 are reachable only where the true difference exceeds the in-run seed spread, which does not shrink with n; inside it a corpus reads NEITHER and CP2 NOT SHOWN at any budget
+== CP1 (deciding; D_card = mean_s NMI_EVAL(gemma, CARD, 768) - mean_s NMI_EVAL(qwen3, CARD, 1024) at K_f; S0's C1 rule) ==
+  CP1 massive K_f 60 n 4946: D_card = gemma 0.78190 - qwen3 0.81429 = -0.03238, 95% BASIC CI [-0.03801, -0.02619] (decides); percentile [-0.03857, -0.02676]; SE 0.00300, MDE80 0.00840, spread max(qwen3 CARD 0.01120, gemma CARD 0.00755), bar 0.01120 -> WORSE
+  CP1 clinc K_f 150 n 6672: D_card = gemma 0.89114 - qwen3 0.92502 = -0.03388, 95% BASIC CI [-0.03861, -0.03196] (decides); percentile [-0.03580, -0.02915]; SE 0.00169, MDE80 0.00472, spread max(qwen3 CARD 0.01262, gemma CARD 0.01239), bar 0.01262 -> WORSE
+  CP1 banking77 K_f 77 n 3908: D_card = gemma 0.87662 - qwen3 0.75836 = +0.11826, 95% BASIC CI [+0.11690, +0.12971] (decides); percentile [+0.10681, +0.11963]; SE 0.00329, MDE80 0.00922, spread max(qwen3 CARD 0.01991, gemma CARD 0.01165), bar 0.01991 -> BETTER
+CP1 VERDICT: KEEP-STRONG (a sub-case of KEEP) -- gemma BETTER on 1 of 3 ['banking77'] (<= 1); gemma WORSE on 2 of 3 ['massive', 'clinc'] (>= 2)
+F-CP1: NOT FIRED (CP1 reads KEEP-STRONG, not REOPEN-CANDIDATE)
+READING (KEEP): gemma's fine-level edge over qwen3 under card prompts at the selected slices is "not shown" on >= 2 of 3 intent corpora; KEEP reads "not shown", never "explained by protocol" (Support (f))
+READING (KEEP-STRONG): in addition, qwen3 CARD is better than gemma CARD at the fine level on >= 2 of 3
+READING AGAINST D3 (registered): Mixed (EMBED-DIM-SLICE REOPEN-CANDIDATE, CP1 KEEP-STRONG): relayed as mixed; no wording chosen here
+== CP2 (deciding; pooled D-bar = (1/3) Sum_c [mean_s NMI_EVAL(qwen3, CARD, 1024) - mean_s NMI_EVAL(qwen3, RAW, 1024)]) ==
+  CP2 per corpus qwen3 CARD - RAW: massive +0.04875; clinc -0.00308; banking77 -0.09064
+  CP2 D-bar -0.01499, 95% BASIC CI [-0.01885, -0.01319] (joint bootstrap, independent per corpus; decides); percentile [-0.01679, -0.01113]; SE 0.00143, MDE80 0.00401, spread term 0.01560, bar_pool 0.01560 -> NOT SHOWN
+CP2 VERDICT: NOT SHOWN
+F-CP2: FIRED (CP2 reads NOT SHOWN): "qwen3 is instruction-aware and was run RAW" is withdrawn as a candidate MECHANISM for S0's qwen3 rows (the sentence stays as a disclosure only)
+== CP3 (DESCRIPTIVE-ONLY; MASSIVE slot swap, K 60, mean over seeds 0-4; R = (S - floor) / (ceiling - floor)) ==
+  CP3 qwen3 RAW@1024: S 0.77443 (seeds 0.7737 / 0.7908 / 0.7834 / 0.7632 / 0.7610); supervised-centroid ceiling 0.85258; random co-filing floor 0.69429 (3222 pairs); R 0.5063
+  CP3 gemma RAW@768: S 0.81092 (seeds 0.8212 / 0.8194 / 0.8144 / 0.7914 / 0.8082); supervised-centroid ceiling 0.89479; random co-filing floor 0.70919 (3222 pairs); R 0.5482
+  CP3 qwen3 CARD@1024: S 0.85990 (seeds 0.8765 / 0.8731 / 0.8541 / 0.8473 / 0.8485); supervised-centroid ceiling 0.90658; random co-filing floor 0.73991 (3222 pairs); R 0.7199
+  CP3 gemma CARD@768: S 0.79410 (seeds 0.7964 / 0.7834 / 0.8076 / 0.7871 / 0.7961); supervised-centroid ceiling 0.87803; random co-filing floor 0.69274 (3222 pairs); R 0.5471
+  CP3 S(gemma CARD) - S(qwen3 CARD) = -0.06580, 95% percentile CI [-0.07709, -0.05462] (CB5; BASIC [-0.07697, -0.05450]); SE 0.00588; n 3222 variants in 3207 components, Kish DEFF 1.0093
+== CP4 (DESCRIPTIVE-ONLY) ==
+  CP4 massive gemma CARD - RAW @768: -0.01692, 95% BASIC CI [-0.02116, -0.01248]
+  CP4 clinc gemma CARD - RAW @768: -0.03452, 95% BASIC CI [-0.03850, -0.03313]
+  CP4 banking77 gemma CARD - RAW @768: -0.01623, 95% BASIC CI [-0.02068, -0.01339]
+  CP4 nomic: NOT READ -- intent_emb_nomic_card.db is not pinned in card_protocol_pins.json (the DESCRIPTIVE arm; the deciding criteria do not read it)
+== PRINTED, NEVER DECIDING ==
+  fine NMI massive seed-mean EVAL: qwen3 RAW@1024 0.76554; gemma RAW@768 0.79883; qwen3 CARD@1024 0.81429; gemma CARD@768 0.78190
+  fine NMI clinc seed-mean EVAL: qwen3 RAW@1024 0.92810; gemma RAW@768 0.92566; qwen3 CARD@1024 0.92502; gemma CARD@768 0.89114
+  fine NMI banking77 seed-mean EVAL: qwen3 RAW@1024 0.84900; gemma RAW@768 0.89286; qwen3 CARD@1024 0.75836; gemma CARD@768 0.87662
+== PREDICTIONS (numeric HELD iff the point lies in the closed 80%% interval; probabilities scored on the event, Brier; CB8; CB9: scored as registered, no shifted-points bracket) ==
+  CP1-P massive D_card -0.03238 vs +0.010 [-0.010, +0.030]: FAILED
+  CP1-P clinc D_card -0.03388 vs -0.025 [-0.040, -0.010]: HELD
+  CP1-P banking77 D_card +0.11826 vs +0.035 [+0.015, +0.055]: FAILED
+  CP1-P KEEP (p 0.75): OCCURRED, Brier 0.0625
+  CP1-P KEEP-STRONG (p 0.10): OCCURRED, Brier 0.8100
+  CP1-P REOPEN-CANDIDATE (p 0.25): did not occur, Brier 0.0625
+  CP2-P D-bar -0.01499 vs +0.020 [+0.000, +0.040]: FAILED
+  CP2-P HELD (p 0.45): did not occur, Brier 0.2025
+  CP2-P HURTS (p 0.05): did not occur, Brier 0.0025
+  CP3-P gemma S - qwen3 S under CARD -0.06580 vs +0.040 [+0.010, +0.070]: FAILED
+WHAT THIS RESULT WILL NOT SHOW (registered): quantisation effects; capability text; parity (no TOST); that MASSIVE's NEITHER is explanation; any change to the embedder of record (D3 is the author's)

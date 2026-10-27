@@ -1,0 +1,105 @@
+=== UNFILTERED-ADOPT: the 920-edge widener fit as the shipped parameters (FRAMEWORK item 3, 0 calls) ===
+  pool of record p2dca21ab5f4ef3ae | key denominator for every McNemar: the anchor's JUDGED questions (anchor_qs, 14 anchors,
+  2811 distinct judged questions) | wrong counts as all(McNemar-established at 0.05) | Meta-Llama-3-70B-Instruct excluded (asserted)
+  edges: key_tie_decline's cached systematic_budget.build() (bigpic/ktd_x12_edges.pkl); fits by systematic_budget.fit;
+  c~ by systematic_budget.cbud; the vectorised likelihood copy is used only for the b0 profile and the bootstrap.
+
+=== 0. DATA CHECK against systematic_budget.txt ===
+  edges with any key gap 920, wrong 60(26)   [record 920 / 60]
+  edges with gap >= 0.02   891, wrong 44(26)   [record 891 / 44]
+  raw certificate at 0.975: ALL 748 called / 11(4) wrong = 1.47%   [record 748 / 11 = 1.47%]
+  raw certificate at 0.975: FILTERED 739 called / 8(4) wrong = 1.08%   [record 739 / 8 = 1.08%]
+  edges the filter excludes: 29, wrong 16(0) = 55.2%   [FRAMEWORK Stage 6 says '33 excluded edges, 52% wrong-direction':
+    does not reproduce from this build (zero-gap edges are never built, systematic_budget.py build(): 'if gap == 0: continue');
+    the correct statement is 29 excluded edges, 16 wrong = 55.2%]
+  established (McNemar p < 0.05): 809 of 920 on the 920 set (wrong on established 26, indeterminate wrong 34);
+    809 of 891 on the 891 set (wrong on established 26)   [record 809 of 891, 26 wrong on established]
+  891 fit: b0 = -3.2326 | b1 = +3.3133   [record -3.2326 / +3.3133]
+  920 fit: b0 = -3.0438 | b1 = +3.1980   [record -3.0438 / +3.1980]
+  reproduction of both committed fits to 4 decimals: OK
+  vectorised likelihood == systematic_budget.nll at the 920 MLE: 127.387457 vs 127.387457 (OK)
+  tau(A) at A = 0.30 / 0.45 / 0.60 / 0.80 / 0.90:
+    891 fit  0.107 / 0.175 / 0.288 / 0.559 / 0.778
+    920 fit  0.124 / 0.201 / 0.325 / 0.615 / 0.847
+  monotonicity (edges the 920 fit makes MORE confident than c_raw, on 920 edges): 0 (must be 0)
+
+=== (a) established-label profile rejects b1 = 0 (delta-deviance >= 3.84 at b1 = 0, b0 profiled) ===
+  920 all-label    n = 920 (wrong 60): MLE b0 = -3.0438 b1 = +3.1980 | delta-dev at b1 = 0:  23.36 -> REJECTED | profile 95% set for b1 [1.75, 5.50]
+  920 ESTABLISHED  n = 809 (wrong 26): MLE b0 = -2.6463 b1 = +2.1430 | delta-dev at b1 = 0:   5.22 -> REJECTED | profile 95% set for b1 [0.50, 5.50]
+  891 all-label    n = 891 (wrong 44): MLE b0 = -3.2326 b1 = +3.3133 | delta-dev at b1 = 0:  19.06 -> REJECTED | profile 95% set for b1 [1.75, 6.00]
+  891 ESTABLISHED  n = 809 (wrong 26): MLE b0 = -2.6463 b1 = +2.1430 | delta-dev at b1 = 0:   5.22 -> REJECTED | profile 95% set for b1 [0.50, 5.50]
+  [record, 891 set: delta-dev 5.22 established / 19.06 all-label; established refit b1 = +2.1430]
+  IDENTITY CHECK: established edges of the 920 set == established edges of the 891 set: YES (0 of the 29 filter-excluded
+    edges are established). So criterion (a) on the 920 set is the SAME likelihood as the record's 5.22: the unfiltered fit adds no established label, and (a) is a reproduction of the 891 result, not an independent identification.
+
+  anchor-cluster bootstrap for b1 (600 draws over 14 anchors, seed 11; the review's chk_ci.py convention):
+    920 all-label    b1 95% CI [1.83, 8.02], P(b1 <= 0) = 0.0000, CI width 6.19
+    920 ESTABLISHED  b1 95% CI [-0.09, 11.90], P(b1 <= 0) = 0.0350, CI width 11.99
+    891 all-label    b1 95% CI [1.72, 7.87], P(b1 <= 0) = 0.0017, CI width 6.15   [record 891: [1.72, 7.87], P = 0.0017]
+
+=== LEAVE-ONE-ANCHOR-OUT (14 folds), both fits, both populations; the row the item asks for ===
+  fold b1 range: 920-trained 2.4671 .. 4.9127 | 891-trained 2.6658 .. 5.0870
+  certificate                                   called wrong(est)  nominal   ratio  utility/edges called/rawcall correct lost
+  -- on the 920 (deployable) population --
+  raw (tau = 0)                                    748     11(4)     0.80   13.8x          81.3%         100.0%            0
+  920 fit, in sample                               651      2(1)     1.38    1.5x          70.8%          87.0%           88
+  891 fit, in sample (cold on the 29)              666      2(1)     1.30    1.5x          72.4%          89.0%           73
+  920 fit, LEAVE-ONE-ANCHOR-OUT                    646      3(2)     1.28    2.4x          70.2%          86.4%           94
+  891 fit, LEAVE-ONE-ANCHOR-OUT (folds on 891)     664      3(2)     1.27    2.4x          72.2%          88.8%           76
+  -- on the 891 (filtered) population --
+  raw (tau = 0)                                    739      8(4)     0.76   10.5x          82.9%         100.0%            0
+  920 fit, in sample                               650      2(1)     1.38    1.5x          73.0%          88.0%           83
+  891 fit, in sample                               665      2(1)     1.30    1.5x          74.6%          90.0%           68
+  920 fit, LEAVE-ONE-ANCHOR-OUT (folds on 920)     645      3(2)     1.27    2.4x          72.4%          87.3%           89
+  891 fit, LEAVE-ONE-ANCHOR-OUT                    663      3(2)     1.27    2.4x          74.4%          89.7%           71
+  [record: 891 in sample 665/2 nominal 1.30; 891 LOAO 663/3/1.27, 74.4%%, established 649/2/1.18;
+   review scratch: 920 LOAO 646/3/1.28 = 2.3x, utility 70.2%; the derivation said 650/3]
+  THE ROW: 920 fit, LOAO: 646 called / 3 wrong (all(established) 2) / nominal 1.28 = 2.4x, utility 70.2% of 920 edges
+    matches the review's scratch (646 / 3 / 1.28, 70.2%): YES
+    out-of-fold nominal over ALL 920 edges: 59.5 against 60 observed wrong (OPTIMISTIC; the aggregate has no bite at the
+    operating point, review item 6; it is printed for parity with systematic_budget.txt and not scored)
+
+=== CALIBRATION STATEMENT for the 920 fit (framework Stage 6 wording) ===
+  920 fit, in sample                       called 651 | wrong 2(1) | nominal 1.38 | wrong-direction rate on the unfiltered set 0.31% (95% UB 0.96%) | UNDETERMINED (nominal < 3)
+  920 fit, LEAVE-ONE-ANCHOR-OUT            called 646 | wrong 3(2) | nominal 1.28 | wrong-direction rate on the unfiltered set 0.46% (95% UB 1.20%) | UNDETERMINED (nominal < 3)
+  Poisson P(>= 3 | 1.28) = 0.137 for the LOAO row (the 891 row's P(>= 3 | 1.27) = 0.135)
+
+=== WRONG CALLS at 0.975 under the 920 fit (McNemar b:c, p on the anchor's judged questions) ===
+  in sample:
+    Law            Meta-Llama-3_1-70B-Instruc vs Qwen1.5-72B-Chat           gap 0.1107 A 0.475 | c~(920) 0.9922, c~(891) 0.9949 | McNemar 59:29 p = 0.0018 -> ESTABLISHED
+    History        Qwen1.5-72B-Chat           vs deepseek-chat-v2_5         gap 0.0336 A 0.605 | c~(920) 0.9752, c~(891) 0.9828 | McNemar 21:17 p = 0.6271 -> indeterminate
+  LOAO:
+    Law            Meta-Llama-3_1-70B-Instruc vs deepseek-chat-v2_5         gap 0.1070 A 0.476 | c~(920) 0.9894, c~(891) 0.9917 | McNemar 54:25 p = 0.0015 -> ESTABLISHED
+    Law            Meta-Llama-3_1-70B-Instruc vs Qwen1.5-72B-Chat           gap 0.1107 A 0.475 | c~(920) 0.9986, c~(891) 0.9990 | McNemar 59:29 p = 0.0018 -> ESTABLISHED
+    History        Qwen1.5-72B-Chat           vs deepseek-chat-v2_5         gap 0.0336 A 0.605 | c~(920) 0.9801, c~(891) 0.9882 | McNemar 21:17 p = 0.6271 -> indeterminate
+
+=== COMPOSED RULE widener + decline at 0.975 (KEY-TIE-DECLINE), both fits, 920 population ===
+  base                                      called  residue residue wrong
+  920 fit, in sample                           651      636             1   (established by construction)
+  891 fit, in sample                           666      651             1   (established by construction)
+  920 fit, LOAO                                646      631             2   (established by construction)
+  891 fit, LOAO                                664      649             2   (established by construction)
+  [record, 891 population: widener + decline 651 / 1(1)]
+
+=== REGISTERED CRITERIA ===
+  (a) established-label profile rejects b1 = 0 on the 920 set: delta-dev 5.22 vs 3.84 -> PASS
+      (all-label 920: 23.36; 891 established 5.22 / all-label 19.06, record 5.22 / 19.06)
+      CAVEAT: the established set is the 891 set's (identity check above), so this is the record's number reproduced;
+      the anchor-cluster bootstrap on established labels has P(b1 <= 0) = 0.035 with the percentile CI touching 0 -
+      the profile at 3.84 is the registered instrument and it rejects; the cluster bootstrap would not at 95%.
+  (b) utility >= 60%: LOAO called / 920 edges = 646 / 920 = 70.2% -> PASS   (called / raw called = 86.4%; in sample 70.8%)
+  (c) established wrong calls at 0.975 not above the filtered fit's, four like-for-like comparisons:
+      LOAO on 920 (primary)    920 fit 3(2) of 646 called  vs  891 fit 3(2) of 664 called  -> equal
+      in sample on 920         920 fit 2(1) of 651 called  vs  891 fit 2(1) of 666 called  -> equal
+      LOAO on 891              920 fit 3(2) of 645 called  vs  891 fit 3(2) of 663 called  -> equal
+      in sample on 891         920 fit 2(1) of 650 called  vs  891 fit 2(1) of 665 called  -> equal
+      -> PASS (not above on any comparison)
+  (d) LOAO row printed by systematic_budget.py: the committed script prints the 920 refit (b0, b1) and no unfiltered LOAO
+      row (checked on the file as it stands: absent); this test may not modify it, so the row is printed above from its functions and matches the review's
+      scratch to the digit -> NOT MET on the literal wording; the row now exists in this test's output (this file, from
+      systematic_budget's committed functions); adding it to systematic_budget.py is a one-block engineering change for Block 4.
+  PREDICTION 'adopted': the item's three numeric criteria all PASS; (d) is NOT MET on the literal wording. Adoption is the record's decision, taken on
+      these numbers: the 920 pair (b0 = -3.0438, b1 = +3.1980) is not worse than the 891 pair on the deployable population at the same
+      operating point, identified on established labels at delta-dev 5.22, at utility 70.2%, with calibration UNDETERMINED.
+
+  elapsed 130 s; nothing posted; no network.

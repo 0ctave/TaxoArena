@@ -1,0 +1,781 @@
+{
+ "meta": {
+  "test_id": "MODEL-VINTAGE-CANARY",
+  "step": "0b (amendment (a): per-model harness_id on vintage v0)",
+  "registration": "docs/judge_v2_program.md 'Registered 2026-09-22 ... MODEL-VINTAGE-CANARY amendment (a)' (L9687-L9799, bec7402)",
+  "script_sha_lf": "599d6e07aaf478f2a6e2232208544b9b4521bd4a99db5be1d27c967f712e4e78",
+  "extract_v1_sha": "b9782bef338e4815",
+  "extractor_version": "extract-v1",
+  "variant_shas": {
+   "tier1-blank-v1": "cbed6f92deece096",
+   "three-tier-v1": "b9782bef338e4815",
+   "three-tier-G-v1": "14f7b3bce20bcdfd"
+  },
+  "variant_order": [
+   "tier1-blank",
+   "three-tier",
+   "three-tier-G"
+  ],
+  "set_hash": "50af669ac6997f9f",
+  "pool_id": "p2dca21ab5f4ef3ae",
+  "date": "2026-09-22 12:27:00",
+  "threshold": 0.99,
+  "assignment_rule": "a model is assigned to the variant in {tier1-blank, three-tier, three-tier-G} that best reproduces its pred column on the canary, ties to the simplest (tier1-blank < three-tier < three-tier-G); applied to the precheck's classes it gives the three memberships, with ONE stated exception: arx_0314 ties at 0.9928 between tier1-blank and three-tier on the canary and the tie is broken by the full-table reading (three-tier 0.9933), so H-threetier. The rule is printed as a CHECK beside the fixed membership and is never used to assign or re-assign.",
+  "families": {
+   "H-tier1-blank": {
+    "variant": "tier1-blank",
+    "members": [
+     "Llama-2-13b-hf",
+     "Llama-2-7b-hf",
+     "Qwen1.5-72B-Chat",
+     "Yi-6b-Chat",
+     "c4ai-command-r-v01"
+    ]
+   },
+   "H-constantG": {
+    "variant": "three-tier-G",
+    "members": [
+     "Meta-Llama-3_1-70B-Instruct",
+     "Meta-Llama-3_1-8B"
+    ]
+   },
+   "H-threetier": {
+    "variant": "three-tier",
+    "members": [
+     "arx_0314",
+     "deepseek-chat-v2_5",
+     "gemini-3.1-pro_5-shots",
+     "gpt-4o-2024-08-06",
+     "iask_pro"
+    ]
+   }
+  },
+  "exceptions": {
+   "arx_0314": [
+    "tier1-blank",
+    "three-tier"
+   ]
+  },
+  "recorded_exclusions": [],
+  "judge_calls": 0,
+  "x12_matches_verified": 300,
+  "fulltable_seconds": 334.0,
+  "mode": "run"
+ },
+ "models": {
+  "Llama-2-13b-hf": {
+   "assigned_family": "H-tier1-blank",
+   "harness_id": "H-tier1-blank",
+   "extractor_variant": "tier1-blank",
+   "variant_id": "tier1-blank-v1",
+   "variant_sha": "cbed6f92deece096",
+   "n": 279,
+   "reproduction": {
+    "agree": 279,
+    "n": 279,
+    "rate": 1.0,
+    "wilson95": [
+     0.9864178395257275,
+     1.0
+    ],
+    "threshold": 0.99,
+    "at_or_above": true
+   },
+   "canary_table": {
+    "tier1-blank": 1.0,
+    "three-tier": 0.967741935483871,
+    "three-tier-G": 0.8387096774193549
+   },
+   "canary_agree": {
+    "tier1-blank": 279,
+    "three-tier": 270,
+    "three-tier-G": 234
+   },
+   "fulltable": {
+    "rows": 12032,
+    "tier1-blank": 1.0,
+    "three-tier": 0.9612699468085106,
+    "three-tier-G": 0.8321974734042553
+   },
+   "fulltable_agree": {
+    "tier1-blank": 12032,
+    "three-tier": 11566,
+    "three-tier-G": 10013
+   },
+   "residual_qids": [],
+   "refused": false,
+   "rule_check": {
+    "assigned_variant": "tier1-blank",
+    "canary_best": "tier1-blank",
+    "canary_tied": [
+     "tier1-blank"
+    ],
+    "fulltable_best": "tier1-blank",
+    "fulltable_tied": [
+     "tier1-blank"
+    ],
+    "verdict": "AGREES",
+    "note": "canary best = assigned",
+    "fulltable_verdict": "FULLTABLE-AGREES"
+   }
+  },
+  "Llama-2-7b-hf": {
+   "assigned_family": "H-tier1-blank",
+   "harness_id": "H-tier1-blank",
+   "extractor_variant": "tier1-blank",
+   "variant_id": "tier1-blank-v1",
+   "variant_sha": "cbed6f92deece096",
+   "n": 279,
+   "reproduction": {
+    "agree": 279,
+    "n": 279,
+    "rate": 1.0,
+    "wilson95": [
+     0.9864178395257275,
+     1.0
+    ],
+    "threshold": 0.99,
+    "at_or_above": true
+   },
+   "canary_table": {
+    "tier1-blank": 1.0,
+    "three-tier": 0.9605734767025089,
+    "three-tier-G": 0.8172043010752689
+   },
+   "canary_agree": {
+    "tier1-blank": 279,
+    "three-tier": 268,
+    "three-tier-G": 228
+   },
+   "fulltable": {
+    "rows": 12032,
+    "tier1-blank": 1.0,
+    "three-tier": 0.9611037234042553,
+    "three-tier-G": 0.8287067819148937
+   },
+   "fulltable_agree": {
+    "tier1-blank": 12032,
+    "three-tier": 11564,
+    "three-tier-G": 9971
+   },
+   "residual_qids": [],
+   "refused": false,
+   "rule_check": {
+    "assigned_variant": "tier1-blank",
+    "canary_best": "tier1-blank",
+    "canary_tied": [
+     "tier1-blank"
+    ],
+    "fulltable_best": "tier1-blank",
+    "fulltable_tied": [
+     "tier1-blank"
+    ],
+    "verdict": "AGREES",
+    "note": "canary best = assigned",
+    "fulltable_verdict": "FULLTABLE-AGREES"
+   }
+  },
+  "Meta-Llama-3_1-70B-Instruct": {
+   "assigned_family": "H-constantG",
+   "harness_id": "H-constantG",
+   "extractor_variant": "three-tier-G",
+   "variant_id": "three-tier-G-v1",
+   "variant_sha": "14f7b3bce20bcdfd",
+   "n": 279,
+   "reproduction": {
+    "agree": 279,
+    "n": 279,
+    "rate": 1.0,
+    "wilson95": [
+     0.9864178395257275,
+     1.0
+    ],
+    "threshold": 0.99,
+    "at_or_above": true
+   },
+   "canary_table": {
+    "tier1-blank": 0.974910394265233,
+    "three-tier": 0.978494623655914,
+    "three-tier-G": 1.0
+   },
+   "canary_agree": {
+    "tier1-blank": 272,
+    "three-tier": 273,
+    "three-tier-G": 279
+   },
+   "fulltable": {
+    "rows": 12032,
+    "tier1-blank": 0.9789727393617021,
+    "three-tier": 0.984375,
+    "three-tier-G": 1.0
+   },
+   "fulltable_agree": {
+    "tier1-blank": 11779,
+    "three-tier": 11844,
+    "three-tier-G": 12032
+   },
+   "residual_qids": [],
+   "refused": false,
+   "rule_check": {
+    "assigned_variant": "three-tier-G",
+    "canary_best": "three-tier-G",
+    "canary_tied": [
+     "three-tier-G"
+    ],
+    "fulltable_best": "three-tier-G",
+    "fulltable_tied": [
+     "three-tier-G"
+    ],
+    "verdict": "AGREES",
+    "note": "canary best = assigned",
+    "fulltable_verdict": "FULLTABLE-AGREES"
+   }
+  },
+  "Meta-Llama-3_1-8B": {
+   "assigned_family": "H-constantG",
+   "harness_id": "H-constantG",
+   "extractor_variant": "three-tier-G",
+   "variant_id": "three-tier-G-v1",
+   "variant_sha": "14f7b3bce20bcdfd",
+   "n": 279,
+   "reproduction": {
+    "agree": 279,
+    "n": 279,
+    "rate": 1.0,
+    "wilson95": [
+     0.9864178395257275,
+     1.0
+    ],
+    "threshold": 0.99,
+    "at_or_above": true
+   },
+   "canary_table": {
+    "tier1-blank": 0.942652329749104,
+    "three-tier": 0.946236559139785,
+    "three-tier-G": 1.0
+   },
+   "canary_agree": {
+    "tier1-blank": 263,
+    "three-tier": 264,
+    "three-tier-G": 279
+   },
+   "fulltable": {
+    "rows": 12032,
+    "tier1-blank": 0.9355884308510638,
+    "three-tier": 0.948969414893617,
+    "three-tier-G": 1.0
+   },
+   "fulltable_agree": {
+    "tier1-blank": 11257,
+    "three-tier": 11418,
+    "three-tier-G": 12032
+   },
+   "residual_qids": [],
+   "refused": false,
+   "rule_check": {
+    "assigned_variant": "three-tier-G",
+    "canary_best": "three-tier-G",
+    "canary_tied": [
+     "three-tier-G"
+    ],
+    "fulltable_best": "three-tier-G",
+    "fulltable_tied": [
+     "three-tier-G"
+    ],
+    "verdict": "AGREES",
+    "note": "canary best = assigned",
+    "fulltable_verdict": "FULLTABLE-AGREES"
+   }
+  },
+  "Qwen1.5-72B-Chat": {
+   "assigned_family": "H-tier1-blank",
+   "harness_id": "H-tier1-blank",
+   "extractor_variant": "tier1-blank",
+   "variant_id": "tier1-blank-v1",
+   "variant_sha": "cbed6f92deece096",
+   "n": 279,
+   "reproduction": {
+    "agree": 279,
+    "n": 279,
+    "rate": 1.0,
+    "wilson95": [
+     0.9864178395257275,
+     1.0
+    ],
+    "threshold": 0.99,
+    "at_or_above": true
+   },
+   "canary_table": {
+    "tier1-blank": 1.0,
+    "three-tier": 0.8673835125448028,
+    "three-tier-G": 0.7885304659498208
+   },
+   "canary_agree": {
+    "tier1-blank": 279,
+    "three-tier": 242,
+    "three-tier-G": 220
+   },
+   "fulltable": {
+    "rows": 12032,
+    "tier1-blank": 1.0,
+    "three-tier": 0.8980219414893617,
+    "three-tier-G": 0.8162400265957447
+   },
+   "fulltable_agree": {
+    "tier1-blank": 12032,
+    "three-tier": 10805,
+    "three-tier-G": 9821
+   },
+   "residual_qids": [],
+   "refused": false,
+   "rule_check": {
+    "assigned_variant": "tier1-blank",
+    "canary_best": "tier1-blank",
+    "canary_tied": [
+     "tier1-blank"
+    ],
+    "fulltable_best": "tier1-blank",
+    "fulltable_tied": [
+     "tier1-blank"
+    ],
+    "verdict": "AGREES",
+    "note": "canary best = assigned",
+    "fulltable_verdict": "FULLTABLE-AGREES"
+   }
+  },
+  "Yi-6b-Chat": {
+   "assigned_family": "H-tier1-blank",
+   "harness_id": "H-tier1-blank",
+   "extractor_variant": "tier1-blank",
+   "variant_id": "tier1-blank-v1",
+   "variant_sha": "cbed6f92deece096",
+   "n": 279,
+   "reproduction": {
+    "agree": 279,
+    "n": 279,
+    "rate": 1.0,
+    "wilson95": [
+     0.9864178395257275,
+     1.0
+    ],
+    "threshold": 0.99,
+    "at_or_above": true
+   },
+   "canary_table": {
+    "tier1-blank": 1.0,
+    "three-tier": 0.9247311827956989,
+    "three-tier-G": 0.8243727598566308
+   },
+   "canary_agree": {
+    "tier1-blank": 279,
+    "three-tier": 258,
+    "three-tier-G": 230
+   },
+   "fulltable": {
+    "rows": 12032,
+    "tier1-blank": 1.0,
+    "three-tier": 0.9183011968085106,
+    "three-tier-G": 0.8107546542553191
+   },
+   "fulltable_agree": {
+    "tier1-blank": 12032,
+    "three-tier": 11049,
+    "three-tier-G": 9755
+   },
+   "residual_qids": [],
+   "refused": false,
+   "rule_check": {
+    "assigned_variant": "tier1-blank",
+    "canary_best": "tier1-blank",
+    "canary_tied": [
+     "tier1-blank"
+    ],
+    "fulltable_best": "tier1-blank",
+    "fulltable_tied": [
+     "tier1-blank"
+    ],
+    "verdict": "AGREES",
+    "note": "canary best = assigned",
+    "fulltable_verdict": "FULLTABLE-AGREES"
+   }
+  },
+  "arx_0314": {
+   "assigned_family": "H-threetier",
+   "harness_id": "H-threetier",
+   "extractor_variant": "three-tier",
+   "variant_id": "three-tier-v1",
+   "variant_sha": "b9782bef338e4815",
+   "n": 279,
+   "reproduction": {
+    "agree": 277,
+    "n": 279,
+    "rate": 0.992831541218638,
+    "wilson95": [
+     0.9742436632992637,
+     0.9980319849787831
+    ],
+    "threshold": 0.99,
+    "at_or_above": true
+   },
+   "canary_table": {
+    "tier1-blank": 0.992831541218638,
+    "three-tier": 0.992831541218638,
+    "three-tier-G": 0.992831541218638
+   },
+   "canary_agree": {
+    "tier1-blank": 277,
+    "three-tier": 277,
+    "three-tier-G": 277
+   },
+   "fulltable": {
+    "rows": 12005,
+    "tier1-blank": 0.9918367346938776,
+    "three-tier": 0.9932528113286131,
+    "three-tier-G": 0.9932528113286131
+   },
+   "fulltable_agree": {
+    "tier1-blank": 11907,
+    "three-tier": 11924,
+    "three-tier-G": 11924
+   },
+   "residual_qids": [
+    {
+     "qid": 4941,
+     "pred": "B",
+     "extract": "I",
+     "tier": "t3"
+    },
+    {
+     "qid": 7433,
+     "pred": "B",
+     "extract": "H",
+     "tier": "t3"
+    }
+   ],
+   "refused": false,
+   "rule_check": {
+    "assigned_variant": "three-tier",
+    "canary_best": "tier1-blank",
+    "canary_tied": [
+     "tier1-blank",
+     "three-tier",
+     "three-tier-G"
+    ],
+    "fulltable_best": "three-tier",
+    "fulltable_tied": [
+     "three-tier",
+     "three-tier-G"
+    ],
+    "verdict": "AGREES-BY-EXCEPTION",
+    "note": "the stated exception: canary tie tier1-blank/three-tier/three-tier-G at 0.9928, broken by the full table toward three-tier (tier1-blank 0.9918 vs three-tier 0.9933 vs three-tier-G 0.9933)",
+    "fulltable_verdict": "FULLTABLE-AGREES"
+   }
+  },
+  "c4ai-command-r-v01": {
+   "assigned_family": "H-tier1-blank",
+   "harness_id": "H-tier1-blank",
+   "extractor_variant": "tier1-blank",
+   "variant_id": "tier1-blank-v1",
+   "variant_sha": "cbed6f92deece096",
+   "n": 279,
+   "reproduction": {
+    "agree": 279,
+    "n": 279,
+    "rate": 1.0,
+    "wilson95": [
+     0.9864178395257275,
+     1.0
+    ],
+    "threshold": 0.99,
+    "at_or_above": true
+   },
+   "canary_table": {
+    "tier1-blank": 1.0,
+    "three-tier": 0.9354838709677419,
+    "three-tier-G": 0.899641577060932
+   },
+   "canary_agree": {
+    "tier1-blank": 279,
+    "three-tier": 261,
+    "three-tier-G": 251
+   },
+   "fulltable": {
+    "rows": 12032,
+    "tier1-blank": 1.0,
+    "three-tier": 0.9228723404255319,
+    "three-tier-G": 0.875748005319149
+   },
+   "fulltable_agree": {
+    "tier1-blank": 12032,
+    "three-tier": 11104,
+    "three-tier-G": 10537
+   },
+   "residual_qids": [],
+   "refused": false,
+   "rule_check": {
+    "assigned_variant": "tier1-blank",
+    "canary_best": "tier1-blank",
+    "canary_tied": [
+     "tier1-blank"
+    ],
+    "fulltable_best": "tier1-blank",
+    "fulltable_tied": [
+     "tier1-blank"
+    ],
+    "verdict": "AGREES",
+    "note": "canary best = assigned",
+    "fulltable_verdict": "FULLTABLE-AGREES"
+   }
+  },
+  "deepseek-chat-v2_5": {
+   "assigned_family": "H-threetier",
+   "harness_id": "H-threetier",
+   "extractor_variant": "three-tier",
+   "variant_id": "three-tier-v1",
+   "variant_sha": "b9782bef338e4815",
+   "n": 279,
+   "reproduction": {
+    "agree": 279,
+    "n": 279,
+    "rate": 1.0,
+    "wilson95": [
+     0.9864178395257275,
+     1.0
+    ],
+    "threshold": 0.99,
+    "at_or_above": true
+   },
+   "canary_table": {
+    "tier1-blank": 0.989247311827957,
+    "three-tier": 1.0,
+    "three-tier-G": 0.996415770609319
+   },
+   "canary_agree": {
+    "tier1-blank": 276,
+    "three-tier": 279,
+    "three-tier-G": 278
+   },
+   "fulltable": {
+    "rows": 12032,
+    "tier1-blank": 0.9928523936170213,
+    "three-tier": 1.0,
+    "three-tier-G": 0.9942652925531915
+   },
+   "fulltable_agree": {
+    "tier1-blank": 11946,
+    "three-tier": 12032,
+    "three-tier-G": 11963
+   },
+   "residual_qids": [],
+   "refused": false,
+   "rule_check": {
+    "assigned_variant": "three-tier",
+    "canary_best": "three-tier",
+    "canary_tied": [
+     "three-tier"
+    ],
+    "fulltable_best": "three-tier",
+    "fulltable_tied": [
+     "three-tier"
+    ],
+    "verdict": "AGREES",
+    "note": "canary best = assigned",
+    "fulltable_verdict": "FULLTABLE-AGREES"
+   }
+  },
+  "gemini-3.1-pro_5-shots": {
+   "assigned_family": "H-threetier",
+   "harness_id": "H-threetier",
+   "extractor_variant": "three-tier",
+   "variant_id": "three-tier-v1",
+   "variant_sha": "b9782bef338e4815",
+   "n": 279,
+   "reproduction": {
+    "agree": 279,
+    "n": 279,
+    "rate": 1.0,
+    "wilson95": [
+     0.9864178395257275,
+     1.0
+    ],
+    "threshold": 0.99,
+    "at_or_above": true
+   },
+   "canary_table": {
+    "tier1-blank": 1.0,
+    "three-tier": 1.0,
+    "three-tier-G": 1.0
+   },
+   "canary_agree": {
+    "tier1-blank": 279,
+    "three-tier": 279,
+    "three-tier-G": 279
+   },
+   "fulltable": {
+    "rows": 12020,
+    "tier1-blank": 0.9980033277870216,
+    "three-tier": 1.0,
+    "three-tier-G": 0.998585690515807
+   },
+   "fulltable_agree": {
+    "tier1-blank": 11996,
+    "three-tier": 12020,
+    "three-tier-G": 12003
+   },
+   "residual_qids": [],
+   "refused": false,
+   "rule_check": {
+    "assigned_variant": "three-tier",
+    "canary_best": "tier1-blank",
+    "canary_tied": [
+     "tier1-blank",
+     "three-tier",
+     "three-tier-G"
+    ],
+    "fulltable_best": "three-tier",
+    "fulltable_tied": [
+     "three-tier"
+    ],
+    "verdict": "CONTRADICTION-TIE",
+    "note": "canary tie tier1-blank/three-tier/three-tier-G at 1.0000 does not distinguish; the tie-break (simplest) picks tier1-blank != assigned three-tier; membership NOT changed",
+    "fulltable_verdict": "FULLTABLE-AGREES"
+   }
+  },
+  "gpt-4o-2024-08-06": {
+   "assigned_family": "H-threetier",
+   "harness_id": "H-threetier",
+   "extractor_variant": "three-tier",
+   "variant_id": "three-tier-v1",
+   "variant_sha": "b9782bef338e4815",
+   "n": 279,
+   "reproduction": {
+    "agree": 279,
+    "n": 279,
+    "rate": 1.0,
+    "wilson95": [
+     0.9864178395257275,
+     1.0
+    ],
+    "threshold": 0.99,
+    "at_or_above": true
+   },
+   "canary_table": {
+    "tier1-blank": 0.989247311827957,
+    "three-tier": 1.0,
+    "three-tier-G": 0.996415770609319
+   },
+   "canary_agree": {
+    "tier1-blank": 276,
+    "three-tier": 279,
+    "three-tier-G": 278
+   },
+   "fulltable": {
+    "rows": 12032,
+    "tier1-blank": 0.9931017287234043,
+    "three-tier": 1.0,
+    "three-tier-G": 0.9945146276595744
+   },
+   "fulltable_agree": {
+    "tier1-blank": 11949,
+    "three-tier": 12032,
+    "three-tier-G": 11966
+   },
+   "residual_qids": [],
+   "refused": false,
+   "rule_check": {
+    "assigned_variant": "three-tier",
+    "canary_best": "three-tier",
+    "canary_tied": [
+     "three-tier"
+    ],
+    "fulltable_best": "three-tier",
+    "fulltable_tied": [
+     "three-tier"
+    ],
+    "verdict": "AGREES",
+    "note": "canary best = assigned",
+    "fulltable_verdict": "FULLTABLE-AGREES"
+   }
+  },
+  "iask_pro": {
+   "assigned_family": "H-threetier",
+   "harness_id": "H-threetier",
+   "extractor_variant": "three-tier",
+   "variant_id": "three-tier-v1",
+   "variant_sha": "b9782bef338e4815",
+   "n": 278,
+   "reproduction": {
+    "agree": 278,
+    "n": 278,
+    "rate": 1.0,
+    "wilson95": [
+     0.9863696487672508,
+     0.9999999999999999
+    ],
+    "threshold": 0.99,
+    "at_or_above": true
+   },
+   "canary_table": {
+    "tier1-blank": 0.9892086330935251,
+    "three-tier": 1.0,
+    "three-tier-G": 0.9928057553956835
+   },
+   "canary_agree": {
+    "tier1-blank": 275,
+    "three-tier": 278,
+    "three-tier-G": 276
+   },
+   "fulltable": {
+    "rows": 11939,
+    "tier1-blank": 0.9941368623837842,
+    "three-tier": 1.0,
+    "three-tier-G": 0.9908702571404641
+   },
+   "fulltable_agree": {
+    "tier1-blank": 11869,
+    "three-tier": 11939,
+    "three-tier-G": 11830
+   },
+   "residual_qids": [],
+   "refused": false,
+   "rule_check": {
+    "assigned_variant": "three-tier",
+    "canary_best": "three-tier",
+    "canary_tied": [
+     "three-tier"
+    ],
+    "fulltable_best": "three-tier",
+    "fulltable_tied": [
+     "three-tier"
+    ],
+    "verdict": "AGREES",
+    "note": "canary best = assigned",
+    "fulltable_verdict": "FULLTABLE-AGREES"
+   }
+  }
+ },
+ "criteria": {
+  "A1": "HELD",
+  "C1H": "HELD",
+  "A2_refused": [],
+  "A2_count": 0,
+  "A3_residual_rows": {
+   "Llama-2-13b-hf": 0,
+   "Llama-2-7b-hf": 0,
+   "Meta-Llama-3_1-70B-Instruct": 0,
+   "Meta-Llama-3_1-8B": 0,
+   "Qwen1.5-72B-Chat": 0,
+   "Yi-6b-Chat": 0,
+   "arx_0314": 2,
+   "c4ai-command-r-v01": 0,
+   "deepseek-chat-v2_5": 0,
+   "gemini-3.1-pro_5-shots": 0,
+   "gpt-4o-2024-08-06": 0,
+   "iask_pro": 0
+  },
+  "contradictions": [
+   "gemini-3.1-pro_5-shots: CONTRADICTION-TIE (canary tie tier1-blank/three-tier/three-tier-G at 1.0000 does not distinguish; the tie-break (simplest) picks tier1-blank != assigned three-tier; membership NOT changed)"
+  ],
+  "premise_overturned": false
+ }
+}

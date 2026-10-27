@@ -1,0 +1,74 @@
+[POPULATION] IFEVAL-RESPONSE-ORACLE | docs/judge_v2_program.md L11148-L11329 (commit 4c8379c); the instrument is section (6) of docs/agents/leads/2026-09-23_ifeval_ruling.md (af116f8) | IFEval reserved (EVAL) side of the multi-corpus per-(source, domain) 0.30 / seed-42 split, GEN-ARENA's own schedule unchanged: 1200 IFEval verdicts over 162 distinct questions -> 407 KEY-DECIDABLE matches over 122 distinct questions (registered 407); deciding subset 407 after 0 NON_TERMINATED exclusion(s); schedule hash ba4a0ac8a2364a49. NO MMLU-Pro pool is opened: p2dca21ab5f4ef3ae and paeec37aa28063c75 are untouched, and gen_arena_grok.db is READ-ONLY (mode=ro) and is never written by this test.
+[PINS] control system ebaec3a0f4b81f33 | reference(first target) 84fff82bc7154bba | schedule ba4a0ac8a2364a49 (pinned by docs/reviews/READY_ifeval_response_oracle.md, 2dea289, condition C2) -> MATCH
+[CACHE] experiment_results\multicorpus\ifeval_response_oracle.db | 814 of 814 rows (407 matches x 2 arms) | schedule hash ba4a0ac8a2364a49 (pinned ba4a0ac8a2364a49) | judge grok-4-1-fast-non-reasoning | cap 8192 | temperature omitted (provider default) | script sha (LF) pinned b8ba94311d813ce7, now b8ba94311d813ce7
+[ARMS] control + treatment, posted INTERLEAVED match by match in the SAME session (the GEN-ARENA cache is a DRIFT READOUT only, never the comparator of record).
+  control   n=407 | accuracy A 0.654 [0.596, 0.710] SE 0.030 (question-clustered over 122 questions) | accuracy B 0.887 (n=300) | ties A 0.263 / B 0.263 | flips A 0.243 / B 0.243 | INVALID 0
+  treatment n=407 | accuracy A 0.988 [0.976, 0.998] SE 0.005 (question-clustered over 122 questions) | accuracy B 1.000 (n=402) | ties A 0.012 / B 0.012 | flips A 0.012 / B 0.012 | INVALID 0
+
+(C1) THE OBEDIENCE FLOOR - the share of key-decidable matches on which the judge commits to the contestant that a correct, per-response reference names. Denominator = the 407 key-decidable matches less the 0 NON_TERMINATED exclusion(s) = 407 (the deciding subset).
+     convention A (ties / INVALID / non-terminated wrong): 0.988 [0.976, 0.998] | convention B (committed verdicts only, n=402): 1.000
+     DISOBEDIENCE RATE (its complement, convention A): 0.012 - the judge's irreducible error under the strongest reference that can exist.
+     C1 (bar 0.85 under convention A): HELD
+     FORBIDDEN BY THE REGISTRATION: no sentence in this outcome, the ledger, the thesis or the blog may place this accuracy beside the MATH checker-repair accuracy, or on the reference ladder, for two independent reasons - the reference objects are not the same kind (a question-level canonical answer against a per-response predicate), and no IFEval cap-hit proxy exists, so the populations differ. The ladder's IFEval rung stays at SPECIFICATION 0.658.
+
+(C2) DECISIVENESS - the DECIDABLE TIE RATE, control vs treatment, PAIRED on the same matches.
+     control 0.263 -> treatment 0.012 | delta -0.251 (-25.1pp) | discordant: treatment-only ties 5, control-only ties 107 over 407 paired matches | exact McNemar p = 0.0000 (rejudge_reasoning.mcnemar_p)
+     pairs in which either arm is INVALID (kept, convention A): 0 of 407
+     SCOREABILITY, declared before the run: SCOREABLE ONLY AT |delta| >= 10pp (the power paragraph below): a smaller move is recorded UNDETERMINED by support, never as "no change".
+     POWER OF RECORD (fixed before the run; the ruling's section 4). 407 matches over 162 distinct reserved questions (~2.5 decidable matches per question); the record's design-effect rule is a median 2.0x and worst 3.7x understatement of match-level SEs, so n_eff = 204 (worst case 110).
+     Paired difference SE = sqrt(d / n_eff): 2.2pp at discordance 0.10, 3.1pp at 0.20, 3.8pp at 0.30. MDE at 80% power, two-sided 0.05 (2.80 x SE): 6.2 / 8.8 / 10.7pp, and 8.5 / 12.0 / 14.7pp at DEFF 3.7.
+     SUPPORT AS MEASURED (the registered power and MDE lines above are quoted VERBATIM and are NOT re-derived here): the judged population is 407 matches over 122 distinct questions, 3.336 matches per question, Kish mean cluster size 4.376 (cluster sizes 1:23/2:30/3:16/4:14/5:22/6:11/7:4/8:2). The registration's descriptive "162 distinct reserved questions (~2.5 decidable matches per question)" is GEN-ARENA's WHOLE 1,200-match IFEval schedule and is wrong for the judged population; the registrar is bracketing both numbers. The registered n_eff = 204 is n / DEFF at QUERY-SUPPORT's median variance-ratio DEFF 2.0 and DOES NOT DEPEND ON THE QUESTION COUNT, so the 162 -> 122 correction does not touch it. Honest DEFF bracket at the measured clustering: transporting QUERY-SUPPORT's own implied ICC (rho 0.072-0.085) to Kish 4.376 gives DEFF 1.24-1.29, n_eff 327-316; the rho = 1 extreme gives DEFF 4.376, n_eff 93, MDEs 9.2 / 13.0 / 15.9pp at discordance 0.10 / 0.20 / 0.30. The registered n_eff 204 sits INSIDE that bracket and is conservative at the plausible end. THE REGISTERED MDEs AND THE 10pp SCOREABILITY FLOOR ARE UNCHANGED.
+     C2: HELD (COULD-NOT-VERIFY): the tie rate falls by >= 10pp with p < 0.05
+
+(C3) THE FLIP RATE, same pairing, same denominator, same McNemar treatment and the same 10pp scoreability floor.
+     control 0.243 -> treatment 0.012 | delta -0.231 (-23.1pp) | discordant: treatment-only flips 5, control-only flips 99 over 407 paired matches | exact McNemar p = 0.0000
+     SCOREABILITY, declared before the run: SCOREABLE ONLY AT |delta| >= 10pp (the power paragraph below): a smaller move is recorded UNDETERMINED by support, never as "no change".
+     C3: HELD: the flip rate falls by >= 10pp with p < 0.05
+
+(C4) NON_TERMINATED ACCOUNTING (rule 10: never a verdict, never a tie).
+     excluded matches 0 of 407 (0.0%) | per contestant: none
+     RECORDED LIMIT: IFEval's only non-termination proxy is the unclosed-<think> one (checker_answers_v1.ifeval_checker_answers.non_terminated). No cl100k cap-hit proxy exists for this corpus - checker_answers_v2.db is MATH-ONLY - and IFEval's harness cap is 1,280 (programme L3741, the Block-1 checker finding (3)).
+
+(C5) THE LEAKAGE READOUT, PRINTED, NO BAR.
+     control   per-contestant agreement (share of COMMITTED verdicts that follow the all-pass contestant, by that contestant):
+       Qwen2.5-72B-Instruct              58 /  60 = 0.967
+       Llama-3.1-70B-Instruct            56 /  59 = 0.949
+       Llama-3.3-70B-Instruct            50 /  54 = 0.926
+       Qwen2.5-32B-Instruct              40 /  41 = 0.976
+       Phi-3.5-mini-instruct             23 /  28 = 0.821
+       Mixtral-8x7B-Instruct-v0.1        20 /  23 = 0.870
+       Mistral-Small-Instruct-2409       19 /  21 = 0.905
+       Qwen2.5-Math-7B-Instruct           0 /  14 = 0.000
+       POOLED                           266 / 300 = 0.887
+     treatment per-contestant agreement (share of COMMITTED verdicts that follow the all-pass contestant, by that contestant):
+       Qwen2.5-72B-Instruct              86 /  86 = 1.000
+       Llama-3.1-70B-Instruct            83 /  83 = 1.000
+       Llama-3.3-70B-Instruct            75 /  75 = 1.000
+       Qwen2.5-32B-Instruct              51 /  51 = 1.000
+       Phi-3.5-mini-instruct             41 /  41 = 1.000
+       Mixtral-8x7B-Instruct-v0.1        27 /  27 = 1.000
+       Mistral-Small-Instruct-2409       27 /  27 = 1.000
+       Qwen2.5-Math-7B-Instruct          12 /  12 = 1.000
+       POOLED                           402 / 402 = 1.000
+     DRIFT readout (control-vs-cache agreement on the same matches; the 2026-09-13 GEN-ARENA cache is a READOUT, never the comparator of record): 365 / 407 = 0.897
+
+DECLARED NOT SCORED, BEFORE THE RUN, AND WHY (nothing in the outcome may quote them):
+  - GEN-ARENA CRITERION 2 (per-corpus board Spearman rho >= 0.85): (i) VACUOUS - under a per-response vector the judged board is a noisy transcription of the key board, so rho measures obedience, not recovery of a key ordering; (ii) NOT COMPUTABLE - this schedule judges only the key-decidable matches, while the GEN-ARENA IFEval board was fitted on all 1,200, and a BT fit on a correctness-selected subset is a biased board.
+  - GEN-ARENA CRITERION 3, THE BRIDGE (judged argmax == key argmax): vacuous and not computable for the same two reasons, AND CLOSED ON THE MERITS - ORACLE established that a perfect reference buys 16.4pp and still misses the frontier order, and CONTEXT section 5 closes the frontier order (FRONTIER, AGGREGATE, ORACLE). The IFEval bridge broke at a judged top-two gap of 0.040 logits, the third independent appearance of the frontier near-tie.
+  - THE EXPLORATORY ROUTER-COST READOUT (IFEval -0.6pp +- 3.8): not scored, same mechanism; no router claim is produced by this schedule, now or later.
+  - CONSENSUS-FIT's KEY / REF SIGNED-CONTRAST LOGISTIC: NOT ESTIMABLE here - the reference and the key coincide by construction, the two regressors are collinear and no REF coefficient exists. The standing strata-by-reference-correctness requirement is met by REPORTING THAT THE REFERENCE-WRONG STRATUM IS EMPTY BY CONSTRUCTION, which is itself the reason this arm says nothing whatever about the reference ceiling.
+
+PREDICTIONS (registered before any code): P1 C1 in [0.88, 0.96] under convention A; P2 treatment decidable tie rate below 0.10; P3 treatment flip rate below 0.25; P4 the CONTROL arm reproduces GEN-ARENA within the session floor (accuracy 0.658 +- 0.07, ties 0.256 +- 0.09, flips 0.380 +- 0.09); P5 drift >= 0.85; P6 NON_TERMINATED exclusions <= 5% of 407; P7 unusable rows <= 1% of the posted calls.
+  P1 C1 in [0.88, 0.96] (convention A)       0.988        -> FAILED
+  P2 treatment tie rate < 0.10               0.012        -> HELD
+  P3 treatment flip rate < 0.25              0.012        -> HELD
+  P4 control accuracy 0.658 +- 0.07          0.654        -> HELD
+  P4 control tie rate 0.256 +- 0.09          0.263        -> HELD
+  P4 control flip rate 0.380 +- 0.09         0.243        -> FAILED
+  P5 drift >= 0.85                           0.897        -> HELD
+  P6 NON_TERMINATED <= 5%                    0            -> HELD
+  P7 unusable rows <= 1%                     0 / 814      -> HELD
+
+FALSIFIER (registered): IF THE TIE RATE DOES NOT FALL BY MORE THAN THE MDE WHILE ACCURACY RISES ABOVE 0.88, the IFEval failure is WOULD-NOT-COMMIT: the abstention and order-instability line owns it, no reference of any strength repairs the rung, and GEN-ARENA finding 2's MECHANISM is overturned while its numbers stand. Reading here: tie delta -25.1pp, treatment accuracy 0.988 -> COULD-NOT-VERIFY.
+
+HEADER: IFEVAL-RESPONSE-ORACLE | judge grok-4-1-fast-non-reasoning | cap 8192 | temperature omitted (provider default) | script sha256[:16] (LF) b8ba94311d813ce7 | written 2026-09-23 05:43:27

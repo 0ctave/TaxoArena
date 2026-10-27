@@ -1,0 +1,162 @@
+{
+ "id": "JUDGE-RETEST-LENGTH",
+ "title": "JUDGE-RETEST-LENGTH: run R (byte-identical repeats in both orders, 600 matches x 2 families, 4,800 calls) and run L (PAD / TRIM / same-length PARA on the same 600, 7,200 judge + <= 1,800 paraphrase calls), content-closed MATH + MMLU-Pro EVAL; each run < 4k matches and needs its own go; DESIGN ONLY, SPEND PENDING AUTHOR GO (REGISTERED 2026-10-08; HF post 6)",
+ "question": "How much verdict instability is position beyond test-retest noise, and does neutral length move verdicts once editing is controlled?",
+ "kind": "judged",
+ "state": "registered",
+ "registration": {
+  "commit": "the commit that writes it (parent e83b59d5)",
+  "program_lines": "docs/judge_v2_program.md L25112-L25125",
+  "program_lines_as_of": "the commit that writes them, parent e83b59d5, re-grepped",
+  "date": "2026-10-08",
+  "heading": "## Registered 2026-10-08 (before any code or call) — JUDGE-RETEST-LENGTH: on content-closed key-decidable matches, how much of a pairwise judge's verdict instability is position ...",
+  "provenance": "the orchestrator's brief of 2026-10-08 and docs/drafts/hf/SERIES_PLAN.md (design); criteria, Support, predictions, falsifier the registrar's; docs/judge_v2_program.md L25043-L25049 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — five HF blog-series analyses registered ...\"; _as_of the commit that writes it, parent e83b59d5, re-grepped)"
+ },
+ "script": {
+  "path": "TO BE BUILT",
+  "sha16": null,
+  "commit": null
+ },
+ "ready": null,
+ "go": "needed: SPEND PENDING AUTHOR GO (the author's 2026-10-08 authorisation, relayed, covers registering the design only; the go is to be quoted in the plan before any call)",
+ "run": null,
+ "review": null,
+ "criteria": [
+  {
+   "id": "RL1",
+   "text": "DECIDING, run R (the INTERVAL decides, pooled over families): POSITION-SHOWN iff LB95(f - r) > 0; NOT-SHOWN otherwise. SCOREABLE narrowly (DEFF 1.45 declared, SE 0.0146, MDE80 0.041, predicted 0.05)",
+   "result": "n/a",
+   "value": "not run",
+   "denominator": "600 matches x 2 families = 1,200 judgements (4 calls each)"
+  },
+  {
+   "id": "RL2",
+   "text": "DECIDING, run L (the INTERVAL decides, pooled): Delta_PAD = W_PAD - W_PARA; LENGTH-PAYS iff LB95 > 0; LENGTH-PENALISED iff UB95 < 0; NEITHER otherwise. DESCRIPTIVE-ONLY by Support (SE 0.0174, MDE80 0.049, predicted +0.03)",
+   "result": "n/a",
+   "value": "not run",
+   "denominator": "600 matches x 2 families, paired arms"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "r 0.05 [0.02, 0.09]; f 0.10 [0.05, 0.16] (pooled)",
+   "result": "n/a",
+   "value": "not run",
+   "denominator": "1,200"
+  },
+  {
+   "id": "P2",
+   "text": "RL1 POSITION-SHOWN 0.70; f - r 0.05 [0.01, 0.09]",
+   "result": "n/a",
+   "value": "not run",
+   "denominator": "1,200"
+  },
+  {
+   "id": "P3",
+   "text": "family A favours the first position, family B the second (0.55)",
+   "result": "n/a",
+   "value": "not run",
+   "denominator": "per family"
+  },
+  {
+   "id": "P4",
+   "text": "RL2 LENGTH-PAYS 0.25 / NEITHER 0.60 / LENGTH-PENALISED 0.15; Delta_PAD +0.03 [-0.05, +0.11]",
+   "result": "n/a",
+   "value": "not run",
+   "denominator": "1,200"
+  },
+  {
+   "id": "P5",
+   "text": "Delta_edit (PARA - ORIG) -0.04 [-0.10, +0.01]",
+   "result": "n/a",
+   "value": "not run",
+   "denominator": "1,200"
+  },
+  {
+   "id": "P6",
+   "text": "Delta_TRIM (TRIM - PARA) -0.05 [-0.12, +0.01]",
+   "result": "n/a",
+   "value": "not run",
+   "denominator": "1,200"
+  }
+ ],
+ "falsifier": {
+  "text": "F-RL fires iff RL1 NOT-SHOWN with UB95(f - r) < 0.02: order adds no flips beyond test-retest noise on content-closed matches with a key reference; overturns the [P-FAM] POSITION-DECOMP / POSITION-FULL reading that position is a material share of instability for these judges; LENGTH-PENALISED would overturn '+0.39/1k length pays' for neutral filler",
+  "fired": null
+ },
+ "numbers_of_record": {},
+ "sentence_of_record": null,
+ "chips": [
+  "REGISTERED 2026-10-08, BEFORE ANY CODE; not built; SPEND PENDING AUTHOR GO"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-08",
+   "by": "registrar (HARNESS-EXTRACTOR)",
+   "text": "MATH scorer of record: MATH-FIX STAYS (ruling L15137, R2) pending the author's decision on the audit's hybrid H (recommended, not adopted; eligible only after HARNESS-EXTRACTOR READY). Not re-pinned now. CONDITIONAL: if the author adopts H, re-pin the MATH label source to H before --run (registrar's record + builder delta + delta READY; denominators unchanged). A MATH-reading outcome discloses the pilot: MATH-FIX false credits about 368 of 7,516 (4.9%, MC 95% 338-686); ranks below 12th move under H. Source: docs/judge_v2_program.md L25221-L25227 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — HARNESS-EXTRACTOR amended to the MATH + IFEval scorer-gap study ...\"; _as_of the commit that writes it, parent cc49fc6a, re-grepped)"
+  },
+  {
+   "date": "2026-10-08",
+   "by": "registrar (D-2026-10-08)",
+   "text": "D-2026-10-08-5 (the author, verbatim: \"Official scorer, H as sensitivity (Recommended)\"): the MATH scorer of record for this run is the official scorer eval_results.is_correct (the imported leaderboard/harness verdict), with NO MATH-FIX overlay; this supersedes MATH-FIX and voids the conditional re-pin to H. H (pinned definition, with corrected refs 2060002 / 2060129 / 2000164 for H only) is a sensitivity line read from a per-row table that must be sha256-pinned (LF) before --run; it decides nothing. Declared pre-run deviation: every outcome header carries the scorer line; criteria, Support, denominators and predictions stand as registered. Not retroactive. Not built: it is built on the official scorer from the start (no delta needed). Spend still needs the author's go (D-2026-10-08-1: \"Register designs now, decide spend later (Recommended)\"). Source: docs/judge_v2_program.md L25317-L25327 (section \"## Author's decision 2026-10-08 (recorded by the registrar; zero calls; insertion only) — D-2026-10-08-1..6 ...\"; _as_of the commit that writes it, parent 5211616a, re-grepped); authority docs/agents/author_decisions/2026-10-08.md (5211616a); plan Amendment 40"
+  }
+ ],
+ "does_not_show": [
+  "effects under a reasoning-text reference or no reference",
+  "other judges or recipes (never joined)",
+  "that length bias is absent (RL2 descriptive-only by support)",
+  "the size of the [P-FAM] effects",
+  "free-form or agentic tasks",
+  "any rubric effect"
+ ],
+ "ledger": {
+  "row_id": "JUDGE-RETEST-LENGTH",
+  "version": "v415 (2026-10-08: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "G-RAW (contestant raw responses)",
+  "JUDGE-KEY-DOSE (call path, reference form)",
+  "TRACE-TRUNCATION (edit sensitivity; TRIM)",
+  "POSITION-DECOMP / POSITION-FULL / DECOMP ([P-FAM] history)",
+  "the author's go, per run"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; both orders with TIE on flip (not ORDER-1 / SELECTIVE-ORDER), temperature omitted (not TEMP-0), no rubric"
+ },
+ "cost": {
+  "calls_run_R": 4800,
+  "calls_run_L": "7,200 judge + <= 1,800 paraphrase",
+  "matches_run_R": 2400,
+  "matches_run_L": 3600,
+  "cce": "to be priced by the cost-estimator",
+  "builds": 0,
+  "agent_hours": "about 6 h",
+  "reads_pool": true,
+  "posts_llm": true
+ },
+ "outputs": "never committed: pinned by sha256, stored on E: with SHA256SUMS.txt; temp under E:/TaxoArena_tmp via scratch_dir",
+ "sources": [
+  "docs/judge_v2_program.md L25112-L25125 (_as_of the commit that writes it, parent e83b59d5, re-grepped)",
+  "docs/judge_v2_program.md L25043-L25049 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — five HF blog-series analyses registered ...\"; _as_of the commit that writes it, parent e83b59d5, re-grepped)",
+  "docs/judge_v2_program.md L25221-L25227 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — HARNESS-EXTRACTOR amended to the MATH + IFEval scorer-gap study ...\"; _as_of the commit that writes it, parent cc49fc6a, re-grepped)",
+  "docs/judge_v2_program.md L25317-L25327 (section \"## Author's decision 2026-10-08 (recorded by the registrar; zero calls; insertion only) — D-2026-10-08-1..6 ...\"; _as_of the commit that writes it, parent 5211616a, re-grepped); authority docs/agents/author_decisions/2026-10-08.md (5211616a); plan Amendment 40"
+ ],
+ "last_update": "2026-10-08",
+ "label_status": "judged; key-scored",
+ "data_disclosure": "DATA ALREADY LOOKED AT (disclosed): GPQA-HEADROOM 7.2% vs 36.7%, MC-ROUTER oracle 0.907 / best 0.553, UNION-AF-ROUTE best 0.6049 / AF 0.6201 / declared 0.6316, CELL-FLIPS 7/101, MODEL-VINTAGE-CANARY 5/12, K46-KEY-READ 0.9249 / 0.2632; [P-FAM] 2.7:1, +16.4pp, 5.7%, 42:1, +0.39/1k as motivation only",
+ "shared_rules": "shared rules R1-R6: drop the 471 union twins (CONTENT-DISJOINT-SPLIT-AUDIT; recomputed, refusal unless 471 / 427) and collapse exact duplicates; one documented extractor per harness; GPQA text never shown; release ids + 0/1 (and verdicts) only; claims relative to these 18 models",
+ "null_means_for_post": "RL1 NOT-SHOWN: the post's number is the noise floor r; RL2 NEITHER: the length chapter reports the interval and the edit effect, no 'length pays' headline",
+ "series": "HF blog series (docs/drafts/hf/SERIES_PLAN.md)",
+ "plain_description": {
+  "sq": "SQ2 Trust",
+  "what": "Design for two judged runs: ask the same judge the same question twice in both answer orders to split verdict flips into noise and position, then pad, trim or paraphrase one answer to see whether length alone moves the verdict. Spend waits for the author's go.",
+  "why": "Shows how much of a leaderboard built by an LLM judge is a coin flip and whether judges pay for words.",
+  "information": "Would measure a judge's noise floor and position and length effects on clean data. Result: registered design, not built or run.",
+  "written": "2026-10-08"
+ },
+ "condition": "G-RAW before READY; the author's go per run (R and L separately) quoted in the plan; transport preflight and pilot-12 truncation guard"
+}

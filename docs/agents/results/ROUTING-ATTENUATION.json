@@ -1,0 +1,118 @@
+{
+  "id": "ROUTING-ATTENUATION",
+  "title": "ROUTING-ATTENUATION: FRAMEWORK item 11: does misrouting at the 19% union rate attenuate per-cell contrasts by more than the cell's clustered SE, and does it bite in the smallest anchors? (zero calls)",
+  "question": "168 (anchor, model) cells on the EVAL-side keyed pool of 3,445 q; within-anchor question-bootstrap SE; SYN-UNIFORM and SYN-TREE misrouting arms at 10 / 19 / 30%, closed form and MC, plus the REALISED bareq512_s42 routing (24.7% of the pool misfiled relative to the declared category); secondary: the 809 of 924 established key edges under misrouting (McNemar on JUDGED questions).",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "eaf1dbf",
+    "program_lines": "docs/judge_v2_program.md L3603-L3611 (by reference; docs/design/FRAMEWORK.md L364 item 11); the Block 1 record bullet at L3777",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-15 (before any run) — BY REFERENCE: the 26 tests in docs/design/FRAMEWORK.md \"Tests to register before shipping\" (commit 8d77f7b), with the criteria, predictions and call counts stated there, scheduled in docs/plan_2026-09-15.md",
+    "outcome_heading": [
+      "L3662: ## Block 1 record (2026-09-15/16, zero calls) — FRAMEWORK items 1-12, 14-16: fourteen zero-call tests built, each adversarially checked; verdicts of record below (checker's number wins where it refutes the builder)",
+      "L3777: - **ROUTING-ATTENUATION (2026-09-15, zero calls): criterion FAIL, prediction NOT SUPPORTED; the attenuation is a proportional shrinkage of every contrast (~20% at 19%, 30-35% in the smallest anchors) that bites where |C_0|/SE is large, not in the small anchors.**"
+    ],
+    "date": "2026-09-15"
+  },
+  "script": {
+    "path": "tools/analysis/routing_attenuation.py",
+    "sha16": "7950ef7c238609b1",
+    "commit": "7076615"
+  },
+  "ready": null,
+  "go": "n/a (0 calls; Block 1)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/routing_attenuation.txt",
+    "outcome_commit": "7076615",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (pool_guard.assert_pool_of_record() first; union pool paeec37aa28063c75 by explicit id where used)",
+    "date": "2026-09-15/16"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); each Block 1 test was 'adversarially checked' at build time and the checker's number wins where it refutes the builder (Block 1 record header L3662-L3663); the checker-confirmed defects are listed in the bullet",
+    "commit": "7076615",
+    "verdict": ""
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "attenuation at 19% <= the cell's clustered SE",
+      "result": "FAILED",
+      "value": "SYN-UNIFORM bias vs contrast SE: C1 42/168 fail (closed form; MC 42), C2 24 (closed form; builder's MC 27); rms reading 62/42; SYN-TREE 16/8; JUDGED denominator 30/14; row-SE reading 39; size-weighted destination arm 46/25; softest reading 8/168; slope of C_19 on C_0 0.795 (0.892 at 10%, 0.679 at 30%); failing cells have |C1_0|/SE >= ~4.2-5.4: FAIL on every reading (CONFIRMED)",
+      "denominator": "168 (anchor, model) cells; 3,445 EVAL-side keyed q"
+    },
+    {
+      "id": "secondary",
+      "text": "established key edges under misrouting (McNemar on JUDGED questions)",
+      "result": "DELIVERED",
+      "value": "declared cells 809 of 924 established; SYN-UNIFORM 19% kept 789.6 (97.6%), lost 19.4, REVERSED 0.0(0.0); SYN-TREE kept 790.9, REVERSED 0.0(0.0); REALISED 24.7% kept 785, lost 24, REVERSED 0(0), new 24; publishable contrasts (|C| > 2 SE) C1 99 -> 84, C2 91 -> 65",
+      "denominator": "924 grid edges"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "fails for the smallest anchors",
+      "result": "FAILED",
+      "value": "NOT SUPPORTED: History / CS / Philosophy (by pool size) and the record's History / Health / Philosophy trio: 0 of 36 cells fail vs 42 of 132 elsewhere under every mechanism; Spearman(size, fails) +0.47, p 0.09; failures Biology 10, Engineering 7, Chemistry 6, Math 6, Psychology 5, Law 5; per-anchor slope at 19%: History 0.646, CS 0.658, Philosophy 0.701, Health 0.799 vs pooled 0.797 (the checker's half-right mechanism: the smallest anchors ARE the most attenuated in relative terms, 30-35%, and pass only because their SE is ~2x Math's, 0.036-0.039 vs 0.020)",
+      "denominator": "36 small-anchor cells vs 132"
+    }
+  ],
+  "falsifier": {
+    "text": "none beyond the criterion (registered by reference)",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "failing_cells": "SYN-UNIFORM C1 42/168 (MC 42), C2 24 (MC 27); rms 62/42; SYN-TREE 16/8; JUDGED denominator 30/14; row-SE 39; size-weighted 46/25; softest 8/168",
+    "slopes": "C_19 on C_0 0.795 (0.892 at 10%, 0.679 at 30%); per anchor at 19% History 0.646, CS 0.658, Philosophy 0.701, Health 0.799 vs pooled 0.797",
+    "realised_routing": "bareq512_s42 misfiles 24.7% of the pool relative to the declared category (the record carries 74.1% / 75.8% / '26%' at FRAMEWORK L53, L183, RESOLVE L195, none measured on this tree); every x12 per-anchor board already sits on the routed anchor",
+    "secondary": "809 of 924 established; SYN-UNIFORM 19% kept 789.6 (97.6%), REVERSED 0.0; SYN-TREE 790.9, REVERSED 0.0; REALISED kept 785, lost 24, new 24, REVERSED 0; publishable contrasts C1 99 -> 84, C2 91 -> 65"
+  },
+  "sentence_of_record": "ROUTING-ATTENUATION (2026-09-15, zero calls): criterion FAIL on every reading (at 19% synthetic misrouting 42 of 168 cells' C1 contrasts shift by more than their clustered SE, 24 for C2), prediction NOT SUPPORTED (0 of 36 small-anchor cells fail vs 42 of 132 elsewhere); the attenuation is a proportional shrinkage of every contrast (slope 0.795 at 19%, 30-35% in the smallest anchors) that bites where |C_0|/SE is large, not in the small anchors, which pass only because their SE is ~2x Math's. The realised bareq512_s42 routing misfiles 24.7% of the pool relative to the declared category; established key edges are robust (REVERSED 0 under every arm).",
+  "chips": [
+    "FAIL (EVERY READING)",
+    "PREDICTION NOT SUPPORTED"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-16",
+      "by": "Block 1 record corrections for LEDGER-CONSISTENCY (programme L3839; FRAMEWORK L53 / L183 bracketed at a75df45)",
+      "text": "the MMLU-Pro routing figure: 24.7% of the pool misfiled relative to the declared category on bareq512_s42 (the record's 74.1% / 75.8% / '26%' were not measured on this tree)."
+    }
+  ],
+  "does_not_show": [
+    "that small anchors are unaffected (they are the most attenuated in relative terms; they pass on SE)",
+    "a reversed established key edge under any misrouting arm (0)"
+  ],
+  "ledger": {
+    "row_id": "ROUTING-ATTENUATION",
+    "version": "v103 (684be03)"
+  },
+  "depends_on": [
+    "MC-ROUTER",
+    "MC-E2E",
+    "PROFILE-DEVIATION-CERT",
+    "KEY-TIE-DECLINE"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L3603-L3611 (by-reference registration eaf1dbf) and docs/design/FRAMEWORK.md L364 item 11: criterion, prediction, call count",
+    "docs/judge_v2_program.md L3777 ff. (Block 1 record bullet, 7076615): the criterion table, predictions scored, checker-confirmed defects, script and output",
+    "experiment_results/x12_crossdomain/routing_attenuation.txt (7076615)",
+    "docs/test_ledger.html row ROUTING-ATTENUATION (v103 684be03): chips verbatim, design / criteria / observed cells, evidence",
+    "script sha16 = sha256 of tools/analysis/routing_attenuation.py at 7076615 (its first commit), first 16 hex (identity, computed by the registrar 2026-09-22; later edited at 13f2142 for the pool_guard change)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' heading and the '- **ID (...)**' bullet line inside the Block 1 record, to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06"
+  ],
+  "last_update": "2026-09-22",
+  "plain_description": {
+    "sq": "SQ1 Use",
+    "what": "Simulating sending questions to the wrong cell (10, 19 and 30% error, plus the tree's real 24.7% mismatch with declared subjects). It measures how much this weakens per-cell model differences, across 168 subject-by-model cells.",
+    "why": "Per-cell routing is only useful if realistic misrouting does not wash out the differences it is meant to reveal.",
+    "information": "Result (no new calls): the criterion fails. At 19% misrouting, 42 of 168 cell differences shift by more than their standard error. The effect is a uniform shrinkage (about 20% at 19%). It hurts most where differences are large, not in the small subjects, which pass only because their uncertainty is larger. No established model ordering was reversed under any misrouting level.",
+    "written": "2026-10-07"
+  }
+}

@@ -1,0 +1,35 @@
+=== LADDER (S_ladder, key-decidable n=967, fully paired) ===
+  generic  0.761
+  anchor   0.774
+  stratum  0.757
+  leaf     0.770
+PRIMARY (a) leaf > anchor: discordant 35:38, one-sided McNemar p = 0.6800 FAIL
+PRIMARY (b) monotone generic<=anchor<=stratum<=leaf: FAIL
+SECONDARY knee: leaf - stratum = +0.013 CI95 [-0.001, +0.029]
+SECONDARY context: anchor - generic = +0.012
+
+── OUTCOME NOTES (2026-09-08) ──
+REGISTERED PRIMARY FAILS on both parts: the ladder is NOT monotone, and leaf does
+not beat anchor (35:38 discordant, p=0.68 — a real null at this n, not noise
+hiding a positive). Freshly induced ANCHOR-level rubrics match the frozen
+leaf rubrics (0.774 vs 0.770) and beat generic (+1.2pp), while stratum rubrics
+land at generic level (-0.4pp, within noise).
+
+RECONCILIATION with the confirmed results (no contradiction):
+- cell > generic (p=0.0001) and cell > WRONG-cell (p=0.006, sibling ~ random)
+  remain true. Today adds: a broad rubric with the RIGHT domain content performs
+  like the right cell's rubric. Together: rubric value = domain-correct induced
+  criteria; WRONG specificity is harmful; RIGHT specificity beyond anchor level
+  adds little on this sample. The knee sits at or before ANCHOR granularity.
+- Thesis reading: "specific enough to beat a generic judge" is CONFIRMED (it was,
+  twice, pre-registered); "the finer the better" is now measured FALSE. The
+  87-leaf tier's unique value concentrates in routing precision for rubric
+  CONTENT selection, not in ever-finer rubric text.
+
+DISCLOSED DESIGN LIMIT: leaf and generic arms reuse verdicts judged in earlier
+sessions (as registered); anchor/stratum arms are fresh. Fresh-vs-old contrasts
+(leaf vs anchor) carry a session/sampling confound of order the judge's ~9%
+self-inconsistency; the clean same-session contrast (anchor vs stratum, +1.7pp)
+and the clean old-vs-old contrast (leaf vs generic, +0.9pp) bracket the story.
+A same-session leaf re-judge arm (~4k calls) would remove the confound if the
+knee question needs settling beyond this sample.

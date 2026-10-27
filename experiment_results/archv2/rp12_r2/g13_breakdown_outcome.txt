@@ -1,0 +1,148 @@
+POOL pv2_1575de61bb20e977 (B0-2 pool check rc 0): [UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977 | [UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json) | engine pool file sha256-lf 79d48f4b36434a55 (pinned) | multicorpus_cache_v1.db-wal 0 bytes; multicorpus_cache_v1.db-journal absent; corpus_v2_union_mc6.db-wal absent; corpus_v2_union_mc6.db-journal absent
+[G13B] script g13_breakdown.py blob:c29fa1c3d3b7837ede6c53f1b98bf32dcd97ca40 (LF); pinned readers: g13_comparator.py blob:61d83ec7, rp12_pairing.py blob:35214b3f, rp12_lane.py blob:ac25b152; flat_mix_mmlu blob:555ae3ac (checked by g13_comparator)
+[G13B] bundle npz sha256 961af1234e64cf933c58c94e1796cc6151aff2853994976b69dede2d07af3ce7; json sha256-lf 8d6624bbde0496dcaccc7f09c8376e17f1a27f05b977367948a1b42f68988261
+[G13B] descent MAIN_union_routing_queries.csv sha256-lf 68ea58f12c07f3d9682b4ffefab319902edecf5d6d9a6331296258c50b455a9d
+[G13B] flatleaf MAIN_union_routing_leaves.csv sha256-lf 211519e9159f7e1d5c72aeee3abe9efda82d5962d3b726734b36456d3ee750df
+[G13B] flatleaf MAIN_union_routing_queries.csv sha256-lf 5146fb357421d1b79feaa28f38ad516ae1d1ef7ef779e5135bef99782e22d5e9
+[G13B] flatleaf MAIN_union_routing_train_queries.csv sha256-lf ef3eceebd2e3c5d8a150248b12d8bf7a5d6bebceb314efd226729ca4e4c6a9f5
+[G13B] pointer_sha256_lf sha256-lf 6f6e40b25e265035aec34572da2b035f1007d3376adf005abed5d6693c7f44e5
+[G13B] G13-BREAKDOWN (lane r2; registration ffed1d52 L22887-L23048). ZERO calls; no build.
+[G13B] union EVAL 6139 items in 5628 CK-CLOSE components (after MC-EXCLUDE: EVAL 14, GATE 5, TRAIN 15 excluded, as in G13); TRAIN 12334; components crossing sources 0
+[G13B] I0-I5 PASSED: I1 {"d13": "-0.0215", "hi": "-0.0125", "lo": "-0.0301", "ncc": "0.8065", "p_fl": "0.8119", "p_kc": ["0.8334", "0.8394", "0.8340", "0.8446", "0.8413"], "ukm": ["0.7381", "0.7381", "0.7159", "0.7252", "0.7573"]}; I2 P_descent 0.7182; I3 misses 0 of 6139; I4 133 leaves, depth <= 7
+
+== (a) A1 PER SOURCE: D13_s = P_fl,s - P(KC_0),s (stratum components); share = n_s D13_s / (n D13), D13 = -0.0215
+  MMLU_PRO_LB  SCOREABLE (C-a1): P_fl 0.7450, P(KC_0) 0.7895, D13_s -0.0446  95% [-0.0566, -0.0321] (n 3478, 3386 components; SE 0.00639, DEFF 1.046, n_eff 3325, MDE80 0.0179, discordance 0.1377); share 1.1742
+  BBH          DESCRIPTIVE-ONLY: P_fl 0.9726, P(KC_0) 0.9587, D13_s +0.0140  95% [-0.0006, +0.0291] (n 1718, 1408 components; SE 0.00752, DEFF 2.538, n_eff 677, MDE80 0.0210, discordance 0.0384); share -0.1818
+  MATH         DESCRIPTIVE-ONLY: P_fl 0.6205, P(KC_0) 0.6410, D13_s -0.0205  95% [-0.0622, +0.0208] (n 390, 382 components; SE 0.02156, DEFF 1.010, n_eff 386, MDE80 0.0604, discordance 0.1795); share 0.0606
+  MUSR         DESCRIPTIVE-ONLY: P_fl 1.0000, P(KC_0) 1.0000, D13_s +0.0000  95% [+0.0000, +0.0000] (n 229, 129 components; SE 0.00000, DEFF nan, n_eff nan, MDE80 0.0000, discordance 0.0000); share -0.0000
+  IFEVAL       DESCRIPTIVE-ONLY: P_fl 0.8765, P(KC_0) 0.8272, D13_s +0.0494  95% [+0.0123, +0.0864] (n 162, 162 components; SE 0.01907, DEFF 0.988, n_eff 164, MDE80 0.0534, discordance 0.0617); share -0.0606
+  GPQA         DESCRIPTIVE-ONLY: P_fl 0.6728, P(KC_0) 0.6790, D13_s -0.0062  95% [-0.0497, +0.0373] (n 162, 161 components; SE 0.02262, DEFF 1.027, n_eff 158, MDE80 0.0633, discordance 0.0802); share 0.0076
+  shares sum to 1.0000
+== A2 STAGEWISE (DESCRIPTIVE-ONLY): source accuracy tree 0.9633, KC_0 0.9585; D_src +0.0049  95% [+0.0015, +0.0083] (n 6139, 5628 components; SE 0.00180, DEFF 0.991, n_eff 6195, MDE80 0.0051, discordance 0.0202)
+  within-source class accuracy on the 5837 items BOTH file to the true source: tree 0.8434, KC_0 0.8703; D_within -0.0269  95% [-0.0361, -0.0184] (n 5837, 5330 components; SE 0.00447, DEFF 1.270, n_eff 4597, MDE80 0.0125, discordance 0.0927)
+== A3 DEPTH CURVE (DESCRIPTIVE-ONLY): d = 1 source accuracy only: tree 0.9633, KC_0 0.9585
+  d = 2: |F(d)| 52 (0 <empty>), sum k_c(d) 52; P_tree(d) 0.8042; P(KC(d)_s) 0.8065 / 0.8065 / 0.8065 / 0.8065 / 0.8065; D(d) -0.0023  95% [-0.0108, +0.0064] (n 6139, 5628 components; SE 0.00435, DEFF 1.098, n_eff 5590, MDE80 0.0122, discordance 0.1059)
+  d = 3: |F(d)| 84 (0 <empty>), sum k_c(d) 84; P_tree(d) 0.8096; P(KC(d)_s) 0.8194 / 0.8288 / 0.8203 / 0.8270 / 0.8202; D(d) -0.0098  95% [-0.0183, -0.0010] (n 6139, 5628 components; SE 0.00448, DEFF 1.149, n_eff 5345, MDE80 0.0125, discordance 0.1072)
+  d = 4: |F(d)| 109 (0 <empty>), sum k_c(d) 109; P_tree(d) 0.8096; P(KC(d)_s) 0.8281 / 0.8389 / 0.8365 / 0.8415 / 0.8348; D(d) -0.0186  95% [-0.0273, -0.0095] (n 6139, 5628 components; SE 0.00456, DEFF 1.135, n_eff 5410, MDE80 0.0128, discordance 0.1127)
+  d = 5: |F(d)| 130 (0 <empty>), sum k_c(d) 130; P_tree(d) 0.8123; P(KC(d)_s) 0.8343 / 0.8381 / 0.8365 / 0.8439 / 0.8410; D(d) -0.0220  95% [-0.0306, -0.0128] (n 6139, 5628 components; SE 0.00453, DEFF 1.229, n_eff 4994, MDE80 0.0127, discordance 0.1028)
+  d = 6: |F(d)| 132 (0 <empty>), sum k_c(d) 132; P_tree(d) 0.8123; P(KC(d)_s) 0.8355 / 0.8381 / 0.8366 / 0.8441 / 0.8402; D(d) -0.0231  95% [-0.0319, -0.0141] (n 6139, 5628 components; SE 0.00460, DEFF 1.243, n_eff 4938, MDE80 0.0129, discordance 0.1052)
+  d = 7: |F(d)| 133 (0 <empty>), sum k_c(d) 133; P_tree(d) 0.8123; P(KC(d)_s) 0.8345 / 0.8369 / 0.8353 / 0.8456 / 0.8397; D(d) -0.0222  95% [-0.0309, -0.0129] (n 6139, 5628 components; SE 0.00462, DEFF 1.241, n_eff 4947, MDE80 0.0129, discordance 0.1062)
+  KC(2) = NCC exactly: asserted on every seed (P_NCC 0.8065); leaves whose subtree TRAIN majority differs from the leaves CSV leaf_dominant: 1
+  D13 at flatLeaf-leaf depth 2: +0.0420  95% [+0.0220, +0.0639] (n 1167, 983 components; SE 0.01083, DEFF 1.796, n_eff 650, MDE80 0.0303, discordance 0.0780)
+  D13 at flatLeaf-leaf depth 3: -0.0190  95% [-0.0325, -0.0060] (n 1839, 1593 components; SE 0.00653, DEFF 1.262, n_eff 1457, MDE80 0.0183, discordance 0.0625)
+  D13 at flatLeaf-leaf depth 4: -0.0234  95% [-0.0422, -0.0053] (n 1325, 1290 components; SE 0.00954, DEFF 1.049, n_eff 1263, MDE80 0.0267, discordance 0.1155)
+  D13 at flatLeaf-leaf depth 5: -0.0683  95% [-0.0898, -0.0467] (n 1596, 1569 components; SE 0.01082, DEFF 1.167, n_eff 1368, MDE80 0.0303, discordance 0.1648)
+  D13 at flatLeaf-leaf depth >= 6: -0.0283  95% [-0.0694, +0.0048] (n 212, 210 components; SE 0.01949, DEFF 1.074, n_eff 197, MDE80 0.0546, discordance 0.0755)
+== A4 Delta = D13 - [P_tree(2) - P_NCC] (paired): -0.0192  95% [-0.0292, -0.0089] (n 6139, 5628 components; SE 0.00514, DEFF 1.147, n_eff 5353, MDE80 0.0144, discordance 0.1388)
+
+== (b) B1 U-global (k = 133, TRAIN-majority naming): P(U_s) 0.7381 / 0.7381 / 0.7159 / 0.7252 / 0.7573; spread_U 0.0414; D_U = P_fl - P(U_0) +0.0738  95% [+0.0625, +0.0855] (n 6139, 5628 components; SE 0.00587, DEFF 1.341, n_eff 4578, MDE80 0.0164, discordance 0.1634)
+== B2 U-source (k per source MMLU_PRO_LB 74, BBH 36, MATH 9, MUSR 6, IFEVAL 5, GPQA 3): P(US_s) 0.7462 / 0.7355 / 0.7568 / 0.7366 / 0.7588; spread_US 0.0233; D_Us = P_fl - P(US_0) +0.0656  95% [+0.0546, +0.0778] (n 6139, 5628 components; SE 0.00601, DEFF 1.449, n_eff 4236, MDE80 0.0168, discordance 0.1572)
+  printed beside (UNION-AF-ROUTE K_s form, EVAL filed within its TRUE source; never deciding): 0.7739 / 0.7682 / 0.7855 / 0.7610 / 0.7847
+== LABEL LADDER (points; seeds 0-4; spread)
+  U-global       0.7381  seeds 0.7381 / 0.7381 / 0.7159 / 0.7252 / 0.7573  spread 0.0414   reads: TRAIN labels at naming only
+  U-source       0.7462  seeds 0.7462 / 0.7355 / 0.7568 / 0.7366 / 0.7588  spread 0.0233   reads: TRAIN source in the partition, labels at naming
+  tree flatLeaf  0.8119  (deterministic)                   reads: GT-seeded anchors + TRAIN naming
+  NCC            0.8065  (deterministic)                   reads: TRAIN class of every member
+  KC             0.8334  seeds 0.8334 / 0.8394 / 0.8340 / 0.8446 / 0.8413  spread 0.0112   reads: TRAIN class of every prototype
+  kNN-15         0.8444  (deterministic)                   reads: TRAIN class of every neighbour
+
+== (c) FILING RULE (DESCRIPTIVE-ONLY): P_descent 0.7182; D13_desc = P_descent - P(KC_0) -0.1152  95% [-0.1279, -0.1023] (n 6139, 5628 components; SE 0.00661, DEFF 1.328, n_eff 4624, MDE80 0.0185, discordance 0.2155)
+  D_U,desc = P_descent - P(U_0) -0.0199  95% [-0.0352, -0.0047] (n 6139, 5628 components; SE 0.00793, DEFF 1.520, n_eff 4040, MDE80 0.0222, discordance 0.2544)
+  MMLU_PRO_LB  D13_desc -0.1944  95% [-0.2103, -0.1781] (n 3478, 3386 components; SE 0.00848, DEFF 1.022, n_eff 3402, MDE80 0.0237, discordance 0.2823) | D_U,desc -0.1242  95% [-0.1414, -0.1088] (n 3478, 3386 components; SE 0.00845, DEFF 1.012, n_eff 3435, MDE80 0.0237, discordance 0.2605)
+  BBH          D13_desc -0.0460  95% [-0.0729, -0.0191] (n 1718, 1408 components; SE 0.01360, DEFF 2.508, n_eff 685, MDE80 0.0381, discordance 0.1286) | D_U,desc +0.0896  95% [+0.0500, +0.1283] (n 1718, 1408 components; SE 0.01934, DEFF 2.505, n_eff 686, MDE80 0.0541, discordance 0.2643)
+  MATH         D13_desc +0.0231  95% [-0.0154, +0.0631] (n 390, 382 components; SE 0.02019, DEFF 0.954, n_eff 409, MDE80 0.0565, discordance 0.1667) | D_U,desc +0.2205  95% [+0.1709, +0.2739] (n 390, 382 components; SE 0.02599, DEFF 1.015, n_eff 384, MDE80 0.0728, discordance 0.3077)
+  MUSR         D13_desc +0.0000  95% [+0.0000, +0.0000] (n 229, 129 components; SE 0.00000, DEFF nan, n_eff nan, MDE80 0.0000, discordance 0.0000) | D_U,desc +0.0000  95% [+0.0000, +0.0000] (n 229, 129 components; SE 0.00000, DEFF nan, n_eff nan, MDE80 0.0000, discordance 0.0000)
+  IFEVAL       D13_desc +0.0926  95% [+0.0432, +0.1481] (n 162, 162 components; SE 0.02696, DEFF 0.967, n_eff 168, MDE80 0.0755, discordance 0.1296) | D_U,desc +0.1914  95% [+0.1296, +0.2531] (n 162, 162 components; SE 0.03288, DEFF 0.970, n_eff 167, MDE80 0.0921, discordance 0.2160)
+  GPQA         D13_desc +0.1481  95% [+0.0807, +0.2160] (n 162, 161 components; SE 0.03417, DEFF 1.000, n_eff 162, MDE80 0.0957, discordance 0.2099) | D_U,desc +0.2407  95% [+0.1677, +0.3168] (n 162, 161 components; SE 0.03734, DEFF 0.967, n_eff 168, MDE80 0.1045, discordance 0.2901)
+  KC-descent (nearest TRAIN source centroid, then nearest KC_0 prototype within it): P 0.7360; P(KC-desc) - P(KC_0) -0.0974  95% [-0.1074, -0.0880] (n 6139, 5628 components; SE 0.00507, DEFF 1.326, n_eff 4631, MDE80 0.0142, discordance 0.1284)
+
+== (M) MECHANISM: KC-relabel_s P 0.8334 / 0.8394 / 0.8345 / 0.8446 / 0.8409 (prototypes with no TRAIN item keep their class: 0 / 0 / 0 / 0 / 0)
+  G_own = P(KC_0) - P(KC-relabel_0) +0.0000  95% [+0.0000, +0.0000] (n 6139, 5628 components; SE 0.00000, DEFF nan, n_eff nan, MDE80 0.0000, discordance 0.0000)
+  P_fl - P(KC-relabel_0) -0.0215  95% [-0.0301, -0.0125] (n 6139, 5628 components; SE 0.00452, DEFF 1.214, n_eff 5058, MDE80 0.0127, discordance 0.1039)
+
+== (d) WALL-CLOCK (DESCRIPTIVE ONLY: no criterion; different languages, threads and scope)
+  bbh             manifest duration_ms 23543; log sha256 1ed779fb48d56e4c0e92f7650e042794556a15a9815fd88a7733f4d877a9861d; TOTAL TIME lines: TOTAL TIME       :     15 313 ms (100.0%) | TOTAL TIME       :     21 983 ms (100.0%)
+  gpqa            manifest duration_ms 3430; log sha256 75d2bca2ee74fd3e58b1ab5c8c964709d94178b9a6d92590a5b8a29ca1f0afd5; TOTAL TIME lines: TOTAL TIME       :      2 263 ms (100.0%) | TOTAL TIME       :      2 834 ms (100.0%)
+  ifeval          manifest duration_ms 2816; log sha256 b43d223eb167d0c34ecee8ad2e4c84f2111030e690962f22e377c2f9d308008f; TOTAL TIME lines: TOTAL TIME       :      1 716 ms (100.0%) | TOTAL TIME       :      2 203 ms (100.0%)
+  math            manifest duration_ms 4857; log sha256 d9889221935d725940e3088f1cec78967427a09daa006d796e2e3596b0d44955; TOTAL TIME lines: TOTAL TIME       :      3 268 ms (100.0%) | TOTAL TIME       :      4 075 ms (100.0%)
+  mmlu_pro_lb     manifest duration_ms 116945; log sha256 4991b86bab47400be14715a0c8b6216f28645ba35740af1ba0c3a64888a0165a; TOTAL TIME lines: TOTAL TIME       :     88 226 ms (100.0%) | TOTAL TIME       :    112 954 ms (100.0%)
+  musr            manifest duration_ms 3425; log sha256 1384af024065682070384cc385d6e6b520e64936e06e76c08a0815c66a9a38ab; TOTAL TIME lines: TOTAL TIME       :      1 731 ms (100.0%) | TOTAL TIME       :      2 541 ms (100.0%)
+  graft_flatleaf  manifest duration_ms 77731; log sha256 19259d63e94dc88060565ac960df2df0f9d630135a42602afea476ca6b3abdf9; TOTAL TIME lines: TOTAL TIME       :     75 383 ms (100.0%)
+  graft_descent   manifest duration_ms 113576; log sha256 1ea1dad00d8b3a02f0393ca4741a9ad51254709a86e63ea90b7d9a749dac3723; TOTAL TIME lines: TOTAL TIME       :     77 888 ms (100.0%)
+  objects load (bundle, CSVs, snapshots) 0.577 s: outside every fit time
+  tree members' manifest sum 155.0 s; engine loop sum (first TOTAL TIME per member log) 112.5 s; grafts flatLeaf 77.7 s / descent 113.6 s
+  k-means fit, 1 thread, KC (all classes)     seconds 0.093 / 0.108 / 0.110 / 0.108 / 0.103; median 0.108, max 0.110
+  k-means fit, 1 thread, U-global             seconds 1.515 / 1.854 / 1.661 / 1.736 / 2.276; median 1.736, max 2.276
+  k-means fit, 1 thread, U-source (six fits)  seconds 0.479 / 0.577 / 0.700 / 0.487 / 0.505; median 0.505, max 0.700
+  k-means fit, 12 threads (BLAS 12,1), KC (all classes)  seconds 0.103 / 0.119 / 0.133 / 0.144 / 0.138; median 0.133, max 0.144
+  k-means fit, 12 threads (BLAS 12,1), U-global          seconds 0.556 / 0.704 / 0.592 / 0.793 / 0.998; median 0.704, max 0.998
+  k-means fit, 12 threads (BLAS 12,1), U-source (six fits) seconds 0.227 / 0.261 / 0.331 / 0.255 / 0.224; median 0.255, max 0.331
+  machine state: free RAM 31.4 GB; admitted PIDs ['ollama app.exe:42336', 'ollama.exe:42448', 'python.exe:29672', 'python.exe:46416']; BLAS threads in this process 1,1
+  tree end-to-end (members + flatLeaf graft) 232.7 s / KC median 0.108 s = 2163.3x; members only 1440.8x
+
+== (e) SELECTIVE FILING (DESCRIPTIVE ONLY; never paired, never deciding): each method's own top c% by class margin
+  tree        50%: 0.9521 (kept 3069)  60%: 0.9310 (kept 3683)  70%: 0.9165 (kept 4297)  80%: 0.8917 (kept 4911)  90%: 0.8552 (kept 5525)  100%: 0.8119 (kept 6139)
+  KC_0        50%: 0.9713 (kept 3069)  60%: 0.9576 (kept 3683)  70%: 0.9397 (kept 4297)  80%: 0.9126 (kept 4911)  90%: 0.8780 (kept 5525)  100%: 0.8334 (kept 6139)
+  U-global_0  50%: 0.8576 (kept 3069)  60%: 0.8433 (kept 3683)  70%: 0.8285 (kept 4297)  80%: 0.8078 (kept 4911)  90%: 0.7767 (kept 5525)  100%: 0.7381 (kept 6139)
+  P@80 tree        0.8917  95% [0.8821, 0.9014] (kept 4911 of 6139)
+  P@80 KC_0        0.9126  95% [0.9024, 0.9227] (kept 4911 of 6139)
+  P@80 U-global_0  0.8078  95% [0.7929, 0.8218] (kept 4911 of 6139)
+  P@80 tree - KC_0 -0.0210  95% [-0.0290, -0.0132] (jointly bootstrapped; different subsets)
+  P@80 tree - U-global_0 +0.0839  95% [+0.0722, +0.0969] (jointly bootstrapped; different subsets)
+
+== CRITERIA
+C-a1: HELD (the tree loses on MMLU_PRO_LB): D13_MMLU -0.0446, interval [-0.0566, -0.0321] wholly below 0
+  support C-a1: SE 0.00639 (registered 0.00724); DEFF 1.046 (registered 1.214); n_eff 3325; MDE80 0.0179 (registered 0.0203); discordance 0.1377 (planning 0.15)
+C-a4: HELD (the loss opens below the anchors): Delta -0.0192, interval [-0.0292, -0.0089] wholly below 0; point seen before registration (domain_ok P_fl 0.8042, NCC 0.8065 printed in g13_outcome.txt blob:ff8fa439)
+  support C-a4: SE 0.00514 (registered 0.00466); DEFF 1.147 (registered 1.214); n_eff 5353; MDE80 0.0144 (registered 0.0131); discordance 0.1388 (planning 0.11)
+C-b2: HELD (the tree beats source-aware unsupervised k-means): D_Us +0.0656, interval [+0.0546, +0.0778] wholly above 0 AND D_Us > spread_US 0.0233
+  support C-b2: SE 0.00601 (registered 0.00629); DEFF 1.449 (registered 1.214); n_eff 4236; MDE80 0.0168 (registered 0.0176); discordance 0.1572 (planning 0.20)
+C-b1: HELD: D_U +0.0738, interval [+0.0625, +0.0855] wholly above 0 AND D_U > spread_U 0.0414; point seen before registration (U-global seeds 0.7159-0.7573, seed 0 0.7381, printed in g13_outcome.txt blob:ff8fa439)
+  support C-b1: SE 0.00587; DEFF 1.341; n_eff 4578; MDE80 0.0164; discordance 0.1634 (no registered Support figure: a seen point, its spread clause decides beside the interval)
+C-M: UNDETERMINED: G_own +0.0000, interval [+0.0000, +0.0000] contains 0
+  support C-M: SE 0.00000 (registered 0.00199); DEFF nan (registered 1.214); n_eff nan; MDE80 0.0000 (registered 0.0056); discordance 0.0000 (planning 0.02)
+No UNDETERMINED or FAILED is read as parity (no TOST registered).
+F-GB (fires iff C-b2 REVERSED): does not fire (C-b2 HELD)
+F-GB2 (fires iff C-a4 FAILED): does not fire (C-a4 HELD)
+PREDICTION C-a1 verdict probabilities (HELD 0.75): observed HELD
+PREDICTION C-a4 verdict probabilities (HELD 0.85 (point-informed)): observed HELD
+PREDICTION C-b1 verdict probabilities (HELD 0.80): observed HELD
+PREDICTION C-b2 verdict probabilities (HELD 0.60, REVERSED 0.05): observed HELD
+PREDICTION C-M verdict probabilities (HELD 0.70): observed UNDETERMINED
+
+== PREDICTIONS (priors; HELD iff the point lies in [lo, hi], endpoints inclusive)
+PREDICTION A1 D13_MMLU -0.030 [-0.050, -0.010]: observed -0.0446 -> HELD
+PREDICTION A1 share MMLU_PRO_LB +0.750 [+0.450, +1.100]: observed +1.1742 -> FAILED
+PREDICTION A1 D13_MATH -0.040 [-0.120, +0.040]: observed -0.0205 -> HELD
+PREDICTION A1 D13_GPQA -0.020 [-0.100, +0.060]: observed -0.0062 -> HELD
+PREDICTION A1 D13_IFEVAL -0.030 [-0.100, +0.040]: observed +0.0494 -> FAILED
+PREDICTION A1 D13_BBH +0.000 [-0.010, +0.010]: observed +0.0140 -> FAILED
+PREDICTION A1 D13_MUSR +0.000 [-0.010, +0.000]: observed +0.0000 -> HELD
+PREDICTION A2 D_src -0.005 [-0.015, +0.005]: observed +0.0049 -> HELD
+PREDICTION A2 D_within -0.018 [-0.030, -0.006]: observed -0.0269 -> HELD
+PREDICTION A3 D(2) -0.002 [-0.008, +0.004]: observed -0.0023 -> HELD
+PREDICTION A3 D(3) -0.010 [-0.020, +0.000]: observed -0.0098 -> HELD
+PREDICTION A3 D(4) -0.016 [-0.026, -0.006]: observed -0.0186 -> HELD
+PREDICTION A3 D(5) within 0.005 of D13: observed D(5) - D13 = -0.0005 -> HELD
+PREDICTION A3 D(6) within 0.005 of D13: observed D(6) - D13 = -0.0016 -> HELD
+PREDICTION A3 D(7) within 0.005 of D13: observed D(7) - D13 = -0.0007 -> HELD
+PREDICTION A4 Delta -0.019 [-0.030, -0.008]: observed -0.0192 -> HELD
+PREDICTION B1 D_U +0.074 [+0.060, +0.090]: observed +0.0738 -> HELD
+PREDICTION B2 P(US_0) +0.770 [+0.740, +0.800]: observed +0.7462 -> HELD
+PREDICTION B2 D_Us +0.040 [+0.015, +0.070]: observed +0.0656 -> HELD
+PREDICTION B2 spread_US +0.020 [+0.010, +0.040]: observed +0.0233 -> HELD
+PREDICTION C D13_desc -0.115 [-0.130, -0.100]: observed -0.1152 -> HELD
+PREDICTION C D_U,desc -0.017 [-0.040, +0.010]: observed -0.0199 -> HELD
+PREDICTION C P(KC-desc) - P(KC_0) -0.010 [-0.025, +0.000]: observed -0.0974 -> FAILED
+PREDICTION D tree members' manifest sum 155.0 s (seen): observed 155.0 s; loop sum 112.5 s (seen): observed 112.5 s; grafts 77.7 / 113.6 s (seen): observed 77.7 / 113.6 s (seen points: not scored)
+PREDICTION D KC 5-seed median (s, 1 thread) [1, 10]: observed +0.1076 -> FAILED
+PREDICTION D U-global 5-seed median (s, 1 thread) [20, 120]: observed +1.7359 -> FAILED
+PREDICTION D tree end-to-end / KC median (1 thread) [10, 100]: observed +2163.2873 -> FAILED
+PREDICTION E P@80 tree +0.870 [+0.840, +0.900]: observed +0.8917 -> HELD
+PREDICTION E P@80 KC_0 +0.890 [+0.860, +0.920]: observed +0.9126 -> HELD
+PREDICTION E P@80 U-global_0 +0.800 [+0.760, +0.840]: observed +0.8078 -> HELD
+PREDICTION E tree - KC gap at 80% within 0.01 of D13: observed gap - D13 = +0.0005 -> HELD
+PREDICTION M G_own +0.012 [+0.004, +0.022]: observed +0.0000 -> FAILED
+PREDICTION M P_fl - P(KC-relabel_0) -0.010 [-0.020, +0.000]: observed -0.0215 -> FAILED
+
+WHAT THIS RESULT WILL NOT SHOW (fixed before data): that the tree is needed for filing (G13 FAILED stands); parity with any comparator (no TOST); anything on capability text; anything for another draw, recipe, embedder or slice; any certificate; any routing value; that a wall-clock ratio generalises beyond this machine, thread count and language; a held-out claim beyond CK-CLOSE-v2's content-closure. Selective filing (e) never decides anything.

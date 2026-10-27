@@ -1,0 +1,697 @@
+[B0p/ifeval] start 2026-10-01T08:04:20+02:00 cmd: ./gradlew.bat bootRun --console=plain --offline -PjvmThreads=12 --args="--config experiment_configs/rp12/B0p/ifeval.toml"
+Configuration on demand is an incubating feature.
+Calculating task graph as no cached configuration is available for tasks: bootRun --args=--config experiment_configs/rp12/B0p/ifeval.toml
+> Task :checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :processResources UP-TO-DATE
+> Task :compileKotlin UP-TO-DATE
+> Task :compileJava NO-SOURCE
+> Task :classes UP-TO-DATE
+> Task :resolveMainClassName UP-TO-DATE
+> Task :processAot UP-TO-DATE
+> Task :processAotResources UP-TO-DATE
+> Task :compileAotKotlin NO-SOURCE
+> Task :compileAotJava UP-TO-DATE
+> Task :aotClasses UP-TO-DATE
+
+> Task :bootRun
+[BOOT] TaxoAdapt starting � pid=43740, java=21.0.6, jar=file:/Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/rp12-b0-run/build/classes/kotlin/main/
+[THREAD-CAP] requested=12 availableProcessors=12 heapEstimate=n/a budget=16.94GB
+[BOOT] corpusDbPath from TOML: taxoadapt.eval.db-path=multicorpus_cache_v1.db
+Page de codes active�: 65001
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+08:04:23.877 [INFO ] EmbeddingCache - SQLite Embedding, GMM & Query Cache initialized successfully.
+08:04:23.889 [INFO ] ModelEvalStore - ModelEvalStore schema ready.
+08:04:23.893 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+08:04:23.913 [WARN ] ArcConfig - LLM provider is AZURE but AZURE_AI_ENDPOINT/AZURE_AI_API_KEY are blank. Create a root-level .env (see .env.example) or export these variables. Falling back to the Ollama chat model at http://localhost:11434 so the application can still start.
+08:04:23.946 [INFO ] LLMClient - [ARENA-PACING] request pacing at 4.0 req/s, semaphore capacity 4
+08:04:23.956 [INFO ] RankingService - SQLite Agent Ratings V2, Match History, and Bradley-Terry schema initialized.
+08:04:23.982 [INFO ] HeadlessRunner - Starting Headless Benchmark Mode with config: experiment_configs/rp12/B0p/ifeval.toml
+08:04:24.009 [INFO ] RatingsDbGuard - [DB-GUARD] ratings database 'ratings.db' is not tracked; safe to write
+08:04:24.034 [INFO ] HeadlessRunner - Loaded CLI Configuration: HeadlessCliConfig(snapshotId=unsaved, models=[DeepSeek-R1-Distill-Llama-8B, DeepSeek-R1-Distill-Qwen-32B, Falcon3-10B-Instruct, Llama-3.1-70B-Instruct, Llama-3.2-3B-Instruct, Llama-3.3-70B-Instruct, Mistral-Small-Instruct-2409, Mixtral-8x7B-Instruct-v0.1, OLMo-2-1124-7B-Instruct, Phi-3.5-mini-instruct, Qwen2.5-32B-Instruct, Qwen2.5-72B-Instruct, Qwen2.5-7B-Instruct, Qwen2.5-Coder-7B-Instruct, Qwen2.5-Math-7B-Instruct, Yi-1.5-34B-Chat-16K, c4ai-command-r-plus-08-2024, internlm2_5-20b-chat], queryLimit=0, category=null, confidenceGate=0.65, parallelism=6, questionsPerRound=12, reservedOnly=true, resumeBenchmark=false, profileMode=false, profileSeTarget=0.15, profileStrataFile=null, maxQueryReuse=2147483647, matchFilter=none, tau=1.0E-6, enableFinalMetrics=true, adaptiveBarFile=null, embeddingSliceDim=512, splitDropTopPcs=0, splitWhiten=false, proposalMemo=null, conditions=[MAIN, ORACLE, GENERIC_JUDGE, RANDOM_SCHEDULER], outputDir=experiment_results/archv2/rp12/B0p/ifeval, testRatio=0.3, seed=42, seeds=[], splitSeed=null, constructionOrderShuffleSeed=null, anchorFree=false, proposalAcceptMultiplier=null, reservedPoolFile=null, v2PoolFile=experiment_configs/engine_pool_pv2_1575de61bb20e977.json, unionRoutingItemKey=false, v2ForeignMembers=[], pool=pv2_1575de61bb20e977, acknowledgedEvalMembers=[], regenerateSplit=false, runPipeline=true, maxDepth=8, minClusterSize=55, proposalSeparationBar=0.0145, membershipFloor=0.25, routingBeamGamma=0.2, descentMargin=0.12, acceptanceZ=2.0, marginalEps=null, maxK=null, excludeFromAnchoring=[], expectedWithheldQueries=null, enableRefitGate=false, defaultKappaPrior=10.0, enableLabeling=false, judgeInduction=false, datasetType=null, corpora=[IFEVAL], corpusDbPath=multicorpus_cache_v1.db, unionSnapshots=[], unionRootRouting=descent, runBenchmark=false, runTrickle=true, domains=[], enableStableQuestionIds=null, enableResidualRouting=null, enableResidualSplitGate=null, fusionSimilarityThreshold=0.9, effectiveSupportFloor=2.0, numIterations=50, runBaselines=false, enableGtWarmStart=false, maxLeafAssignments=5, dagMode=DAG_MAX, enableProfiling=true, judgeSeesOptions=null, judgeOptionMode=null, judgeRecipe=null, judgeRecipeKit=null, judgeRecipeModel=null, judgeRecipeMaxTokens=null, judgeRecipeTemperature=null)
+08:04:24.036 [INFO ] HeadlessRunner - [SLICE] embedding slice width = 512, split PCA dropTop=0 whiten=false
+08:04:24.036 [INFO ] HeadlessRunner - [CORPUS] corpora=[IFEVAL] corpusDbPath=multicorpus_cache_v1.db
+08:04:24.036 [INFO ] HeadlessRunner - [JUDGE-RECIPE] disabled: judge = Mistral-Large-3 on the langchain4j path (byte-identical to the board of record)
+08:04:24.129 [INFO ] Diagnostics - [DIAG] diagnostics bundle open at Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\B0p\ifeval\seed_42\diagnostics
+08:04:24.129 [INFO ] HeadlessRunner - ==================================================
+08:04:24.129 [INFO ] HeadlessRunner - STARTING PIPELINE AND EVALUATION WITH SEED: 42
+08:04:24.129 [INFO ] HeadlessRunner - ==================================================
+08:04:24.129 [INFO ] HeadlessRunner - Headless pipeline execution enabled. Starting DAG generation pipeline...
+08:04:24.130 [INFO ] HeadlessRunner - Loading dataset for domains: []
+08:04:24.140 [INFO ] LeaderboardCorpus - Loaded 541 IFEVAL queries across 1 domain(s) from multicorpus_cache_v1.db
+08:04:24.147 [INFO ] DatasetFetcher - [CORPUS] merged 1 source(s): IFEVAL=1 domain(s)/541 queries -> 1 domain key(s), 541 queries
+08:04:24.267 [WARN ] HeadlessRunner - [SPLIT-V2] the split is taken AS GIVEN from experiment_configs/engine_pool_pv2_1575de61bb20e977.json (pv2_1575de61bb20e977, CK-CLOSE-v2); seed, testRatio and reservedPoolFile are not used for the split
+08:04:24.310 [WARN ] DatasetFetcher - [SPLIT-V2] namespaced pool file: this build loaded [IFEVAL] of [BBH, GPQA, IFEVAL, MATH, MMLU_PRO, MUSR]; one-to-one checked on those
+08:04:24.322 [INFO ] DatasetFetcher - [POOL] recorded p01c5441205338483 (v2 pool pv2_1575de61bb20e977, 216 judgeable ids; sentinels excluded); nothing activated
+08:04:24.323 [WARN ] DatasetFetcher - [SPLIT-V2] split taken as given from pv2_1575de61bb20e977 (CK-CLOSE-v2, engine pool file sha256(LF) 79d48f4b36434a55): 325 train / 216 reserved (eval 6466, gate 54, sentinels 0); one-to-one TRAIN and RESERVED hold; 0 TRAIN rows share a stem key with the 8186 global reserved keys; legacy id-list pool p01c5441205338483 (READY_rp12_et D-1: it holds EVAL + GATE ids, never an EVAL pool)
+08:04:24.325 [WARN ] HeadlessRunner - [TRAIN-ONLY] global reserved keys installed: 8186 (pv2_1575de61bb20e977, all corpora, sentinels included); build stamp recorded
+08:04:24.341 [INFO ] HeadlessRunner - [POOL] recorded p01c5441205338483 (seed=42, gate=54, closedByContent=0); nothing activated
+08:04:24.342 [INFO ] HeadlessRunner - Running GMM splitting and trickle routing pipeline...
+08:04:24.345 [INFO ] Engine - Starting Taxonomy Adaptation: IFEVAL
+08:04:24.346 [INFO ] Engine - 
+┌── TAXONOMY CONFIGURATION PARAMETERS ─────────────────────
+│ Execution Settings:
+│   - Dataset Type:         AG_NEWS
+│   - Corpora:              [IFEVAL]
+│   - Num Iterations:       50
+│   - Early Stopping:       true
+│   - Labeling:             false
+│   - Selected Domains:     [All]
+│   - Split Dataset:        true
+│   - Test Split Ratio:     0.3
+├── LLM & Embedding Models:
+│   - LLM Provider:         AZURE
+│   - Embedding Provider:   OLLAMA
+│   - Embedding Model:      qwen3-embedding:latest
+│   - Judge Model:          Mistral-Large-3
+│   - Labeling Model:       Mistral-Large-3
+│   - Max Judge Generality: 1
+├── Advanced Mathematical Formalism Controls:
+│   - DAG Mode:             DAG_MAX
+│   - Max Depth:            8
+│   - Min Cluster Size:     55
+│   - Separation Bar:       0.0145
+│   - Slice Dim / PCA:      512 / dropTop=0 whiten=false
+│   - Lexicographic Tau:    1.0E-6
+│   - Membership Floor:     0.25
+│   - Routing Beam Gamma:   0.2
+│   - Descent Margin:       0.12
+│   - Fusion Sim Threshold: 0.9
+│   - Eff Support Floor:    2.0
+│   - Default Kappa Prior:  10.0
+└──────────────────────────────────────────────────────────
+08:04:24.347 [INFO ] Engine - Phase 1: Precomputing Embeddings...
+08:04:24.370 [INFO ] EmbeddingCache - All 325 requested embeddings are already cached on disk.
+08:04:24.371 [INFO ] Engine - Dimension check passed: model=4096 dims, minRequired=512 (maxDepth=8)
+08:04:24.373 [INFO ] Engine - Bootstrap: Seeding GMMs with 100% ground-truth data...
+08:04:24.374 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+08:04:24.405 [INFO ] Fitter - [FITTER] Fitting complete (2 depths, 2 nodes)
+08:04:24.407 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 142.0450     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 142.0450     | 142.0450     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+08:04:24.407 [INFO ] Engine - Initial DAG Structure (Before Statistical Fitting)
+08:04:24.410 [INFO ] Operations - 
+┌── TAXONOMY DAG HIERARCHY ───────────────────────────────
+│ IFEVAL [q_dir=0, q_rec=325, mass=325.0 - Parent/Residual] (vMF kappa: 142.045)
+│ └── IFEVAL/ifeval [q_dir=325, q_rec=325, mass=325.0 - Leaf] (vMF kappa: 142.045)
+└─────────────────────────────────────────────────────────
+08:04:24.411 [INFO ] Engine - STARTING EVOLUTION ITERATION 1
+08:04:24.860 [INFO ] Splitter - Split 'IFEVAL/ifeval' (q=325, k=2, sep=0.017, routed=[125, 200], converged=true) -> Spawning 2 children
+08:04:24.889 [INFO ] Splitter - Split 'IFEVAL/ifeval' (q=325, k=2, sep=0.017, routed=[125, 200], converged=true) -> Spawning 2 children
+08:04:25.046 [INFO ] Operations - [DJ-SE] GROW 'IFEVAL/ifeval' dJ=1.817e-02 SE_dJ=2.792e-03 z=6.51 dV=2
+08:04:25.048 [INFO ] Operations - [GROW ACCEPTED] 'IFEVAL/ifeval' Delta J = 0.018166, Delta V = 2
+08:04:25.056 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+08:04:25.062 [INFO ] Fitter - [FIT-μ]  iter=1: mean_MLE_drift=1.000, oscillating_nodes=0/4, earlyout_rate=1.00
+08:04:25.063 [INFO ] Fitter - [FIT-κ]  iter=1: prior_dominated=0/4 (0.0%), median_kfinal=142.05, median_alpha=0.07
+08:04:25.063 [INFO ] Fitter - [FITTER] Fitting complete (3 depths, 4 nodes)
+08:04:25.064 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 142.0450     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 142.0450     | 142.0450     | 0               | 0.0000             | 0.0000            
+│ 2     | 101.6908     | 142.0450     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+08:04:25.065 [INFO ] Engine - [REFIT-DELTA] Iteration 1 | 0.000e+00 (M-step inert, as expected)
+08:04:25.066 [INFO ] Engine - [J-TRACK] Iteration 1 | J_after_trickle: 0.000000 (Trickle Delta: 0.000000) | J_after_edits: 0.018166 (Edits Delta: 0.018166)
+08:04:25.066 [INFO ] Engine - [MU-GAP] Iteration 1 | internal nodes=2 cos(mu_v, resultant) min=0.9986 p10=0.9986 median=1.0000 max=1.0000
+08:04:25.120 [INFO ] Engine - [J-RESOLUTION] Iteration 1 | J=0.018166 SE_boot=2.659e-03 (B=200) | tau=1.000e-06 SE/tau=2659.2 | 2*SE=5.318e-03
+08:04:25.121 [INFO ] Engine - Iteration 1 completed in 709ms.
+08:04:25.121 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 4 (2 leaves, 2 internal) | Total Mass: 325.00 ===
+08:04:25.132 [INFO ] Engine - === DAG after iteration 1 ===
+08:04:25.134 [INFO ] Operations - 
+┌── TAXONOMY HIERARCHY ───────────────────────────────────
+│ IFEVAL [q_dir=0, q_rec=325, mass=325.0, Parent] (kappa: 142.0)
+│ └── IFEVAL/ifeval [q_dir=0, q_rec=325, mass=325.0, Parent] (kappa: 142.0)
+│     ├── Emergent Concept #4 [q_dir=202, q_rec=202, mass=197.4, Leaf] (kappa: 105.5)
+│     └── Emergent Concept #3 [q_dir=135, q_rec=135, mass=127.6, Leaf] (kappa: 97.9)
+└─────────────────────────────────────────────────────────
+08:04:25.134 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 1) ===
+08:04:25.135 [INFO ] Engine - GROW: 4 attempted (1 accepted, 0 rejected, 3 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+08:04:25.136 [INFO ] Engine - [CONVERGENCE] Iteration 1 | GED converged=false | J stationary=false (streak 0/5, editsDelta=1.817e-02, trickleDelta=0.000e+00)
+08:04:25.138 [INFO ] Engine - STARTING EVOLUTION ITERATION 2
+08:04:25.314 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #4' reason=min-pair n=202 k=2 emK=2 sep=0.0104 bar=0.0145
+08:04:25.332 [INFO ] Splitter - Split 'Emergent Concept #4' (q=202, k=3, sep=0.035, routed=[55, 67, 80], converged=true) -> Spawning 3 children
+08:04:25.356 [INFO ] Splitter - Split 'Emergent Concept #4' (q=202, k=3, sep=0.035, routed=[55, 67, 80], converged=true) -> Spawning 3 children
+08:04:25.395 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #4' dJ=2.965e-02 SE_dJ=2.651e-03 z=11.18 dV=3
+08:04:25.395 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #4' Delta J = 0.029646, Delta V = 3
+08:04:25.890 [INFO ] Splitter - Split 'Emergent Concept #3' (q=135, k=2, sep=0.018, routed=[57, 78], converged=true) -> Spawning 2 children
+08:04:25.906 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #3' dJ=5.003e-03 SE_dJ=2.634e-03 z=1.90 dV=2
+08:04:25.906 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #3' Delta J = 0.005003, Delta V = 2. Reverting.
+08:04:25.910 [INFO ] Splitter - Split 'Emergent Concept #3' (q=135, k=2, sep=0.018, routed=[57, 78], converged=true) -> Spawning 2 children
+08:04:25.929 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #3' dJ=5.003e-03 SE_dJ=2.634e-03 z=1.90 dV=2
+08:04:25.929 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #3' Delta J = 0.005003, Delta V = 2. Reverting.
+08:04:25.933 [INFO ] Splitter - Split 'Emergent Concept #3' (q=135, k=2, sep=0.018, routed=[57, 78], converged=true) -> Spawning 2 children
+08:04:25.949 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #3' dJ=5.003e-03 SE_dJ=2.634e-03 z=1.90 dV=2
+08:04:25.950 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #3' Delta J = 0.005003, Delta V = 2. Reverting.
+08:04:25.953 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+08:04:25.964 [INFO ] Fitter - [FIT-μ]  iter=2: mean_MLE_drift=1.000, oscillating_nodes=0/7, earlyout_rate=1.00
+08:04:25.965 [INFO ] Fitter - [FIT-κ]  iter=2: prior_dominated=3/7 (42.9%), median_kfinal=100.40, median_alpha=0.25
+08:04:25.965 [INFO ] Fitter - [FITTER] Fitting complete (4 depths, 7 nodes)
+08:04:25.965 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 142.0450     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 142.0450     | 142.0450     | 0               | 0.0000             | 0.0000            
+│ 2     | 101.6817     | 142.0450     | 0               | 0.0000             | 0.0000            
+│ 3     | 90.7809      | 105.4710     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+08:04:25.966 [INFO ] Engine - [REFIT-DELTA] Iteration 2 | 0.000e+00 (M-step inert, as expected)
+08:04:25.966 [INFO ] Engine - [J-TRACK] Iteration 2 | J_after_trickle: 0.018168 (Trickle Delta: 0.000002) | J_after_edits: 0.047814 (Edits Delta: 0.029646)
+08:04:25.966 [INFO ] Engine - [MU-GAP] Iteration 2 | internal nodes=3 cos(mu_v, resultant) min=0.9986 p10=0.9986 median=0.9991 max=1.0000
+08:04:25.980 [INFO ] Engine - [J-RESOLUTION] Iteration 2 | J=0.047814 SE_boot=3.705e-03 (B=200) | tau=1.000e-06 SE/tau=3705.0 | 2*SE=7.410e-03
+08:04:25.980 [INFO ] Engine - Iteration 2 completed in 842ms.
+08:04:25.980 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 7 (4 leaves, 3 internal) | Total Mass: 325.00 ===
+08:04:25.989 [INFO ] Engine - === DAG Changes in iteration 2 ===
+08:04:25.991 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│ "IFEVAL" (Parent, q=0/325)
+│ └── "IFEVAL/ifeval" (Parent, q=0/325)
+│     └── [MUTATED] "Emergent Concept #4" (Parent, kappa: 105.5, q=0/202) -> type changed: Leaf -> Parent
+│         ├── [ADDED] "Emergent Concept #9" (Leaf, kappa: 88.2, q=69/69)
+│         ├── [ADDED] "Emergent Concept #10" (Leaf, kappa: 83.8, q=80/80)
+│         └── [ADDED] "Emergent Concept #8" (Leaf, kappa: 100.4, q=58/58)
+└──────────────────────────────────────────────────────────
+08:04:25.992 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 2) ===
+08:04:25.992 [INFO ] Engine - GROW: 11 attempted (1 accepted, 3 rejected, 7 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+08:04:25.993 [INFO ] Stabilizer - GED Analysis (Iter 2): +3/-0 nodes, +3/-0 relations.
+08:04:25.993 [INFO ] Engine - [CONVERGENCE] Iteration 2 | GED converged=false | J stationary=false (streak 0/5, editsDelta=2.965e-02, trickleDelta=1.579e-06)
+08:04:25.993 [INFO ] Engine - STARTING EVOLUTION ITERATION 3
+08:04:26.000 [INFO ] Splitter - Split 'Emergent Concept #3' (q=135, k=2, sep=0.018, routed=[57, 78], converged=true) -> Spawning 2 children
+08:04:26.008 [INFO ] Splitter - Split 'Emergent Concept #3' (q=135, k=2, sep=0.018, routed=[57, 78], converged=true) -> Spawning 2 children
+08:04:26.022 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #3' dJ=5.004e-03 SE_dJ=2.632e-03 z=1.90 dV=2
+08:04:26.026 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #3' Delta J = 0.005004, Delta V = 2. Reverting.
+08:04:26.028 [INFO ] Splitter - Split 'Emergent Concept #3' (q=135, k=2, sep=0.018, routed=[57, 78], converged=true) -> Spawning 2 children
+08:04:26.043 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #3' dJ=5.004e-03 SE_dJ=2.632e-03 z=1.90 dV=2
+08:04:26.043 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #3' Delta J = 0.005004, Delta V = 2. Reverting.
+08:04:26.045 [INFO ] Splitter - Split 'Emergent Concept #3' (q=135, k=2, sep=0.018, routed=[57, 78], converged=true) -> Spawning 2 children
+08:04:26.059 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #3' dJ=5.004e-03 SE_dJ=2.632e-03 z=1.90 dV=2
+08:04:26.059 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #3' Delta J = 0.005004, Delta V = 2. Reverting.
+08:04:26.063 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+08:04:26.070 [INFO ] Fitter - [FIT-μ]  iter=3: mean_MLE_drift=1.000, oscillating_nodes=0/7, earlyout_rate=1.00
+08:04:26.071 [INFO ] Fitter - [FIT-κ]  iter=3: prior_dominated=3/7 (42.9%), median_kfinal=100.40, median_alpha=0.25
+08:04:26.071 [INFO ] Fitter - [FITTER] Fitting complete (4 depths, 7 nodes)
+08:04:26.071 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 142.0450     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 142.0450     | 142.0450     | 0               | 0.0000             | 0.0000            
+│ 2     | 101.6817     | 142.0450     | 0               | 0.0000             | 0.0000            
+│ 3     | 90.7811      | 105.4711     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+08:04:26.072 [INFO ] Engine - [REFIT-DELTA] Iteration 3 | 0.000e+00 (M-step inert, as expected)
+08:04:26.072 [INFO ] Engine - [J-TRACK] Iteration 3 | J_after_trickle: 0.047814 (Trickle Delta: -0.000000) | J_after_edits: 0.047814 (Edits Delta: 0.000000)
+08:04:26.072 [INFO ] Engine - [MU-GAP] Iteration 3 | internal nodes=3 cos(mu_v, resultant) min=0.9986 p10=0.9986 median=0.9991 max=1.0000
+08:04:26.086 [INFO ] Engine - [J-RESOLUTION] Iteration 3 | J=0.047814 SE_boot=3.705e-03 (B=200) | tau=1.000e-06 SE/tau=3705.0 | 2*SE=7.410e-03
+08:04:26.086 [INFO ] Engine - Iteration 3 completed in 93ms.
+08:04:26.086 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 7 (4 leaves, 3 internal) | Total Mass: 325.00 ===
+08:04:26.094 [INFO ] Engine - === DAG Changes in iteration 3 ===
+08:04:26.094 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│   (No structural changes in this iteration)
+└──────────────────────────────────────────────────────────
+08:04:26.094 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 3) ===
+08:04:26.094 [INFO ] Engine - GROW: 21 attempted (0 accepted, 3 rejected, 18 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+08:04:26.095 [INFO ] Stabilizer - GED Analysis (Iter 3): +0/-0 nodes, +0/-0 relations.
+08:04:26.095 [INFO ] Engine - [CONVERGENCE] Iteration 3 | GED converged=false | J stationary=true (streak 1/5, editsDelta=0.000e+00, trickleDelta=-7.477e-08)
+08:04:26.095 [INFO ] Engine - STARTING EVOLUTION ITERATION 4
+08:04:26.102 [INFO ] Splitter - Split 'Emergent Concept #3' (q=135, k=2, sep=0.018, routed=[57, 78], converged=true) -> Spawning 2 children
+08:04:26.110 [INFO ] Splitter - Split 'Emergent Concept #3' (q=135, k=2, sep=0.018, routed=[57, 78], converged=true) -> Spawning 2 children
+08:04:26.127 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #3' dJ=5.004e-03 SE_dJ=2.634e-03 z=1.90 dV=2
+08:04:26.127 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #3' Delta J = 0.005004, Delta V = 2. Reverting.
+08:04:26.129 [INFO ] Splitter - Split 'Emergent Concept #3' (q=135, k=2, sep=0.018, routed=[57, 78], converged=true) -> Spawning 2 children
+08:04:26.143 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #3' dJ=5.004e-03 SE_dJ=2.634e-03 z=1.90 dV=2
+08:04:26.144 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #3' Delta J = 0.005004, Delta V = 2. Reverting.
+08:04:26.145 [INFO ] Splitter - Split 'Emergent Concept #3' (q=135, k=2, sep=0.018, routed=[57, 78], converged=true) -> Spawning 2 children
+08:04:26.160 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #3' dJ=5.004e-03 SE_dJ=2.634e-03 z=1.90 dV=2
+08:04:26.160 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #3' Delta J = 0.005004, Delta V = 2. Reverting.
+08:04:26.163 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+08:04:26.173 [INFO ] Fitter - [FIT-μ]  iter=4: mean_MLE_drift=1.000, oscillating_nodes=0/7, earlyout_rate=1.00
+08:04:26.174 [INFO ] Fitter - [FIT-κ]  iter=4: prior_dominated=3/7 (42.9%), median_kfinal=100.40, median_alpha=0.25
+08:04:26.174 [INFO ] Fitter - [FITTER] Fitting complete (4 depths, 7 nodes)
+08:04:26.174 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 142.0450     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 142.0450     | 142.0450     | 0               | 0.0000             | 0.0000            
+│ 2     | 101.6817     | 142.0450     | 0               | 0.0000             | 0.0000            
+│ 3     | 90.7811      | 105.4711     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+08:04:26.175 [INFO ] Engine - [REFIT-DELTA] Iteration 4 | 0.000e+00 (M-step inert, as expected)
+08:04:26.175 [INFO ] Engine - [J-TRACK] Iteration 4 | J_after_trickle: 0.047814 (Trickle Delta: -0.000000) | J_after_edits: 0.047814 (Edits Delta: 0.000000)
+08:04:26.175 [INFO ] Engine - [MU-GAP] Iteration 4 | internal nodes=3 cos(mu_v, resultant) min=0.9986 p10=0.9986 median=0.9991 max=1.0000
+08:04:26.189 [INFO ] Engine - [J-RESOLUTION] Iteration 4 | J=0.047814 SE_boot=3.705e-03 (B=200) | tau=1.000e-06 SE/tau=3705.0 | 2*SE=7.410e-03
+08:04:26.189 [INFO ] Engine - Iteration 4 completed in 94ms.
+08:04:26.189 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 7 (4 leaves, 3 internal) | Total Mass: 325.00 ===
+08:04:26.196 [INFO ] Engine - === DAG Changes in iteration 4 ===
+08:04:26.196 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│   (No structural changes in this iteration)
+└──────────────────────────────────────────────────────────
+08:04:26.196 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 4) ===
+08:04:26.196 [INFO ] Engine - GROW: 21 attempted (0 accepted, 3 rejected, 18 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+08:04:26.196 [INFO ] Stabilizer - GED Analysis (Iter 4): +0/-0 nodes, +0/-0 relations.
+08:04:26.197 [INFO ] Engine - [CONVERGENCE] Iteration 4 | GED converged=false | J stationary=true (streak 2/5, editsDelta=0.000e+00, trickleDelta=-2.896e-10)
+08:04:26.197 [INFO ] Engine - STARTING EVOLUTION ITERATION 5
+08:04:26.204 [INFO ] Splitter - Split 'Emergent Concept #3' (q=135, k=2, sep=0.018, routed=[57, 78], converged=true) -> Spawning 2 children
+08:04:26.211 [INFO ] Splitter - Split 'Emergent Concept #3' (q=135, k=2, sep=0.018, routed=[57, 78], converged=true) -> Spawning 2 children
+08:04:26.226 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #3' dJ=5.004e-03 SE_dJ=2.432e-03 z=2.06 dV=2
+08:04:26.226 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #3' Delta J = 0.005004, Delta V = 2
+08:04:26.229 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+08:04:26.233 [INFO ] Fitter - [FIT-μ]  iter=5: mean_MLE_drift=1.000, oscillating_nodes=0/9, earlyout_rate=1.00
+08:04:26.233 [INFO ] Fitter - [FIT-κ]  iter=5: prior_dominated=5/9 (55.6%), median_kfinal=98.00, median_alpha=0.57
+08:04:26.233 [INFO ] Fitter - [FITTER] Fitting complete (4 depths, 9 nodes)
+08:04:26.233 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 142.0450     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 142.0450     | 142.0450     | 0               | 0.0000             | 0.0000            
+│ 2     | 101.7171     | 142.0450     | 0               | 0.0000             | 0.0000            
+│ 3     | 89.0633      | 102.4603     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+08:04:26.234 [INFO ] Engine - [REFIT-DELTA] Iteration 5 | 0.000e+00 (M-step inert, as expected)
+08:04:26.234 [INFO ] Engine - [J-TRACK] Iteration 5 | J_after_trickle: 0.047814 (Trickle Delta: -0.000000) | J_after_edits: 0.052817 (Edits Delta: 0.005004)
+08:04:26.234 [INFO ] Engine - [MU-GAP] Iteration 5 | internal nodes=4 cos(mu_v, resultant) min=0.9986 p10=0.9986 median=0.9991 max=1.0000
+08:04:26.241 [INFO ] Engine - [J-RESOLUTION] Iteration 5 | J=0.052817 SE_boot=4.477e-03 (B=200) | tau=1.000e-06 SE/tau=4476.5 | 2*SE=8.953e-03
+08:04:26.241 [INFO ] Engine - Iteration 5 completed in 44ms.
+08:04:26.241 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 9 (5 leaves, 4 internal) | Total Mass: 325.00 ===
+08:04:26.250 [INFO ] Engine - === DAG Changes in iteration 5 ===
+08:04:26.250 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│ "IFEVAL" (Parent, q=0/325)
+│ └── "IFEVAL/ifeval" (Parent, q=0/325)
+│     └── [MUTATED] "Emergent Concept #3" (Parent, kappa: 98.0, q=0/134) -> type changed: Leaf -> Parent
+│         ├── [ADDED] "Emergent Concept #35" (Leaf, kappa: 92.2, q=59/59)
+│         └── [ADDED] "Emergent Concept #36" (Leaf, kappa: 80.7, q=78/78)
+└──────────────────────────────────────────────────────────
+08:04:26.251 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 5) ===
+08:04:26.251 [INFO ] Engine - GROW: 19 attempted (1 accepted, 0 rejected, 18 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+08:04:26.251 [INFO ] Stabilizer - GED Analysis (Iter 5): +2/-0 nodes, +2/-0 relations.
+08:04:26.251 [INFO ] Engine - [CONVERGENCE] Iteration 5 | GED converged=false | J stationary=false (streak 0/5, editsDelta=5.004e-03, trickleDelta=-2.016e-13)
+08:04:26.251 [INFO ] Engine - STARTING EVOLUTION ITERATION 6
+08:04:26.260 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+08:04:26.262 [INFO ] Fitter - [FIT-μ]  iter=6: mean_MLE_drift=1.000, oscillating_nodes=0/9, earlyout_rate=1.00
+08:04:26.262 [INFO ] Fitter - [FIT-κ]  iter=6: prior_dominated=5/9 (55.6%), median_kfinal=98.00, median_alpha=0.57
+08:04:26.262 [INFO ] Fitter - [FITTER] Fitting complete (4 depths, 9 nodes)
+08:04:26.262 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 142.0450     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 142.0450     | 142.0450     | 0               | 0.0000             | 0.0000            
+│ 2     | 101.7172     | 142.0450     | 0               | 0.0000             | 0.0000            
+│ 3     | 89.0633      | 102.4603     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+08:04:26.263 [INFO ] Engine - [REFIT-DELTA] Iteration 6 | 0.000e+00 (M-step inert, as expected)
+08:04:26.263 [INFO ] Engine - [J-TRACK] Iteration 6 | J_after_trickle: 0.052817 (Trickle Delta: -0.000000) | J_after_edits: 0.052817 (Edits Delta: 0.000000)
+08:04:26.263 [INFO ] Engine - [MU-GAP] Iteration 6 | internal nodes=4 cos(mu_v, resultant) min=0.9986 p10=0.9986 median=0.9991 max=1.0000
+08:04:26.268 [INFO ] Engine - [J-RESOLUTION] Iteration 6 | J=0.052817 SE_boot=4.477e-03 (B=200) | tau=1.000e-06 SE/tau=4476.5 | 2*SE=8.953e-03
+08:04:26.268 [INFO ] Engine - Iteration 6 completed in 17ms.
+08:04:26.268 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 9 (5 leaves, 4 internal) | Total Mass: 325.00 ===
+08:04:26.277 [INFO ] Engine - === DAG Changes in iteration 6 ===
+08:04:26.277 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│   (No structural changes in this iteration)
+└──────────────────────────────────────────────────────────
+08:04:26.277 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 6) ===
+08:04:26.277 [INFO ] Engine - GROW: 27 attempted (0 accepted, 0 rejected, 27 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+08:04:26.277 [INFO ] Stabilizer - GED Analysis (Iter 6): +0/-0 nodes, +0/-0 relations.
+08:04:26.277 [INFO ] Stabilizer - Convergence streak: 1/5
+08:04:26.277 [INFO ] Engine - [CONVERGENCE] Iteration 6 | GED converged=false | J stationary=true (streak 1/5, editsDelta=0.000e+00, trickleDelta=-1.075e-08)
+08:04:26.277 [INFO ] Engine - STARTING EVOLUTION ITERATION 7
+08:04:26.287 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+08:04:26.290 [INFO ] Fitter - [FIT-μ]  iter=7: mean_MLE_drift=1.000, oscillating_nodes=0/9, earlyout_rate=1.00
+08:04:26.290 [INFO ] Fitter - [FIT-κ]  iter=7: prior_dominated=5/9 (55.6%), median_kfinal=98.00, median_alpha=0.57
+08:04:26.290 [INFO ] Fitter - [FITTER] Fitting complete (4 depths, 9 nodes)
+08:04:26.290 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 142.0450     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 142.0450     | 142.0450     | 0               | 0.0000             | 0.0000            
+│ 2     | 101.7172     | 142.0450     | 0               | 0.0000             | 0.0000            
+│ 3     | 89.0633      | 102.4603     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+08:04:26.291 [INFO ] Engine - [REFIT-DELTA] Iteration 7 | 0.000e+00 (M-step inert, as expected)
+08:04:26.291 [INFO ] Engine - [J-TRACK] Iteration 7 | J_after_trickle: 0.052817 (Trickle Delta: -0.000000) | J_after_edits: 0.052817 (Edits Delta: 0.000000)
+08:04:26.291 [INFO ] Engine - [MU-GAP] Iteration 7 | internal nodes=4 cos(mu_v, resultant) min=0.9986 p10=0.9986 median=0.9991 max=1.0000
+08:04:26.296 [INFO ] Engine - [J-RESOLUTION] Iteration 7 | J=0.052817 SE_boot=4.477e-03 (B=200) | tau=1.000e-06 SE/tau=4476.5 | 2*SE=8.953e-03
+08:04:26.296 [INFO ] Engine - Iteration 7 completed in 19ms.
+08:04:26.296 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 9 (5 leaves, 4 internal) | Total Mass: 325.00 ===
+08:04:26.305 [INFO ] Engine - === DAG Changes in iteration 7 ===
+08:04:26.305 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│   (No structural changes in this iteration)
+└──────────────────────────────────────────────────────────
+08:04:26.305 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 7) ===
+08:04:26.305 [INFO ] Engine - GROW: 27 attempted (0 accepted, 0 rejected, 27 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+08:04:26.305 [INFO ] Stabilizer - GED Analysis (Iter 7): +0/-0 nodes, +0/-0 relations.
+08:04:26.306 [INFO ] Stabilizer - Convergence streak: 2/5
+08:04:26.306 [INFO ] Engine - [CONVERGENCE] Iteration 7 | GED converged=false | J stationary=true (streak 2/5, editsDelta=0.000e+00, trickleDelta=-2.562e-11)
+08:04:26.309 [INFO ] Engine - STARTING EVOLUTION ITERATION 8
+08:04:26.318 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+08:04:26.320 [INFO ] Fitter - [FIT-μ]  iter=8: mean_MLE_drift=1.000, oscillating_nodes=0/9, earlyout_rate=1.00
+08:04:26.320 [INFO ] Fitter - [FIT-κ]  iter=8: prior_dominated=5/9 (55.6%), median_kfinal=98.00, median_alpha=0.57
+08:04:26.320 [INFO ] Fitter - [FITTER] Fitting complete (4 depths, 9 nodes)
+08:04:26.320 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 142.0450     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 142.0450     | 142.0450     | 0               | 0.0000             | 0.0000            
+│ 2     | 101.7172     | 142.0450     | 0               | 0.0000             | 0.0000            
+│ 3     | 89.0633      | 102.4603     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+08:04:26.321 [INFO ] Engine - [REFIT-DELTA] Iteration 8 | 0.000e+00 (M-step inert, as expected)
+08:04:26.321 [INFO ] Engine - [J-TRACK] Iteration 8 | J_after_trickle: 0.052817 (Trickle Delta: 0.000000) | J_after_edits: 0.052817 (Edits Delta: 0.000000)
+08:04:26.321 [INFO ] Engine - [MU-GAP] Iteration 8 | internal nodes=4 cos(mu_v, resultant) min=0.9986 p10=0.9986 median=0.9991 max=1.0000
+08:04:26.325 [INFO ] Engine - [J-RESOLUTION] Iteration 8 | J=0.052817 SE_boot=4.477e-03 (B=200) | tau=1.000e-06 SE/tau=4476.5 | 2*SE=8.953e-03
+08:04:26.325 [INFO ] Engine - Iteration 8 completed in 16ms.
+08:04:26.325 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 9 (5 leaves, 4 internal) | Total Mass: 325.00 ===
+08:04:26.334 [INFO ] Engine - === DAG Changes in iteration 8 ===
+08:04:26.334 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│   (No structural changes in this iteration)
+└──────────────────────────────────────────────────────────
+08:04:26.334 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 8) ===
+08:04:26.334 [INFO ] Engine - GROW: 27 attempted (0 accepted, 0 rejected, 27 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+08:04:26.334 [INFO ] Stabilizer - GED Analysis (Iter 8): +0/-0 nodes, +0/-0 relations.
+08:04:26.335 [INFO ] Stabilizer - Convergence streak: 3/5
+08:04:26.335 [INFO ] Engine - [CONVERGENCE] Iteration 8 | GED converged=false | J stationary=true (streak 3/5, editsDelta=0.000e+00, trickleDelta=1.665e-15)
+08:04:26.335 [INFO ] Engine - STARTING EVOLUTION ITERATION 9
+08:04:26.344 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+08:04:26.346 [INFO ] Fitter - [FIT-μ]  iter=9: mean_MLE_drift=1.000, oscillating_nodes=0/9, earlyout_rate=1.00
+08:04:26.346 [INFO ] Fitter - [FIT-κ]  iter=9: prior_dominated=5/9 (55.6%), median_kfinal=98.00, median_alpha=0.57
+08:04:26.346 [INFO ] Fitter - [FITTER] Fitting complete (4 depths, 9 nodes)
+08:04:26.347 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 142.0450     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 142.0450     | 142.0450     | 0               | 0.0000             | 0.0000            
+│ 2     | 101.7172     | 142.0450     | 0               | 0.0000             | 0.0000            
+│ 3     | 89.0633      | 102.4603     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+08:04:26.347 [INFO ] Engine - [REFIT-DELTA] Iteration 9 | 0.000e+00 (M-step inert, as expected)
+08:04:26.347 [INFO ] Engine - [J-TRACK] Iteration 9 | J_after_trickle: 0.052817 (Trickle Delta: 0.000000) | J_after_edits: 0.052817 (Edits Delta: 0.000000)
+08:04:26.347 [INFO ] Engine - [MU-GAP] Iteration 9 | internal nodes=4 cos(mu_v, resultant) min=0.9986 p10=0.9986 median=0.9991 max=1.0000
+08:04:26.352 [INFO ] Engine - [J-RESOLUTION] Iteration 9 | J=0.052817 SE_boot=4.477e-03 (B=200) | tau=1.000e-06 SE/tau=4476.5 | 2*SE=8.953e-03
+08:04:26.352 [INFO ] Engine - Iteration 9 completed in 17ms.
+08:04:26.352 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 9 (5 leaves, 4 internal) | Total Mass: 325.00 ===
+08:04:26.361 [INFO ] Engine - === DAG Changes in iteration 9 ===
+08:04:26.361 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│   (No structural changes in this iteration)
+└──────────────────────────────────────────────────────────
+08:04:26.361 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 9) ===
+08:04:26.361 [INFO ] Engine - GROW: 27 attempted (0 accepted, 0 rejected, 27 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+08:04:26.362 [INFO ] Stabilizer - GED Analysis (Iter 9): +0/-0 nodes, +0/-0 relations.
+08:04:26.362 [INFO ] Stabilizer - Convergence streak: 4/5
+08:04:26.362 [INFO ] Engine - [CONVERGENCE] Iteration 9 | GED converged=false | J stationary=true (streak 4/5, editsDelta=0.000e+00, trickleDelta=0.000e+00)
+08:04:26.362 [INFO ] Engine - STARTING EVOLUTION ITERATION 10
+08:04:26.370 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+08:04:26.374 [INFO ] Fitter - [FIT-μ]  iter=10: mean_MLE_drift=1.000, oscillating_nodes=0/9, earlyout_rate=1.00
+08:04:26.375 [INFO ] Fitter - [FIT-κ]  iter=10: prior_dominated=5/9 (55.6%), median_kfinal=98.00, median_alpha=0.57
+08:04:26.375 [INFO ] Fitter - [FITTER] Fitting complete (4 depths, 9 nodes)
+08:04:26.375 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 142.0450     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 142.0450     | 142.0450     | 0               | 0.0000             | 0.0000            
+│ 2     | 101.7172     | 142.0450     | 0               | 0.0000             | 0.0000            
+│ 3     | 89.0633      | 102.4603     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+08:04:26.375 [INFO ] Engine - [REFIT-DELTA] Iteration 10 | 0.000e+00 (M-step inert, as expected)
+08:04:26.375 [INFO ] Engine - [J-TRACK] Iteration 10 | J_after_trickle: 0.052817 (Trickle Delta: -0.000000) | J_after_edits: 0.052817 (Edits Delta: 0.000000)
+08:04:26.375 [INFO ] Engine - [MU-GAP] Iteration 10 | internal nodes=4 cos(mu_v, resultant) min=0.9986 p10=0.9986 median=0.9991 max=1.0000
+08:04:26.380 [INFO ] Engine - [J-RESOLUTION] Iteration 10 | J=0.052817 SE_boot=4.477e-03 (B=200) | tau=1.000e-06 SE/tau=4476.5 | 2*SE=8.953e-03
+08:04:26.380 [INFO ] Engine - Iteration 10 completed in 18ms.
+08:04:26.380 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 9 (5 leaves, 4 internal) | Total Mass: 325.00 ===
+08:04:26.388 [INFO ] Engine - === DAG Changes in iteration 10 ===
+08:04:26.388 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│   (No structural changes in this iteration)
+└──────────────────────────────────────────────────────────
+08:04:26.388 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 10) ===
+08:04:26.388 [INFO ] Engine - GROW: 27 attempted (0 accepted, 0 rejected, 27 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+08:04:26.389 [INFO ] Stabilizer - GED Analysis (Iter 10): +0/-0 nodes, +0/-0 relations.
+08:04:26.389 [INFO ] Stabilizer - Convergence streak: 5/5
+08:04:26.389 [INFO ] Stabilizer - Convergence Met: Taxonomy mixture has stabilized for 5 consecutive iterations.
+08:04:26.389 [INFO ] Engine - [CONVERGENCE] Iteration 10 | GED converged=true | J stationary=true (streak 5/5, editsDelta=0.000e+00, trickleDelta=-1.110e-16)
+08:04:26.389 [INFO ] Engine - Early stopping triggered in iteration 10 due to convergence (GED quiescence).
+08:04:26.390 [INFO ] Engine - [FIXED-POINT] iteration=10 editsDelta=0.000e+00 trickleDelta=-1.110e-16 maxMuDelta=0.000e+00 maxKappaRel=1.886e-13 tol=1.000e-06 certified=true
+08:04:26.390 [INFO ] Engine - === STARTING FINALIZATION PHASE ===
+08:04:26.391 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+08:04:26.394 [INFO ] Fitter - [FITTER] Fitting complete (4 depths, 9 nodes)
+08:04:26.395 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 142.0450     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 142.0450     | 142.0450     | 0               | 0.0000             | 0.0000            
+│ 2     | 101.7172     | 142.0450     | 0               | 0.0000             | 0.0000            
+│ 3     | 89.0633      | 102.4603     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+08:04:26.395 [INFO ] Engine - Finalization phase completed in 4ms.
+08:04:26.395 [INFO ] Engine - --- 50-Iteration Evolution Completed ---
+08:04:26.399 [INFO ] Operations - 
+┌── TAXONOMY DAG HIERARCHY ───────────────────────────────
+│ IFEVAL [q_dir=0, q_rec=325, mass=325.0 - Parent/Residual] (vMF kappa: 142.045)
+│ └── IFEVAL/ifeval [q_dir=0, q_rec=325, mass=325.0 - Parent/Residual] (vMF kappa: 142.045)
+│     ├── Emergent Concept #4 [q_dir=0, q_rec=202, mass=197.6 - Parent/Residual] (vMF kappa: 105.433)
+│     │   ├── Emergent Concept #9 [q_dir=69, q_rec=69, mass=64.7 - Leaf] (vMF kappa: 88.119)
+│     │   ├── Emergent Concept #10 [q_dir=80, q_rec=80, mass=78.2 - Leaf] (vMF kappa: 83.870)
+│     │   └── Emergent Concept #8 [q_dir=58, q_rec=58, mass=54.8 - Leaf] (vMF kappa: 100.364)
+│     └── Emergent Concept #3 [q_dir=0, q_rec=134, mass=127.4 - Parent/Residual] (vMF kappa: 98.001)
+│         ├── Emergent Concept #35 [q_dir=59, q_rec=59, mass=56.8 - Leaf] (vMF kappa: 92.247)
+│         └── Emergent Concept #36 [q_dir=78, q_rec=78, mass=70.6 - Leaf] (vMF kappa: 80.716)
+└─────────────────────────────────────────────────────────
+08:04:26.402 [INFO ] Engine - 
+========================================================================================================
+                               DAG PERFORMANCE REPORT & INSTRUMENTATION                                 
+========================================================================================================
+Top-Level Roll-Up:
+  Construction     :      1 777 ms (100,0%)
+  Arena/Bench      :          0 ms (  0,0%)
+  Persistence      :          0 ms (  0,0%)
+  Other            :          0 ms (  0,0%)
+  TOTAL TIME       :      1 777 ms (100.0%)
+========================================================================================================
+
+Section: CONSTRUCTION DETAILS
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| Phase / Operation                           | Calls | Total(ms) | Avg(ms) | p50(ms) | p95(ms) |     Count |    Unit/s |  Shr |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| phase4_split                                |    10 |      1605 |   160,5 |      26 |     810 |        10 |       6,2 | 90,3% |
+| phase2_refit                                |    10 |        60 |     6,0 |       5 |      12 |        10 |     166,7 | 3,4% |
+| phase3_trickle                              |    10 |        41 |     4,1 |       4 |       7 |     3 250 |  79 268,3 | 2,3% |
+| phase2_bootstrap                            |     1 |        35 |    35,0 |      35 |      35 |         1 |      28,6 | 2,0% |
+| phase1_precompute                           |     1 |        22 |    22,0 |      22 |      22 |       325 |  14 772,7 | 1,2% |
+| phase5_optimize                             |    10 |        14 |     1,4 |       1 |       3 |        10 |     714,3 | 0,8% |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+
+Construction Per-Iteration Step Times:
+  Iter  1:    649 ms  [phase4_split=638ms, phase5_optimize=3ms, phase2_refit=8ms, phase3_trickle=0ms]
+  Iter  2:    825 ms  [phase5_optimize=1ms, phase4_split=810ms, phase2_refit=12ms, phase3_trickle=2ms]
+  Iter  3:     77 ms  [phase5_optimize=2ms, phase4_split=63ms, phase2_refit=8ms, phase3_trickle=4ms]
+  Iter  4:     78 ms  [phase5_optimize=1ms, phase4_split=62ms, phase3_trickle=4ms, phase2_refit=11ms]
+  Iter  5:     36 ms  [phase5_optimize=1ms, phase4_split=26ms, phase3_trickle=4ms, phase2_refit=5ms]
+  Iter  6:      9 ms  [phase5_optimize=1ms, phase4_split=2ms, phase3_trickle=4ms, phase2_refit=2ms]
+  Iter  7:     12 ms  [phase5_optimize=1ms, phase4_split=1ms, phase3_trickle=7ms, phase2_refit=3ms]
+  Iter  8:     11 ms  [phase2_refit=3ms, phase5_optimize=2ms, phase4_split=1ms, phase3_trickle=5ms]
+  Iter  9:     11 ms  [phase2_refit=3ms, phase5_optimize=1ms, phase4_split=1ms, phase3_trickle=6ms]
+  Iter 10:     12 ms  [phase4_split=1ms, phase5_optimize=1ms, phase3_trickle=5ms, phase2_refit=5ms]
+========================================================================================================
+
+08:04:26.481 [INFO ] AdditionalMetrics - [CALIB]  ECE=0.0000, reliability_bins={[0.9,1.0]:1.00/1.00}
+08:04:26.482 [INFO ] Metrics - 
+┌── TAXONOMY CONFIGURATION PARAMETERS ─────────────────────
+│ Execution Settings:
+│   - Dataset Type:         AG_NEWS
+│   - Corpora:              [IFEVAL]
+│   - Num Iterations:       50
+│   - Early Stopping:       true
+│   - Labeling:             false
+│   - Selected Domains:     [All]
+│   - Split Dataset:        true
+│   - Test Split Ratio:     0.3
+├── LLM & Embedding Models:
+│   - LLM Provider:         AZURE
+│   - Embedding Provider:   OLLAMA
+│   - Embedding Model:      qwen3-embedding:latest
+│   - Judge Model:          Mistral-Large-3
+│   - Labeling Model:       Mistral-Large-3
+│   - Max Judge Generality: 1
+├── Advanced Mathematical Formalism Controls:
+│   - DAG Mode:             DAG_MAX
+│   - Max Depth:            8
+│   - Min Cluster Size:     55
+│   - Separation Bar:       0.0145
+│   - Slice Dim / PCA:      512 / dropTop=0 whiten=false
+│   - Lexicographic Tau:    1.0E-6
+│   - Membership Floor:     0.25
+│   - Routing Beam Gamma:   0.2
+│   - Descent Margin:       0.12
+│   - Fusion Sim Threshold: 0.9
+│   - Eff Support Floor:    2.0
+│   - Default Kappa Prior:  10.0
+└──────────────────────────────────────────────────────────
+| TAXONOMY ARCHITECTURAL METRICS
++----------------------------------------------------------
+| Topology Stats:
+|   Total Nodes:         9
+|   Leaf Nodes:          5
+|   Cross-Domain Nodes:  0
+|   Bridge Node Ratio:   0.00%
+|   Max Depth:           3
+|   Avg Leaf Depth:      3.00
++----------------------------------------------------------
+| Assignment Stats:
+|   Unique Queries:      325
+|   Median Nodes/Query:  1.00
+|   Residual Queries:    0
+|   Avg Match Count:     1.06 leaves/query
++----------------------------------------------------------
+| Structural & Semantic Diagnostics:
+|   Residual Ratio:      0.00%
+|   Max Concentration:   24.62%
+|   Tree Equilibrium:    92.67%
+|   Contamination:       0.00%
+|   vMF κ by depth:
+|     Depth 3: 89.063
++----------------------------------------------------------
+| External Validation & Geometric Metrics:
+|   NMI:                 0.0000
+|   ARI:                 0.0000
+|   Dendrogram Purity:   1.0000
+|   Weighted Leaf Purity:1.0000
+|   Edge F1 vs Gold:     1.0000
+|   Spherical Silhouette:0.0753
+|   Ancestor Correct:    1.0000
+|   Leaf Entropy:        1.6005 nats
++----------------------------------------------------------
+
+08:04:26.505 [INFO ] HeadlessRunner - [TRAIN-ONLY] after construction: 0 EVAL texts among the tree's members (216 keys checked)
+08:04:26.506 [INFO ] HeadlessRunner - Saving generated DAG snapshot to database...
+08:04:26.506 [INFO ] Persistence - Saving taxonomy DAG with Vector-Offloading to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\temp_graph_save.tmp...
+08:04:26.581 [INFO ] Persistence - Saved 9 nodes successfully (offloaded structure to SQL).
+08:04:26.653 [WARN ] AdditionalMetrics - computeRoutingECE: empty ground truth — returning 0.0 (GT plumbing absent)
+08:04:26.659 [INFO ] SnapshotManager - [POOL-PIN] snapshot stores this run's own reserved pool p01c5441205338483
+08:04:26.677 [INFO ] SnapshotManager - [TRAIN-ONLY] saveSnapshot: 0 EVAL texts among the tree's members (216 pool texts checked)
+08:04:26.694 [INFO ] SnapshotManager - Successfully created and saved snapshot to DB: 20261001_080426_Headless_Run_Auto_ge
+08:04:26.694 [INFO ] HeadlessRunner - Successfully generated and saved snapshot. Snapshot ID: 20261001_080426_Headless_Run_Auto_ge
+08:04:26.694 [INFO ] HeadlessRunner - Active graph node set: n00000001
+08:04:26.695 [INFO ] HeadlessRunner - Bridge Nodes CSV written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\B0p\ifeval\seed_42\validation\bridge_nodes.csv
+08:04:26.695 [INFO ] HeadlessRunner - Bridge Residuals CSV written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\B0p\ifeval\seed_42\validation\bridge_residuals.csv
+08:04:26.700 [INFO ] LeaderboardCorpus - Loaded 541 IFEVAL queries across 1 domain(s) from multicorpus_cache_v1.db
+08:04:26.700 [INFO ] DatasetFetcher - [CORPUS] merged 1 source(s): IFEVAL=1 domain(s)/541 queries -> 1 domain key(s), 541 queries
+08:04:26.700 [INFO ] HeadlessRunner - ========================================
+08:04:26.700 [INFO ] HeadlessRunner - RUNNING TRICKLE VALIDATION: MAIN
+08:04:26.700 [INFO ] HeadlessRunner - ========================================
+08:04:26.702 [INFO ] HeadlessRunner - Starting Headless Batch Trickle Validation for MAIN...
+08:04:26.703 [INFO ] HeadlessRunner - Graph validity CSV for MAIN written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\B0p\ifeval\seed_42\validation\MAIN_graph_validity.csv
+08:04:26.739 [INFO ] AdditionalMetrics - [CALIB]  ECE=0.0000, reliability_bins={[0.9,1.0]:1.00/1.00}
+08:04:26.740 [INFO ] HeadlessRunner - Taxonomy quality CSV for MAIN written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\B0p\ifeval\seed_42\validation\MAIN_taxonomy_quality.csv
+08:04:26.740 [INFO ] HeadlessRunner - Bridge quality CSV for MAIN written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\B0p\ifeval\seed_42\validation\MAIN_bridge_quality.csv
+08:04:26.741 [INFO ] HeadlessRunner - Loaded 344 ground-truth categories directly from DAG queries.
+08:04:26.742 [INFO ] HeadlessRunner - Backfilled 0 categories from local cache. Total mapping keys: 327
+08:04:26.744 [INFO ] HeadlessRunner - Indexed leaves: 5 / 5 leaves tagged with a domain.
+08:04:26.745 [INFO ] HeadlessRunner - Routing 216 test queries...
+08:04:26.783 [INFO ] AdditionalMetrics - [CALIB]  ECE=0.0784, reliability_bins={[0.9,1.0]:1.00/1.00, [0.7,0.8]:0.72/1.00, [0.6,0.7]:0.67/1.00, [0.5,0.6]:0.54/1.00, [0.4,0.5]:0.49/1.00}
+08:04:26.783 [INFO ] BatchTrickleEvaluator - [ROUTE]  posterior_sum≈1.0000, membership_depth_corr=0.0000, multi_leaf_rate=0.1991, dist={1:0.80, 2:0.19, 3:0.00}
+08:04:26.783 [INFO ] BatchTrickleEvaluator - Held-out residual rate: 0.00%
+08:04:26.784 [INFO ] HeadlessRunner - Batch Trickle Results (MAIN):
+08:04:26.784 [INFO ] HeadlessRunner -   - Total Queries: 216
+08:04:26.784 [INFO ] HeadlessRunner -   - Top-1 Accuracy: 100,00% (95% Wilson CI: [98,25%, 100,00%])
+08:04:26.784 [INFO ] HeadlessRunner -   - Any-Match Accuracy: 100,00%
+08:04:26.784 [INFO ] HeadlessRunner -   - Mean Leaf Purity: 100,00%
+08:04:26.784 [INFO ] HeadlessRunner -   - Expected Calibration Error (ECE): 0,0784
+08:04:26.784 [INFO ] HeadlessRunner -   - Macro F1: 100,00%
+08:04:26.784 [INFO ] HeadlessRunner -   - Avg Match Count (Eval): 1,20 leaves/query
+08:04:26.784 [INFO ] HeadlessRunner -   - Median Nodes/Query (Eval): 1,00
+08:04:26.784 [INFO ] HeadlessRunner - Held-out residual rate: 0.00%
+08:04:26.785 [INFO ] HeadlessRunner - 
+Per-Domain Trickle Results (MAIN):
+----------------------------------------------------------------------
+Domain                    | Support | Precision |   Recall |       F1
+----------------------------------------------------------------------
+IFEVAL/ifeval             |     216 |    100,0% |   100,0% |   100,0%
+======================================================================
+
+08:04:26.788 [INFO ] HeadlessRunner - Trickle validation results written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\B0p\ifeval\seed_42\validation\MAIN_trickle_validation_results.csv
+08:04:26.801 [INFO ] HeadlessRunner - Nearest-Centroid Routing Results (MAIN):
+08:04:26.801 [INFO ] HeadlessRunner -   - Total Evaluated: 216
+08:04:26.801 [INFO ] HeadlessRunner -   - Top-1 Accuracy: 100,00%
+08:04:26.801 [INFO ] HeadlessRunner -   - Top-3 Accuracy: 100,00%
+08:04:26.801 [INFO ] HeadlessRunner -   - Top-5 Accuracy: 100,00%
+08:04:26.801 [INFO ] HeadlessRunner -   - Top-10 Accuracy: 100,00%
+08:04:26.802 [INFO ] HeadlessRunner - Centroid routing results written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\B0p\ifeval\seed_42\validation\MAIN_centroid_routing_results.csv
+08:04:26.823 [INFO ] HeadlessRunner - Migration flow matrix written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\B0p\ifeval\seed_42\validation\MAIN_migration_flow_matrix.csv
+08:04:26.849 [INFO ] HeadlessRunner - Held-out leaf support CSV written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\B0p\ifeval\seed_42\validation\MAIN_heldout_leaf_support.csv
+08:04:26.850 [INFO ] HeadlessRunner - Held-out leaf support (MAIN): leaves=5, top1 min=36 median=38.0 max=56, leaves with <12 held-out top-1 queries: 0
+08:04:26.851 [INFO ] HeadlessRunner - Routing calibration CSV written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\B0p\ifeval\seed_42\validation\MAIN_routing_calibration.csv
+08:04:26.884 [INFO ] AdditionalMetrics - [CALIB]  ECE=0.0000, reliability_bins={[0.9,1.0]:1.00/1.00}
+08:04:26.981 [INFO ] HeadlessRunner - Appended condition MAIN results to ledger at Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\B0p\ifeval\tuning_ledger.csv
+08:04:26.983 [INFO ] HeadlessRunner - Performance report JSON written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\B0p\ifeval\seed_42\performance_report.json
+08:04:26.984 [INFO ] HeadlessRunner - 
+========================================================================================================
+                               DAG PERFORMANCE REPORT & INSTRUMENTATION                                 
+========================================================================================================
+Top-Level Roll-Up:
+  Construction     :      1 846 ms ( 79,8%)
+  Arena/Bench      :        280 ms ( 12,1%)
+  Persistence      :        188 ms (  8,1%)
+  Other            :          0 ms (  0,0%)
+  TOTAL TIME       :      2 314 ms (100.0%)
+========================================================================================================
+
+Section: CONSTRUCTION DETAILS
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| Phase / Operation                           | Calls | Total(ms) | Avg(ms) | p50(ms) | p95(ms) |     Count |    Unit/s |  Shr |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| phase4_split                                |    10 |      1605 |   160,5 |      26 |     810 |        10 |       6,2 | 69,4% |
+| finalization.generate_report                |     2 |        69 |    34,5 |      36 |      36 |         2 |      29,0 | 3,0% |
+| phase2_refit                                |    10 |        60 |     6,0 |       5 |      12 |        10 |     166,7 | 2,6% |
+| phase3_trickle                              |    10 |        41 |     4,1 |       4 |       7 |     3 250 |  79 268,3 | 1,8% |
+| phase2_bootstrap                            |     1 |        35 |    35,0 |      35 |      35 |         1 |      28,6 | 1,5% |
+| phase1_precompute                           |     1 |        22 |    22,0 |      22 |      22 |       325 |  14 772,7 | 1,0% |
+| phase5_optimize                             |    10 |        14 |     1,4 |       1 |       3 |        10 |     714,3 | 0,6% |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+
+Section: ARENA/BENCHMARK DETAILS
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| Phase / Operation                           | Calls | Total(ms) | Avg(ms) | p50(ms) | p95(ms) |     Count |    Unit/s |  Shr |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| validation.MAIN                             |     1 |       280 |   280,0 |     280 |     280 |       216 |     771,4 | 12,1% |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+
+Section: PERSISTENCE DETAILS
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| Phase / Operation                           | Calls | Total(ms) | Avg(ms) | p50(ms) | p95(ms) |     Count |    Unit/s |  Shr |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| snapshot_save                               |     1 |       188 |   188,0 |     188 |     188 |         1 |       5,3 | 8,1% |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+
+Construction Per-Iteration Step Times:
+  Iter  1:    649 ms  [phase5_optimize=3ms, phase2_refit=8ms, phase3_trickle=0ms, phase4_split=638ms]
+  Iter  2:    825 ms  [phase5_optimize=1ms, phase2_refit=12ms, phase3_trickle=2ms, phase4_split=810ms]
+  Iter  3:     77 ms  [phase5_optimize=2ms, phase2_refit=8ms, phase3_trickle=4ms, phase4_split=63ms]
+  Iter  4:     78 ms  [phase5_optimize=1ms, phase3_trickle=4ms, phase2_refit=11ms, phase4_split=62ms]
+  Iter  5:     36 ms  [phase5_optimize=1ms, phase3_trickle=4ms, phase2_refit=5ms, phase4_split=26ms]
+  Iter  6:      9 ms  [phase5_optimize=1ms, phase3_trickle=4ms, phase2_refit=2ms, phase4_split=2ms]
+  Iter  7:     12 ms  [phase5_optimize=1ms, phase3_trickle=7ms, phase2_refit=3ms, phase4_split=1ms]
+  Iter  8:     11 ms  [phase5_optimize=2ms, phase3_trickle=5ms, phase2_refit=3ms, phase4_split=1ms]
+  Iter  9:     11 ms  [phase5_optimize=1ms, phase3_trickle=6ms, phase2_refit=3ms, phase4_split=1ms]
+  Iter 10:     12 ms  [phase5_optimize=1ms, phase2_refit=5ms, phase4_split=1ms, phase3_trickle=5ms]
+========================================================================================================
+
+08:04:26.991 [INFO ] Diagnostics - [DIAG] diagnostics bundle closed (completed) at Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\B0p\ifeval\seed_42\diagnostics
+08:04:26.991 [INFO ] HeadlessRunner - Headless Benchmark finished successfully.
+08:04:26.992 [INFO ] ModelEvalStore - SQLite evaluation store database connection closed cleanly via shutdown hook.
+08:04:26.992 [INFO ] RankingService - SQLite database connection closed cleanly via shutdown hook.
+08:04:26.992 [INFO ] DatasetFetcher - SQLite dataset fetcher database connection closed cleanly via shutdown hook.
+08:04:26.997 [INFO ] SnapshotManager - SQLite snapshot database connection closed cleanly via shutdown hook.
+
+BUILD SUCCESSFUL in 6s
+7 actionable tasks: 1 executed, 6 up-to-date
+Configuration cache entry stored.
+[B0p/ifeval] end 2026-10-01T08:04:27+02:00 rc=0 wall_s=7

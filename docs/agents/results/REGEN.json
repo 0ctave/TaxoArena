@@ -1,0 +1,124 @@
+{
+  "id": "REGEN",
+  "title": "REGEN: can grok-4-1-fast-reasoning enter the arena fairly, given its answer-only traces were a third the contestants' length? (3,445 reasoning calls, no judging)",
+  "question": "Regenerate grok-4-1-fast-reasoning's answers on the 3,445 pool questions under the CONTESTANTS' prompt shape (MMLU-Pro chain-of-thought, options A-J, step-by-step, 'the answer is (X)'); ADMISSION RULE fixed before the run: admitted only if the median trace length falls inside the contestants' range AND extraction succeeds on > 98%; also report accuracy against the answer-only prompt and per-question agreement.",
+  "kind": "solve",
+  "state": "done",
+  "registration": {
+    "commit": "d580537",
+    "program_lines": "docs/judge_v2_program.md L915-L931",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-13 (before any call) — REGEN: grok-4-1-fast-reasoning as a FAIR arena contestant",
+    "outcome_heading": [
+      "L1100: - **REGEN OUTCOME (2026-09-14): ADMITTED as a contestant, and the final prompt effect is -1.0pp.**"
+    ],
+    "date": "2026-09-13"
+  },
+  "script": {
+    "path": "tools/analysis/regen_contestant.py",
+    "sha16": "88ea0aea93a6a32e (at 7454760)",
+    "commit": "7454760 (later a7db10d / 13f2142)"
+  },
+  "ready": null,
+  "go": "3,445 reasoning calls (no judging; under the 4,000-match rule)",
+  "run": {
+    "outcome_file": "experiment_results/judge_solve/regen_grok_reasoning_cot.txt",
+    "outcome_commit": "35b093a",
+    "calls": 3445,
+    "cce": "not stated",
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-14",
+    "other_files": [
+      "experiment_results/judge_solve/grok-reasoning-cot.db (cache; 3,434 rows)"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the admission rule fixed before the run is the gate; PROMPT-AUDIT's controlled estimate is the paired readout",
+    "commit": "35b093a",
+    "verdict": "ADMITTED; final controlled prompt effect -0.010 +- 0.004"
+  },
+  "criteria": [
+    {
+      "id": "admission",
+      "text": "median trace length inside the contestants' range AND extraction > 98%",
+      "result": "HELD",
+      "value": "median 886 chars (contestants 503-1,474); extraction 99.6%: both clauses pass; ADMITTED",
+      "denominator": "3,434 of 3,445 answered (11 content-filter refusals)"
+    },
+    {
+      "id": "(1)",
+      "text": "accuracy under CoT vs the 0.860 answer-only, and per-question agreement",
+      "result": "DELIVERED",
+      "value": "0.849 vs 0.860 on the same questions, 92.7% agreement; lands SECOND on the pool behind gemini (0.913), above arx (0.834); controlled paired prompt effect -0.010 +- 0.004 over 3,430 questions (105 flips vs 71), superseding the -0.006 +- 0.006 interim on 1,344",
+      "denominator": "3,430 paired questions"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "accuracy within 2pp of 0.860",
+      "result": "HELD",
+      "value": "0.849 (-1.1pp)",
+      "denominator": "3,434"
+    },
+    {
+      "id": "P2",
+      "text": "median length 700-1,400 characters",
+      "result": "HELD",
+      "value": "886",
+      "denominator": "3,434"
+    },
+    {
+      "id": "P3",
+      "text": "extraction above 99%",
+      "result": "HELD",
+      "value": "99.6%",
+      "denominator": "3,434"
+    }
+  ],
+  "falsifier": {
+    "text": "the admission rule (else it stays a key-level data point)",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "trace": "median 886 chars (contestants 503-1,474)",
+    "extraction": "99.6%",
+    "accuracy": "0.849 CoT vs 0.860 answer-only; 92.7% agreement; -0.010 +- 0.004 over 3,430 (105 vs 71 flips)",
+    "position": "second on the pool (gemini 0.913; arx 0.834)"
+  },
+  "sentence_of_record": "REGEN (2026-09-14): ADMITTED as a contestant: median trace 886 chars (contestants 503-1,474), extraction 99.6%, both clauses of the admission rule pass; accuracy 0.849 under CoT vs 0.860 answer-only on the same questions, 92.7% agreement; lands SECOND on the pool behind gemini (0.913) and above arx (0.834), inside the contested frontier; the final controlled prompt effect is -0.010 +- 0.004 over 3,430 paired questions, superseding the -0.006 interim and an order of magnitude below the retracted 4.6pp claim.",
+  "chips": [
+    "ADMITTED"
+  ],
+  "brackets": [],
+  "does_not_show": [
+    "a judged board with the new contestant (ARENA-13 admitted it on 2026-09-14)"
+  ],
+  "ledger": {
+    "row_id": "REGEN",
+    "version": "v68 (35b093a)"
+  },
+  "depends_on": [
+    "FRONTIER",
+    "PROMPT-AUDIT",
+    "ARENA-13"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L915-L931 (registration d580537) and L1100-L1114 (outcome 35b093a)",
+    "experiment_results/judge_solve/regen_grok_reasoning_cot.txt (35b093a)",
+    "docs/test_ledger.html row REGEN (v68): chips verbatim, evidence (regen_contestant.py, regen_grok_reasoning_cot.txt, d580537)",
+    "script sha16 = sha256 of tools/analysis/regen_contestant.py at 7454760, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (rubric_v2_design.md / multi_corpus_design.md lines as of their last commits named in sources)"
+  ],
+  "last_update": "2026-09-22",
+  "plain_description": {
+    "sq": "Data hygiene",
+    "what": "3,445 model calls, no judging. Answers from grok-4-1-fast-reasoning were regenerated with the same step-by-step prompt the other contestants used. An admission rule was fixed beforehand: typical answer length within the contestants' range, and answer extraction above 98%.",
+    "why": "Its original answers were a third as long as the others', so judging it as-is would be unfair (judges favour length).",
+    "information": "It decides whether the model can enter the arena on equal terms, and how much the prompt format alone changes accuracy. Result: done, admitted. Median length was 886 characters (contestants 503 to 1,474) and extraction 99.6%. Accuracy was 0.849, second on the pool. The prompt effect is about -1 point, far smaller than an earlier, retracted 4.6-point claim.",
+    "written": "2026-10-07"
+  }
+}

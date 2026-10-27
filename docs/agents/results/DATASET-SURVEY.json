@@ -1,0 +1,182 @@
+{
+  "id": "DATASET-SURVEY",
+  "title": "DATASET-SURVEY: the admission table for a keyed second corpus (>= 20 complete models; >= 120 EVAL per scored stratum; CK-CLOSE-v1 closable with a stem_key collision check; a key; a stated licence; protocol columns), each leg sourced (zero-call; REGISTERED)",
+  "question": "Which candidate corpora pass the admission legs for a keyed second corpus, and on which leg does each fail, with every leg cited?",
+  "kind": "zero-call",
+  "state": "built",
+  "registration": {
+    "commit": "the commit that writes this record (parent b9491bf)",
+    "program_lines": "docs/judge_v2_program.md L21774-L21788",
+    "program_lines_as_of": "the commit that writes them, parent b9491bf, re-grepped",
+    "date": "2026-09-27",
+    "heading": "## Registered 2026-09-27 (before any code or call) \u2014 DATASET-SURVEY: which candidate corpora pass the admission legs for a keyed second corpus ...",
+    "index_section": "docs/judge_v2_program.md L21535-L21555 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run; BEFORE any code) \u2014 Wave-0 REGISTRATIONS (record 2 of 2) ...\"; _as_of the commit that writes them, parent b9491bf, re-grepped)",
+    "provenance": "plan docs/agents/plans/2026-09-27_research_plan_rev2.md PART C2 (the research-lead's drafts), verified and corrected by the registrar before registration (stale items S1-S14 and reconciliations (i)-(ii) in the index section); the orchestrator's brief of 2026-09-27 (computed task, not the author's words); authority: the author's adoption and 'You can start' (docs/judge_v2_program.md L21435-L21457, _as_of b9491bf)"
+  },
+  "script": {
+    "path": "tools/analysis/dataset_survey.py",
+    "sha16": "blob:696154e8502f9bdbffe3e40857ce2d62c558b4c4 / sha256-lf16:40e05526391d0642 / sha256-crlf16:c2083bac52f39b0f (review pin) [2026-09-29 registrar: at b2ad5ef / merged 481b613: dataset_survey.py blob:d83f382485c3c3a5051f80176b855d3ca7e970ed / sha256-lf16:573f4058cd1e4294 / sha256-crlf16:bbe721df3017d2ec (delta-2 review pins, LF blob of record; equal at HEAD 481b613 by git rev-parse)]",
+    "commit": "481b613 (by-path merge of 639e60f; not an ancestor)"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_w0_delta2.md",
+    "commit": "b2ad5ef",
+    "at": "639e60f (505b34b; in RP11)",
+    "verdict": "READY-WITH-CONDITIONS (tool only); MERGEABLE; --analyze HAZARD (write-once; 14 rows owed)",
+    "conditions": [
+      "B2 OPEN: 14 candidate rows owed (126 cells) before --analyze",
+      "--analyze DEFERRED by the orchestrator until all 14 rows are filled"
+    ],
+    "source": "docs/reviews/READY_w0_delta2.md (b2ad5ef)"
+  },
+  "go": "n/a (0 calls, 0 cce); licences and disk of the external corpora beyond SuperGPQA stay the author's (plan B7 item 4)",
+  "run": null,
+  "review": null,
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "COMPLETENESS: HELD iff every cell of every candidate row carries a source (URL, retrieval date, sha256 of the fetched bytes, or the count command) or an UNVERIFIED reason; FAILED otherwise",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "about 10 candidate rows x the legs"
+    },
+    {
+      "id": "C2",
+      "text": "ADMISSION per candidate: ADMIT iff every leg PASSES; REFUSE-by-<leg> iff any FAILS; UNVERIFIED iff none fails and one is UNVERIFIED",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "per candidate"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "SuperGPQA ADMITS on every pre-key leg: 0.85",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "C2"
+    },
+    {
+      "id": "P2",
+      "text": "BigCodeBench-perf REFUSED or UNVERIFIED on licence: 0.70",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "C2"
+    },
+    {
+      "id": "P3",
+      "text": "HELM UNVERIFIED on licence: 0.60",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "C2"
+    },
+    {
+      "id": "P4",
+      "text": "LiveBench REFUSED on support: 0.90",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "C2"
+    },
+    {
+      "id": "P5",
+      "text": "BFCL-Result ADMITS with at most 3 categories >= 120 EVAL: 0.70",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "C2"
+    },
+    {
+      "id": "P6",
+      "text": "RouterEval ADMITS: 0.85",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "C2"
+    },
+    {
+      "id": "P7",
+      "text": "C1 HELD: 0.85",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "C1"
+    }
+  ],
+  "falsifier": {
+    "text": "F1 = SuperGPQA REFUSED on any leg: SUPERGPQA-STAGE0 does not run and the 'second corpus' clause becomes a sourced limit (overturns the author-scoped plan item, docs/judge_v2_program.md L21435-L21457 item (3), not a recorded result).",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "none_yet": "registered; nothing run (the Support figures are planning values of the registration, not outcomes)"
+  },
+  "sentence_of_record": "",
+  "chips": [
+    "REGISTERED 2026-09-27, BEFORE ANY CODE [plan]",
+    "C1 / C2 SCOREABLE (A CENSUS); UNVERIFIED A REGISTERED OUTCOME [plan]",
+    "READS NO MODEL RESULT; NEVER THE SUPERGPQA AGGREGATE JSON [plan]",
+    "BUILT; READY-WITH-CONDITIONS, TOOL ONLY (fd6a349); C11-2 OPEN [plan]",
+    "BUILT; READY-WITH-CONDITIONS (b2ad5ef); SUPERGPQA C2 ADMIT; --analyze DEFERRED (14 ROWS OWED) [plan]"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-29",
+      "by": "the registrar (research lead's rulings 1-21 accepted by the orchestrator; orchestrator rulings B5-1, C7-2; steward 5572465; delta READY fd6a349; merge cfcec54; insertion only; zero calls; pre-data)",
+      "text": "Delta READY fd6a349: READY-WITH-CONDITIONS (tool only) at 505b34b; the tool trusts the status word (witness Y-DS1: models 12 and support 0 marked PASS score ADMIT). OPEN: C11-2; the steward's table (B2). State registered -> built."
+    },
+    {
+      "date": "2026-09-29",
+      "by": "the registrar (steward 8c2b846; delta-2 READY b2ad5ef; merge 481b613; the author's machine cap ~22/24 threads; orchestrator ruling STAGE0b / survey --analyze; refused gemma embed; insertion only; zero calls; pre-data)",
+      "text": "Steward 8c2b846: table experiment_configs/dataset_survey_table_w0_steward.csv (sha256-bytes LF 2684ccf9d9e0ea398866c23b47865021c6482dc1e6db15c21e6d1503d57611cf), SuperGPQA row only; validated without --analyze: C2 SuperGPQA = ADMIT; C1 = FAILED as of now (126 cells of 14 candidates missing). ORCHESTRATOR RULING: --analyze (write-once) DEFERRED until all 14 owed rows are filled; C1 is not recorded of record now. Delta-2 READY b2ad5ef: READY-WITH-CONDITIONS (tool only); merged by path 481b613. State built."
+    }
+  ],
+  "does_not_show": [
+    "anything yet: registered; not run",
+    "any key or model-result number (none read)",
+    "anything from the SuperGPQA Records' aggregate JSON (never opened)",
+    "dominance as an admission leg (reported only)"
+  ],
+  "ledger": {
+    "row_id": "DATASET-SURVEY",
+    "version": "v311 (2026-09-29: a dated bracket into the observed cell; one chip added)"
+  },
+  "depends_on": [
+    "the data-steward's W0 pass (RP02)",
+    "AGENT-CORPUS-ADMISSION (done; the admission form)"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing; touches no closed line (CONTEXT section 5 checked at b9491bf)"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L21774-L21788 (section \"## Registered 2026-09-27 (before any code or call) \u2014 DATASET-SURVEY: which candidate corpora pass the admission legs for a keyed second corpus ...\"; _as_of the commit that writes them, parent b9491bf, re-grepped)",
+    "docs/judge_v2_program.md L21535-L21555 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run; BEFORE any code) \u2014 Wave-0 REGISTRATIONS (record 2 of 2) ...\"; _as_of the commit that writes them, parent b9491bf, re-grepped)",
+    "docs/agents/plans/2026-09-27_research_plan_rev2.md section B4",
+    "docs/judge_v2_program.md L21867-L21892 (section \"## Registrar's record 2026-09-29 (insertion only; zero calls; nothing run; pre-data) \u2014 the research lead's 21 pre-data rulings (accepted by the orchestrator), the data-steward's counts 5572465 ...\"; _as_of the commit that writes it, parent cfcec54, re-grepped)",
+    "docs/reviews/READY_w0_delta1.md (fd6a349)",
+    "docs/judge_v2_program.md L21894-L21903 (section \"## Registrar's record 2026-09-29 (insertion only; zero calls; nothing run; pre-data) \u2014 the data-steward's preconditions 8c2b846, the delta-2 READY b2ad5ef, the by-path merge 481b613, ...\"; _as_of the commit that writes it, parent 481b613, re-grepped)"
+  ],
+  "last_update": "2026-09-29 (registrar: steward 8c2b846, delta-2 READY b2ad5ef, merge 481b613, author cap ~22 threads, orchestrator ruling STAGE0b / survey, refused gemma embed)",
+  "support": {
+    "a": "a census of about 10 candidates; counts per declared stratum",
+    "b": "NOT APPLICABLE (a census)",
+    "c": "not applicable",
+    "d": "none",
+    "e": "not applicable",
+    "f": "SCOREABLE (deterministic counts and documents)",
+    "g": "a licence leg can be UNVERIFIABLE at any budget; UNVERIFIED is registered and never read as PASS"
+  },
+  "cost": {
+    "calls_expected": 0,
+    "cce_expected": 0,
+    "calls_max": 0,
+    "cce_max": 0,
+    "machine": "minutes plus metadata downloads",
+    "priced": "UNPRICED (the experiment-manager's)"
+  },
+  "plain_description": {
+    "sq": "Data hygiene",
+    "what": "Builds an admission table of candidate datasets for a second corpus with an answer key. Each candidate is checked on sourced conditions: at least 20 complete models, enough evaluation questions per cell, a closable content-overlap check, a key, a stated licence and the needed protocol columns.",
+    "why": "The thesis needs a second keyed corpus to show results are not specific to MMLU-Pro. This survey decides which candidate (SuperGPQA first) may enter.",
+    "information": "It would say which datasets are admissible and why the others fail. If SuperGPQA failed any condition, the second-corpus claim would become a stated limit. Result: built, not yet run as a result. Only the SuperGPQA row is filled, and it is provisionally admitted. The final analysis is deferred until the 14 other rows are complete. No result of record yet.",
+    "written": "2026-10-07"
+  }
+}

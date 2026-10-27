@@ -1,0 +1,118 @@
+=== BFCL-FINAL-STATE-SWAP: does the inherited 'final answer' furniture explain the BFCL pilot's indecision? ===
+  registration docs/judge_v2_program.md L12315-L12598 (heading L12316), commit ca3a7cc (registered 2026-09-23, before any code or call); record docs/agents/results/BFCL-FINAL-STATE-SWAP.json; closed-line ruling docs/agents/leads/2026-09-23_bfcl_final_state_swap_ruling.md (1470fe8)
+  pool p2035adddedd1becb | judge grok-4-1-fast-non-reasoning on azure | cap 8192 | temperature OMITTED | seed 42 (the pilot's; bootstrap + posting order) | protocol: BFCL-FINAL-STATE-SWAP: the frozen BFCL-JUDGED-PILOT instrument with FOUR literal replacements in the prompt_v2 verify-first block ('final answer' -> 'final state', each asserted count == 1, 4 in total) and NOTHING ELSE; the 458 deciding matches, both orders, user turns byte-identical to the pilot's (gated); parent protocol: BFCL-JUDGED-PILOT: prompt_v2 verify-first system template + corpus-level SYSTEM_BFCL / RUBRIC_BFCL slots + SCHEMA_INSTRUCTION; reference = the PER-TASK EXPECTED OUTCOME (the corpus's ground-truth call sequence, possible_answer), rendered once per task, identical for both sides, attached to the task statement and OUTSIDE the artefact cap, carrying no per-side verdict (ruling BFCL-REF-ORACLE, programme L11001, commit 6ccf2f7); artefact per side = decoded call sequence + final state_info capped at 2500 estimated tokens (chars/4) with the final state always retained; dual order, TIE on flip, no third call; INVALID if an order is unparsed or finish_reason is length or content_filter
+  cache experiment_results\agent\bfcl_final_state_swap.db (mode=ro) | run_meta script_sha256_16 48a9d23632c107e6 (LF) | this script LF 48a9d23632c107e6 / working-tree 9e911c509d5b322f | parent LF 5e9db53b894eeccb | new system prompt sha16 7cee3034d3d93296 (pilot's 058faa54f0697ad9) | started 2026-09-23 14:31:42 | resumed ["2026-09-23 14:32:19"]
+  the pilot on the same 458 matches (recomputed from its cache): T 0.2183, A 0.7402, W 0.0415 | registered constants T 0.2183, A 0.7402, W 0.0415
+
+=== C1 THE TIE RATE (primary; ONE deciding statistic: the paired delta's task-clustered interval) ===
+  T_swap = 98 / 458 = 0.2140 (49 task clusters) | clustered SE 0.0292 -> [0.1567, 0.2713] | Wilson [0.1789, 0.2538] | MEASURED level-DEFF 2.328, n_eff 196.7 | LITERAL denominator 458 (an unusable match is not a TIE); T over the 458 usable matches 0.2140, printed, decides nothing
+  Delta = T_swap - T_pilot = -0.0044 (paired, match by match; denominator 458 matches, 49 task clusters) | interval of record point +- 1.96 x clustered SE 0.0175 = [-0.0387, +0.0300] | percentile [-0.0390, +0.0284] (B = 2000, seed 42) | bar -0.05 | MEASURED delta-DEFF 1.151, n_eff 398.0, MDE +-0.049 at 80% power (+-0.034 at 50%) [R2: DESCRIPTIVE-ONLY - a delta in [-0.05, 0] sits inside the session floor (CANARY pass 2 0.087 [0.056, 0.122]; DECOMP 5.7%) and is NEVER narrated as a move]
+  USABLE-ONLY ESTIMATE beside the literal one (printed, DECIDES NOTHING; the literal Delta decides, confirmed reading D4(a)): Delta over the 458 usable matches = -0.0044 (49 task clusters) | interval point +- 1.96 x clustered SE 0.0175 = [-0.0387, +0.0300] | percentile [-0.0390, +0.0284] | literal -0.0044 - usable-only -0.0044 = +0.0000 is what unusable rows (counted not-TIE) contribute toward HELD | the usable-only interval reads FAILED-side (wholly above -0.05), the same as the literal one
+  REQUIRED COMPANION (not a deciding clause): exact two-sided McNemar on the 458 paired TIE / not-TIE outcomes: b (TIE in the pilot, not in the swap) = 29, c (not -> TIE) = 27, exact p = 0.8939
+  measured delta-DEFF 1.151 <= 3.0: not underpowered by the registration's own test
+  SUPPORT planning values of record: unpaired MDE +-0.102 at the level-DEFF 3.60; paired d = 0.20, delta-DEFF 2.0 -> SE 0.0295, MDE +-0.083 (80%) / +-0.058 (50%); C1 is scored against the MEASURED delta-DEFF above.
+  C1 UNDER THE SUPPORT RULE (registrar 9b046c4 section (C), quoted verbatim): SCOREABLE for a large template effect (true Δ <= −0.133, 80% power); at the registered prediction P1 (Δ ≈ −0.07) the design is DESCRIPTIVE-ONLY and will read UNDETERMINED about 90% of the time.
+  POWER AGAINST THE BAR -0.05 OF RECORD (registrar 9b046c4 section (B); planning SE 0.02955 = sqrt(0.20 / 458 x 2.0)): HELD needs Delta-hat < -0.1079, FAILED needs Delta-hat > +0.0079 | at P1 (Delta -0.0683): P(HELD) 0.090, P(FAILED) 0.005, P(UND) 0.905 | at Delta = 0: P(FAILED) 0.394 | 80% power at Delta <= -0.1328 or >= +0.0328
+  PLANNING SE 0.02955 (recomputed): HELD needs Delta-hat < -0.1079, FAILED needs Delta-hat > +0.0079 | at P1 (Delta -0.0683): P(HELD) 0.090, P(FAILED) 0.005, P(UND) 0.905 | at Delta = 0: P(FAILED) 0.394, P(UND) 0.606, P(HELD) 0.000 | 80% power at Delta <= -0.1328 or >= +0.0328
+  MEASURED SE 0.01753: HELD needs Delta-hat < -0.0843, FAILED needs Delta-hat > -0.0157 | at P1 (Delta -0.0683): P(HELD) 0.180, P(FAILED) 0.001, P(UND) 0.819 | at Delta = 0: P(FAILED) 0.814, P(UND) 0.186, P(HELD) 0.000 | 80% power at Delta <= -0.0991 or >= -0.0009
+  REALISED: at the observed Delta-hat -0.0044 and the MEASURED SE 0.01753 (measured delta-DEFF 1.151), a re-run of this design would read P(HELD) 0.000, P(FAILED) 0.740, P(UNDETERMINED) 0.260
+  C1: FAILED - the four strings do NOT explain the indecision: the clustered interval [-0.0387, +0.0300] lies wholly above -0.05 [R2: DESCRIPTIVE-ONLY - a delta in [-0.05, 0] sits inside the session floor (CANARY pass 2 0.087 [0.056, 0.122]; DECOMP 5.7%) and is NEVER narrated as a move]
+  the point -0.0044 is printed and DECIDES NOTHING; the session is a confound bounded (not removed) by the record's retest floors, which is why the bar is -0.05.
+
+=== C2 CONVENTION-A AGREEMENT (secondary; harm bar; ONE deciding statistic: the paired delta's interval) ===
+  A_swap (convention A: ties / INVALID wrong) = 342 / 458 = 0.7467 (49 task clusters) | clustered SE 0.0343 -> [0.6795, 0.8139] | Wilson [0.7050, 0.7844] | MEASURED level-DEFF 2.846, n_eff 161.0
+    R1 (ruling section 4): the reference-wrong stratum is EMPTY BY CONSTRUCTION (the reference is the per-task EXPECTED OUTCOME, the corpus's own ground truth); this arm says NOTHING about the reference ceiling on BFCL and the CONSENSUS-FIT KEY/REF contrast is NOT ESTIMABLE on it.
+    R1 per-contestant agreement with the expected outcome (the contestant's checker pass-share on its sides of the 458; in a checker-disagreeing match exactly one side passes) | the judge's convention-A agreement on the matches involving it, pilot -> swap:
+      DeepSeek-V3.2-Exp-FC                     passed  32 of 145 = 0.2207 | judge conv-A pilot 109 / 145 = 0.7517 -> swap 110 / 145 = 0.7586
+      Qwen_Qwen3-32B-FC                        passed  64 of 116 = 0.5517 | judge conv-A pilot  81 / 116 = 0.6983 -> swap  83 / 116 = 0.7155
+      Salesforce_Llama-xLAM-2-70b-fc-r         passed 130 of 150 = 0.8667 | judge conv-A pilot 135 / 150 = 0.9000 -> swap 135 / 150 = 0.9000
+      claude-sonnet-4-5-20250929-FC            passed 103 of 131 = 0.7863 | judge conv-A pilot  90 / 131 = 0.6870 -> swap  89 / 131 = 0.6794
+      gemini-2.5-flash-FC                      passed  47 of 139 = 0.3381 | judge conv-A pilot  97 / 139 = 0.6978 -> swap 103 / 139 = 0.7410
+      gpt-5.2-2025-12-11-FC                    passed  42 of 131 = 0.3206 | judge conv-A pilot  98 / 131 = 0.7481 -> swap  97 / 131 = 0.7405
+      meta-llama_Llama-3.3-70B-Instruct-FC     passed  40 of 104 = 0.3846 | judge conv-A pilot  68 / 104 = 0.6538 -> swap  67 / 104 = 0.6442
+    R1 leakage: assert_no_per_side_verdict executed on 916 of 916 re-assembled payloads
+  A_swap (convention B: committed verdicts only) = 342 / 360 = 0.9500 (49 task clusters) | clustered SE 0.0192 -> [0.9124, 0.9876] | Wilson [0.9224, 0.9681] | MEASURED level-DEFF 2.790, n_eff 129.0
+    R1 (ruling section 4): the reference-wrong stratum is EMPTY BY CONSTRUCTION (the reference is the per-task EXPECTED OUTCOME, the corpus's own ground truth); this arm says NOTHING about the reference ceiling on BFCL and the CONSENSUS-FIT KEY/REF contrast is NOT ESTIMABLE on it.
+    R1 per-contestant agreement with the expected outcome (the contestant's checker pass-share on its sides of the 458; in a checker-disagreeing match exactly one side passes) | the judge's convention-A agreement on the matches involving it, pilot -> swap:
+      DeepSeek-V3.2-Exp-FC                     passed  32 of 145 = 0.2207 | judge conv-A pilot 109 / 145 = 0.7517 -> swap 110 / 145 = 0.7586
+      Qwen_Qwen3-32B-FC                        passed  64 of 116 = 0.5517 | judge conv-A pilot  81 / 116 = 0.6983 -> swap  83 / 116 = 0.7155
+      Salesforce_Llama-xLAM-2-70b-fc-r         passed 130 of 150 = 0.8667 | judge conv-A pilot 135 / 150 = 0.9000 -> swap 135 / 150 = 0.9000
+      claude-sonnet-4-5-20250929-FC            passed 103 of 131 = 0.7863 | judge conv-A pilot  90 / 131 = 0.6870 -> swap  89 / 131 = 0.6794
+      gemini-2.5-flash-FC                      passed  47 of 139 = 0.3381 | judge conv-A pilot  97 / 139 = 0.6978 -> swap 103 / 139 = 0.7410
+      gpt-5.2-2025-12-11-FC                    passed  42 of 131 = 0.3206 | judge conv-A pilot  98 / 131 = 0.7481 -> swap  97 / 131 = 0.7405
+      meta-llama_Llama-3.3-70B-Instruct-FC     passed  40 of 104 = 0.3846 | judge conv-A pilot  68 / 104 = 0.6538 -> swap  67 / 104 = 0.6442
+    R1 leakage: assert_no_per_side_verdict executed on 916 of 916 re-assembled payloads
+  A_swap - A_pilot = +0.0066 (paired, match by match; denominator 458 matches, 49 task clusters) | interval of record point +- 1.96 x clustered SE 0.0159 = [-0.0246, +0.0377] | percentile [-0.0232, +0.0379] (B = 2000, seed 42) | bar -0.05 | MEASURED delta-DEFF 1.082, n_eff 423.4, MDE +-0.044 at 80% power (+-0.031 at 50%)
+  C2: HELD (no fidelity harm: the interval's lower end -0.0246 is at or above -0.05)
+  NOTE OF RECORD (mandatory with this number): A_swap is NOT a rung reading and is NEVER placed on the reference ladder; the 0.75 bar belongs to BFCL-JUDGED-PILOT's C1 and is not re-litigated here, and nothing in this test can restore the 'for Agents' bridge as a measured claim.
+
+=== C3 THE WRONG-COMMITTED RATE (secondary; harm bar; ONE deciding statistic) ===
+  W_swap = 18 / 458 = 0.0393 (49 task clusters) | clustered SE 0.0148 -> [0.0103, 0.0683] | Wilson [0.0250, 0.0613] | MEASURED level-DEFF 2.648, n_eff 172.9
+  DECOMPOSITION of the swapped arm's 458: right 342 + wrong-committed 18 + ties 98 + unusable 0
+    R1 (ruling section 4): the reference-wrong stratum is EMPTY BY CONSTRUCTION (the reference is the per-task EXPECTED OUTCOME, the corpus's own ground truth); this arm says NOTHING about the reference ceiling on BFCL and the CONSENSUS-FIT KEY/REF contrast is NOT ESTIMABLE on it.
+    R1 per-contestant agreement with the expected outcome (the contestant's checker pass-share on its sides of the 458; in a checker-disagreeing match exactly one side passes) | the judge's convention-A agreement on the matches involving it, pilot -> swap:
+      DeepSeek-V3.2-Exp-FC                     passed  32 of 145 = 0.2207 | judge conv-A pilot 109 / 145 = 0.7517 -> swap 110 / 145 = 0.7586
+      Qwen_Qwen3-32B-FC                        passed  64 of 116 = 0.5517 | judge conv-A pilot  81 / 116 = 0.6983 -> swap  83 / 116 = 0.7155
+      Salesforce_Llama-xLAM-2-70b-fc-r         passed 130 of 150 = 0.8667 | judge conv-A pilot 135 / 150 = 0.9000 -> swap 135 / 150 = 0.9000
+      claude-sonnet-4-5-20250929-FC            passed 103 of 131 = 0.7863 | judge conv-A pilot  90 / 131 = 0.6870 -> swap  89 / 131 = 0.6794
+      gemini-2.5-flash-FC                      passed  47 of 139 = 0.3381 | judge conv-A pilot  97 / 139 = 0.6978 -> swap 103 / 139 = 0.7410
+      gpt-5.2-2025-12-11-FC                    passed  42 of 131 = 0.3206 | judge conv-A pilot  98 / 131 = 0.7481 -> swap  97 / 131 = 0.7405
+      meta-llama_Llama-3.3-70B-Instruct-FC     passed  40 of 104 = 0.3846 | judge conv-A pilot  68 / 104 = 0.6538 -> swap  67 / 104 = 0.6442
+    R1 leakage: assert_no_per_side_verdict executed on 916 of 916 re-assembled payloads
+  W_swap - W_pilot = -0.0022 (paired, match by match; denominator 458 matches, 49 task clusters) | interval of record point +- 1.96 x clustered SE 0.0057 = [-0.0134, +0.0090] | percentile [-0.0131, +0.0090] (B = 2000, seed 42) | bar +0.05 | MEASURED delta-DEFF 0.763, n_eff 600.1, MDE +-0.016 at 80% power (+-0.011 at 50%) [R2: DESCRIPTIVE-ONLY - a delta in [-0.05, 0] sits inside the session floor (CANARY pass 2 0.087 [0.056, 0.122]; DECOMP 5.7%) and is NEVER narrated as a move]
+  C3: HELD (decisiveness was not bought with errors: the interval's upper end +0.0090 is at or below +0.05) [R2: DESCRIPTIVE-ONLY - a delta in [-0.05, 0] sits inside the session floor (CANARY pass 2 0.087 [0.056, 0.122]; DECOMP 5.7%) and is NEVER narrated as a move]
+
+=== FALSIFIER AND THE HARM CLAUSE ===
+  FALSIFIER FIRES: THE TEMPLATE-MIS-FIT HYPOTHESIS IS OVERTURNED AT THE GRANULARITY THIS TEST EXAMINES: naming the FINAL STATE instead of the FINAL ANSWER in the inherited verify-first block does NOT explain the BFCL pilot's indecision. Consequences adopted BY INSERTION with the outcome: (a) BFCL-JUDGED-PILOT's paragraph 'THE THIRD HYPOTHESIS, WHICH THE OUTCOME FILE NEVER NAMES' and its does_not_show item on template mis-fit are BRACKETED (the answer / state slot was TESTED AND DOES NOT CARRY THE EFFECT; no number moves); (b) TWO HYPOTHESES SURVIVE - POSITION BIAS AND CORPUS DIFFICULTY - and the 0.2183 stands as an UNEXPLAINED DECISIVENESS COLLAPSE; (c) NO FURTHER PROMPT-EDIT SEPARATOR IS BOUGHT ON THIS CORPUS WITHOUT A NEW REGISTRATION THAT NAMES A MECHANISM THE RECORD HAS NOT SEEN.
+  (d) A NULL RESULT DOES NOT CLEAR TEMPLATE MIS-FIT IN GENERAL; it clears THESE FOUR STRINGS. It does not show that the template is well fitted - the rest of the MMLU-Pro furniture ('the question', 'the response', 'its reasoning') was deliberately left standing - only that THESE FOUR STRINGS do not carry the effect.
+  harm clause (C1 HELD with C3 FAILED) does not fire: C1 FAILED, C3 HELD
+
+=== C4 THE POSITION SIGNATURE (descriptive, no bar) ===
+  first-position rate over the swapped arm's non-tie votes: 497 / 872 = 0.5700 (Wilson [0.5369, 0.6024]; clustered SE 0.0137 -> [0.5431, 0.5968]; z vs 0.5 = 4.13) | beside the pilot's 510 / 870 = 0.5862 (z = 5.09; registered 0.5862 of 870, z = 5.09)
+  flip table over the dual-order TIEs, (fwd vote, rev vote) as posted, swapped arm -> pilot (registered pilot 57 / 0 / 24 / 14 / 3 / 2):
+    ('Model A', 'Model A')   swap  50 | pilot  57 (registered 57)
+    ('Model B', 'Model B')   swap   5 | pilot   0 (registered 0)
+    ('TIE', 'Model A')       swap  16 | pilot  24 (registered 24)
+    ('Model A', 'TIE')       swap  21 | pilot  14 (registered 14)
+    ('TIE', 'TIE')           swap   1 | pilot   3 (registered 3)
+    ('Model B', 'TIE')       swap   3 | pilot   2 (registered 2)
+    outside the six classes: swap {('TIE', 'Model B'): 2}
+  per-task tie concentration: swap 8 of 49 tasks at or above 50% ties, the top 5 tasks carry 32 of 98 ties | pilot 11 of 49, top 5 carry 32 of 100 (registered '11 of 49 tasks, 5 tasks carrying 32 of the 100')
+  NO BAR: if the swap removes the mis-fit and the first-position rate STAYS near 0.586, position bias is the surviving explanation - a DIRECTION this design can print but not adjudicate.
+  C4: HELD (all three computed and printed with their denominators)
+
+=== C5 INSTRUMENT COUNTS AND GATES ===
+[F2 GATE] (a) user turns equal to the comparator's (the parent module's re-assembly): 916 of 916 (mid, arm) cells
+[F2 GATE] (a) the comparator tied to pass 1 through the SCHEDULE-WIDE PAYLOAD ANCHOR over all 1,216 assembled payloads plus the system prompt - the anchor spans the self-preference stratum's payloads TOO (their bytes are hashed only: no datum of that stratum is read, none of its payloads is posted or enters any readout; ruling D4(f)) - recomputed through the parent module: 951ec3a0a063b5a8 vs of record 951ec3a0a063b5a8 -> MATCH
+[F2 GATE] (b) NEW system prompt sha16 7cee3034d3d93296 BESIDE the comparator's: the pilot system prompt's OWN sha16 058faa54f0697ad9 (re-derived through the parent module) vs of record 058faa54f0697ad9 -> MATCH
+[F2 GATE] (b) the parent's filled prompt with the four replacements applied == the new prompt: True | every changed character inside one of the four FROM spans: True | SYSTEM_BFCL / RUBRIC_BFCL / SCHEMA_INSTRUCTION present once and unchanged: True | 'final answer' referents: 4 in the pilot's prompt, 0 in the new one
+[F2 GATE] (c) replacement counts in order [1, 1, 1, 1] in the template and [1, 1, 1, 1] in the filled prompt (each must be 1; total 4)
+    (1) "extract each model's FINAL ANSWER and check it" -> "extract each model's FINAL STATE and check it" : matched 1
+    (2) 'A response whose final answer is wrong cannot win' -> 'A response whose final state is wrong cannot win' : matched 1
+    (3) 'against a response whose final answer is right, whatever its reasoning looks like.' -> 'against a response whose final state is right, whatever its reasoning looks like.' : matched 1
+    (4) 'When BOTH final answers are right:' -> 'When BOTH final states are right:' : matched 1
+[F2 GATE] (d) schedule hash bcf9d1654e68e4ca re-derived from the corpus, equal to the pilot run_meta's, 608 cached rows reproduce with 0 differences: True | SYSTEM_BFCL / RUBRIC_BFCL == the pilot run_meta's pinned values: True
+[F2 GATE] assert_no_per_side_verdict executed on 916 of 916 re-assembled payloads (one per cell) -> PASS (one knob, byte-proved)
+  (b) unusable rows (content_filter + length + unparsed) 0 of 916 posted calls (0.0000)
+  (c) finish_reason {'stop': 916} | provider fingerprint {'azure:grok-4-1-fast-non-reasoning': 916} (expected azure:grok-4-1-fast-non-reasoning)
+  (d) max completion tokens 483 of the 8192 cap
+  (e) truncated sides 0 of 916, truncated matches 0 of 458, state-over-cap sides 0 | CHECKER_TEXT_CUT 0 of 49 SCHEDULED TASKS (denominator TASKS, the scheduled ones, not the 57 in the pool: the pilot's D11 fixed)
+  (f) the leakage assertion executed on 916 of 916 re-assembled payloads
+  (g) [NIGHT] cumulative grok calls tonight 3860 of 14000 (plan Amendment 9 hard ceiling; count of record experiment_results\night_calls_2026-09-23.json) | this launch (--analyze (0 calls)) would post at most 0 -> 3860 | source: experiment_results\night_calls_2026-09-23.json (7 launch rows); this test's own cache holds 916 posted rows
+  C5: HELD ((a)-(g) printed)
+
+=== PREDICTIONS (registered before any code; scored explicitly) ===
+  P1 T_swap in [0.10, 0.20] (point 0.15), THE PREDICTION OF RECORD (D3 ruling, 7da2ec5): T_swap 0.2140 -> FAILED | restatement, printed and NEVER scored: Delta in [-0.1183, -0.0183] (point -0.0683): Delta -0.0044
+  P2 exact McNemar p < 0.01 with b + c in [60, 140] (point 95): p = 0.8939, b + c = 56 -> FAILED
+  P3 A_swap - 0.7402 in [-0.02, +0.10] (point +0.04): +0.0066 -> HELD
+  P4 W_swap - 0.0415 in [0.00, +0.04] (point +0.015): -0.0022 -> FAILED | P4(ii) W_swap below PAIR-NOREF's 0.0930: 0.0393 -> HELD
+  P5 first-position rate over the swapped arm's non-tie votes in [0.53, 0.62] (point 0.57): 0.5700 -> HELD
+  P6 unusable rows <= 1% of the 916 posted calls: 0 of 916 = 0.0000 -> HELD
+  P7 the F2 gate passes 916 of 916 user turns with exactly 4 replacements, and truncated sides 0 of 916: 916 of 916, counts [1, 1, 1, 1], truncated sides 0 -> HELD
+  P8 the MEASURED task-clustered DEFF for the paired Delta in [1.2, 3.0] (point 1.9): 1.151 -> FAILED
+
+=== THE RULING'S FENCE AND RIDERS; WHAT THIS RUN WILL NOT SHOW (registered) ===
+  R1 (ruling section 4): the reference-wrong stratum is EMPTY BY CONSTRUCTION (the reference is the per-task EXPECTED OUTCOME, the corpus's own ground truth); this arm says NOTHING about the reference ceiling on BFCL and the CONSENSUS-FIT KEY/REF contrast is NOT ESTIMABLE on it.
+  FENCE (ruling section 5): F3 - after this reading, HELD or FAILED, a further template edit on BFCL requires a DIFFERENT F1-qualifying referent AND a pre-registered argument why this result does not predict the next one; two readings on one corpus close the template line on that corpus PERMANENTLY. F4 - this edit changes ONE referent (answer -> state) in four strings; a multi-referent edit would be DESCRIPTIVE-ONLY. F5 - nothing this arm returns changes the STACK-v2 recipe of record; a HELD C1 licenses a CORPUS-LOCAL variant only; promotion needs its own registration with an MMLU-Pro NON-INFERIORITY reading.
+  ruling section 3 riders: the IFEVAL 25.1pp collapse is never quoted as an expectation for this arm (P1, point -0.07, is the prediction of record); A_swap never goes on the reference ladder.
+  (1) it does not separate position bias from corpus difficulty; (2) it is not a same-session control; (3) no rung, no ladder position, no 0.75-bar reading; (4) no profile cell, agent ranking, per-trajectory or process claim; (5) nothing about miss_func / miss_param / long_context, NON_TERMINATED episodes or the grok-FC stratum; (6) nothing about any other corpus: no MMLU-Pro or MATH result is touched, questioned or re-read.

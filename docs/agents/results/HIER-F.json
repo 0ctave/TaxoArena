@@ -1,0 +1,158 @@
+{
+ "id": "HIER-F",
+ "title": "HIER-F (pre-data addendum to GRANULARITY-GT): hierarchical F over every node of the [LF] intent trees vs average-link (HF1) and vs 200 matched-shape random trees (HF2); taxonomic P/R/F, ancestor-F1, Fowlkes-Mallows curve descriptive (zero calls; REGISTERED 2026-10-04)",
+ "question": "Does the tree carry the gold hierarchy beyond its leaves under node-level credit?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "the commit that writes it (parent b7fb6bc8)",
+  "program_lines": "docs/judge_v2_program.md L24430-L24441",
+  "program_lines_as_of": "the commit that writes them, parent b7fb6bc8, re-grepped",
+  "date": "2026-10-04",
+  "provenance": "docs/literature/2026-10-04_hierarchy_evaluation.md (68a3d731; blob a6e8148b); docs/agents/plans/2026-10-04_literature_shortlist.md (68a3d731); the author's Go (docs/agents/plans/2026-10-04_W1_W2_schedule.md (be8e54d3))"
+ },
+ "script": {
+  "path": "tools/analysis/granularity_gt.py",
+  "sha16": "bcb4240d (git blob, LF; sha256-lf16:3a9a38fc29c8012b; working tree CRLF sha256-crlf16:e54ade5498dbf140, D-4)",
+  "commit": "e2c082ef (merged)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_granularity_gt.md",
+  "commit": "e2c082ef",
+  "blob": "45b0be9b (LF)",
+  "verdict": "READY on blob bcb4240d, on conditions R-1 (B1-B5) and R-2"
+ },
+ "go": "the author's Go for zero-call windows (2026-10-04)",
+ "run": {
+  "outcome_file": "E:/TaxoArena_backup_2026-10-04_ggt/outcome/granularity_gt_outcome.txt (never committed; also E:/TaxoArena_backup_2026-10-04_granularity_gt/granularity_gt_outcome.txt)",
+  "outcome_sha256": "f338a3e6065433ee0ceaf38fd8b19e0d3cb95d6e9125d9da4ca55daaffecbfa2",
+  "outcome_commit": "run from main (blob bcb4240d; never committed)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "none (S1 intent build DBs, read-only; not a union-pool reader)",
+  "date": "2026-10-04",
+  "concurrency": "none affecting (RESP-PROFILE-INFO and the three routing readouts in the window; zero-call readers of other objects; no construction; pins OK)"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_granularity_gt.md",
+  "commit": "4572dbd4",
+  "blob": "b26bf856 (LF)",
+  "verdict": "HF1 VALID with C-1; HF2 NOT EVALUATED (D-1)"
+ },
+ "criteria": [
+  {
+   "id": "HF1",
+   "text": "DECIDING per corpus (point and interval): TREE-BETTER / AVG-BETTER / NEITHER against the bisecting spread. DESCRIPTIVE-ONLY at the prediction (SE 0.0050; MDE80 0.014)",
+   "result": "HELD",
+   "value": "TREE-BETTER on both: MASSIVE D +0.48169, 95% [+0.46587, +0.49370], spread_B 0.02675; CLINC D +0.50933, 95% [+0.49610, +0.51694], spread_B 0.01343; C-1 chained average-link; realised SE 0.0071 / 0.0054",
+   "denominator": "MASSIVE 4,946 / 4,923; CLINC 6,672 / 6,672"
+  },
+  {
+   "id": "HF2",
+   "text": "DECIDING: HELD iff HF(tree) > random p97.5 on both corpora; FAILED iff neither; MIXED otherwise. SCOREABLE",
+   "result": "n/a",
+   "value": "NOT EVALUATED (D-1): CLINC 0 of 150 classes internal-best, HF(tree) 0.84700 = the leaves+root floor, ABOVE-RANDOM unreachable; MASSIVE ABOVE-RANDOM per corpus only (0.74780 vs p97.5 0.69713; 9 of 60 internal-best); printed 'HF2 MIXED' / 'HELD REFUTED' NOT SCORED",
+   "denominator": "200 matched-shape random trees per corpus"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "D +0.01 [-0.03, +0.05]; HF1 NEITHER 0.60 [B3: HF1 NEITHER scored per corpus (two Briers)]",
+   "result": "FAILED",
+   "value": "D +0.48169 / +0.50933 outside [-0.03, +0.05]; 'HF1 NEITHER 0.60' false on both, Briers 0.3600 / 0.3600",
+   "denominator": "EVAL"
+  },
+  {
+   "id": "P2",
+   "text": "HF2 HELD 0.75",
+   "result": "n/a",
+   "value": "NOT SCORED (D-1); the printed Brier 0.5625 is not of record",
+   "denominator": "2 corpora"
+  },
+  {
+   "id": "P3",
+   "text": "MMLU-Pro recovery above random p97.5 on all four trees 0.70 (descriptive) [B5: arm not built: NOT EVALUATED]",
+   "result": "n/a",
+   "value": "NOT EVALUATED (B5; MMLU-Pro arm not built)",
+   "denominator": "4 trees"
+  }
+ ],
+ "falsifier": {
+  "text": "F-HF fires iff HF2 FAILED: no gold hierarchy beyond the leaves under node-level credit.",
+  "fired": false,
+  "note": "not testable as registered: HF2 NOT EVALUATED (D-1)"
+ },
+ "numbers_of_record": {
+  "HF1_MASSIVE": "HF tree 0.74780 vs average-link 0.26611; D +0.48169, 95% [+0.46587, +0.49370]; spread_B 0.02675; SE 0.0071; C-1",
+  "HF1_CLINC": "HF tree 0.84700 vs average-link 0.33767; D +0.50933, 95% [+0.49610, +0.51694]; spread_B 0.01343; SE 0.0054; C-1",
+  "HF2": "NOT EVALUATED; internal-best classes MASSIVE 9 / 60, CLINC 0 / 150 (D-5, the review); MASSIVE per-corpus 0.74780 vs p97.5 0.69713 (floor 0.68717); CLINC HF(tree) = floor 0.84700",
+  "D3_dedup": "HF D on deduplicated MASSIVE TRAIN +0.50398 (+0.0223); no word moves"
+ },
+ "sentence_of_record": "HIER-F (2026-10-04, 0 calls) — HF1 TREE-BETTER on both corpora, VALID: under node-level hierarchical F against the fine gold, the [LF] intent tree scores 0.748 (MASSIVE) and 0.847 (CLINC) against 0.266 and 0.338 for average-link (D +0.482 [+0.466, +0.494]; +0.509 [+0.496, +0.517]), which reads 'better than a chained average-link' (one leaf holds 85.7% of MASSIVE TRAIN), not 'better than a competent hierarchy'. HF2 NOT EVALUATED: the matched-shape null keeps each leaf's items, and on CLINC no class has an internal best node (0 of 150), so ABOVE-RANDOM is unreachable; MASSIVE ABOVE-RANDOM (0.748 vs p97.5 0.697; 9 of 60 internal-best classes) is a per-corpus word only. HF P2 NOT SCORED.",
+ "chips": [
+  "REGISTERED 2026-10-04, BEFORE ANY CODE; not built",
+  "VALID (POST-RUN 4572dbd4): HF1 TREE-BETTER BOTH CORPORA",
+  "HF2 NOT EVALUATED (D-1: CLINC 0 OF 150 INTERNAL-BEST, ABOVE-RANDOM UNREACHABLE; MASSIVE ABOVE-RANDOM PER CORPUS ONLY); &#x27;HF2 HELD REFUTED&#x27; AND HF P2 NOT SCORED",
+  "C-1: HF1 = BETTER THAN A CHAINED AVERAGE-LINK, NOT A COMPETENT HIERARCHY"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-04",
+   "by": "registrar (pre-data; READY_granularity_gt)",
+   "text": "B2 HF2 on fine gold; B3 P1 HF1 NEITHER scored per corpus; B4 descriptive readings H2-H4; B5 MMLU-Pro arm not built (NOT EVALUATED); D3; R-2. Programme L24433, L24436, L24437, L24438."
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (POSTRUN 4572dbd4)",
+   "text": "outcome recorded; duties applied: D-1 HF2 NOT EVALUATED, FAILS line and HF P2 NOT SCORED, D-5 counts, C-1, D-3; concurrency none affecting. docs/judge_v2_program.md L24515-L24528 (section \"## HIER-F (2026-10-04, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent c32ef885, re-grepped); OUTCOME brackets on the registration lines."
+  }
+ ],
+ "does_not_show": [
+  "the gold hierarchy beyond the leaves on both corpora (HF2 NOT EVALUATED)",
+  "a refutation of HF2 (not of record)",
+  "superiority over a competent hierarchy (C-1)",
+  "routing value",
+  "MMLU-Pro (not built)"
+ ],
+ "ledger": {
+  "row_id": "HIER-F",
+  "version": "v386 (2026-10-04: OUTCOME bracket, OK + NULL + WARN chips) | v383 (2026-10-04: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "GRANULARITY-GT (arms and objects; one readout, one READY)"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; no Gaussian-mixture LR / BIC, MDL or Bayesian evidence (MIX-LRT-SITE untouched); no judge, rubric, reference, frontier, temperature"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "CPU minutes (MMLU-Pro recovery arm is a pool reader)",
+  "agent_hours": "about 2 h",
+  "reads_pool": false
+ },
+ "outputs": "never committed: stored on E: with SHA256SUMS.txt; temp under E:/TaxoArena_tmp via scratch_dir",
+ "sources": [
+  "docs/judge_v2_program.md L24430-L24441 (_as_of the commit that writes it, parent b7fb6bc8, re-grepped)",
+  "docs/literature/2026-10-04_hierarchy_evaluation.md (68a3d731; blob a6e8148b)",
+  "docs/agents/plans/2026-10-04_literature_shortlist.md (68a3d731)",
+  "docs/reviews/POSTRUN_granularity_gt.md (4572dbd4; blob b26bf856, LF)",
+  "docs/judge_v2_program.md L24515-L24528 (section \"## HIER-F (2026-10-04, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent c32ef885, re-grepped)",
+  "E:/TaxoArena_backup_2026-10-04_ggt/SHA256SUMS.txt"
+ ],
+ "last_update": "2026-10-04",
+ "addendum_to": "GRANULARITY-GT",
+ "label_status": "AF-U [SC] where used",
+ "plain_description": {
+  "sq": "SQ3 Taxonomy",
+  "what": "Scores the label-free intent trees on two intent datasets (MASSIVE, CLINC) against their gold class hierarchy, giving credit at every node, not just leaves. It compares them with average-link clustering and with 200 random trees of the same shape. No judge calls.",
+  "why": "It asks whether the tree captures the true hierarchy above its leaves, which is the point of building a tree rather than flat clusters.",
+  "information": "Beating random same-shape trees would show the tree carries hierarchy beyond its leaves. Result: done. The tree scores far above average-link on both corpora (0.75 and 0.85 against 0.27 and 0.34), but average-link degenerated into one huge leaf, so this means 'better than a broken baseline', not 'better than a competent hierarchy'. The comparison with random trees could not be evaluated as designed (impossible on CLINC). On MASSIVE alone it is above random, as a per-corpus descriptive reading only.",
+  "written": "2026-10-07"
+ }
+}

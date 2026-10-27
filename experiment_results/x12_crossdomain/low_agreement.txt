@@ -1,0 +1,51 @@
+=== LOW-AGREEMENT: what predicts the errors the fitted budget cannot see? (corrected 2026-09-15) ===
+  891 edges | median answer agreement 0.441 | low half 445, high half 446
+  wrong-direction edges: 6 in the LOW half (4 McNemar-established), 38 in the HIGH half (22 established)
+  wrong rate by agreement band over ALL 891 edges, all(established):
+    0.00-0.35:  5( 3) wrong of 328  (1.5% / 0.9%)
+    0.35-0.45:  1( 1) wrong of 129  (0.8% / 0.8%)
+    0.45-0.55:  4( 3) wrong of 137  (2.9% / 2.2%)
+    0.55-0.65:  2( 1) wrong of 109  (1.8% / 0.9%)
+    0.65-0.80: 12(10) wrong of 120  (10.0% / 8.3%)
+    0.80-1.01: 20( 8) wrong of  68  (29.4% / 11.8%)
+
+  (3) THE REGISTERED POWER CHECK FIRST, because it decides how the rest may be read.
+      I predicted roughly 20 wrong edges in the low half; there are 6.
+      That is too few to support any claim and every result below is DESCRIPTIVE.
+
+=== (1) PRIMARY: predictors of a wrong direction WITHIN the low-agreement half ===
+  every predictor is computable without the answer key at inference, except the last
+  predictor                         wrong    right      diff                 95% CI
+  bootstrap SD s                                                    0.236    0.250    -0.014  [-0.050, +0.025]
+  |mean theta gap|                                                  0.143    1.838    -1.695  [-1.832, -1.545]  <- excludes zero
+  raw confidence                                                    0.719    0.983    -0.264  [-0.375, -0.135]  <- excludes zero
+  distinct questions                                              171.667  166.023    +5.644  [-30.843, +40.513]
+  tie rate in the cell                                              0.335    0.176    +0.158  [+0.095, +0.220]  <- excludes zero
+  answer agreement                                                  0.291    0.284    +0.007  [-0.048, +0.060]
+  |length difference| (k chars)  [REGISTERED predictor]             0.499    0.626    -0.127  [-0.354, +0.088]
+  LENGTH ADV of arena pick [SUBSTITUTED, C-7: sign IS the label]   -0.338    0.460    -0.799  [-0.995, -0.581]  <- excludes zero
+  LENGTH ADV of the KEY's pick (k chars)  [the honest signed one    0.338    0.460    -0.122  [-0.334, +0.081]
+  key gap  [NOT available at inference]                             0.091    0.414    -0.322  [-0.348, -0.293]  <- excludes zero
+  NOTE (review 2026-09-15): the arena-signed length advantage equals +lenkey on right edges and -lenkey on
+  wrong ones, so its 'effect' is the label's sign and it is NOT a predictor; the registered predictor is the
+  absolute difference, and the only honest signed one is anchored on the KEY's pick.
+
+  surviving candidates before conditioning: |mean theta gap|, raw confidence, tie rate in the cell
+
+  LOGISTIC over the low half, each candidate against agreement (does it survive?):
+      |mean theta gap|                   coef -10.106 +- 3.487 | z= -2.9  (agreement -0.435)
+      raw confidence                     coef -0.919 +- 0.191 | z= -4.8  (agreement -0.370)
+      tie rate in the cell               coef +0.570 +- 0.326 | z= +1.8  (agreement +0.066)
+
+=== (2) WHAT A SECOND CHANNEL WOULD BUY, on the wrong calls the budget keeps in sample ===
+  the shipped budget calls 665 edges in sample and keeps 2 wrong (1 McNemar-established); percentiles
+  below are over the 665 CALLED edges, not the 891 (the two populations give different quintile cuts):
+    History        Qwen1.5-72B-Chat vs deepseek-chat-v2_  A=0.605  len-adv +0.214k  tie 0.167  c=0.9828
+    Law            Meta-Llama-3_1-70 vs Qwen1.5-72B-Chat  A=0.475  len-adv +0.128k  tie 0.042  c=0.9949
+
+  A second channel on '|mean theta gap|' would have to flag these three without flagging
+  the 663 correct calls. Their values of that predictor:
+    Qwen1.5-72B-Chat vs deepseek-chat-v2_  absm = +0.799  (percentile 10% among called edges)
+    Meta-Llama-3_1-70 vs Qwen1.5-72B-Chat  absm = +0.753  (percentile 8% among called edges)
+  READ: if the three sit in the tail of that predictor, a second channel is worth adding; if
+  they sit mid-distribution, it would cost more correct calls than it saves and must not be.

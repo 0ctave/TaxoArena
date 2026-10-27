@@ -1,0 +1,178 @@
+{
+  "id": "SUPERGPQA-STAGE0",
+  "title": "SUPERGPQA-STAGE0: key only on declared disciplines (13 / 72 / 285), CK-CLOSE-v1 split at 0.30 EVAL per field: per-discipline TRAIN policy gain G and interaction-only R against its null; registered BEFORE anyone opens the Records' whole-corpus aggregate JSON (zero-call; REGISTERED)",
+  "question": "On SuperGPQA, split content-closed under CK-CLOSE-v1 at 0.30 EVAL per field, does a per-discipline policy fitted on TRAIN beat the best single zero-shot model on EVAL, and is the key profile's interaction-only reliability over the declared disciplines above its null?",
+  "kind": "zero-call",
+  "state": "registered",
+  "registration": {
+    "commit": "the commit that writes this record (parent b9491bf)",
+    "program_lines": "docs/judge_v2_program.md L21790-L21829",
+    "program_lines_as_of": "the commit that writes them, parent b9491bf, re-grepped",
+    "date": "2026-09-27",
+    "heading": "## Registered 2026-09-27 (before any code or call) \u2014 SUPERGPQA-STAGE0: on SuperGPQA, split content-closed under CK-CLOSE-v1 at 0.30 EVAL per field, does a per-discipline policy fitted on TRAIN beat the best single zero-shot model ...",
+    "index_section": "docs/judge_v2_program.md L21535-L21555 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run; BEFORE any code) \u2014 Wave-0 REGISTRATIONS (record 2 of 2) ...\"; _as_of the commit that writes them, parent b9491bf, re-grepped)",
+    "provenance": "plan docs/agents/plans/2026-09-27_research_plan_rev2.md PART C2 (the research-lead's drafts), verified and corrected by the registrar before registration (stale items S1-S14 and reconciliations (i)-(ii) in the index section); the orchestrator's brief of 2026-09-27 (computed task, not the author's words); authority: the author's adoption and 'You can start' (docs/judge_v2_program.md L21435-L21457, _as_of b9491bf)"
+  },
+  "script": {
+    "path": "none (registration only; the builder's)",
+    "sha16": "NOT BUILT",
+    "commit": "n/a (not built)"
+  },
+  "ready": null,
+  "go": "n/a (0 calls, 0 cce); in scope by the author's decision of 2026-09-27 (stage 0 only); disk for the ~4.3 GB Records is the author's (plan B7 item 4)",
+  "run": null,
+  "review": null,
+  "criteria": [
+    {
+      "id": "A1-A6",
+      "text": "admission legs first, in order (any failure -> STOP, the refusal is the outcome): A1 >= 20 complete zero-shot models (49 asserted, printed); A2 key audit on TRAIN, >= 0.95 agreement per model, failing models excluded by name, >= 20 remain; A3 CK-CLOSE-v1 split, no family straddles; A4 cross-store stem_key collisions <= 2.0% (excluded, counted per store); A5 ODC-BY confirmed on both cards; A6 >= 5 disciplines >= 120 EVAL (else C2 UNDETERMINED-BY-SUPPORT)",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "the corpus"
+    },
+    {
+      "id": "C1",
+      "text": "G = acc_EVAL(per-discipline TRAIN argmax policy) - acc_EVAL(pooled TRAIN best single) over the scored disciplines' EVAL items: HELD iff the two-stage 95% interval (B 2,000, CK-CLOSE components) wholly above 0; FAILED iff wholly below; UNDETERMINED otherwise; placebo interval wholly above 0 VOIDs",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "EVAL items of the scored disciplines (planning 7,959, unsourced)"
+    },
+    {
+      "id": "C2",
+      "text": "interaction-only R over the scored disciplines (EVAL): HELD iff the jackknife 95% lower bound exceeds the logit-additive null p95 (19th of 20); FAILED iff the upper bound is at or below it; UNDETERMINED otherwise",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "scored disciplines (planning 10 of 13, unsourced)"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "every admission leg passes: 0.70; A1 finds 49: 0.85; A4 zero collisions: 0.60 (<= 2.0%: 0.90); >= 40 models pass A2: 0.75",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "A1-A6"
+    },
+    {
+      "id": "P2",
+      "text": "scored disciplines = 10 (80% [9, 11])",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "A6"
+    },
+    {
+      "id": "P3",
+      "text": "G = +1.0pp (80% [-0.2, +2.5]); C1 HELD 0.35, UNDETERMINED 0.60, FAILED 0.05",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "C1"
+    },
+    {
+      "id": "P4",
+      "text": "R = 0.85 (80% [0.70, 0.93]); C2 HELD 0.85",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "C2"
+    },
+    {
+      "id": "P5",
+      "text": "the best single is the TRAIN argmax in >= 5 scored disciplines: 0.60",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "dominance column"
+    },
+    {
+      "id": "P6",
+      "text": "the placebo's interval covers 0: 0.90",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "C1 validity"
+    },
+    {
+      "id": "P7",
+      "text": "the best zero-shot model's pooled EVAL accuracy <= 0.65 (DESCRIPTIVE; the 'mostly solved' readout): 0.85",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "descriptive"
+    }
+  ],
+  "falsifier": {
+    "text": "F1 = C2 FAILED: the key-profile interaction licence (R above its null on MMLU-Pro and the union, id-disjoint only) does not transport to SuperGPQA's declared disciplines at this roster; overturns the planned SQ5 corpus-invariance of the key-R clause, not any recorded number.",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "none_yet": "registered; nothing run (the Support figures are planning values of the registration, not outcomes)"
+  },
+  "sentence_of_record": "",
+  "chips": [
+    "REGISTERED 2026-09-27, BEFORE ANY CODE AND BEFORE THE AGGREGATE JSON IS OPENED [plan]",
+    "KEY ONLY, DECLARED CELLS, ZERO CALLS (STAGE 0; THE AUTHOR'S SCOPE) [plan]",
+    "C1 DESCRIPTIVE-ONLY (MDE 1.42PP); C2 SCOREABLE [plan]",
+    "ADMISSION LEGS A1-A6 FIRST; ANY FAILURE = STOP [plan]"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (author decisions (a)-(c) and orchestrator rulings R1-R5; insertion only; zero calls; pre-data)",
+      "text": "READY review 1adce88 NOT READY (B1 STOP path prints key counts; H1; B2 DATASET-SURVEY unmet); A4 CONFIRMED 1,251 / 26,529 = 4.7156% > 2.0% (lower bound). THE AUTHOR (decision (a), 2026-09-27): register SUPERGPQA-STAGE0b excluding the 1,251 MMLU-Pro-colliding items, labelled post-count, pre-key; no key read. STAGE0 is not run as registered; it stays in the record, superseded by STAGE0b (state left \"registered\"; nothing withdrawn by the author). docs/judge_v2_program.md L21831-L21846 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run; pre-data) \u2014 the author's decisions (a)-(c) of 2026-09-27 and the orchestrator's rulings ...\"; _as_of the commit that writes it, parent bb30526, re-grepped)"
+    }
+  ],
+  "does_not_show": [
+    "anything yet: registered; not built, not run; no SuperGPQA number in the record",
+    "whether SuperGPQA is 'mostly solved' beyond the descriptive P7 readout (newer frontier models are not in the Records)",
+    "stage 1 (tree, FLAT, filing): a separate registration",
+    "transport to agents, judges or unkeyed data",
+    "anything from the Records' aggregate JSON (sealed; never opened)",
+    "[2026-09-27] NOT RUN AS REGISTERED: its A4 bar (<= 2.0%) fails post-count (1,251 / 26,529 = 4.7156%, READY review 1adce88); superseded by SUPERGPQA-STAGE0b before any key was read"
+  ],
+  "ledger": {
+    "row_id": "SUPERGPQA-STAGE0",
+    "version": "v308 (2026-09-27: registered; a new section-7 row, PLAN chips)"
+  },
+  "depends_on": [
+    "DATASET-SURVEY (registered; its SuperGPQA row must ADMIT)",
+    "ROUTER-CLEAN-POLICY (done; the instrument)",
+    "PROFILE-RELIABILITY-INTERACTION (done; the estimator)",
+    "the author's scope decision (docs/judge_v2_program.md L21435-L21457 item (3))"
+  ],
+  "supersedes": null,
+  "superseded_by": "SUPERGPQA-STAGE0b (registered 2026-09-27, post-count / pre-key; the author's decision (a))",
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing; touches no closed line (CONTEXT section 5 checked at b9491bf)"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L21790-L21829 (section \"## Registered 2026-09-27 (before any code or call) \u2014 SUPERGPQA-STAGE0: on SuperGPQA, split content-closed under CK-CLOSE-v1 at 0.30 EVAL per field, does a per-discipline policy fitted on TRAIN beat the best single zero-shot model ...\"; _as_of the commit that writes them, parent b9491bf, re-grepped)",
+    "docs/judge_v2_program.md L21535-L21555 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run; BEFORE any code) \u2014 Wave-0 REGISTRATIONS (record 2 of 2) ...\"; _as_of the commit that writes them, parent b9491bf, re-grepped)",
+    "docs/agents/plans/2026-09-27_research_plan_rev2.md sections B4 (SuperGPQA row, admission legs), B8 (hazards), C2 R-H",
+    "https://huggingface.co/datasets/m-a-p/SuperGPQA",
+    "https://huggingface.co/datasets/m-a-p/SuperGPQA-Records",
+    "docs/judge_v2_program.md L21831-L21846 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run; pre-data) \u2014 the author's decisions (a)-(c) of 2026-09-27 and the orchestrator's rulings ...\"; _as_of the commit that writes it, parent bb30526, re-grepped)",
+    "docs/plan_2026-09-15.md Amendment 26 (2026-09-27)"
+  ],
+  "last_update": "2026-09-27 (registrar: author decisions (a)-(c), orchestrator rulings R1-R5, STAGE0b registered)",
+  "support": {
+    "a": "C1 EVAL items of the scored disciplines, planning n 7,959 (0.30 x 26,529, before closure; unsourced), CK-CLOSE components; C2 the scored disciplines (planning 10 of 13)",
+    "b": "C1 1.312 (ROUTER-CLEAN-POLICY measured two-stage DEFF, transported) x component Kish 1.0-1.1 (DECLARED PILOT) = 1.312-1.443; C2 SE transported from PROFILE-RELIABILITY-INTERACTION K12 half-width 0.0665",
+    "c": "7,959 / 1.312 = 6,066 to 7,959 / 1.443 = 5,515",
+    "d": "d = 0.00491^2 x 6,482 = 0.1563 (transported); SE_iid = sqrt(0.1563 / 7,959) = 0.004431; x sqrt(1.312) = 0.005076; x sqrt(1.1) = 0.005323; at d 0.25: 0.006420; C2 0.0339",
+    "e": "C1 1.42pp-1.49pp (1.80pp at d 0.25); C2 0.095",
+    "f": "C1 DESCRIPTIVE-ONLY (+1.0pp < MDE 1.42pp; UNDETERMINED expected, a HELD notable); C2 SCOREABLE (break-even null p95 0.755)",
+    "g": "C1 reachable iff the true per-discipline gain is non-zero (the policy can lose on EVAL); C2 iff the true interaction variance is non-zero, R <= 1; A6 can make C2 unreachable on this corpus at any budget"
+  },
+  "cost": {
+    "calls_expected": 0,
+    "cce_expected": 0,
+    "calls_max": 0,
+    "cce_max": 0,
+    "machine": "about 4.3 GB download; about 1-2 CPU-h single-threaded (unsourced); not a pool reader of the programme's DBs",
+    "priced": "UNPRICED (the experiment-manager's)"
+  },
+  "plain_description": {
+    "sq": "SQ5 Invariance",
+    "what": "Planned to repeat the routing and profile checks on a second benchmark, SuperGPQA, using its declared disciplines and a content-closed train/eval split. It would ask whether a per-discipline best-model choice beats the best single model, and whether model profiles per discipline are reliable. No judge calls.",
+    "why": "Tests whether the MMLU-Pro findings carry over to a different corpus.",
+    "information": "Would show whether the per-cell gains and reliable profiles generalise beyond one benchmark. Result: not run as registered. An admission check failed because 4.7% of items collide with MMLU-Pro, above the 2% limit. A version that excludes these items (STAGE0b) replaced it before any answer key was read.",
+    "written": "2026-10-07"
+  }
+}

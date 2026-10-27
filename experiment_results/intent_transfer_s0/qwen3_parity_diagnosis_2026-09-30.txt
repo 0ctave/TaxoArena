@@ -1,0 +1,13 @@
+qwen3 route-parity diagnosis (orchestrator, 2026-09-30; zero judge calls; local Ollama 0.34.4 on RTX 3090; qwen3-embedding:latest Q4_K_M 7.6B)
+Same 20 texts as route_parity (first 20 by sha256 of text in embeddings_cache.db, read mode=ro&immutable=1); cos after slice-256 + renormalise vs stored vector.
+Fresh embeds (batch of 20, twice, and one-by-one):
+  15 of 20 texts: 1.00000 in every trial
+  5 texts: 0.99920 0.99941 0.99936 0.99939 0.99954, identical in all trials (batched and single) -> deterministic drift of the stored rows vs today's route
+  1 long text (4,519 chars): 1.00000 in batch trial 1 and single, 0.99915 in batch trial 2 -> GPU batch nondeterminism
+  batched vs single min cos 0.99915
+Real route errors on the same 20 texts (min / median):
+  trailing space appended      0.9846 / 0.9973
+  prefix "query: "             0.9212 / 0.9888
+  instruct prefix              0.7460 / 0.8466
+  wrong dims (reversed)        -0.0916
+Reading: numeric drift >= 0.99915; smallest real route error <= 0.9846. The frozen bar 0.9999 sits inside the numeric-drift band for qwen3 on this GPU; 0.998 separates drift from every route error tested.

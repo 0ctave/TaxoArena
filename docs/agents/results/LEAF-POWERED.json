@@ -1,0 +1,143 @@
+{
+  "id": "LEAF-POWERED",
+  "title": "LEAF-POWERED: does a leaf-level rubric beat the anchor-level one? (the cancelled LEAF-SS, run properly, on the four anchors where cell context looked strongest; 2,150 single-order verdicts)",
+  "question": "ANCHOR rubric (the deployed STACK-v2 configuration) vs LEAF rubric (the promoted bareq512_s42 tree's own induced judgeRubric for the routed leaf), everything else identical (grok-4-1-fast-non-reasoning, reasoning reference, v2 mechanics, both arms fresh and interleaved), on Philosophy, Business, Biology, Chemistry, ~270 disagreement-filtered matches per anchor; PRIMARY pooled leaf - anchor >= 2pp at paired McNemar p < 0.05; SECONDARY per anchor under Holm. Amended before any call to SINGLE order (2,160 calls).",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "a12cdc6",
+    "program_lines": "docs/rubric_v2_design.md L213-L242 (registration; amendment L233-L241 e930207: single order) and L243-L266 (outcome; correction 0dabe2c: 92.9% vs 98%); no programme section (the rubric line is recorded in rubric_v2_design.md)",
+    "program_lines_as_of": "docs/rubric_v2_design.md at 53f5fd4",
+    "heading": "### LEAF-POWERED — registered 2026-09-14, before any call (tools/analysis/leaf_powered.py)",
+    "outcome_heading": [
+      "docs/rubric_v2_design.md L243: #### LEAF-POWERED OUTCOME (2026-09-14) — PRIMARY FAIL, and for a reason that settles the leaf layer"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "tools/analysis/leaf_powered.py",
+    "sha16": "71d81ed60c1a437b (at e66c9e4, its only commit)",
+    "commit": "e66c9e4"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (2,160 matches, single order = 2,160 calls; amendment e930207 before any call)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/leaf_powered_outcome.txt",
+    "outcome_commit": "a398570",
+    "calls": 2150,
+    "cce": "not stated",
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-14"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the registrar's own correction 0dabe2c (the arms agree on 92.9% of all matches; the 98% belongs to the key-decidable correctness statement)",
+    "commit": "0dabe2c",
+    "verdict": "PRIMARY FAIL; the leaf layer closed on evidence: the rubric change moves verdicts but almost never across the right/wrong boundary (2.0% of decidable pairs)"
+  },
+  "criteria": [
+    {
+      "id": "PRIMARY",
+      "text": "pooled over the four anchors, leaf beats anchor by >= 2pp on key-decidable accuracy at paired McNemar p < 0.05",
+      "result": "FAILED",
+      "value": "anchor 0.934 vs leaf 0.931 (-0.003), discordant 9:7, p 0.80",
+      "denominator": "786 key-decidable paired matches"
+    },
+    {
+      "id": "SECONDARY",
+      "text": "per anchor with Holm correction",
+      "result": "FAILED",
+      "value": "Chemistry n 190 +0.016 (0:3); Philosophy n 185 -0.016 (4:1); Business n 205 -0.010 (4:2); Biology n 206 0.000 (1:1); none significant under Holm",
+      "denominator": "four anchors"
+    },
+    {
+      "id": "DESCRIPTIVE",
+      "text": "per-anchor effect sizes vs the earlier underpowered estimates; the decidable rate; the invalid rate",
+      "result": "DELIVERED",
+      "value": "the arms return an identical verdict on 92.9% of all 1,078 matches (1,001); of the 786 key-decidable only 16 (2.0%) differ in whether the verdict was CORRECT (9:7): the arithmetic ceiling on a leaf rubric's effect is about +-2pp, so the earlier 6-17pp per-anchor 'gains' were noise; 2,150 verdicts, 0 errors",
+      "denominator": "1,078 matches"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "pooled +1 to +3pp, one or two anchors individually significant, Philosophy the largest",
+      "result": "FAILED",
+      "value": "-0.3pp; none significant; Philosophy -1.6pp",
+      "denominator": "786"
+    }
+  ],
+  "falsifier": {
+    "text": "if the pooled effect is null AND no anchor survives correction, the leaf layer is closed properly rather than by a cancelled gate",
+    "fired": true,
+    "note": "the leaf layer is CLOSED on evidence; power stated honestly: designed for a 0.10 discordant rate, observed 0.02, so as a significance test it could not have detected 6pp, but the low discordance is itself the measurement (the intervention barely perturbs the judge); scope: LEAF vs ANCHOR, both domain-specific, not cell vs generic; absolute 0.93 figures are single-order and filtered, not comparable to the dual-order 0.86 elsewhere"
+  },
+  "numbers_of_record": {
+    "pooled": "anchor 0.934 vs leaf 0.931, -0.003, 9:7, p 0.80",
+    "per_anchor": "Chemistry +0.016 0:3; Philosophy -0.016 4:1; Business -0.010 4:2; Biology 0.000 1:1",
+    "discordance": "identical verdict on 1,001 of 1,078 (92.9%); correctness differs on 16 of 786 key-decidable (2.0%)",
+    "run": "2,150 verdicts, 0 errors, single order"
+  },
+  "sentence_of_record": "LEAF-POWERED (2026-09-14, 2,150 single-order verdicts): PRIMARY FAIL (pooled anchor 0.934 vs leaf 0.931, -0.003, 9:7, p = 0.80; no anchor significant under Holm), and for a reason that settles the leaf layer: the arms give an identical verdict on 92.9% of all 1,078 matches, and of the 786 key-decidable ones only 16 (2.0%) differ in whether the verdict was CORRECT, so the rubric moves verdicts but almost never across the right/wrong boundary; the arithmetic ceiling on a leaf rubric's effect is +-2pp and the earlier 6-17pp per-anchor 'gains' were noise. Registered power assumed a 0.10 discordant rate; the observed 0.02 means it could not have detected 6pp as a significance test, but the low discordance IS the measurement. Scope: leaf vs ANCHOR, both domain-specific; the 0.93 figures are single-order and filtered.",
+  "chips": [
+    "FAIL — leaf layer closed"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-14",
+      "by": "the amendment before any call (rubric_v2_design.md L233-L241, e930207)",
+      "text": "the run is SINGLE ORDER, not dual (2,160 calls): position bias cancels in a paired within-experiment contrast and ORDER-1 measured single order resolves more pairs; cost drove the change; the absolute accuracies are single-order figures not comparable to the dual-order numbers elsewhere."
+    },
+    {
+      "date": "2026-09-14",
+      "by": "the registrar's correction (rubric_v2_design.md L248-L252, 0dabe2c)",
+      "text": "the arms return an identical verdict on 92.9% of all 1,078 matches, NOT 98%; the 98% belongs to the narrower statement that only 16 of the 786 key-decidable matches (2.0%) differ in correctness."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the SPLIT-FOLLOWUPS review 8ebfa7a (insertion only, zero calls)",
+      "text": "Route (b) APPLIES: this readout used the leaf rubrics induced on bareq512_s42 = snapshot 20260909_212117, whose induction held 28 p2dca norm-v1-only twins (exact, 16 leaves) with the key and CoT, and whose labelling prompts held 26 twin texts (16 leaves). CORRECTED 2026-09-23 by the SPLIT-FOLLOWUPS review (8ebfa7a): FALSE for the tree of record. 20260909_212117 was built with labelling and induction ON (143 LLM-written labels - not 158: the other 15 are the root and the 14 ground-truth anchors - and 87 induced leaf judgePrompt / judgeRubric). Induction withheld the active pool by EXACT linked text after an 80% hash hold-in, so 29 of the 37 exact twins were withheld; 28 OF THE 33 NORM-V1-ONLY TWINS WERE IN THE INDUCTION CORPORA OF 16 LEAVES, with the key mark and CoT; 28 IS EXACT, NOT AN UPPER BOUND (the corpus model reproduces all 17 [JUDGE-LEAK] log lines). Labelling applies NO reserved filter: 26 twin texts (12 exact, 14 norm-v1-only) were in the leaf labelling prompts of 16 leaves (the sampling is deterministic and was reproduced); internal-node samples are seeded and unreproduced, and all 70 are eligible there. ROUTE (b) APPLIES to RUBRIC-512 (cell arm), RUBRIC-512-SS, RUBRIC-512-R, LEAF-POWERED and rubric_text_stats; the RK-1 kit material is built from 212117 leaf members and its exposure is unmeasured. See docs/judge_v2_program.md L14455-L14487 (SPLIT-FOLLOWUPS)."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "cell vs GENERIC rubric (RUBRIC-512's ambiguous +1.8pp remains as it was)",
+    "a 6pp effect detected as a significance test (underpowered at the observed discordance)"
+  ],
+  "ledger": {
+    "row_id": "LEAF-POWERED",
+    "version": "v67 (a398570); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "RUBRIC-HIDDEN",
+    "RUBRIC-512",
+    "RK-1b",
+    "LEAF-SS",
+    "ORDER-1"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "the leaf rubric layer; rubric text at every granularity (CONTEXT.md section 5 lists LEAF-POWERED)"
+  },
+  "sources": [
+    "docs/rubric_v2_design.md L213-L266 (registration a12cdc6, amendment e930207, outcome a398570, correction 0dabe2c)",
+    "experiment_results/x12_crossdomain/leaf_powered_outcome.txt (a398570)",
+    "docs/test_ledger.html row LEAF-POWERED (v67): chips verbatim, observed cell, evidence (leaf_powered.py, leaf_powered_outcome.txt, a12cdc6, e930207)",
+    "script sha16 = sha256 of tools/analysis/leaf_powered.py at e66c9e4, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (rubric_v2_design.md / multi_corpus_design.md lines as of their last commits named in sources)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "About 2,150 verdicts on four subject areas, comparing the judge using a grading guide written for each fine-grained leaf of the tree with the judge using a guide written for the broad subject.",
+    "why": "It tests whether making the judge's instructions more specific to each cell improves its accuracy.",
+    "information": "A gain would support cell-specific judging. No gain would close that line. Result: done. No gain: 0.934 with the broad guide against 0.931 with the leaf guide. The two guides give the same verdict on 93% of matches and change right-or-wrong on only 2% of the decidable ones, so a leaf guide can move accuracy by at most about 2 points. Earlier larger per-subject 'gains' were noise. This was single-order judging on filtered matches, and it compares leaf against subject guides only. Later ruled history rather than evidence, because it ran on the older question pool.",
+    "written": "2026-10-07"
+  }
+}

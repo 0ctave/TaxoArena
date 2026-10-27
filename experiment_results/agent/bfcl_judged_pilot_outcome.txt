@@ -1,0 +1,75 @@
+=== BFCL-JUDGED-PILOT: the deployed recipe against the BFCL CHECKER_OUTPUT on the base stratum ===
+  registration docs/judge_v2_program.md L10965-L11146, commit 22c5d5f (registered 2026-09-23, before any code or call)
+  pool p2035adddedd1becb (57 EVAL base tasks) | corpus bfcl_result_2025-12-16.db mode=ro&immutable=1 | judge grok-4-1-fast-non-reasoning | cap 8192 | temperature omitted | reference EXPECTED_OUTCOME (per-task ground-truth call sequence; no per-side verdict)
+  protocol: BFCL-JUDGED-PILOT: prompt_v2 verify-first system template + corpus-level SYSTEM_BFCL / RUBRIC_BFCL slots + SCHEMA_INSTRUCTION; reference = the PER-TASK EXPECTED OUTCOME (the corpus's ground-truth call sequence, possible_answer), rendered once per task, identical for both sides, attached to the task statement and OUTSIDE the artefact cap, carrying no per-side verdict (ruling BFCL-REF-ORACLE, programme L11001, commit 6ccf2f7); artefact per side = decoded call sequence + final state_info capped at 2500 estimated tokens (chars/4) with the final state always retained; dual order, TIE on flip, no third call; INVALID if an order is unparsed or finish_reason is length or content_filter
+  cache experiment_results\agent\bfcl_judged_pilot.db (mode=ro) | producing script LF sha fa38c1dbe2776314 | this script 5e9db53b894eeccb (DIFFERS) | started 2026-09-23 05:48:30 | resumed ["2026-09-23 05:49:34", "2026-09-23 06:04:47"]
+  deployment fingerprint over the posted calls (expected azure:grok-4-1-fast-non-reasoning): {'azure:grok-4-1-fast-non-reasoning': 1216}
+  rosters: HEADLINE DeepSeek-V3.2-Exp-FC, Qwen_Qwen3-32B-FC, Salesforce_Llama-xLAM-2-70b-fc-r, claude-sonnet-4-5-20250929-FC, gemini-2.5-flash-FC, gpt-5.2-2025-12-11-FC, meta-llama_Llama-3.3-70B-Instruct-FC | SELF-PREFERENCE (C3, never in the headline) grok-4-1-fast-reasoning-FC
+  reference of record (ruling BFCL-REF-ORACLE, programme L11001, commit 6ccf2f7): the PER-TASK EXPECTED OUTCOME, rendered once per task from experiment_results\agent\bfcl_raw\2025-12-16\dataset\possible_answer\BFCL_v4_multi_turn_base.json (sha256 1fee67823b317571), identical for both sides, attached to the task statement, OUTSIDE the artefact cap; no per-side verdict, error text, error_type, PASS / FAIL or all_pass is in any prompt this cache was built from (assert_no_per_side_verdict checked every assembled statement). A is therefore a BLIND verification rate, which is what makes the ladder positioning legitimate.
+  task statement from experiment_results\agent\bfcl_raw\2025-12-16\dataset\BFCL_v4_multi_turn_base.json (sha256 1a21a995d06fd6f2); pinned in run_meta as 1a21a995d06fd6f2 / 1fee67823b317571
+  prompt strings pinned in run_meta (amendment item (2)) | SYSTEM_BFCL: You are judging two attempts by tool-using agents at the same multi-turn function-calling task. Each attempt is shown as its decoded tool-call sequence followed by the final environment state. The task statement carries the corpus's own ground-truth call sequence for the task: one sequence that solves it, not necessarily the only one. | RUBRIC_BFCL: Rank by: (1) whether the attempt reaches the outcome the task asks for, read against the ground-truth sequence and against your own reading of the task; (2) whether the calls are valid and in an order that could produce that outcome; (3) whether the final environment state is the state the task asks for. A different sequence that reaches the same final state is as good; an attempt that does not reach the outcome cannot win on style, on length or on the number of calls.
+  recipe note: the v2 template's inherited sentence "The question carries a reference solution (marked as produced independently; it may be wrong)" is kept verbatim for comparability with STAGE3-MATH's 0.958 rung, which carried it too; it does not instruct the judge to defer to the reference
+  COUNTS OF RECORD (registration 22c5d5f) beside the DRY-RUN's recomputation from experiment_results\agent\bfcl_result_2025-12-16.db (mode=ro&immutable=1):
+    headline_matches   registered  1113 | recomputed  1113
+    headline_filtered  registered   461 | recomputed   461
+    grok_matches       registered   385 | recomputed   385
+    grok_filtered      registered   147 | recomputed   147
+    both-present pairs before the termination rule: headline 1197, self-preference 399 | pass-differs WITHOUT the both-decided clause: headline 461, self-preference 147 (the filter of record adds that clause)
+  cache rows: 1216 of 1216 calls | matches with both orders 604 of 608 | unusable 0 (0.0%) | finish_reason {'stop': 1216}
+
+=== C2 THE EMPTY / DEGENERATE CLASS, NON-JUDGEABLE BY THE REGISTRATION, COUNTED BEFORE A ===
+  rule (fixed in this script's header before any call): EMPTY = zero non-blank decoded calls; DEGENERATE = error_type multi_turn:empty_turn_model_response AND a blank decoded-call text; a MATCH is non-judgeable iff EITHER side is.
+  episodes: EMPTY 1 + DEGENERATE 0 = 1 of 385 base-stratum EVAL TERMINATED episodes of the 7-agent roster = 0.0026
+  matches: 3 of the 461 checker-disagreeing headline matches (0.0065) removed -> DECIDING SUBSET 458 matches on 49 tasks
+  beside it (a DIFFERENT object: the admission run's 18.3% error_type share): episodes with error_type multi_turn:empty_turn_model_response: 56 of 385 = 0.1455
+  C2: HELD (declared before any call, counted and printed with its denominator BEFORE A; A is reported BOTH ways below, the deciding-subset reading being the reading of record for C1; partition check 458 + 3 = 461)
+
+=== C1 A, THE HEADLINE AGREEMENT WITH THE CHECKER, AND ITS LADDER POSITION ===
+  [convention A] deciding subset (READING OF RECORD)        A = 339 / 458 = 0.7402 on 49 tasks | Wilson [0.6981, 0.7782] | question-clustered bootstrap (B=2000, seed 42) SE 0.0389 -> percentile [0.6590, 0.8136], normal [0.6640, 0.8164]
+  [convention B] deciding subset (READING OF RECORD)        A = 339 / 358 = 0.9469 on 48 tasks | Wilson [0.9186, 0.9658] | question-clustered bootstrap (B=2000, seed 42) SE 0.0184 -> percentile [0.9069, 0.9793], normal [0.9109, 0.9829]
+  [convention A] all checker-disagreeing headline matches   A = 342 / 461 = 0.7419 on 49 tasks | Wilson [0.7000, 0.7797] | question-clustered bootstrap (B=2000, seed 42) SE 0.0388 -> percentile [0.6614, 0.8160], normal [0.6659, 0.8178]
+  [convention B] all checker-disagreeing headline matches   A = 342 / 361 = 0.9474 on 48 tasks | Wilson [0.9193, 0.9661] | question-clustered bootstrap (B=2000, seed 42) SE 0.0182 -> percentile [0.9077, 0.9795], normal [0.9116, 0.9831]
+  convention A = ties, INVALID and non-terminated counted WRONG on the full denominator; convention B = committed verdicts only. The SE OF RECORD for C1 is the question-clustered (DEFF-inflated) SE; the registration's expectation at 461 matches on 57 tasks is ~0.024.
+  LADDER POSITION of A (deciding subset, convention A) against the three rungs; CROSS-CORPORA CAVEAT: the three rungs were measured on OTHER corpora under the same recipe, so this ladder reading is a POSITIONING ACROSS CORPORA, never a paired test; the only on-corpus contrast in this test is the C3 self-preference stratum.
+      NONE                     0.738  (PAIR-NOREF, measured on MMLU-Pro): A 0.740 [0.664, 0.816] is not distinguished from it
+      CACHED_SOLVE             0.865  (STACK-v2 (0.849 GROK-CALIB), measured on MMLU-Pro): A 0.740 [0.664, 0.816] is BELOW (the interval lies under it)
+      CHECKER_OUTPUT (MATH)    0.958  (STAGE3-MATH-CAPFREE, measured on terminated MATH traces): A 0.740 [0.664, 0.816] is BELOW (the interval lies under it)
+  INTERVAL OF RECORD for C1 (amendment item (5)(d)): the point +- 1.96 x the clustered SE = [0.6640, 0.8164]; the PERCENTILE interval [0.6590, 0.8136] is printed beside it (B = 2000, cluster unit = the 49 TASKS). If the two disagree about the 0.75 bar, C1 is UNDETERMINED.
+  C1: FAILED - THE FALSIFIER FIRES (the point 0.7402 is at or below 0.75)
+  FALSIFIER READING (registration): on a real agentic artefact with a real outcome checker the deployed recipe verifies no better than a NO-REFERENCE judge does on MMLU-Pro (PAIR-NOREF 0.738); the "for Agents" bridge may then be written only as motivation, never as a measured claim, ON THIS CORPUS. It overturns no BFCL number, no board, no profile, no tier and no MMLU-Pro result.
+
+=== C3 THE SELF-PREFERENCE STRATUM, BESIDE AND NEVER IN THE HEADLINE ===
+  A_grok = 100 / 146 = 0.6849 (convention A, deciding subset of the stratum; 147 matches before the C2 removal) | clustered SE 0.0439 -> [0.5988, 0.7711]: a DIRECTION, not a number
+  A_grok - A_headline on the 49 tasks that appear in both strata: -0.0552, paired-by-task bootstrap [-0.1269, +0.0173]
+  the grok-4-1-fast-reasoning-FC side: judge win-share 0.5342 (of 146 committed matches) beside its checker pass-share 0.7534 (of 146 matches)
+  C3: HELD (the stratum is computed, printed and kept out of every headline figure; grok-FC matches inside the headline set: 0)
+
+=== C4 INSTRUMENT COUNTS (printed, no bar) ===
+  truncated sides 0 of 922 headline sides (0.0000); truncated matches 0 of 461 (0.0000); state-over-cap sides 0
+  per-task reference block: median 609, max 1118 characters; CHECKER_TEXT_CUT 0 of 57 TASKS (denominator TASKS, not sides: the block is per task, so the cut is identical in both orders)
+  DeepSeek-V3.2-Exp-FC                     NON_TERMINATED excluded by rule (c): CAP_HIT   0 + ERROR   0 of  57 base-stratum EVAL episodes (TERMINATED  57)
+  Qwen_Qwen3-32B-FC                        NON_TERMINATED excluded by rule (c): CAP_HIT   0 + ERROR   0 of  57 base-stratum EVAL episodes (TERMINATED  57)
+  Salesforce_Llama-xLAM-2-70b-fc-r         NON_TERMINATED excluded by rule (c): CAP_HIT   0 + ERROR   0 of  57 base-stratum EVAL episodes (TERMINATED  57)
+  claude-sonnet-4-5-20250929-FC            NON_TERMINATED excluded by rule (c): CAP_HIT   0 + ERROR   0 of  57 base-stratum EVAL episodes (TERMINATED  57)
+  gemini-2.5-flash-FC                      NON_TERMINATED excluded by rule (c): CAP_HIT   0 + ERROR   0 of  57 base-stratum EVAL episodes (TERMINATED  57)
+  gpt-5.2-2025-12-11-FC                    NON_TERMINATED excluded by rule (c): CAP_HIT   0 + ERROR   0 of  57 base-stratum EVAL episodes (TERMINATED  57)
+  grok-4-1-fast-reasoning-FC               NON_TERMINATED excluded by rule (c): CAP_HIT   0 + ERROR   0 of  57 base-stratum EVAL episodes (TERMINATED  57)   [self-preference stratum]
+  meta-llama_Llama-3.3-70B-Instruct-FC     NON_TERMINATED excluded by rule (c): CAP_HIT  14 + ERROR   0 of  57 base-stratum EVAL episodes (TERMINATED  43)
+  unusable rows (content_filter + length + unparsed) 0 of 1216 posted calls (0.0000)
+  order-flip TIE share 100 of 458 judged matches on the deciding subset (0.2183)
+  [NIGHT] cumulative grok calls tonight 2944 of 14000 (Amendment 9 hard ceiling; the COUNT OF RECORD is the night ledger experiment_results\night_calls_2026-09-23.json, amendment item (4): append-only, appended with the calls ACTUALLY posted after every posting launch, read before posting) | this launch (--analyze (0 calls)) would post at most 0 -> 2944 | source: experiment_results\night_calls_2026-09-23.json (5 launch rows); this test's own cache holds 1316 posted rows
+
+=== predictions (registered before any code; scored explicitly) ===
+  P1 A deciding subset, convention A, in [0.78, 0.90] (point 0.85): 0.7402 -> FAILED
+  P2 A under convention B in [0.85, 0.95] (4-8pp above convention A): 0.9469 (delta +0.2068) -> HELD
+  P3 order-flip TIE share in [0.08, 0.25] of the judged matches: 0.2183 -> HELD
+  P4 truncated-side share in [0.04, 0.12] of the headline sides: 0.0000 -> FAILED
+  P5 the C2 empty / degenerate class in [0.10, 0.25] of the roster's base-stratum EVAL TERMINATED episodes: 0.0026 -> FAILED   (the admission's 18.3% is the error_type share 0.1455, printed beside: a different object)
+  P6 A_grok - A_headline in [-0.05, +0.10], scored as a BAND with 'undecidable at this support' allowed: -0.0552 [-0.1269, +0.0173] -> FAILED
+  P7 unusable rows <= 1% of the posted calls: 0.0000 -> HELD
+  P8 A's DEFF-inflated interval EXCLUDES 0.958: [0.6640, 0.8164] -> HELD
+
+=== what this outcome does and does not license ===
+  it licenses ONE measured sentence for the "for Agents" bridge, with its interval and its ladder position, and a CALIBRATION / CANARY object on an agent corpus.
+  it licenses NO profile cell (57 EVAL tasks against the 120-question support rule, FRAMEWORK L117), NO agent ranking, NO per-trajectory claim and NO process statement, now or later, without a new registration.
+  the REJECTED per-side form (the per-episode checker verdict in the block) is forbidden in this test, its cache, this outcome, the ledger, the thesis and the blog; a number measured under it is never placed beside 0.958 or on the ladder (ruling BFCL-REF-ORACLE).

@@ -1,0 +1,74 @@
+# H9 EMBEDDER ARM (embeddinggemma:latest) — registered EXPLORATION (2026-09-08, committed pre-launch).
+#
+# Identical to the frozen construction config (bar 0.025, mcs 55, seed 42; labeling/
+# judging/final-metrics off) except the EMBEDDING MODEL, which cannot live in TOML
+# (the EmbeddingModel bean reads it at Spring startup): launch with
+#   -Dtaxoadapt.llm.embedding-model=embeddinggemma:latest
+# The embedding cache is per-model (EmbeddingCache derives the file name), so no
+# vector reuse across models is possible. embeddinggemma:latest is Matryoshka-trained, so the
+# pipeline's 256-dim truncation remains valid.
+#
+# FROZEN EXPECTATIONS (descriptive): anchors stable (GT-seeded); leaf count same
+# order of magnitude as the frozen 87; held-out Top-1 near the qwen3 seed floor
+# (0.750-0.776) — a large drop would say construction quality is embedder-bound.
+# EXPLORATORY READOUTS (adjudicate nothing): per-anchor leaf distribution vs
+# qwen3's; whether Philosophy splits in this geometry. NOTE: mu-matching vs the
+# frozen tree is INVALID across embedding spaces — structural/routing metrics only.
+#
+datasetType   = "MMLU_PRO"
+
+models        = [
+    "gpt-4o-2024-08-06",
+    "claude-3-5-sonnet-20241022",
+    "gemini-1.5-pro-002",
+    "deepseek-chat-v2_5",
+    "Meta-Llama-3_1-70B-Instruct",
+    "Qwen1.5-72B-Chat",
+    "gpt-4o-mini",
+    "claude-3-5-haiku-20241022",
+    "Mixtral-8x7B-Instruct-v0.1",
+    "c4ai-command-r-v01",
+    "Qwen1.5-14B-Chat",
+    "Meta-Llama-3_1-8B-Instruct",
+    "gemini-1.5-flash-002",
+    "Llama-2-70b-hf",
+    "Llama-2-13b-hf"
+]
+
+category      = ""
+queryLimit    = 0
+outputDir     = "experiment_results/h9_embed_gemma"
+testRatio     = 0.3
+seed          = 42
+
+runPipeline        = true
+runBenchmark       = false
+runTrickle         = true
+runBaselines       = false
+enableFinalMetrics = false
+enableLabeling     = false
+judgeInduction     = false
+
+dagMode = "DAG_MAX"
+
+maxDepth              = 8
+minClusterSize        = 55
+proposalSeparationBar = 0.025
+tau                   = 1e-6
+acceptanceZ           = 2.0
+enableRefitGate       = false
+
+membershipFloor       = 0.25
+routingBeamGamma      = 0.2
+descentMargin         = 0.12
+
+effectiveSupportFloor = 2.0
+defaultKappaPrior     = 10.0
+
+numIterations         = 50
+maxLeafAssignments    = 5
+
+fusionSimilarityThreshold = 0.90
+enableGtWarmStart         = false
+
+enableProfiling           = true

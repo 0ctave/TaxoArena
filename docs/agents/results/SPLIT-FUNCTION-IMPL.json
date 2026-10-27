@@ -1,0 +1,145 @@
+{
+  "id": "SPLIT-FUNCTION-IMPL",
+  "title": "SPLIT-FUNCTION-IMPL (+ TRAIN-ONLY-TREE): FRAMEWORK item 18: the construction / arena split as a FUNCTION of the item, asserted per row in both languages, with the pinned pools kept as lists (engineering, zero calls)",
+  "question": "Implement side = f(item) (stem + content_key under SplitSide norm-v1; GATE = hash in [300, 400)) with a per-row assertion in Kotlin (SplitSide.kt) and Python (split_side.py, one shared literal set, source-scanned by test); PoolPin.decide (the TRAIN-ONLY refusal) on the headless and TUI benchmark paths; the baseline generator takes the run's own pool as a mandatory argument; is_reserved retired from every code path; pool_guard takes a pool id and --activate no longer exists.",
+  "kind": "engineering",
+  "state": "done",
+  "registration": {
+    "commit": "eaf1dbf",
+    "program_lines": "registered BY REFERENCE at docs/judge_v2_program.md (lines as of 5dc8a06) L3603-L3611 (eaf1dbf, 2026-09-15: the 26 FRAMEWORK tests, docs/design/FRAMEWORK.md 'Tests to register before shipping' at 8d77f7b); FRAMEWORK item 18; docs/plan_2026-09-15.md L34 (Block 4, code review not checker); landed record at docs/judge_v2_program.md (lines as of 5dc8a06) L4179-L4193 and L4202-L4203",
+    "date": "2026-09-15",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-15 (before any run) — BY REFERENCE: the 26 tests in docs/design/FRAMEWORK.md \"Tests to register before shipping\" (commit 8d77f7b), with the criteria, predictions and call counts stated there, schedu",
+    "outcome_heading": [
+      "L4179: ## Blocks 3-4 engineering landed (2026-09-16, zero calls) — SPLIT-FUNCTION-IMPL + TRAIN-ONLY-TREE, H9-REM flag, PERF-8 memo"
+    ]
+  },
+  "script": {
+    "path": "SplitSide.kt; tools/analysis/split_side.py; tools/analysis/pool_guard.py --pool; tools/chains/split_function_check.ps1",
+    "sha16": "n/a (engineering merge; no single script of record)",
+    "commit": "d3b4ba9 (worktree merge; conflicts repaired b342efa / 7d11c4e; source change 13f2142)"
+  },
+  "ready": null,
+  "go": "n/a (0 calls; planner + implementer in an isolated worktree + adversarial reviewer, MERGEABLE after three MEDIUM fixes)",
+  "run": {
+    "outcome_file": "docs/judge_v2_program.md L4179-L4193 ('Blocks 3-4 engineering landed', the record of the criterion met at zero calls; no outcome file under experiment_results)",
+    "outcome_commit": "c0f5ff7",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (eval 3,445 by id, 3,537 with content closure, gate 860, train 7,603) and paeec37aa28063c75 (eval 6,482 / 7,025, gate 1,487, train 13,094) [UNREPRODUCED 2026-09-23 (D2): 3,537 / 860 / 7,603 matches no reading; engine 3,770 / 843 / 7,387; paeec method 3,552 / 859 / 7,589.]",
+    "date": "2026-09-16",
+    "other_files": [
+      "suite 418 / 418 after merge; every Block 2 dry-run re-passed under the declared-pool model"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the adversarial code review of the worktree (MERGEABLE after three MEDIUM fixes) is the check of record",
+    "commit": "d3b4ba9",
+    "verdict": "MERGEABLE; criterion MET at zero calls; standing rule changed: nothing is activated any more"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "3/3 rebuilds reproduce the pinned pools as lists and the function for new items; |gate ∩ eval| = 0; |scored \\ eval| = 0; EVAL items never in a member set",
+      "result": "FAILED",
+      "value": "3 of 3 rebuilds, identical digest 01c5086e...; gate hashes all in [300, 400); |gate ∩ eval| = 0, |eval_closure ∩ train| = 0, |scored \\ eval| = 0 on both corpora; suite 418/418",
+      "denominator": "both corpora (p2dca, paeec) [ADDED 2026-09-23: the member-set clause's denominators are the THREE TREES OF RECORD and their member slots, which the value string never names: 20260727_042523 against p2dca, 20260910_043557 against p2dca, 20260911_144214 against paeec]",
+      "result_note": "[CORRECTED 2026-09-23 by the registrar (record-integrity blocker A1, insertion only, zero calls; the recorded value string above is NOT edited and the original score HELD is preserved verbatim here): THE NARRATIVE VERDICT OF RECORD IS 'C1 PARTLY'. C1 is a CONJUNCTION of four clauses. Clauses 1-3 HOLD and are the ones the value string reports: 3/3 rebuilds reproduce the pinned pools as lists and the function for new items (identical digest 01c5086e...), |gate INTERSECT eval| = 0, |scored MINUS eval| = 0. THE FOURTH CLAUSE, 'EVAL ITEMS NEVER IN A MEMBER SET', IS MEASURABLY FALSE ON ALL THREE TREES OF RECORD, and the value string never reports the member-set count at all. MEASURED (docs/design/FRAMEWORK.md guard 3 at L229 and item 18 at L373, `gradlew trainOnlyAudit`, read-only): distinct EVAL texts among members, EXACT TEXT / under the function's own key NORM-V1 = 2,437 / 2,448 for 20260727_042523 (the incident tree, against p2dca), 37 / 70 for 20260910_043557 (the MMLU-Pro tree of record) and 427 / 432 for 20260911_144214 (the union tree). FRAMEWORK L373 already states 'TRAIN-ONLY-TREE is FAIL on every tree of record'; the defect corrected here is that THIS RECORD said HELD while the design file said FAIL, so the failure lived in exactly one place in the machine-readable record. BECAUSE THE SCHEMA ADMITS ONLY HELD / FAILED / UNDETERMINED / SILENT / DELIVERED / n/a AND NOT 'PARTLY', the machine-readable `result` carries FAILED - the correct score for a conjunction with a false conjunct - and the narrative verdict 'C1 PARTLY (three clauses HELD, the member-set clause FAILED)' is carried by the chips, by this note and by the ledger row's observed cell. THE FIXTURE IS NOT THE DEFECT: src/test/kotlin/taxonomy/TreesOfRecordEvalMembershipAudit.kt L47-52 asserts 2437 / 37 / 427 as EXPECTED values and build.gradle.kts L72 excludes it from `test` so it runs only by name; that is a REGRESSION PIN ON A KNOWN, DISCLOSED STATE - it exists so the contamination cannot drift silently - and NOT a guard pretending the invariant holds. The registrar read both files and agrees with the checker's reading in full.]"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none (engineering item with a verified invariant)",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "pools": "p2dca: eval 3,445 by id (3,537 with content closure), gate 860, train 7,603; paeec: eval 6,482 / 7,025, gate 1,487, train 13,094; digest 01c5086e... [UNREPRODUCED 2026-09-23 (D2): as above.]",
+    "not_done_named": "dropping the is_reserved column physically from the two dataset DBs; rebuilding any tree of record; the epoch / MinHash items",
+    "standing_rule": "every rule that said 're-pin with pool_guard.py --activate' now reads 'verify with pool_guard.py --pool <id>'; nothing is activated any more; the FRAMEWORK paragraph the implementer had replaced was restored verbatim with its bracket appended (insertion-only rule)",
+    "train_only_member_contamination": "[ADDED 2026-09-23, blocker A1] distinct EVAL texts among members, EXACT TEXT / NORM-V1: 2,437 / 2,448 (20260727_042523 vs p2dca, the incident tree); 37 / 70 (20260910_043557, the MMLU-Pro tree of record, vs p2dca); 427 / 432 (20260911_144214, the union tree, vs paeec). Source: docs/design/FRAMEWORK.md L229 (guard 3) and L373 (item 18), measured by `gradlew trainOnlyAudit` read-only; pinned as expected values in src/test/kotlin/taxonomy/TreesOfRecordEvalMembershipAudit.kt L47-52 (excluded from `test` at build.gradle.kts L72, so it runs only by name - a REGRESSION PIN on a disclosed state, not a guard that claims the invariant holds).",
+    "worst_case_bound": "[ADDED 2026-09-23, blocker A1] THE WORST-CASE BOUND, which needs no run and is a BOUND AND NOT AN ESTIMATE OF THE EFFECT (it assumes every contaminated item is correct BECAUSE of the contamination, which is the largest the effect can possibly be). UNION TREE 20260911_144214: 432 of 6,482 paeec EVAL ids = 6.66% (exact text 427). At MC-ROOT's Top-1 of 81.58% that is 5,288.0 correct, so a clean reading is at worst (5,288 - 432) / (6,482 - 432) = 4,856 / 6,050 = 80.26%: THE UNION ROUTING HEADLINE CANNOT FALL BY MORE THAN 1.32pp. MC-E2E's +3.38pp router gain and PROFILE-INTERVAL-ALL-UNION's 0.8537 are bounded by the same 6.66% share. MMLU-PRO TREE 20260910_043557: 70 of 3,445 = 2.03% (exact text 37), so AT MOST 2.03pp on any routed proportion - about 5 questions per anchor spread over the 14 bareq512_s42 anchors at 119-304 questions per anchor."
+  },
+  "sentence_of_record": "SPLIT-FUNCTION-IMPL + TRAIN-ONLY-TREE (item 18, 2026-09-16, zero calls): side = f(item) with a per-row assertion in Kotlin and Python; GATE = hash in [300, 400); invariants verified at zero calls on both corpora (|gate ∩ eval| = 0, |eval_closure ∩ train| = 0, |scored \\ eval| = 0); the pinned pools reproduce AS LISTS from their id files (3 of 3 rebuilds, identical digest 01c5086e...); is_reserved retired from every code path; pool_guard takes a pool id and --activate no longer exists; TRAIN-ONLY refusal on the headless AND TUI benchmark paths. Criterion MET at zero calls. Standing-rule change: nothing is activated any more.",
+  "chips": [
+    "CRITERION MET (ZERO CALLS)",
+    "STANDING RULE CHANGED: NOTHING IS ACTIVATED",
+    "[CORRECTED 2026-09-23, blocker A1] C1 PARTLY: reproduction and the two set invariants HELD, 'EVAL ITEMS NEVER IN A MEMBER SET' FAILED on all three trees of record (2,437 / 37 / 427 exact, 2,448 / 70 / 432 norm-v1); the chip 'CRITERION MET (ZERO CALLS)' above is SUPERSEDED and kept for the record",
+    "TRAIN-ONLY-TREE FAIL ON EVERY TREE OF RECORD (already FRAMEWORK L229 / L373; now in this record too)",
+    "DISCLOSE, NOT REBUILD, AT A BOUND: union <= 1.32pp, MMLU-Pro tree <= 2.03pp WORST CASE - the rebuild-or-disclose choice is an OPEN AUTHOR DECISION"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the coordinator's verified record-integrity blocker A1 (insertion only, zero calls; nothing is deleted and no recorded number moves)",
+      "text": "C1 IS SCORED 'PARTLY' BY INSERTION: three clauses HELD, the fourth - 'EVAL items never in a member set' - FAILED on all three trees of record (2,437 / 37 / 427 exact-text distinct EVAL texts among members; 2,448 / 70 / 432 under norm-v1; FRAMEWORK L229 and L373, which already say 'TRAIN-ONLY-TREE is FAIL on every tree of record'). The machine-readable `result` moves HELD -> FAILED because the schema has no PARTLY and a conjunction with a false conjunct is FAILED; the narrative verdict is carried by the chips, the result_note and the ledger. The ledger chip 'CRITERION MET (ZERO CALLS)' is replaced by 'C1 PARTLY ...' with a bracket in the observed cell saying why. THE FIXTURE IS NOT THE DEFECT: TreesOfRecordEvalMembershipAudit.kt pins 2437 / 37 / 427 as EXPECTED and is excluded from `test` so it runs only by name - a regression pin on a known, disclosed state. THE DEFECT WAS THE HELD IN THIS RECORD. A research lead asserted that this correction needed no fresh registration and was wrong; the source files settled it. THE WORST-CASE BOUND, which needs no run and is a BOUND AND NOT AN ESTIMATE OF THE EFFECT (it assumes every contaminated item is correct BECAUSE of the contamination, which is the largest the effect can possibly be). UNION TREE 20260911_144214: 432 of 6,482 paeec EVAL ids = 6.66% (exact text 427). At MC-ROOT's Top-1 of 81.58% that is 5,288.0 correct, so a clean reading is at worst (5,288 - 432) / (6,482 - 432) = 4,856 / 6,050 = 80.26%: THE UNION ROUTING HEADLINE CANNOT FALL BY MORE THAN 1.32pp. MC-E2E's +3.38pp router gain and PROFILE-INTERVAL-ALL-UNION's 0.8537 are bounded by the same 6.66% share. MMLU-PRO TREE 20260910_043557: 70 of 3,445 = 2.03% (exact text 37), so AT MOST 2.03pp on any routed proportion - about 5 questions per anchor spread over the 14 bareq512_s42 anchors at 119-304 questions per anchor. CONSEQUENCE: DISCLOSE, NOT REBUILD, at that bound - and the rebuild-or-disclose choice is registered as an OPEN AUTHOR DECISION with the bound beside it."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "INCONSISTENCIES-PASS (registrar, zero calls; insertion only)",
+      "text": "NO-FILE 2026-09-23 by INCONSISTENCIES-PASS (registrar, zero calls; insertion only): no outcome file exists under experiment_results/; the readout of record is the programme section '## Blocks 3-4 engineering landed (2026-09-16, zero calls) — SPLIT-FUNCTION-IMPL + TRAIN-ONLY-TREE, H9-REM flag, PERF-8 memo', as corrected at 8b4075b (C1 PARTLY: the member-set clause FAILED). [ledger: evidence cell of row SPLIT-FUNCTION-IMPL, v132]"
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the post-run review 21c4fda (insertion only, zero calls)",
+      "text": "Blocker A1's 427 exact-text count EQUALS ROUTER-CLEAN-POLICY's count of distinct EVAL texts with a TRAIN twin on the union split (review 21c4fda, D2): A1's contamination is this CONTENT DUPLICATION across an id-disjoint split, and it reaches the POLICY FIT as well as the tree. On C1 it moves nothing (twin-removal sensitivity +2.68 to +3.40, all above 0). Queue CONTENT-DISJOINT-SPLIT-AUDIT (HIGH)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on CONTENT-DISJOINT-SPLIT-AUDIT (review 1df2cf1; insertion only, zero calls)",
+      "text": "D2: 'p2dca 3,537 with content closure, gate 860, train 7,603' is UNREPRODUCED (20 readings; first at c0f5ff7 with no script); reproducible: the engine 3,770 / 843 / 7,387 (pins all 3,599 ids; matches the build logs) and the paeec method 3,552 / 859 / 7,589 (3,445 judgeable). C1's '|eval_closure intersect train| = 0' is TRUE BY DEFINITION of the function and says nothing about the trees of record. FOR THE AUTHOR'S REBUILD-OR-DISCLOSE DECISION (added so it is decided once, with the numbers): content twins in the trees of record - frozen 20260727_042523: 2,437 / 2,448 p2dca texts are members, 12 / 23 of them in the 1,020 CLEAN, and its rubric induction withheld by id; bareq512_s42: 37 exact / 70 norm-v1, and 31 p2dca questions judged on an exact ordered copy of a construction-side row (64 option-set); union 20260911_144214: 427 texts / 471 ids exact (478 norm-v1), reaching the tree and the router policy fits. CK-CLOSE-v1 is PROPOSED, NOT ADOPTED (four conditions). Adopting it, and rebuild or disclose, are AUTHOR-OWNED."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the SPLIT-FOLLOWUPS review 8ebfa7a (insertion only, zero calls)",
+      "text": "ADDED TO THE AUTHOR'S REBUILD-OR-DISCLOSE DECISION: the RUBRIC-512 family's induction exposure on bareq512_s42 (20260909_212117): 28 exact norm-v1-only twins in 16 leaves' induction corpora with key and CoT; its labelling exposure: 26 twin texts in 16 leaves' labelling prompts; the STACK-v2 ladder's 14 norm-only twins (0 exact; frozen tree's centroids). See docs/judge_v2_program.md L14455-L14487 (SPLIT-FOLLOWUPS)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (CERT-UNDER-FILTER outcome, review 605675c)",
+      "text": "ADDED TO THE AUTHOR'S REBUILD-OR-DISCLOSE DECISION, a CONSUMER-SIDE IMPACT: CERT-UNDER-FILTER's data path (x12 board, bareq512_s42 anchor map) contains 74 exposed qids (69 judged, 201 of 9,142 rows): 27 of the 28 induction-exposed, 65 of the 70 norm-v1 twins, 14 of the 14 ladder twins, 26 of 26 labelling ids. Excluding them moves C1's Delta_W from -7.15 to -3.45 [-12.70, +5.80] (21-stream mean -4.90, HELD 0 of 21), but anchor-matched random exclusions shift it by -1.56 +- 1.66 and the exposed +0.96 ranks above 10 of 10 controls: whether the exposure drives the result is UNDETERMINED. docs/judge_v2_program.md L14649-L14687."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (the author's decision, relayed)",
+      "text": "CK-CLOSE-v1 is no longer 'PROPOSED, NOT ADOPTED': the author adopted it (\"Yes I prefer this version to handle the data\"; plan Amendment 13) for NEW pools, constructions and policy fits. THIS REBUILD-OR-DISCLOSE ITEM FOR THE OBJECTS OF RECORD STAYS OPEN AND AUTHOR-OWNED; SPLIT-EXPOSURE-SENSITIVITY informs it. docs/judge_v2_program.md L15013-L15025."
+    }
+  ],
+  "does_not_show": [
+    "a physically dropped is_reserved column",
+    "any rebuilt tree of record",
+    "the epoch / MinHash items",
+    "[ADDED 2026-09-23, blocker A1] that the trees of record satisfy the TRAIN-ONLY invariant: they DO NOT, and this record said HELD on a conjunction whose fourth clause is false. The measured member contamination is 2,437 / 37 / 427 distinct EVAL texts (2,448 / 70 / 432 under norm-v1); what the criterion DID establish is the reproduction of the split FUNCTION and the two SET invariants, which are about the pools and the gate, not about tree membership",
+    "[ADDED 2026-09-23, blocker A1] the SIZE of the effect on any routed readout: only a WORST-CASE BOUND exists and no clean re-read was run. THE WORST-CASE BOUND, which needs no run and is a BOUND AND NOT AN ESTIMATE OF THE EFFECT (it assumes every contaminated item is correct BECAUSE of the contamination, which is the largest the effect can possibly be). UNION TREE 20260911_144214: 432 of 6,482 paeec EVAL ids = 6.66% (exact text 427). At MC-ROOT's Top-1 of 81.58% that is 5,288.0 correct, so a clean reading is at worst (5,288 - 432) / (6,482 - 432) = 4,856 / 6,050 = 80.26%: THE UNION ROUTING HEADLINE CANNOT FALL BY MORE THAN 1.32pp. MC-E2E's +3.38pp router gain and PROFILE-INTERVAL-ALL-UNION's 0.8537 are bounded by the same 6.66% share. MMLU-PRO TREE 20260910_043557: 70 of 3,445 = 2.03% (exact text 37), so AT MOST 2.03pp on any routed proportion - about 5 questions per anchor spread over the 14 bareq512_s42 anchors at 119-304 questions per anchor.",
+    "[ADDED 2026-09-23, blocker A1] whether to REBUILD or to DISCLOSE: rebuilding 20260910_043557 and 20260911_144214 under content closure costs 0 judge calls but moves every routed readout in the record and creates new snapshot ids. THAT IS AN OPEN AUTHOR DECISION, registered here WITH THE BOUND BESIDE IT so it is taken on the number and not on the discomfort; the registrar's and the coordinator's reading is DISCLOSE, and neither is the author",
+    "[ADDED 2026-09-23, blocker A1] that the propagation is COMPLETE. The disclosure was written today into the seven consumer records named by the coordinator (MC-ROOT, MC-E2E, PROFILE-INTERVAL-ALL-UNION, PROFILE-INTERVAL-ALL, UNION-PROFILE-HOME, PROFILE-RELIABILITY-INTERACTION, PROFILE-TREE-ROBUST). A grep over docs/agents/results/*.json returns 18 records naming bareq512_s42 or 20260910_043557 and 29 naming 20260911_144214 or paeec37aa28063c75, so THE CLASS IS WIDER THAN THE SEVEN and the remainder is an OPEN PROPAGATION ITEM, not a closed one"
+  ],
+  "ledger": {
+    "row_id": "SPLIT-FUNCTION-IMPL",
+    "version": "v106 (fd21fec) [UPDATED 2026-09-23 at ledger v130 (audit OK, 227 rows): the chip 'CRITERION MET (ZERO CALLS)' was SWAPPED for 'C1 PARTLY ...' plus 'TRAIN-ONLY-TREE FAIL ON EVERY TREE OF RECORD' and 'DISCLOSE, NOT REBUILD, AT A BOUND - AN OPEN AUTHOR DECISION', and a dated blocker-A1 bracket was inserted into the observed cell with the three counts in both renderings and the worst-case bound. The old chip text stays recoverable in git.] [v132 2026-09-23: INCONSISTENCIES-PASS insertion in this row]"
+  },
+  "depends_on": [
+    "SPLIT-RATIO",
+    "INCIDENT pool mismatch 2026-09-09"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md (lines as of 5dc8a06) L3603-L3611 (by-reference registration eaf1dbf); docs/plan_2026-09-15.md L34 / L61 (Block 4) and Amendment 2 L137-L140",
+    "docs/judge_v2_program.md (lines as of 5dc8a06) L4179-L4193 and L4202-L4203 ('Blocks 3-4 engineering landed', c0f5ff7): what landed, the invariants, the criterion, not-done items, the standing-rule change",
+    "docs/test_ledger.html row SPLIT-FUNCTION-IMPL (v106): chips verbatim, observed cell, evidence (SplitSide.kt, split_side.py, pool_guard.py --pool, split_function_check.ps1, 13f2142, d3b4ba9)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' lines (grep -n them regardless of line drift); line numbers are as of programme HEAD 5dc8a06",
+    "docs/design/FRAMEWORK.md L229 (guard 3) and L373 (item 18), read 2026-09-23: the measured member-set contamination 2,437 / 37 / 427 exact and 2,448 / 70 / 432 norm-v1, and the sentence 'TRAIN-ONLY-TREE is FAIL on every tree of record'",
+    "src/test/kotlin/taxonomy/TreesOfRecordEvalMembershipAudit.kt L47-52 and build.gradle.kts L68-72, read 2026-09-23: the three expected counts as a REGRESSION PIN and the exclusion of the fixture from the default suite",
+    "docs/judge_v2_program.md L14649-L14687",
+    "docs/judge_v2_program.md L15013-L15025"
+  ],
+  "last_update": "2026-09-23 (registrar: CK-CLOSE-v1 adopted by the author; docs/judge_v2_program.md L15013-L15025)",
+  "plain_description": {
+    "sq": "Data hygiene",
+    "what": "An engineering change. Whether a question is used for building the tree or for the arena is now computed from the question's own content, with a check on every row in both Kotlin and Python. Benchmark runs refuse trees not built on training-only data, and old toggle flags are retired.",
+    "why": "Earlier incidents showed arena questions leaking into tree building. This makes the split a fixed function that can be checked, not a setting someone can change.",
+    "information": "It guarantees that the build and test sets stay separate for new work. Result: done. The invariants were verified and the pinned pools reproduce exactly. A later correction: the trees built earlier do NOT meet the training-only rule (some held-out texts were inside them). The worst-case effect on routing figures is at most about 1.3 points (combined pool) and 2 points (MMLU-Pro). Whether to rebuild or disclose is still the author's decision.",
+    "written": "2026-10-07"
+  }
+}

@@ -1,0 +1,134 @@
+{
+ "id": "SI-NULL-TRIAD",
+ "title": "SI-NULL-TRIAD: plain vs SigClust-soft vs Gao-type selective null on CERT-PLANTED's planted grid (size and power); real sites descriptive (zero calls; REGISTERED 2026-10-04)",
+ "question": "Is any null sensitive to planted 2-way structure without certifying structureless clouds?",
+ "kind": "zero-call",
+ "state": "registered",
+ "registration": {
+  "commit": "the commit that writes it (parent b7fb6bc8)",
+  "program_lines": "docs/judge_v2_program.md L24335-L24347",
+  "program_lines_as_of": "the commit that writes them, parent b7fb6bc8, re-grepped",
+  "date": "2026-10-04",
+  "provenance": "docs/literature/2026-10-04_hierarchy_evaluation.md (68a3d731; blob a6e8148b); docs/agents/plans/2026-10-04_literature_shortlist.md (68a3d731); the author's Go (docs/agents/plans/2026-10-04_W1_W2_schedule.md (be8e54d3))"
+ },
+ "script": {
+  "path": "TO BE BUILT (the faithful SigClust reading: simulate in 512-d from the soft-thresholded eigenvalues, re-run the whole proxy incl. its PCA per simulation)",
+  "sha16": null,
+  "commit": null,
+  "substituted_build_not_of_record": "tools/analysis/si_null_triad.py blob:7928e99b6de1b5c9b6a98b67788f3c5e20dd9893 (sha256-lf16:b7d5bd88d6022602), built 397ebd77, merged only as cert_split_dip.py's import"
+ },
+ "ready": null,
+ "go": "the author's Go for zero-call windows (2026-10-04)",
+ "run": null,
+ "review": null,
+ "criteria": [
+  {
+   "id": "SA1",
+   "text": "per arm: SIZE-OK iff rejection rate over 300 SIZE draws <= 0.10 AND CP upper <= 0.15",
+   "result": "n/a",
+   "value": "not run",
+   "denominator": "300 generated draws per arm"
+  },
+  {
+   "id": "TN1",
+   "text": "DECIDING: THIRD-NULL-WORKS iff S or G K2-SENSITIVE (SIZE-OK and delta 2 >= 4/5 in >= 2 of 3 anchors) while P is not; NO-NULL-WORKS iff no SIZE-OK arm reaches delta 2; MIXED otherwise. SCOREABLE as a classification",
+   "result": "n/a",
+   "value": "not run",
+   "denominator": "CERT-PLANTED's grid, 5 subsamples x 3 anchors"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "SIZE-OK: S 0.80, G (sigma I) 0.70, G (S matrix) 0.75",
+   "result": "n/a",
+   "value": "not run",
+   "denominator": "300 draws"
+  },
+  {
+   "id": "P2",
+   "text": "K2-SENSITIVE: S 0.70, G 0.75",
+   "result": "n/a",
+   "value": "not run",
+   "denominator": "planted grid"
+  },
+  {
+   "id": "P3",
+   "text": "TN1: THIRD 0.20, NO-NULL 0.10, MIXED 0.70",
+   "result": "n/a",
+   "value": "not run",
+   "denominator": "planted grid"
+  },
+  {
+   "id": "P4",
+   "text": "median delta* 1 [0.5, 2]",
+   "result": "n/a",
+   "value": "not run",
+   "denominator": "sensitive arms"
+  }
+ ],
+ "falsifier": {
+  "text": "F-SN fires iff TN1 NO-NULL-WORKS or every K2-SENSITIVE S / G arm fails SA1.",
+  "fired": null
+ },
+ "numbers_of_record": {},
+ "sentence_of_record": null,
+ "chips": [
+  "REGISTERED 2026-10-04, BEFORE ANY CODE; not built"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-08",
+   "by": "registrar (record docs/judge_v2_program.md L24950-L24956 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — six zero-call tests registered ...\"; _as_of the commit that writes it, parent d8ab39fa, re-grepped))",
+   "text": "STATE CONFIRMED: registered, not built, no READY. Run by CERT-SPLIT-DIP's tool in the same pool window under its own registration (unchanged). CONDITION SI-C1 for its READY review: its POWER grid cites CERT-PLANTED's grid as delta {0, 0.5, 1, 2}, but CERT-PLANTED's grid was amended pre-data to {0, 2, 4, 6, 8, 10, 12} (L24306 bracket); delta 0.5 / 1 are not in the record files: planted by cert_planted.plant_rows at the record seeds (CPL-2 / CPL-3) or ruled by the reviewer; TN1's deciding delta 2 unchanged. Not an amendment."
+  },
+  {
+   "date": "2026-10-08",
+   "by": "registrar (docs/judge_v2_program.md L25147-L25157 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — rulings GAP-FIX-CC C-1 (B-3), SI-NULL-TRIAD B1 and SIN-2; ...\"; _as_of the commit that writes it, parent 17c34de9, re-grepped))",
+   "text": "B1 RULED (READY review docs/reviews/READY_cert_split_dip.md 4bb0b263: SI-NULL-TRIAD NOT READY): the built proxy-space reading (S / G_S null = the site's own projected covariance; tau 0 on 4 / 4 sites) substitutes the excluded object and is NOT of record; option (a): stays REGISTERED, script TO BE BUILT faithfully, then a delta READY review; registration unchanged; joint-run SI_NULL_TRIAD_* outputs go to HELD_not_of_record/. SIN-2: 64-d at n < 500 ACCEPTED as the splitter's own rule (TaxonomySplitter splitDim 32/64/128); registration bracketed. SI-C1 stays open."
+  }
+ ],
+ "does_not_show": [
+  "a certificate of any real site",
+  "a mode test (MIX-LRT-SITE closed)",
+  "other members, draws, slices",
+  "G's validity for the engine's selection"
+ ],
+ "ledger": {
+  "row_id": "SI-NULL-TRIAD",
+  "version": "v383 (2026-10-04: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "CERT-PLANTED (planted grid and P counts; runs first)"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; no Gaussian-mixture LR / BIC, MDL or Bayesian evidence (MIX-LRT-SITE untouched); no judge, rubric, reference, frontier, temperature"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "CPU 3-5 h (pool reader)",
+  "agent_hours": "about 4 h",
+  "reads_pool": true
+ },
+ "outputs": "never committed: stored on E: with SHA256SUMS.txt; temp under E:/TaxoArena_tmp via scratch_dir",
+ "sources": [
+  "docs/judge_v2_program.md L24335-L24347 (_as_of the commit that writes it, parent b7fb6bc8, re-grepped)",
+  "docs/literature/2026-10-04_hierarchy_evaluation.md (68a3d731; blob a6e8148b)",
+  "docs/agents/plans/2026-10-04_literature_shortlist.md (68a3d731)",
+  "docs/judge_v2_program.md L25147-L25157 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — rulings GAP-FIX-CC C-1 (B-3), SI-NULL-TRIAD B1 and SIN-2; ...\"; _as_of the commit that writes it, parent 17c34de9, re-grepped)"
+ ],
+ "last_update": "2026-10-08 (registrar: B1 and SIN-2 ruled; stays registered)",
+ "label_status": "AF-U [SC] where used",
+ "plain_description": {
+  "sq": "SQ3 Taxonomy",
+  "what": "Plans to compare three ways of building the 'no structure' baseline for split certificates: the plain one and two stricter statistical variants. Each is tested on artificial data with planted 2-way structure and on structureless data. No judge calls.",
+  "why": "Looks for a certificate baseline that detects real 2-way splits without certifying random clouds.",
+  "information": "Would show whether any baseline can certify the tree's binary splits fairly, or whether none can. Result: registered but not run yet.",
+  "written": "2026-10-07"
+ }
+}

@@ -1,0 +1,182 @@
+{
+ "id": "E1-SPLIT-DRAWS",
+ "title": "E1-SPLIT-DRAWS: is E1's nomic-vs-qwen3 anchor-free tree-filing loss consistently negative and beyond the between-split spread across 3 re-drawn CK-CLOSE MMLU-Pro splits? (zero calls; 6 builds; REGISTERED 2026-10-03)",
+ "question": "Is the E1 filing loss the embedder's beyond split-draw variation?",
+ "kind": "build",
+ "state": "done",
+ "registration": {
+  "commit": "the commit that writes it (parent 0de843b2)",
+  "program_lines": "docs/judge_v2_program.md L23831-L23859",
+  "program_lines_as_of": "the commit that writes them, parent 0de843b2, re-grepped",
+  "date": "2026-10-03",
+  "heading": "## Registered 2026-10-03 (before any code or call) — E1-SPLIT-DRAWS: is E1's nomic-vs-qwen3 anchor-free tree-filing loss consistently negative, and larger than the between-split spread, across K = 3 freshly re-drawn CK-CLOSE content-closed MMLU-Pro splits (paired nomic_raw and qwen3 trees per split, af_clean_s42 recipe)? (zero calls; 6 builds; CPU readout)",
+  "provenance": "draft lead with the E1-REPLICATES withdrawal (b7f380d2); the author's go (plan Amendment 39); design the orchestrator's; criteria etc. the registrar's"
+ },
+ "script": {
+  "path": "e1-split-draws tooling (split-draw tool, 6 TOMLs, e1_readout delta)",
+  "sha16": null,
+  "commit": "6ff23dc9 (branch e1-split-draws, unmerged)"
+ },
+ "ready": null,
+ "go": "plan Amendment 39: the author's \"yes run E1-SPLIT-DRAWS with 3 splits\"",
+ "run": {
+  "outcome_file": "experiment_results/e1_split_draws/e1sd_readout_outcome.txt (sha256 052dfcd1...; never committed; backup E:/TaxoArena_backup_2026-10-03_e1sd)",
+  "outcome_commit": "ops d0c58b11; readout blob 3318a16a (merged 13a03abc)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "e1sd1-3 pools (never arena); CP-0 / CP-1 via wal_checkpoint.py",
+  "date": "2026-10-03"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_e1_split_draws.md",
+  "commit": "285589ba",
+  "verdict": "VALID; SD1 NEITHER; F-SD spread clause"
+ },
+ "criteria": [
+  {
+   "id": "IDENTITY",
+   "text": "precondition: E1's af_clean_s42 / N-raw reproduce 0.7269 / 0.6813, b 327 / c 484 (descriptive 4th point)",
+   "result": "HELD",
+   "value": "E1 pair reproduced",
+   "denominator": "per split about 3,600 held-out items (content-closed, Kish ~1.0; DEFF 1.0 transported from E1, tree-vs-tree); K = 3 splits"
+  },
+  {
+   "id": "SD1",
+   "text": "WORSE iff all three per-split paired Wald 95% intervals of G_k = top1(N_k) - top1(Q_k) lie wholly < 0 AND Gbar < -max(spread_N, spread_Q); BETTER symmetric; NEITHER otherwise. Verdict line: interval clause SCOREABLE (MDE80 0.023 per split); spread clause DESCRIPTIVE-ONLY at prediction (K = 3)",
+   "result": "UNDETERMINED",
+   "value": "NEITHER: G1 -0.1723 [-0.1897, -0.1549], G2 -0.0494 [-0.0660, -0.0328], G3 -0.0794 [-0.0955, -0.0633] (all intervals < 0); Gbar -0.1004 inside spread_N 0.1315 (spread_Q 0.0086)",
+   "denominator": "held-out 3,598 / 3,522 / 3,500 per split, paired; K = 3"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "each G_k -0.040 [-0.065, -0.015]; Gbar -0.040 [-0.060, -0.020]",
+   "result": "FAILED",
+   "value": "G_1, G_3 outside [-0.065, -0.015]; Gbar -0.1004 outside [-0.060, -0.020]",
+   "denominator": "per split about 3,600 held-out items (content-closed, Kish ~1.0; DEFF 1.0 transported from E1, tree-vs-tree); K = 3 splits"
+  },
+  {
+   "id": "P2",
+   "text": "spread_N 0.015 [0.005, 0.035]; spread_Q 0.012 [0.004, 0.030]",
+   "result": "FAILED",
+   "value": "spread_N 0.1315 outside [0.005, 0.035]; spread_Q 0.0086 inside",
+   "denominator": "per split about 3,600 held-out items (content-closed, Kish ~1.0; DEFF 1.0 transported from E1, tree-vs-tree); K = 3 splits"
+  },
+  {
+   "id": "P3",
+   "text": "all three per-split intervals below 0: 0.70",
+   "result": "n/a",
+   "value": "event occurred (all three below 0); Brier 0.0900",
+   "denominator": "per split about 3,600 held-out items (content-closed, Kish ~1.0; DEFF 1.0 transported from E1, tree-vs-tree); K = 3 splits"
+  },
+  {
+   "id": "P4",
+   "text": "SD1 WORSE 0.55, NEITHER 0.43, BETTER 0.02",
+   "result": "n/a",
+   "value": "NEITHER; Brier 0.6278",
+   "denominator": "per split about 3,600 held-out items (content-closed, Kish ~1.0; DEFF 1.0 transported from E1, tree-vs-tree); K = 3 splits"
+  },
+  {
+   "id": "P5",
+   "text": "F-SD fires 0.40",
+   "result": "n/a",
+   "value": "F-SD fired; Brier 0.3600",
+   "denominator": "per split about 3,600 held-out items (content-closed, Kish ~1.0; DEFF 1.0 transported from E1, tree-vs-tree); K = 3 splits"
+  }
+ ],
+ "falsifier": {
+  "text": "F-SD fires iff any split's point G_k >= 0 OR |Gbar| <= max(spread_N, spread_Q): the E1 loss is not separable from split-draw variation; the 'at this split' bracket reads 'not stable across 3 content-closed re-draws'. No recorded number revised.",
+  "fired": true,
+  "outcome": "FIRED on the spread clause only (|Gbar| <= max spread), not on the sign clause (no G_k >= 0)"
+ },
+ "numbers_of_record": {
+  "G": "G1 -0.1723 [-0.1897, -0.1549]; G2 -0.0494 [-0.0660, -0.0328]; G3 -0.0794 [-0.0955, -0.0633]",
+  "Gbar": "-0.1004",
+  "spreads": "spread_N 0.1315 (set by N_e1sd1, 28 leaves, top-1 0.5545); spread_Q 0.0086",
+  "held_out": "3,598 / 3,522 / 3,500"
+ },
+ "sentence_of_record": "SD1 NEITHER (K = 3; one recipe, one corpus). On each of the 3 content-closed re-draws the nomic_raw anchor-free tree files worse than qwen3: per-split paired Wald intervals wholly below 0 (G -0.1723, -0.0494, -0.0794; P3's event occurred). The spread clause fails: Gbar -0.1004 lies inside spread_N 0.1315, which is set by N_e1sd1 (28 leaves, top-1 0.5545). [F-SD FIRED on its spread clause (abs(Gbar) <= max spread), not on its sign clause (no G_k >= 0).; E1's bracket reads 'at this split only; not stable across 3 content-closed re-draws'; the sign held, only the magnitude varied; one coarse nomic build (N_e1sd1, 28 leaves, under the qwen3-tuned bar 0.025) inflates G_1 and spread_N]",
+ "chips": [
+  "REGISTERED 2026-10-03, BEFORE ANY CODE; not built",
+  "VALID (POST-RUN 285589ba): SD1 NEITHER; F-SD FIRES (SPREAD CLAUSE ONLY)",
+  "NOMIC WORSE ON ALL 3 RE-DRAWS, MAGNITUDE UNSTABLE (N_e1sd1 28 LEAVES UNDER THE QWEN3-TUNED BAR); NEVER WORSE OR &ldquo;REPLICATES&rdquo;; K = 3"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-03",
+   "by": "registrar (pre-data)",
+   "text": "L1 FRESH-or-RECORDED + TOML pool check, full pool_guard before Q_k and after every build; L2 two author checkpoints via wal_checkpoint.py; L3 F-SD worded per direction. section \"## Registrar's record 2026-10-03 (insertion only; zero calls; nothing run; pre-data) — E1-SPLIT-DRAWS built ...\" (L23861-L23868, _as_of the commit that writes it, parent 8e474b4b)"
+  },
+  {
+   "date": "2026-10-03",
+   "by": "registrar (POSTRUN 285589ba)",
+   "text": "outcome recorded; reviewer's write-once probe and launcher-log read refused by the permission system (non-deciding). docs/judge_v2_program.md L23929-L23937 (section \"## E1-SPLIT-DRAWS (2026-10-03, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent 285589ba)"
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (consistency check 2026-10-04; zero calls)",
+   "text": "the 'chips' list had drifted from the ledger row's chips (wording or replaced chips); the chips of record are the ledger's, copied verbatim into 'chips_ledger_verbatim' (ledger v379); 'chips' is kept as history."
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (consistency check 2026-10-04; zero calls)",
+   "text": "READY pointer completed: docs/reviews/READY_e1_split_draws.md committed in 13a03abc (blob 25a8725a, LF); 'ready' kept as written."
+  }
+ ],
+ "does_not_show": [
+  "another corpus, embedder, prompt or recipe",
+  "anchored trees; routing or judging value",
+  "parity (no TOST); the mechanism",
+  "anything about the p2dca 3,445 or any arena pool"
+ ],
+ "ledger": {
+  "row_id": "E1-SPLIT-DRAWS",
+  "version": "v363 (2026-10-03: OUTCOME bracket, OK + WARN chips) | v361 (2026-10-03: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "EMBEDDER-CROSS-FLAT",
+  "E1-ROUTE"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 6,
+  "cpu": "6 x ~5 min builds + readout (estimate)",
+  "author_checkpoints": "2 (CP-0 before N_e1sd1; CP-1 after Q_e1sd3), via tools/ops/wal_checkpoint.py (8e474b4b)",
+  "agent_hours": "engine-coder about 3 h",
+  "reads_pool": true
+ },
+ "outputs": "never committed: pinned by sha256, backed up to E:",
+ "sources": [
+  "docs/judge_v2_program.md L23831-L23859 (section \"## Registered 2026-10-03 (before any code or call) — E1-SPLIT-DRAWS: is E1's nomic-vs-qwen3 anchor-free tree-f ...\"; _as_of the commit that writes it, parent 0de843b2, re-grepped)",
+  "docs/plan_2026-09-15.md Amendment 39",
+  "docs/agents/results/EMBEDDER-CROSS-FLAT.json (E1)",
+  "docs/agents/results/E1-REPLICATES.json (withdrawn)"
+ ],
+ "last_update": "2026-10-04",
+ "chips_ledger_verbatim": [
+  "plan: REGISTERED 2026-10-03, BEFORE ANY CODE; not built",
+  "ok: VALID (POST-RUN 285589ba): SD1 NEITHER; F-SD FIRES (SPREAD CLAUSE ONLY)",
+  "warn: NOMIC WORSE ON ALL 3 RE-DRAWS, MAGNITUDE UNSTABLE (N_e1sd1 28 LEAVES, QWEN3-TUNED BAR); NEVER WORSE OR “REPLICATES”; K = 3"
+ ],
+ "ready_of_record": {
+  "file": "docs/reviews/READY_e1_split_draws.md",
+  "commit": "13a03abc",
+  "blob": "25a8725a (LF)",
+  "note": null
+ },
+ "plain_description": {
+  "sq": "SQ5 Invariance",
+  "what": "Rebuilds the label-free tree on MMLU-Pro with two embedders (nomic and qwen3) on three fresh random train/evaluation splits that share no question text (6 builds, no calls). It compares how well each tree files questions into the right place.",
+  "why": "An earlier test (E1) found the nomic embedder files worse. This checks whether that loss is real or just luck of one split.",
+  "information": "A consistent loss larger than the split-to-split spread would make the embedder effect robust. Otherwise it stays specific to one split. Result: neither. Nomic filed worse on all 3 splits (the sign held), but the average loss is not larger than the spread between splits. That spread was inflated by one unusually coarse nomic build. The falsifier fired on the size of the effect, not its direction. E1 now reads \"at this split only; not stable across 3 re-draws\". One corpus and one recipe only.",
+  "written": "2026-10-07"
+ }
+}

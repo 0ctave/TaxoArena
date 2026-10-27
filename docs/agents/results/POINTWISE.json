@@ -1,0 +1,150 @@
+{
+  "id": "POINTWISE",
+  "title": "POINTWISE: the thesis's founding bet, tested directly for the first time: is a judge more reliable comparing two answers than grading one? (3,689 + 3,669 graded answers; arms A with and B without the reference)",
+  "question": "3,689 answers behind R3's 1,980 matches graded once on 0-100 by the same judge with the same reference, rubric and verify-first mechanics; a pair's verdict is the higher grade; comparator the cached pairwise verdicts on exactly those matches; two-sided by registration so the thesis could lose; amended before any scored run after a 20-call probe showed grades collapsing to a 100/0 binary. Arm B repeats it with NO reference to complete the 2x2.",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "48fab98",
+    "program_lines": "docs/judge_v2_program.md L633-L676 (registration; amendment d34287f before any scored run), L677-L707 (arm A) and L751-L772 (arm B and the completed 2x2)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-13 (before any call) — POINTWISE: the thesis's founding hypothesis, finally tested directly",
+    "outcome_heading": [
+      "L677: - **POINTWISE arm A (2026-09-13): the founding hypothesis is SUPPORTED on pairs and OVERTURNED on the board.**",
+      "L751: - **POINTWISE arm B and the completed 2x2 (2026-09-13).** 3,669 answers graded with NO reference (4 refusals), ..."
+    ],
+    "date": "2026-09-13"
+  },
+  "script": {
+    "path": "tools/analysis/pointwise_judge.py",
+    "sha16": "d6831b6eece5697b (at 6e2d4fc)",
+    "commit": "6e2d4fc"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (3,689 + 3,669 grading calls at 2.68x reuse; 1.86 calls per match)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/pointwise_outcome.txt",
+    "outcome_commit": "9de8115",
+    "calls": "3,689 (arm A) + 3,669 (arm B, 4 refusals)",
+    "cce": "not stated",
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-13"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the 20-call probe and the amendment (d34287f) before any scored run are the instrument checks; POINTWISE-REPL (2026-09-14) tested the board advantage at anchor scale",
+    "commit": "9de8115",
+    "verdict": "SUPPORTED on pairs; OVERTURNED on the board; both replicate in arm B without a reference; the reference effect is twice the format effect"
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "pairwise > pointwise on key-decidable pairs at paired McNemar p < 0.05 supports the hypothesis; pointwise >= pairwise refutes it",
+      "result": "HELD",
+      "value": "941 decidable pairs: pairwise 0.864 vs pointwise 0.808 (87:34, p 1.6e-06); top cluster 0.721 vs 0.649: the founding bet holds for deciding one comparison; arm B (no reference) pairwise 0.746 vs pointwise 0.678: the format effect (+5.6 to +6.8pp) REPLICATES",
+      "denominator": "941 key-decidable R3 pairs"
+    },
+    {
+      "id": "(2)",
+      "text": "board rho vs key",
+      "result": "DELIVERED",
+      "value": "12-model board rho 0.9930 pointwise vs 0.9790 pairwise (raw mean grade alone 0.9860); on the 598 top-cluster matches pointwise gives the key order exactly (0 violations) where pairwise inverts iask / arx (1): OVERTURNED on the board; arm B 0.9650 vs 0.9860, the board reversal REPLICATES; the REFERENCE effect is twice the format effect (+11.8pp pairwise, +13.0pp pointwise)",
+      "denominator": "12-model board; 598 top-cluster matches"
+    },
+    {
+      "id": "(3)",
+      "text": "ties",
+      "result": "DELIVERED",
+      "value": "9.4% pointwise vs 7.0% pairwise; without a reference 20.5% vs 16.1% (ties double)",
+      "denominator": "1,980 matches"
+    },
+    {
+      "id": "(4)",
+      "text": "cost per match",
+      "result": "DELIVERED",
+      "value": "1.86 vs 2.00 calls / match at 2.68x reuse; grades 25 values but 75% at 0 or 100; AUC 0.873",
+      "denominator": "1,980 matches"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "two-sided by registration: pointwise >= pairwise on key-decidable pairs refutes the founding hypothesis",
+    "fired": false,
+    "note": "the hypothesis is SUPPORTED on pairs (pairwise decides) and OVERTURNED on the board (pointwise ranks); POINTWISE-REPL: the board advantage does not replicate at anchor scale (noise-dominated at small n); the unifying rule: grade where answers are checkable, compare where they are not"
+  },
+  "numbers_of_record": {
+    "pairs": "pairwise 0.864 vs pointwise 0.808 (87:34, p 1.6e-06); top cluster 0.721 vs 0.649; arm B 0.746 vs 0.678",
+    "board": "rho 0.9930 pointwise vs 0.9790 pairwise (raw mean grade 0.9860); top-cluster violations 0 vs 1 (iask / arx); arm B 0.9860 vs 0.9650",
+    "reference_effect": "+11.8pp pairwise, +13.0pp pointwise",
+    "ties": "9.4% vs 7.0%; no reference 20.5% vs 16.1%",
+    "cost": "1.86 vs 2.00 calls per match at 2.68x reuse; 75% of grades at 0 or 100; AUC 0.873"
+  },
+  "sentence_of_record": "POINTWISE (2026-09-13): the founding bet holds for deciding one comparison (941 decidable pairs: pairwise 0.864 vs pointwise 0.808, 87:34, p = 1.6e-06; top cluster 0.721 vs 0.649) and is OVERTURNED on the board (12-model rho 0.9930 pointwise vs 0.9790 pairwise; on the 598 top-cluster matches pointwise gives the key order exactly where pairwise inverts iask / arx, the same inversion as ARENA-V2, X20 and GEN-ARENA's broken bridge); ties 9.4% vs 7.0%; cost 1.86 vs 2.00 calls per match. Pairwise decides; pointwise ranks. Arm B completes the 2x2 with no reference: the format effect (+5.6 to +6.8pp on pairs) and the board reversal both REPLICATE, while the REFERENCE effect is twice the format effect (+11.8pp pairwise, +13.0pp pointwise); ties double without a reference.",
+  "chips": [
+    "SUPPORTED on pairs",
+    "OVERTURNED on the board"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-13",
+      "by": "the amendment before any scored run (d34287f; programme L633 ff.)",
+      "text": "a 20-call probe showed grades collapsing to a 100/0 verification binary; the design was amended before any scored run (the registration's criteria unchanged)."
+    },
+    {
+      "date": "2026-09-14",
+      "by": "POINTWISE-REPL (the three probes)",
+      "text": "the board advantage does not replicate at anchor scale (pointwise wins 4, pairwise 8, 1 tie at 64-274 matches): grade where checkable, compare where discursive."
+    },
+    {
+      "date": "2026-09-14",
+      "by": "the PAIR-NOREF registration (programme 'Registered 2026-09-14 (before any call) — PAIR-NOREF', L1875 ff. as of 5dc8a06)",
+      "text": "the '+11.8pp pairwise reference effect' quoted in this row is not a clean toggle: the pairwise no-reference comparator (rejudge_grok.db) is v1 prompt + cell rubric, so it differs from the pairwise-with-reference arm in prompt version AND rubric level AND reference and inherits all three confounds; the clean pairwise reference effect on record is J2-R's +7.6pp (different judge); PAIR-NOREF measures the clean toggle."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "INCONSISTENCIES-PASS (registrar, zero calls; insertion only)",
+      "text": "CORRECTED 2026-09-14 by PAIR-NOREF, carried into THIS row on 2026-09-23 by INCONSISTENCIES-PASS (registrar, zero calls; insertion only): the '+11.8pp pairwise reference effect' above is confounded three ways: its no-reference comparator (rejudge_grok.db) is a v1-prompt, cell-rubric cache, so it differs from the with-reference arm in prompt version AND rubric level AND reference ('## Registered 2026-09-14 (before any call) — PAIR-NOREF: does the displacement finding hold in the format we actually deploy?'). It is SUPERSEDED by PAIR-NOREF's clean +12.6pp in the deployed pairwise configuration (0.864 against 0.738, 144:25, p=1.6e-21, R3's 944 key-decidable matches). The format-effect and board-reversal readings above are not touched. [ledger: observed cell of row POINTWISE, v132]"
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a per-anchor board advantage for pointwise (POINTWISE-REPL: noise-dominated at small n)",
+    "a frontier order (closed by rule)",
+    "a clean pairwise reference effect (+11.8pp is confounded with prompt version and rubric level; PAIR-NOREF is the clean toggle)"
+  ],
+  "ledger": {
+    "row_id": "POINTWISE",
+    "version": "v55 (9de8115) [v132 2026-09-23: INCONSISTENCIES-PASS insertion in this row]; [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "STACK-v2",
+    "ARENA-V2",
+    "HYBRID",
+    "POINTWISE-REPL",
+    "FORMAT-REF",
+    "GEN-ARENA"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L633-L707 and L751-L772 (48fab98 / d34287f / 9de8115)",
+    "experiment_results/x12_crossdomain/pointwise_outcome.txt (9de8115)",
+    "docs/test_ledger.html row POINTWISE (v55): chips verbatim, evidence (pointwise_judge.py, pointwise_outcome.txt, 48fab98, d34287f)",
+    "script sha16 = sha256 of tools/analysis/pointwise_judge.py at 6e2d4fc, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/judge_v2_program.md PAIR-NOREF registration L1875 ff. (the confound note on the +11.8pp)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Compares two ways of using an LLM judge on the same answers: grading each answer alone on 0-100, versus comparing two answers head to head. One arm uses a reference answer and one does not (about 7,400 graded answers).",
+    "why": "It tests the thesis's founding bet, that judges are more reliable comparing than grading. The test was set up so the thesis could lose.",
+    "information": "Pointwise winning would undercut the pairwise design. Result: done, split verdict. Comparing is better for deciding a single match (0.864 vs 0.808, significant). Grading gives a slightly better overall leaderboard (rank correlation 0.993 vs 0.979). Both effects replicate without a reference. The leaderboard advantage did not replicate on small per-area samples. Working rule: grade where answers are checkable, compare where they are not. Later ruled history rather than evidence, because it ran on the older question pool.",
+    "written": "2026-10-07"
+  }
+}

@@ -1,0 +1,26 @@
+=== SYSTEMATIC-SIGNAL: does a free signal predict the bootstrap's confident errors? ===
+  891 edges over 14 anchors | called at the 0.975 threshold: 739
+  of those, 8 point the WRONG way and 731 the right way
+  answer-agreement                   wrong 0.704 | right 0.437 | diff +0.267  95% CI [+0.150, +0.374]   <- excludes zero
+      expected: HIGHER on wrong edges
+  reference accuracy in the anchor   wrong 0.765 | right 0.852 | diff -0.088  95% CI [-0.111, -0.052]   <- excludes zero
+      expected: LOWER on wrong edges
+  key gap between the pair           wrong 0.066 | right 0.356 | diff -0.290  95% CI [-0.318, -0.261]   <- excludes zero
+      expected: LOWER on wrong edges
+
+  (3) LOGISTIC over ALL 891 edges: P(wrong direction) on standardised agreement and reference accuracy
+      intercept              -4.061 +- 0.309 | z=-13.1
+      answer-agreement       +1.511 +- 0.215 | z= +7.0
+      reference accuracy     -0.798 +- 0.190 | z= -4.2
+      (44 wrong of 891 edges overall)
+
+  (4) OPERATING POINT: decline a called edge when the pair's answer-agreement exceeds a threshold
+    agree >=   declined   wrong kept   correct lost
+        0.70        101            4             97
+        0.75         66            4             62
+        0.80         32            4             28
+        0.85         13            6             11
+        0.90          4            8              4
+        1.01          0            8              0
+  READ: a usable signal removes most wrong calls while losing few correct ones. With only 8 wrong
+  edges this table is descriptive; it cannot establish an operating point on its own.

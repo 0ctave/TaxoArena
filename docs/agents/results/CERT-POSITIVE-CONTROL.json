@@ -1,0 +1,189 @@
+{
+ "id": "CERT-POSITIVE-CONTROL",
+ "title": "CERT-POSITIVE-CONTROL: does the site-null certificate that gave G12 0 of 60 certify the declared 14-category level of R2's MMLU-Pro member (recovered above chance, H 0.31 at 512) under the same instrument (300 reps, slice 512, sepBar 0.0145)? (zero calls; REGISTERED 2026-10-02)",
+ "question": "Can the certificate certify structure known to be there? If the declared level also fails, G12's 0 of 60 is a sensitivity limit, not absence of structure.",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "the commit that writes it (parent 1a922a80)",
+  "program_lines": "docs/judge_v2_program.md L23464-L23488",
+  "program_lines_as_of": "the commit that writes them, parent 1a922a80, re-grepped",
+  "date": "2026-10-02",
+  "heading": "## Registered 2026-10-02 (before any code or call) — CERT-POSITIVE-CONTROL: does the site-null certificate that left R2's MMLU-Pro member with 0 of 60 sites (G12) certify the DECLARED 14-category level ...",
+  "provenance": "the orchestrator's brief of 2026-10-02; arms, comparability precondition C0, Support, predictions, falsifier the registrar's; the author's go (plan Amendment 38)"
+ },
+ "script": {
+  "path": "tools/analysis/cert_positive_control.py + SeparationNullBySizeTest.kt declared-site arm (task certPositiveControl)",
+  "sha16": "cert_positive_control.py blob:a2b80ed2 / sha256-lf16:c4631fa19382243e (LF); SeparationNullBySizeTest.kt blob 50c4b0ef; CertPositiveControlArmTest.kt blob fb800b4b; build.gradle.kts blob 82d0552e; readout --analyze blob e0751d7c at 416ac436 (merged 218f9b7f)",
+  "commit": "b5653fb7 (branch cert-positive-control, unmerged)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_cert_positive_control.md; docs/reviews/READY_cert_positive_control_delta.md",
+  "commit": "aac3f7fc; 1c6af944"
+ },
+ "go": "plan Amendment 38: the author's \"register 2, 6 and 3\" (0 calls for the readouts; the 4k-match rule not engaged)",
+ "run": {
+  "outcome_file": ".claude/worktrees/rp12-r2-run experiment_results/cert_positive_control/outcome.txt (sha256-lf16:1decf875908a1559, 39 lines; untracked, write-once) + cpc_sites.csv (sha256-lf16:0117d37542b10657)",
+  "outcome_commit": "arm ops c7cf3116, d7f34193, 1597e801 (rp12-r2-run at b5653fb7); --analyze at 416ac436",
+  "calls": 0,
+  "cce": 0,
+  "pool": "pv2_1575de61bb20e977 (B0-2 check); embeddings_cache per-table hashes unchanged",
+  "date": "2026-10-03"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_cert_positive_control.md",
+  "commit": "218f9b7f (merge)",
+  "verdict": "VALID (W-1..W-4)"
+ },
+ "criteria": [
+  {
+   "id": "IDENTITY",
+   "text": "preconditions (refuse): I-1 the declared-site routine reproduces the persisted dasguptaDeltaNorm of G12's 60 sites; I-2 three G12 TOP-site nulls reproduce G12_sites.csv's k (or reuse is shown exact) [CORRECTED 2026-10-03 pre-data (D-I1): I-1 ratified in its LIVE form (G12's 60 site populations through splitSingleNode; routine == splitter's dasguptaDeltaNorm bit for bit; -Di1Form=live -Di1Bracket=\"docs/judge_v2_program.md L23470\"); no criterion moves]",
+   "result": "HELD",
+   "value": "I-1 live 60 of 60 bit for bit (36 at k >= 3); I-2 PASS (3 registered + 11 beside)",
+   "denominator": "300 null replicates for one site (R2 B0 MMLU_PRO_LB member root, its TRAIN items, about 7,000, in 14 declared categories); DEFF 1.0 by construction"
+  },
+  {
+   "id": "C0",
+   "text": "comparability precondition: 300 random size-matched 14-group relabellings scored by the same routine; PC1 NOT EVALUABLE if their p95 reaches the site null's p95",
+   "result": "HELD",
+   "value": "COMPARABLE: relabelling p95 0.000604 < null p95 0.041626",
+   "denominator": "300 null replicates for one site (R2 B0 MMLU_PRO_LB member root, its TRAIN items, about 7,000, in 14 declared categories); DEFF 1.0 by construction"
+  },
+  {
+   "id": "PC1",
+   "text": "the member root with the 14 declared categories as children: k_d = null replicates >= the declared statistic, p_d = (k_d + 1) / 301; CERTIFIED iff p_d <= 0.05 (k_d <= 14), NOT CERTIFIED otherwise (the POINT of the exact count decides); NOT EVALUABLE iff C0 fails. Verdict line: SCOREABLE (predicted p_d 0.60, 0.55 from the bar > MDE80 0.0352)",
+   "result": "HELD",
+   "value": "CERTIFIED: declared 0.107803 vs null max 0.042414 (p95 0.041626); k_d 0 of 300, p 1/301 = 0.003322 (SEEN 0.1078 before the null, W-3)",
+   "denominator": "300 null replicates for one site (R2 B0 MMLU_PRO_LB member root, its TRAIN items, about 7,000, in 14 declared categories); DEFF 1.0 by construction"
+  },
+  {
+   "id": "PC3",
+   "text": "DESCRIPTIVE-ONLY: the declared src partition inside each of the 14 anchors (G12's TOP-site populations), BH over the TOP family as G12; src geometry unknown, never a power statement",
+   "result": "n/a",
+   "value": "DESCRIPTIVE: 14 of 14 scored, 0 certified (BH m 14); smallest p 296/301",
+   "denominator": "up to 14 anchor sites (G12_sites.csv n), 300 reps each"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "p_d 0.60 [0.05, 1.00]; PC1 NOT CERTIFIED 0.85, CERTIFIED 0.12, NOT EVALUABLE 0.03",
+   "result": "FAILED",
+   "value": "p_d 0.0033 outside [0.05, 1.00]; NOT CERTIFIED prior 0.85 did not occur; 3-way Brier 1.4978",
+   "denominator": "300 null replicates for one site (R2 B0 MMLU_PRO_LB member root, its TRAIN items, about 7,000, in 14 declared categories); DEFF 1.0 by construction"
+  },
+  {
+   "id": "P2",
+   "text": "C0's random-relabelling p95 below the null p05, p 0.90",
+   "result": "HELD",
+   "value": "C0 p95 0.000604 < null p05 0.039256; Brier 0.0100",
+   "denominator": "300 null replicates for one site (R2 B0 MMLU_PRO_LB member root, its TRAIN items, about 7,000, in 14 declared categories); DEFF 1.0 by construction"
+  },
+  {
+   "id": "P3",
+   "text": "PC3 certified anchors 0 [0, 2] of the scored",
+   "result": "HELD",
+   "value": "0 of 14",
+   "denominator": "up to 14 anchor sites"
+  }
+ ],
+ "falsifier": {
+  "text": "F-PC fires iff PC1 CERTIFIED: overturns the working reading that G12's 0 of 60 is a sensitivity limit of the certificate (N-1's empty set is then evidence about the data-driven depth-1 splits, with the n caveat). F-TAX N-1 FIRES and F2 stand either way; NOT CERTIFIED does not reinstate the certificate clause.",
+  "fired": true
+ },
+ "numbers_of_record": {
+  "SEEN_declared_root_statistic": "0.1078 (numpy replica, computed once pre-run by the builder; no null seen; disclosed)",
+  "PC1": "declared root statistic 0.107803 (6,993 TRAIN items, 14 declared groups) vs null p05/p50/p95/max 0.039256 / 0.040510 / 0.041626 / 0.042414; k_d 0 of 300; p 1/301",
+  "C0": "relabelling p95 0.000604 (comparable)",
+  "deflated_root": "k 0, p95 0.010493 (descriptive)",
+  "PC3": "0 of 14 certified (descriptive)"
+ },
+ "sentence_of_record": "CERT-POSITIVE-CONTROL (2026-10-03, 0 calls; post-run review VALID): at the root of R2's B0 MMLU_PRO_LB member (one site; 6,993 TRAIN items of draw 5a3e756; the 14 declared MMLU-Pro categories as the partition; qwen3 512-slice; sepBar 0.0145; 300 reps), the site-null certificate CERTIFIES the declared partition: statistic 0.1078 against a null maximum of 0.0424, k_d 0 of 300, p 1/301 [the LABEL partition, not the tree's root split (declared, persisted 0.0); the sensitivity-limit reading of G12's 0 of 60 is overturned at root scale only, nothing shown at depth-1 sizes (n 264-778); F-TAX N-1 and F2 stand; the declared statistic was seen once before the null was drawn, no null replicate seen; never 'the certificate is validated' or 'geometric clusters']",
+ "chips": [
+  "REGISTERED 2026-10-02, BEFORE ANY CODE; not built",
+  "VALID (POST-RUN): PC1 CERTIFIED (k_d 0/300, p 1/301); C0 COMPARABLE; F-PC FIRED",
+  "ROOT SCALE ONLY (ONE SITE, LABEL PARTITION, NOT THE TREE&#x27;S SPLIT); NOTHING AT DEPTH-1 SIZES; F-TAX N-1 AND F2 STAND; STATISTIC SEEN BEFORE THE NULL (NO NULL SEEN); P1 FAILED"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-03",
+   "by": "registrar (builder's report b5653fb7)",
+   "text": "D-I1 ruled bracketable: I-1 live form ratified (L23470); SEEN declared root statistic 0.1078 (no null); empty -wal/-shm sidecars in rp12-r2-run disclosed. section \"## Registrar's record 2026-10-03 (insertion only; zero calls; nothing run; pre-data) — CERT-POSITIVE-CONTROL built ...\" (L23616-L23621, _as_of the commit that writes it, parent c1ed61d5)"
+  },
+  {
+   "date": "2026-10-03",
+   "by": "registrar",
+   "text": "anchor correction: the record section of d6afbcb6 spans L23616-L23620, not L23616-L23621 (bracket on its SECTION SPAN line)"
+  },
+  {
+   "date": "2026-10-03",
+   "by": "registrar (POSTRUN W-1..W-4)",
+   "text": "outcome recorded; sidecar correction (-shm 32,768 B; 604 files moved to _backup); reading table and the reframing memo's change 7 bracketed; checkpoint D searched, no reliance. docs/judge_v2_program.md L23638-L23649 (section \"## CERT-POSITIVE-CONTROL (2026-10-03, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent 218f9b7f)"
+  },
+  {
+   "date": "2026-10-03",
+   "by": "registrar (CERT-PC-SIZE POSTRUN W-2)",
+   "text": "W-2's 'nothing shown at depth-1 sizes' superseded for the size question only: CERT-PC-SIZE certified the declared partition 5/5 at n 486 and 441. docs/judge_v2_program.md L23782-L23792 (section \"## CERT-PC-SIZE (2026-10-03, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent 541fde40)"
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (consistency check 2026-10-04; zero calls)",
+   "text": "the 'chips' list had drifted from the ledger row's chips (wording or replaced chips); the chips of record are the ledger's, copied verbatim into 'chips_ledger_verbatim' (ledger v379); 'chips' is kept as history."
+  }
+ ],
+ "does_not_show": [
+  "that the declared categories are the right taxonomy or 'geometric clusters' (H partial recovery)",
+  "a certificate of any tree site or the tree",
+  "power at depth-1 site sizes (PC1 at root size; PC3 descriptive)",
+  "another member, draw, slice, recipe or embedder; a mode test (MIX-LRT-SITE closed)"
+ ],
+ "ledger": {
+  "row_id": "CERT-POSITIVE-CONTROL",
+  "version": "v352 (2026-10-03: OUTCOME bracket, OK + WARN chips) | v345 (2026-10-02: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "ARCH-V2-E-T-R2",
+  "MMLU-GOLD-GEOMETRY",
+  "F-TAX"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; MIX-LRT-SITE not touched (site null, no mixture LR or BIC)"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "one site null at about 7,000 items, slice 512, 300 reps, 12 threads (+ up to 14 anchor nulls if reuse is not exact); unsourced, the dry-run prices it",
+  "agent_hours": "engine-coder about 3-4 h (Kotlin declared-site arm)",
+  "reads_pool": false,
+  "lane": "machine, rule-7 window (a site null)"
+ },
+ "sources": [
+  "docs/judge_v2_program.md L23464-L23488 (section \"## Registered 2026-10-02 (before any code or call) — CERT-POSITIVE-CONTROL: does the site-null certificate that left R2's MMLU-Pro member with 0 of 60 sites (G12) certify the DECLARED 14-category level ...\"; _as_of the commit that writes it, parent 1a922a80, re-grepped)",
+  "docs/agents/results/ARCH-V2-E-T-R2.json (G12)",
+  "experiment_results/archv2/rp12_r2/g12/G12_sites.csv",
+  "docs/agents/results/MMLU-GOLD-GEOMETRY.json (H 0.2912; 512 H 0.3130)",
+  "tools/analysis/g12_site_null.py docstring (launch command, heap rule)",
+  "docs/literature/2026-10-02_related_work_pass2.md (487ac3bd) §5 row 6",
+  "docs/plan_2026-09-15.md Amendment 38",
+  "docs/judge_v2_program.md L23638-L23649 (section \"## CERT-POSITIVE-CONTROL (2026-10-03, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent 218f9b7f)",
+  "docs/reviews/POSTRUN_cert_positive_control.md (merged 218f9b7f)"
+ ],
+ "last_update": "2026-10-04",
+ "chips_ledger_verbatim": [
+  "plan: REGISTERED 2026-10-02, BEFORE ANY CODE; not built",
+  "ok: VALID (POST-RUN): PC1 CERTIFIED (k_d 0/300, p 1/301); C0 COMPARABLE; F-PC FIRED",
+  "warn: ROOT SCALE ONLY (ONE SITE, LABEL PARTITION); NOTHING AT DEPTH-1 SIZES; F-TAX N-1 AND F2 STAND; STATISTIC SEEN BEFORE THE NULL; P1 FAILED"
+ ],
+ "plain_description": {
+  "sq": "SQ2 Trust",
+  "what": "Applies the split certificate (which compares a split with random splits) to structure known to exist: the 14 official MMLU-Pro categories over about 7,000 questions. No calls.",
+  "why": "An earlier test (G12) certified 0 of 60 tree splits, so this checks whether the certificate can certify anything at all, or whether it is simply blind.",
+  "information": "If the known categories failed too, G12's zero would be a sensitivity limit. If they pass, the certificate works at least at this scale. Result: the certificate clearly certifies the declared categories (statistic 0.108 against a random-split maximum of 0.042). That overturns the 'blind certificate' reading at whole-corpus scale. A later test (CERT-PC-SIZE) extended this to the smaller sizes of real tree splits. The test does not 'validate' the certificate in general.",
+  "written": "2026-10-07"
+ }
+}

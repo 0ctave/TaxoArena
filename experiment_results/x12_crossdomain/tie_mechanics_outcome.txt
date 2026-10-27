@@ -1,0 +1,61 @@
+[POOL] p2dca21ab5f4ef3ae (pool of record; pool_guard.assert_pool_of_record passed)
+[COPIES] set_hash and clustered AST-identical to canary_baseline.py (clustered up to its default seed, canary SEED = 42)
+[SET] experiment_results/x12_crossdomain/canary_set.json re-hashed with set_hash(): 50af669ac6997f9f = the hash of record; 300 matches
+[CACHE] experiment_results/x12_crossdomain/canary_baseline_pass1.db before: {'db': (1236992, 1789516127415133500)}
+[CACHE] experiment_results/x12_crossdomain/canary_baseline_pass2.db before: {'db': (1245184, 1790067661307879600)}
+[CACHE] pass 1 sha256 5142795bdc8c5a8ec8d09a3a4f9cd6c84de206834aeab7ca11cea4761000690c (= the pass-2 READY's); pass 2 sha256 9e2f4b7cb2b30b3a2a7abf897c8bb531d5c6c14eebd21668ed6ab3d747132c4e
+[SCHEMA] table verdicts (the table the counts read; run_meta is not compared): pass 1 24 columns, pass 2 26 columns: identical in name, type and order except the columns EXCLUDED from the comparison, absent from pass 1 only: [('provider1', 'TEXT'), ('provider2', 'TEXT')]
+[FRAME] pass 1: 300 rows, 300 distinct match ids; every stored winner = name_of(combine_orders(vote1, vote2_raw)) (300 rows)
+[FRAME] pass 2: 300 rows, 300 distinct match ids; every stored winner = name_of(combine_orders(vote1, vote2_raw)) (300 rows)
+[R1] recomputed: 26 verdict changes (16 TIE->decisive, 10 decisive->TIE) | 215 decisive in both | 0 direct reversals | 59 of 600 order votes changed | 23 verdict-keeping matches with a changed vote | recorded {'changes': 26, 'tie_to_dec': 16, 'dec_to_tie': 10, 'dec_both': 215, 'reversals': 0, 'T': 59, 'cells': 600, 'keep_changed': 23}
+[R1] HELD: every recorded count reproduced exactly
+[CACHE] experiment_results/x12_crossdomain/canary_baseline_pass1.db after: {'db': (1236992, 1789516127415133500)} -> unchanged
+[CACHE] experiment_results/x12_crossdomain/canary_baseline_pass2.db after: {'db': (1245184, 1790067661307879600)} -> unchanged
+=== TIE-MECHANICS (zero calls) | registration docs/judge_v2_program.md L12911-L13030 (3c2fcab) | script sha256[:16] of the LF bytes d6a1a0409a0fc06e (of the CRLF rendering 4a18124878801487) ===
+
+(C1) THE DECIDING STATISTIC
+  C1 n2 = 10 matches with BOTH order votes changed, of M = 300 matches, given T = 59 changed cells of 600; n1 = T - 2 x n2 = 39 (decides nothing)
+  C1 EXACT CONDITIONAL NULL by Monte Carlo: 1000000 uniformly random 59-subsets of the 600 cells (numpy default_rng(42)): E0 2.854 (closed form M T (T-1) / (N (N-1)) = 2.856), SD0 1.528; P0(n2 >= 10) = 0.00010 (MC SE 0.00001; closed form 0.00010)
+  C1 null pmf P0(n2 = 0..12): MC 0.0423 0.1496 0.2451 0.2483 0.1738 0.0906 0.0358 0.0111 0.0028 0.0005 0.0001 0.0000 0.0000 | closed form 0.0422 0.1491 0.2448 0.2483 0.1746 0.0905 0.0359 0.0112 0.0028 0.0006 0.0001 0.0000 0.0000
+  C1 two-sided alpha-0.05 region (each tail <= 0.025): upper n2 >= 7 (P0 0.0146); lower NONE
+  C1 NO LOWER REJECTION REGION: P0(n2 = 0) = 0.0423 > 0.025, so a DEFICIT of double changes (the orders changing together LESS than independence allows) CANNOT BE SEEN at T = 59, whatever the data
+  SUPPORT (measured on this cache pair; beside the deciding statistic):
+    (a) deciding denominator: 300 matches = 600 (match, order) cells on 279 questions; cluster sizes 1:260/2:18/4:1; sum n^2 = 348; KISH MEAN CLUSTER SIZE 1.160
+    (b) DEFF 1.09 MEASURED on this pair: the question-clustered bootstrap of the verdict-change indicator (canary_baseline.clustered, B 2000, seed 42): floor 0.087 [0.056, 0.122] SE 0.0170 against the binomial SE 0.0162 (registered: DEFF 1.09 from CANARY-BASELINE pass 2)
+    (c) n_eff = 300 / 1.09 = 274
+    (d) SD0(n2 | T) = 1.528 (the exact conditional null above); carried at the measured DEFF: 1.528 x sqrt(1.09) = 1.598
+    (e) MDE at 80% power: the Poisson alternative mean at which P(n2 >= 7) = 0.80 is 9.08, an excess of 9.08 - 2.856 = 6.22 double-change matches; 6.50 with the DEFF carried (x sqrt(1.09)). A DEFICIT has no MDE at this n: it is not detectable at all.
+    (f) verdict line at the measured support: C1 prediction 10 against E0 2.856, distance 7.14 > MDE 6.50 -> SCOREABLE (margin 0.64); C2, C3, C4 DESCRIPTIVE-ONLY
+    (g) structural: n is fixed at 300 by the frozen set; at this T only an EXCESS of double changes is detectable; the deficit reading is reachable only with further retest passes (not bought)
+  C1 FAILED: n2 = 10 is INSIDE the rejection region (exact conditional p = 0.0001 by MC, 0.0001 closed form; DEFF 1.09, n_eff 274, MDE 6.50 beside)
+  reading: within-match dependence: the two orders of a match change TOGETHER more often than independent per-call change allows (a property of the judge on these matches)
+
+(C2) THE REVERSAL CELL, DESCRIPTIVE-ONLY
+  measured transition counts (pass 1 -> pass 2) pooled over the 600 cells: {'Model A->Model B': 11, 'Model A->TIE': 11, 'Model B->Model A': 6, 'Model B->TIE': 11, 'TIE->Model A': 15, 'TIE->Model B': 5}
+  order 1: {'Model A->Model B': 7, 'Model A->TIE': 4, 'Model B->Model A': 4, 'Model B->TIE': 3, 'TIE->Model A': 9, 'TIE->Model B': 3}
+  order 2: {'Model A->Model B': 4, 'Model A->TIE': 7, 'Model B->Model A': 2, 'Model B->TIE': 8, 'TIE->Model A': 6, 'TIE->Model B': 2}
+  E_rev = 0.2164 expected direct reversals among the 225 pass-1-decisive matches (pooled matrix; per-order matrices 0.2018); observed 0; P(0 | E_rev) = exp(-E_rev) = 0.805
+  the relayed unconditional 2.9 (every double change; an upper bound on the reversal expectation): exp(-2.9) = 0.055 > 0.05, so no expectation at or below 2.9 can make "0 reversals" significant
+
+(C3) THE VERDICT-CHANGE COMPOSITION, DESCRIPTIVE
+  under i.i.d. at the pooled matrix: E[verdict changes] 37.38 = TIE<->decisive 37.16 + decisive<->decisive 0.216 + involving INVALID 0.000; expected TIE<->decisive share 0.9942 | observed 26 of 26
+
+(C4) SENSITIVITY, DESCRIPTIVE: one match per question (the first by match id)
+  C4 n2 = 10 matches with BOTH order votes changed, of M = 279 matches, given T = 57 changed cells of 558; n1 = T - 2 x n2 = 37 (decides nothing)
+  C4 EXACT CONDITIONAL NULL by Monte Carlo: 1000000 uniformly random 57-subsets of the 558 cells (numpy default_rng(42)): E0 2.864 (closed form M T (T-1) / (N (N-1)) = 2.865), SD0 1.525; P0(n2 >= 10) = 0.00010 (MC SE 0.00001; closed form 0.00010)
+  C4 null pmf P0(n2 = 0..12): MC 0.0415 0.1475 0.2445 0.2495 0.1755 0.0910 0.0359 0.0112 0.0027 0.0005 0.0001 0.0000 0.0000 | closed form 0.0412 0.1474 0.2444 0.2494 0.1759 0.0911 0.0360 0.0111 0.0027 0.0005 0.0001 0.0000 0.0000
+  C4 two-sided alpha-0.05 region (each tail <= 0.025): upper n2 >= 7 (P0 0.0146); lower NONE
+  C4 NO LOWER REJECTION REGION: P0(n2 = 0) = 0.0415 > 0.025, so a DEFICIT of double changes (the orders changing together LESS than independence allows) CANNOT BE SEEN at T = 57, whatever the data
+  C4 reading (descriptive): n2 = 10 would be INSIDE the region of its own conditional null
+
+PREDICTIONS
+  P1 HELD: n2 = 10 (registered 10, interval [8, 12])
+  P2 HELD: n1 = 39 (registered 39, interval [35, 43])
+  P3 HELD: C1 FAILED with exact conditional p 0.0001 (registered: C1 FAILED, p <= 0.001)
+  P4 HELD: E_rev 0.2164, P(0 | E_rev) = 0.805 (registered E_rev in [0.02, 1.0], point 0.25, P(0) >= 0.37)
+  P5 HELD: expected TIE <-> decisive share of verdict changes under i.i.d. = 0.9942 (registered >= 0.90)
+
+CRITERION C1: FAILED
+FALSIFIER: FIRED. C1 FAILED overturns the reading (a relayed lead, never a recorded result) that the canary's tie-boundary pattern is forced arithmetic of independent per-call flips, and forbids deriving any match-level floor from a per-call rate (0.098, or DECOMP's per-call 0.057) by independence arithmetic anywhere in the record; EITHER WAY NO RECORDED NUMBER MOVES (canary floor 0.087 [0.056, 0.122], NO ALARM, 26 / 215 / 0, 0.098, DECOMP 5.7%, BFCL-FLIP-RESEED's anchor 0.913).
+CONSEQUENCE FOR TRACE-TRUNCATION: C1 FAILED -> the per-call rate does NOT transfer; no match-level floor may be derived from 0.098 or 0.057 by independence arithmetic; TRACE-TRUNCATION's floor stays a per-match retest quantity (CANARY 0.087, DECOMP 5.7%) and its "re-price after TIE-MECHANICS" resolves to NO RE-PRICE FROM THIS TEST.
+WHAT THIS RUN WILL NOT SHOW: why the orders co-vary (dependence, not mechanism); anything about another corpus, judge or set; that 0 reversals is a judge property (a deficit of double changes is structurally undetectable here); any fidelity or accuracy number.

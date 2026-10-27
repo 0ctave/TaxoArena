@@ -1,0 +1,80 @@
+# K-SELECTION arm R3' af_s2048_k105: the anchor-free recipe on the seed-2048 own split (pool p19d9f473b5a610a0,
+# ~70% in-sample for the pool of record: identity only, never purity as a clean number) under the geometric
+# hysteresis rule. BASE experiment_configs/anchorfree/redraw/af_s2048.toml (REDRAW R3), unchanged but for this
+# header, its own outputDir and EXACTLY ONE added active key line:
+#   proposalAcceptMultiplier = 1.05   (a split is ACCEPTED only at routed min-pair >= 1.05 x bar; the
+#   sibling-merger's bar, marginalEps and barFor are untouched; the site null is never read)
+# Own -Dranking.db.path (experiment_results/anchorfree/redraw/kselect/ratings_af_s2048_k105.db, set by the chain).
+#  outputDir: experiment_results/anchorfree/redraw/kselect/af_s2048_k105
+# REGISTRATION. docs/judge_v2_program.md, "Registered 2026-09-19 (before any code or call) - K-SELECTION"
+# (L8224-L8390, commit 8fde7fa; plan docs/agents/plans/2026-09-18_reframing_and_next.md S2 R2 / S5). Zero judge
+# calls; label-free, z 2.0, mcs 55, 256-dim slice, bar 0.025; the split is the base's. The tree this builds is
+# STRUCTURAL EVIDENCE ONLY; the registration does NOT authorise judging on it. File names and outputDirs follow
+# the engine-coder delegation (redraw/kselect/, _k105); the registration's L8339-8340 names them
+# anchorfree/kselect/{..._m105, af_clean_s42_inert}: the MERGEABLE review records the naming (registration (b)).
+# Instrument: 300-rep site null at the build's slice, anchor_free_readout.py vs af/seed_42, then
+# anchor_free_redraw.py --arms <kselect> --unprimed <redraw>. Order in the sweep: I2, R1', R2', R3'; all run.
+#
+datasetType   = "MMLU_PRO"
+
+models        = [
+    "gpt-4o-2024-08-06",
+    "claude-3-5-sonnet-20241022",
+    "gemini-1.5-pro-002",
+    "deepseek-chat-v2_5",
+    "Meta-Llama-3_1-70B-Instruct",
+    "Qwen1.5-72B-Chat",
+    "gpt-4o-mini",
+    "claude-3-5-haiku-20241022",
+    "Mixtral-8x7B-Instruct-v0.1",
+    "c4ai-command-r-v01",
+    "Qwen1.5-14B-Chat",
+    "Meta-Llama-3_1-8B-Instruct",
+    "gemini-1.5-flash-002",
+    "Llama-2-70b-hf",
+    "Llama-2-13b-hf"
+]
+
+category      = ""
+queryLimit    = 0
+outputDir     = "experiment_results/anchorfree/redraw/kselect/af_s2048_k105"
+testRatio     = 0.3
+seed          = 2048
+
+# Body = o0_s42.toml (seed 42 = the frozen build's split and construction seed). anchorFree = true is
+# the BASE's instrument key (ANCHOR-FREE / REDRAW), inherited unchanged; the K-SELECTION treatment
+# key is the one active line right below it.
+anchorFree = true
+proposalAcceptMultiplier = 1.05   # K-SELECTION: the ONE treatment key (creation-side hysteresis, 1.05 x bar)
+
+runPipeline        = true
+runBenchmark       = false
+runTrickle         = true
+runBaselines       = false
+enableFinalMetrics = false
+enableLabeling     = false
+judgeInduction     = false
+
+dagMode = "DAG_MAX"
+
+maxDepth              = 8
+minClusterSize        = 55
+proposalSeparationBar = 0.025
+tau                   = 1e-6
+acceptanceZ           = 2.0
+enableRefitGate       = false
+
+membershipFloor       = 0.25
+routingBeamGamma      = 0.2
+descentMargin         = 0.12
+
+effectiveSupportFloor = 2.0
+defaultKappaPrior     = 10.0
+
+numIterations         = 50
+maxLeafAssignments    = 5
+
+fusionSimilarityThreshold = 0.90
+enableGtWarmStart         = false
+
+enableProfiling           = true

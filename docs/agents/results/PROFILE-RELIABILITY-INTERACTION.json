@@ -1,0 +1,203 @@
+{
+  "id": "PROFILE-RELIABILITY-INTERACTION",
+  "title": "PROFILE-RELIABILITY-INTERACTION: what is the MMLU-Pro profile reliability once anchor difficulty is removed, i.e. the model- AND anchor-demeaned split-half R on the 14 anchors, key and judge? (zero calls; the number the ledger v113 bracket on PROFILE-RELIABILITY left for the author)",
+  "question": "On MMLU-Pro, key and judge, what is the interaction-only (model- and anchor-demeaned) split-half R with its interval on the 14 bareq512_s42 anchors, and does it clear the registered 0.70 bar? That number is what 'profile' means once the anchor's difficulty is taken out: a re-indexed global score (interaction-only R near the null) or a profile (interaction-only R high).",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "954e829",
+    "program_lines": "docs/judge_v2_program.md L6313-L6384; pre-run bracket L6392 (af176a2): K12 the leg of record, C0 expected by construction, the logit null's curvature floor, profile_reliability_interaction.py the instrument of record [re-lined 2026-09-22: batch-1 lines were read at 9c1f37b-era HEAD and shifted by +6 by later insertions]",
+    "program_lines_as_of": "6aa2a0d",
+    "heading": "## Registered 2026-09-18 (before any code or call) — PROFILE-RELIABILITY-INTERACTION: what is the MMLU-Pro profile reliability once anchor difficulty is removed, i.e. the model- AND anchor-demeaned split-half R on the 14 anchors, key and judge? (zero calls; the number the ledger v113 bracket on PROFILE-RELIABILITY left for the author; night schedule §3; plan 2026-09-17 §1)",
+    "outcome_heading": [
+      "L6853: ## PROFILE-RELIABILITY-INTERACTION (2026-09-18, zero judge calls) — on the 14 bareq512_s42 anchors (2,811 judged q, 119-304 per anchor, 40 halvings) the 12-mode"
+    ],
+    "date": "2026-09-18"
+  },
+  "script": {
+    "path": "tools/analysis/profile_reliability_interaction.py (with profile_reliability.py --interaction-only, inert when absent; seven pins asserted)",
+    "sha16": "5ef7a934b0604fbe",
+    "commit": "2ccd646"
+  },
+  "ready": null,
+  "go": "n/a (0 calls; window W2 pool reader)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/profile_reliability_interaction_outcome.txt",
+    "outcome_commit": "17a4434",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-18",
+    "other_files": [
+      "experiment_results/x12_crossdomain/profile_reliability_interaction_run.log"
+    ]
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-18_night_batch.md section 'PROFILE-R-FILTERED and PROFILE-RELIABILITY-INTERACTION: independent post-run review' (supersedes the orchestrator's interim reading in the same file)",
+    "commit": "f505a2a (file last at 074eb3d)",
+    "verdict": "every number CONFIRMED to 4 dp by independent code (C0 identity |anchor mean| 4e-16; gates; K12 0.8665 with all folds; K46 0.8118; K20 0.8391; variance shares to 5 dp; additive-logit MLE to 3 dp; one null table bit-for-bit); the '46-model 0.9135' misattribution stands at four programme lines; like-for-like paired gaps +0.194 / +0.121 with 14/14 folds"
+  },
+  "criteria": [
+    {
+      "id": "C0",
+      "text": "per-anchor mean of each judge half-profile printed first; if the per-anchor BT fit centres theta by construction, the judge legs' interaction-only R equals the recorded model-demeaned R by IDENTITY",
+      "result": "HELD",
+      "value": "J1 max |mean| over 40 x 2 x 14 = 4.071e-16, J2 3.997e-16; max |r_model-only - r_interaction-only| 3.3e-16 / 5.6e-16: identity holds, the anchor-demeaning subtracts 0 on the judge legs; key legs for contrast max |anchor mean| 0.7027 (K12) / 0.7046 (K46)",
+      "denominator": "40 halvings x 2 halves x 14 anchors"
+    },
+    {
+      "id": "C1",
+      "text": "the interaction-only R with its jackknife interval and halving SD, per leg K / J1 / J2, each beside its recorded model-demeaned value reproduced to 4 dp",
+      "result": "HELD",
+      "value": "K12 (leg of record) r 0.7644 / R 0.8665 / SD 0.0220 / re-halved LOAO [0.8000, 0.9330] / fixed [0.7979, 0.9351], beside 0.9135 [0.8706, 0.9565] reproduced; K46 0.8118 [0.7254, 0.8983] beside 0.9177; K20 0.8391 [0.7760, 0.9021] beside 0.9139 reproduced; J1 0.6728 [0.4932, 0.8524] = recorded; J2 0.7183 [0.6076, 0.8291] = recorded; every K12 LOAO fold >= 0.8427",
+      "denominator": "14 bareq512_s42 anchors, 2,811 judged q (119-304 per anchor), 40 halvings Random(7); ARENA12 key rows on the judged questions"
+    },
+    {
+      "id": "C2",
+      "text": "the no-interaction null Bernoulli(logistic(a_m - d_c)) under both demeanings (median and range over 20 tables) and the variance decomposition",
+      "result": "HELD",
+      "value": "K12 model-only median 0.8731 [0.8544, 0.8867] (real 0.9135), interaction-only 0.3142 [0.1806, 0.4683] (real 0.8665, +0.5523); K46 0.8968 [0.8928, 0.9022] / 0.2343 [0.1441, 0.3082] (real 0.9177 / 0.8118, +0.5775); variance shares model / anchor / interaction K12 0.85 / 0.09 / 0.06, K46 0.74 / 0.18 / 0.07; unregistered beside: probability-additive null -0.046 (K12) / 0.040 (K46)",
+      "denominator": "20 simulated tables per leg; 12 x 14 (117-304 trials per cell) and 46 x 14 (116-304)"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "(lane-2 brief; prediction of record) key interaction-only R in [0.80, 0.88]",
+      "result": "HELD",
+      "value": "0.8665 (K46 0.8118 also HELD)",
+      "denominator": "K12, 14 anchors"
+    },
+    {
+      "id": "P1'",
+      "text": "(night schedule wording) the same in [0.78, 0.88]",
+      "result": "HELD",
+      "value": "0.8665",
+      "denominator": "K12"
+    },
+    {
+      "id": "P2",
+      "text": "key interaction-only R above the 0.70 bar (lower jackknife bound >= 0.70: PASS; point >= 0.70 with the lower bound below: PASS-WITH-INTERVAL)",
+      "result": "HELD",
+      "value": "PASS: lower bound 0.8000 >= 0.70 (K46 PASS at 0.7254)",
+      "denominator": "K12"
+    },
+    {
+      "id": "P3",
+      "text": "judge interaction-only R in [0.55, 0.70] on the merged board J2; FAILED-BY-IDENTITY with the C0 statement if the judge half-profiles are centred per anchor by construction",
+      "result": "FAILED",
+      "value": "FAILED-BY-IDENTITY: C0 holds; J2 = 0.7183, J1 = 0.6728 unchanged; the brief's expected fall was wrong for a structural reason",
+      "denominator": "J2 merged board, 20 rows"
+    },
+    {
+      "id": "P4",
+      "text": "the no-interaction null on the model-only instrument <= 0.90",
+      "result": "HELD",
+      "value": "0.8731 (K46 0.8968)",
+      "denominator": "20 null tables"
+    },
+    {
+      "id": "P5",
+      "text": "(registrar's blind addition) the null under the interaction-only demeaning <= 0.30 AND the real key reading >= 0.50 above it",
+      "result": "FAILED",
+      "value": "FAILED on K12 (null median 0.3142 > 0.30; real - null +0.5523): STRUCTURAL per the af176a2 bracket (the logistic-curvature floor); HELD on K46 (0.2343; +0.5775); neither bears on the falsifier",
+      "denominator": "20 null tables, K12 / K46"
+    }
+  ],
+  "falsifier": {
+    "text": "key interaction-only R < 0.70 at the point: the MMLU-Pro key-built profile is a re-indexed global score; PROFILE-RELIABILITY's row takes a further bracket, FRAMEWORK L117's 'key 0.9135-0.9139' is bracketed, the atlas's key-built rows carry 'offset, not order'",
+    "fired": false,
+    "note": "SILENT (0.8665 K12; 0.8118 K46; every LOAO fold >= 0.84)"
+  },
+  "numbers_of_record": {
+    "K12_interaction_only_R": "0.8665, re-halved LOAO jackknife [0.8000, 0.9330], fixed [0.7979, 0.9351], halving SD 0.0220, r 0.7644 (model-demeaned 0.9135 [0.8706, 0.9565] reproduced)",
+    "K46_beside": "0.8118 [0.7254, 0.8983] (fixed [0.7278, 0.8958]), SD 0.0183 (model-demeaned 0.9177, no recorded value)",
+    "K20_beside": "0.8391 [0.7760, 0.9021] (fixed [0.7678, 0.9103]), SD 0.0208 (model-demeaned 0.9139 reproduced)",
+    "judge_legs": "J1 x12 0.6728 [0.4932, 0.8524] = recorded; J2 merged 0.7183 [0.6076, 0.8291] = recorded (interaction-only by identity)",
+    "LOAO_K12": "drop Math 0.8427, Chemistry 0.8445, Psychology 0.8532, Physics 0.8594 ... Computer science 0.8761",
+    "null_logit_additive": "K12 model-only 0.8731 [0.8544, 0.8867], interaction-only 0.3142 [0.1806, 0.4683]; K46 0.8968 [0.8928, 0.9022] / 0.2343 [0.1441, 0.3082]; a_m [-1.511, 2.454]; d_c Engineering +0.735, Law +0.631, Chemistry +0.494 ... Biology -0.649, Economics -0.606",
+    "variance_shares": "K12 model / anchor / interaction 0.85 / 0.09 / 0.06 (0.05714 / 0.00586 / 0.00435); K46 0.74 / 0.18 / 0.07",
+    "probability_additive_null_unregistered": "interaction-only -0.046 (K12) / 0.040 (K46): the instrument's sampling floor; the logit null's 0.31 / 0.23 is the curvature floor",
+    "like_for_like_gap_reviewer": "K12 - J1 (x12) = +0.194, fixed [0.037, 0.351] / re-halved [0.037, 0.351], 14 of 14 folds positive; K20 - J2 (merged) = +0.121 [0.030, 0.211], 14 of 14; verdict density per half judge ~3.3 / ~7.7 per question vs key 12-20",
+    "consequence_for_PROFILE-RELIABILITY_(2)": "'the shortfall is the judge's' stands at the anchor level against a difficulty-free key (gap 0.19 / 0.12 instead of 0.24; ratio 0.78 / 0.86 instead of 0.74); the leaf-level ratio 0.31 (0.8135 vs 0.2559) remains difficulty-inclusive and unconverted",
+    "key_rows_missing_on_judged_questions": "iask_pro 27, sonnet_0shots 98, arx_0314 5, gemini-1.5-flash 5, deepseek 3, gemini-1.5-pro 3, gemini-3.1-pro 2"
+  },
+  "sentence_of_record": "PROFILE-RELIABILITY-INTERACTION: on the 14 bareq512_s42 anchors (2,811 judged q, 119-304 per anchor, 40 halvings Random(7)) the 12-model key's model- AND anchor-demeaned split-half R is 0.8665, re-halved LOAO jackknife [0.8000, 0.9330], halving SD 0.0220 (model-demeaned 0.9135 reproduced; the 0.9135 is the ARENA12 key, not 46 models: K46 reads 0.9177 model-demeaned / 0.8118 [0.7254, 0.8983] interaction-only; K20 0.9139 / 0.8391): P1, P1', P2 (PASS), P4 HELD; the logit-additive null reads 0.8731 model-only and 0.3142 interaction-only on K12 (0.2343 on K46), the curvature floor the bracket pre-stated, so the registrar's <= 0.30 addition FAILED on K12 structurally and HELD on K46; falsifier silent. C0 holds by construction, so the judge's 0.6728 (x12) and 0.7183 (merged) were already interaction-only and P3 is FAILED-BY-IDENTITY. Like-for-like: key 0.8665 vs judge 0.6728 on x12 (gap +0.194, paired jackknife [0.037, 0.351], 14/14 folds), key 0.8391 vs judge 0.7183 merged (gap +0.121 [0.030, 0.211], 14/14); PROFILE-RELIABILITY (2)'s 'the shortfall is the judge's' stands at the anchor level against a difficulty-free key (0.19 / 0.12 instead of 0.24), noting the judge's halves hold 3-8 verdicts per question against the key's 12-20; its leaf-level ratio 0.31 remains difficulty-inclusive and unconverted.",
+  "chips": [
+    "K12 INTERACTION-ONLY 0.87 [0.80, 0.93] PASS",
+    "K46 0.81 [0.73, 0.90] BESIDE",
+    "JUDGE ALREADY INTERACTION-ONLY (C0; P3 FAILED-BY-IDENTITY)",
+    "NULL FLOOR 0.31 K12 / 0.23 K46 (ADDITION FAILED K12, STRUCTURAL)",
+    "LIKE-FOR-LIKE GAP +0.19 [0.04, 0.35] x12, +0.12 [0.03, 0.21] MERGED",
+    "\"46-MODEL 0.9135\" MISATTRIBUTED AT L5420 / L5643 / L5661 / L6313"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-18",
+      "by": "the pre-run review, before --run (programme L6386, af176a2)",
+      "text": "(1) The recorded 0.9135 is the 12-model ARENA12 key; '(K) the 46-model key ... beside 0.9135' names two objects. Leg of record for P1 / P1' / P2 and the falsifier: K12; K46 and K20 read beside, labelled; the same misattribution at L5643 (PROFILE-INTERVAL-ALL-UNION) is corrected by this bracket. (2) C0 is expected to hold by construction (rj.mm_fit centres theta per fit): P3 reads FAILED-BY-IDENTITY, and the judge's recorded 0.6728 / 0.7183 are already interaction-only; PROFILE-RELIABILITY (2) takes a bracket with the K12 interaction-only R as the like-for-like comparator. (3) The registered logit null carries an accuracy-scale interaction from the logistic curvature, so the registrar's '<= 0.30' addition and P4 may FAIL for that structural reason; such a FAIL is recorded as structural. (4) profile_reliability_interaction.py is the instrument of record."
+    },
+    {
+      "date": "2026-09-18",
+      "by": "the outcome section (3dd0900), consequence as registered: the v113 bracket on PROFILE-RELIABILITY answered by insertion",
+      "text": "0.8665 [0.8000, 0.9330] written beside the 0.9135 in the PROFILE-RELIABILITY ledger row and FRAMEWORK L117; the leaf-level ratio 0.31 bracketed as difficulty-inclusive and unconverted; one bracket naming L5420 / L5643 / L5661 / L6313 inserted after L5643 (checker D1)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "CORRECTIONS_2026-09-23 (registrar)",
+      "text": "[CORRECTED 2026-09-23 by the registrar (line pointer only, zero calls; no number, no criterion and no sentence moves): registration.program_lines names docs/judge_v2_program.md L6313, and that was exact when it was written. After commit cd83eac inserted four one-line correction brackets mid-file (hunks @@ -3911,0 / -6535,0 / -6692,0 / -6949,0 @@), the heading of record \"## Registered 2026-09-18 (before any code or call) — PROFILE-RELIABILITY-INTERACTION: what is the MMLU-Pro profile reliability once anchor d ...\" stands at L6314, +1; the whole span shifts by the same +1. Verified at HEAD by sed -n '6314p' docs/judge_v2_program.md. The map for every such pointer is the programme's \"## Line-shift map, appended 2026-09-23\" section: +0 up to old L3911, +1 to L6535, +2 to L6692, +3 to L6949, +4 below. The recorded span is left standing beside this bracket, not rewritten.]"
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the coordinator's verified record-integrity blocker A1 (insertion only, zero calls; no number of this record moves)",
+      "text": "DISCLOSED 2026-09-23 by the registrar (blocker A1, insertion only, zero calls; NO number of this record moves and nothing above is rewritten): THE MMLU-PRO TREE THIS RESULT IS ROUTED ON FAILS THE TRAIN-ONLY INVARIANT. Snapshot 20260910_043557 (bareq512_s42) carries 37 distinct EVAL texts among its member slots by exact text and 70 under the split function's own key norm-v1 (FRAMEWORK L229 / L373, `gradlew trainOnlyAudit`, read-only), i.e. 70 of the 3,445 p2dca EVAL ids = 2.03% of the routed population were visible to construction. THE WORST-CASE BOUND, which needs no run and assumes every contaminated item is correct BECAUSE of the contamination: AT MOST 2.03pp on any routed proportion - about 5 questions per anchor spread over the 14 anchors at 119-304 questions per anchor. IT IS A BOUND AND NOT AN ESTIMATE; no clean re-read was run, and whether to rebuild under content closure (0 judge calls, new snapshot ids, every routed readout moves) or to disclose at this bound is an OPEN AUTHOR DECISION registered in docs/agents/results/SPLIT-FUNCTION-IMPL.json."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: mixed row (legs) (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM (legs) 2026-09-27: the judge legs (0.7183 / 0.5613 via ANCHOR-PROFILE-INTERVAL / PROFILE-R-FILTERED) are p2dca judged family — history, not evidence; the key legs (K12 / K46 / K20) are not (RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "any level compared to the union's 0.8537 (rosters, pools and cell counts differ)",
+    "any judged number beyond the identity (the judge legs carry no falsifier and were re-read on recorded verdicts only)",
+    "a sub-anchor row",
+    "a within-frontier order (a demeaned half-profile orders nothing the record would publish)",
+    "that the judge's density disadvantage explains the gap (named, not measured)",
+    "a K46 leg of record (beside only)",
+    "[DISCLOSED 2026-09-23 by the registrar (blocker A1, insertion only, zero calls; NO number of this record moves and nothing above is rewritten): THE MMLU-PRO TREE THIS RESULT IS ROUTED ON FAILS THE TRAIN-ONLY INVARIANT. Snapshot 20260910_043557 (bareq512_s42) carries 37 distinct EVAL texts among its member slots by exact text and 70 under the split function's own key norm-v1 (FRAMEWORK L229 / L373, `gradlew trainOnlyAudit`, read-only), i.e. 70 of the 3,445 p2dca EVAL ids = 2.03% of the routed population were visible to construction. THE WORST-CASE BOUND, which needs no run and assumes every contaminated item is correct BECAUSE of the contamination: AT MOST 2.03pp on any routed proportion - about 5 questions per anchor spread over the 14 anchors at 119-304 questions per anchor. IT IS A BOUND AND NOT AN ESTIMATE; no clean re-read was run, and whether to rebuild under content closure (0 judge calls, new snapshot ids, every routed readout moves) or to disclose at this bound is an OPEN AUTHOR DECISION registered in docs/agents/results/SPLIT-FUNCTION-IMPL.json.]"
+  ],
+  "ledger": {
+    "row_id": "PROFILE-RELIABILITY-INTERACTION",
+    "version": "v114 [UPDATED 2026-09-23 at ledger v130 (audit OK, 227 rows): the blocker-A1 TRAIN-ONLY disclosure, with its counts and its worst-case bound, inserted into this row's observed cell. No number in the row moves.]; [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "PROFILE-RELIABILITY",
+    "ANCHOR-PROFILE-INTERVAL",
+    "PROFILE-INTERVAL-ALL",
+    "PROFILE-INTERVAL-ALL-UNION",
+    "PROFILE-RELIABILITY-X20",
+    "PROFILE-TREE-ROBUST"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L6307-L6378 (registration 954e829) and the pre-run bracket L6386 (af176a2): question, hygiene, instrument, criteria, predictions, falsifier",
+    "docs/judge_v2_program.md L6847-L6930 (outcome section, 3dd0900): every number, C0-C2, P1-P4 and the registrar's addition scored, the like-for-like gaps, defects D1-D3, does-not-show, the sentence of record",
+    "docs/reviews/2026-09-18_night_batch.md, independent post-run review section (f505a2a; file last at 074eb3d): CONFIRMED status, the paired-jackknife gaps, chips",
+    "experiment_results/x12_crossdomain/profile_reliability_interaction_outcome.txt (17a4434)",
+    "docs/test_ledger.html row PROFILE-RELIABILITY-INTERACTION (v114): chips verbatim, observed cell, evidence (954e829, af176a2, 2ccd646, 17a4434, f505a2a, 3dd0900)",
+    "script sha16 = sha256 of tools/analysis/profile_reliability_interaction.py at 2ccd646, first 16 hex (identity, computed by the registrar 2026-09-20)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' lines to grep -n regardless of line drift; line numbers re-lined 2026-09-22 as of programme HEAD 6aa2a0d (shift +6 from the batch-1 reading)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ1 Use",
+    "what": "On 14 MMLU-Pro anchors, it measured how reproducible each model's per-cell profile is across random halves of the questions. Overall model skill and cell difficulty were both removed first. The bar was 0.70. No calls were made.",
+    "why": "It tests whether a 'profile' is real per-cell information, or just the global score re-sorted by how hard each cell is.",
+    "information": "High reliability would mean profiles carry real per-cell strengths. Near-baseline reliability would mean they are just a global score. Result: done. The answer-key profile reliability is 0.87 [0.80, 0.93], so it passes. The judge-built profile is lower, at 0.67. The judge-built figures come from the older judged question family, later ruled 'history, not evidence'. A later disclosure noted that this tree had some evaluation questions leaking into its build; no number was changed.",
+    "written": "2026-10-07"
+  }
+}

@@ -1,0 +1,17 @@
+=== GROK-CALIB readout: 9142 of 9142 scheduled matches judged (4507 key-decidable of 4507) | judge grok-4-1-fast-non-reasoning | cap 8192 | temperature omitted (provider default; Amendment 1 D2) ===
+  schedule coverage: 9142 of 9142 scheduled matches cached (0 cached rows outside this schedule ignored) | 0 missing (errors are never cached; counted as unparsed below)
+  unparsed (INVALID in either order + missing): 11 of 9142 overall (0.1%; 11 INVALID + 0 missing) | 8 of 4507 key-decidable (0.2%; 8 INVALID + 0 missing) | guard 5%
+  finish_reason over 18284 calls: {'stop': 18283, '(none)': 1} | finish=length: 0
+  completion tokens: mean 275 | p95 365
+  flip rate 0.154 | tie rate 0.219 (all valid) | key-decidable accuracy 0.849 (n=4499, ties count as wrong)
+  paired with Mistral x12 on 9131 matches: 3-way agreement 0.837 | both decisive agree 0.986 (n=6477)
+  guard: PASS
+
+=== FRAMEWORK item 26 criteria (helpers from systematic_budget; full table in grok_calib_systematic_budget.txt) ===
+  [key gap >= 0.02 (the derivation's population)] edges 891 (established 809) | b0 -3.5451 b1 +3.3854 | established-label refit b1 +2.7194, delta-dev vs b1=0: 4.47 -> IDENTIFIED
+      LOAO at 0.975: called 667 of 891 edges (utility 74.9% -> PASS; criterion (2), denominator = all edges of the population) | called/raw-called 667/733 = 91.0% (non-deciding) | wrong 2 (established 1) | nominal 1.11 -> UNDETERMINED (power rule: nominal < 3)
+      prediction b1 in [1.72, 7.87]: HELD (established-label b1 +2.719)
+  [unfiltered (the adopted denominator)] edges 920 (established 809) | b0 -3.3172 b1 +3.3001 | established-label refit b1 +2.7194, delta-dev vs b1=0: 4.47 -> IDENTIFIED
+      LOAO at 0.975: called 653 of 920 edges (utility 71.0% -> PASS; criterion (2), denominator = all edges of the population) | called/raw-called 653/740 = 88.2% (non-deciding) | wrong 2 (established 1) | nominal 1.24 -> UNDETERMINED (power rule: nominal < 3)
+      prediction b1 in [1.72, 7.87]: HELD (established-label b1 +2.719)
+  Consequence if b1 is identified and utility passes: ORDERED-JUDGED becomes available for the shipped judge; otherwise fallback stays.

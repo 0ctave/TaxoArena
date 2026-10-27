@@ -1,0 +1,875 @@
+{
+  "id": "LCB-STAGE0-INTERACTION",
+  "title": "LCB-STAGE0-INTERACTION: on LiveCodeBench v6 (1,055 problems), a model x region interaction in pass/fail beyond difficulty, difficulty slope and input format, on the TRAIN side of a label-free anchor-free tree over the problem texts (zero-call pre-check for the specialised-vs-generic judge line; a STOP ends the line on this corpus)",
+  "question": "On LCB v6, with regions = cells of an anchor-free, label-free tree built on TRAIN problem texts only (coarsened to >= 130 TRAIN problems per region), do the (model, problem) pass rates carry a model x region interaction that (G1) survives a family-block permutation null after absorbing each problem's difficulty and each model's difficulty slope, within input-format x difficulty strata, and (G2) produces order reversals of practical size (>= 10pp DiD) beyond the null?",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "the commit that writes this record (parent cc7a6d7); before any code; THE BUILDER'S PARENT [RESOLVED 2026-09-25 by the registrar at the READY record: a62c7e0 (git log; the build chain a62c7e0 -> 6af3a85 -> ed948d6)]",
+    "program_lines": "docs/judge_v2_program.md L17702-L17982",
+    "program_lines_as_of": "the commit that writes them, parent cc7a6d7, re-grepped",
+    "date": "2026-09-25",
+    "heading": "## Registered 2026-09-25 (before any code; zero judge calls) — LCB-STAGE0-INTERACTION: on LiveCodeBench v6, is there a model x region interaction ...",
+    "provenance": "the research lead's draft lcb_stage0_registration_draft.md (scratchpad, not committed), recorded VERBATIM between markers (L17707-L17941); sha256 9203c76eb958ccaa84c0e77a679260ae8805a9de3e3f539b3b4464a56d01d231 (UTF-8, LF, 235 lines, 39,408 bytes; typographic apostrophes kept), verified before recording and re-hashed after insertion",
+    "authority": "the author 2026-09-25: \"yes register stage 0 on LiveCodeBench\"; the night authorisation quoted at docs/judge_v2_program.md L17333"
+  },
+  "registered_seeds": {
+    "split": "LCB-STAGE0-SPLIT:cc7a6d7f31345d571253c67ca9799d2e8a3d95c4 (HEAD asserted by the registrar immediately before insertion; code path --seed \"LCB-STAGE0-SPLIT:cc7a6d7f31345d571253c67ca9799d2e8a3d95c4\" --registration LCB-STAGE0-INTERACTION)",
+    "permutation": "LCB-STAGE0-PERM:cc7a6d7f31345d571253c67ca9799d2e8a3d95c4 (the text: the same HEAD sha as H2)",
+    "disclosure": "the orchestrator's brief expected HEAD = the registrar's v262 commit c09440eaa78cfe1cf1db72c91d0a8881d024c045; a peer commit cc7a6d7 landed on top before insertion; the registered method (HEAD asserted at insertion) governs"
+  },
+  "script": {
+    "path": "tools/analysis/lcb_stage0/ (download, ingest, draw, stats, analysis, selftest, fixture, common, embed_context_check, __init__) + DatasetType.LIVECODEBENCH (src/main/kotlin/taxonomy/{config/TaxonomyConfig.kt, dataset/CorpusRegistry.kt, dataset/CorpusSource.kt, dataset/MMLUDatasetFetcher.kt}) + experiment_configs/lcb_stage0/lcb_af_bareq512_s42.toml.template",
+    "sha16": "draw.py blob:ed5801a8e37132cdc4fa4e742d5ed1854d708a16 / sha256-lf16:23618585ef34e575; ingest.py blob:4a43de637f32ca15b86b5cd50cdba13bd52ba934 / sha256-lf16:61cd03e7f42169df; analysis.py blob:5553e76a27a0169897f2c3ebe633c9774d1a6985 / sha256-lf16:e2a955a3a47a3b8e; stats.py blob:314905532f09087cec2b80e716af91400570d7e2 / sha256-lf16:7dd2f4e5303066e4 (every pin: ready.pins) [2026-09-25 delta READY 1ceafae, at 4497373: analysis.py blob:e3144692 / sha256-lf16:404d6a957771b30c; stats.py blob:813d2d6d / sha256-lf16:59914c65e5d1c352; selftest.py blob:0f4ba49b / sha256-lf16:2f9e78e442e454a5; fixture.py blob:10437edb / sha256-lf16:a27f797caad7caf4; MMLUDatasetFetcher.kt blob:70eedfdf / sha256-lf16:14cfc139d63030d9 / sha256-crlf16:3e511013801eba99]",
+    "commit": "ed948d6d25e541bf083d1d8f17dc14ca27b53509 on branch worktree-agent-adb18465164aaf122 (parent 6af3a85), worktree Z:\\FAC\\TUBerlin\\THESIS\\TaxoArena\\.claude\\worktrees\\agent-adb18465164aaf122; NOT MERGED (git merge-base --is-ancestor ed948d6 main rc 1)",
+    "planned": "tools/analysis/lcb_stage0/{download,ingest,draw,analysis}.py; DatasetType.LIVECODEBENCH (no remote fallback, inertness proof with an execution discriminator); experiment_configs/lcb_stage0/lcb_af_bareq512_s42.toml; unit tests (drawer golden, roster rule, statistic size); built in a worktree, parent = the registration commit"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_lcb_stage0.md",
+    "commit": "dae836c9e68a42f209ae4115b094bc028bc40e78",
+    "at": "ed948d6d25e541bf083d1d8f17dc14ca27b53509",
+    "section": "# READY review: LCB-STAGE0-INTERACTION, build ed948d6 (parent 6af3a85) / ## VERDICT",
+    "review_blob": "blob:4a516d04a90dc9b3270b5d9ee02563918fe89fd6 / sha256-lf 0f1f15f0f93bdc37b0e53a6bbe02638e0f25334cd570036f02a881bb870c6c0a (working tree LF, equal)",
+    "scope": "PARTIAL [2026-09-25 delta 1ceafae: every run step DONE or READY (draw DONE, L2 MET, ingest DONE, window READY, analysis READY); only the merge NOT READY (D9 pending)]",
+    "stages": {
+      "draw": "READY (the one-shot record draw: draw.py --seed \"LCB-STAGE0-SPLIT:cc7a6d7f31345d571253c67ca9799d2e8a3d95c4\" --registration LCB-STAGE0-INTERACTION), under L1, then L2 [DONE 2026-09-25: drawn once at 3c70660 (NOT MERGED); L1 met as far as the record shows]",
+      "ingest": "READY (ingest.py --outcomes and ingest.py --construction), under L1-L3 [2026-09-25: still READY; ingest files blob-identical at 3c70660; L3 (E: backup of TAXOARENA_LCB_ROOT with SHA256SUMS) OWED before --outcomes, none observed on E: at the draw record] [DONE 2026-09-25 at f646b478 (NOT MERGED): both rc 0 (run-operator's statement), zero calls; L3 MET (backup verified by the registrar)]",
+      "build_window": "READY (embed check, build, site null, from the build worktree), under L4-L9; WAITS for the ARCH-V2-PILOT-K46 run of record to finish posting (L4) [2026-09-25: PENDING the delta review of 4497373's Kotlin (MMLUDatasetFetcher.kt blob:3ca53697 -> blob:70eedfdf, D7 lcbWorkDirGuard), per the READY's identity line; then L4-L9] [READY 2026-09-25 by the delta READY 1ceafae: L5 UNCHANGED (the guard runs after EmbeddingCache opens ./embeddings_cache.db and not in the site null), L8 + the guard-passed line; after the ARCH-V2-PILOT-K46 posting ends (L4)] [2026-09-25 registrar: L4 REPLACED by L4.1-L4.7 (ruling ab90e24, SAFE; the author's \"do both\"): the window is READY NOW, beside the ARCH-V2-PILOT-K46 posting, under L4.1-L4.7 and L5-L10; it no longer waits for the posting to end]",
+      "analysis": "NOT READY until D1 (HIGH) and D2-D5 (MEDIUM) are fixed and a delta review passes (L10) [2026-09-25: NOT READY until the delta review of 4497373 (the builder's D1-D8 fixes, unreviewed) passes] [READY 2026-09-25 by the delta READY 1ceafae: after the window; L10 SUPERSEDED by --pins <json>, --site-null, B = 2000; the D4 deviation ACCEPTED with its condition]",
+      "merge_to_main": "NOT READY: D7 (engine-side refusal) and D9 (inertness proof, OPEN) before the Kotlin merges [2026-09-25: the split artefacts of 3c70660 are on the branch only] [NOT READY 2026-09-25: D7 CONFIRMED (1ceafae); D9 PENDING the byte run LCB-D9-BYTE-INERTNESS (registered, merge gate only); then behind the F5 freeze once the K46 outcome is written]",
+      "l2": "MET 2026-09-25 (docs/reviews/POSTDRAW_lcb_stage0.md, dfeb9b3: 0 of 1,055 differ)",
+      "d9": "RULED 2026-09-25 by the tree-construction-specialist: form (a), the byte run; registered as LCB-D9-BYTE-INERTNESS (docs/judge_v2_program.md L18662-L18872 (section \"## Registered 2026-09-25 (before any code or call) — LCB-D9-BYTE-INERTNESS: ...\"; the ruling VERBATIM between the marker lines L18666 and L18815, i.e. L18667-L18814; _as_of the commit that writes it, parent 1ceafae, re-grepped)); a MERGE GATE for the Kotlin, NOT a gate of the analysis",
+      "summary_2026-09-25_delta": "draw DONE; L2 MET; ingest DONE; window READY; analysis READY; merge NOT READY (D9 pending)"
+    },
+    "verdict": "READY for the one-shot record draw; READY for the outcome and construction ingest under L1-L3; READY for the rule-7 build window under L4-L9; NOT READY for the analysis of record until D1 (HIGH) and D2-D5 (MEDIUM) and a delta review. Review-internal discrepancy: verdict row 4 says D2-D4, L10 and the commit message say D1-D5 / D2-D5; the reading of record is D1-D5.",
+    "identity_line": "READY AT ed948d6 BY BLOB (the registrar's reading of the review's premise): if the branch moves, a step runs only while its files equal their ed948d6 blobs: draw {draw.py, common.py, __init__.py}; ingests {ingest.py, common.py, download.py, __init__.py}; window {the template, the four src/main Kotlin files, embed_context_check.py, ingest.py, common.py}; closure modules at their main blobs; otherwise a delta review first",
+    "pins": {
+      "tools/analysis/lcb_stage0/analysis.py": "blob:5553e76a27a0169897f2c3ebe633c9774d1a6985 / sha256-lf16:e2a955a3a47a3b8e",
+      "tools/analysis/lcb_stage0/stats.py": "blob:314905532f09087cec2b80e716af91400570d7e2 / sha256-lf16:7dd2f4e5303066e4",
+      "tools/analysis/lcb_stage0/selftest.py": "blob:2fb5095a0e0f97a257306057c103a7a12ac5de44 / sha256-lf16:78544af355bdb527",
+      "tools/analysis/lcb_stage0/fixture.py": "blob:3369c11ef225a92201a3ab37d187e88be3743cff / sha256-lf16:64735d943b082741",
+      "tools/analysis/lcb_stage0/ingest.py": "blob:4a43de637f32ca15b86b5cd50cdba13bd52ba934 / sha256-lf16:61cd03e7f42169df",
+      "tools/analysis/lcb_stage0/draw.py": "blob:ed5801a8e37132cdc4fa4e742d5ed1854d708a16 / sha256-lf16:23618585ef34e575",
+      "tools/analysis/lcb_stage0/common.py": "blob:022f11bfcca6666aa96ec0c9fe46e4568209e757 / sha256-lf16:a890323a74b2bd9b",
+      "tools/analysis/lcb_stage0/download.py": "blob:d72b5d00e1d724814f0b4d339de2b13b2ff7474f / sha256-lf16:226beb86ea23515f",
+      "tools/analysis/lcb_stage0/embed_context_check.py": "blob:a3e41e1682f98e2abee6e8462767300bf46b610e / sha256-lf16:b7547057b0d6a20f",
+      "tools/analysis/lcb_stage0/__init__.py": "blob:a861097a56475bfcadfb884dd5536fe7e6466877 / sha256-lf16:758ab9c9ca3225fb",
+      "experiment_configs/lcb_stage0/lcb_af_bareq512_s42.toml.template": "blob:af49d40a1e6bde3c4152379e2a251d3f8d73ca7f / sha256-lf16:e362ac6f8a95a3cd",
+      "src/main/kotlin/taxonomy/config/TaxonomyConfig.kt": "blob:2825b12d9640f1643e465479d20f07f1ad7aedac / sha256-lf16:61f67a71d6ca9cd3 / sha256-crlf16:1860445fcb273875 (worktree CRLF)",
+      "src/main/kotlin/taxonomy/dataset/CorpusRegistry.kt": "blob:5b1bbb3a6804ff754bc167a2263c9355b4aa1907 / sha256-lf16:f8f39d7aca0b4666 / sha256-crlf16:6f71693dda26d859 (worktree CRLF)",
+      "src/main/kotlin/taxonomy/dataset/CorpusSource.kt": "blob:817b1417d8b2961b1c84fb43ba7d9aa8279db12a / sha256-lf16:00af04220803814c / sha256-crlf16:af3dde076e7df6bf (worktree CRLF)",
+      "src/main/kotlin/taxonomy/dataset/MMLUDatasetFetcher.kt": "blob:3ca53697e5d52824e3cf200413562856bfe37564 / sha256-lf16:85f89ad295a19b2f / sha256-crlf16:32972bc7236ea0e0 (worktree CRLF)",
+      "src/test/kotlin/taxonomy/dataset/LiveCodeBenchDatasetTypeTest.kt": "blob:45aa0c80e68bb80f440042b986c0d1e66de86f1f / sha256-lf16:22d8037a4a38c8b6",
+      "src/test/kotlin/taxonomy/runner/LcbStage0ConfigTest.kt": "blob:9cb34d125afc24033707b64fb9a6e15903b2cee5 / sha256-lf16:d7a5eb0fa461ee39",
+      "src/test/kotlin/taxonomy/dataset/PinnedPoolsReproduceTest.kt": "blob:9cfcd2fcd41c97df81c201e6ec3275a2aa8a66c8 / sha256-lf16:a68d9acb4cd585ec / sha256-crlf16:28ef77e617995245 (worktree CRLF)",
+      "tools/analysis/split_side.py (main = ed948d6)": "blob:05224b5a4b76e74353bc3931ec69f0b14f0e340b / sha256-lf16:19501df01e3d6285 / sha256-crlf16:0cc90adcd2122d5e",
+      "tools/analysis/passage_closure.py (main = ed948d6)": "blob:003d5d4ef28bd6f5ed9b5020b669e206d995d92e / sha256-lf16:2d36985c91133d30 / sha256-crlf16:83621329b4fce8d2",
+      "tools/analysis/content_closure.py (main = ed948d6)": "blob:1533cb5a56c8e001ddc65d3e2ec0cc4b56aa87e3 / sha256-lf16:d362aad31f650cc0 / sha256-crlf16:351f89732f9f8b22",
+      "tools/analysis/pool_guard.py (main = ed948d6)": "blob:6521b51ac0fce04063563f9e6dcf42554ad86591 / sha256-lf16:8ca50c0fba9b8ce3 / sha256-crlf16:5c528e083c4120d2",
+      "experiment_results/lcb_stage0/manifests/ingest_texts_manifest.json": "sha256 7ec76d95d8d8856782848c519d8691f20bad138f148a2085142e8e0637701182 (file, LF; blob:3410f7f4)",
+      "experiment_results/lcb_stage0/manifests/roster.tsv": "sha256 c332b558a5faced19041dc1f30b9c1c1130020644059fbf7a6706135c8133610 (file, LF; blob:f33cf4d4)",
+      "experiment_results/lcb_stage0/manifests/download_manifest.json": "sha256 0de7b77d1b21cd6fa9b2d0e4108f0f52d589fd1f56dde30cde3ececa0e4c3e0a (file, LF; blob:23d4bbcc; equals the texts manifest download_manifest_sha256)",
+      "TAXOARENA_LCB_ROOT/lcb_v6_texts_7d2f4cad635b254d.db": "file sha256 5f8ae5d8acbfa4dcf97cf6fb329cc51af4cb7c108be4299b52fc01838cf689be (2,400,256 bytes; root Z:\\FAC\\TUBerlin\\THESIS\\TaxoArena_data\\lcb)",
+      "TAXOARENA_LCB_ROOT/lcb_v6_texts_7d2f4cad635b254d.superseded_6af3a85.db": "file sha256 f0f56aec7ebb72a01d0cc3b0fa391aef9df3c19e9a02f2e26f489794e2df077e (2,400,256 bytes; KEEP, back up under L3)",
+      "table-shas (the REVIEWER's recomputation, not re-derived by the registrar)": "problem 1,055 rows 7d2f4cad635b254d (both DBs); roster 74 rows 1e92d878ec12d13b (superseded c88a229f); meta 15 rows e66f5ced18f3540c (superseded 14); M_texts 26 (superseded 25)",
+      "main-checkout baseline for L6 (registrar, 2026-09-25 ~07:05, immutable view only)": "embeddings_cache.db 804,462,592 bytes, mtime 2026-09-23 14:33:13, -wal 0; embeddings 39,631 / queries 31,986 / gmm_vectors 0; snapshots.db 1,065,541,632 bytes, mtime 2026-09-23 04:34:26, -wal 0"
+    },
+    "confirmed_by_the_review": "B1 marginal fit (code + execution; cross-check 200/200 worlds on every field); B2 M = 26 (16 / 9 / 1); B3 precedence; B4 family-majority T (X2 / R-REP halves untested: D5); B5 analysis.py readers PARTLY verified (D2); selftest 277 checks / 38 refusals under python and -O; Gradle 41/41 (9 classes); independent draw re-derivation on 3 DEV seeds 1,055/1,055 (P 91, D 0, band 134, 986 components / 49 multi / largest 8, Kish 1.2142; EVAL 309/318/310, GATE 106/104/103); support arithmetic equal to the digit; mutants 19: 14 killed by named checks, 5 survived (D5, D6, D7)",
+    "rulings": [
+      {
+        "id": "DEV-1 SAFE_AFTER",
+        "ruling": "ACCEPTED",
+        "text": "the exact-curvature M-step fallback after 1,000 EM iterations does not change the ruled estimator (objective, exact gradient and convergence rule unchanged). THE BUILDER'S CLAIM ('one planted fixture fit, never in the ruling's worlds') IS REFUTED: engaged in 1 of the ruling's 3,850 worlds (null_slope_2 world 133, 2,294 iterations; identical outcome: max s 5.32336, max |pihat diff| 1.4e-13, p_T 0.7061469) and in 3 of 6 fixture fits (Delta-D K = 4 at 1,022, S1 at 1,030, GATE at 1,036), where it is load-bearing (reference path non-convergent at 5,000 iterations; SAFE converges at a higher penalised log-likelihood; 4 rendered lines change; primary fit and verdict GO unchanged); 0/6 all-binary and 0/12 near-zero-slope null worlds engage it. Conditions: D3"
+      },
+      {
+        "id": "DEV-2 replaced artefacts",
+        "ruling": "ACCEPTED",
+        "text": "the 6af3a85 ingest artefacts replaced, not bracketed (machine manifests on an unmerged branch; supersedes names b51a3d48, a5d64a3d, f0f56aec; nothing consumed them; the problem table byte-identical). Conditions: keep the superseded DB and back it up (L3); a 6af3a85 checkout fails closed on the texts-DB sha"
+      },
+      {
+        "id": "DEV-3 DEFF recomputation",
+        "ruling": "PARTLY ACCEPTED",
+        "text": "G1 valid at any family DEFF; G2 SE_k family-clustered; SUPPORT prints measured DEFF, n_eff and MDE80. NOT met: the single-contrast SCOREABLE class MDE (under 10pp only while DEFF <= 1.49 at K = 4, <= 1.98 at K = 3, n 630, v 0.0675) is not recomputed; the support condition is a literal True (analysis.py L375 at ed948d6). Owed: D4"
+      },
+      {
+        "id": "DEV-4 points left to the build",
+        "ruling": "ACCEPTED",
+        "text": "EVAL not routed in stage 0 (condition: the tree pinned, D2); boards on informative TRAIN at own regions; Q1 purity over all TRAIN at the routed depth-1 ancestor (state \"routed\"); Z1 median-date split over informative TRAIN contest dates, fixed before the data"
+      },
+      {
+        "id": "DEV-5 inertness proof form",
+        "ruling": "SUBSTITUTED; NOT RULED (D9 OPEN)",
+        "text": "a structural proof (ordinals and offsets unchanged + the new branch executed on a temp Design N DB) replaced the registered byte-inertness run with an execution discriminator (P1 L17737 / A5 L17954)"
+      }
+    ],
+    "defects": [
+      {
+        "id": "D1",
+        "severity": "HIGH",
+        "gates": "analysis",
+        "state": "OPEN",
+        "text": "TRAIN-ONLY / held-out membership check (analysis.py L292-L304 at ed948d6) vacuous under an id mismatch (executed: heldout_members 0, routing 0 / 0 = nan, verdict GO, no refusal); fix: refuse unless every distinct leaf queryId maps to a TRAIN text and train_members = distinct leaf queryIds > 0; print both; a mismatched-id selftest mutant"
+      },
+      {
+        "id": "D2",
+        "severity": "MEDIUM",
+        "gates": "analysis",
+        "state": "OPEN",
+        "text": "the outcome names / pins no tree or build input (snapshot id, dag_snapshots.jsonl, the build-worktree embeddings_cache.db after checkpoint, the site-null CSV sha + snapshot_id check, texts / TRAIN+GATE / split_side shas); fix: print all; refuse on a site-null snapshot_id mismatch"
+      },
+      {
+        "id": "D3",
+        "severity": "MEDIUM",
+        "gates": "analysis",
+        "state": "OPEN",
+        "text": "SAFE_AFTER engagement printed for the primary fit only; fix: engaged yes/no for every fit object, the reference path's convergence and p_T / statistic beside where engaged; correct the builder's statement"
+      },
+      {
+        "id": "D4",
+        "severity": "MEDIUM",
+        "gates": "analysis",
+        "state": "OPEN",
+        "text": "DEFF > 1.3 recomputation incomplete; fix: MDE80 at the measured DEFF and informative n for the single-contrast SCOREABLE class and the median pair, with the SCOREABLE / DESCRIPTIVE-ONLY status; replace the literal True at analysis.py L375"
+      },
+      {
+        "id": "D5",
+        "severity": "MEDIUM",
+        "gates": "analysis",
+        "state": "OPEN",
+        "text": "B4 X2 half and R-REP half untested (2 mutants survived); fix: a split-family world asserting X2 == g2_all at the family-majority labelling and != own-region; the same for r_rep"
+      },
+      {
+        "id": "D6",
+        "severity": "LOW",
+        "gates": "analysis (with the delta review)",
+        "state": "OPEN",
+        "text": "the analyse()-level non-convergence -> UNDETERMINED path and the S2 roster count never executed (2 mutants survived); fix: a forced non-converged analyse() asserting UNDETERMINED; S2 M = 6 at the real roster"
+      },
+      {
+        "id": "D7",
+        "severity": "LOW",
+        "gates": "merge of the Kotlin",
+        "state": "OPEN",
+        "text": "the |a| > 50 bound passes by NaN, not a finite crossing (mutant survived); no engine-side refusal to build from the main checkout; fix: a finite-crossing test; fetchLiveCodeBench refuses when user.dir is the main checkout or ./embeddings_cache.db holds rows at start; REQUIRED BEFORE THE KOTLIN MERGES (a Kotlin change before the window needs a delta review)"
+      },
+      {
+        "id": "D8",
+        "severity": "LOW",
+        "gates": "the outcome (disclosure)",
+        "state": "OPEN",
+        "text": "disclose the (vii) matrix-leg EVAL read in ingest --outcomes (exact identity only) and the R1 file-presence limit"
+      },
+      {
+        "id": "D9",
+        "severity": "MEDIUM",
+        "gates": "MERGE of the Kotlin to main (NOT the window)",
+        "state": "OPEN",
+        "owner": "put to the tree-construction-specialist; the registrar rules on its advice",
+        "text": "the registered byte-inertness run for DatasetType.LIVECODEBENCH (with an execution discriminator, rule 11) replaced by a structural proof; discharged only by (a) one registered existing arm before and after, byte-identical, with a discriminator proving the changed code ran, or (b) a registrar ruling accepting the structural proof; BEFORE the Kotlin of ed948d6 merges to main"
+      }
+    ],
+    "launch_conditions": [
+      "L1 draw from the build worktree only, at a clean tree (R1 dirty-paths check); commit the four manifest outputs by path before --outcomes (which refuses otherwise)",
+      "L2 record-seed R4 after the draw, before any \"content-closed\" wording: an independent re-derivation (e.g. rv_lcb/indep_draw.py with the record seed) reproduces the committed split_side.tsv on 1,055/1,055 rows",
+      "L3 back up TAXOARENA_LCB_ROOT (both texts DBs) to E: with SHA256SUMS before --outcomes; record the sha of lcb_v6_eval_sealed_*.db in the manifest; re-check it at the post-run review",
+      "L4 the window only after the PILOT-K46 run and every SPLIT-2 view reader, PID 53020 resolved, W1-W5 met [SUPERSEDED 2026-09-25: see the next entry]",
+      "L4 REPLACED 2026-09-25 by L4.1-L4.7 (the adversarial-reviewer's ruling ab90e24, SAFE; the author's \"do both, start the LCB build now and register parallel posting\"): the window MAY run CONCURRENTLY with the ARCH-V2-PILOT-K46 run of record: (L4.1) the poster the only admitted foreign process, its PID and command line printed beside every leg; (L4.2) the W1 probe over the window's own objects (LCB construction DB, the build worktree's embeddings_cache.db and snapshots.db) and main's embeddings_cache.db and snapshots.db, all FREE; the pilot's eval_view, pool DB, run2 store and day ledger EXCLUDED and never opened; (L4.3) >= 12 GB free RAM before each leg, printed with [SITENULL-HEAP]; (L4.4) opens only during steady posting (store mtime advanced within 60 s), never during pilot-guard / --analyze / outcome; (L4.5) poster verdict count printed at open and after each leg; poster exit or store stall > 10 min -> stop at the next leg boundary (never kill a site null mid-write), report; neither event an outcome of either test; (L4.6) the E: backup before the build leg, never overlapping the site null; (L4.7) L5-L10 unchanged. No latency trigger. Verbatim at docs/judge_v2_program.md L18874-L18906 (section \"## Author's decision and registrar's record 2026-09-25 (insertion only; zero calls; no LCB outcome value read) — \"do both\": the LCB-STAGE0-INTERACTION rule-7 build window MAY run beside the ARCH-V2-PILOT-K46 posting ...\"; the ruling's L4 VERBATIM between the marker lines L18880 and L18894; lines _as_of the commit that writes them, parent ab90e24, re-grepped)",
+      "L5 shell pre-flight from the build worktree, fail-closed: test -f .git; pwd -W differs from Z:/FAC/TUBerlin/THESIS/TaxoArena; ./embeddings_cache.db holds 0 rows in embeddings and queries (registrar note: read the mode=ro view; the schema sits in the -wal, so the immutable view has no tables)",
+      "L6 before and after the window, the main embeddings_cache.db per-table pins in both views (mode=ro&immutable=1 and mode=ro) and the snapshots.db mtime / size identical to the baseline (39,631 / 31,986 rows, mtime 2026-09-23 14:33:13, -wal 0)",
+      "L7 embed_context_check.py first; no truncation printed",
+      "L8 the build log shows \"[LCB] fetched N\" with N = n_TRAIN + n_GATE from construction_manifest.json, the TRAIN-ONLY guard at 0 held-out members, its own -Dranking.db.path; afterwards checkpoint the build worktree embeddings_cache.db and snapshots.db (read-write open and close) before any analysis read",
+      "L9 never re-run a failed build: the failure is the arm's result",
+      "L10 the analysis waits for D1-D5 and a delta review"
+    ],
+    "sequencing": "the orchestrator: the K46 pilot posts now and reads the SPLIT-2 views and pools; the LCB draw and ingests read only the LCB texts under TAXOARENA_LCB_ROOT and may run now; the build window is CPU-heavy and waits until the pilot's posting ends. The registrar's reading: L4 as written governs (after the K46 run of record, not the pilot 12 alone) [SUPERSEDED FOR THE WINDOW 2026-09-25 (the author's \"do both\"; L4.1-L4.7, ruling ab90e24): the window may open during steady posting; ordering (1') the LCB window beside the K46 posting, (2') the K46 posting ends, (3') the D9 byte run, (4') the LCB analysis, (5') the post-run reviews, (6') the merges behind F5; docs/judge_v2_program.md L18874-L18906 (section \"## Author's decision and registrar's record 2026-09-25 (insertion only; zero calls; no LCB outcome value read) — \"do both\": the LCB-STAGE0-INTERACTION rule-7 build window MAY run beside the ARCH-V2-PILOT-K46 posting ...\"; the ruling's L4 VERBATIM between the marker lines L18880 and L18894; lines _as_of the commit that writes them, parent ab90e24, re-grepped)]",
+    "observations_at_record": [
+      "the K46 pilot 12 on run2 live: python.exe PID 36748, created 2026-09-25 07:04:09 (archv2_pilot_k46.py --pilot 12 --go --store ...pilot_k46_verdicts_run2.db)",
+      "PID 53020 NOT PRESENT at 07:06:49 (tasklist): exited; L4 re-checks",
+      "the build worktree dirty at 07:05-07:06 (HEAD ed948d6): M tools/analysis/lcb_stage0/stats.py, M tools/analysis/lcb_stage0/analysis.py: the builder's D-fixes in progress; the draw waits for a clean tree (L1); neither file is a draw / ingest / window file",
+      "the build worktree embeddings_cache.db 4,096 bytes, -wal 37,112 bytes (mtime 05:24:00): immutable view no tables; mode=ro view embeddings 0 / gmm_vectors 0 / queries 0; the registrar's mode=ro read changed only the -shm mtime"
+    ],
+    "delta": {
+      "file": "docs/reviews/READY_lcb_stage0.md (new top section)",
+      "commit": "1ceafae2f1e2b5fc737c68bf5679143ca8114d3b",
+      "at": "449737330bc4880566719f05377eec09beaef937 (parent ed948d6; branch worktree-agent-adb18465164aaf122; NOT MERGED)",
+      "section": "# DELTA READY: LCB-STAGE0-INTERACTION fixes at 4497373 (parent ed948d6), 2026-09-25 / ## VERDICT",
+      "review_blob": "blob:8c5aac17485fe18677a609b3cb6156e236c1e3da / sha256-lf 59a447ad53581bf5dc8636d3ffe95b108794b1d3f94105414f39ab8d8f03d6b3 (0 CR; working tree equal)",
+      "verdict": {
+        "(1) analysis of record": "READY (no BLOCKER / HIGH; E1-E3 LOW test gaps, none changes a number or a verdict)",
+        "(2) rule-7 build window on MMLUDatasetFetcher.kt blob:70eedfdf": "READY, L5 UNCHANGED, L8 + one line. The guard does NOT replace L5: it runs inside fetchLiveCodeBench AFTER Spring start-up, when EmbeddingCache has already opened ./embeddings_cache.db read-write, and it does not cover the site-null task (which never calls the fetcher). L8 + line: the log must show `[LCB] working-dir guard passed: '<the build worktree>' ...` before `[LCB] fetched N`; a guard refusal is a failed precondition, never the arm's result (L9 does not apply)",
+        "(3) D9 pins": "CONFIRMED: TaxonomyConfig.kt 2825b12d, CorpusRegistry.kt 5b1bbb3a, CorpusSource.kt 817b1417, MMLUDatasetFetcher.kt 70eedfdf (A = a62c7e0, B = 4497373)"
+      },
+      "pins": {
+        "src/main/kotlin/taxonomy/config/TaxonomyConfig.kt": "blob:2825b12d9640f1643e465479d20f07f1ad7aedac / sha256-lf16:61f67a71d6ca9cd3 / sha256-crlf16:1860445fcb273875",
+        "src/main/kotlin/taxonomy/dataset/CorpusRegistry.kt": "blob:5b1bbb3a6804ff754bc167a2263c9355b4aa1907 / sha256-lf16:f8f39d7aca0b4666 / sha256-crlf16:6f71693dda26d859",
+        "src/main/kotlin/taxonomy/dataset/CorpusSource.kt": "blob:817b1417d8b2961b1c84fb43ba7d9aa8279db12a / sha256-lf16:00af04220803814c / sha256-crlf16:af3dde076e7df6bf",
+        "src/main/kotlin/taxonomy/dataset/MMLUDatasetFetcher.kt": "blob:70eedfdf1c8745d9f3a42913ea033681f9f4527f / sha256-lf16:14cfc139d63030d9 / sha256-crlf16:3e511013801eba99",
+        "tools/analysis/lcb_stage0/analysis.py": "blob:e3144692 / sha256-lf16:404d6a957771b30c",
+        "tools/analysis/lcb_stage0/stats.py": "blob:813d2d6d / sha256-lf16:59914c65e5d1c352",
+        "tools/analysis/lcb_stage0/selftest.py": "blob:0f4ba49b / sha256-lf16:2f9e78e442e454a5",
+        "tools/analysis/lcb_stage0/fixture.py": "blob:10437edb / sha256-lf16:a27f797caad7caf4",
+        "src/test/kotlin/taxonomy/dataset/LiveCodeBenchDatasetTypeTest.kt": "blob:e72de809 / sha256-lf16:e95d8a7d5e5c4d05"
+      },
+      "pins_verified_by": "registrar: git rev-parse 4497373:<path>; sha256 of git cat-file -p <blob> (LF) and of the same bytes with CRLF line ends; all EQUAL to the review's table. Four-file precondition re-derived (git diff --name-only a62c7e0 4497373 -- src/main build.gradle.kts settings.gradle.kts gradle.properties gradle/ config/ = the four files; a62c7e0..main -- src/main = 0); arm TOML blob:efd82bda at a62c7e0, 4497373 and main; branch tip f646b478 differs from 4497373 in 0 of those paths (nor experiment_configs/topic_partition/)",
+      "discriminator_counts_build_worktree": "LIVECODEBENCH 4 / fetchLiveCodeBench 2 / lcbWorkDirGuard 1 (the review's grep of the build worktree's classes; ruling minimum >= 3 / >= 1 / >= 1; not re-derived by the registrar)",
+      "per_claim": "T1 selftest 321 / 43 under python and -O CONFIRMED; T2 cross-check 10/10 x 4 families CONFIRMED; T3 Gradle 42/42 re-executed (--rerun) CONFIRMED; T4 PARTLY: first-review mutants 19/19 KILLED, 15 new: 12 KILLED, 3 SURVIVED (E1-E3), the builder's 13 not re-run; D1 D2 D3 D5 D7 D8 CONFIRMED; D4 CONFIRMED (E2); D6 PARTLY (E3); javap: constructors reference lcbWorkDir 0 times and user.dir 0 times",
+      "d4_deviation_ruling": "ACCEPTED as the registered letter (L17816: 'measured family DEFF <= 1.3, or the recomputation done'): the support item reads the recomputation-DONE status, not the single-contrast class status; acceptable only because the certified numbers are printed beside it. CONDITION: when the status reads DESCRIPTIVE-ONLY the outcome text makes NO single-contrast claim; the post-run review checks it. Closes the READY dae836c's Deviation (3) 'PARTLY ... Owed: D4'",
+      "findings": [
+        "E1 LOW: a GATE text among leaf members never exercised by the selftest (mutant D1-held-ignored SURVIVED; still refused by the count check 'TRAIN members 632 vs distinct leaf queryIds 633'); fix: a GATE-member fixture asserting the TRAIN-ONLY refusal",
+        "E2 LOW: the 'K <= 4' leg of the SCOREABLE rule untested (fixture K = 4; mutant D4-status-K-ignored SURVIVED); structurally K <= 4 at TRAIN 633-642; fix: a crafted K = 5 case",
+        "E3 LOW: the S2 test cannot tell 'n = 10' from 'n = 10 and temp 0.2' (mutant D6-S2-temp-ignored SURVIVED; code correct; the real roster has 3 n = 10 files at temp 0.6, the mutant would give S2 9 models instead of 6); fix: an n = 10, temp 0.6 fixture model",
+        "E4 LOW (note): stats.SAFE_AFTER bound as a default argument; callers pass safe_after=; the first review's reassigning scripts apply to ed948d6 only"
+      ],
+      "launch_amendments": {
+        "L5": "UNCHANGED (shell pre-flight before the JVM)",
+        "L6": "UNCHANGED",
+        "L8": "+ `[LCB] working-dir guard passed: '<the build worktree>' ...` before `[LCB] fetched N` (N = 741); a guard refusal is a failed precondition, L9 does not apply",
+        "L10": "SUPERSEDED: the analysis of record runs after the window with --pins <json> (the run-operator's post-window record of dag_snapshots.jsonl, snapshots.db, the checkpointed build embeddings_cache.db and the site-null CSV), --site-null, B = 2000",
+        "post_run_review_rechecks": "the sealed EVAL DB sha (74ea30e5898384bdedc9b1b2860f46e4037095bef712122083a6f5a02520a0ec); the RECOMPUTATION line; no single-contrast claim under DESCRIPTIVE-ONLY"
+      },
+      "record": "docs/judge_v2_program.md L18593-L18660 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; no LCB outcome value read) — LCB-STAGE0-INTERACTION DELTA READY 1ceafae of 4497373 (NOT MERGED): ...\"; _as_of the commit that writes it, parent 1ceafae, re-grepped)"
+    }
+  },
+  "go": "n/a: zero judge calls, zero solves, local embeddings (0 cce); the 4,000-match rule does not apply",
+  "run": {
+    "outcome_file": "experiment_results/lcb_stage0/lcb_stage0_outcome.txt (blob:8fbdb07f7d6d6e62abfe60396ad66edff554fc1c; sha256 b18c6f8bb20d51781411828b601d1d67ff6f40baf7fa8f3b918251aec6e0b408, 0 CR = LF of record; written at 3bcc9ab on branch lcb-build-2, landed on main by path with this record; tag lcb-stage0-outcome-of-record -> 3bcc9ab); beside it analysis_run/pins.json (blob:dd330fc10356966927c35a2a13d2889f6ba81f21) and analysis_run/analysis_stdout.txt (blob:108a6bc2a149f9dac59dc2e3a80e30fae309b9b8), landed by path",
+    "outcome_commit": "3bcc9ab34937ea6ea4991d514b04b8c2870d91a2 (branch lcb-build-2, parent 087e43d; local tag lcb-stage0-outcome-of-record); recorded on main by the commit that writes docs/judge_v2_program.md L19732-L19800 (section \"## LCB-STAGE0-INTERACTION (2026-09-25, 0 calls; outcome 3bcc9ab on branch lcb-build-2, post-run review f222c28) — VALID; STOP AS REGISTERED ...\"; _as_of the commit that writes it, parent ab8aee9, re-grepped)",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p94b63cd78524813b (the GATE export; stage 0 has no pool of record); EVAL 314 sealed, never read",
+    "date": "2026-09-25 16:08:01-16:08:11, rc 0, from the worktree .claude/worktrees/lcb-build-2 (review Q5: forced, ACCEPTABLE)",
+    "command": "the R9 form of record (docs/judge_v2_program.md L19304): analysis.py --build-dir .claude/worktrees/lcb-build-2 --run-dir .claude/worktrees/lcb-build-2/experiment_results/lcb_stage0/lcb_af_bareq512_s42/seed_42 --snapshot-id 20260925_121944_Headless_Run_Auto_ge --site-null .claude/worktrees/lcb-build-2/experiment_results/lcb_stage0/site_null_lcb_af512.csv --pins <json>; the operator's literal invocation is not printed in the review or the committed files [ADDED 2026-09-25 (registrar): the operator's EXACT command, verbatim from the run-operator's hand-back (the operator's report, not a committed file): TAXOARENA_LCB_ROOT='Z:\\FAC\\TUBerlin\\THESIS\\TaxoArena_data\\lcb' python -B tools/analysis/lcb_stage0/analysis.py --build-dir . --run-dir experiment_results/lcb_stage0/lcb_af_bareq512_s42/seed_42 --snapshot-id 20260925_121944_Headless_Run_Auto_ge --site-null experiment_results/lcb_stage0/site_null_lcb_af512.csv --pins experiment_results/lcb_stage0/analysis_run/pins.json --B 2000 > experiment_results/lcb_stage0/analysis_run/analysis.log 2>&1 ; checked against experiment_results/lcb_stage0/analysis_run/analysis_stdout.txt (blob:108a6bc2): its [LCB-S0] pool line (L2, p94b63cd78524813b) and [OUTCOME] line (L25, 'experiment_results/lcb_stage0/lcb_stage0_outcome.txt written (OF RECORD), sha256 b18c6f8bb20d5178...', a path relative to --build-dir .) are present and consistent with it, as are B = 2000 and the --pins path (= the landed analysis_run/pins.json); analysis.log is byte-identical to the stdout per the review (not committed, .gitignore covers .claude/); docs/judge_v2_program.md L19739 line-end bracket]",
+    "code": "tools/analysis/lcb_stage0/*.py 10/10 blob-equal to 4497373 (review)"
+  },
+  "review": {
+    "file": "docs/reviews/POSTRUN_lcb_stage0.md",
+    "commit": "f222c28",
+    "blob": "blob:6cf6b01f8db8bd8ff5eeb375ee1bf2e82f4282a4 (file bytes LF, equal)",
+    "verdict": "VALID. The STOP stands as registered; recorded with 1 MEDIUM disclosure addendum (D1), 1 MEDIUM power/scope bracket (D2) and LOW items D3-D8; the outcome not re-run, not edited. Reproduced on own code: G1 T 96.689, p_T 0.0300 exact (independent seed B 20,000: 0.0308, MC SE 0.0012); G2 X2 1, p_X2 0.7101 (exact rational 0.7111; float loop 0.7031); DEFF 1.0108, n_eff 542.2, MDE80 12.62pp. Records mergeable by path; Kotlin, tests and toml NOT (D9 open; ConfigParsesTest)"
+  },
+  "criteria": [
+    {
+      "id": "SUPPORT",
+      "text": "support block (all must hold for GO or STOP to be read): M >= 20 and K >= 2; every region >= 130 TRAIN problems; informative TRAIN problems >= 400; measured family DEFF <= 1.3 or the recomputation done; every D6 ingest assertion passes; the rank-1 fit converged (max |gradient| printed); a failure -> UNDETERMINED [AMENDED 2026-09-25 pre-data by the build ruling (docs/judge_v2_program.md L18102-L18373 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; BEFORE ANY OUTCOME IS READ) — LCB-STAGE0-INTERACTION PRE-DATA AMENDMENT: the arena-specialist's build ruling on build 6af3a85 ...\"; verbatim L18106-L18345; _as_of the commit that writes them, parent 5345640, re-grepped)): 'the rank-1 fit' is the amended MARGINAL fit; converged = max |gradient| of its penalised marginal log-likelihood < 1e-6 and every |a_m|, s_m <= 50, printed with the iteration count; the joint fit's non-convergence is a printed diagnostic, never a support failure; M = 26 (floor 20 holds).]",
+      "result": "HELD",
+      "value": "HOLDS on every leg: M 26; K 3; TRAIN per region [264, 229, 137] >= 130; informative 548 >= 400 (of 630; all-pass 61, all-fail 21; cells 14,248); DEFF median 1.011 (q90 1.045, max 1.152, 325 pairs; Kish 1.241), recomputation done; D6 asserts pass; marginal rank-1 fit converged (max |grad| 9.49e-07, 198 EM iterations, max s 4.232); n_eff 542.2; MDE80 12.6pp (reviewer 12.62pp)",
+      "denominator": "the TRAIN side x eligible models"
+    },
+    {
+      "id": "G1",
+      "text": "Rao score statistic T of model x region residuals under the rank-1 difficulty-slope null (logit pi_mp = a_m + s_m delta_p, unit-weight fractional logit); family-block permutation within input format x quintile-within-format of the Rasch dhat_p; B = 2,000, seed LCB-STAGE0-PERM:cc7a6d7f31345d571253c67ca9799d2e8a3d95c4; G1 PASSES iff p_T <= 0.01 (one clause; no interval) [AMENDED 2026-09-25 pre-data by the build ruling (docs/judge_v2_program.md L18102-L18373 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; BEFORE ANY OUTCOME IS READ) — LCB-STAGE0-INTERACTION PRE-DATA AMENDMENT: the arena-specialist's build ruling on build 6af3a85 ...\"; verbatim L18106-L18345; _as_of the commit that writes them, parent 5345640, re-grepped)): T is computed under the MARGINAL rank-1 null (x_p ~ N(0,1) integrated out, 41-node Gauss-Hermite, EM, prior SD 1.0 on log s_m), not the joint fit (no finite optimum on this roster); observed T at the FAMILY-MAJORITY labelling (reading (a)); the bar p_T <= 0.01 is unchanged. Synthetic size at 0.01: 18/1500 = 0.012 (CP95 0.007-0.019), consistent with, not shown <= alpha.]",
+      "result": "FAILED",
+      "value": "FAILS: T = 96.689 (family-majority labelling; own-region 100.057; 3 split families of 510), p_T = 0.0300 over B = 2000 within 10 format x dhat-quintile strata > bar 0.01 (the point decides); reviewer: 0.0300 exact on the registered stream, independent seed B 20,000: 0.0308 ± 0.0012 (MC SE); Rasch T 108.862, p 0.0750; 20 dhat tie-breaks p_T 0.0265-0.0380, 0 at or below 0.01 (D7)",
+      "denominator": "informative TRAIN problems (0 < sum_m ybar_mp < M) x M eligible models; cluster = content family"
+    },
+    {
+      "id": "G2",
+      "text": "X2 = number of model pairs with a region gap g_k >= b_k and another g_l <= -b_l, b = max(0.05, 2 SE_k) (family-clustered), i.e. a >= 10pp DiD each; p_X2 from the same permutations; G2 PASSES iff p_X2 <= 0.05 (one clause) [AMENDED 2026-09-25 pre-data by the build ruling (docs/judge_v2_program.md L18102-L18373 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; BEFORE ANY OUTCOME IS READ) — LCB-STAGE0-INTERACTION PRE-DATA AMENDMENT: the arena-specialist's build ruling on build 6af3a85 ...\"; verbatim L18106-L18345; _as_of the commit that writes them, parent 5345640, re-grepped)): observed X2 at the FAMILY-MAJORITY labelling (reading (a)); bar unchanged; G2 is fit-free.]",
+      "result": "FAILED",
+      "value": "FAILS: X2 = 1 (O3-Mini-2025-01-31 (High) / XBai-o4-medium; null median 1.0), p_X2 = 0.7101 > bar 0.05; exact rational 0.7111, float loop 0.7031 (D3); X1 3 (p 0.3223); X2 over n = 10 pairs 0; without frontier-frontier pairs 0",
+      "denominator": "model pairs over the TRAIN regions"
+    },
+    {
+      "id": "DECISION",
+      "text": "GO iff G1 and G2 pass and the support block holds; STOP iff G1 fails with support held (clean negative at the stated power, ~0.2 logit SD; never 'no interaction'); STOP-SUB-PRACTICAL iff G1 passes and G2 fails; TREE=FORMAT iff every region nests in one input format with one region per format (governs over a G1 fail: not a clean negative); UNDETERMINED iff the support block fails (incl. K < 2) [AMENDED 2026-09-25 pre-data by the build ruling (docs/judge_v2_program.md L18102-L18373 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; BEFORE ANY OUTCOME IS READ) — LCB-STAGE0-INTERACTION PRE-DATA AMENDMENT: the arena-specialist's build ruling on build 6af3a85 ...\"; verbatim L18106-L18345; _as_of the commit that writes them, parent 5345640, re-grepped)): ORDER OF PRECEDENCE, first match wins: UNDETERMINED (support fails) > TREE=FORMAT > {GO, STOP-SUB-PRACTICAL, STOP}; 'tree = format: yes/no' printed in every outcome. STOP sentence: 'fewer than about 2-7 model pairs with a true 10pp reversal' (80% power of G1 at the real roster, K = 3-4); STOP-SUB-PRACTICAL carries G2's power (GO power 0.57-0.85 at tau 0.20).]",
+      "result": "HELD",
+      "value": "STOP (G1 fails with support held); TREE = FORMAT: no. At the stated SYNTHETIC power only (D2: not re-derived at the measured design; effective test one within-stdin split, 206 vs 101 informative); never \"no interaction\"",
+      "denominator": "as G1 / G2"
+    },
+    {
+      "id": "R-REP",
+      "text": "GATE annotation only (never creates or cancels a GO): weighted correlation of TRAIN and GATE one-step gamma_mk; GATE families permuted within format x dhat-half; one-sided p <= 0.05 -> 'GO, GATE-replicated', else 'GO, GATE UNDETERMINED at its power' [AMENDED 2026-09-25 pre-data by the build ruling (docs/judge_v2_program.md L18102-L18373 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; BEFORE ANY OUTCOME IS READ) — LCB-STAGE0-INTERACTION PRE-DATA AMENDMENT: the arena-specialist's build ruling on build 6af3a85 ...\"; verbatim L18106-L18345; _as_of the commit that writes them, parent 5345640, re-grepped)): its power is NOT re-derived at M = 26: the registered figure is read 'at M ~35'; refitted with the amended marginal fit on each side.]",
+      "result": "n/a",
+      "value": "annotation only: r_rep 0.384, one-sided p 0.2104 (no GO)",
+      "denominator": "GATE problems x M"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "Q1",
+      "text": "depth-1 split = input format (LeetCode vs AtCoder + Codeforces) at >= 90% purity, P = 0.75",
+      "result": "HELD",
+      "value": "HELD: purity 0.9905 (n00000004 261 functional / 3 stdin; n00000005 363 stdin / 3 functional)",
+      "denominator": "the tree's depth-1 split"
+    },
+    {
+      "id": "Q2",
+      "text": "K in {3, 4, 5}, P = 0.70; TREE=FORMAT, P = 0.10 [AMENDED 2026-09-25 pre-data by the build ruling (docs/judge_v2_program.md L18102-L18373 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; BEFORE ANY OUTCOME IS READ) — LCB-STAGE0-INTERACTION PRE-DATA AMENDMENT: the arena-specialist's build ruling on build 6af3a85 ...\"; verbatim L18106-L18345; _as_of the commit that writes them, parent 5345640, re-grepped)): the TREE=FORMAT clause is scored on the structural condition (the ruling's Q3 text).]",
+      "result": "PARTIAL",
+      "value": "K in {3,4,5} (P 0.70): HELD (K = 3); TREE=FORMAT (P 0.10): FAILED",
+      "denominator": "the region rule's K"
+    },
+    {
+      "id": "Q3",
+      "text": "G1 passes under the rank-1 null, P = 0.75; T would pass under the Rasch null, P = 0.90 [AMENDED 2026-09-25 pre-data by the build ruling (docs/judge_v2_program.md L18102-L18373 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; BEFORE ANY OUTCOME IS READ) — LCB-STAGE0-INTERACTION PRE-DATA AMENDMENT: the arena-specialist's build ruling on build 6af3a85 ...\"; verbatim L18106-L18345; _as_of the commit that writes them, parent 5345640, re-grepped)): 'the rank-1 null' is read as the amended marginal fit; probability unchanged.]",
+      "result": "FAILED",
+      "value": "G1 passes under rank-1 (P 0.75): FAILED (p_T 0.0300); T passes under Rasch (P 0.90): FAILED (p 0.0750)",
+      "denominator": "as G1"
+    },
+    {
+      "id": "Q4",
+      "text": "G2 passes, P = 0.45; joint GO, P = 0.40; STOP or STOP-SUB-PRACTICAL, P = 0.45; UNDETERMINED or TREE=FORMAT, P = 0.15 (clauses scored separately)",
+      "result": "PARTIAL",
+      "value": "G2 passes (P 0.45): FAILED; joint GO (P 0.40): FAILED; STOP or STOP-SUB-PRACTICAL (P 0.45): HELD; UNDETERMINED or TREE=FORMAT (P 0.15): FAILED",
+      "denominator": "the decision"
+    },
+    {
+      "id": "Q5",
+      "text": "given GO, R-REP replicates, P = 0.50 (UNDETERMINED if not GO)",
+      "result": "UNDETERMINED",
+      "value": "UNDETERMINED (scored only given GO; not GO)",
+      "denominator": "GATE"
+    },
+    {
+      "id": "Q6",
+      "text": "the tree's excess per df above the C-FD point, P = 0.45; above the median C-KM seed, P = 0.50",
+      "result": "HELD",
+      "value": "above the C-FD point (P 0.45): HELD (1.1625 > 0.4878); above the median C-KM seed (P 0.50): HELD (1.1625 > 0.9320)",
+      "denominator": "the common null (descriptive)"
+    },
+    {
+      "id": "Q7",
+      "text": "the tree's root certifies against its site null, P = 0.60",
+      "result": "FAILED",
+      "value": "FAILED: root n00000001 observed_sep 0.063907 < p95 0.102432; 0 of 6 sites certified",
+      "denominator": "the site null, 300 reps"
+    },
+    {
+      "id": "Q8",
+      "text": "measured family DEFF <= 1.1, P = 0.85",
+      "result": "HELD",
+      "value": "HELD: 1.011",
+      "denominator": "informative TRAIN problems, family clusters"
+    }
+  ],
+  "falsifier": {
+    "text": "F1 STOP (G1 fails with support): overturns the premise of the specialised-vs-generic judge line on LCB (that models excel on different branches of a text-derived partition, at the stated power); the judged stage (~8.5k cce) is NOT registered on LCB. F2 STOP-SUB-PRACTICAL: overturns the judged stage's costing premise (a 10pp DiD available). F3 a G1 pass that vanishes under Z1: read as a contest-date (contamination) artefact. F4 Rasch passes, rank-1 fails: the interaction is difficulty slope, not branches. None touches a closed line or a result of record.",
+    "fired": true,
+    "reading": "F1 FIRED, in the registered words (L17844; the outcome's FALS_TEXT drops the qualifier, D4): 'F1, STOP (G1 fails with support): overturns the premise of the specialised-vs-generic-judge line on LiveCodeBench, namely the web survey's reading that LCB is a corpus where models excel on different branches of a text-derived partition (at the stated power). The judged stage (~8.5k cce) is NOT registered on LCB.' F2, F3, F4 NOT FIRED. OVERTURNED: only on LCB v6, this 26-model roster, the 548 informative TRAIN problems of the one draw and ONE tree recipe (anchor-free, label-free, 512 / 0.0145 / mcs 55 / seed 42), at the registered strength; the negative is about the one within-stdin split. NOT OVERTURNED: the specialised-vs-generic-judge question as such; any other corpus (MMLU-Pro R2 atlas p_perm 0.002 stands); EVAL, other rosters, trees or recipes; interactions below ~0.2 logit SD (~0.15 SD missed 25-45% of the time); model x format structure (review Q6)"
+  },
+  "numbers_of_record": {
+    "source_draft_sha256": "9203c76eb958ccaa84c0e77a679260ae8805a9de3e3f539b3b4464a56d01d231 (file bytes, UTF-8, LF, 235 lines, 39,408 bytes; registrar-verified; re-hashed between the markers at L17707-L17941)",
+    "split_seed": "LCB-STAGE0-SPLIT:cc7a6d7f31345d571253c67ca9799d2e8a3d95c4",
+    "permutation_seed": "LCB-STAGE0-PERM:cc7a6d7f31345d571253c67ca9799d2e8a3d95c4",
+    "submissions_commit": "LiveCodeBench/submissions 6ca212e9c2039373f6e5069d37ffa9db66e23736 (the text's D1; not re-verified by the registrar)",
+    "hf_revision_stage1_only": "livecodebench/code_generation_lite 0fe84c3912ea0c4d4a78037083943e8f0c4dd505, test6.jsonl sha256 bb4c364f71921c4495a6ad15abe1a927350b720009f4933e2e71f8af0f6fd1f5 (the text's D2; not downloaded in stage 0; not re-verified)",
+    "problems": "1,055 (atcoder 602 / leetcode 444 / codeforces 9; easy 322 / medium 383 / hard 350) (the text's D3)",
+    "region_rule": "coarsen leaves to >= 130 TRAIN problems per region; expected K 3-5",
+    "recipe": "one arm: anchor-free, label-free, slice 512, bar 0.0145, minClusterSize 55, seed 42 (A8)",
+    "amendment_source_sha256": "893c277bcb0a645a52ef2d503edb926bd44c41713605c32103495b0196361b9b (lcb_stage0_build_ruling.md, file bytes, UTF-8, LF, 240 lines, 25,479 bytes; re-hashed between the markers at L18106-L18345)",
+    "roster_M": "26 (16 n = 1, 9 n = 10, 1 n = 4 files; the build ruling's Q2; file counts and folder names, the caller's, no outcome value; not 25 by the literal rule)",
+    "null_fit_of_record": "the MARGINAL rank-1 fit (x_p ~ N(0,1), 41-node Gauss-Hermite, EM, Gaussian prior SD 1.0 on log s_m around the roster mean; converged iff max |gradient| < 1e-6 and |a_m|, s_m <= 50); the registered joint fit a diagnostic only (the build ruling's Q1)",
+    "synthetic_G1_size_0.01": "18/1500 = 0.012 (CP95 0.007-0.019; P(X >= 18 | 0.01) = 0.25), pooled over four null families (base 9/600, twins 6/300, slope 2/300, strong slope 1/300); SYNTHETIC; consistent with alpha, not shown <= alpha (the build ruling)",
+    "synthetic_GO_size": "<= 0.007 in each null family (2/600, 2/300, 0/300, 1/300); SYNTHETIC (the build ruling)",
+    "synthetic_GO_power_M26": "0.17-0.38 at tau 0.15; 0.57-0.85 at tau 0.20; 0.79-0.98 at tau 0.25 (K = 3-4, 150 worlds per cell, 100 at tau 0.25); G1 alone 0.55-0.75 / 0.91-0.99; SYNTHETIC (the build ruling)",
+    "synthetic_marginal_fit_convergence": "3,850/3,850 roster-shaped TRAIN fits; 119/120 GATE and 120/120 first-sample fits; SYNTHETIC (the build ruling)",
+    "split_sides_components_over_problems": "EVAL 296/314, GATE 99/111, TRAIN 591/630 over 986 components / 1,055 problems (split_runlog.txt / split_manifest.json at 3c70660; confirmed by dfeb9b3)",
+    "split_realised_shares": "EVAL 0.2976, GATE 0.1052, TRAIN 0.5972 of 1,055 problems (split_runlog.txt [R3])",
+    "closure_of_record": "P 91, O 0, D 0 edges; band 15-19 tokens 134 pairs (76 cross-side, dfeb9b3 F1); edge-set sha16 c3498356c2cc5e11; 49 multi-problem components, largest 8; Kish 1.214218 (upper bound, all 1,055); EVAL Kish 1.165605 (manifest checks)",
+    "l2_rederivation": "0 of 1,055 problems differ; 91/91 edges (docs/reviews/POSTDRAW_lcb_stage0.md, dfeb9b3)",
+    "ingest_M": "M = 26 after the matrix leg of (vii), 0 dropped (ingest_outcomes_transcript.txt at f646b478)",
+    "ingest_s3_train_gate": "pass-without-code samples on TRAIN + GATE only: Grok-3-Mini (High) 9, every other model 0 (ingest_outcomes_manifest.json s3_train_gate)",
+    "eval_sealed_db": "8,164 cells; lcb_v6_eval_sealed_266d26872c31ce00.db file sha256 74ea30e5898384bdedc9b1b2860f46e4037095bef712122083a6f5a02520a0ec (ingest_outcomes_manifest.json)",
+    "train_gate_db": "19,266 cells; lcb_v6_train_gate_34e58f18b99d7611.db file sha256 7ac912737b40afec6423692985c2db7bed4325676f8a8e66d4941f95cc4f392e (ingest_outcomes_manifest.json)",
+    "construction_db": "741 TRAIN+GATE rows (630 + 111); lcb_v6_construction_2a94f2dbf91b4371.db file sha256 fbd9613996afef3e62b768594d80f20ffa2c942d31403c665b31bc2818b80dc9 (construction_manifest.json); the build must print fetched 741",
+    "eval_routing_db": "314 rows; lcb_v6_eval_texts_92764cb2900dd0dc.db file sha256 dfce18dea0e344e7104c906be7c6ee550fcd4a0c0fa0e529e743cda1eba1bba3 (construction_manifest.json)",
+    "gate_export": "111 ids, pool p94b63cd78524813b; lcb_gate_ids.json sha256-lf 66cf5da10e1ae73a1965f5130b70a4f372524e5f8ceafc48586daba50bc6664e",
+    "l3_backup": "E:\\TaxoArena_backup_2026-09-25\\lcb\\: 100 files, 1,386,696,956 bytes, SHA256SUMS OK (registrar, 2026-09-25); same physical disk",
+    "window_rerun_snapshot": "20260925_121944_Headless_Run_Auto_ge (13 nodes, fixed point certified at iteration 9; build exit 0, 087e43d; source: 00_window.txt / 03_build.log)",
+    "window_rerun_dag_snapshots_sha256_lf": "1fa662d53469e1c6a5c906892953da07cc57bcfc29fd7a9f4672647f8a388f78 (blob:f8d960a0; worktree file identical)",
+    "window_rerun_site_null_csv": "blob:cf90314e241d88ff4bb0bcdbe57121da340bf805 / sha256-lf 65f50739143dfc65e413048dbf632fb0e940aa8c9eac64d9b61ddc7b0ec5304f / sha256-crlf 5db716c2eaf0e0803a5073604d58ea0c7cfd38cdbb108030ee951b9171eff8f5 (worktree file); 300 reps; 6 site rows",
+    "window_rerun_worktree_embeddings_cache": "ea4220391c43d9bd9e1253b0cc1aec2098af888af92fe63c189f0c0c69ee01b6 (checkpointed; 741 embeddings / 630 queries; -wal 0 B)",
+    "window_rerun_worktree_snapshots_db": "af75292a57e65738d2b2b6d1b02f1f822f363f6d385dae4100e52fe10e0f2005 (-wal 0 B)",
+    "window_rerun_construction_db_checkpointed": "d621f27778292e64d63273381a426afc9d699a3fdea3d494f84e081c3348c71a (111 reserved_pool rows; pre-checkpoint 358192ee + -wal 354192a3 on E:)",
+    "window_rerun_pool": "p94b63cd78524813b OK: ids 111, judgeable 111, sentinels 0",
+    "window_rerun_main_caches": "before = after, both views: embeddings 39,631 / 348808c8bf968013; queries 31,986 / 5efabd42a268619e",
+    "outcome": "experiment_results/lcb_stage0/lcb_stage0_outcome.txt (blob:8fbdb07f7d6d6e62abfe60396ad66edff554fc1c; sha256 b18c6f8bb20d51781411828b601d1d67ff6f40baf7fa8f3b918251aec6e0b408, 0 CR = LF of record; written at 3bcc9ab on branch lcb-build-2, landed on main by path with this record; tag lcb-stage0-outcome-of-record -> 3bcc9ab)",
+    "g1": "T 96.689; p_T 0.0300 (B 2000, registered stream); independent 0.0308 ± 0.0012 (B 20,000, reviewer); bar 0.01",
+    "g2": "X2 1; p_X2 0.7101 (exact 0.7111); bar 0.05",
+    "support": "M 26; K 3; informative 548 of 630; DEFF 1.011 (reviewer 1.0108); n_eff 542.2; v 0.1834; MDE80 12.6pp (12.62pp); single contrast MDE80 12.4pp -> DESCRIPTIVE-ONLY",
+    "sensitivities": "Z1 p_T 0.0225 / p_X2 0.7786; Z2 0.9700 / 0.7646; S1 0.0095 / 0.1729 (517); S2 0.7716 / 1.0000 (385, M 6); S3 0.0325 / 0.7021; joint-fit diagnostic p_T 0.0195",
+    "comparators": "descriptive: tree z 7.35, excess 1.1625; C-FD z 3.66, excess 0.4878; C-KM excess 0.9483 / 0.9320 / 1.0118 / 0.7732 / 0.8483",
+    "regions": "K 3 [n00000004, n00000010, n00000011]; TRAIN [264, 229, 137]; GATE [48, 36, 27]; informative [238, 208, 102]; by format 261+3 / 227 stdin+2 / 136 stdin+1; informative 235+3 / 206+2 / 101+1 (review Q6)",
+    "tree_of_record": "snapshot 20260925_121944_Headless_Run_Auto_ge; dag 1fa662d5...; the SECOND build (the aborted 20260925_115023, dag 35a92b94..., NOT admissible)",
+    "split_words": "content-closed under CK-CLOSE-v2 (R = 6 policy) (D6: the outcome prints a stale \"id-disjoint only until R4\")",
+    "hash_kinds_d5": "CRLF file bytes as printed -> LF of record / blob: split_manifest ab350c13 -> 8a655d58 / 43485850; ingest_texts_manifest 4d3b4633 -> 7ec76d95 / 3410f7f4; ingest_outcomes_manifest 5d09cc53 -> 009938c1 / 40587941; construction_manifest b720d912 -> bf5531e3 / effdcce2; site null 5db716c2 -> 65f50739 / cf90314e; split_side.tsv f0a694b2 is LF; dag and outcome 0 CR"
+  },
+  "support": "(a) informative TRAIN problems (~630 before the filter, expected) x M (~35-45, UNVERIFIED); cluster = content family; Kish 1.214 over 1,055 in DEV (upper bound). (b) DEFF 1.0-1.1, source: DECLARED PILOT ASSUMPTION (synthetic median 1.00, max 1.04), measured on TRAIN at readout, recompute if > 1.3. (c) n_eff ~573-630. (d) SE(DiD) = sqrt(DEFF v 2K / n): K 4, v 0.10: sqrt(1.1 x 0.10 x 8 / 630) = 0.03737 -> MDE80 10.46pp; K 3: 9.06pp; K 6, v 0.25: 20.26pp; K 4, v 0.065: 8.44pp (re-done by the registrar = the text's table, DEFF 1.1 carried). (e) G1 / G2 have no effect-scale bar; power 0.40-0.70 at tau 0.15, 0.86-0.99 at tau 0.20 (synthetic). (f) VERDICT LINE: G1 and G2 SCOREABLE (aggregate); single contrast at 10pp SCOREABLE only at K <= 4 for two n = 10 models (8.4pp); every other single contrast and every GATE contrast (22-64pp) DESCRIPTIVE-ONLY; comparators DESCRIPTIVE-ONLY. (g) STRUCTURAL: reachable at infinite samples (floor MDE 6.3 / 7.7pp at DEFF 1.0, 6.6 / 8.1pp at DEFF 1.1, < 10pp; 2 SE_k floor < 0.05); K < 2 -> UNDETERMINED. Source: docs/judge_v2_program.md L17702-L17982 (section \"## Registered 2026-09-25 (before any code; zero judge calls) — LCB-STAGE0-INTERACTION: on LiveCodeBench v6, is there a model x region interaction ...\"; verbatim L17707-L17941, registrar's record L17944-L17982; lines _as_of the commit that writes them, parent cc7a6d7, re-grepped) [CORRECTED 2026-09-25 pre-data by the build ruling (docs/judge_v2_program.md L18102-L18373 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; BEFORE ANY OUTCOME IS READ) — LCB-STAGE0-INTERACTION PRE-DATA AMENDMENT: the arena-specialist's build ruling on build 6af3a85 ...\"; verbatim L18106-L18345; _as_of the commit that writes them, parent 5345640, re-grepped)): (a) M = 26 (16 n = 1, 9 n = 10, 1 n = 4), cells ~16.4k; (e) GO power 0.17-0.38 at tau 0.15, 0.57-0.85 at 0.20, 0.79-0.98 at 0.25 (K = 3-4, synthetic, amended null); G1 alone 0.55-0.75 / 0.91-0.99; the registered 0.40-0.70 / 0.86-0.99 were G1 and X1 at M = 35, K = 4-6; K = 6 unreachable (K <= 4); median pair v 0.19-0.20 -> MDE80 14.6pp (K 4) / 12.7pp (K 3); single-contrast class unchanged, MDE80 8.6pp (K 4) / 7.5pp (K 3) (registrar re-did 8.60 / 7.45 at DEFF 1.1, v 0.0675); (f) verdicts unchanged: G1 / G2 SCOREABLE; (g) unchanged.]",
+  "orchestrator_decisions": [
+    {
+      "date": "2026-09-25",
+      "by": "the orchestrator, under the author's night authorisation (L17333); NOT author decisions; the author may overturn any before the build",
+      "item": "A1 the roster rule",
+      "choice": "D4 as written: full v6 coverage as the operational 'recent'; named drops; highest effort rung; thinking variant; distinct dated releases kept; duplicates collapsed; v4 (713) excluded; M >= 20 [CORRECTED 2026-09-25 pre-data by the build ruling's Q2 (docs/judge_v2_program.md L18102-L18373 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; BEFORE ANY OUTCOME IS READ) — LCB-STAGE0-INTERACTION PRE-DATA AMENDMENT: the arena-specialist's build ruling on build 6af3a85 ...\"; verbatim L18106-L18345; _as_of the commit that writes them, parent 5345640, re-grepped); not an author decision): clause (ii)'s premise is void (the (N=10) _10_ file holds 880 records, not eligible); Gemini-Flash-2.0-Exp kept through ONE n = 1 file (the folder 'Gemini-Flash-2.0-Exp', lexicographically first); M = 26 (16 n = 1, 9 n = 10, 1 n = 4).]",
+      "record": "docs/judge_v2_program.md L17702-L17982 (section \"## Registered 2026-09-25 (before any code; zero judge calls) — LCB-STAGE0-INTERACTION: on LiveCodeBench v6, is there a model x region interaction ...\"; verbatim L17707-L17941, registrar's record L17944-L17982; lines _as_of the commit that writes them, parent cc7a6d7, re-grepped)"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "the orchestrator, under the author's night authorisation (L17333); NOT author decisions; the author may overturn any before the build",
+      "item": "A2 pooling",
+      "choice": "D5 as written: 1-sample and 10-sample files pooled at unit weight per (model, problem) cell; S2 a sensitivity; the data-steward's single-class alternative not taken",
+      "record": "docs/judge_v2_program.md L17702-L17982 (section \"## Registered 2026-09-25 (before any code; zero judge calls) — LCB-STAGE0-INTERACTION: on LiveCodeBench v6, is there a model x region interaction ...\"; verbatim L17707-L17941, registrar's record L17944-L17982; lines _as_of the commit that writes them, parent cc7a6d7, re-grepped)"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "the orchestrator, under the author's night authorisation (L17333); NOT author decisions; the author may overturn any before the build",
+      "item": "A3 side use",
+      "choice": "H4 as written: TRAIN decides, GATE annotates (R-REP only), EVAL sealed; the cost-estimator's EVAL proposal not taken",
+      "record": "docs/judge_v2_program.md L17702-L17982 (section \"## Registered 2026-09-25 (before any code; zero judge calls) — LCB-STAGE0-INTERACTION: on LiveCodeBench v6, is there a model x region interaction ...\"; verbatim L17707-L17941, registrar's record L17944-L17982; lines _as_of the commit that writes them, parent cc7a6d7, re-grepped)"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "the orchestrator, under the author's night authorisation (L17333); NOT author decisions; the author may overturn any before the build",
+      "item": "A4 storage outside the repo",
+      "choice": "Z:\\FAC\\TUBerlin\\THESIS\\TaxoArena_data\\lcb\\ via TAXOARENA_LCB_ROOT, set at runtime and NEVER written to .env; TAXOARENA_DATA_ROOT not reused; .gitignore untouched",
+      "record": "docs/judge_v2_program.md L17702-L17982 (section \"## Registered 2026-09-25 (before any code; zero judge calls) — LCB-STAGE0-INTERACTION: on LiveCodeBench v6, is there a model x region interaction ...\"; verbatim L17707-L17941, registrar's record L17944-L17982; lines _as_of the commit that writes them, parent cc7a6d7, re-grepped)"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "the orchestrator, under the author's night authorisation (L17333); NOT author decisions; the author may overturn any before the build",
+      "item": "A5 the new dataset type",
+      "choice": "DatasetType.LIVECODEBENCH with no remote fallback, inert when absent, inertness proof with an execution discriminator; TWENTY_NEWSGROUPS reuse refused",
+      "record": "docs/judge_v2_program.md L17702-L17982 (section \"## Registered 2026-09-25 (before any code; zero judge calls) — LCB-STAGE0-INTERACTION: on LiveCodeBench v6, is there a model x region interaction ...\"; verbatim L17707-L17941, registrar's record L17944-L17982; lines _as_of the commit that writes them, parent cc7a6d7, re-grepped)"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "the orchestrator, under the author's night authorisation (L17333); NOT author decisions; the author may overturn any before the build",
+      "item": "A6 build and site null from a worktree",
+      "choice": "its own fresh embeddings_cache.db, snapshots.db and transport JSON; the main checkout's caches never opened",
+      "record": "docs/judge_v2_program.md L17702-L17982 (section \"## Registered 2026-09-25 (before any code; zero judge calls) — LCB-STAGE0-INTERACTION: on LiveCodeBench v6, is there a model x region interaction ...\"; verbatim L17707-L17941, registrar's record L17944-L17982; lines _as_of the commit that writes them, parent cc7a6d7, re-grepped)"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "the orchestrator, under the author's night authorisation (L17333); NOT author decisions; the author may overturn any before the build",
+      "item": "A7 the closure thresholds",
+      "choice": "exact stem_key + P at N = 20, R = 6, PAIR_RULE 'both' (a stated policy)",
+      "record": "docs/judge_v2_program.md L17702-L17982 (section \"## Registered 2026-09-25 (before any code; zero judge calls) — LCB-STAGE0-INTERACTION: on LiveCodeBench v6, is there a model x region interaction ...\"; verbatim L17707-L17941, registrar's record L17944-L17982; lines _as_of the commit that writes them, parent cc7a6d7, re-grepped)"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "the orchestrator, under the author's night authorisation (L17333); NOT author decisions; the author may overturn any before the build",
+      "item": "A8 a single tree recipe",
+      "choice": "one arm 512 / 0.0145 / mcs 55 / seed 42; no second arm",
+      "record": "docs/judge_v2_program.md L17702-L17982 (section \"## Registered 2026-09-25 (before any code; zero judge calls) — LCB-STAGE0-INTERACTION: on LiveCodeBench v6, is there a model x region interaction ...\"; verbatim L17707-L17941, registrar's record L17944-L17982; lines _as_of the commit that writes them, parent cc7a6d7, re-grepped)"
+    }
+  ],
+  "author_decision_owed": [
+    "A9 (before stage 1, NOT stage 0): the HF dataset livecodebench/code_generation_lite's card licence 'cc' with no variant, and the hidden tests from the pinned HF revision; blocks any stage 1"
+  ],
+  "open_items": [
+    "PID 53020 (python.exe '-', created 2026-09-25 03:19:56, parent 56432 = a Claude Code Bash-tool shell that wrote scratchpad ledger_v257.py; provisional reading: an orphaned agent 'python -' child with no DB path in its command line; open handles NOT shown): must be identified (exited, or handles shown free of every pool DB / view / cache of record) BEFORE the rule-7 window; the registrar kills nothing",
+    "the rule-7 window: CLARIFIED to open after the ARCH-V2-PILOT-K46 run and any SPLIT-2 view reader (and after PID 53020 is resolved), W1-W5 as written; the text's 'after G22 has finished' is read as that condition (G22 carries state 'running' but its re-run is ON HOLD since 2026-09-24 and nothing of G22 is running tonight, per the orchestrator)",
+    "for the READY: whether the text's H1 key / closure (named CK-CLOSE-v2) meets CK-CLOSE-v1's four conditions before the words 'content-closed' are used (CONTEXT rule 12)",
+    "for the READY: the text's floor MDEs are printed at DEFF 1.0 while its table carries 1.1 (LOW; both < 10pp)",
+    "[2026-09-25 build ruling] builder follow-ups B1-B6 owed before the READY: B1 marginal fit + convergence rule; B2 apply_roster fix + 880-record _10_ fixture; B3 Q3 precedence in stats.decide; B4 family-majority labelling for p_T / p_X2; B5 the analysis.py driver (not written); B6 stats.py L585 pointer L17966 -> L17973 and the LeetCode id-order disclosure",
+    "[2026-09-25 build ruling] the author may overturn the pre-data amendment (not an author decision) before any outcome is ingested",
+    "[2026-09-25 READY dae836c] D9 OPEN MERGE GATE: the byte-inertness run (or a registrar ruling accepting the structural proof) before the Kotlin of ed948d6 merges to main; put to the tree-construction-specialist",
+    "[2026-09-25 READY dae836c] D1-D5 (+ D6 in the same delta) before the analysis; D7 before the Kotlin merges; D8 in the outcome",
+    "[2026-09-25 READY dae836c] L2: the record-seed R4 after the draw, before any \"content-closed\" wording",
+    "[2026-09-25 READY dae836c] PID 53020 observed EXITED at 07:06:49 (tasklist); L4 re-checks at the window",
+    "[2026-09-25 draw record] L2 MET (dfeb9b3); L3 E: backup OWED before --outcomes; the delta review of 4497373 (D1-D8 fixes + the Kotlin D7 guard) OWED before the window and the analysis; F1 (the '(R = 6 policy)' qualifier + band 134 / 76 cross-side), F2 (TSV stratum = component stratum, 40 problems) and F3 (D8) owed in the outcome; F4 (__init__.py pin) in any future draw manifest",
+    "[2026-09-25 delta READY 1ceafae + ingest record] E1-E3 LOW test gaps and E4 note open (none gating); D4 condition: no single-contrast claim under DESCRIPTIVE-ONLY, checked by the post-run review; the post-run review re-checks the sealed EVAL DB sha 74ea30e5..., the RECOMPUTATION line; D8 disclosure in the outcome; the merge waits for LCB-D9-BYTE-INERTNESS (C1 HELD) and then the F5 queue"
+  ],
+  "hazards": [
+    "experiment_results/_backup/: 15 *.db files (directory 4.5 GB), untracked and NOT ignored (.gitignore:145 !experiment_results/**/*.db re-includes them): any `git add -A` would stage them; added to the author-owned queue item GITIGNORE-AGENT; nothing touched",
+    "JudgeBench's GPT split carries 42 coding pairs sourced from livecodebench (JUDGEBENCH-REASONING-SIDE, programme L17343 / L17359 / L17365): the text's grep claim of 0 prior hits is CORRECTED by the registrar; a cross-corpus check before any stage that mixes corpora or judges LCB problems should include JudgeBench's coding stems"
+  ],
+  "corrections": [
+    {
+      "date": "2026-09-25",
+      "by": "registrar",
+      "text": "the text's 'Grep of docs/judge_v2_program.md for \"LiveCodeBench|LCB\": 0 hits before this entry' is FALSE at HEAD cc7a6d7: 3 lines (L17343, L17359, L17365) in JUDGEBENCH-REASONING-SIDE's verbatim registration; none is an LCB result; the rule-4 reading stands"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar, on the orchestrator's instruction",
+      "text": "the text's section 11 'No ledger row until the outcome' is SUPERSEDED: a PLAN-chip registration row is written at v263"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "the arena-specialist (build ruling) and the orchestrator, recorded by the registrar; pre-data; NOT an author decision",
+      "text": "L17747's 'Rank-1 + the strata below holds 0.053 / 0.020 at 0.05 / 0.01' was measured with core.fit_2pl at a FIXED 80 iterations (early-stopped joint fit, not the registered estimator) at M = 35; at the real roster under the amended fit G1 at 0.01 = 18/1500 = 0.012 (CP95 0.007-0.019); G1 alone at 0.05 0.075 / 0.077 (base / twins)"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "the arena-specialist (build ruling) and the orchestrator, recorded by the registrar; pre-data; NOT an author decision",
+      "text": "L17806 / the support's (e): the registered GO power 0.40-0.70 / 0.86-0.99 was G1 and X1 at M = 35, K = 4-6; at M = 26, K = 3-4: 0.17-0.38 / 0.57-0.85 / 0.79-0.98 (tau 0.15 / 0.20 / 0.25)"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "the build ruling (Q3), recorded by the registrar",
+      "text": "pointer: the registrar's TREE=FORMAT reading sits at L17973, not L17966 (support (b)); 'L17966' occurs only in the build's stats.py L585 comment at 6af3a85 (builder follow-up B6)"
+    }
+  ],
+  "numbers_of_record_note": "every figure in the text other than the seeds is the research lead's or its delegates' (online facts, DEV and SYNTHETIC figures, not of record until re-derived); the registrar re-derived only the support arithmetic, the seeds, the grep, the _backup hazard and the PID reading",
+  "sentence_of_record": "LCB-STAGE0-INTERACTION (2026-09-25, 0 calls; outcome 3bcc9ab, VALID by post-run review f222c28): STOP on LiveCodeBench v6 at the stated power: no model x text-region interaction of about 0.2 logit SD or more beyond difficulty slope and input format, on the one within-stdin split the tree produced (G1 p_T 0.0300 against the 0.01 bar, independent 0.0308 ± 0.0012; G2 X2 1, p_X2 0.7101; 548 informative TRAIN problems x 26 models, DEFF 1.011) [the power is SYNTHETIC and was not re-derived at the measured design (~0.2 logit SD at 80% UNVERIFIED; ~0.15 SD missed 25-45% of the time); S1 0.0095, Z1 0.0225, joint fit 0.0195 beside it; never 'no interaction'; F1 FIRED: the judged stage is not registered on LCB (this corpus, roster and tree recipe only; the specialised-vs-generic question and MMLU-Pro R2 are not overturned); disclosures: see the addendum] [CORRECTED 2026-10-01 by LCB-STAGE0-POWER-RESIM (F1 FIRES; b880c44; post-run review owed): at the measured design power(0.20) is 0.2225 [0.1845, 0.2658]; the power clause reads 'tau80 > 0.30' (measured design, plug-in null, iid structure); the STOP, G1's FAIL, LCB's F1 and the closed line stand; never 'no interaction'] [CORRECTED 2026-10-01 by LCB-STAGE0-POWER-RESIM (post-run review 207d800e VALID; W-L1, W-L2): the power clause reads 'power 0.22 [0.18, 0.27] at 0.20 logit SD and 0.66 [0.61, 0.70] at 0.30; tau80 > 0.30 (measured design, plug-in null, iid interactions on the fixed real regions)'; G1's FAIL is uninformative about interactions up to at least 0.30 logit SD; the '2-7 model pairs with a true 10pp reversal' clause is VOID; the STOP, G1's FAIL, LCB's F1 and the closed line stand; never 'no interaction']",
+  "chips": [
+    "REGISTERED 2026-09-25, BEFORE ANY CODE",
+    "NOT RUN [REPLACED IN THE LEDGER 2026-09-25 v282]",
+    "ZERO JUDGE CALLS; 0 CCE (LOCAL EMBEDDINGS)",
+    "G1 / G2 SCOREABLE (AGGREGATE, SYNTHETIC POWER); SINGLE CONTRASTS DESCRIPTIVE EXCEPT K &le; 4, n = 10 PAIRS",
+    "A1&ndash;A8 ORCHESTRATOR DECISIONS (AUTHOR MAY OVERTURN BEFORE THE BUILD)",
+    "A9 OWED TO THE AUTHOR (BLOCKS STAGE 1 ONLY)",
+    "PID 53020 EXITED (OBSERVED 2026-09-25 07:06); L4 RE-CHECKS AT THE WINDOW",
+    "AMENDED PRE-DATA 2026-09-25 (BUILD RULING, NOT THE AUTHOR&rsquo;S): MARGINAL RANK-1 NULL; M = 26; GO POWER 0.57&ndash;0.85 AT &tau; 0.20",
+    "READY (PARTIAL) 2026-09-25 (dae836c AT ed948d6): DRAW + INGEST NOW; BUILD WINDOW AFTER THE K46 RUN; ANALYSIS NOT READY (D1&ndash;D5)",
+    "D9 RULED 2026-09-25: BYTE RUN REGISTERED (LCB-D9-BYTE-INERTNESS; AG_NEWS SMOKE, A a62c7e0 / B 4497373); MERGE NOT READY UNTIL C1 HOLDS",
+    "DRAWN ONCE 2026-09-25 (3c70660, NOT MERGED); L2 MET (dfeb9b3): CONTENT-CLOSED UNDER CK-CLOSE-v2 (R = 6 POLICY)",
+    "DELTA READY 2026-09-25 (1ceafae AT 4497373): ANALYSIS READY; WINDOW READY (L5 UNCHANGED, L8 + GUARD LINE); D4 DEVIATION ACCEPTED WITH CONDITION; E1&ndash;E4 LOW",
+    "INGEST DONE 2026-09-25 (f646b47, NOT MERGED): M = 26; 741 TRAIN+GATE ROWS; EVAL SEALED 8,164 CELLS; L3 BACKUP VERIFIED",
+    "L4 REPLACED 2026-09-25 (RULING ab90e24, SAFE; THE AUTHOR: &ldquo;DO BOTH&rdquo;): WINDOW MAY RUN BESIDE THE K46 POSTING UNDER L4.1&ndash;L4.7; D9 + ANALYSIS STILL AFTER THE WINDOW",
+    "BUILD WINDOW 2026-09-25 11:48&ndash;11:51 STOPPED (EXIT 1 AFTER THE SNAPSHOT; b3e8c94): ABORTED TREE NOT ADMISSIBLE; RERUN READY (5f3c06e, FIX 6b9fc7c) UNDER R1&ndash;R11",
+    "BUILD WINDOW RERUN DONE 2026-09-25 (087e43d, NOT MERGED): EXIT 0; SNAPSHOT 20260925_121944 (13 NODES, FIXED POINT CERTIFIED); POOL p94b63cd OK (111); SITE NULL 300 REPS; ANALYSIS NOT RUN",
+    "STOP 2026-09-25 (3bcc9ab; REVIEW f222c28 VALID): G1 FAIL (p_T 0.0300 > 0.01; INDEPENDENT 0.0308 ± 0.0012), G2 FAIL (p_X2 0.7101); SUPPORT HOLDS; F1 FIRED (THE WEB SURVEY'S READING, AT THE STATED POWER): JUDGED STAGE NOT REGISTERED ON LCB",
+    "POWER AT THE MEASURED DESIGN (LCB-STAGE0-POWER-RESIM, VALID 207d800e): 0.22 [0.18, 0.27] AT 0.20 LOGIT SD, 0.66 [0.61, 0.70] AT 0.30; tau80 &gt; 0.30; &ldquo;2&ndash;7 PAIRS&rdquo; CLAUSE VOID; ONE WITHIN-STDIN SPLIT (206 vs 101); NEVER &ldquo;NO INTERACTION&rdquo; [warn]",
+    "DISCLOSURES: SEE ADDENDUM (D1: THE RENDERER'S DISCLOSURES IS A CONSTANT; ABORTED 11:48–11:50 BUILD, RESTORE, RERUN, 7(b), 8)",
+    "OUTCOME ON MAIN BY PATH (3 FILES; TAG lcb-stage0-outcome-of-record); KOTLIN / TOML MERGE NOT READY (LCB-D9B-BYTE-INERTNESS)",
+    "D9 DISCHARGED BY D9b 2026-09-25 (5a51d52) [v285]; KOTLIN / TOML READY TO MERGE UNDER CONDITIONS 1&ndash;8; NOT MERGED",
+    "KOTLIN / TESTS / CONFIGS MERGED 2026-09-25 AT ca4afcd (10 PATHS = 087e43d; src/main 98b29c3a, src/test 32e859f4); CONDITIONS 1&ndash;4, 7, 8 MET; 5 WITH A DEVIATION FROM ITS LETTER (3RD FAILURE NoIsReservedInSourceTest, THE RECORDED RED OF L18093); 6 RELAYED [v287]"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-25",
+      "by": "registrar (registration, verbatim; zero calls)",
+      "text": "REGISTERED before any code: docs/judge_v2_program.md L17702-L17982 (section \"## Registered 2026-09-25 (before any code; zero judge calls) — LCB-STAGE0-INTERACTION: on LiveCodeBench v6, is there a model x region interaction ...\"; verbatim L17707-L17941, registrar's record L17944-L17982; lines _as_of the commit that writes them, parent cc7a6d7, re-grepped); seeds LCB-STAGE0-SPLIT:cc7a6d7f31345d571253c67ca9799d2e8a3d95c4 / LCB-STAGE0-PERM:cc7a6d7f31345d571253c67ca9799d2e8a3d95c4 (HEAD asserted at insertion); A1-A8 orchestrator decisions; A9 owed to the author (stage 1 only); _backup hazard to GITIGNORE-AGENT; PID 53020 open; rule-7 window clarified; grep claim corrected; ledger v263 (a PLAN-chip row, newest first, before JUDGEBENCH-REASONING-SIDE)"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar, recording the arena-specialist's build ruling (pre-data; zero calls; not an author decision)",
+      "text": "PRE-DATA AMENDMENT recorded verbatim at docs/judge_v2_program.md L18102-L18373 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; BEFORE ANY OUTCOME IS READ) — LCB-STAGE0-INTERACTION PRE-DATA AMENDMENT: the arena-specialist's build ruling on build 6af3a85 ...\"; verbatim L18106-L18345; _as_of the commit that writes them, parent 5345640, re-grepped) (sha256 893c277b...): Q1 null fit of record = MARGINAL rank-1 fit (joint fit diagnostic only); Q2 M = 26; Q3 precedence UNDETERMINED > TREE=FORMAT > {GO, STOP-SUB-PRACTICAL, STOP}; reading (a) OVERRULED; GO power, STOP sentence and the L17747 calibration CORRECTED; 11 line-end brackets (L17722, L17747 x2, L17749, L17752, L17769, L17771, L17772, L17806, L17816, L17965, L17969); state stays registered; builder follow-ups B1-B6 owed before the READY; ledger v266"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (READY recorded; zero calls; insertion only)",
+      "text": "READY dae836c of build ed948d6 (NOT MERGED) recorded at docs/judge_v2_program.md L18459-L18543 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; no LCB outcome value read) — LCB-STAGE0-INTERACTION READY dae836c of build ed948d6 (NOT MERGED): READY (PARTIAL) ...\"; _as_of the commit that writes it, parent dae836c, re-grepped): READY (PARTIAL): draw READY; ingests READY under L1-L3; build window READY under L4-L9 (after the K46 run); analysis NOT READY until D1 (HIGH) and D2-D5 (MEDIUM) + a delta review; SAFE_AFTER ACCEPTED, the builder's claim REFUTED (1/3,850 ruling worlds, identical outcome; 3 of 6 fixture fits); replaced artefacts ACCEPTED; DEFF PARTLY (D4); EVAL-unrouted / boards / Q1 / Z1 ACCEPTED; D9 OPEN MERGE GATE (put to the tree-construction-specialist); line-end brackets at L17737, L17954, L17960, L18362; the chip \"OPEN: PID 53020 BEFORE THE RULE-7 WINDOW\" replaced by \"PID 53020 EXITED ...\" (observed); state registered -> READY (partial); ledger v268"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (draw + L2 recorded; zero calls; insertion only; no LCB outcome value read)",
+      "text": "record split DRAWN ONCE at 3c70660 (NOT MERGED; seed LCB-STAGE0-SPLIT:cc7a6d7f...; code HEAD 4497373, draw files blob-identical to ed948d6): EVAL 296/314, GATE 99/111, TRAIN 591/630 (components/problems), P 91, 986 components, CK-CLOSE PASS x3; L2 MET by dfeb9b3 (0 of 1,055 differ); the words 'content-closed under CK-CLOSE-v2 (R = 6 policy)' now of record; findings F1-F4 LOW; the window and the analysis pending the delta review of 4497373; L3 owed; recorded at docs/judge_v2_program.md L18545-L18591 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; no LCB outcome value read) — LCB-STAGE0-INTERACTION RECORD SPLIT DRAWN ONCE (3c70660, NOT MERGED) AND RE-DERIVED INDEPENDENTLY ...\"; _as_of the commit that writes it, parent dfeb9b3, re-grepped) with line-end brackets at L17730, L17946, L18506, L18521; state stays READY (partial); ledger v269"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (delta READY + ingest recorded; D9 ruled and registered; zero calls; insertion only; no LCB outcome value read)",
+      "text": "delta READY 1ceafae of 4497373 (NOT MERGED): (1) analysis of record READY; (2) window READY on MMLUDatasetFetcher.kt 70eedfdf, L5 UNCHANGED (the guard runs after EmbeddingCache opens ./embeddings_cache.db and not in the site null), L8 + the guard-passed line (a refusal is a failed precondition); (3) D9 pins 2825b12d / 5b1bbb3a / 817b1417 / 70eedfdf CONFIRMED (re-derived by the registrar). D4 deviation ACCEPTED on condition (no single-contrast claim under DESCRIPTIVE-ONLY); L10 SUPERSEDED (--pins, --site-null, B = 2000); E1-E4 LOW. INGEST DONE at f646b478 (NOT MERGED): M = 26 (0 dropped); S3 TRAIN+GATE Grok-3-Mini (High) 9; eval_sealed 8,164 cells sha256 74ea30e5...; train_gate 19,266 cells 7ac91273...; construction 741 rows fbd96139...; EVAL routing 314 rows dfce18de...; GATE 111, pool p94b63cd78524813b; L3 MET (100 files, 1,386,696,956 B, SHA256SUMS OK; 90 before --outcomes per the run-operator). D9 RULED (form (a)) and the byte run REGISTERED as LCB-D9-BYTE-INERTNESS. The chips 'D9 OPEN MERGE GATE ...' and 'WINDOW + ANALYSIS PENDING ...' REPLACED (superseded by this record), 'INGEST DONE ...' added. Recorded at docs/judge_v2_program.md L18593-L18660 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; no LCB outcome value read) — LCB-STAGE0-INTERACTION DELTA READY 1ceafae of 4497373 (NOT MERGED): ...\"; _as_of the commit that writes it, parent 1ceafae, re-grepped) and docs/judge_v2_program.md L18662-L18872 (section \"## Registered 2026-09-25 (before any code or call) — LCB-D9-BYTE-INERTNESS: ...\"; the ruling VERBATIM between the marker lines L18666 and L18815, i.e. L18667-L18814; _as_of the commit that writes it, parent 1ceafae, re-grepped), with line-end brackets at L17737, L17954, L18502, L18517, L18522, L18527, L18529, L18581, L18582, L18583, L18584; state READY (merge NOT READY: D9 pending); ledger v270"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (the author's decision and the L4 ruling recorded; zero calls; insertion only; no LCB outcome value read)",
+      "text": "THE AUTHOR: \"do both, start the LCB build now and register parallel posting\" (plan Amendment 23). L4 REPLACED by L4.1-L4.7, docs/reviews/READY_lcb_stage0.md, top section \"# L4 RULING: the LCB-STAGE0 build window beside the PILOT-K46 run of record, 2026-09-25\" / \"## (c) REPLACEMENT TEXT FOR L4\", commit ab90e24 (blob:0ba8d494a90df42bebda2b81bc91a0456c724145 / sha256-lf16:c5ca5ef7dc2f029b; working tree LF, equal): VERDICT SAFE; the window may run beside the ARCH-V2-PILOT-K46 run of record (poster the only admitted foreign process; W1 re-scoped, pilot objects excluded and never opened; >= 12 GB free RAM per leg; opens only during steady posting; stop at a leg boundary on poster exit or a > 10 min stall; E: backup never overlaps the site null; L5-L10 unchanged). ORDERING: the old step (1) \"the K46 posting ends\" SUPERSEDED FOR THE LCB WINDOW ONLY; D9 and the analysis still follow the window (D9 also after the posting ends); the K46 post-run steps and the merges behind F5 unchanged. Parallel posting (b) OWED, not registered. Programme: docs/judge_v2_program.md L18874-L18906 (section \"## Author's decision and registrar's record 2026-09-25 (insertion only; zero calls; no LCB outcome value read) — \"do both\": the LCB-STAGE0-INTERACTION rule-7 build window MAY run beside the ARCH-V2-PILOT-K46 posting ...\"; the ruling's L4 VERBATIM between the marker lines L18880 and L18894; lines _as_of the commit that writes them, parent ab90e24, re-grepped); line-end brackets at L18523, L18532, L18533, L18649, L18653, L18660, L18868, L18872. Chip added: L4 REPLACED ... WINDOW MAY RUN BESIDE THE K46 POSTING [plan]. Ledger v271."
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (insertion only; zero calls; no LCB outcome value read)",
+      "text": "BUILD-WINDOW INCIDENT 11:48-11:51 (b3e8c94: exit 1 after snapshot 20260925_115023_Headless_Run_Auto_ge; second guard call in the same JVM at the MAIN trickle; construction DB written fbd96139 -> 358192ee + -wal bb8e7003; main caches identical; foreign selftest disclosed) and RERUN READY (READY_lcb_stage0.md at 5f3c06e, fix 6b9fc7c, NOT MERGED) under R1-R11 with L4.1a/L4.1b; D9 leg B -> 6b9fc7c; recorded at docs/judge_v2_program.md L19241-L19271 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; no LCB outcome value read) — LCB-STAGE0-INTERACTION BUILD-WINDOW INCIDENT (11:48-11:51, exit 1 after the snapshot; b3e8c94) and RERUN READY ...\"; _as_of the commit that writes it, parent 5f3c06e, re-grepped)"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (insertion only; zero calls; no LCB outcome value read)",
+      "text": "BUILD WINDOW RERUN DONE under R1-R11 (087e43d, branch lcb-build-2, NOT MERGED): build 12:18:06-12:20:01 exit 0 with every required line; snapshot 20260925_121944_Headless_Run_Auto_ge (13 nodes, fixed point iteration 9; dag sha256 1fa662d5...); main caches identical; construction DB checkpointed by the run-operator (H5 names the data-steward: disclosed) -> d621f277..., 111 reserved_pool rows; pool_guard p94b63cd78524813b OK (111); site null 300 reps exit 0, CSV sha256-lf 65f50739... / sha256-crlf 5db716c2... (the operator's pin is the CRLF rendering); stray empty file lcb$B disclosed; recorded at docs/judge_v2_program.md L19273-L19304 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; no LCB outcome value read) — LCB-STAGE0-INTERACTION BUILD WINDOW RERUN DONE under R1-R11 (087e43d on branch lcb-build-2, NOT MERGED): ...\"; _as_of the commit that writes it, parent 5bfce6c, re-grepped)"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (insertion only; zero calls; no LCB outcome value read)",
+      "text": "D9 RAN (LCB-D9-BYTE-INERTNESS outcome at docs/judge_v2_program.md L19587-L19640 (section \"## LCB-D9-BYTE-INERTNESS (2026-09-25, 0 calls) — VALID (post-run review d7eca94); C1 FAILED AS REGISTERED ...\"; _as_of the commit that writes it, parent f222c28, re-grepped)): VALID; C1 FAILED as registered (2 of 21 files, DP / SS / TDC only); R9 non-determinism; the change not implicated; D9 OPEN; THE KOTLIN MERGE STAYS NOT READY and now waits on LCB-D9B-BYTE-INERTNESS (registered at docs/judge_v2_program.md L19642-L19714 (section \"## Registered 2026-09-25 (before any code or call) — LCB-D9B-BYTE-INERTNESS: ...\"; _as_of the commit that writes it, parent f222c28, re-grepped); needs a build and a READY); the analysis of record is not gated by D9 (R8's 'not before S12' met at 15:55; its launch is not decided by this record); ledger v281"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (outcome; zero calls; insertion only)",
+      "text": "OUTCOME recorded at docs/judge_v2_program.md L19732-L19800 (section \"## LCB-STAGE0-INTERACTION (2026-09-25, 0 calls; outcome 3bcc9ab on branch lcb-build-2, post-run review f222c28) — VALID; STOP AS REGISTERED ...\"; _as_of the commit that writes it, parent ab8aee9, re-grepped): VALID (f222c28); STOP; G1 and G2 FAIL; support holds; Q1 H, Q2a H, Q2b F, Q3a F, Q3b F, Q4a F, Q4b F, Q4c H, Q4d F, Q5 UND, Q6a H, Q6b H, Q7 F, Q8 H; F1 FIRED (registered words restored, D4), F2-F4 not fired; D1 DISCLOSURES ADDENDUM (dated, sourced; the READY miss recorded: the renderer's DISCLOSURES is a constant); D2 bracket on the STOP sentence (synthetic power, not re-derived; one within-stdin split; p_T 0.0308 ± 0.0012, S1 0.0095, Z1 0.0225, joint 0.0195 beside it; never 'no interaction'); D3-D8 LOW; the outcome, pins.json and analysis_stdout.txt landed on main by path (blob-equal); src / tests / toml NOT landed (D9b); tag lcb-stage0-outcome-of-record; ledger v282"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (insertion only; zero calls)",
+      "text": "the operator's exact command added (source: the run-operator's hand-back, not a committed file; checked against analysis_stdout.txt [LCB-S0] pool and [OUTCOME] lines) at docs/judge_v2_program.md L19739; the closed line added to docs/agents/CONTEXT.md section 5 (L53 bracket), citing 3552d8b / f222c28; no ledger version (the ledger row carries no command)"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (LCB-D9B-BYTE-INERTNESS outcome; zero calls; insertion only)",
+      "text": "D9 DISCHARGED by LCB-D9B-BYTE-INERTNESS (post-run review 5a51d52); THE KOTLIN / TEST / TOML MERGE (10 paths from 087e43d; tag lcb-build-2-d9b-discharged; src/main 98b29c3a, src/test 32e859f4) READY TO MERGE under conditions 1-8 (docs/judge_v2_program.md L19897-L19974 (section \"## LCB-D9B-BYTE-INERTNESS (2026-09-25, 0 calls) — DISCHARGED: S5c exit 0; C1' HELD (0 of 24) and C2 HELD (0 of 24) ...\"; _as_of the commit that writes it, parent 3187b6f, re-grepped) item 10); NOT MERGED by this record (a separate step); line-end bracket at L19800; ledger v285 (bracket; D9 chip and landing chip replaced)"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (merge / archive record; zero calls; insertion only)",
+      "text": "evidence archived at TaxoArena_data\\evidence_2026-09-25\\pr_lcb (the post-run reviewer's scripts; the merge gate's evidence in d9 and d9b) (Z:\\FAC\\TUBerlin\\THESIS\\TaxoArena_data\\evidence_2026-09-25; copied by the orchestrator; file counts equal to the scratchpad's; the scratchpad is temporary); docs/judge_v2_program.md L20054-L20090 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — LCB-STAGE0-INTERACTION's Kotlin, tests and configs MERGED at ca4afcd ... and the session evidence ARCHIVED at TaxoArena_data\\evidence_2026-09-25 ...\"; _as_of the commit that writes it, parent c16ab01, re-grepped)"
+    },
+    {
+      "date": "2026-10-01",
+      "by": "the registrar (LCB-STAGE0-POWER-RESIM F1; insertion only)",
+      "text": "Power clause re-bracketed 'tau80 > 0.30' (item 3 of the outcome section). docs/judge_v2_program.md L22281-L22290 (section \"## LCB-STAGE0-POWER-RESIM (2026-10-01, 0 calls) — run-unreviewed (post-run review OWED, batched with the next review): ...\"; _as_of the commit that writes it, parent e7348f3, re-grepped)"
+    },
+    {
+      "date": "2026-10-01",
+      "by": "the registrar (LCB-STAGE0-POWER-RESIM post-run review 207d800e; insertion only)",
+      "text": "W-L1 / W-L2 bracketed into item 3 of the outcome section (power words at the measured design; the '2-7 pairs' clause void); the synthetic power-scope chip replaced by the measured one. docs/judge_v2_program.md L22472-L22481 (section \"## LCB-STAGE0-POWER-RESIM (2026-10-01, 0 calls) — VALID (post-run review docs/reviews/POSTRUN_gold_slotswap_lcb.md, 207d800e): C0 ...\"; _as_of the commit that writes it, parent 12ceb48c, re-grepped)"
+    }
+  ],
+  "does_not_show": [
+    "anything about a judge, specialised or generic; any judged accuracy; that a specialised judge would beat the generic one on any region (the text's section 12)",
+    "anything about EVAL (never read); transfer of any TRAIN interaction to EVAL, another roster or another corpus",
+    "that the regions are topics",
+    "that the tree beats format x difficulty or k-means (descriptive only, powerless at the relevant sizes)",
+    "any frontier order, per-question rank, or single contrast outside the scoreable class (K <= 4, two n = 10 models)",
+    "that the interaction is free of contamination (Z1 is a proxy)",
+    "anything about LCB's graders (graded_list accepted as-is)",
+    "a clean negative in the absolute (a STOP is bounded by ~0.2 logit SD)",
+    "[registrar] the online facts of D1-D3 and D8 re-verified by the registrar; M, K, the informative count and the real DEFF (U1, U4, U6); that PID 53020 is harmless; that the author accepts A1-A8",
+    "[2026-09-25 amendment] anything about LCB outcomes (none read); that G1's size is <= 0.01 (consistent at 1,500 synthetic worlds; liberal at 0.05); the source of the base / twins excess; that the synthetic families span the real roster; R-REP, Z1 and the Delta-D correlation at M = 26; that the marginal fit converges on the real data; that the build implements B1-B6; that the author accepts the amendment (the registrar re-ran no simulation)",
+    "the stated power at the measured design (D2: synthetic, not re-derived; LCB-STAGE0-POWER-RESIM drafted) (registrar, from f222c28)",
+    "any partition of LCB other than the one within-stdin split the tree produced (review Q6)",
+    "the reviewer's independent recomputation of Z2, S2, the sensitivities' p_X2, R-REP, Delta-D and the joint p_T (not done)",
+    "the operator's literal command line (the R9 form of record is on record; the literal invocation is not printed) [2026-09-25: the literal invocation is now on record from the operator's report (L19739 bracket), not from a committed file]"
+  ],
+  "ledger": {
+    "row_id": "LCB-STAGE0-INTERACTION",
+    "version": "v324 (2026-10-01: W-L1 / W-L2 bracket; power-scope chip replaced) | v321 (2026-10-01: power-clause bracket) | v266 (a dated bracket in the row's observed cell and one warn chip for the pre-data amendment) [v263: the PLAN-chip registration row] | v268 (2026-09-25: the READY (partial) recorded: a bracket in the observed cell; chips READY (PARTIAL) [plan] and D9 OPEN MERGE GATE [warn] added; the PID 53020 chip replaced by the observed exit [plan]) | v269 (2026-09-25: the draw and L2 recorded: a bracket in the observed cell; chips DRAWN ONCE ... L2 MET [plan] and WINDOW + ANALYSIS PENDING THE DELTA REVIEW OF 4497373 [warn] added) | v270 (2026-09-25: the delta READY 1ceafae, the ingest DONE f646b478 and the D9 ruling recorded: a bracket in the observed cell; chips 'D9 OPEN MERGE GATE ...' [warn] -> 'D9 RULED ... MERGE NOT READY UNTIL C1 HOLDS' [warn] and 'WINDOW + ANALYSIS PENDING ...' [warn] -> 'DELTA READY ... ANALYSIS READY; WINDOW READY ...' [plan] replaced; 'INGEST DONE ...' [plan] added) | v271 (2026-09-25: the author's \"do both\" and the L4 ruling ab90e24 recorded: a bracket in the observed cell; chip 'L4 REPLACED ... WINDOW MAY RUN BESIDE THE K46 POSTING ...' [plan] added) | v273 (2026-09-25: the build-window incident and the rerun READY: a bracket in the observed cell; chip 'BUILD WINDOW ... RERUN READY ...' [warn]) | v274 (2026-09-25: the build window RERUN DONE: a bracket in the observed cell; chip 'BUILD WINDOW RERUN DONE ...' [plan] added) | v281 (2026-09-25: D9 outcome and D9b registration: a bracket in the observed cell; the D9 chip replaced by 'D9 RAN ... C1 FAILED AS REGISTERED ... D9 OPEN: D9b REGISTERED (NOT READY); MERGE NOT READY' [warn]) | v282 (2026-09-25: OUTCOME: a bracket in the observed cell; chip 'NOT RUN' replaced by STOP / power-scope / disclosures-addendum / landing chips) | v285 (2026-09-25: D9b outcome: a bracket in the observed cell; the D9 chip replaced by 'D9 DISCHARGED BY D9b ...' [ok] + 'P6 FAILED (DESCRIPTIVE) ...' [warn]; the landing chip replaced by '... KOTLIN / TOML READY TO MERGE UNDER CONDITIONS 1-8 ...' [plan]) | v287 (2026-09-25: Kotlin merged at ca4afcd: a bracket; the landing chip replaced by 'OUTCOME ON MAIN BY PATH ...; KOTLIN / TESTS / CONFIGS MERGED 2026-09-25 AT ca4afcd ...' [ok]; evidence archive)"
+  },
+  "depends_on": [
+    "TOPIC-PARTITION-20NG",
+    "TOPIC-PARTITION-20NG-T1B-NULL",
+    "PROFILE-RELIABILITY-INTERACTION",
+    "ARCH-V2-SPLIT-DRAW-1 (the seed method)",
+    "the rerun of the build window under R1-R11 (READY 5f3c06e), before D9 and the analysis [DONE 2026-09-25: 087e43d]",
+    "LCB-D9B-BYTE-INERTNESS (the Kotlin merge only; D9 OPEN after LCB-D9-BYTE-INERTNESS C1 FAILED as registered, 2026-09-25)"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "CLOSES the specialised-vs-generic-judge line ON LCB ONLY (LiveCodeBench v6, this 26-model roster, this tree recipe), at the stated (synthetic) power; F1 FIRED: the judged stage (~8.5k cce) is NOT registered on LCB. Does NOT close the specialised-vs-generic question as such or touch MMLU-Pro R2 / R2-QP / H-1; reopens nothing"
+  },
+  "cost": {
+    "calls_expected": 0,
+    "cce_expected": 0,
+    "calls_max": 0,
+    "cce_max": 0,
+    "machine": "~1-2 h wall clock, ~30-45 min in a rule-7 window",
+    "agent_hours": "~3.5-4",
+    "source": "the text's section 9 (cost-estimator); the experiment-manager prices and places"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L17702-L17982 (section \"## Registered 2026-09-25 (before any code; zero judge calls) — LCB-STAGE0-INTERACTION: on LiveCodeBench v6, is there a model x region interaction ...\"; verbatim L17707-L17941, registrar's record L17944-L17982; lines _as_of the commit that writes them, parent cc7a6d7, re-grepped)",
+    "the orchestrator's relay of 2026-09-25 (A1-A8 taken; A9 owed; the _backup hazard; PID 53020; the window clarification; the ledger row)",
+    "read-only checks at HEAD cc7a6d7: git rev-parse HEAD; grep -n -i livecodebench docs/judge_v2_program.md; git check-ignore -v experiment_results/_backup/x.db; find / du / git ls-files on experiment_results/_backup; Get-CimInstance Win32_Process for PIDs 53020 and 56432; docs/agents/results/ARCH-V2-G22.json and the queue item ARCH-V2-G22",
+    "docs/judge_v2_program.md L18102-L18373 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; BEFORE ANY OUTCOME IS READ) — LCB-STAGE0-INTERACTION PRE-DATA AMENDMENT: the arena-specialist's build ruling on build 6af3a85 ...\"; verbatim L18106-L18345; _as_of the commit that writes them, parent 5345640, re-grepped)",
+    "lcb_stage0_build_ruling.md sha256 893c277bcb0a645a52ef2d503edb926bd44c41713605c32103495b0196361b9b (the arena-specialist's build ruling; relayed by the orchestrator)",
+    "read-only checks: sha256sum / wc of the ruling; git rev-parse 6af3a85:tools/analysis/lcb_stage0/stats.py; git branch --contains 6af3a85; grep -rn L17966 docs/; scipy.stats CP95 and binomial tail re-done",
+    "docs/judge_v2_program.md L18459-L18543 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; no LCB outcome value read) — LCB-STAGE0-INTERACTION READY dae836c of build ed948d6 (NOT MERGED): READY (PARTIAL) ...\"; _as_of the commit that writes it, parent dae836c, re-grepped)",
+    "docs/reviews/READY_lcb_stage0.md at dae836c (blob:4a516d04a90dc9b3270b5d9ee02563918fe89fd6), sections \"## VERDICT\", \"## Pins ...\", \"## Per-claim table\", \"## Deviations: rulings\", \"## CK-CLOSE-v1 conditions ...\", \"## Defects\", \"## Launch conditions\"",
+    "the orchestrator's relay of 2026-09-25 (the split verdict, the rulings to record, D9 to the tree-construction-specialist, the rule-7 sequencing against PILOT-K46)",
+    "registrar re-derivations 2026-09-25 ~07:00-07:07 (git rev-parse / git show | sha256sum on ed948d6; sha256sum of the manifests and texts DBs; stat and an immutable read of the main embeddings_cache.db; tasklist / Get-CimInstance; git status of the build worktree)",
+    "draw + L2: docs/judge_v2_program.md L18545-L18591 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; no LCB outcome value read) — LCB-STAGE0-INTERACTION RECORD SPLIT DRAWN ONCE (3c70660, NOT MERGED) AND RE-DERIVED INDEPENDENTLY ...\"; _as_of the commit that writes it, parent dfeb9b3, re-grepped); git show 3c70660 (the four outputs); docs/reviews/POSTDRAW_lcb_stage0.md (dfeb9b3)",
+    "delta READY + ingest: docs/judge_v2_program.md L18593-L18660 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; no LCB outcome value read) — LCB-STAGE0-INTERACTION DELTA READY 1ceafae of 4497373 (NOT MERGED): ...\"; _as_of the commit that writes it, parent 1ceafae, re-grepped); docs/reviews/READY_lcb_stage0.md at 1ceafae (new top section); git show f646b478 (six artefacts); E:\\TaxoArena_backup_2026-09-25\\lcb\\SHA256SUMS (sha256sum -c)",
+    "D9: docs/judge_v2_program.md L18662-L18872 (section \"## Registered 2026-09-25 (before any code or call) — LCB-D9-BYTE-INERTNESS: ...\"; the ruling VERBATIM between the marker lines L18666 and L18815, i.e. L18667-L18814; _as_of the commit that writes it, parent 1ceafae, re-grepped); lcb_d9_ruling.md sha256 7e8f16b03aead981f7f481ad8d9dc94071c4288538948b9c74a0b8a7e58e57a1",
+    "docs/judge_v2_program.md L18874-L18906 (section \"## Author's decision and registrar's record 2026-09-25 (insertion only; zero calls; no LCB outcome value read) — \"do both\": the LCB-STAGE0-INTERACTION rule-7 build window MAY run beside the ARCH-V2-PILOT-K46 posting ...\"; the ruling's L4 VERBATIM between the marker lines L18880 and L18894; lines _as_of the commit that writes them, parent ab90e24, re-grepped)",
+    "docs/reviews/READY_lcb_stage0.md, top section \"# L4 RULING: the LCB-STAGE0 build window beside the PILOT-K46 run of record, 2026-09-25\" / \"## (c) REPLACEMENT TEXT FOR L4\", commit ab90e24 (blob:0ba8d494a90df42bebda2b81bc91a0456c724145 / sha256-lf16:c5ca5ef7dc2f029b; working tree LF, equal) (the L4 ruling; VERDICT SAFE; section read by the registrar)",
+    "the orchestrator's relay of 2026-09-25: the author's decision verbatim and the offer (a) / (b)",
+    "docs/judge_v2_program.md L19241-L19271 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; no LCB outcome value read) — LCB-STAGE0-INTERACTION BUILD-WINDOW INCIDENT (11:48-11:51, exit 1 after the snapshot; b3e8c94) and RERUN READY ...\"; _as_of the commit that writes it, parent 5f3c06e, re-grepped)",
+    "docs/reviews/READY_lcb_stage0.md at 5f3c06e (blob:f2de6b8740a1cc4862c037d7973217bb0a4f9639), top section; incident evidence b3e8c9412baae1806077aaf334fbe17eeda02481 experiment_results/lcb_stage0/window/",
+    "docs/judge_v2_program.md L19273-L19304 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; no LCB outcome value read) — LCB-STAGE0-INTERACTION BUILD WINDOW RERUN DONE under R1-R11 (087e43d on branch lcb-build-2, NOT MERGED): ...\"; _as_of the commit that writes it, parent 5bfce6c, re-grepped)",
+    "run-operator's window record 087e43d51c2a5a5fb8d67df285ab1099560ed951 (branch lcb-build-2, NOT MERGED): experiment_results/lcb_stage0/window_rerun/00_window.txt blob:298b521303fd2d62949f644af12c5eaa7ef1ff0a / sha256-lf16:b255e9b40511c0c7; 03_build.log blob:75220604a6a34afbba21483fdfbc947eab0d9495 / sha256-lf16:f233ee64ff99ecdb / sha256-crlf16:fead10205e50532e",
+    "docs/judge_v2_program.md L19587-L19640 (section \"## LCB-D9-BYTE-INERTNESS (2026-09-25, 0 calls) — VALID (post-run review d7eca94); C1 FAILED AS REGISTERED ...\"; _as_of the commit that writes it, parent f222c28, re-grepped)",
+    "docs/judge_v2_program.md L19732-L19800 (section \"## LCB-STAGE0-INTERACTION (2026-09-25, 0 calls; outcome 3bcc9ab on branch lcb-build-2, post-run review f222c28) — VALID; STOP AS REGISTERED ...\"; _as_of the commit that writes it, parent ab8aee9, re-grepped)",
+    "docs/reviews/POSTRUN_lcb_stage0.md at f222c28 (blob:6cf6b01f8db8bd8ff5eeb375ee1bf2e82f4282a4; file bytes LF, equal): verdict, objects and pins, per-claim table 1-24, Q4 (disclosures), Q5 (landing), Q6 (scope), defects D1-D8, commands",
+    "experiment_results/lcb_stage0/lcb_stage0_outcome.txt and analysis_run/analysis_stdout.txt at 3bcc9ab (read in full)",
+    "git rev-parse lcb-stage0-outcome-of-record^{commit} = 3bcc9ab34937ea6ea4991d514b04b8c2870d91a2 (lightweight, local)",
+    "docs/judge_v2_program.md L19897-L19974 (section \"## LCB-D9B-BYTE-INERTNESS (2026-09-25, 0 calls) — DISCHARGED: S5c exit 0; C1' HELD (0 of 24) and C2 HELD (0 of 24) ...\"; _as_of the commit that writes it, parent 3187b6f, re-grepped)",
+    "docs/judge_v2_program.md L20054-L20090 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — LCB-STAGE0-INTERACTION's Kotlin, tests and configs MERGED at ca4afcd ... and the session evidence ARCHIVED at TaxoArena_data\\evidence_2026-09-25 ...\"; _as_of the commit that writes it, parent c16ab01, re-grepped)",
+    "docs/judge_v2_program.md L22281-L22290 (section \"## LCB-STAGE0-POWER-RESIM (2026-10-01, 0 calls) — run-unreviewed (post-run review OWED, batched with the next review): ...\"; _as_of the commit that writes it, parent e7348f3, re-grepped)",
+    "docs/judge_v2_program.md L22472-L22481 (section \"## LCB-STAGE0-POWER-RESIM (2026-10-01, 0 calls) — VALID (post-run review docs/reviews/POSTRUN_gold_slotswap_lcb.md, 207d800e): C0 ...\"; _as_of the commit that writes it, parent 12ceb48c, re-grepped)"
+  ],
+  "last_update": "2026-09-25 (registrar: Kotlin / tests / configs MERGED at ca4afcd (conditions scored; 5 with a deviation from its letter; 6 relayed); evidence archived; ledger v287); 2026-10-01 (registrar: power clause re-bracketed by LCB-STAGE0-POWER-RESIM F1; ledger v321); 2026-10-01 (registrar: W-L1 / W-L2 bracket from LCB-STAGE0-POWER-RESIM's review 207d800e; ledger v324)",
+  "amendments": [
+    {
+      "id": "AMEND-1 (build ruling)",
+      "date": "2026-09-25",
+      "by": "the arena-specialist (build ruling) and the orchestrator, recorded by the registrar; pre-data; NOT an author decision",
+      "authority": "the author's night authorisation of 2026-09-25 (docs/judge_v2_program.md L17333); pre-data correction by the specialist and the orchestrator; NOT an author decision; A1-A8 stand (A1 as corrected by Q2); A9 still owed to the author",
+      "source": "lcb_stage0_build_ruling.md (session scratchpad, not committed), sha256 893c277bcb0a645a52ef2d503edb926bd44c41713605c32103495b0196361b9b (file bytes, UTF-8, LF, 0 CR, 240 lines, 25,479 bytes; registrar-verified; re-hashed between the markers)",
+      "build_ruled_on": "6af3a857783200b26d8db054628687e46b490a18 (branch worktree-agent-adb18465164aaf122, NOT MERGED); tools/analysis/lcb_stage0/stats.py blob:fd8df0a2bfb2da24dee3ccdfb90afce138aeffae (git blob id; = git rev-parse 6af3a85:tools/analysis/lcb_stage0/stats.py)",
+      "program_lines": "docs/judge_v2_program.md L18102-L18373 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; BEFORE ANY OUTCOME IS READ) — LCB-STAGE0-INTERACTION PRE-DATA AMENDMENT: the arena-specialist's build ruling on build 6af3a85 ...\"; verbatim L18106-L18345; _as_of the commit that writes them, parent 5345640, re-grepped)",
+      "line_brackets": "L17722 (Q2), L17747 (Q1 fix + calibration correction), L17752 (reading (a)), L17769 (STOP-SUB-PRACTICAL), L17771 (Q3), L17772 (STOP sentence), L17806 (power), L17816 (convergence) = the ruling's texts verbatim; L17749 (Delta-D base), L17965 (support (a)), L17969 (support (e)) = the registrar's, applied backward; prefix check 11/11 (each old line an exact prefix of its new line; all other lines of L1-L18100 identical)",
+      "no_outcome_read": "no LCB outcome value read by anyone (the orchestrator); the ruling opened no raw file, DB, manifest or LCB probe; every rate is synthetic",
+      "items": [
+        "Q1 (HIGH): the registered joint rank-1 null fit has no finite optimum on this roster (fails 67/600 base, 34/300 twins, 204/300 slope, 286/300 strong-slope null worlds; 22/40 base GATE fits; 31/40 slope-world S1 fits). THE NULL FIT OF RECORD IS THE MARGINAL RANK-1 FIT: logit pi_mp = a_m + s_m x_p, x_p ~ N(0,1) integrated out (41-node Gauss-Hermite; EM with a Newton M-step), s_m > 0, Gaussian prior SD 1.0 on log s_m around the roster mean log-slope; pihat = E[pi_mp | Y_p]; CONVERGED iff max |gradient| < 1e-6 and every |a_m|, s_m <= 50 (printed with iterations and max s_m). Converged 3,850/3,850 roster-shaped TRAIN fits. The registered joint fit is a printed diagnostic only.",
+        "Q1 size: G1 at 0.01 pooled 18/1500 = 0.012 (CP95 0.007-0.019; P(X >= 18 | 0.01) = 0.25): consistent with alpha, NOT shown <= alpha; GO size <= 0.007 in each of four null families; G1 alone at 0.05 mildly liberal (0.075 base, 0.077 twins), source not located.",
+        "Q1 correction: the registered calibration 'Rank-1 + the strata below holds 0.053 / 0.020 at 0.05 / 0.01' was measured with core.fit_2pl at a fixed 80 iterations (an early-stopped joint fit), M = 35.",
+        "Q2: M = 26 (16 n = 1, 9 n = 10, 1 n = 4): the (N=10) _10_ file (880 records) is not eligible; Gemini-Flash-2.0-Exp kept through the _1_ file of the folder 'Gemini-Flash-2.0-Exp' (lexicographically first); the other _1_ file dropped.",
+        "Q3: precedence UNDETERMINED (support fails) > TREE=FORMAT > {GO, STOP-SUB-PRACTICAL, STOP}; 'tree = format: yes/no' printed in every outcome; the registrar's reading CONFIRMED, at L17973 (not L17966).",
+        "Builder readings: (a) OVERRULED (p_T / p_X2 at the family-majority labelling; own-region T printed beside); (b)-(f) CONFIRMED ((c) on the amended base); (g) REPLACED by Q3.",
+        "Lower M: K <= 4 (K = 6 unreachable); median pair v 0.19-0.20, MDE80 14.6pp (K 4) / 12.7pp (K 3); GO power 0.17-0.38 at tau 0.15, 0.57-0.85 at 0.20, 0.79-0.98 at 0.25 (registered 0.40-0.70 / 0.86-0.99 were G1 and X1 at M = 35); G1 alone 0.55-0.75 / 0.91-0.99; STOP sentence '7-15 model pairs' -> '2-7'; STOP-SUB-PRACTICAL carries G2's power; single-contrast class unchanged (MDE80 8.6pp K 4, 7.5pp K 3); R-REP not re-derived at M = 26 (read 'at M ~35').",
+        "PLAIN-LANGUAGE CONSEQUENCE (the orchestrator's): a STOP at moderate effect sizes is now weakly informative."
+      ],
+      "builder_follow_ups_owed_before_READY": [
+        "B1 implement the marginal fit and its convergence rule (joint fit a diagnostic; fit_rank1_region / Delta-D on the marginal base)",
+        "B2 ingest.py apply_roster fix + a selftest fixture with an 880-record _10_ file",
+        "B3 the Q3 precedence in stats.decide (tree_is_format returned and printed always)",
+        "B4 family-majority labelling for p_T / p_X2 (own-region T and X2 printed beside, split-family count)",
+        "B5 write the analysis.py driver (not written at 6af3a85)",
+        "B6 stats.py L585 comment pointer L17966 -> L17973; manifest states the LeetCode id sort order (reading (b))"
+      ]
+    }
+  ],
+  "draw": {
+    "state": "DONE (drawn once; L2 MET)",
+    "commit": "3c70660e8a6edeaabafaf4239bf91d7fe69a9180 (parent 449737330bc4880566719f05377eec09beaef937), branch worktree-agent-adb18465164aaf122, NOT MERGED (git merge-base --is-ancestor 3c70660 main rc 1; branch --contains = that branch only)",
+    "date": "2026-09-25",
+    "by": "run-operator (exit 0: the run-operator's statement, not observed by the registrar)",
+    "seed": "LCB-STAGE0-SPLIT:cc7a6d7f31345d571253c67ca9799d2e8a3d95c4 (split_manifest.json 'seed'; label OF RECORD, dev false)",
+    "code_head": "4497373 (runlog [R1] 'dirty paths: none; HEAD 449737330bc4880566719f05377eec09beaef937'); draw.py blob:ed5801a8e37132cdc4fa4e742d5ed1854d708a16, common.py blob:022f11bfcca6666aa96ec0c9fe46e4568209e757, __init__.py blob:a861097a56475bfcadfb884dd5536fe7e6466877, blob-identical at ed948d6 / 4497373 / 3c70660 (inside the READY's identity line)",
+    "outputs": {
+      "experiment_results/lcb_stage0/manifests/split_side.tsv": "blob:0a5da5ab2211907b50f1b7db0c22aa7adb58c8a2 / sha256-lf f0a694b268eb8ed7cebf671c9779de1ea65851d008abfe7e819ec77b90e64317 (0 CR; no CRLF rendering)",
+      "experiment_results/lcb_stage0/manifests/closure_edges.tsv": "blob:fdffafed79ac632168036fe61e509735e8d60eae / sha256-lf a94bb29ad15c20566ba5988df89bbbe876436130c233a620645095f8e9230cf4 (0 CR)",
+      "experiment_results/lcb_stage0/manifests/split_manifest.json": "blob:4348585084c82d43b3df9ef504219d7f2071137c / sha256-lf 8a655d5896e630ab3486d33b7959215fbc904bded028ef92912d5b14c619e7e5 (0 CR)",
+      "experiment_results/lcb_stage0/manifests/split_runlog.txt": "blob:15ee194aa7ba48cf851a93842c682b51197110ec / sha256-lf eacea12d2fd2d7112a7635b490708c5549ee0a65a86c5c4b3a72ddf66a25f542 (0 CR)"
+    },
+    "pins_verified_by": "registrar: git rev-parse 3c70660:<path>, git show 3c70660:<path> | sha256sum, the worktree bytes; equal to the brief and to the review's pins",
+    "texts_db": "TAXOARENA_LCB_ROOT/lcb_v6_texts_7d2f4cad635b254d.db file sha256 5f8ae5d8acbfa4dcf97cf6fb329cc51af4cb7c108be4299b52fc01838cf689be, unchanged before and after (registrar sha256sum at the record; the review before/after its reads)",
+    "result": "CK-CLOSE-v2 P 91 / O 0 / D 0 edges; band 15-19 tokens 134 pairs; edge-set sha16 c3498356c2cc5e11; 986 components over 1,055 problems (49 multi, largest 8, Kish 1.214218 upper bound); EVAL 296/314, GATE 99/111, TRAIN 591/630 (components/problems); shares 0.2976 / 0.1052 / 0.5972; CK-CLOSE content-disjoint PASS on TRAIN-EVAL, TRAIN-GATE, GATE-EVAL",
+    "l2_review": {
+      "file": "docs/reviews/POSTDRAW_lcb_stage0.md",
+      "commit": "dfeb9b374ccaa3794660f161ae2204adbc5b6f1e",
+      "blob": "blob:8911b3c86c0764d620a59e0557aa945fb76725bf / sha256-lf 677c73413f13c64e95b5cd4154c007106161e547e4048d682ea505236c428ef5 (working tree LF, equal)",
+      "section": "# POST-DRAW review L2 (R4): LCB-STAGE0-INTERACTION record split, draw commit 3c70660 / ## VERDICT",
+      "verdict": "R-L2 MET: 0 of 1,055 problems differ in side or any other split_side.tsv field; closure_edges.tsv equal edge by edge (91/91); content disjointness re-checked independently on the three side pairs; 17/17 claims CONFIRMED; findings LOW only",
+      "independence": "rederive.py imports none of draw.py / common.py / ingest.py / indep_draw.py; stem_key re-implemented (norm-v1); P edges by per-pair diagonal DP; BFS components; integer quotas; record seed; compared against git show 3c70660",
+      "findings": [
+        "F1 LOW: content-closed is relative to A7's R = 6 policy; 366 cross-side pairs share a raw run >= 20 tokens (boilerplate among the 8 longest read); unmasked cross-side pairs at R = 6/8/10/15/20/30: 0/14/15/27/47/72; the outcome must write '(R = 6 policy)' and disclose the 15-19 band: 134 pairs, 76 cross-side",
+        "F2 LOW: split_side.tsv's stratum column is the COMPONENT stratum; differs from the problem's own for 40 problems; the primary test's strata (format x dhat quintile) unaffected; name it in the outcome or the analysis",
+        "F3 LOW (carried from READY D8): 'run once' / 'dirty paths: none' are the tool's statements; one commit of the outputs on any ref; byte-deterministic given texts DB and seed",
+        "F4 LOW: split_manifest.json does not pin __init__.py (blob-identical at ed948d6/4497373/3c70660); pin it in future draw manifests"
+      ]
+    },
+    "words": "content-closed under CK-CLOSE-v2 (R = 6 policy) -- the qualifier mandatory (F1); before dfeb9b3: id-disjoint only",
+    "record": "docs/judge_v2_program.md L18545-L18591 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; no LCB outcome value read) — LCB-STAGE0-INTERACTION RECORD SPLIT DRAWN ONCE (3c70660, NOT MERGED) AND RE-DERIVED INDEPENDENTLY ...\"; _as_of the commit that writes it, parent dfeb9b3, re-grepped)"
+  },
+  "ingest": {
+    "state": "DONE",
+    "commit": "f646b478c68d58deb8c0e48d1deee78a99481665 (parent 3c70660), branch worktree-agent-adb18465164aaf122, NOT MERGED (git merge-base --is-ancestor f646b478 main rc 1; branch --contains = that branch only)",
+    "date": "2026-09-25",
+    "by": "run-operator (both rc 0 and zero calls: the run-operator's statements, not observed by the registrar)",
+    "outcomes": "M = 26 (0 dropped; support floor M >= 20 HOLDS); S3 pass-without-code on TRAIN+GATE only: {'Grok-3-Mini (High)': 9}, every other model 0; eval_sealed 8,164 cells, lcb_v6_eval_sealed_266d26872c31ce00.db, file sha256 74ea30e5898384bdedc9b1b2860f46e4037095bef712122083a6f5a02520a0ec (cell_table_sha 266d26872c31ce00...); train_gate 19,266 cells, lcb_v6_train_gate_34e58f18b99d7611.db, file sha256 7ac912737b40afec6423692985c2db7bed4325676f8a8e66d4941f95cc4f392e; manifest sha256 009938c1fad576d152b4ddd15e8d394e5218c396fc004da66e1856bd0a4f2a68; sealed_note: opened by NOTHING in stage 0 after this write (H3)",
+    "construction": "construction DB lcb_v6_construction_2a94f2dbf91b4371.db, 741 TRAIN+GATE rows (630 + 111), table-sha 2a94f2dbf91b4371..., file sha256 fbd9613996afef3e62b768594d80f20ffa2c942d31403c665b31bc2818b80dc9; EVAL routing DB lcb_v6_eval_texts_92764cb2900dd0dc.db, 314 rows, file sha256 dfce18dea0e344e7104c906be7c6ee550fcd4a0c0fa0e529e743cda1eba1bba3; GATE export 111 ids, pool p94b63cd78524813b; corpus_id_offset 10,000,000; the build must print fetched 741",
+    "artefacts": {
+      "experiment_configs/lcb_stage0/lcb_af_bareq512_s42.toml": "blob:306bee1ff521b48fee8e514b33dce880b47951c0 / sha256-lf 468a43efb9fb0db84d1563892dda765c36592ac4910c8e5c3d4697fa5c6c2b7d",
+      "experiment_configs/lcb_stage0/lcb_gate_ids.json": "blob:61fd073b70a2406b49d1d20dd9a061735acf860c / sha256-lf 66cf5da10e1ae73a1965f5130b70a4f372524e5f8ceafc48586daba50bc6664e",
+      "experiment_results/lcb_stage0/manifests/construction_manifest.json": "blob:effdcce2cccb051ca3b4d9a03ecbbb193a5753c9 / sha256-lf bf5531e37821469a7ba64b734bc2f84bf9284a821c0fe16e5058a391a0d8e1dc",
+      "experiment_results/lcb_stage0/manifests/ingest_outcomes_manifest.json": "blob:40587941cf66f00f2f85c47439b3d310e4341bfe / sha256-lf 009938c1fad576d152b4ddd15e8d394e5218c396fc004da66e1856bd0a4f2a68",
+      "experiment_results/lcb_stage0/ingest_outcomes_transcript.txt": "blob:77be1a9f0b400b78e0b8b83f1552ffac9ceafe20 / sha256-lf 91d8f13ac66df644fdbce3e8f9000ae8efa71796e649bf7742dfd1488273cab0",
+      "experiment_results/lcb_stage0/ingest_construction_transcript.txt": "blob:332a8db1e9c2024f5584c6e28e454c95107e6a18 / sha256-lf ec0c47be1ab61de876d108b4f6e3afaf8f9071fad0583d2f9894b025da58d25c"
+    },
+    "artefacts_verified_by": "registrar: git rev-parse f646b478:<path>, sha256 of git cat-file -p; cross-checked against the manifests' filled_sha256 / gate_ids_sha256 / the transcript's manifest sha",
+    "l3_backup": "MET: E:\\TaxoArena_backup_2026-09-25\\lcb\\, 100 files besides SHA256SUMS, 1,386,696,956 bytes, sha256sum -c SHA256SUMS OK (registrar-verified at the record); both texts DBs, eval_sealed, train_gate, construction and eval_texts DBs included. Timing: 90 files verified BEFORE --outcomes (the run-operator's commit message; the orchestrator's brief says 100 before; the commit message's reading is of record), 100 after the new DBs were added. E: is the SAME physical disk",
+    "owed_in_outcome": "D8: the (vii) matrix-leg EVAL read inside --outcomes (0 dropped)",
+    "record": "docs/judge_v2_program.md L18593-L18660 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; no LCB outcome value read) — LCB-STAGE0-INTERACTION DELTA READY 1ceafae of 4497373 (NOT MERGED): ...\"; _as_of the commit that writes it, parent 1ceafae, re-grepped)"
+  },
+  "d9": {
+    "state": "RULED 2026-09-25; the byte run REGISTERED as LCB-D9-BYTE-INERTNESS (docs/agents/results/LCB-D9-BYTE-INERTNESS.json) [2026-09-25 registrar: RAN; VALID; C1 FAILED as registered (non-determinism, change not implicated); D9 OPEN, carried by LCB-D9B-BYTE-INERTNESS (registered, not READY); merge NOT READY] [2026-09-25 registrar, at the outcome: the Kotlin / toml merge still NOT READY on LCB-D9B-BYTE-INERTNESS] [2026-09-25 registrar: D9 DISCHARGED by LCB-D9B-BYTE-INERTNESS (5a51d52; declared-drop words only); the merge READY TO MERGE under conditions 1-8; not merged] [2026-09-25 registrar: the Kotlin MERGED at ca4afcd under conditions 1-8 as scored in the merge record]",
+    "ruling_file": "lcb_d9_ruling.md (session scratchpad, not committed), sha256 7e8f16b03aead981f7f481ad8d9dc94071c4288538948b9c74a0b8a7e58e57a1 (ASCII, LF, 0 CR, 148 lines, 17,748 bytes), the tree-construction-specialist's own write, recorded VERBATIM",
+    "substance": "Q1: the structural proof does NOT reach channels (i)-(v) for any existing corpus, so D9 is discharged by (a), the byte run; option (b) not taken. Q2: the arm is the AG_NEWS smoke ag_news_smoke_s42.toml (blob efd82bda); leg A a62c7e0, leg B 4497373, each from its own throw-away worktree on byte-identical sha-pinned copies of the main embeddings_cache.db and ag_news_smoke_cache_v1.db (copied WITH its -wal; only the copy is checkpointed); discriminator D9-R1-R3 plus the sanity lines; C1 byte identity over the fixed file list with the declared fields dropped; ~15 min, 30-min window; after the K46 posting AND after the LCB window, never overlapping. Q3: once, on 4497373; any later src/main edit voids it",
+    "label": "a MERGE GATE for the Kotlin; does NOT gate the stage-0 analysis (the orchestrator's)",
+    "record": "docs/judge_v2_program.md L18662-L18872 (section \"## Registered 2026-09-25 (before any code or call) — LCB-D9-BYTE-INERTNESS: ...\"; the ruling VERBATIM between the marker lines L18666 and L18815, i.e. L18667-L18814; _as_of the commit that writes it, parent 1ceafae, re-grepped)"
+  },
+  "author_decisions": [
+    {
+      "date": "2026-09-25",
+      "item": "(a) start the LCB-STAGE0 rule-7 build window during the ARCH-V2-PILOT-K46 posting; (b) register parallel posting in judge_v2 (the orchestrator's offer)",
+      "choice": "do both, start the LCB build now and register parallel posting",
+      "text": "VERBATIM: \"do both, start the LCB build now and register parallel posting\". (a) executed under L4.1-L4.7 (ruling ab90e24); (b) OWED: being drafted, NOT registered; no parallel posting before its registration",
+      "record": "docs/judge_v2_program.md L18874-L18906 (section \"## Author's decision and registrar's record 2026-09-25 (insertion only; zero calls; no LCB outcome value read) — \"do both\": the LCB-STAGE0-INTERACTION rule-7 build window MAY run beside the ARCH-V2-PILOT-K46 posting ...\"; the ruling's L4 VERBATIM between the marker lines L18880 and L18894; lines _as_of the commit that writes them, parent ab90e24, re-grepped); plan Amendment 23"
+    }
+  ],
+  "incidents": [
+    {
+      "id": "LCB-WINDOW-1150",
+      "date": "2026-09-25",
+      "window": "11:47:15-11:51:20 (build 11:48:45-11:50:24, exit 1)",
+      "worktree": ".claude/worktrees/agent-adb18465164aaf122 at f646b478 (branch worktree-agent-adb18465164aaf122, NOT MERGED)",
+      "passed": "L4.1-L4.4, L5, L6 (main caches byte-identical before/after: embeddings 39,631 rows sha16 348808c8bf968013, queries 31,986 rows sha16 5efabd42a268619e), L7 (963 tokens), E: backup SHA256SUMS OK; guard passed (log L45) before 'fetched 741' (L46); TRAIN-ONLY 0 EVAL",
+      "aborted_snapshot": "20260925_115023_Headless_Run_Auto_ge (11 nodes; dag_snapshots.jsonl sha256 35a92b94c0b4b62de012ad75c34186c75fa24ccc58eafb9db9b8439dfde9fb5e); NOT ADMISSIBLE (R10): kept as evidence, never an analysis input, never compared with the rerun tree, never used for a decision",
+      "cause": "runTrickle = true: the MAIN trickle's hoisted fetch in the same JVM (HeadlessBenchmarkRunner L918) re-ran lcbWorkDirGuard on the now-warm cache (630 rows); the refusal was swallowed by catch-Throwable (L918-L922), then the non-hoisted fetch at L1344 failed loudly",
+      "not_run": "site null, L8 checkpoint, pool_guard, D9, the analysis",
+      "construction_db_written": "lcb_v6_construction_2a94f2dbf91b4371.db sha256 fbd9613996afef3e62b768594d80f20ffa2c942d31403c665b31bc2818b80dc9 -> 358192eece73f5796b796d0ba017a1148e33fb9c311169c21a976aa6361228cc, -wal 152,472 bytes sha256 bb8e70034e844725..., plus -shm (reserved_pool rows, as P1 expects); R2 renames it as evidence, never checkpointed; R3 restores fbd96139 from the L3 backup",
+      "foreign_process_disclosed": "another agent's selftest (PID 56164 tools/analysis/archv2_pilot/selftest.py --part all; PID 44576 the same under -O), in the process list at BUILD-END and WINDOW-CLOSE, absent at BUILD-START; contrary to L4.1; did NOT cause the failure; W1 at close all FREE; disclosed (L4.1b)",
+      "evidence": "b3e8c9412baae1806077aaf334fbe17eeda02481 experiment_results/lcb_stage0/window/ (incl. incident_build_20260925_1150/); E:\\TaxoArena_backup_2026-09-25\\lcb_window_incident\\",
+      "why_missed": "the reviewer's own account (docs/reviews/READY_lcb_stage0.md at 5f3c06e, '## Why my delta READY (1ceafae) did not catch this, for the record'): the guard was reviewed as a unit (one fetch per fetcher in a fresh process, plus javap); the runner was not walked for a second fetch in the same JVM, nor the catch-Throwable at L918-L922 read; 'It passes on the build worktree as it stands' was true only for the first call; lesson: review a guard against EVERY invocation of its path in one process, by call-site count",
+      "fix": "6b9fc7c278121868cb79477a9e12803b36830a3a (parent b3e8c94), NOT MERGED: cold check once per JVM (LcbWorkDirGuardState), later calls assert the same (dir, cache); MMLUDatasetFetcher.kt blob:a2a85c03 / sha256-lf16:7a408454036d3886 / sha256-crlf16:728648dbb035e98f; test LiveCodeBenchDatasetTypeTest.kt blob:c53115cd",
+      "residual": "LOW, disclosed, not gating: catch-Throwable at HeadlessBenchmarkRunner L909/L922 unchanged inside the D9 bytes",
+      "source": "docs/judge_v2_program.md L19241-L19271 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; no LCB outcome value read) — LCB-STAGE0-INTERACTION BUILD-WINDOW INCIDENT (11:48-11:51, exit 1 after the snapshot; b3e8c94) and RERUN READY ...\"; _as_of the commit that writes it, parent 5f3c06e, re-grepped)"
+    }
+  ],
+  "window": {
+    "state": "DONE (2026-09-25 12:15:54-12:24:13; 087e43d, NOT MERGED) [was: RERUN READY (2026-09-25)]",
+    "ready": {
+      "file": "docs/reviews/READY_lcb_stage0.md",
+      "commit": "5f3c06e",
+      "section": "# RERUN READY: the LCB-STAGE0 build window after the 2026-09-25 11:50 incident; the guard fix at 6b9fc7c / ## VERDICT: READY for the rerun of the build window, under steps R1-R11 below",
+      "review_blob": "blob:f2de6b8740a1cc4862c037d7973217bb0a4f9639"
+    },
+    "steps": "R1 stop the idle JVMs (PIDs 51100, 5488), then no java.exe; R2 rename the written construction DB with its -wal/-shm as evidence, no SQLite open, never checkpointed, copy to E: lcb_window_incident + SHA256SUMS; R3 RESTORE (not re-create) the ingest-time DB from the L3 backup, require sha256 fbd9613996afef3e62b768594d80f20ffa2c942d31403c665b31bc2818b80dc9, no -wal/-journal, livecodebench table-sha 2a94f2dbf91b4371...; R4 fresh worktree .claude/worktrees/lcb-build-2 at 6b9fc7c (HEAD, .git a file, no root caches, clean status); R5 nothing run in it before the build (no Gradle test, selftest, dry-run); R6 L5, L6, L7; R7 build with the required log lines (guard passed, first check of this process; fetched 741; 'same process, already checked' at the trickle; 0 held-out; MAIN trickle completes; exit 0); a refusal or exit != 0 before the snapshot = FAILED PRECONDITION; no third run without a new ruling; R8 checkpoint, pool_guard on the GATE export, site null from lcb-build-2; R9 pins, then analysis.py from lcb-build-2; R10 the aborted tree NOT admissible, DISCLOSURES line in the outcome; R11 scope",
+    "l4": "L4.1-L4.7 stand, plus L4.1a (no java.exe at open, daemons included) and L4.1b (tool freeze announced to all lanes by the orchestrator; a foreign python/java other than the K46 poster makes the next leg wait); L5-L10 stand",
+    "source": "docs/judge_v2_program.md L19241-L19271 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; no LCB outcome value read) — LCB-STAGE0-INTERACTION BUILD-WINDOW INCIDENT (11:48-11:51, exit 1 after the snapshot; b3e8c94) and RERUN READY ...\"; _as_of the commit that writes it, parent 5f3c06e, re-grepped)",
+    "rerun": {
+      "state": "DONE",
+      "commit": "087e43d51c2a5a5fb8d67df285ab1099560ed951 (parent 6b9fc7c), branch lcb-build-2, worktree .claude/worktrees/lcb-build-2, 31 files, NOT MERGED",
+      "by": "run-operator (values from 00_window.txt and 03_build.log; the registrar re-read the pins so marked in the programme section)",
+      "window": "12:15:54-12:24:13; build 12:18:06-12:20:01 exit 0; site null 12:22:12-12:23:34 exit 0",
+      "process_checks": "K46 poster PID 53840 alive at every print; R1: first gradlew --stop failed (exit 1, 12:15:55), retry via PowerShell 12:16:00 '1 Daemon stopped', then PIDs 51100 and 5488 absent (L4.1a MET); no foreign python/java at any leg (L4.1b: no leg waited); PID 56872 = the window's own Gradle daemon (operator's attribution), listed BUILD-END to WINDOW-CLOSE, stopped at close; free RAM 27.86-30.64 GB of 63.11 after R1 (27.33 before)",
+      "r2_aborted_evidence": "renamed without open to lcb_v6_construction_2a94f2dbf91b4371.aborted_build_20260925_1150.db (+ -wal/-shm): db 358192eece73f5796b796d0ba017a1148e33fb9c311169c21a976aa6361228cc, -wal bb8e70034e8447258e5ddd979c4a2ec08dfd3375b895eed41d47e4feeab7fce6, -shm 9e1b472cbb3bf663b2449e7b416bed55d0a6a311f2771da757c1ee4ec131fe9b; E:\\TaxoArena_backup_2026-09-25\\lcb_window_incident\\ SHA256SUMS OK",
+      "r3_restored": "sha256 fbd9613996afef3e62b768594d80f20ffa2c942d31403c665b31bc2818b80dc9, no sidecars, livecodebench table-sha 2a94f2dbf91b43711465ab8f79ef49a07df5debbccad629769304c18d431a1f6 over 741 rows",
+      "r4_worktree": "lcb-build-2 at 6b9fc7c, .git a file, no root caches, status 0 lines; toml blob:306bee1ff521b48fee8e514b33dce880b47951c0 / sha256-lf 468a43efb9fb0db84d1563892dda765c36592ac4910c8e5c3d4697fa5c6c2b7d (= manifest filled_sha256) / sha256-crlf 104b772958bb250758e0385acb3dce7bbbc7c26578113469d3cc9b50c9aee76a (the worktree file, printed in the log)",
+      "l5_l6_l7": "all pass; main caches before = after, both views: embeddings 39,631 / 348808c8bf968013, queries 31,986 / 5efabd42a268619e; sizes and mtimes of embeddings_cache.db and snapshots.db unchanged, -wal 0 B; L7 963 tokens, 4,096 dims",
+      "r7_build_lines": "03_build.log L27 guard passed (first check of this process); L28 fetched 741; L33 SPLIT-SIDE 630 train / 111 test; L404 fixed point iteration 9 certified; L472 0 EVAL texts (111 keys checked) after construction; L478 0 EVAL at saveSnapshot; L479-L480 snapshot saved; L484 'same process, already checked' at the trickle; MAIN trickle completed; exit 0",
+      "snapshot": "20260925_121944_Headless_Run_Auto_ge (13 nodes; fixed point certified at iteration 9)",
+      "dag_snapshots_jsonl": "experiment_results/lcb_stage0/lcb_af_bareq512_s42/seed_42/dag_snapshots.jsonl blob:f8d960a0658967618af5c958b46bd7e3749a2f8a / sha256-lf 1fa662d53469e1c6a5c906892953da07cc57bcfc29fd7a9f4672647f8a388f78 (worktree file identical, no CR)",
+      "worktree_caches_checkpointed": "embeddings_cache.db sha256 ea4220391c43d9bd9e1253b0cc1aec2098af888af92fe63c189f0c0c69ee01b6 (741 embeddings / 630 queries; pre-checkpoint 124c3ec5... + -wal 93e5bd2a...); snapshots.db sha256 af75292a57e65738d2b2b6d1b02f1f822f363f6d385dae4100e52fe10e0f2005; both -wal 0 B",
+      "construction_db_after": "pre-checkpoint db 358192ee... (the same main-file bytes as the aborted build) + -wal 354192a378999ec1fda6cfd44226a6755968954e1f5f06d45e50bbaf909fc34d + -shm aaba767f..., copied to E:\\TaxoArena_backup_2026-09-25\\lcb_window_rerun\\construction_db_pre_checkpoint\\ (SHA256SUMS OK); CHECKPOINTED BY THE RUN-OPERATOR 12:21:31 (H5 names the data-steward: DISCLOSED DEVIATION) -> sha256 d621f27778292e64d63273381a426afc9d699a3fdea3d494f84e081c3348c71a, no sidecar; reserved_pool 111 rows f2318c96fd9e09ef; livecodebench 741 rows 2a94f2dbf91b4371 unchanged",
+      "pool_guard": "p94b63cd78524813b OK: keys 3, ids 111, judgeable 111, sentinels 0 (export experiment_results/lcb_stage0/window_rerun/gate_export_20260925_121944_Headless_Run_Auto_ge.json)",
+      "site_null": "experiment_results/lcb_stage0/site_null_lcb_af512.csv, 300 reps, exit 0, 6 site rows: blob:cf90314e241d88ff4bb0bcdbe57121da340bf805 / sha256-lf 65f50739143dfc65e413048dbf632fb0e940aa8c9eac64d9b61ddc7b0ec5304f (of record) / sha256-crlf 5db716c2eaf0e0803a5073604d58ea0c7cfd38cdbb108030ee951b9171eff8f5 (the worktree file; the operator's printed pin; the --pins JSON must label it sha256-crlf)",
+      "backups": "E:\\TaxoArena_backup_2026-09-25\\lcb_window_rerun\\ (worktree\\ 5 files and construction_db_pre_checkpoint\\ 3 files: SHA256SUMS OK, re-run by the registrar; after_rerun_checkpointed.db d621f277...)",
+      "disclosures": [
+        "the construction DB was checkpointed by the run-operator, not by the data-steward named in H5",
+        "12:20:44: a mis-quoted first checkpoint attempt created an EMPTY stray file Z:\\FAC\\TUBerlin\\THESIS\\TaxoArena_data\\lcb$B (journal_mode delete reported); db 358192ee / -wal 354192a3 printed unchanged; the -shm after-state not printed (operator: only the -shm changed); moved to the scratchpad 12:21:48; none remains (registrar re-read)",
+        "PID 56872 (the window's own Gradle daemon) listed from BUILD-END to WINDOW-CLOSE, stopped at close"
+      ],
+      "source": "docs/judge_v2_program.md L19273-L19304 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; no LCB outcome value read) — LCB-STAGE0-INTERACTION BUILD WINDOW RERUN DONE under R1-R11 (087e43d on branch lcb-build-2, NOT MERGED): ...\"; _as_of the commit that writes it, parent 5bfce6c, re-grepped)"
+    }
+  },
+  "defects_postrun": [
+    "D1 MEDIUM: the R10 / 7(b) / 8 disclosures are absent from the write-once outcome; the renderer's DISCLOSURES is a module-level constant (analysis.py L85-L98), no input path; READY-side miss (RERUN READY R10 at 5f3c06e; the registrar's 087e43d item 9) -> the registrar's DISCLOSURES ADDENDUM in the outcome record (item 9)",
+    "D2 MEDIUM: the power / scope statement synthetic, not re-derived at readout (single-contrast v 0.1765 vs synthetic 0.0675, 2.6x); effective design one within-stdin split -> bracket on the STOP sentence; optional zero-call re-simulation (LCB-STAGE0-POWER-RESIM, drafted)",
+    "D3 LOW: p_X2 tie resolution at the 0.05 leg floor (0.7101 / 0.7111 exact / 0.7031); verdict unaffected",
+    "D4 LOW: the outcome's F1 text drops '(at the stated power)' and the web-survey clause; restored in the record and the chip",
+    "D5 LOW: INPUTS hash kinds unlabelled and mixed; kinds and LF renderings of record in numbers_of_record.hash_kinds_d5",
+    "D6 LOW: stale split words; of record 'content-closed under CK-CLOSE-v2 (R = 6 policy)'",
+    "D7 LOW: dhat ties broken by fit-convergence noise; G1 FAIL robust (0 of 20 tie-breaks at or below 0.01)",
+    "D8 LOW: 13 TRAIN texts in two leaves (643 memberships / 630 ids); routing agreement 608 counts any member leaf (603 single-leaf); no statistic affected"
+  ],
+  "disclosures_addendum": "2026-09-25, registrar (review f222c28 D1); item 9 of docs/judge_v2_program.md L19732-L19800 (section \"## LCB-STAGE0-INTERACTION (2026-09-25, 0 calls; outcome 3bcc9ab on branch lcb-build-2, post-run review f222c28) — VALID; STOP AS REGISTERED ...\"; _as_of the commit that writes it, parent ab8aee9, re-grepped): (i) aborted window 11:48-11:50, snapshot 20260925_115023_Headless_Run_Auto_ge, dag 35a92b94c0b4b62d..., NOT admissible (L19243; R10 L19259); (ii) cause: guard re-ran at the trickle's second fetch, swallowed at HeadlessBenchmarkRunner L922, surfaced at L1344 (L19243); (iii) construction DB restored to fbd96139... from the L3 backup (L19279-L19281); (iv) rerun from a fresh worktree at 6b9fc7c (L19283); (v) TRAIN texts embedded twice, locally, same Ollama model, only the rerun's cache read (R10 L19259; L19288); (vi) the first window's foreign selftest PIDs 56164 / 44576 (L19243); (vii) 7(b): the run-operator, not the data-steward, checkpointed the construction DB -> d621f277... (L19289); (viii) 8: stray empty 'lcb$B' file 12:20:44 / 12:21:48 (L19294)",
+  "landing": "records only, by path, from 3bcc9ab: experiment_results/lcb_stage0/{lcb_stage0_outcome.txt, analysis_run/pins.json, analysis_run/analysis_stdout.txt}, none present on main before; blob-equal (8fbdb07f / dd330fc1 / 108a6bc2); main's 5 d9/helpers untouched. NOT landed: src/main/** (4), src/test/** (3), experiment_configs/lcb_stage0/*.toml (+ .toml.template, lcb_gate_ids.json): wait for LCB-D9B-BYTE-INERTNESS (ConfigParsesTest would fail on LIVECODEBENCH). Other evidence stays on the branch (087e43d / 3bcc9ab), reachable through the tag lcb-stage0-outcome-of-record [2026-09-25 registrar: src/main (4), src/test (3) and experiment_configs/lcb_stage0 (3) READY TO MERGE under the D9b review's conditions 1-8 (atomic, by path, tag lcb-build-2-d9b-discharged first (met), tree checks 98b29c3a / 32e859f4, clean-worktree suite); NOT MERGED] [2026-09-25 registrar: Kotlin/tests/configs merged at ca4afcd (10 paths by path from 087e43d, tag lcb-build-2-d9b-discharged; blobs equal; src/main 98b29c3a, src/test 32e859f4); conditions 1-4, 7, 8 MET; 5 MET WITH A DEVIATION FROM ITS LETTER (suite 451 / 3 failures / 0 errors: the two worktree failures plus NoIsReservedInSourceTest, the recorded red of L18093, acknowledged in the commit message); 6 relayed, not captured; docs/judge_v2_program.md L20054-L20090 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — LCB-STAGE0-INTERACTION's Kotlin, tests and configs MERGED at ca4afcd ... and the session evidence ARCHIVED at TaxoArena_data\\evidence_2026-09-25 ...\"; _as_of the commit that writes it, parent c16ab01, re-grepped)]",
+  "merge": {
+    "commit": "ca4afcd6a2c838ed490dd043fbc1ab38b2bcee31 (parent 73e09b6; 2026-09-25 18:34:22)",
+    "paths": "10: src/main 4 (TaxonomyConfig.kt, CorpusRegistry.kt, CorpusSource.kt, MMLUDatasetFetcher.kt), src/test 3 (LiveCodeBenchDatasetTypeTest.kt A, PinnedPoolsReproduceTest.kt M, LcbStage0ConfigTest.kt A), experiment_configs/lcb_stage0 3 (lcb_af_bareq512_s42.toml, .toml.template, lcb_gate_ids.json)",
+    "trees": "src/main 98b29c3a887ca7427aa8771dce36844ab43a0f6e; src/test 32e859f43c89d7abd33609f10bfa112c10817e0d (= 087e43d, the tested trees)",
+    "suite": "clean worktree 3187b6f + 10 paths (removed): tests 451, failures 3, errors 0, skipped 0; ConfigParsesTest 9/0, LiveCodeBenchDatasetTypeTest 8/0, LcbStage0ConfigTest 2/0, PinnedPoolsReproduceTest 5/0 (relayed); failures MrlRoutingTest.testMrlConfigDefaults, TraceEnvelopeUnwrapTest (blank trace column), NoIsReservedInSourceTest (test.log); compileKotlin / compileTestKotlin FROM-CACHE (disclosed); main DBs byte-identical before / after incl. -wal / -shm mtimes (db_before.txt = db_after.txt, sha256 89b22335...)",
+    "conditions": {
+      "1": "MET (tag lcb-build-2-d9b-discharged -> 087e43d, present before the merge)",
+      "2": "MET (one commit, 10 paths)",
+      "3": "MET on the commit (10 paths, nothing else); staged count relayed",
+      "4": "MET (trees 98b29c3a / 32e859f4; 10 of 10 blobs = 087e43d; a62c7e0..ca4afcd src/main = the 4 files; ancestry 73e09b6, 3187b6f OK)",
+      "5": "MET WITH A DEVIATION FROM ITS LETTER: a third failure, NoIsReservedInSourceTest, the known pre-existing red on main (L18093; NOISRESERVED-TEST-ALLOWLIST); not in a merged path; acknowledged in the commit message; not reviewer-ratified",
+      "6": "NOT CAPTURED (relayed as met; not contradicted); the registrar's own docs-only processes and commit 73e09b6 (18:32:07) fell inside the suite window (18:31:14-18:32:25), no DB, no Gradle, no src/",
+      "7": "MET (73e09b6 is the parent; one merge at a time)",
+      "8": "MET (a62c7e0..73e09b6 on src/main src/test build files config/: 0)"
+    },
+    "evidence": "scratchpad t0 (436e4e9a...), test.log (89f7e869...), db_before.txt = db_after.txt (89b22335...); NOT yet in the archive",
+    "recorded_at": "docs/judge_v2_program.md L20054-L20090 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — LCB-STAGE0-INTERACTION's Kotlin, tests and configs MERGED at ca4afcd ... and the session evidence ARCHIVED at TaxoArena_data\\evidence_2026-09-25 ...\"; _as_of the commit that writes it, parent c16ab01, re-grepped)"
+  },
+  "plain_description": {
+    "sq": "SQ1 Use",
+    "what": "On LiveCodeBench (coding problems, 26 models), a label-free tree is built on problem texts. The test asks whether some models do unusually well or badly in particular tree regions, beyond overall problem difficulty and input format. It is a pre-check before paying for a specialised-judge experiment.",
+    "why": "Per-cell evaluation and specialised judges only pay off if models really have region-specific strengths on this corpus.",
+    "information": "Result (no new calls): STOP. No model-by-region effect was found on the training side. A later power check corrected the original claim: at the actual design the test could only reliably detect effects larger than about 0.30 logit SD, so it is uninformative about smaller ones. This is bounded, never 'no interaction'. The judged stage is not run on LiveCodeBench. This covers this corpus, roster and tree recipe only.",
+    "written": "2026-10-07"
+  }
+}

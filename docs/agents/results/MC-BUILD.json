@@ -1,0 +1,98 @@
+{
+  "id": "MC-BUILD",
+  "title": "MC-BUILD: multi-corpus stage 1: the first six-corpus build (one construction loop over the union, 52 source/domain anchors; zero calls)",
+  "question": "Label-free, promoted bareq512 body, 0.30 split seed 42 on the union (21,606 queries, 18 models), local embeddings (6,375 new texts, 6.5 min); site null on the snapshot; descriptive: leaves, Top-1, certified sites per source vs the single-corpus builds.",
+  "kind": "build",
+  "state": "done",
+  "registration": {
+    "commit": "2bfecdb",
+    "program_lines": "docs/multi_corpus_design.md L268-L274 (stage 1 build) and L288-L356 (certification result and the design adjustment); no programme section",
+    "program_lines_as_of": "docs/multi_corpus_design.md at 4ec8f18",
+    "heading": "## Stage 1 build + stage 2b result (2026-09-11, zero calls)",
+    "outcome_heading": [
+      "docs/multi_corpus_design.md L288: ## Stage 1 certification result (2026-09-11) and the design adjustment it forces"
+    ],
+    "date": "2026-09-11"
+  },
+  "script": {
+    "path": "experiment_configs/multicorpus/mc6_s42.toml (construction chain; site null)",
+    "sha16": "n/a (construction chain)",
+    "commit": "2bfecdb"
+  },
+  "ready": null,
+  "go": "n/a (0 LLM calls)",
+  "run": {
+    "outcome_file": "experiment_results/multicorpus/site_null_mc6_s42.csv",
+    "outcome_commit": "2bfecdb",
+    "calls": 0,
+    "cce": 0,
+    "pool": "the union 0.30 split at seed 42 (the mc6_s42 build's own split)",
+    "date": "2026-09-11"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/)",
+    "commit": "2bfecdb",
+    "verdict": "BUILT; CERTIFICATION LOSES (5/94 vs 8-11 on MMLU-Pro alone): one loop over the union starves each anchor => federated construction (stage 1b)"
+  },
+  "criteria": [
+    {
+      "id": "descriptive",
+      "text": "leaves, Top-1, certified sites per source vs the single-corpus builds",
+      "result": "DELIVERED",
+      "value": "242 nodes, 147 leaves (MMLU-Pro 88, BBH 25, MATH 16, GPQA 11, IFEval 4, MuSR 3), Top-1 0.785 across 52 anchors; site null 5/94 certified (3 MMLU-Pro anchors + 2 deeper; BBH 0/1, GPQA 0/3, MATH 0/6, IFEval 0/1) vs 8-11 on MMLU-Pro alone",
+      "denominator": "94 sites; 52 anchors"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "design adjustment: federated construction (per-corpus trees grafted under a union root), the online-router form; stage 1b (MC-FED)"
+  },
+  "numbers_of_record": {
+    "tree": "242 nodes, 147 leaves; Top-1 0.785",
+    "certified": "5/94 (vs 8-11 on MMLU-Pro alone)"
+  },
+  "sentence_of_record": "MC-BUILD (2026-09-11, zero calls): the first six-corpus build: 242 nodes, 147 leaves (MMLU-Pro 88, BBH 25, MATH 16, GPQA 11, IFEval 4, MuSR 3), Top-1 0.785 across 52 anchors; site null 5/94 certified vs 8-11 on MMLU-Pro alone: one loop over the union starves each anchor of budget. Design adjustment: federated construction (per-corpus trees grafted under a union root).",
+  "chips": [
+    "BUILT",
+    "CERTIFICATION LOSES"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-23",
+      "by": "INCONSISTENCIES-PASS (registrar, zero calls; insertion only)",
+      "text": "NO-FILE 2026-09-23 by INCONSISTENCIES-PASS (registrar, zero calls; insertion only): no scored outcome .txt: the evidence is the TRACKED experiment_results/multicorpus/site_null_mc6_s42.csv, and the readout of record is docs/multi_corpus_design.md '## Stage 1 certification result (2026-09-11) and the design adjustment it forces'. [ledger: evidence cell of row MC-BUILD, v132]"
+    }
+  ],
+  "does_not_show": [
+    "a certified union tree from one loop"
+  ],
+  "ledger": {
+    "row_id": "MC-BUILD",
+    "version": "v48 (2bfecdb) [v132 2026-09-23: INCONSISTENCIES-PASS insertion in this row]"
+  },
+  "depends_on": [
+    "MC-FED",
+    "MC-LEAF",
+    "MC-ROUTER"
+  ],
+  "supersedes": null,
+  "superseded_by": "MC-FED",
+  "closed_line": false,
+  "sources": [
+    "docs/multi_corpus_design.md L268-L274 and L288-L356 (2bfecdb)",
+    "experiment_results/multicorpus/site_null_mc6_s42.csv (2bfecdb)",
+    "experiment_configs/multicorpus/mc6_s42.toml",
+    "docs/test_ledger.html row MC-BUILD (v48): chips verbatim, observed cell, evidence",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)"
+  ],
+  "last_update": "2026-09-23",
+  "plain_description": {
+    "sq": "SQ3 Taxonomy",
+    "what": "The first single construction loop over all six corpora together (21,606 questions, 18 models, 52 declared anchors). It counts leaves, filing accuracy and certified branch points per source against the single-corpus builds. No judge calls; descriptive.",
+    "why": "It checks whether one tree can be built over a multi-corpus union without losing quality.",
+    "information": "If certification holds up, one union loop is enough. If it collapses, the construction must change. Result: done. 147 leaves, filing accuracy 0.785. Only 5 of 94 branch points certified, against 8-11 on MMLU-Pro alone: one loop spreads the budget too thin per anchor. This led to the federated design (one tree per corpus, joined under a common root).",
+    "written": "2026-10-07"
+  }
+}

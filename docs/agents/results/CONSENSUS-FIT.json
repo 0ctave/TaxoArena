@@ -1,0 +1,116 @@
+{
+  "id": "CONSENSUS-FIT",
+  "title": "CONSENSUS-FIT: how much of a model's standing in a reference-based arena is being RIGHT, and how much is AGREEING WITH THE FIELD? (zero calls)",
+  "question": "Weighted logistic of the verdict on two signed contrasts (KEY, REF) fitted on ARENA-13 arm A (ensemble reference, n = 1,800) and x12 MAIN (the deployed grok reference, n = 9,142); plus a model-level fit of BT theta on standardised accuracy and standardised ensemble agreement, n = 13; falsifier stated in advance: if REF is not significantly positive once KEY is controlled, the consensus mechanism is unsupported.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "24cf708",
+    "program_lines": "docs/judge_v2_program.md L1206-L1228 (registration) and L1291-L1325 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-14 (before looking at any result, ZERO calls) — CONSENSUS-FIT: correctness or consensus, quantified",
+    "outcome_heading": [
+      "L1291: - **CONSENSUS-FIT OUTCOME (2026-09-14, zero calls): the reference outweighs correctness by 2.7 to 1, in both"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "tools/analysis/consensus_fit.py",
+    "sha16": "81dc1a2c3d273104 (at b28a475)",
+    "commit": "b28a475"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/consensusfit_outcome.txt",
+    "outcome_commit": "1ee0f5c",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-14"
+  },
+  "review": {
+    "file": "FORMAT-REF (2026-09-14) supplied the negative control: the REF contrast scores +0.507 with no reference shown, so 2.7:1 is an UPPER BOUND and the clean causal figure is +1.811 (carried in the observed cell)",
+    "commit": "e4b6167",
+    "verdict": "MATCH LEVEL CONFIRMED (an upper bound); MODEL LEVEL WITHDRAWN"
+  },
+  "criteria": [
+    {
+      "id": "match-level",
+      "text": "REF significantly positive once KEY is controlled",
+      "result": "HELD",
+      "value": "arm A KEY +0.516 +- 0.097, REF +1.380 +- 0.099; x12 MAIN KEY +0.788 +- 0.069, REF +2.177 +- 0.072 (odds x8.8 for the reference vs x2.2 for the key): agreeing with the reference is worth about 2.7x being right, an UPPER BOUND (FORMAT-REF's negative control: REF scores +0.507 with no reference shown; clean causal +1.811); without a model: on 6,049 key-decidable matches accuracy 0.922 when the reference backs the key-correct model, 0.657 when neither, 0.226 when the wrong one",
+      "denominator": "1,800 arm A + 9,142 x12 MAIN; 6,049 key-decidable"
+    },
+    {
+      "id": "model-level",
+      "text": "BT theta on standardised accuracy and ensemble agreement",
+      "result": "FAILED",
+      "value": "cannot identify anything: accuracy and agreement correlate 0.982 across the roster (VIF 27.5), neither coefficient survives permutation; the fitted consensus advantage explains 9% of the new contestant's lead over gemini: the ARENA-13 consensus-alignment mechanism is withdrawn",
+      "denominator": "13 models"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "if REF is not significantly positive once KEY is controlled, the consensus mechanism is unsupported",
+    "fired": false,
+    "note": "REF positive on both match sets; descriptive: on the 120 arm A matches where neither key nor reference favours a side the new model still wins 0.683 (arm A was single order with it always in slot A)"
+  },
+  "numbers_of_record": {
+    "arm_A": "KEY +0.516 +- 0.097; REF +1.380 +- 0.099",
+    "x12_MAIN": "KEY +0.788 +- 0.069; REF +2.177 +- 0.072 (odds x8.8 vs x2.2)",
+    "ratio": "2.7:1 (upper bound; clean +1.811 per FORMAT-REF)",
+    "accuracy_by_endorsement": "0.922 / 0.657 / 0.226 (n 6,049)",
+    "model_level": "r 0.982, VIF 27.5; 9% of the lead"
+  },
+  "sentence_of_record": "CONSENSUS-FIT (2026-09-14, zero calls): two reference constructions, two independent match sets, one answer: agreeing with the reference is worth about 2.7x being right (arm A KEY +0.516 +- 0.097, REF +1.380 +- 0.099; x12 MAIN KEY +0.788 +- 0.069, REF +2.177 +- 0.072), an UPPER BOUND (FORMAT-REF's negative control shows the REF contrast scores +0.507 even when the judge never saw a reference; the clean causal figure is +1.811); on 6,049 key-decidable matches accuracy is 0.922 when the reference backs the key-correct model, 0.657 when it backs neither, 0.226 when it backs the wrong one. MODEL LEVEL cannot identify anything (accuracy and agreement correlate 0.982, VIF 27.5) and the fitted consensus advantage explains 9% of the new contestant's lead: the ARENA-13 consensus-alignment mechanism is withdrawn.",
+  "chips": [
+    "MATCH LEVEL CONFIRMED",
+    "MODEL LEVEL WITHDRAWN"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-14",
+      "by": "FORMAT-REF (carried in the observed cell)",
+      "text": "the 2.7:1 is an upper bound: the REF contrast scores +0.507 (z = 4.6) with no reference in the prompt, so it is partly a difficulty / consensus proxy; the clean toggle gives +1.811 [+1.507, +2.121]."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a model-level consensus effect",
+    "the ratio as a causal figure (upper bound)"
+  ],
+  "ledger": {
+    "row_id": "CONSENSUS-FIT",
+    "version": "v70 (cdee03a); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "ARENA-13",
+    "DECOMP",
+    "FORMAT-REF",
+    "PAIR-NOREF"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L1206-L1228 and L1291-L1325 (24cf708 / b28a475)",
+    "experiment_results/x12_crossdomain/consensusfit_outcome.txt (1ee0f5c)",
+    "docs/test_ledger.html row CONSENSUS-FIT (v70): chips verbatim, observed cell, evidence",
+    "script sha16 = sha256 of tools/analysis/consensus_fit.py at b28a475, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Statistical model fitted on existing judged matches (no new calls): how much does the judge's verdict depend on a model being actually correct versus agreeing with the reference answer the judge is shown?",
+    "why": "If an LLM judge mostly rewards agreement with its reference, an arena measures conformity, not correctness.",
+    "information": "A large agreement effect would show the arena rewards matching the reference. Result: done; agreeing with the reference weighs about 2.7 times as much as being right, but this is an upper bound (part of it appears even when no reference is shown). At the model level nothing can be separated (correctness and agreement are almost the same), so an earlier 'consensus' explanation of one model's lead was withdrawn. Note: this test is on the older p2dca question family, later ruled 'history, not evidence'.",
+    "written": "2026-10-07"
+  }
+}

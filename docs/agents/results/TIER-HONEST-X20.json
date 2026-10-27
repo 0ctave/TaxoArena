@@ -1,0 +1,134 @@
+{
+  "id": "TIER-HONEST-X20",
+  "title": "TIER-HONEST-X20: does the finding the entire budget line rests on (within-tier separations disproportionately wrong; across-tier error-free) replicate with three times the edges? (zero calls; the 20-model board)",
+  "question": "The TIER-HONEST instrument on the 20-model board: key tiers at the 0.017 gap, per-pair question bootstrap, separations at 95% and the wrong directions among them, within-tier vs across-tier; the board's self-tiering and its cross-tier key inversions; the 66 shared and 124 novel pairs reported apart (only the novel pairs are an independent replication).",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "14e3915",
+    "program_lines": "docs/judge_v2_program.md L2888-L2908",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-14 (before any run, ZERO calls) — TIER-HONEST-X20: does the finding that motivated the whole budget line replicate with three times the edges?",
+    "outcome_heading": [
+      "L2926: - **TIER-HONEST-X20 (2026-09-14, zero calls): the finding the entire budget line rests on REPLICATES, on ...** (first run, sparse board; headline inverted 2026-09-15)",
+      "L3099: ## REVIEW of the 2026-09-14/15 session (2026-09-15, zero calls) — three headline conclusions are artefacts",
+      "L3146: - **X20-MERGED (2026-09-15, zero calls): the two x20 instruments rerun on the BOARD OF RECORD. PROFILE-RELIABILITY-X20 reverses from FAIL to PASS; TIER-HONEST-X20's \"within-tier is where the board is dishonest\" inverts.**"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "tools/analysis/x20_replications.py",
+    "sha16": "32ed2e3332aa1b9d",
+    "commit": "0060654 (first run; the rerun of record is tools/analysis/x20_merged.py at ba12200, sha16 c96d662cda2b0ac9)"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/x20_merged.txt (the board of record; x20_replications.txt is the sparse-board first run, retained and labelled)",
+    "outcome_commit": "00deff3",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (2,811 judged questions on the merged board of record x12 9,142 + x20 12,394 = 21,536 verdicts; the sparse x20-alone board is retained, labelled)",
+    "date": "2026-09-14 (first run) / 2026-09-15 (corrected rerun)"
+  },
+  "review": {
+    "file": "docs/review_session_2026-09-14.md (the adversarial review of the 2026-09-14/15 session, ba12200; programme L3099-L3145 'REVIEW of the 2026-09-14/15 session') and the corrections by insertion it required",
+    "commit": "ba12200",
+    "verdict": "REVIEW finding (3): the headline does not survive the session's own McNemar rule; finding (1): the board was not the board of record; corrected by X20-MERGED on the merged board (00deff3, ledger v93)"
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "PRIMARY: the within-tier confident-separation count and how many point the wrong way, with the across-tier figures beside them; the x12 pattern replicates if within-tier separations are again confidently made and disproportionately wrong",
+      "result": "FAILED",
+      "value": "board of record, McNemar-established counts: ALL within-tier 6/7 separated, 3 wrong (1 established); across-tier 176/183, 5 wrong (4 established); SHARED 2/2, 1 (1) | 62/64, 0 (0) = x12 exactly; NOVEL 4/5, 2 (0) | 114/119, 5 (4): on established labels 1 of 6 within vs 4 of 176 across; 'within-tier separations are disproportionately wrong' does NOT replicate; what replicates is overconfidence on key-tied pairs and the arx/iask inversion (179:123, p 0.0015, reproduced with zero direct arx/iask verdicts)",
+      "denominator": "190 pairs on the merged board; 2,811 judged questions; 66 shared / 124 novel pairs"
+    },
+    {
+      "id": "(2)",
+      "text": "the arena's own self-tiering and its cross-tier key inversions",
+      "result": "DELIVERED",
+      "value": "board of record: 13 tiers, 7 cross-tier key inversions, 4 established (sparse board 11 / 9; x12 10 / 2)",
+      "denominator": "20 models"
+    },
+    {
+      "id": "(3)",
+      "text": "the 66 shared and 124 novel pairs reported apart",
+      "result": "DELIVERED",
+      "value": "SHARED reproduces x12 exactly; NOVEL: the two within-tier wrong separations are both key-indeterminate, four of the five across-tier wrong separations are key-established: the established errors on new pairs are ACROSS tiers, not within; x12's 'across-tier is error-free' holds on the original roster and fails on the added models (4 established of 114): a roster property, not a small-sample artefact",
+      "denominator": "66 / 124 pairs"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "the pattern replicates and strengthens; within-tier separations in the low tens with a wrong-direction rate well above the across-tier rate; across-tier wrong count near zero as on x12",
+      "result": "FAILED",
+      "value": "within-tier 6/7 (not low tens); on established labels 1 of 6 within vs 4 of 176 across; across-tier 5 wrong (4 established) on the novel pairs: 'across-tier near zero' FAILED",
+      "denominator": "190 pairs"
+    }
+  ],
+  "falsifier": {
+    "text": "none named (a replication test)",
+    "fired": false,
+    "note": "the first reading (sparse board: within-tier 8/9 separated, 6 wrong = 75% vs across-tier 2.9%, 'a 26-fold disproportion', 'ONE HALF OF x12 WITHDRAWN') is superseded: only 1 of the 6 'wrong' within-tier separations survives the McNemar rule adopted 14 minutes later, and the board had 0 verdicts on the 66 original pairs"
+  },
+  "numbers_of_record": {
+    "board_of_record": "within 6/7, 3 wrong (1 est); across 176/183, 5 wrong (4 est); SHARED 2/2 1(1) | 62/64 0(0); NOVEL 4/5 2(0) | 114/119 5(4); self-tiering 13 tiers, 7 inversions (4 est)",
+    "sparse_board_first_run": "ALL within 8/9, 6 wrong (75.0%) vs across 173/181, 5 wrong (2.9%); NOVEL within 6/7, 4 wrong vs across 111/117, 4 wrong; 11 tiers, 9 inversions; six 'wrong' within-tier separations incl. arx/iask (p 0.000, key 0.834 vs 0.817) and arx_3 vs claude-3-5-sonnet (p 0.000, key 0.790 vs 0.779); only 1 of 6 established under McNemar",
+    "arx_iask": "179:123, p 0.0015, established, reproduces with zero direct arx/iask verdicts in the x20 cache"
+  },
+  "sentence_of_record": "TIER-HONEST-X20, CORRECTED (2026-09-15, X20-MERGED): on the board of record with McNemar-established counts, within-tier 6/7 separated, 3 wrong, 1 established (arx/iask); across-tier 176/183, 5 wrong, 4 established, all on NOVEL pairs; SHARED reproduces x12 exactly. What replicates is overconfidence on key-tied pairs and the arx/iask inversion (179:123, p = 0.0015, reproduced with zero direct arx/iask verdicts); 'within-tier separations are disproportionately wrong' does not (1 of 6 within vs 4 of 176 across, established); x12's 'across-tier is error-free' holds on the original roster and fails on the added models: not a small-sample artefact, a roster property. The prediction that across-tier would stay near zero FAILED; the sparse-board headline ('a 26-fold disproportion'; 'one half of x12 withdrawn') is superseded: only 1 of its 6 within-tier 'wrong' separations survives the McNemar rule, and that board had 0 verdicts on the 66 original pairs.",
+  "chips": [
+    "REPLICATES",
+    "ONE HALF OF x12 WITHDRAWN"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-15",
+      "by": "the adversarial REVIEW (ba12200; programme L3099 finding (3)) and X20-MERGED (programme L3146, 00deff3; ledger v93 observed cell 'CORRECTED 2026-09-15: HEADLINE INVERTS [X20-MERGED]')",
+      "text": "of the six 'wrong' within-tier separations exact McNemar establishes ONE (arx/iask); the rule adopted 14 minutes after the outcome was never applied back to it; every x20 analysis ran on a board with 0 verdicts on the 66 original pairs; on the board of record the headline inverts: the established errors on new pairs are across tiers, not within."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "that within-tier separations are disproportionately wrong on established labels (1 of 6 vs 4 of 176)",
+    "that across-tier is error-free beyond the original roster (4 established of 114 novel across-tier separations)",
+    "the sparse-board '26-fold disproportion' (superseded)"
+  ],
+  "ledger": {
+    "row_id": "TIER-HONEST-X20",
+    "version": "v93 (row added v89 at 63e8b5e; [UNDER CORRECTION] v92; 'HEADLINE INVERTS [X20-MERGED]' v93 at 00deff3); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "TIER-HONEST",
+    "ARENA-V2-X20",
+    "X20-MERGED",
+    "KEY-TIE-DECLINE"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L2888-L2908 (registration 14e3915): question, criteria, prediction, falsifier",
+    "docs/judge_v2_program.md outcome bullets and corrections at the headings listed in registration.outcome_heading (first run 2026-09-14; REVIEW L3099; X20-MERGED L3146 00deff3; corrected reruns L3188 010713b / L3281 d4eec8d)",
+    "docs/review_session_2026-09-14.md (ba12200): the adversarial review that found the sparse-board artefact and the McNemar rule's backward application",
+    "experiment_results/x12_crossdomain/x20_merged.txt (the board of record; x20_replications.txt is the sparse-board first run, retained and labelled) (00deff3)",
+    "docs/test_ledger.html row TIER-HONEST-X20 (v93 (row added v89 at 63e8b5e; [UNDER CORRECTION] v92; 'HEADLINE INVERTS [X20-MERGED]' v93 at 00deff3)): chips verbatim, observed cell with its CORRECTED / UNDER CORRECTION insertions, evidence",
+    "script sha16 = sha256 of tools/analysis/x20_replications.py at 0060654, first 16 hex (identity, computed by the registrar 2026-09-22; the first run's script; the rerun of record is x20_merged.py at ba12200 (sha16 c96d662cda2b0ac9))",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' or '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Re-testing, on a 20-model board with three times as many model pairs, an earlier finding about the judge's errors. The finding was that orderings between near-tied models are disproportionately wrong, while orderings across clear tiers are error-free.",
+    "why": "The budget line rested on that finding, so it needed replication.",
+    "information": "Result (no new calls, corrected): only partly replicated. Overconfidence on near-tied pairs and one specific inversion (arx vs iask) replicate. 'Near-tied orderings are disproportionately wrong' does not (1 of 6 vs 4 of 176 once a stricter test is applied). 'Across-tier is error-free' holds on the original roster but fails on added models. The earlier dramatic headline is superseded. It is on older judged data now ruled history.",
+    "written": "2026-10-07"
+  }
+}

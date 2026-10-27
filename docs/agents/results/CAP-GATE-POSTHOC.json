@@ -1,0 +1,192 @@
+{
+  "id": "CAP-GATE-POSTHOC",
+  "title": "CAP-GATE-POSTHOC: would a CAPABILITY split gate accept the sites the geometric gate certifies? (zero judge calls, zero constructions; EXPLORATORY feasibility study before any capability-gated construction)",
+  "question": "The construction accepts a split on geometry and certifies a site afterwards against its own 300-rep site null. A capability gate would accept a split only when the children carry different model-performance profiles (key-only LOO Brier gain of the children over the parent, in-roster and LOMO). Do the two gates accept the same sites, a subset, or different ones, and how many sites clear BOTH? Primary object the af tree (69 sites, 16 certified); abt2, bareq512, the promoted bareq512_s42 and o0 beside.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "7073c97",
+    "program_lines": "docs/judge_v2_program.md (lines as of 5dc8a06) L4785-L4855 (the script existed and its --dry-run had passed; no gain computed)",
+    "date": "2026-09-17",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-17 (before running; the script exists, its --dry-run passed, no gain has been computed) — CAP-GATE-POSTHOC: would a CAPABILITY split gate accept the sites the geometric gate certifies? (zero judge c",
+    "outcome_heading": [
+      "L5028: ## CAP-GATE-POSTHOC (2026-09-17, zero judge calls; EXPLORATORY) — the capability gate accepts a DIFFERENT SET from the geometric certificate at every registered threshold (t=+1: 24 of 69 accepted, 9 of 16 certified, Jacc"
+    ]
+  },
+  "script": {
+    "path": "tools/analysis/cap_gate_posthoc.py",
+    "sha16": "092c0ebab9b3079f",
+    "commit": "7073c97"
+  },
+  "ready": null,
+  "go": "n/a (0 calls, 0 constructions)",
+  "run": {
+    "outcome_file": "experiment_results/anchorfree/cap_gate_posthoc_readout.txt",
+    "outcome_commit": "719c671",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae printed first; scored NOWHERE (scored set = 10,925 keyed q minus the tree's own reserved pool minus p2dca: 5,602 on the p8a29 trees, 7,795 on the promoted tree)",
+    "date": "2026-09-17",
+    "other_files": [
+      "experiment_results/anchorfree/cap_gate_posthoc_sites.csv (719c671)",
+      "experiment_results/promoted/site_null_bareq512_s42.csv (the promoted tree's first site null, 70 sites / 10 certified, 300 reps, 512/0; 719c671)",
+      "cap_gate_run.log (gitignored); *_promotedonly.* superseded, untracked"
+    ]
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-17_zero_call_batch.md section CAP-GATE-POSTHOC",
+    "commit": "46f44e8",
+    "verdict": "numbers CONFIRMED to the digit (independent loader); falsifier does NOT fire and P3 failed: the outcome lies in the unregistered gap; defects (1) HIGH t=0 is not a zero line (within-site null LOMO -0.54/1000), (2) HIGH P10 is a size confound, (3) P5 degenerate, (4) F2-CLEAN carried as text when a held-out measurement existed (both falsifier legs met at low power on the held-out side)"
+  },
+  "criteria": [
+    {
+      "id": "readout",
+      "text": "EXPLORATORY: no pass/fail criterion; the per-site table, accepted / joint / certified-only / accepted-only / Jaccard per threshold t in {0, +0.5, +1, +2} and the CI gate; rank correlations; depth profile; certified vs uncertified median gain; cross-tree summary",
+      "result": "DELIVERED",
+      "value": "af: in-roster median -0.10 [p25 -1.06, p75 +1.88]; LOMO median +0.51 [-0.38, +2.00]; g_lomo > 0 on 41 of 69; accepted / joint / cert-only / acc-only / Jaccard: t=0 41 / 13 / 3 / 28 / 0.295; t=+0.5 35 / 10 / 6 / 25 / 0.244; t=+1 24 / 9 / 7 / 15 / 0.290; t=+2 17 / 6 / 10 / 11 / 0.222; CI gate 8 / 5 / 11 / 3 / 0.263; Spearman(g_lomo, sep) +0.106, (n_scored) +0.353, (sep - p95) +0.309, (depth) -0.276; certified median +1.39 (median n 439) vs uncertified +0.18 (n 179): +1.20; cross-tree at t=+1 (accepted, joint): abt2 17 (13/23), bareq512 29 (5/10), promoted 19 (3/10), o0 21 (4/5)",
+      "denominator": "af 69 sites / 16 certified on 5,602 train-side keyed questions; abt2 36 / 23; bareq512 87 / 10; promoted 70 / 10 (7,795 q); o0 65 / 5"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "median LOMO gain over the 69 af sites in [+1.0, +3.0] per 1000 (builder); under +1.0 (orchestrator)",
+      "result": "FAILED",
+      "value": "+0.51: builder FAILED, orchestrator HELD",
+      "denominator": "69 af sites"
+    },
+    {
+      "id": "P2",
+      "text": "af accepted at t=0: 50-60; t=+0.5: 42-55; t=+1: 35-48; t=+2: 20-32",
+      "result": "FAILED",
+      "value": "41 / 35 / 24 / 17, all below (FAILED x4)",
+      "denominator": "69 af sites"
+    },
+    {
+      "id": "P3",
+      "text": "JOINT gate at t=+1 on af >= 11 of 16 certified (builder); under 8 (orchestrator)",
+      "result": "FAILED",
+      "value": "9 of 16: builder FAILED, orchestrator FAILED",
+      "denominator": "16 certified af sites"
+    },
+    {
+      "id": "P4",
+      "text": "Spearman(LOMO, observed sep) in [-0.30, +0.20]; (LOMO, n_scored) in [+0.20, +0.60]; (LOMO, sep - p95) in [+0.10, +0.50]",
+      "result": "HELD",
+      "value": "+0.106 / +0.353 / +0.309 HELD x3 (null-corrected rho(n) +0.16 leaves the range; defect 1)",
+      "denominator": "69 af sites"
+    },
+    {
+      "id": "P5",
+      "text": "LOMO / in-roster ratio at the median af site in [0.8, 1.2]",
+      "result": "FAILED",
+      "value": "the printed -5.18 is median/median with the in-roster median at -0.10, not the per-site ratio (script L461-463 mislabelled): FAILED / uninterpretable",
+      "denominator": "69 af sites"
+    },
+    {
+      "id": "P6",
+      "text": "anchored trees carry less per-site gain: median LOMO on o0 and promoted each <= +1.3 and at least 0.5 below af's",
+      "result": "FAILED",
+      "value": "PARTLY: o0 +0.23 and promoted +0.06 <= +1.3 HELD; gaps to af +0.28 / +0.45 against >= 0.5 FAILED",
+      "denominator": "o0 65 sites, promoted 70 sites"
+    },
+    {
+      "id": "P7",
+      "text": "depth profile on af: median LOMO at depth <= 2 exceeds the median at depth >= 4 by >= 1.0 per 1000",
+      "result": "HELD",
+      "value": "+1.24 as registered (null-corrected +0.50)",
+      "denominator": "af sites by depth: d0 1, d1 2, d2 7, d3 14, d4 24, d5 19, d6 2"
+    },
+    {
+      "id": "P8",
+      "text": "CI gate on af: 25-40 of 69 accepted; joint with certified under the CI gate >= 11 of 16",
+      "result": "FAILED",
+      "value": "8 accepted; joint 5 (FAILED x2)",
+      "denominator": "69 / 16"
+    },
+    {
+      "id": "P9",
+      "text": "joint at t=+1: af_abt2 14-20 of 23; af_bareq512 7-10 of 10",
+      "result": "FAILED",
+      "value": "abt2 13 of 23; bareq512 5 of 10 (FAILED x2)",
+      "denominator": "23 / 10 certified"
+    },
+    {
+      "id": "P10",
+      "text": "certified minus uncertified median LOMO gain on af >= +1.0 per 1000",
+      "result": "HELD",
+      "value": "+1.20 as registered; matched on log n +0.31, partial rho +0.05, null-corrected +0.43, held-out +0.34 (a size confound, defects 1, 2, 4)",
+      "denominator": "16 certified vs 53 uncertified af sites"
+    }
+  ],
+  "falsifier": {
+    "text": "if on af the joint count at t=+1 is < 8 of 16 AND the certified-minus-uncertified median LOMO difference is < +0.5 per 1000, the geometric certificate marks structure the key does not see and a construction arm must be registered; if instead P3 HOLDS with a large accepted-only set, no construction change is warranted and a capability gate could only be an additive second admission rule",
+    "fired": false,
+    "note": "did NOT fire (joint 9 not < 8; +1.20 not < +0.5) AND P3 (>= 11) FAILED: the outcome lies in the unregistered gap between the two registered branches; no branch picked; no construction arm registered; nothing about any board adjudicated (resolved by CAP-PRUNE 2026-09-18)"
+  },
+  "numbers_of_record": {
+    "af_gain_distribution": "in-roster median -0.10 [p25 -1.06, p75 +1.88]; LOMO median +0.51 [p25 -0.38, p75 +2.00]; g_lomo > 0: 41 of 69",
+    "af_gate_table": "t=0 accepted 41 / joint 13 / cert-only 3 / acc-only 28 / Jaccard 0.295; t=+0.5 35 / 10 / 6 / 25 / 0.244; t=+1 24 / 9 / 7 / 15 / 0.290; t=+2 17 / 6 / 10 / 11 / 0.222; CI gate 8 / 5 / 11 / 3 / 0.263",
+    "af_correlations": "Spearman(g_lomo, observed sep) +0.106; (g_lomo, n_scored) +0.353; (g_lomo, sep - p95) +0.309; (g_lomo, depth) -0.276",
+    "af_depth_profile": "median g_lomo / sites / certified / accepted at t=+1: d0 +1.48 / 1 / 1 / 1; d1 +3.82 / 2 / 2 / 2; d2 +1.36 / 7 / 3 / 4; d3 +0.06 / 14 / 4 / 5; d4 +0.35 / 24 / 4 / 7; d5 -0.37 / 19 / 2 / 4; d6 +1.90 / 2 / 0 / 1",
+    "cross_tree_t1": "af 69/16 | +0.51 | 24 (9/16) | +1.20; af_abt2 36/23 | +0.78 | 17 (13/23) | +1.86; af_bareq512 87/10 | +0.13 | 29 (5/10) | +1.07; promoted 70/10 | +0.06 | 19 (3/10) | +0.26; o0 65/5 | +0.23 | 21 (4/5) | +1.70",
+    "checker_within_site_null": "200 reps: LOMO median -0.54 / 1000 on af (-0.93 below n = 150, -0.15 above n = 400), Spearman(null median, n) +0.89 (abt2 -0.68, bareq512 -0.56, promoted -0.42, o0 -0.65); rho(n) +0.35 -> +0.16, rho(depth) -0.28 -> -0.07, P7 +1.24 -> +0.50, P10 +1.20 -> +0.43; against own null median 54 of 69 accepted with 16/16 certified; against own null p95 31 of 69 with 10/16 (21 accepted-only)",
+    "checker_size_confound": "Spearman(certified, log n) +0.37; within-band contrast flips sign at n 300-600 (-1.54); matched on log n +0.31, partial rho +0.05",
+    "checker_heldout": "the tree's own held-out side minus p2dca (2,193 keyed q, median 79 per site): LOMO median +0.45, Spearman(train, held-out) +0.21, joint at t=+1 6 of 16, certified contrast +0.34 (both falsifier legs met at low power); trunk replicates; the two strongest depth-4 sites flip sign [CORRECTED 2026-09-18 by CAP-PRUNE: node ids n00000164 (replicating depth-5), n00000125 (+5.37 -> -4.79) and n00000127 (+8.15 -> -5.22), not the Concept labels n00000163 / n00000124 / n00000126]",
+    "scored_sets": "5,602 q on the p8a29 trees (af, abt2, bareq512, o0), 7,795 on the promoted tree; scored ∩ eval_ids(p2dca) = 0 on every tree; 191 of the 5,602 share a stem"
+  },
+  "sentence_of_record": "CAP-GATE-POSTHOC (2026-09-17, zero calls; af tree 69 sites / 16 certified on 5,602 train-side keyed questions, pool of record scored nowhere): the capability gate at t=+1.0 accepts 24 sites of which 9 are certified (7 certified-only, 15 accepted-only, Jaccard 0.29), a DIFFERENT SET from the geometric certificate at every registered threshold, a superset of it only against each site's own null median (16/16 certified clear, 38 accepted-only); the falsifier did not fire (joint 9 not < 8; certified-uncertified +1.20 not < +0.5) and P3 (>= 11) failed, so the outcome lies in the gap between the two registered branches; builder's P1, P2, P3, P5, P8, P9 FAILED, P4, P7, P10 HELD, P6 PARTLY; orchestrator's P1 HELD, P3 FAILED. Caveats of record: the t=0 line is not a zero line (within-site null LOMO -0.54/1000 at the median site, -0.93 below n=150, Spearman with n +0.89), which halves rho(n) (+0.35 -> +0.16), removes rho(depth) (-0.28 -> -0.07), and reduces the P7 depth contrast to +0.50 and the P10 certified contrast to +0.43; the certified contrast is mostly size (matched on log n +0.31, partial rho +0.05); on the tree's own held-out side minus the pool of record (2,193 q, median 79 per site) the median is +0.45, rho with the train-side gain +0.21, joint at t=+1 6/16 and the certified contrast +0.34, both falsifier legs met at low power, the trunk (root, both depth-1 sites, n00000163) replicating and the two strongest depth-4 sites flipping sign; P5's -5.18 is median/median with the in-roster median at -0.10 and is uninterpretable, and g_in - g_lomo (negative at 52/69 sites) is the differential LOO penalty, not a roster-specific residual. Reading: geometric certification is sufficient for capability content only above the site's own null and never necessary; a capability gate would be an additive second admission rule, and the 'different sites' case rests on small, deep sites whose gains do not replicate out of sample. [CORRECTED 2026-09-18 by CAP-PRUNE: the site ids are Concept labels, not node ids: the replicating depth-5 site is n00000164, the flipping depth-4 sites n00000125 / n00000127; the null and held-out columns are now a file of record (cap_prune_sites.csv); under the replicating PRUNE 20 of 69 survive, Jaccard with the certified 16 = 0.241 at chance.]",
+  "chips": [
+    "EXPLORATORY",
+    "FALSIFIER NOT FIRED; P3 FAILED: OUTCOME IN THE UNREGISTERED GAP",
+    "DIFFERENT SET AT EVERY THRESHOLD (JACCARD 0.29)",
+    "t=0 IS NOT A ZERO LINE; P10 IS A SIZE CONFOUND",
+    "BUILDER 6 OF 10 FAILED, 3 HELD, 1 PARTLY"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-18",
+      "by": "CAP-PRUNE (from the af176a2 pre-run bracket; programme outcome defect (4) L5090 and the ledger observed cell, v114)",
+      "text": "the site ids in the programme's checker note were Concept labels, not node ids (node = label + 1): the replicating depth-5 site is n00000164 (n_train 228, g_lomo +13.98, held-out +15.93 [5.35, 27.87]), not n00000163 (n_train 112, g -0.72, pruned); the flipping depth-4 sites are n00000125 (+5.37 -> -4.79) and n00000127 (+8.15 -> -5.22), not n00000124 / n00000126. The checker's within-site null and held-out columns are now a file of record (cap_prune_sites.csv, 69 rows; reproduced 0 diff). Under the replicating PRUNE 20 of 69 sites survive, 7 with a held-out interval excluding 0; Jaccard with the certified 16 = 0.241, at chance (0.148, P 0.12): the gate and the certificate select nearly independently; the capability-gated construction line stays open as a PRUNE readout, never a gate."
+    }
+  ],
+  "does_not_show": [
+    "any capability meaning for a board",
+    "a routing gain",
+    "a construction arm",
+    "that a capability gate would select the certified trunk (it does so only against each site's own null median)",
+    "that the accepted-only sites carry out-of-sample gain (the two strongest flip sign on the held-out side)"
+  ],
+  "ledger": {
+    "row_id": "CAP-GATE-POSTHOC",
+    "version": "v114 (row added v112 at 4650ada; observed cell bracketed v114 by CAP-PRUNE)"
+  },
+  "depends_on": [
+    "ANCHOR-FREE",
+    "ANCHOR-FREE-CERT",
+    "F5",
+    "F6",
+    "H9-REM-FLAG"
+  ],
+  "supersedes": null,
+  "superseded_by": "CAP-PRUNE (the registered resolution of the unregistered gap, 2026-09-18)",
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md (lines as of 5dc8a06) L4785-L4855 (registration 7073c97): question, instrument, hygiene, priors P1-P10 (builder and orchestrator), falsifier, cost",
+    "docs/judge_v2_program.md (lines as of 5dc8a06) L5028-L5122 (outcome section 719c671; CAP-PRUNE bracket L5090 at 3dd0900): every number, predictions scored, the checker's numbers, defects (1)-(7), does-not-show, the sentence of record",
+    "docs/reviews/2026-09-17_zero_call_batch.md section CAP-GATE-POSTHOC (46f44e8): CONFIRMED status, defects, the sentence of record",
+    "experiment_results/anchorfree/cap_gate_posthoc_readout.txt and _sites.csv; experiment_results/promoted/site_null_bareq512_s42.csv (719c671)",
+    "docs/test_ledger.html row CAP-GATE-POSTHOC (v112 4650ada; bracketed v114): chips verbatim, observed-cell bracket, evidence (7073c97, 719c671)",
+    "script sha16 = sha256 of tools/analysis/cap_gate_posthoc.py at 7073c97, first 16 hex (identity, computed by the registrar 2026-09-22; script unchanged since registration)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' lines (grep -n them regardless of line drift); line numbers are as of programme HEAD 5dc8a06"
+  ],
+  "last_update": "2026-09-22",
+  "plain_description": {
+    "sq": "SQ3 Taxonomy",
+    "what": "On an existing tree (69 split points, 16 of which are statistically certified on geometry), checks whether a 'capability' rule would accept the same splits. That rule keeps a split only if the child cells really show different model-performance profiles. No new judge calls and no new tree builds.",
+    "why": "Statistical separation in embedding space does not automatically mean the cells differ in what models can do. This tests whether the certificate has capability meaning.",
+    "information": "If the two rules picked the same splits, geometry would be a stand-in for capability; if they picked different ones, the two notions come apart. Result (exploratory): mostly different sets. At the main threshold the capability rule accepts 24 splits, 9 of them certified; overlap is low (about 0.29). The certified splits clear the capability rule only when each is compared with its own random baseline. On held-out data the top-level splits replicate, but the two strongest deep splits flip sign. Reading: geometric certification is enough for capability content only above the split's own baseline, and it is never necessary.",
+    "written": "2026-10-07"
+  }
+}

@@ -1,0 +1,76 @@
+# Smoke test for the post-repair arena, 2026-07-27.
+#
+# Two questions, both of which must be answered before the full run is costed:
+#   1. Do the Azure credentials resolve? (AZURE_AI_* are not in the shell; .env is
+#      loaded by spring-dotenv at runtime, which has never been verified directly.)
+#   2. What does a cell cost NOW? The Bradley-Terry variance fix (a92a3ed) took every
+#      standard error off the 1e-6 clamp, and BtMatchScheduler reads those SEs in two
+#      scale-sensitive places -- noiseFloor = 0.15*combinedSE and the median-proximity
+#      kernel scale (seA+seB). Both moved by ~200x, so pair selection differs from the
+#      run that produced 1,736 comparisons and that figure is no longer a valid estimate.
+#
+# MAIN only. GENERIC_JUDGE is a settled negative (99.4% identical winners, BT sign test
+# p=0.227) and re-running it here would double the cost for a second copy of it.
+#
+# ISOLATION (learned the hard way): match_history is keyed by (snapshot_id, condition),
+# and snapshot_id is "<base>_<CONDITION>", so reusing the frozen snapshot with condition
+# MAIN CLEARS the frozen run's 1,736 MAIN rows before writing. The first attempt at this
+# smoke test did exactly that -- 1736/11 cells/241 questions became 66/1/1 -- and was only
+# recoverable because ratings.db had been backed up. Renaming the condition is not a fix
+# either: HeadlessBenchmarkRunner:327,341 special-case "MAIN" for judge-prompt setup.
+#
+# So this run MUST be launched against a throwaway ranking DB:
+#
+#   ./gradlew bootRun -Dranking.db.path=ratings_smoke.db #       --args="--config experiment_configs/smoke_arena_v2.toml"
+#
+# Roster: 12 models, 7 families, from the 36 that pass validity post-backfill.
+# Length band 486-1413 (2.91x), r(len,acc) = +0.286 against +0.597 for the full 36 --
+# the format artifact that decided half the previous run is controlled by construction.
+# claude-3-5-sonnet-20241022 is paired with claude-3.5-sonnet deliberately: they agree on
+# only 83.4% of predictions and sit 3 points apart, so they are a free resolution check --
+# two near-clones should rank adjacently and tie often, and a judge that separates them
+# confidently is over-resolving. That failure is invisible to rho.
+datasetType   = "MMLU_PRO"
+models        = [
+    "gemini-3.1-pro_5-shots",
+    "iask_pro",
+    "arx_3",
+    "claude-3.5-sonnet",
+    "gpt-4o-2024-08-06",
+    "deepseek-chat-v2_5",
+    "gpt-4o-mini",
+    "claude-3-5-sonnet-20241022",
+    "Qwen1.5-72B-Chat",
+    "Meta-Llama-3-8B-Instruct",
+    "Qwen1.5-14B-Chat",
+    "Meta-Llama-3-8B"
+]
+snapshotId    = "20260727_042523_Headless_Run_Auto_ge"
+category      = "Computer science"
+queryLimit    = 0            # all in-domain reserved questions
+outputDir     = "experiment_results/arena_cs_paired"
+testRatio     = 0.3
+seed          = 42
+
+runPipeline        = false
+regenerateSplit    = false   # load-bearing: use the canonical reserved pool as-is
+runBenchmark       = true
+runTrickle         = false
+runBaselines       = false
+enableFinalMetrics = false
+enableLabeling     = false   # rubrics already in the snapshot
+judgeInduction     = false
+
+conditions         = ["MAIN", "C5"]
+questionsPerRound  = 1
+confidenceGate     = 0.0     # DISABLED for both arms: C5 emits a flat 0.85 and
+                             # MAIN emits real values, so a live gate would filter one
+                             # arm and not the other - the paired design would break at
+                             # the verdict level while looking intact at the question level.
+parallelism        = 4
+reservedOnly       = true
+
+dagMode = "DAG_MAX"
+maxDepth              = 8
+minClusterSize        = 55
+proposalSeparationBar = 0.025

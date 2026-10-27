@@ -1,0 +1,174 @@
+{
+  "id": "GUARD-22-RENAME-PROOF",
+  "title": "GUARD-22-RENAME-PROOF: does the per-arm local rename in SeparationNullBySizeTest leave the site-null output BYTE-IDENTICAL? (engineering, zero judge calls; two :siteNull legs on af_bareq512_s42 at -PnullReps=24; the proof guard 22's 'RECOMMENDED FIX, NOT MADE' clause has owed since it was written)",
+  "question": "withinNull and siteNull in src/test/kotlin/taxonomy/SeparationNullBySizeTest.kt carry BYTE-IDENTICAL setup blocks (L1390-L1395 and L1680-L1685), so an edit sited by CONTENT lands in the wrong arm and still compiles. Branch guard22-rename at 46d2f0f renames the locals per arm (anchorReps/anchorMcs/anchorConfig/anchorSplitter/anchorCapture and siteReps/siteMcs/siteConfig/siteSplitter/siteCapture), 36 insertions / 36 deletions, a pure token rename, NOT MERGED. IS THE RENAME INERT ON THE OUTPUT? The site-null CSVs written before and after, on the same arm at the same reps and heap, must be BYTE-IDENTICAL.",
+  "kind": "engineering",
+  "state": "done",
+  "registration": {
+    "commit": "8b4075b (the registration commit; registration precedes the proof - the CODE exists on the unmerged branch guard22-rename at 46d2f0f and is pinned, and NOTHING has been executed under this registration). The section was appended at the END of docs/judge_v2_program.md so that no line number above it moves. The ledger row's evidence cell says 'this commit' and it means 8b4075b.",
+    "program_lines": "docs/judge_v2_program.md L12599-L12708 (heading at L12600)",
+    "program_lines_as_of": "8b4075b (the registration commit); resolve by the quoted heading, not by the line number",
+    "heading": "## Registered 2026-09-23 (before the proof is run; the change exists on a branch and is NOT merged, and nothing has been executed under this registration) — GUARD-22-RENAME-PROOF: does the per-arm local rename in SeparationNullBySizeTest leave the site-null output BYTE-IDENTICAL? (zero judge calls; two :siteNull legs on af_bareq512_s42 at -PnullReps=24; the registration guard 22's \"RECOMMENDED FIX, NOT MADE\" clause has been owed since it was written)",
+    "date": "2026-09-23",
+    "depends_on_registration": "docs/judge_v2_program.md, the standing-defect paragraph of 2026-09-23 ('RECOMMENDED FIX, NOT MADE ... The pass still needs its own registration; the proof is now cheap and specified'; 'Registered here as a KNOWN HAZARD, not as a change'); docs/design/FRAMEWORK.md guard 22 (L249); docs/agents/CONTEXT.md rule 11",
+    "plan_amendment": "n/a (0 judge calls, 0 cce, no construction, no pool, no DB write); the only operational cost is one rule-7 no-readers window of about 20 minutes"
+  },
+  "script": {
+    "path": "THE CODE EXISTS AND IS PINNED; THE PROOF HARNESS DOES NOT. Pinned: src/test/kotlin/taxonomy/SeparationNullBySizeTest.kt at branch guard22-rename commit 46d2f0f (worktree .claude/worktrees/guard22-rename, NOT MERGED) and the Gradle :siteNull task. To be written or scripted by the run-operator under a committed READY: the two-leg switch-and-restore procedure and the byte comparison, whose CSVs go to the SCRATCHPAD and never to experiment_results/.",
+    "sha16": "SeparationNullBySizeTest.kt LF 6322154dda0ef4c7 -> a87a6b37319c5ca5, CRLF 35054ef65ef7b221 -> fd5fbaa1abccd4b4 (both renderings named, as the standing rule requires); blob c0d891213e777b0b8746f3f60f7375becb548fa2 -> 0b6e176fb9e6c45f8a5f655e4c85bcad44ef274b",
+    "commit": "46d2f0f on branch guard22-rename (NOT MERGED; the main checkout is untouched, blob still c0d8912, status clean)"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_guard22_rename_proof.md",
+    "commit": "55c4c10",
+    "verdict": "READY-WITH-CONDITIONS G1-G6 for guard22-rename 46d2f0f (blob c0d89121 -> 0b6e176f)"
+  },
+  "go": "n/a on money (0 judge calls, 0 cce). The operational gates: an adversarial-reviewer READY stating the exact two command lines, the switch-and-restore procedure and the refusal conditions; ONE rule-7 no-readers window; both legs in the MAIN checkout (the worktree has no embeddings_cache.db and the arm assumeTrue's on it, and copying the cache in is FORBIDDEN); the withinNull leg is EXCLUDED by the registration and may not be run under it, because it writes docs/data/within_null_frozen_*.csv with no -DoutCsv override. NOT SCHEDULED BY THIS REGISTRATION.",
+  "run": {
+    "outcome_file": "the proof's scratch evidence (g22_legA/B.csv, .out, .xml, .disc, g22_compare.txt, g22_probe*.txt; never under experiment_results/ by registration) and the programme outcome section L13925-L13965",
+    "outcome_commit": "the registrar's outcome commit (this record's bracket names it)",
+    "calls": 0,
+    "cce": 0,
+    "pool": "none read by the instrument (the siteNull leg reads embeddings_cache.db and the snapshot under the rule-7 window)",
+    "date": "2026-09-23",
+    "script": "g22_proof.sh sha16 e42f3e75a7e0a18c (byte-identical to the READY's embedded block)",
+    "legs": "A 426 s, B 407 s; both exit 0; R2-R9 sound; R9 0 / 14"
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-23_guard22_rename_proof_G5.md",
+    "commit": "10b6150",
+    "verdict": "C1 HELD independently (both CSVs sha256 aec4b517...a665, cmp identical, 16,869 bytes, 87 non-degenerate rows); R2-R9, R13 re-checked; selftest overlap affects only P3, which holds"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "BYTE-IDENTITY OF THE SITE-NULL CSV. The CSV written by leg A (the file at HEAD, blob c0d8912) and by leg B (the file at 46d2f0f, blob 0b6e176), on arm af_bareq512_s42 (snapshot 20260917_161817_Headless_Run_Auto_ge, sliceDim 512, dropTop 0, whiten false, NO -DsepBar, default 6 g heap, -PnullReps=24 on BOTH legs), are compared BYTE FOR BYTE with the sha256 of each printed. HELD iff byte-identical; FAILED otherwise. UNDETERMINED IS NOT ADMISSIBLE ON C1 AND IS NOT REGISTERED FOR IT - the two CSVs either match or they do not, and there is no support, interval or denominator that could leave the question open. This is the one criterion in the programme that says so, and the difference is deliberate.",
+      "result": "HELD",
+      "value": "byte-identical: both CSVs sha256 aec4b517829a376f84ea2f333a0bc07d8aaae39be8c05e5c05f0271d6ed9a665, cmp identical, 87 rows / 87 distinct site_null_p95; execution witness R9 0 after leg A, 14 after leg B",
+      "denominator": "the two site-null CSVs, 87 sites at 24 reps"
+    },
+    {
+      "id": "C2",
+      "text": "INSTRUMENT AND HYGIENE COUNTS, printed, no bar. Per leg: the commit and the BLOB SHA of SeparationNullBySizeTest.kt actually compiled, the LF and CRLF sha16, the Gradle command line verbatim, the core count, the heap, the reps, the exit code, the wall time, the CSV path and its sha256, and the [SITENULL-HEAP] line guard 22 clause (b) requires on EVERY run, pass or fail. Plus the main checkout's `git status --short` before leg A and after the restore, and the blob sha after the restore, which must equal c0d8912. HELD iff all are printed.",
+      "result": "DELIVERED",
+      "value": "per leg: commit and blob compiled, command line, cores, heap, reps, exit 0, wall 426 / 407 s, CSV sha256, [SITENULL-HEAP] line, porcelain before / after (G5 re-check)",
+      "denominator": "two legs"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "the two CSVs are byte-identical (a 0-byte-difference prediction) and their sha256 are equal",
+      "result": "HELD",
+      "value": "0 byte differences, equal sha256 aec4b517...a665",
+      "denominator": "the two scratchpad CSVs"
+    },
+    {
+      "id": "P2",
+      "text": "both legs exit 0, neither prints '[SITENULL-HEAP] REFUSING', and neither reports the arm SKIPPED",
+      "result": "HELD",
+      "value": "both legs exit 0; no REFUSING, no SKIPPED",
+      "denominator": "the two legs"
+    },
+    {
+      "id": "P3",
+      "text": "each leg's wall time in [4, 12] minutes at -PnullReps=24 over 97 sites (point 7), and the two legs differ by less than 40% of the shorter - a NUISANCE readout with no bar, printed because a large asymmetry would itself be evidence the legs did not do the same work [CORRECTED 2026-09-23 (READY 55c4c10, D1 / G6): 87 sites, not 97; the af_bareq512_s42 CSV of record has 88 lines; 97 is the 20NG T1b tree.]",
+      "result": "HELD",
+      "value": "426 s (7.1 min) and 407 s (6.8 min) in [4, 12]; differ by 4.7% of the shorter (< 40%); the admitted selftest overlap (~14 s of leg B) bears on P3 only",
+      "denominator": "wall clock per leg"
+    },
+    {
+      "id": "P4",
+      "text": "the tracked file's blob sha after the restore equals c0d891213e777b0b8746f3f60f7375becb548fa2 and `git status --short` shows SeparationNullBySizeTest.kt unmodified (a 0-drift prediction)",
+      "result": "HELD",
+      "value": "blob c0d89121 after the restore; porcelain empty",
+      "denominator": "the main checkout after the restore"
+    }
+  ],
+  "falsifier": {
+    "text": "ANY BYTE DIFFERENCE AT ALL fires it, and the classes are named so that no difference is argued away after the fact: a changed observed_sep; a changed site_null_p50 or site_null_p95; a changed q_site or q_deflated; a changed reach or accept percentage; a changed cert_* flag; A REORDERED ROW; a different feasibility string; a different trailing reps column. It ALSO fires if leg B writes no CSV while leg A did, if either leg shows the arm SKIPPED, if either prints '[SITENULL-HEAP] REFUSING', or if either exits non-zero. WHAT IT OVERTURNS: the claim that the rename is a pure token rename with no effect on the numbers - which would mean the two arms are NOT the independent, identically-shaped blocks the record has treated them as, a finding about the harness far more important than the rename; the branch does NOT merge, the hazard stays registered and unfixed, and the difference becomes the next registered object. WHAT IT DOES NOT OVERTURN IN EITHER DIRECTION: no site-null number of record, no certified count, no bar, no tree and no judged result - the CSVs are written to the scratchpad at reps = 24 and measure nothing.",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "change": "branch guard22-rename at 46d2f0f (NOT MERGED), worktree .claude/worktrees/guard22-rename; per-arm locals in src/test/kotlin/taxonomy/SeparationNullBySizeTest.kt - withinNull takes anchorReps / anchorMcs / anchorConfig / anchorSplitter / anchorCapture, siteNull takes siteReps / siteMcs / siteConfig / siteSplitter / siteCapture; 36 insertions / 36 deletions, a PURE TOKEN RENAME. Extended beyond guard 22's prescribed names to reps and mcs because leaving those identical would leave two of the five lines still mis-sitable.",
+    "shas": "blob c0d891213e777b0b8746f3f60f7375becb548fa2 -> 0b6e176fb9e6c45f8a5f655e4c85bcad44ef274b; LF sha16 6322154dda0ef4c7 -> a87a6b37319c5ca5; CRLF sha16 35054ef65ef7b221 -> fd5fbaa1abccd4b4",
+    "inverse_substitution_check": "COPIED FROM THE COORDINATOR, WHO VERIFIED IT, AND NOT RE-DERIVED HERE: applying the INVERSE substitution to the new file reproduces HEAD BYTE-FOR-BYTE, so nothing but identifiers changed. The main checkout is untouched (blob still c0d8912, status clean).",
+    "arm": "af_bareq512_s42, snapshot 20260917_161817_Headless_Run_Auto_ge, sliceDim 512, dropTop 0, whiten false, NO -DsepBar, default 6 g heap, -PnullReps=24 on BOTH legs (a GRADLE property; -DnullReps is silently ignored by the task - a known trap, named so the operator does not fall into it)",
+    "hazard_source": "docs/judge_v2_program.md, the 2026-09-23 standing-defect paragraph ('RECOMMENDED FIX, NOT MADE ... The pass still needs its own registration; the proof is now cheap and specified'; 'Registered here as a KNOWN HAZARD, not as a change'); docs/design/FRAMEWORK.md guard 22 L249; docs/agents/CONTEXT.md rule 11 - all three say the fix needs its own registered, byte-inertness-verified pass. A research lead asserted it needed no fresh registration and was wrong; the source files settled it.",
+    "on_pass": "THREE dated brackets BY INSERTION, each recording the fix AND ITS PROOF (the commit, the two blob shas, the two CSV sha256, the byte-identity result): FRAMEWORK guard 22's 'REGISTERED AND NOT FIXED' line; CONTEXT rule 11's line; this programme's standing-defect paragraph. THEN, AND ONLY THEN, the branch merges. NONE of the three may be written before the proof passes - a bracket saying 'fixed and verified' written before the verification is exactly the class of defect guard 22 was adopted to stop.",
+    "outcome_csv_sha256": "aec4b517829a376f84ea2f333a0bc07d8aaae39be8c05e5c05f0271d6ed9a665 (both legs; 16,869 bytes; 87 rows)",
+    "r9_discriminator": "0 after leg A, 14 after leg B",
+    "wall_times": "leg A 426 s, leg B 407 s",
+    "restore": "blob c0d89121; porcelain empty",
+    "window_correction": "c33b404 (tools/, 14:17:33) landed DURING leg A and 70203ea (tools/, 14:27:44) after the restore; the report 'HEAD moved only through docs/ commits' was INACCURATE; W5 not violated (no src/ or build-file write)",
+    "merge_commit": "1e0afab (SeparationNullBySizeTest.kt blob 0b6e176f, content-identical to guard22-rename 46d2f0f)"
+  },
+  "sentence_of_record": "GUARD-22-RENAME-PROOF (2026-09-23, zero judge calls): the per-arm local rename of SeparationNullBySizeTest.kt (branch guard22-rename, 46d2f0f; blob c0d89121 -> 0b6e176f) is INERT on the siteNull leg: at -PnullReps=24 on arm af_bareq512_s42 (87 sites) the two legs' site-null CSVs are BYTE-IDENTICAL (sha256 aec4b517...a665, cmp identical, 87 non-degenerate rows), and the execution witness R9 reads 0 renamed identifiers in the compiled classes after leg A and 14 after leg B, so leg B provably ran the renamed code; C1 HELD, confirmed by the independent G5 recomputation (10b6150). It certifies the renamed pattern on the siteNull leg only, closes one instance of guard 22 and not the class, and produces no site-null number of record.",
+  "chips": [
+    "C1 HELD: BYTE-IDENTICAL, EXECUTION WITNESS R9 0 / 14",
+    "P1-P4 HELD",
+    "UNDETERMINED NOT ADMISSIBLE (did not arise)",
+    "MERGE CLEARED (brackets first, then the merge)"
+  ],
+  "does_not_show": [
+    "any site-null number of record, certified count, bar, tree or judged result: the two CSVs are scratchpad files at reps = 24 and measure nothing",
+    "the withinNull arm: it was EXCLUDED (it writes docs/data/within_null_frozen_*.csv); the pass certifies the renamed pattern on the siteNull leg, with the inverse-substitution check carrying the rest",
+    "that guard 22's hazard class is closed: one instance is fixed, never the class",
+    "anything about a FAIL's wording (D8 restricts only how a FAIL may be worded; with no A/A control this is a PASS)"
+  ],
+  "ledger": {
+    "row_id": "GUARD-22-RENAME-PROOF",
+    "version": "v130 (2026-09-23; a plan-chip registration row in section 7, chipped REGISTERED / NOT RUN / UNDETERMINED NOT ADMISSIBLE) [UPDATED 2026-09-23 at ledger v148: outcome bracket inserted and the PLAN chips NOT RUN / GATES THE MERGE replaced by the outcome chips.]"
+  },
+  "depends_on": [
+    "TOPIC-PARTITION-20NG",
+    "TOPIC-PARTITION-20NG-T1B-NULL",
+    "ANCHOR-FREE-CERT"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing yet; ON A PASS it closes ONE INSTANCE of FRAMEWORK guard 22 (the byte-identical setup blocks in SeparationNullBySizeTest) with an EXECUTED proof, which would be guard 22's first fixed instance. It reopens no closed line: no judge, no rubric, no reference, no order, no temperature, no ranking - it is a test-source rename and its inertness proof."
+  },
+  "queue_items": [
+    "docs/agents/queue.json item GUARD-22-RENAME-PROOF (state registered, lane machine, 0 cce)"
+  ],
+  "sources": [
+    "docs/judge_v2_program.md L12599-L12708 (8b4075b, the registration commit): the registration itself - the question, the pinned change and its shas, the six hygiene clauses, the pinned arm and the two legs, C1-C2, P1-P4, the falsifier with its named difference classes, the on-pass bracket order, cost and consequence and the flow",
+    "docs/judge_v2_program.md, the 2026-09-23 standing-defect paragraph on SeparationNullBySizeTest: the hazard as registered, and the sentence that the fixing pass needs its own registration",
+    "docs/design/FRAMEWORK.md guard 22 (L249) and docs/agents/CONTEXT.md rule 11, read 2026-09-23: the same requirement in the same words, and the known-hazard line that takes a bracket only on a pass",
+    "the coordinator's relay of 2026-09-23: the branch, the commit, the local names, the 36/36 diff, the two blob shas, the LF and CRLF sha16 pairs, the verified inverse-substitution check, the criterion, the falsifier classes, the six hygiene clauses and the exclusion of the withinNull leg - copied here, not re-derived",
+    "build.gradle.kts (the :siteNull task) and src/test/kotlin/taxonomy/SeparationNullBySizeTest.kt at HEAD: the arm, the heap guard's printed line, and the -PnullReps / -DnullReps trap"
+  ],
+  "last_update": "2026-09-23",
+  "brackets": [
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, discharging the READY's go condition G6 (insertion only, zero calls)",
+      "text": "G6 (a): the site count is 87, not 97, corrected by insertion in P3, the budget sentence and this record (C1 denominator, P3 text); the criterion, a byte comparison, is unchanged. G6 (b): ready set to 55c4c10; state READY. Standing rules adopted (programme L13849-L13881; CONTEXT section 4 rules 7 and 11): the rule-7 no-readers guard's operational form W1-W5, and the vacuity principle (a byte-identity proof must prove the changed code executed: here R9, the class-file discriminator)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the run and the G5 review 10b6150 (insertion only, zero calls)",
+      "text": "OUTCOME recorded (programme L13925-L13965): C1 HELD with the execution witness R9 0 / 14; C2 DELIVERED; P1-P4 HELD; falsifier not fired. G6 was already discharged at c4506f0 and is not redone. Window correction recorded: c33b404 landed during leg A (tools/ only), 70203ea after the restore; the coordinator's 'only docs/ commits' was inaccurate; W5 not violated. Residual for the next window: print probe command lines in full. The three on-pass brackets follow in a separate commit, then the merge."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar (insertion only, zero calls)",
+      "text": "THE THREE ON-PASS BRACKETS inserted, as the registration requires, before the merge: FRAMEWORK.md guard 22 (L249, 'REGISTERED AND NOT FIXED'), CONTEXT.md section 4 rule 11 (L47, the rename sentence), and the programme's standing-defect paragraph (L11540, 'CODE HAZARD REGISTERED, NOT FIXED'), each recording FIXED by the rename at guard22-rename 46d2f0f, proved inert at 10b6150, merge commit TO FOLLOW. One instance of guard 22, not the class."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar (insertion only, zero calls)",
+      "text": "Merge commit resolved: 1e0afab (blob 0b6e176f, content-identical to 46d2f0f), recorded in the three on-pass brackets (FRAMEWORK L249, CONTEXT L47, programme L11540) where they read 'MERGE COMMIT: TO FOLLOW'."
+    }
+  ],
+  "plain_description": {
+    "sq": "Engineering/infrastructure",
+    "what": "Checks that renaming local variables in two copy-pasted blocks of a split-significance test does not change its output. The site-null CSV is produced before and after the rename and compared byte by byte (no judge calls).",
+    "why": "The two blocks were identical, so an edit could land in the wrong one and still compile. The rename removes that hazard, but only if it is truly inert.",
+    "information": "Identical outputs, plus proof that the renamed code actually ran, show the rename is safe. Any byte difference would mean the two arms were not independent. Result: done, passed. The CSVs are byte-identical, and compiled classes show the new code ran. This covers the 'site-null' arm only and fixes one instance of the hazard, not the whole class.",
+    "written": "2026-10-07"
+  }
+}

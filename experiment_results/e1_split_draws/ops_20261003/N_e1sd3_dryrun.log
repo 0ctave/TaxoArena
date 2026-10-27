@@ -1,0 +1,29 @@
+[E1SD-LAUNCH] (1) data root = JVM cwd Z:\FAC\TUBerlin\THESIS\TaxoArena; build N_e1sd3 (nomic_raw (nomic-embed-text:latest, the pinned DIR arm file through e1_route_launch's working copy))
+[E1SD-LAUNCH] (2) DECLARED N_e1sd3: config blob:00d2543e, split file blob:5ad9c86e -> pool p69d2762ac6223d93; check_toml OK
+[E1SD-LAUNCH] (3) ORDER admitted for an N build
+[E1SD-LAUNCH] (4) BACKUP E:\TaxoArena_backup_2026-10-03_e1sd\N_e1sd3\caches\embeddings_cache.db == live embeddings_cache.db (sha256 52229e1ebfdda76ebaed3e461eeee80ae654dfb35ac480eb9cb9868bb0269769)
+[E1SD-LAUNCH] (4) BACKUP E:\TaxoArena_backup_2026-10-03_e1sd\N_e1sd3\caches\mmlu_pro_dataset_cache_v2.db == live mmlu_pro_dataset_cache_v2.db (sha256 0f5c739681ebd70bdd62ec2ad487f3faf58e4490d26bed8bd9cc5da72127a355)
+[E1SD-LAUNCH] (4) BACKUP E:\TaxoArena_backup_2026-10-03_e1sd\N_e1sd3\caches\mmlu_pro_dataset_cache_v2.db-wal == live mmlu_pro_dataset_cache_v2.db-wal (sha256 6c0a296ce86651d19539721fa76a9cf2493877c7446969e71042b2c30456d167)
+[E1SD-LAUNCH] VIEW mmlu_pro_dataset_cache_v2.db: WAL tail 8689112 B -> checkpointed scratch copy Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\e1_split_draws_work\scratch_20261003_164408_52908\mmlu_pro_dataset_cache_v2.db (originals sha256 0f5c739681ebd70b / wal 6c0a296ce86651d1 equal before, after, copy)
+[E1SD-LAUNCH] (2) split e1sd3 re-derived byte-equal from the corpus DB (a checkpointed scratch copy): held-out 3573 rows / TRAIN 8427 rows
+[E1SD-LAUNCH] (5) COVERAGE nomic_raw DIR file: 11769 of 11769 corpus texts have a vector; misses 0 (0 required)
+[E1SD-LAUNCH] (6) POOL p69d2762ac6223d93 FRESH (no reserved_pool rows; the split's first build records it; the JVM's [POOL-PIN] checks it)
+[E1SD-LAUNCH] (7) BEFORE corpus tables {"active_reserved_pool": 1, "ag_news": 2000, "arc": 0, "corpus_registry": 1, "eval_question_link": 12257, "eval_results": 560379, "mmlu_original": 0, "mmlu_pro": 12000, "pool:p5fb86f1075d76e34:meta": 1, "pool:p5fb86f1075d76e34:rows": 3503, "pool:p69d2762ac6223d93:meta": 0, "pool:p69d2762ac6223d93:rows": 0, "pool:p6d15d913354f256d:meta": 1, "pool:p6d15d913354f256d:rows": 3452, "reserved_pool": 146568, "reserved_pool_meta": 49, "twenty_newsgroups": 0}
+[E1-ROUTE] (C-E1-3) data root = JVM cwd Z:\FAC\TUBerlin\THESIS\TaxoArena; (C-E1-4) code pins {"embedder_arms.py": "2073d1315981a30464037913b85ce2bf8838aa00", "embedder_cross_flat.py": "7868e8589fee107b15d3c535966b840cd648f771"}
+[E1-ROUTE] arm nomic_raw; DIR file under test Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\embedder_cross\embeddings_cache_nomic-embed-text_latest.db; java PIDs before: ['58328']
+[EMB-ARMS] registrar pin: arm nomic_raw sha256 53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95 == embedder_cross_arm_pins.json
+[E1-ROUTE] (i) pin: sha256 53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95 == the registrar's pin
+[E1-ROUTE] (B-E1-2) config experiment_configs/e1_split_draws/N_e1sd3.toml outputDir Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results/e1_split_draws/N_e1sd3 (fresh; outside every object of record); ranking DB Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\e1_route_work\20261003_164423_nomic_raw\ratings_e1route.db
+[E1-ROUTE] (B-E1-1) no -wal / -shm / -journal beside any of the 9 hashed files
+[E1-ROUTE] (iv) model nomic-embed-text:latest (pinned digest 0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f); JVM threads 12
+[E1-ROUTE] P before DIR/nomic_raw                                53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95
+[E1-ROUTE] P before DIR/nomic_card                               90754dfd95849cf23ee3698a8523a17ea6e3ec3d32fc7516c78534c36301e414
+[E1-ROUTE] P before DIR/gemma_raw                                28f2e3a41e77312ff5c92d798b95e6ea2acdb8b6591b2eab1c677fa1d5367867
+[E1-ROUTE] P before DIR/gemma_card                               24820836f7266c08958438c1d4a0116d38416113c7602499420f7e0ca65b4e93
+[E1-ROUTE] P before source/embeddings_cache_nomic-embed-text_latest.db 53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95
+[E1-ROUTE] P before source/embeddings_cache_embeddinggemma_latest.db 3e9ce57772160749e0b5ea0267713286ca4109444d5a6b676e877a5b0501df29
+[E1-ROUTE] P before main/embeddings_cache.db                     52229e1ebfdda76ebaed3e461eeee80ae654dfb35ac480eb9cb9868bb0269769; tables {"queries": "cdeca05e573e257810a329d394e28de6611614b65f8019c20aa521049312c081", "reserved_pool_meta": "ABSENT"}
+[E1-ROUTE] P before frozen/snapshots_frozen.db                   3f7f5e9a470baba3a66d0dbc870bf772739ae60cc415615b0c4f54e0f4793e4e
+[E1-ROUTE] P before DIR-under-test                               53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95
+[E1-ROUTE] DRY RUN: pin and target checks passed; nothing copied, nothing launched; command: Z:\FAC\TUBerlin\THESIS\TaxoArena\gradlew.bat bootRun --console=plain --offline -PjvmThreads=12 -Dtaxoarena.embeddingCacheFile=Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\e1_route_work\20261003_164423_nomic_raw\embeddings_cache_nomic-embed-text_latest.db -Dtaxoadapt.llm.embedding-model=nomic-embed-text:latest -Dtaxoarena.embeddingCacheSourceSha256=53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95 -Dranking.db.path=Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\e1_route_work\20261003_164423_nomic_raw\ratings_e1route.db --args=--config experiment_configs/e1_split_draws/N_e1sd3.toml
+[E1SD-LAUNCH] DRY RUN (N): every pre-launch check passed, e1_route_launch's dry-run admitted; nothing launched

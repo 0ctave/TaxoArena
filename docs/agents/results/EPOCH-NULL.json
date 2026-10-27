@@ -1,0 +1,147 @@
+{
+  "id": "EPOCH-NULL",
+  "title": "EPOCH-NULL: FRAMEWORK item 15: the per-leaf null between consecutive seed builds (what a re-opening gate would see under a seed change), the chance floor, and the one real config-change epoch (zero calls)",
+  "question": "Per-leaf J_best null between consecutive seed builds (family F: the frozen recipe, 21 builds / 20 steps / 1,682 leaf-steps; family P: bareq512, 3 builds); the share pooled by a gate at 0.50 / 0.66 / 0.80; the within-anchor permutation chance floor; ARI per step vs the record's '0.66-0.69'; the strict held-out subset; per-anchor null; determinism floor; leaf-size dependence; the one real config-change epoch (freeze_mcs55 -> promoted/bareq512_s42).",
+  "kind": "zero-call",
+  "state": "UNDETERMINED",
+  "registration": {
+    "commit": "eaf1dbf",
+    "program_lines": "docs/judge_v2_program.md L3603-L3611 (by reference; docs/design/FRAMEWORK.md L367 item 15); the Block 1 record bullet at L3810",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-15 (before any run) — BY REFERENCE: the 26 tests in docs/design/FRAMEWORK.md \"Tests to register before shipping\" (commit 8d77f7b), with the criteria, predictions and call counts stated there, scheduled in docs/plan_2026-09-15.md",
+    "outcome_heading": [
+      "L3662: ## Block 1 record (2026-09-15/16, zero calls) — FRAMEWORK items 1-12, 14-16: fourteen zero-call tests built, each adversarially checked; verdicts of record below (checker's number wins where it refutes the builder)",
+      "L3810: - **EPOCH-NULL (2026-09-16, zero calls): UNDETERMINED as registered (readout, no criterion); the readout stands; one HIGH correction: freeze_mcs55 is NOT a pool-of-record tree, so the \"one real epoch\" line is restated on the clean 1,020 and the READING is narrowed to one pair.** [ID-ONLY 2026-09-23 (CLAIMS-SWEEP-BRACKETS, registrar): pool 1,020 CLEAN (p2dca judgeable minus p8a29); verified by id only, not by content; reviewed twins on this pool (reviews 1df2cf1, 8ebfa7a): frozen tree 12 exact / 23 norm-v1 (option-set 22 / ordered 11); bareq512_s42 15 / 28 (26 / 13); see docs/judge_v2_program.md L14280-L14340 (CONTENT-DISJOINT-SPLIT-AUDIT) and L14455-L14487 (SPLIT-FOLLOWUPS).]"
+    ],
+    "date": "2026-09-15"
+  },
+  "script": {
+    "path": "tools/analysis/epoch_null.py",
+    "sha16": "164c5805578cb0d8",
+    "commit": "7076615"
+  },
+  "ready": null,
+  "go": "n/a (0 calls; Block 1)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/epoch_null.txt",
+    "outcome_commit": "7076615",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (pool_guard.assert_pool_of_record() first; union pool paeec37aa28063c75 by explicit id where used)",
+    "date": "2026-09-15/16"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); each Block 1 test was 'adversarially checked' at build time and the checker's number wins where it refutes the builder (Block 1 record header L3662-L3663); the checker-confirmed defects are listed in the bullet",
+    "commit": "7076615",
+    "verdict": ""
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "per-leaf J_best null between consecutive seed builds",
+      "result": "DELIVERED",
+      "value": "F median 0.568 [p10 0.284, p90 0.889], bootstrap on the median [0.558, 0.581]; P 0.674; one-to-one median 0.568",
+      "denominator": "F 1,682 leaf-steps; P 3 builds"
+    },
+    {
+      "id": "(2)",
+      "text": "share pooled by a gate at 0.50 / 0.66 / 0.80 under a seed change",
+      "result": "DELIVERED",
+      "value": "F 0.611 / 0.373 / 0.204 (re-opened 0.389 / 0.627 / 0.796); P 0.698 / 0.517 / 0.291",
+      "denominator": "F / P leaf-steps"
+    },
+    {
+      "id": "(3)",
+      "text": "chance floor (within-anchor permutation)",
+      "result": "DELIVERED",
+      "value": "F median 0.120, p95 0.223, p99 0.324; 94.6% of null leaves above p95 (pooled over sizes)",
+      "denominator": "F"
+    },
+    {
+      "id": "(4)",
+      "text": "ARI per step vs the record's '0.66-0.69'",
+      "result": "DELIVERED",
+      "value": "F 0.660 [0.601, 0.727], P 0.679; P1's train-question ARI reproduces (0.664 vs 0.663 [0.585, 0.704])",
+      "denominator": "F 20 steps"
+    },
+    {
+      "id": "(5)",
+      "text": "strict held-out subset (reserved in BOTH trees)",
+      "result": "DELIVERED",
+      "value": "builder n = 1,612, median 0.588; corrected: step 1's strict subset is 315 (not 1,068, because freeze_mcs55's true pool is p8a29d8f3ff75aa55); pooled n = 1,607, median 0.583, shares 0.685 / 0.448 / 0.291 (moves <= 0.005): PARTLY",
+      "denominator": "1,607 leaf-steps"
+    },
+    {
+      "id": "(6)-(8)",
+      "text": "per-anchor null; determinism floor; leaf-size dependence",
+      "result": "DELIVERED",
+      "value": "per anchor Law 0.913 / share >= 0.66 0.79 down to Psychology 0.396 / 0.05; same seed + config rebuilt a day apart 167/167 leaves J_best 1.000, vmfMu max diff 0, ARI 1.000 (every F/P step changes seed AND the 30% split, so construction-seed and split variance are not separated); median J_best 0.419 / 0.534 / 0.617 / 0.886 for eval-membership bands [1,20) / [20,40) / [40,80) / [80, inf), rank corr 0.27",
+      "denominator": "F"
+    },
+    {
+      "id": "(9)",
+      "text": "the one real config-change epoch (freeze_mcs55 -> promoted/bareq512_s42)",
+      "result": "DELIVERED",
+      "value": "builder (all 3,445): router median 0.432, share >= 0.50 0.310, >= 0.66 0.115, ARI 0.541; corrected on the clean 1,020 (held out on both trees): router median 0.421, shares 0.379 / 0.172 / 0.103, ARI 0.573; centroid 0.429 / 0.402 / 0.241 / 0.573; still below the size-matched null steps (0.538-0.634); the second config-change pair (h9_sweep/s3 -> promoted, clean on both sides, 3,445 q) reads 0.517 / 0.540 / 0.287 / ARI 0.600, INSIDE the seed null's per-step range: PARTLY [ID-ONLY 2026-09-23: the 1,020 CLEAN are 15 exact / 28 norm-v1 / 26 option-set / 13 ordered twins on bareq512_s42 and 12 / 23 / 22 / 11 on the frozen tree]",
+      "denominator": "1,020 clean q / 3,445 q [ID-ONLY 2026-09-23 (CLAIMS-SWEEP-BRACKETS, registrar): pool 1,020 CLEAN (p2dca judgeable minus p8a29); verified by id only, not by content; reviewed twins on this pool (reviews 1df2cf1, 8ebfa7a): frozen tree 12 exact / 23 norm-v1 (option-set 22 / ordered 11); bareq512_s42 15 / 28 (26 / 13); see docs/judge_v2_program.md L14280-L14340 (CONTENT-DISJOINT-SPLIT-AUDIT) and L14455-L14487 (SPLIT-FOLLOWUPS).]"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none (a readout, no criterion; no prediction registered)",
+    "fired": false,
+    "note": "the record's '0.66-0.69' reproduces as a whole-partition ARI and is not a per-leaf bar; under a pure seed+split change a 0.66 per-leaf bar re-opens ~63% (F) / ~48% (P) of leaves, a 0.50 bar 39% / 30%; no tree on disk was built by adding data to a previous tree, so the null of an actual train-side growth epoch is not measured"
+  },
+  "numbers_of_record": {
+    "seed_null": "F median 0.568 [0.558, 0.581]; P 0.674; shares at 0.50 / 0.66 / 0.80 F 0.611 / 0.373 / 0.204, P 0.698 / 0.517 / 0.291; chance floor median 0.120, p95 0.223; ARI F 0.660 [0.601, 0.727], P 0.679",
+    "checker_HIGH": "own_pool() read snapshots.db reserved_queries, which for the frozen snapshot 20260727_042523 holds the foreign p2dca split of the 2026-09-09 incident; the frozen tree's true held-out pool is p8a29 (3,437 ids; 2,425 of the 3,445 pool-of-record questions on its TRAIN side); 'strict held-out on both sides' was false; the real-epoch line is restated on the clean 1,020 [ID-ONLY 2026-09-23 (CLAIMS-SWEEP-BRACKETS, registrar): pool 1,020 CLEAN (p2dca judgeable minus p8a29); verified by id only, not by content; reviewed twins on this pool (reviews 1df2cf1, 8ebfa7a): frozen tree 12 exact / 23 norm-v1 (option-set 22 / ordered 11); bareq512_s42 15 / 28 (26 / 13); see docs/judge_v2_program.md L14280-L14340 (CONTENT-DISJOINT-SPLIT-AUDIT) and L14455-L14487 (SPLIT-FOLLOWUPS).]",
+    "real_epoch": "freeze_mcs55 -> promoted on the clean 1,020: router 0.421 / 0.379 / 0.172 / 0.103, ARI 0.573 (below the size-matched null 0.538-0.634); h9_sweep/s3 -> promoted 0.517 / 0.540 / 0.287 / 0.600 (inside the null) [ID-ONLY 2026-09-23 (CLAIMS-SWEEP-BRACKETS, registrar): pool 1,020 CLEAN (p2dca judgeable minus p8a29); verified by id only, not by content; reviewed twins on this pool (reviews 1df2cf1, 8ebfa7a): frozen tree 12 exact / 23 norm-v1 (option-set 22 / ordered 11); bareq512_s42 15 / 28 (26 / 13); see docs/judge_v2_program.md L14280-L14340 (CONTENT-DISJOINT-SPLIT-AUDIT) and L14455-L14487 (SPLIT-FOLLOWUPS).]",
+    "size_matched_note": "the headline null is on all 3,445 q, ~70% train-side on 19 of 21 F trees; size-matched the both-reserved subset reads 0.041 lower (sd 0.063)"
+  },
+  "sentence_of_record": "EPOCH-NULL (2026-09-16, zero calls): UNDETERMINED as registered (readout, no criterion); the readout stands: the per-leaf J_best null between consecutive seed builds is median 0.568 (F) / 0.674 (P), a 0.66 per-leaf bar re-opens ~63% / ~48% of leaves under a pure seed+split change, the chance floor p95 is 0.223, and the record's '0.66-0.69' reproduces as a whole-partition ARI, not a per-leaf bar; one HIGH correction: freeze_mcs55 is NOT a pool-of-record tree (its true held-out pool is p8a29), so the 'one real epoch' line is restated on the clean 1,020 (router median 0.421, below the size-matched null) and the READING is narrowed to one pair (the s3 -> promoted pair sits inside the null). The null of an actual train-side growth epoch is not measured. [ID-ONLY 2026-09-23 (CLAIMS-SWEEP-BRACKETS, registrar): pool 1,020 CLEAN (p2dca judgeable minus p8a29); verified by id only, not by content; reviewed twins on this pool (reviews 1df2cf1, 8ebfa7a): frozen tree 12 exact / 23 norm-v1 (option-set 22 / ordered 11); bareq512_s42 15 / 28 (26 / 13); see docs/judge_v2_program.md L14280-L14340 (CONTENT-DISJOINT-SPLIT-AUDIT) and L14455-L14487 (SPLIT-FOLLOWUPS).]",
+  "chips": [
+    "UNDETERMINED AS REGISTERED (READOUT)",
+    "HIGH CORRECTION: freeze_mcs55 IS NOT A POOL-OF-RECORD TREE"
+  ],
+  "does_not_show": [
+    "a per-leaf re-opening bar (the record's 0.66-0.69 is an ARI)",
+    "the null of a real train-side growth epoch (no such tree on disk)",
+    "construction-seed variance separated from split variance"
+  ],
+  "ledger": {
+    "row_id": "EPOCH-NULL",
+    "version": "v103 (684be03)"
+  },
+  "depends_on": [
+    "SPLIT-RATIO-SEEDS",
+    "H9-1",
+    "INCIDENT pool mismatch 2026-09-09",
+    "P1"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L3603-L3611 (by-reference registration eaf1dbf) and docs/design/FRAMEWORK.md L367 item 15: criterion, prediction, call count",
+    "docs/judge_v2_program.md L3810 ff. (Block 1 record bullet, 7076615): the criterion table, predictions scored, checker-confirmed defects, script and output",
+    "experiment_results/x12_crossdomain/epoch_null.txt (7076615)",
+    "docs/test_ledger.html row EPOCH-NULL (v103 684be03): chips verbatim, design / criteria / observed cells, evidence",
+    "script sha16 = sha256 of tools/analysis/epoch_null.py at 7076615 (its first commit), first 16 hex (identity, computed by the registrar 2026-09-22; later edited at 13f2142 for the pool_guard change)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' heading and the '- **ID (...)**' bullet line inside the Block 1 record, to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06"
+  ],
+  "last_update": "2026-09-23",
+  "brackets": [
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the SPLIT-FOLLOWUPS review 8ebfa7a (insertion only, zero calls)",
+      "text": "'held out on both trees' is ID-ONLY: the 1,020 CLEAN are 15 exact / 28 norm-v1 / 26 option-set / 13 ordered twins on bareq512_s42 (212117) and 12 / 23 / 22 / 11 on the frozen tree. See docs/judge_v2_program.md L14455-L14487 (SPLIT-FOLLOWUPS)."
+    }
+  ],
+  "plain_description": {
+    "sq": "SQ5 Invariance",
+    "what": "No calls. Using 21 trees built with different random seeds (plus 3 trees of the newer recipe), the test measured how much each leaf changes between consecutive rebuilds when only the seed and the data split change. It also measured a pure-chance floor.",
+    "why": "It sets a baseline for how much a leaf 'moves' by chance alone, so a later rule for re-opening a cell after a rebuild is not triggered by noise.",
+    "information": "It shows what a re-opening threshold would flag under pure noise. Result: undetermined by design (a readout with no pass/fail criterion). Leaves overlap with their successor at a median of 0.57 to 0.67. A 0.66 per-leaf bar would re-open about half or more of the leaves from a seed change alone. The '0.66-0.69' figure quoted earlier holds for whole-tree agreement, not per leaf. The effect of a real growth step (adding data) was not measured.",
+    "written": "2026-10-07"
+  }
+}

@@ -1,0 +1,123 @@
+{
+ "id": "TAU-GRID",
+ "title": "TAU-GRID: finer or continuous tau_L2 grid for S-TAU on WORK rows: does the L2 re-read fill the factor-2 grid gap? (exploratory)",
+ "question": "Is the L2 re-read an artefact of S-TAU's factor-2 grid for tau_L2 (tau_L2 chosen continuously by the same S-TAU inner criterion)?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "none (exploratory, not registered); plan benchzoom docs/tau-grid.md committed 2b1bb0e before every statistic (POSTRUN row 1)",
+  "program_lines": "docs/judge_v2_program.md section \"## Registrar's record 2026-10-26 (insertion only; zero calls; nothing run) — BZ-AXIS-CONFIRM-FRESH draft amended per D-2026-10-26-1: ...\" L25708-L25724 (_as_of c3aada22) paragraph RECORD KEEPING (queue item); outcome recorded in docs/judge_v2_program.md section \"## Registrar's record 2026-10-27 (insertion only; zero calls; nothing run) — FRESH-RULES-SIM (POSTRUN 8bebb4ee) and TAU-GRID (POSTRUN 6f16a31c) recorded done ...\" L25726-L25734 (_as_of the commit that writes it, parent c3aada22, re-grepped)",
+  "date": "2026-10-26"
+ },
+ "script": {
+  "path": "benchzoom examples/tau-grid.py",
+  "sha16": "blob:d89d8ea1 (run of record at 32c2e6e; git blob LF = sha256-lf16:f689bf63efe3d92e); tip blob:601416f5 (one hunk inside the module docstring); working tree 0 CR bytes, no CRLF rendering (POSTRUN); test blob:a0e9fd42",
+  "commit": "benchzoom tau-grid 8d8d824..fdeee7f, merged master 1c60deb (master 35b2724)"
+ },
+ "ready": null,
+ "go": "D-2026-10-26-1 (\"yes to 1 and 3, build the variant both ways\"; a8990e4b) item (3)",
+ "run": {
+  "outcome_file": "E:/benchzoom_demo/followups/tau-grid (SHA256SUMS sha256 75e7bb179f050030, summary.txt 36ea3e91669bc6a1; 10/10 and 15/15; backup 15/15 and 10/10 per POSTRUN)",
+  "outcome_commit": "outputs not committed",
+  "calls": 0,
+  "cce": 0,
+  "pool": "WORK rows only (MATH 2,949 items / 2,946 clusters; MMLU and MMLU-Pro WORK rows as REREAD-STEPS, reproduced per item); no vault or reserved read (structural; POSTRUN)",
+  "date": "2026-10-26"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_TAU-GRID.md",
+  "commit": "6f16a31c",
+  "verdict": "OUTCOME CONFIRMED (exploratory), GRID MECHANISM SUPPORTED stands with qualifier (R1); MERGEABLE; R2 record condition; C2-C5 LOW"
+ },
+ "criteria": [],
+ "predictions": [
+  {
+   "id": "PR1",
+   "text": "the word is SUPPORTED",
+   "result": "HELD",
+   "value": "GRID MECHANISM SUPPORTED (MATH, MAP, cont vs g2)",
+   "denominator": "MATH WORK, 2,949 items"
+  },
+  {
+   "id": "PR2",
+   "text": "on MATH, among the tasks where g2 picked tau_L2 = 0.04, tau_L2(cont) lies strictly inside (0.04, 0.08) in at least 75%",
+   "result": "HELD",
+   "value": "8 of 8",
+   "denominator": "8 tasks (fold seed, fold) with g2 tau_L2 = 0.04"
+  },
+  {
+   "id": "PR3",
+   "text": "on MMLU, tau_L2(cont) > 0.08 in at least 75% of the 25 tasks",
+   "result": "HELD",
+   "value": "25 of 25",
+   "denominator": "25 tasks"
+  },
+  {
+   "id": "PR4",
+   "text": "|H_inf(cont) - H_inf(g2)| < 0.010 on all three datasets",
+   "result": "FAILED",
+   "value": "MATH -0.0004 (0.0003), MMLU -0.0204 (0.0055; 3.71 SE), MMLU-Pro +0.0058 (0.0052)",
+   "denominator": "WORK rows, three datasets"
+  }
+ ],
+ "falsifier": {
+  "text": "none (exploratory); the rule word KILLED (D <= 1 SE_D) did not fire",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "word (pre-specified rule, MATH, MAP, cont vs g2)": "GRID MECHANISM SUPPORTED (exploratory, MATH WORK, MAP); structural: tau_RR(cont) = 0 in 25/25; z 3.13 is the g2 re-read's own z (POSTRUN R1)",
+  "MATH re-read g2 -> cont": "+0.0114 -> 0.0000; D +0.0114, paired SE 0.0036, z 3.13; composite SE 0.0038, z 3.03; n 2,949, clusters 2,946, DEFF 1.005, n_eff 2,934, MDE80 0.0103 (91% of D) (POSTRUN rows 5-6)",
+  "tau_RR(cont) = 0": "25/25 tasks on each of MATH, MMLU, MMLU-Pro (75/75); the criterion has one local minimum in 75/75 (dense grid) (POSTRUN verdict, row 8)",
+  "cont tau_L2 ranges": "MATH 0.048-0.073, MMLU 0.094-0.107, MMLU-Pro 0.049-0.066; none at a bound (POSTRUN row 8)",
+  "g2 re-read MMLU / MMLU-Pro (descriptive)": "+0.0136 (0.0102; 1.33) / +0.0250 (0.0155; 1.62); R_cont 0.0000 on both (POSTRUN C4)",
+  "leaf headline H g2 -> cont (paired)": "MATH -0.0004 (0.0003); MMLU -0.0204 (0.0055; 3.71 SE); MMLU-Pro +0.0058 (0.0052) (POSTRUN row 9)",
+  "MMLU C1(V0) g2 -> cont": "-0.0104 (0.0045), 2.33 SE (descriptive; POSTRUN row 10)",
+  "H_cont - net_g2 (paired)": "MATH +0.0110 (0.0036, 3.0 SE); MMLU-Pro +0.0308 (0.0149, 2.1 SE); MMLU -0.0068 (0.0093, 0.7 SE): 'net of re-read' is not a lower bound (POSTRUN row 11, R2)",
+  "G(L2|L1) under cont": "MATH +0.0199 (4.5 SE), MMLU-Pro +0.0461 (3.7 SE), MMLU +0.0158 (1.5 SE) (POSTRUN 'What it licenses')"
+ },
+ "sentence_of_record": "On WORK rows only, with tau_L2 chosen continuously by the same S-TAU criterion, S-TAU sets tau_RR = 0 in 25/25 tasks on each dataset, so the L2 re-read of record (MATH +0.0114, SE 0.0036, at the MAP) is a product of the factor-2 grid for tau_L2: GRID MECHANISM SUPPORTED (exploratory, MATH WORK, MAP) [EXPLORATORY, adjudicates nothing; POSTRUN 6f16a31c R1: structural: tau_RR(cont) = 0 in 25/25; z 3.13 is the g2 re-read's own z; R2: 'net of re-read' is not a lower bound; PR4 FAILED: the WORK MMLU leaf headline falls by 0.0204 (3.7 SE)]",
+ "chips": [],
+ "brackets": [
+  {
+   "date": "2026-10-27",
+   "by": "registrar",
+   "text": "R1 (POSTRUN 6f16a31c): the word is quoted only with its qualifier: 'SUPPORTED (exploratory, MATH WORK, MAP); structural: tau_RR(cont) = 0 in 25/25; z 3.13 is the g2 re-read's own z'; since R_cont = 0, D = R_g2 per item and the test adds no strength beyond REREAD-STEPS claim 3; the new evidence is the count tau_RR(cont) = 0 (75/75) plus unimodality"
+  },
+  {
+   "date": "2026-10-27",
+   "by": "registrar",
+   "text": "R2 (POSTRUN 6f16a31c): 'net of re-read' is not a conservative bound (conservative on MATH and MMLU-Pro WORK, undetermined on MMLU); binds every 'net of the L2 re-read' quotation (C-M1, C-P1); the vault C-M1 +0.1171 / net +0.0864 was not re-read: bracket appended to BZ-AXIS-CONFIRM-MMLU (record and ledger v430)"
+  },
+  {
+   "date": "2026-10-27",
+   "by": "registrar",
+   "text": "C3: 'strictly between g2 points in every task' is not carried; C2 (selftest fixture where R_g2(1) and R_g2(inf) straddle 2 R_v; mutant V5 survives, not decisive) and C5 (full suite at merge if master moves) -> queue item BZ-GUARDS-FRESH-TAU"
+  }
+ ],
+ "does_not_show": [
+  "any switch of S-TAU's grid (meter.TAU_GRID) or of any deciding estimator (the author's)",
+  "any vault, reserved or registered number: C-M1 +0.1171 and net +0.0864 were not re-read",
+  "that the re-read is zero under a continuous tau_RR (RR, L3a and the C1 readers stayed on TAU_GRID)",
+  "that leaf gains are grid-invariant (PR4 FAILED: MMLU H -0.0204, C1 -0.0104)",
+  "that 'net of re-read' is a lower bound (R2)",
+  "any statement at n_eff below the WORK sizes (MATH MDE80 0.0103 against D 0.0114)"
+ ],
+ "ledger": null,
+ "depends_on": [
+  "REREAD-STEPS"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "nothing"
+ },
+ "sources": [
+  "docs/reviews/POSTRUN_TAU-GRID.md (6f16a31c)",
+  "benchzoom docs/tau-grid.md at master 35b2724 (plan 2b1bb0e; outcome paragraph [P1] fdeee7f)",
+  "docs/agents/author_decisions/2026-10-26.md (a8990e4b)",
+  "docs/judge_v2_program.md section \"## Registrar's record 2026-10-26 (insertion only; zero calls; nothing run) — BZ-AXIS-CONFIRM-FRESH draft amended per D-2026-10-26-1: ...\" L25708-L25724 (_as_of c3aada22)",
+  "docs/judge_v2_program.md section \"## Registrar's record 2026-10-27 (insertion only; zero calls; nothing run) — FRESH-RULES-SIM (POSTRUN 8bebb4ee) and TAU-GRID (POSTRUN 6f16a31c) recorded done ...\" L25726-L25734 (_as_of the commit that writes it, parent c3aada22, re-grepped)"
+ ],
+ "last_update": "2026-10-27 (registrar: record created, exploratory, no ledger row; D-2026-10-27-2 item 0 batch)"
+}

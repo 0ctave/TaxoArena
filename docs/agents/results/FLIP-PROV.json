@@ -1,0 +1,102 @@
+{
+  "id": "FLIP-PROV",
+  "title": "FLIP-PROV: where do STACK-v2's flips come from? (B2; zero calls)",
+  "question": "STACK-v2's 1,974 verdicts: flip rate vs key-decidability and key accuracy gap; correctness of each single-order vote among decidable flips; registered readout: flips concentrate on near-tie pairs and both single-order votes are wrong about equally => no mitigation.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "218df92",
+    "program_lines": "docs/judge_v2_program.md L316-L320 (registration bullet) and L290-L297 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "- **FLIP-PROV — flip provenance under STACK-v2** (zero calls): on key-decidable pairs, P(flip) vs the",
+    "outcome_heading": [
+      "L290: - **FLIP-PROV (2026-09-10 13:25, zero calls): B2 closed — flips are near-tie noise and the TIE resolution"
+    ],
+    "date": "2026-09-10"
+  },
+  "script": {
+    "path": "n/a (free check / probe; scratch script, no script of record; the output file is the record)",
+    "sha16": "n/a",
+    "commit": "20670ac"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/flip_prov_boardw.txt",
+    "outcome_commit": "20670ac",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-10"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); POSITION-DECOMP (2026-09-14) later separated the 13.9% flip into ~6pp position on ~6pp test-retest noise",
+    "commit": "20670ac",
+    "verdict": "CLOSED (B2)"
+  },
+  "criteria": [
+    {
+      "id": "readout",
+      "text": "flips concentrate on near-tie pairs and both single-order votes are wrong about equally",
+      "result": "HELD",
+      "value": "flip 21.7% on non-decidable pairs (n = 1,030) vs 5.4% on decidable (51 / 944); decidable flips 11.8% at gap 0.05-0.15, 3.1% at gap > 0.15; among the 51, order-1 right 45%, order-2 right 49%: a coin toss the TIE rule refuses to call",
+      "denominator": "1,974 STACK-v2 verdicts"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "flip guard retired for 'decidable flip <= 8%'; B2 closed"
+  },
+  "numbers_of_record": {
+    "flip_rates": "21.7% non-decidable (n 1,030) vs 5.4% decidable (51 / 944); 11.8% at gap 0.05-0.15, 3.1% at gap > 0.15",
+    "single_order_correctness": "order-1 45%, order-2 49% among the 51"
+  },
+  "sentence_of_record": "FLIP-PROV (2026-09-10, zero calls): B2 closed: flip 21.7% on non-decidable pairs vs 5.4% on decidable (51 / 944); decidable flips 11.8% at key gap 0.05-0.15, 3.1% above 0.15; among the 51, order-1 right 45% and order-2 right 49%, a coin toss the TIE rule refuses to call; the flip guard is retired for 'decidable flip <= 8%'.",
+  "chips": [
+    "CLOSED (B2)"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-14",
+      "by": "POSITION-DECOMP",
+      "text": "the 13.9% flip rate quoted since FLIP-PROV is about 6pp position on 6pp stochasticity (flip 0.124, noise 0.057, position 0.067 [+0.030, +0.107])."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a position component (FLIP-PROV did not separate position from noise; POSITION-DECOMP did)"
+  ],
+  "ledger": {
+    "row_id": "FLIP-PROV",
+    "version": "v33 (1b9312f); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "STACK-v2",
+    "POSITION-DECOMP",
+    "DECOMP"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L316-L320 and L290-L297 (218df92 / 20670ac)",
+    "experiment_results/x12_crossdomain/flip_prov_boardw.txt (20670ac)",
+    "docs/test_ledger.html row FLIP-PROV (v33): chips verbatim, observed cell, evidence",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Using about 2,000 verdicts from the assembled judge, the test asked when the verdict changes if the two answers swap position. It compared pairs where the answer key decides the winner with pairs where it does not, and checked which of the two order-wise votes was right.",
+    "why": "It decides whether order flips need an extra fix or are already handled by recording a tie.",
+    "information": "If flips sat on clear-cut pairs, the judge would need repair. If they sit on near-ties where neither vote is reliable, recording a tie is the right response. Result: done. Flips are 22% on undecidable pairs and 5% on decidable ones, mostly where the two answers are close. On flipped decidable pairs, each order is right about half the time, a coin toss. The flip guard was relaxed. It did not separate position bias from noise, which a later test did. Later ruled history rather than evidence, because it ran on the older question pool.",
+    "written": "2026-10-07"
+  }
+}

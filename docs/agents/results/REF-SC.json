@@ -1,0 +1,109 @@
+{
+  "id": "REF-SC",
+  "title": "REF-SC: can self-consistency of the reference model raise the reference ceiling on the hard questions? (free check on the two existing independent solves, zero calls)",
+  "question": "On the two existing independent solves of the reference model (the J2-R reference and the confidence reference): gate for a paid third sample = it must plausibly lift conf < 100 accuracy by >= 5pp.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "4dfa56c",
+    "program_lines": "docs/judge_v2_program.md L534-L542 (a free-check bullet)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "- **REF-SC free check (2026-09-10 20:15, zero calls): self-consistency of the same reference model is NOT a ...**",
+    "outcome_heading": [
+      "L534: the same bullet"
+    ],
+    "date": "2026-09-10"
+  },
+  "script": {
+    "path": "n/a (free check / probe; scratch script, no script of record; the output file is the record)",
+    "sha16": "n/a",
+    "commit": "4dfa56c"
+  },
+  "ready": null,
+  "go": "n/a (0 calls; the paid test never run)",
+  "run": {
+    "outcome_file": "experiment_results/judge_solve/refsc_free_check.txt",
+    "outcome_commit": "4dfa56c",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-10",
+    "other_files": [
+      "experiment_results/x12_crossdomain/arena_v2_weakpairs.txt (e7b086e)"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); a free check",
+    "commit": "4dfa56c",
+    "verdict": "CLOSED (no paid test): majority-of-3 gains ~0"
+  },
+  "criteria": [
+    {
+      "id": "gate",
+      "text": "a third sample must plausibly lift conf < 100 accuracy by >= 5pp",
+      "result": "FAILED",
+      "value": "the two solves agree 94% (acc 0.888); on disagreements each is right 35%; conf < 100 stratum: agree 89% at 0.793, disagree 11% at 0.35: majority-of-3 gains ~0; 87% of wrong frontier references are in the conf < 100 bin (targeting works), but only a different solver family can raise the ceiling; none reachable then",
+      "denominator": "the two independent solves on the pool; the conf < 100 stratum"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "closed without a paid test; MODEL-VINTAGE-CANARY (2026-09-18) quotes REF-SC's 0.94 as the two-prompt agreement figure for the reference model (a different object from contestant drift)"
+  },
+  "numbers_of_record": {
+    "agreement": "94% (acc 0.888); on disagreements each right 35%",
+    "conf_lt_100": "agree 89% at 0.793; disagree 11% at 0.35",
+    "wrong_frontier_refs_in_bin": "87%"
+  },
+  "sentence_of_record": "REF-SC (2026-09-10, zero calls): self-consistency of the same reference model is NOT a way to raise the reference ceiling: the two solves agree 94% (acc 0.888); on disagreements each is right 35%; on the conf < 100 stratum they agree 89% at 0.793 and disagree 11% at 0.35, so a majority-of-3 gains ~0; 87% of wrong frontier references are in the conf < 100 bin (targeting works), but only a different solver family can raise the ceiling. CLOSED without the paid test.",
+  "chips": [
+    "CLOSED (no paid test)"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-23",
+      "by": "INCONSISTENCIES-PASS (registrar, zero calls; insertion only)",
+      "text": "NAME 2026-09-23 by INCONSISTENCIES-PASS (registrar, zero calls; insertion only): paths of record: experiment_results/judge_solve/refsc_free_check.txt and experiment_results/x12_crossdomain/arena_v2_weakpairs.txt (both tracked). [ledger: evidence cell of row REF-SC, v132]"
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a reference ceiling gain from self-consistency",
+    "a different solver family (REF-QUAL-KIMI-JSON later: exists in principle, not deployable)"
+  ],
+  "ledger": {
+    "row_id": "REF-SC",
+    "version": "v43 (4dfa56c) [v132 2026-09-23: INCONSISTENCIES-PASS insertion in this row]; [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "J2-R",
+    "REF-CONF",
+    "ENSEMBLE-REF",
+    "REF-QUAL-KIMI-JSON",
+    "ARM-B-VINTAGE"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L534-L542 (4dfa56c)",
+    "experiment_results/judge_solve/refsc_free_check.txt (4dfa56c)",
+    "docs/test_ledger.html row REF-SC (v43): chips verbatim, evidence (refsc_free_check.txt, arena_v2_weakpairs.txt)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Two existing independent solves by the reference model were compared, to see whether a majority over more samples could raise its accuracy on hard questions. No calls were made.",
+    "why": "It decides whether a paid third sample is worth buying to strengthen the judge's reference.",
+    "information": "Large disagreement would mean voting could help. High agreement would mean it cannot. Result: done. The two solves agree 94% of the time, so a majority of 3 would gain about nothing. Only a different family of solver could raise the ceiling. The paid test was not run. Older p2dca data family: history, not evidence.",
+    "written": "2026-10-07"
+  }
+}

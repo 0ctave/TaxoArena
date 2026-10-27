@@ -1,0 +1,494 @@
+{
+  "id": "ARCH-V2-G22",
+  "title": "ARCH-V2-G22: the arena simulator (validity; nu(k, N); P(nominal >= 9) per design; b1 identification; the key-blind stop; overdispersion; DEFF at reuse; coverage)",
+  "question": "Is the simulator valid against the recorded board, and which design reaches P(nominal >= 9) >= 0.8 with b1 identified and a safe key-blind stop?",
+  "kind": "zero-call",
+  "state": "blocked",
+  "registration": {
+    "commit": "the commit that adds this record (after the instrument's build at 7a63e6c, before any real-data leg)",
+    "program_lines": "docs/judge_v2_program.md L15208-L15245",
+    "program_lines_as_of": "this commit",
+    "date": "2026-09-24"
+  },
+  "script": {
+    "path": "archv2_g22_sim.py + archv2_g23_replay.py + archv2_arena/ MERGED on main at 8f2cf69 from 74fc4f7 (the G22-REBIND-1 build; chain a62384a live)",
+    "sha16": "instrument_lf16 876d01413318bd7b (re-derived on main by the coordinator and the registrar); archv2_g22_sim.py blob:72b0197805dbd77816db23453a0a92cab38ac86f / sha256-lf16:fee6e27a207fbbea; archv2_arena/g22.py blob:c21e0a33867aca0e15fe1c135089a931f0c8e580 / sha256-lf16:3d178b1bc6d7207d",
+    "commit": "8f2cf69"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_archv2_EA.md",
+    "commit": "5dfc825",
+    "legs": "per leg: v1 validity READY (V1-V4); v2 NOT READY (D1, D2 HIGH; D3-D5 MEDIUM); designs / (d) / (g) / stop NOT READY (D2; gated on a v2 PASS); nu, coverage READY; (f) + P7 READY-WITH-CONDITIONS F1, F2. Running: nu and coverage, overdispersion with P7, v1 validity R = 1,000 (after the G23 legs). NOT run: v2, designs, stop. D9 (tail order statistic) to be disclosed in the outcome; D5 replaced by the arena-specialist's ruling (optimiser check + three descriptive prints, deciding nothing).",
+    "delta": {
+      "file": "docs/reviews/READY_archv2_EA.md",
+      "commit": "f8c2979",
+      "at": "17a93c7",
+      "verdict": "delta READY: v1 READY unchanged; v2 one-shot READY-WITH-CONDITIONS C1-C6; designs / (d) / (g) / stop READY-WITH-CONDITIONS C3, C4, C7 (sealed record v2 PASS token at instrument_lf16 f37145df9516b7ec); (f) + P7 and G23 residue READY",
+      "pins_17a93c7_not_merged": "tools/analysis/archv2_g22_sim.py blob:1019d61d42970dbce7a529a4b0ec5d67abc9943c / sha256-lf16:719723d3163e7f4f; tools/analysis/archv2_g23_replay.py blob:f1763bf892578d291e41bb0061ead67e7a1b53cb / sha256-lf16:8595768e18e63921; tools/analysis/archv2_arena/g22.py blob:1d1ff47b04a94a00d34634482e25a7525f43cfa1 / sha256-lf16:b7f31cd4c97db231; tools/analysis/archv2_arena/verdict_model.py blob:418d979e3ca632340f739a9449180e653932bddf / sha256-lf16:c87ef3a34e7b3a7f; tools/analysis/archv2_arena/selftest_g22_v2.py blob:bb1143cae99cfdc09d42d26b5f62ebbdef5c0ec3 / sha256-lf16:9c8d993ddc3bc09f",
+      "token_binding": "instrument_lf16 f37145df9516b7ec (11 files; recomputed by the reviewer); FROZEN from the v2 record run to the last designs / stop run (C3)"
+    }
+  },
+  "go": "n/a (0 calls); the board size it informs needs the author's go",
+  "run": {
+    "outcome_file": "NOT YET RECORDED (post-run reviews pending): v1 legs at 5abb79f (experiment_results/archv2/g22_g23/G22_validity.txt blob:e3206bfb7493aeb56d99b6951c5e743766e8ecf7 / sha256-lf16:d10cd9b5626fe15e; experiment_results/archv2/g22_g23/G23_identity.txt blob:1f08afdfa3fe5b09fa7f6fa0870b7d51ceb4678c / sha256-lf16:faec3bce070e0ecc; experiment_results/archv2/g22_g23/G22_overdispersion.txt blob:033dfcc4fb6fb0210a45d4fe1a94281d4c15c315 / sha256-lf16:1362fde0ad155319); v2 one shot at e644a25 (experiment_results/archv2/g22_g23/G22_validity_v2.txt blob:79e9348da961aec5e03f73ba67c9a2d6ca16a340 / sha256-lf16:742710d80edd3c36)",
+    "outcome_commit": "5abb79f (v1 legs); e644a25 (v2 one shot)",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-24",
+    "v1_legs_outcome_files": "experiment_results/archv2/g22_g23/G22_validity.txt blob:e3206bfb7493aeb56d99b6951c5e743766e8ecf7 / sha256-lf16:d10cd9b5626fe15e; experiment_results/archv2/g22_g23/G22_nu.txt blob:8b3fe2832ba7fa7cf3c45319e68bd927cdddcf84 / sha256-lf16:96f35516eb171e3c; experiment_results/archv2/g22_g23/G22_coverage.txt blob:f6ba054691ebdeb7f51eb311ff1f63abd702b3b3 / sha256-lf16:eb882c0a7bf79ddf; experiment_results/archv2/g22_g23/G22_overdispersion.txt blob:033dfcc4fb6fb0210a45d4fe1a94281d4c15c315 / sha256-lf16:1362fde0ad155319",
+    "v2_outcome_files": "experiment_results/archv2/g22_g23/G22_validity_v2.txt blob:79e9348da961aec5e03f73ba67c9a2d6ca16a340 / sha256-lf16:742710d80edd3c36; experiment_results/archv2/g22_g23/G22_validity_v2.txt.console.txt blob:bcd3eff4be9cadb45c6503c3ada112ae4a1c45e0 / sha256-lf16:31da033387822aaa / sha256-crlf16:90f11a27a4f7b7de (the working tree's rendering); experiment_results/archv2/g22_g23/G22_validity_v2.txt.streams.tsv blob:3ccfcacaf662b3034ea9b75266dcc9600740a94f / sha256-lf16:0791961ee6b76940",
+    "nu_grok": {
+      "commit": "d9f801b",
+      "outcome_file": "experiment_results/archv2/g22_g23/G22_nu_grok.txt blob:347855dd2b65493f3712180960e26c141a245716 / sha256 75445ae2113a11bc82812b021312d9fa9e710a18b3bfc53364cc003b4c23e95f (LF as committed)",
+      "streams": "experiment_results/archv2/g22_g23/G22_nu_grok.txt.streams.tsv blob:d96ed228778ae8c89a2b016f32db1c325d048f88 / sha256 272d108370fbb42d2d020c0a8e8f5569e988e2533790bbfdc72710f0679abde1 (LF as committed)",
+      "proclist": "experiment_results/archv2/g22_g23/G22_nu_grok.proclist.txt blob:d14a7b43a64cdbf89872a65eceb3e5a46c30d99e / sha256 861c917f279c2f517190fda852940dd0518a57415282de61c5680f70d32905e2 (LF as committed) / sha256-crlf16:5ba3267a128fa90e (the working tree's rendering)",
+      "review": "e4623ba docs/reviews/2026-09-24_archv2_g22_nu_grok_post.md: ACCEPT with L1-L3 (LOW); reproduced to the digit",
+      "frozen_pair": "unshipped GROK-CALIB 920 pair b0 -3.3172 / b1 +3.3001 (grok_calib_outcome.txt L14), key-blind frozen, admitted as merged's N2; NOT ruling B's certificate pair",
+      "exponents": "N 2 +1.647 [1.477, 1.828]; N 3 +1.910 [1.665, 2.178]; N 5 +2.020 [1.857, 2.196]; N full +2.325 [2.141, 2.506] (100 points per N; within-k bootstrap 2,000)"
+    },
+    "rebind_replay": {
+      "commit": "475da53 (streams 1afa407)",
+      "outcome_file": "experiment_results/archv2/g22_g23/rebind/G22_validity_v2_REPLAY.txt blob:afc7a6a64760b89628606652e75180914bd668ec / sha256 3a410b9627c275fc81137fd24cdab91c11e17d3db82a499d20a4d8611e1b0822",
+      "streams": "experiment_results/archv2/g22_g23/rebind/G22_validity_v2_REPLAY.txt.streams.tsv blob:3ccfcacaf662b3034ea9b75266dcc9600740a94f / sha256 0791961ee6b76940515030a72f5679d65f9d24392646975c8ddeb3446689fca6",
+      "review": "docs/reviews/2026-09-24_g22_rebind_replay_post.md (678c1e6): REPLAY PASS CONFIRMED",
+      "instrument_lf16": "876d01413318bd7b (74fc4f7)"
+    },
+    "designs_stop": {
+      "commit": "a5b68e6",
+      "outcome_files": "experiment_results/archv2/g22_g23/designs/G22_designs.txt blob:be28bba31391cab3e46dce2816835601b0c81d63 / sha256-lf16:9d21b03cd8a24d00; experiment_results/archv2/g22_g23/designs/G22_stop.txt blob:a1d4bbad9565655eafce0223b78f4a1f9ec3b4b1 / sha256-lf16:66925ffd92a23cc5; experiment_results/archv2/g22_g23/designs/G22_designs_stop_launch_record.txt blob:3329e3db09fed52f76b6761d46a4511dda1ff2d0 / sha256-lf16:76bb10e9a4ff4127 (a5b68e6; the per-replicate records, manifests, streams and proclists beside)",
+      "review": "docs/reviews/2026-09-24_archv2_g22_designs_stop_post.md (47fd0d6): RECORDABLE WITH CONDITIONS C1-C6",
+      "token_and_chain": "token file sha256 14cfff2fb55cfbd23f5f18403d7815a3168e3411a21e97ce7b0c0d94787e57ca (token_digest 3069666d0f5e553ad61bd9cb8f178e2771d6fd683f63f01b8b35435cf56cdfc0); chain file sha256 ff70668ced25496551d2955cce70cf7c86c92d7daf1ecd6e948cc32f15f433c1"
+    }
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-24_archv2_g22_g23_readylegs_post.md",
+    "commit": "3ed7cbd",
+    "verdict": "v1 legs: v1 validity ACCEPT (FAIL genuine) WITH V-a to V-c; nu ACCEPT WITH N1, N2; coverage ACCEPT WITH C1; overdispersion + P7 ACCEPT WITH O1-O4; none rejected. The v2 one shot has its own review (pending)"
+  },
+  "criteria": [
+    {
+      "id": "a",
+      "text": "VALIDITY gate: every target inside its simulated central (1 - 0.05/T) interval (downstream mode); without PASS, legs c, d, e, g refuse",
+      "result": "FAILED",
+      "value": "v1 validity FAIL, genuine: random (primary) mode misses f_raw_wrong, f_loao_called, u_raw_wrong, u_loao_called with 0 of 1,000 replicates reaching any (f_raw_wrong median 222.5 [43.9, 468.7] vs 7; f_loao_called 6 [0, 384.9] vs 667); not D9",
+      "denominator": "the recorded board's targets"
+    },
+    {
+      "id": "b",
+      "text": "nu(k, N) exponent with a bootstrap CI; descriptive",
+      "result": "n/a",
+      "value": "DESCRIPTIVE (merged only): exponents +1.879 [1.801, 1.953], +1.992 [1.893, 2.100], +1.876 [1.780, 1.978], +2.019 [1.889, 2.159]; grok arm NOT run of record (N1) [2026-09-24 grok arm RAN d9f801b (review pending): +1.647 [1.477, 1.828], +1.910 [1.665, 2.178], +2.020 [1.857, 2.196], +2.325 [2.141, 2.506]; N1 closed by execution; docs/judge_v2_program.md L15688-L15701] [2026-09-24 REVIEWED e4623ba: grok arm ACCEPT, reproduced to the digit; docs/judge_v2_program.md L15703-L15711]",
+      "denominator": "subsampled rosters"
+    },
+    {
+      "id": "c",
+      "text": "P(nominal >= 9) per design vs 0.8, Wilson interval decides (MEETS / BELOW / UNRESOLVED AT THIS R)",
+      "result": "n/a",
+      "value": "DEV supply, ruling-2 admissibility: P(LOAO nominal >= 9) D4 0.000 [0.000, 0.004] BELOW; D1-stage1 1.000 [0.996, 1.000] MEETS; D1-full 1.000 [0.996, 1.000] MEETS (optimistic by construction); admissible only as the order D4 < D1-stage1 < D1-full and the schedule quantities 3,990 / 14,490 / 28,980",
+      "denominator": "R = 1,000 re-draws per design"
+    },
+    {
+      "id": "d",
+      "text": "b1 identification rate vs 0.8, Wilson decides",
+      "result": "UNDETERMINED",
+      "value": "identification 0.182 / 0.518 / 0.654, BELOW 0.80, but SIGN-BLIND: substantively UNDETERMINED (552 of 654 identified D1-full replicates have b1 <= 0; v2 b1_est median -0.023 vs the record's +2.6386)",
+      "denominator": "R = 1,000"
+    },
+    {
+      "id": "e",
+      "text": "P(MISCALIBRATED | calibrated) vs 0.05, Wilson decides",
+      "result": "n/a",
+      "value": "MEETS at every margin (0.020-0.024); stage-1 branch only at margins 0-1 (margin 1: 6/210 = 0.029 [0.013, 0.061], UNRESOLVED); no overdispersion (bias UPWARD); all-label count only",
+      "denominator": "R = 1,000"
+    },
+    {
+      "id": "f",
+      "text": "overdispersion by model and anchor; residue model resolved from the data; descriptive",
+      "result": "n/a",
+      "value": "DESCRIPTIVE (merged, exact builder): by model chi2 53.40 / 20, p <= 0.0005 (0/2,000; < 5e-5 at 20,000); by anchor chi2 22.34 / 14, p 0.0465 (2,000) / 0.0380 SE 0.0014 (20,000); DEFF 1.780 (ICC 0.0050, Kish m 158.3, n_eff 1241.9) supersedes 1.897; grok DEFF floored at 1",
+      "denominator": "grok_calib, x12, merged"
+    },
+    {
+      "id": "g",
+      "text": "DEFF at the measured reuse (~8.4); descriptive",
+      "result": "n/a",
+      "value": "NOT RUN",
+      "denominator": "simulated boards"
+    },
+    {
+      "id": "h",
+      "text": "coverage D_c >= 0.95 per anchor for the 46-model roster",
+      "result": "n/a",
+      "value": "DESCRIPTIVE: D_c >= 0.95 on 2 of 14 anchors; 'A on the EVAL side' NOT PRINTED (C1)",
+      "denominator": "14 anchors"
+    },
+    {
+      "id": "a'",
+      "text": "VALIDITY v2 (fresh-judge, POST-HOC-SPECIFIED, one shot; ruling 1 (ii) of 83f431b): part A the 14 full-board targets at central 0.99643, part B the 12 held-out H2 targets at central 0.99583, every target inside its interval (inclusive type-7 rule as coded at f1192e6)",
+      "result": "HELD",
+      "value": "PASS AT THE BOUNDARY: A 14/14, B 12/12; H2 u_raw_wrong 3 = q_lo 3.00 (D9 realised; fresh-draw flip probability about 0.02-0.26; P(PASS on a fresh draw) about 0.75-0.98); interval ends not resolvable at R = 1,000 (SE 0.00144 at p 0.00208; MDE 0.0040) [2026-09-24 D9 SETTLED on the stored records (replay 475da53, review 678c1e6): 23 of 24 deciding rows clear; H2 u_raw_wrong passes by ONE replicate (tail 0.0050, CP [0.0016, 0.0116] contains the bar 0.00208; q_lo exactly 3.00); fresh-master P(pass this row) about 0.74 (about 0.16 at the bar); docs/judge_v2_program.md L15816-L15828]",
+      "denominator": "part A grok_calib 891 / 920 / 809 edges; part B H2 1,409 of 2,811 questions, 11 of 14 anchors; R = 1,000"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "(a) PASS (point probability 0.7)",
+      "result": "FAILED",
+      "value": "v1 validity FAIL",
+      "denominator": "targets"
+    },
+    {
+      "id": "P2",
+      "text": "exponent 1.06 [0.80, 1.30]",
+      "result": "FAILED",
+      "value": "merged exponents 1.88-2.02, CIs [1.78, 2.16] vs 1.06 [0.80, 1.30]; grok arm not of record [2026-09-24 grok arm (d9f801b, review pending): FAILED on all 4 N (1.65-2.33, every CI excludes 1.06); docs/judge_v2_program.md L15688-L15701] [2026-09-24 REVIEWED e4623ba: FAILED on grok at all 4 N confirmed; docs/judge_v2_program.md L15703-L15711]",
+      "denominator": "rosters"
+    },
+    {
+      "id": "P3",
+      "text": "P(nominal >= 9): D4 0.00 [0, 0.02]; D1-stage1 0.30 [0.05, 0.60]; D1-full 0.75 [0.30, 0.95]; D0 0.35 [0.10, 0.70]; D2 0.85 [0.60, 0.98]",
+      "result": "FAILED",
+      "value": "D4 HELD; D1-stage1 and D1-full FAILED on every reading (memo exponent 1.06 vs measured 1.6-2.3); D0 and D2 NOT SCORED",
+      "denominator": "R = 1,000"
+    },
+    {
+      "id": "P4",
+      "text": "(d) 0.85 [0.60, 0.97]",
+      "result": "FAILED",
+      "value": "D1-full HELD ON ITS INTERVAL ONLY (point missed by 0.196; MDE 0.042); D1-stage1 and D4 FAILED; all sign-blind",
+      "denominator": "R"
+    },
+    {
+      "id": "P5",
+      "text": "(e) 0.03 [0.01, 0.08]",
+      "result": "HELD",
+      "value": "the stop's false-alarm rate 0.020-0.024 at every margin (stage-1 branch exercised at margins 0-1 only)",
+      "denominator": "R"
+    },
+    {
+      "id": "P6",
+      "text": "(h) 14 of 14 anchors [12, 14]",
+      "result": "FAILED",
+      "value": "2 of 14 anchors vs 14 [12, 14]",
+      "denominator": "14 anchors"
+    },
+    {
+      "id": "P7",
+      "text": "the residue model is Meta-Llama-3_1-70B-Instruct, inside the 46-model roster [RULED 2026-09-24 (DECLARED post-data; docs/judge_v2_program.md L15413-L15420): the identity clause is scored on MERGED ONLY, HELD iff Meta-Llama-3_1-70B-Instruct is the UNIQUE most-incident model among the called wrong(established) edges under the certificate of record (a tie = NOT HELD); x12 and grok residue sets DESCRIPTIVE, a one-edge set printed 'UNRESOLVED (one-edge tie)'; the ROSTER clause checked on all three boards (a member outside the 46-model roster fires the falsifier); readings (a) and (b) printed beside, deciding nothing]",
+      "result": "HELD",
+      "value": "HELD ONLY under the post-data ruling of 97f3a1f: identity on merged, Meta-Llama-3_1-70B-Instruct unique top (4 of 4); roster clause OK on all three boards; reading (b) 'unique top on every board' NO; reading (a) yes",
+      "denominator": "data"
+    }
+  ],
+  "falsifier": {
+    "text": "(a) FAIL: no design reading may set the size; (c) BELOW for D1-full overturns the memo's 55,300-call recommendation as an 0.8-power design; (e) EXCEEDS overturns the key-blind stop; P7 failing re-opens the corrected caveat.",
+    "fired": true,
+    "result": "FIRED on (a): v1 validity FAIL, the registered simulator decides nothing; design readings re-enter only through the POST-HOC-SPECIFIED one-shot v2 (e644a25, in review). (c) and (e) not reached. P7's falsifier (roster) NOT fired [2026-09-24: (c) and (e) NOT FIRED under the post-hoc v2 simulator only (docs/judge_v2_program.md L16009-L16041)]"
+  },
+  "numbers_of_record": {
+    "v1_validity": "FAIL; random mode 0 of 1,000 replicates reach 4 targets (f_raw_wrong 222.5 [43.9, 468.7] vs 7; f_loao_called 6 [0, 384.9] vs 667); R = 1,000 per mode, level 0.99643",
+    "nu_merged": "+1.879 [1.801, 1.953], +1.992 [1.893, 2.100], +1.876 [1.780, 1.978], +2.019 [1.889, 2.159]",
+    "overdispersion_merged": "by model chi2 53.40 / 20, p <= 0.0005 (0/2,000); by anchor chi2 22.34 / 14, p 0.0465 (2,000) / 0.0380 (20,000)",
+    "deff_merged": "1.780 (ICC 0.0050, Kish m 158.3, n_eff 1241.9; supersedes the provisional 1.897); grok floored at 1",
+    "coverage": "2 of 14 anchors at D_c >= 0.95",
+    "p7": "Meta-Llama-3_1-70B-Instruct unique top on merged (4 of 4), post-data rule",
+    "v2_validity": "PASS AT THE BOUNDARY: part A 14/14 (0.99643), part B 12/12 (0.99583), inclusive type-7 rule; H2 u_raw_wrong 3 = q_lo 3.00",
+    "v2_flip": "fresh-draw flip of H2 u_raw_wrong about 0.02-0.26; P(PASS fresh) about 0.75-0.98; other near-tail targets <= 2.2e-3",
+    "v2_support": "DEFF 1.0 by design; part-B end p 0.0020833, MC SE 0.00144, MDE 0.0040; part A p 0.0017857, SE 0.00134",
+    "v2_centring": "NOT CENTRED: raw-wrong medians 13/18 vs 7/8 (full), 11/13 vs 3/3 (H2); LOAO-called 7-15% low; LOAO nominal 6-18% high",
+    "v2_fit": "beta-hat +5.2445 (H1 +5.1007, printed only); sigma_eps_LOMO 0.3730; shares in-sample 0.9363, fresh-draw 0.9212",
+    "v2_split": "H1 1,402 / H2 1,409; digests (reviewer) H1 416de6a5dc14061b, H2 0e0d2b429ce846d2; H2 11 anchors, H1 fit 10 anchors (200-row floor)",
+    "nu_grok": "+1.647 [1.477, 1.828] / +1.910 [1.665, 2.178] / +2.020 [1.857, 2.196] / +2.325 [2.141, 2.506] at N 2 / 3 / 5 / full (100 subsample points per N; frozen unshipped GROK-CALIB 920 pair)",
+    "v2_d9_stored": "23 of 24 deciding rows clear; H2 u_raw_wrong: order stats 1, 2, 3, 3, 3, 4; tail 0.0050 CP [0.0016, 0.0116] vs bar 0.00208; one replicate fewer -> q_lo 3.081 FAIL; P(pass row | fresh master) ~0.74 (~0.16 at the bar)",
+    "rebind_chain": "old_lf16 f37145df9516b7ec -> new_lf16 876d01413318bd7b; token_digest 3069666d...cdfc0; replay_output_sha 3a410b9627c275fc81137fd24cdab91c11e17d3db82a499d20a4d8611e1b0822",
+    "designs": "P(LOAO nominal >= 9) D4 0.000 / D1-stage1 1.000 / D1-full 1.000 (DEV supply); frozen medians 1.71 / 9.80 / 19.92 (memo X 1.8 / 9.5 / 19.1); matches 3,990 / 14,490 / 28,980; order D4 < D1-stage1 < D1-full",
+    "identification_signblind": "0.182 / 0.518 / 0.654; 552 of 654 identified D1-full replicates b1 <= 0",
+    "stop": "false-alarm 0.020-0.024 at every margin; stage-1 branch margin 0 19/960, margin 1 6/210 = 0.029 [0.013, 0.061]"
+  },
+  "sentence_of_record": "ARCH-V2 G22 / G23 READY legs, record runs at 4381e4b, independently reproduced (post-run review 2026-09-24). G23: identity HELD (tables sha256 04754dbc…, byte-identical, re-run and recomputed). Certificate B is ADMISSIBLE on both draws (utility 69.2% / 69.3%, LOAO wrong(established) 1 ≤ A's 1). P1, P2 and P3 HELD (cross-draw Jaccard 0.941 / 0.938). Holm: 809 → 736 per anchor → 671 pooled; the 19 ordered edges that lose establishment are all right-direction. MC-UNRESOLVED 22 of 920. G22 v1 validity FAILED as registered: the fresh-judge (random) mode puts f_raw_wrong at median 222.5 (central 0.99643 interval [43.9, 468.7]) against 7, and f_loao_called at median 6 [0, 384.9] against 667, with no replicate of 1,000 reaching either target (u likewise). The falsifier (a) FIRED: the registered simulator decides nothing. Design readings can re-enter only through the POST-HOC-SPECIFIED one-shot v2 (ruling 1 (ii)). P1 FAILED; P2 FAILED (merged exponent 1.88-2.02, CIs [1.78, 2.16], against 1.06 [0.80, 1.30]; the grok arm was not run); P3-P5 NOT SCORED (gated); P6 FAILED (2 of 14 anchors at D_c ≥ 0.95). P7 HELD under the post-data ruling of 97f3a1f: Meta-Llama-3_1-70B-Instruct is the unique top among merged's 4 called wrong(established) edges; the roster clause is OK on all three boards. Under the pre-data reading 'unique top on every board' it is NOT HELD (x12 and grok are one-edge ties). Merged wrong(established) overdispersion: by model χ² 53.40 on 20 models, p ≤ 0.0005 (0 of 2,000 permutations; within-anchor null p 0.0001); by anchor χ² 22.34, p 0.0465 ± 0.005 (Monte Carlo); DEFF 1.780 (ICC 0.0050, Kish m 158.3). [run 5abb79f (record runs from main at 4381e4b = ca84e44; zero judge calls), review 3ed7cbd (5 ACCEPT, 5 ACCEPT WITH; none rejected); denominators: grok 891 f / 920 u edges, 809 established, 2,811 judged questions in 14 anchors; merged 21,536 valid verdicts, 2,538 edges; R = 1,000 per validity mode; pool p2dca21ab5f4ef3ae, id-disjoint only; P7 scored under the POST-DATA ruling of 97f3a1f; the v2 one shot (e644a25) is NOT covered here] [v1 legs only; the v2 one shot, designs and stop are recorded separately] || v2: ARCH-V2-G22 validity v2 (fresh-judge, POST-HOC-SPECIFIED, one shot; zero calls; run e644a25 at instrument_lf16 f37145df9516b7ec) PASSES under the registered rule as coded before any real-data leg (inclusive ends of numpy's default central (1 - 0.05 / T) interval): part A 14 of 14 targets on grok_calib (891 / 920 / 809 edges; 0.99643), part B 12 of 12 on the held-out half H2 (1,409 of 2,811 judged questions, 11 of 14 anchors above the 200-row floor, fitted on H1's 10; 0.99583). The PASS is AT THE BOUNDARY: H2's u_raw_wrong target (3) equals its interval's lower end (percentile 0.004), so a fresh Monte-Carlo draw of 1,000 replicates would flip it with probability about 0.05-0.25. The simulator is not centred on the record. Its median raw wrong-direction counts are 13 and 18 against 7 and 8 on the full board, and 11 and 13 against 3 and 3 on H2; its LOAO-called counts run 7-15% low; its LOAO nominal runs 6-18% high. The targets fall inside the intervals because of the fresh judge's spread (beta-hat 5.24, sigma_eps,LOMO 0.373; fresh-draw quality share 0.921 against 0.936 in sample), and the fixed-judge mode, which decides nothing, misses 3 of 14. Design readings are admitted only as readings of a post-hoc-specified simulator whose wrong-direction counts and nominal run high. [run e644a25 (ONE SHOT, POST-HOC-SPECIFIED; main 165ffb8, instrument_lf16 f37145df9516b7ec; zero calls), review aec0a55 ACCEPT WITH W1-W6; denominators: part A 14 targets on grok_calib (891 / 920 / 809 edges), part B 12 targets on H2 (1,409 of 2,811 judged questions; 11 of 14 anchors above the 200-row floor; fit on H1's 10); R = 1,000 per mode; the inclusive type-7 rule coded at f1192e6 before any real-data leg decides; token_digest 3069666d...cdfc0 pinned at L15586-L15595] || nu grok: G22-NU-GROK-RECORD (d9f801b) independently reproduced (light post-run review 2026-09-24). A re-run from `git archive d9f801b` at master ARCHV2-G22-REC-1 is byte-identical to the committed output except the argv and started lines, and the streams file is sha256 272d1083… again. An independent log-log OLS with a within-k bootstrap of 2,000 resamples gives grok exponents +1.647 [1.477, 1.828], +1.910 [1.665, 2.178], +2.020 [1.857, 2.196] and +2.325 [2.141, 2.506] for N 2 / 3 / 5 / full. That matches the output to the digit, with 100 points per N and 0 zero-nominal draws. Reading P (1.06) lies outside every CI, and M / X (2.0) lies inside only at N 3 and N 5. G22 P2 is therefore FAILED on grok too. The frozen pair is the GROK-CALIB 920 pair of record (-3.3172 / +3.3001, grok_calib_outcome.txt L14). The 11 bound files are unchanged from 165ffb8, and instrument_lf16 was recomputed as f37145df9516b7ec. N1 of 3ed7cbd is closed. DESCRIPTIVE-ONLY: the CIs are conditional on one 12-model board, and the k 11 and k 12 subsamples overlap. || designs / stop: ARCH-V2-G22 designs and stop record runs (a5b68e6; lf16 876d01413318bd7b; master ARCHV2-G22-REC-1, R 1,000; DEV proportional supply) reproduce to the digit from their stored replicates. On the DEV supply, P(LOAO nominal >= 9) is 0.000 [0.000, 0.004] for D4, 1.000 [0.996, 1.000] for D1-stage1 and 1.000 [0.996, 1.000] for D1-full; frozen 0.000 / 0.974 / 1.000; deflated x1.18 0.000 / 0.996 / 1.000. Under ruling 2 these are admissible only as the order D4 < D1-stage1 < D1-full and as the schedule quantities (3,990 / 14,490 / 28,980 matches). The (d) identification rates 0.182 / 0.518 / 0.654 are BELOW 0.80 but are sign-blind: the simulator does not reproduce the sign of the widener slope (validity-v2 random mode: established b1 median -0.023, 506 of 1,000 <= 0, against the record's +2.6386). The key-blind stop calls a calibrated judge MISCALIBRATED in 0.020-0.024 of re-draws at every margin, but its stage-1 branch fires in only 1 and 0 of 1,000 at margins 2 and 3, and its calibrated labels carry no overdispersion. P3 FAILED for D1-stage1 and D1-full, held for D4; P5 held; no falsifier fired. The real-supply, registered-anchor re-run is owed. [run a5b68e6 (record runs under ruling 2; lf16 876d01413318bd7b; the token and chain of record: token file sha256 14cfff2fb55cfbd23f5f18403d7815a3168e3411a21e97ce7b0c0d94787e57ca (token_digest 3069666d0f5e553ad61bd9cb8f178e2771d6fd683f63f01b8b35435cf56cdfc0); chain file sha256 ff70668ced25496551d2955cce70cf7c86c92d7daf1ecd6e948cc32f15f433c1), review 47fd0d6 RECORDABLE WITH CONDITIONS C1-C6; denominators: R = 1,000 simulated re-draws per design and for the stop; DEV proportional supply (4,002 vs the split of record's 3,749 mmlu-pro-v2 EVAL items, +6.7%); readings of a post-hoc-specified simulator that passed at the boundary and is NOT centred; no board size follows (ruling 3)]",
+  "chips": [
+    "REGISTERED 2026-09-24, BEFORE ANY REAL-DATA LEG",
+    "v1 VALIDITY FAIL (GENUINE); FALSIFIER (a) FIRED",
+    "P1, P2, P6 FAILED; P3-P5 NOT SCORED",
+    "P7 HELD UNDER THE POST-DATA RULING ONLY",
+    "v2 PASS AT THE BOUNDARY (D9 REALISED ON H2 u_raw_wrong; POST-HOC-SPECIFIED); MONTE-CARLO-FRAGILE ON ONE ROW, BY ONE REPLICATE",
+    "SIMULATOR NOT CENTRED (D2): DESIGN READINGS LIKELY OPTIMISTIC",
+    "(c): D4 BELOW; D1-STAGE1 AND D1-FULL MEETS, OPTIMISTIC BY CONSTRUCTION; ORDER AND SCHEDULE ONLY",
+    "(d): BELOW ON ALL 3; SIGN-BLIND (D1, HIGH)",
+    "(e): MEETS AT EVERY MARGIN; STAGE 1 ONLY AT MARGINS 0-1 (D2); NO OVERDISPERSION (D3)",
+    "P3 FAILED (D1-STAGE1, D1-FULL); P4 D1-FULL HELD ON ITS INTERVAL ONLY; P5 HELD; FALSIFIERS (c), (e) NOT FIRED",
+    "ITEM 2: NOTHING VOIDED; REAL-SUPPLY, REGISTERED-ANCHOR RE-RUN OWED",
+    "ZERO CALLS",
+    "SETS THE SIZE PROPOSAL; DECIDES NOTHING WITHOUT THE GO"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-24",
+      "by": "registrar (provisional run, relayed)",
+      "text": "RAN, PROVISIONAL until E-A's READY (instrument 4c2d2b5): see docs/judge_v2_program.md L15320-L15339. Not an outcome of record."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (the arena-specialist's rulings, relayed)",
+      "text": "Rulings 1-5 and the run order recorded before any code change or R = 1,000 run; every diagnostic DEV. docs/judge_v2_program.md L15341-L15365."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (the arena-specialist's rulings A and B, relayed verbatim)",
+      "text": "Rulings A and B recorded before any v2 code change or R = 1,000 run; GROK-CALIB L3934 bracketed; DEV script arena_rulings/diag_beta_synth.py. docs/judge_v2_program.md L15377-L15389."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (the arena-specialist's P7 ruling, verbatim; the code delta)",
+      "text": "P7 ruling recorded verbatim before any R = 1,000 run; code delta 805d830 (READY pending); DEV precondition MET on merged. docs/judge_v2_program.md L15413-L15420."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (READY review 5dfc825, relayed by the coordinator)",
+      "text": "READY per leg: v1 validity READY (V1-V4); v2 NOT READY (D1, D2 HIGH; D3-D5 MEDIUM); designs / (d) / (g) / stop NOT READY (D2; gated on a v2 PASS); nu, coverage READY; (f) + P7 READY-WITH-CONDITIONS F1, F2. Running: nu and coverage, overdispersion with P7, v1 validity R = 1,000 (after the G23 legs). NOT run: v2, designs, stop. D9 (tail order statistic) to be disclosed in the outcome; D5 replaced by the arena-specialist's ruling (optimiser check + three descriptive prints, deciding nothing). docs/judge_v2_program.md L15422-L15448."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (delta READY f8c2979, relayed by the coordinator)",
+      "text": "Delta READY f8c2979 at 17a93c7: v1 unchanged (the 4381e4b record run stands); v2 READY-WITH-CONDITIONS C1-C6; designs / stop READY-WITH-CONDITIONS C3, C4, C7; (f) + P7 READY. REGISTRAR OBLIGATION at the v2 outcome: pin token_digest and the token file sha (C4). docs/judge_v2_program.md L15485-L15513."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (the coordinator's relay; token re-derived by the registrar)",
+      "text": "v2 ONE SHOT RAN at e644a25 (printed PASS; the shot is consumed); the token PINNED: token_digest 3069666d0f5e553ad61bd9cb8f178e2771d6fd683f63f01b8b35435cf56cdfc0, file sha256 14cfff2fb55cfbd23f5f18403d7815a3168e3411a21e97ce7b0c0d94787e57ca; claim sha256 35c16163543ad478dc39480cff52dbce6eb68552e6b3aec57060d936f05daa41. v1 legs RAN at 5abb79f (printed v1 FAIL, G23 identity PASS, P7 HELD). Reviews pending; no outcome recorded. docs/judge_v2_program.md L15586-L15595."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (run 5abb79f; review 3ed7cbd)",
+      "text": "v1-legs OUTCOME recorded: v1 validity FAIL (genuine; falsifier (a) FIRED); P1, P2, P6 FAILED; P3-P5 NOT SCORED; P7 HELD under the post-data ruling only; DEFF 1.780 supersedes 1.897. State stays running (v2 in review). docs/judge_v2_program.md L15597-L15634."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (run e644a25; review aec0a55)",
+      "text": "v2 OUTCOME recorded: PASS AT THE BOUNDARY (W1); simulator not centred (W2); split digests and console LF pinned (W5); the W3 / C3 conflict OPEN (re-binding ruling asked of the arena-specialist); designs and stop NOT RUN. docs/judge_v2_program.md L15636-L15665."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (the arena-specialist's rulings 1-3, verbatim, relayed by the coordinator)",
+      "text": "G22-REBIND-1 registered before any change to the frozen files; the W3 / C3 conflict is resolved by the rule, pending its build, delta READY and the user-permitted replay; designs and stop not run meanwhile. docs/judge_v2_program.md L15667-L15686."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (run d9f801b; the coordinator's relay)",
+      "text": "G22-NU-GROK-RECORD RAN on the frozen build: grok exponents 1.647 / 1.910 / 2.020 / 2.325; reading P outside every CI; N1 closed; P2 FAILED on grok too; light post-run review pending. docs/judge_v2_program.md L15688-L15701."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (review e4623ba)",
+      "text": "G22-NU-GROK-RECORD OUTCOME: ACCEPT; P2 FAILED on grok (4 N); N1 closed; L1 pair bracket, L2 CRLF pin, L3 correction of the registrar's 'to the digit' wording, inserted at L15688-L15701. docs/judge_v2_program.md L15703-L15711."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (delta READY d8a71ce, relayed by the coordinator)",
+      "text": "G22-REBIND-1 at 6d35537 (lf16 d70f3608177046d0): NOT READY FOR THE REPLAY on RB1 (load_token refuses the token of record under the new lf16); fix: registrar-written chain file experiment_configs/g22_rebind_chain.json outside the hashed files; the lf16 will change again. docs/judge_v2_program.md L15713-L15730."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (delta READY ad27bbf, relayed by the coordinator)",
+      "text": "G22-REBIND-1 at 74fc4f7 (lf16 876d01413318bd7b): READY FOR THE REPLAY (RP1-RP4); the replay waits for the USER'S permission; the registrar writes the chain file only after a replay PASS and checks replay_output_sha against the file. docs/judge_v2_program.md L15741-L15752."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (the author's decision, relayed by the coordinator)",
+      "text": "The author permitted the G22-REBIND-1 replay (ruling 1 (v)): \"I accept the split and I accept the simulator replay run\"; plan Amendment 15. The replay launches from 74fc4f7 (RP1). docs/judge_v2_program.md L15754-L15762."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (replay 475da53; review 678c1e6)",
+      "text": "G22-REBIND-1 REPLAY PASS CONFIRMED; D9 settled on the stored records (one row passes by one replicate); chain old f37145df9516b7ec -> new 876d01413318bd7b; the chain file follows in the next commit. docs/judge_v2_program.md L15816-L15828."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (RP2)",
+      "text": "Chain file written and pinned: experiment_configs/g22_rebind_chain.json sha256 ff70668ced25496551d2955cce70cf7c86c92d7daf1ecd6e948cc32f15f433c1 (registrar_commit a48fc95). docs/judge_v2_program.md L15830-L15841."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (the coordinator's relay; lf16 re-derived)",
+      "text": "REBIND build merged 8f2cf69 byte-identical from 74fc4f7; instrument_lf16 on main 876d01413318bd7b = the chain's new_lf16; designs / stop next under ruling 2, after the split draw and CANARY's retry. docs/judge_v2_program.md L15850-L15853."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (run a5b68e6; review 47fd0d6)",
+      "text": "Designs and stop OUTCOME recorded under ruling 2; (d) sign-blind UNDETERMINED; (e) stop exercised at margins 0-1 only; the re-run owed (C6 / D8); the launch record's HEAD corrected (D4). docs/judge_v2_program.md L16009-L16041."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (the author's decision, relayed)",
+      "text": "The author chose \"Redraw the split\" (Amendment 19): the split of record b51eb71 is superseded for forward use; the G22 legs already run stay of record on b51eb71; the owed real-supply re-run is ON HOLD until ARCH-V2-SPLIT-DRAW-2. docs/judge_v2_program.md L16092-L16099."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: imported quantity (c) (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM (c) 2026-09-27: validity against the recorded x12 board (VALID against a family board is a planning status) is a p2dca-family quantity — planning only (RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    },
+    {
+      "date": "2026-10-04",
+      "by": "registrar (consistency check 2026-10-04; zero calls)",
+      "text": "state running -> blocked: not running (no process alive, docs/agents/plans/2026-10-04_queue_rerank.md (002f20b8)); last activity 2026-09-27; the real-supply, registered-anchor re-run (G22-REAL-SUPPLY-RERUN) is owed; the re-rank PROPOSES a decline, which waits for the author."
+    }
+  ],
+  "does_not_show": [
+    "the size of the v2 board (the author's go decides)",
+    "anything about a v2 board's actual rates",
+    "a frontier order",
+    "A full independent re-run of v1 validity. Only rep0000-rep0039 of random and fixed were replayed. The FAIL is decided by the printed pct at the ends of the empirical range.",
+    "The fixed-mode u_raw_wrong miss at other seeds (it is a D9 tail event; it decides nothing).",
+    "conjuncts, mcstreams and the Kotlin certab draw recomputed with independent code. They were re-run through the instrument only (byte-identical).",
+    "Any rate-leg reading (c), (d), (e), (g), or anything about v2, which is running now at 17a93c7 and was not touched.",
+    "nu on grok_calib (not run of record).",
+    "Coverage on an EVAL side: no split is drawn. D_c here is over all questions of each category.",
+    "Any claim that the simulator is valid in any mode. retest passing reproduces verdicts it partly keeps. It is not a fresh-judge validation.",
+    "Anything about content-closed splits: bareq512_s42 is id-disjoint only.",
+    "(v2) That the simulator is calibrated or centred: every raw-wrong target sits in the lower 12%, and every LOAO-called target in the upper 15%.",
+    "(v2) That the PASS is robust to the Monte-Carlo draw: about 1 chance in 4 to 1 in 20 of a flip at another master; it rests on inclusivity at infinite R.",
+    "(v2) Validity for any object other than grok_calib's 12-model, 14-anchor board. That excludes the 46-model roster, the EVAL supply, another judge, the merged or x12 boards, and D0 / D2's trace-less strata.",
+    "(v2) An out-of-sample test in the strong sense. H2 is the other half of the same board, same judge, same models. The beta covariate was chosen after seeing the full board (the circularity stated in ruling 1), and H1 is a subset of that board.",
+    "(v2) Anything from below on the four zero-count H2 targets, or from the delta-deviance check.",
+    "(v2) That b1 is identifiable at the recorded size in the simulator: 233 of 1,000 random-mode boards reach ddev >= 3.84.",
+    "(v2) Any board size or design choice: it authorises nothing (registration COST AND CONSEQUENCE). Designs and stop still need their own runs under C3, C4, C7 and W2-W3.",
+    "(v2) The H1 figures (beta-hat 5.1007, sigma_eps_LOMO 0.4091): printed only, not recomputed here.",
+    "(designs / stop) Any reading at the EVAL supply of record, or at the registered stage-1 anchors.",
+    "(designs / stop) That a real k = 46 board would identify b1 (D1), or that its LOAO nominal behaves like the simulated one (the per-replicate corr of frozen with LOAO is 0.13, so the 1.325 is a ratio, not a map).",
+    "(designs / stop) The stop's false-alarm rate under overdispersed wrong events (D3), or at margins 2-3 on the stage-1 branch (D2).",
+    "(designs / stop) Anything about D0 or D2 (not run).",
+    "(designs / stop) Any board size: ruling 3 holds, and the author decides.",
+    "(designs / stop) Validity outside grok_calib's 12-model, 14-anchor board."
+  ],
+  "ledger": {
+    "row_id": "ARCH-V2-G22",
+    "version": "v380 (2026-10-04: correction bracket, not running) | v235 (designs / stop adjudicated; audit OK); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "ARCH-V2-E-A",
+    "CERT-DIRECTION-STREAM",
+    "SPLIT-EXPOSURE-SENSITIVITY"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing and reopens nothing (the frontier order stays closed)"
+  },
+  "support": "MC rates: R = 1,000, DEFF 1.0 by design, n_eff 1,000; SE sqrt(p(1-p)/R) = 0.0126 at 0.8, 0.0054 at 0.03; MDE 0.035 / 0.015; (c) (d) (e) SCOREABLE; (a) a gate; (b) (f) (g) (h) DESCRIPTIVE-ONLY; structural: nu(k)'s CI is bounded by the fixed recorded boards at any R. docs/judge_v2_program.md L15208-L15245",
+  "sources": [
+    "docs/judge_v2_program.md L15208-L15245",
+    "docs/agents/results/evidence/ARCH-V2_SYNTHESIS_2026-09-23.md section 4",
+    "docs/agents/results/evidence/ARCH-V2_BUDGET_STUDY_2026-09-23.md section 5",
+    "docs/judge_v2_program.md L15320-L15339",
+    "docs/judge_v2_program.md L15341-L15365",
+    "docs/judge_v2_program.md L15377-L15389",
+    "docs/judge_v2_program.md L15413-L15420",
+    "docs/judge_v2_program.md L15422-L15448",
+    "docs/reviews/READY_archv2_EA.md (5dfc825)",
+    "docs/judge_v2_program.md L15485-L15513",
+    "docs/reviews/READY_archv2_EA.md (f8c2979)",
+    "docs/judge_v2_program.md L15586-L15595",
+    "docs/judge_v2_program.md L15597-L15634",
+    "docs/reviews/2026-09-24_archv2_g22_g23_readylegs_post.md (3ed7cbd)",
+    "docs/judge_v2_program.md L15636-L15665",
+    "docs/reviews/2026-09-24_archv2_g22_v2_post.md (aec0a55)",
+    "docs/judge_v2_program.md L15667-L15686",
+    "docs/judge_v2_program.md L15688-L15701",
+    "docs/judge_v2_program.md L15703-L15711",
+    "docs/reviews/2026-09-24_archv2_g22_nu_grok_post.md (e4623ba)",
+    "docs/judge_v2_program.md L15713-L15730",
+    "docs/judge_v2_program.md L15741-L15752",
+    "docs/judge_v2_program.md L15754-L15762",
+    "docs/judge_v2_program.md L15816-L15828",
+    "docs/reviews/2026-09-24_g22_rebind_replay_post.md (678c1e6)",
+    "docs/judge_v2_program.md L15830-L15841",
+    "docs/judge_v2_program.md L15850-L15853",
+    "docs/judge_v2_program.md L16009-L16041",
+    "docs/reviews/2026-09-24_archv2_g22_designs_stop_post.md (47fd0d6)",
+    "docs/judge_v2_program.md L16092-L16099",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-10-04",
+  "amendments": [
+    {
+      "date": "2026-09-24",
+      "record": "docs/judge_v2_program.md L15341-L15365",
+      "text": "RULING 1: v1 validity AS REGISTERED; 'fresh-judge v2' registered as a POST-HOC-SPECIFIED amendment (beta x keyacc difference fitted jointly; LOMO epsilon SD), ONE SHOT, with a held-out half split under the registered seed 'ARCHV2-G22-V2-HALF-1' (PASS iff both parts pass); RULING 2 BBH / MuSR answers MISSING, D0 and D2's union part HYPOTHETICAL, D1 the only runnable design; CORRECTION 3 the nu CI uses 2,000 resamples, the '>= 0.9' test vacuous, the intended test declared post-data; RULING 4 the residue = CALLED wrong(established); RULING 5 ties as a set. Run order (0)-(5)."
+    },
+    {
+      "date": "2026-09-24",
+      "record": "docs/judge_v2_program.md L15377-L15389",
+      "text": "RULING A: beta acceptable as specified (the MAP projection); keyacc is MODEL-LEVEL (keyacc_m pooled, broadcast, centred per anchor); two-stage fit rejected; selftest against the oracle projection; the real run prints beta-hat, sigma_eps_LOMO, the 12 LOMO errors and corr(u-hat, keyacc). RULING B: the certificate of record = the SHIPPED widener pair applied COLD (b0 -3.2326 / b1 +3.3133 for x12 and merged; GROK-CALIB's stored -3.5451 / +3.3854 for grok_calib) plus the key-tie decline at 0.975 per anchor on key-gap >= 0.02 edges; precondition: the exact builder reproduces KTD-CHECK's 1,714 called / 4(4) on merged before any residue model is read; the in-sample widener printed beside. Both need a code delta and a delta READY before the one-shot v2 run."
+    },
+    {
+      "date": "2026-09-24",
+      "record": "docs/judge_v2_program.md L15413-L15420",
+      "text": "P7 ruling (declared post-data): identity on merged only, unique top; roster on all three boards; readings (a) / (b) beside. Code delta 805d830 implements rulings A and B; DEV precondition merged 1,714 / 4(4) MET."
+    },
+    {
+      "date": "2026-09-24",
+      "record": "docs/judge_v2_program.md L15422-L15448",
+      "text": "D5 ruling (arena-specialist, verbatim in the programme): corr(u-hat, keyacc) withdrawn as a diagnostic, kept as an OPTIMISER CHECK (|corr| < 1e-3 expected); replaced by (1) quality-alignment shares (in-sample and fresh-draw), (2) corr of the 12 LOMO errors with keyacc_m, (3) beta-hat on H1 beside the full board; all printed beside the v2 verdict, deciding nothing; POST-HOC-SPECIFIED with the rest of v2."
+    },
+    {
+      "date": "2026-09-24",
+      "record": "docs/judge_v2_program.md L15485-L15513",
+      "text": "v2 one-shot rulings: C1 crash recovery (no figure printed -> shot not consumed, claim renamed *.VOID-<date>.json, one relaunch; any figure printed -> UNDETERMINED (crash), no relaunch without a new author decision); C2 no --dev v2 on the record DBs; C3 instrument freeze + registered re-binding rule before any later fix; C4 the seal is integrity, not authentication: the registrar pins the v2 token_digest and file sha at the outcome, and designs / stop must show the same digest."
+    },
+    {
+      "date": "2026-09-24",
+      "record": "docs/judge_v2_program.md L15667-L15686",
+      "text": "G22-REBIND-1 registered (ruling 1): additive per-replicate storage; byte-identical replay of validity-v2 (replay mode, no token, one shot stays consumed) as proof; chain recorded on success, refusal on failure (designs / stop then on the frozen build with the D5 caveat); replay only with the user's permission. Ruling 2: designs D4, D1-stage1, D1-full and stop run as registered, readings admissible only as readings of a post-hoc, boundary, not-centred simulator; order and schedule quantities survive, absolute P(nominal >= 9) is optimistic by construction; D0 / D2 NOT RUN (declared deviation), P3's D0 / D2 NOT SCORED. Ruling 3: recommendation to the author: memo arithmetic with measured nu primary; a registered k = 46 pilot; the simulator secondary. Correction to aec0a55 D2: primary=nom_loao (g22.py L892)."
+    }
+  ],
+  "registered_seeds": {
+    "run": "ARCHV2-G22-REC-1",
+    "v2_half_split": "ARCHV2-G22-V2-HALF-1"
+  },
+  "v2_token_of_record": {
+    "file": "experiment_results/archv2/g22_g23/G22_validity_v2.txt.validity_v2.json",
+    "blob": "c4870ebbf703988feb8c89e8867edebdc1fd6483",
+    "sha256": "14cfff2fb55cfbd23f5f18403d7815a3168e3411a21e97ce7b0c0d94787e57ca",
+    "token_digest": "3069666d0f5e553ad61bd9cb8f178e2771d6fd683f63f01b8b35435cf56cdfc0",
+    "status": "PASS",
+    "record": true,
+    "instrument_lf16": "f37145df9516b7ec",
+    "vm_digest": "e9d78b8ea98638c6443233a0f1c9fc6f8c31a9a34099cf9a4486fc531faf505e",
+    "claim_file": "experiment_results/archv2/G22_validity_v2.ONE_SHOT.json",
+    "claim_blob": "8189713705004451f8ffe1726ff1051b716415b2",
+    "claim_sha256": "35c16163543ad478dc39480cff52dbce6eb68552e6b3aec57060d936f05daa41",
+    "launched": "2026-09-24 11:31:42",
+    "commit": "e644a25",
+    "pinned_at": "docs/judge_v2_program.md L15586-L15595",
+    "rule": "every designs / (d) / (g) / stop run and outcome must present this token_digest and a token file of this sha256 (C4 / C7 of f8c2979)"
+  },
+  "review_v2": {
+    "file": "docs/reviews/2026-09-24_archv2_g22_v2_post.md",
+    "commit": "aec0a55",
+    "verdict": "ACCEPT WITH W1-W6; PASS AT THE BOUNDARY (D9 realised on H2 u_raw_wrong); D2 HIGH simulator not centred; replay denied by the permission system"
+  },
+  "rebind_chain_of_record": {
+    "file": "experiment_configs/g22_rebind_chain.json",
+    "blob": "6743d02fc264e5bf672ce6e7514bd79d048ee6e8",
+    "sha256": "ff70668ced25496551d2955cce70cf7c86c92d7daf1ecd6e948cc32f15f433c1",
+    "content": {
+      "old_lf16": "f37145df9516b7ec",
+      "new_lf16": "876d01413318bd7b",
+      "token_digest": "3069666d0f5e553ad61bd9cb8f178e2771d6fd683f63f01b8b35435cf56cdfc0",
+      "replay_output_sha": "3a410b9627c275fc81137fd24cdab91c11e17d3db82a499d20a4d8611e1b0822",
+      "registrar_commit": "a48fc95a18c487967a91d678855e998f9f9637cf"
+    },
+    "pinned_at": "docs/judge_v2_program.md L15830-L15841",
+    "written_after": "a48fc95a18c487967a91d678855e998f9f9637cf"
+  },
+  "plain_description": {
+    "sq": "SQ4 Price",
+    "what": "Builds a simulator of the arena and checks it against the board that was actually recorded. The aim was then to use it to choose a board size (number of matches and calls) likely to certify at least 9 model orderings, with a safe stopping rule that does not look at the answer key.",
+    "why": "Before paying for a large new judged board, the thesis needs evidence about how big it must be. Only a validated simulator can supply that.",
+    "information": "A valid simulator would size the next arena cheaply and justify a stopping rule. A failed one means no design can be sized this way. Result: the simulator as registered FAILED its validity check, so it decides nothing. Its error counts were far from the recorded ones, and cost grows much faster with the number of models than the planning memo assumed (exponent about 1.9 to 2.0 instead of 1.06). A separate certificate check passed. A second simulator, specified after the data were seen and run once, passed at the very edge of its rule. It is not centred on the record (it over-predicts wrong orderings), so its design readings are only an ordering of designs. No board size follows. These are planning quantities from the older question family. The item is now blocked: a re-run on real data is owed, and dropping it is proposed but waits for the author's decision.",
+    "written": "2026-10-07"
+  }
+}

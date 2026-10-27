@@ -1,0 +1,29 @@
+[THREADS] OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+[EMB-ARMS] --target-dir: source Z:\FAC\TUBerlin\THESIS\TaxoArena\embeddings_cache_embeddinggemma_latest.db sha256 3e9ce57772160749e0b5ea0267713286ca4109444d5a6b676e877a5b0501df29 -> copy Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\embedder_cross\embeddings_cache_embeddinggemma_latest.db (absent; written only with --go)
+[EMB-ARMS] arm gemma_raw: 11687 needed texts, 3504 missing from Z:\FAC\TUBerlin\THESIS\TaxoArena\embeddings_cache_embeddinggemma_latest.db (expected 3504)
+Traceback (most recent call last):
+  File "Z:\FAC\TUBerlin\THESIS\TaxoArena\tools\analysis\embedder_arms.py", line 1382, in <module>
+    sys.exit(main(sys.argv[1:]))
+             ^^^^^^^^^^^^^^^^^^
+  File "Z:\FAC\TUBerlin\THESIS\TaxoArena\tools\analysis\embedder_arms.py", line 1378, in main
+    return run_embed(a)
+           ^^^^^^^^^^^^
+  File "Z:\FAC\TUBerlin\THESIS\TaxoArena\tools\analysis\embedder_arms.py", line 1143, in run_embed
+    embed_missing(a.embed_missing, a.expect_missing, a.go, target_dir=a.target_dir)
+  File "Z:\FAC\TUBerlin\THESIS\TaxoArena\tools\analysis\embedder_arms.py", line 1082, in embed_missing
+    route_parity(path, arm, embed_fn)
+  File "Z:\FAC\TUBerlin\THESIS\TaxoArena\tools\analysis\embedder_arms.py", line 501, in route_parity
+    new = embed_fn(arm.model, [arm.prefix + t for t, _ in rows])
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "Z:\FAC\TUBerlin\THESIS\TaxoArena\tools\analysis\embedder_arms.py", line 206, in ollama_embed
+    req = urllib.request.Request(url, data=body, headers={"Content-Type": "application/json"})
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\octav\AppData\Local\Programs\Python\Python311\Lib\urllib\request.py", line 322, in __init__
+    self.full_url = url
+    ^^^^^^^^^^^^^
+  File "C:\Users\octav\AppData\Local\Programs\Python\Python311\Lib\urllib\request.py", line 348, in full_url
+    self._parse()
+  File "C:\Users\octav\AppData\Local\Programs\Python\Python311\Lib\urllib\request.py", line 377, in _parse
+    raise ValueError("unknown url type: %r" % self.full_url)
+ValueError: unknown url type: '0.0.0.0/api/embed'
+rc=1

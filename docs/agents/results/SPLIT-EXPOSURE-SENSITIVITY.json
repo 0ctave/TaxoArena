@@ -1,0 +1,283 @@
+{
+  "id": "SPLIT-EXPOSURE-SENSITIVITY",
+  "title": "SPLIT-EXPOSURE-SENSITIVITY: how much does the recorded content leak move the recorded readouts it touches, measured against anchor-matched RANDOM removals of equal size? (zero calls; informs the author's rebuild-or-disclose decision and DECIDES NOTHING about it)",
+  "question": "For each recorded readout the content exposure touches, does re-scoring it without the exposed questions shift its headline beyond the central 95% of anchor-matched random removals of equal size? Informs the author's rebuild-or-disclose decision; decides nothing about it.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "46889ea (the registration commit; it adds this record and the programme section and precedes all code: no script exists for this test at 46889ea)",
+    "program_lines": "docs/judge_v2_program.md L14701-L14756",
+    "program_lines_as_of": "46889ea",
+    "heading": "## Registered 2026-09-23 (before any code or call) — SPLIT-EXPOSURE-SENSITIVITY: how much does the recorded content leak move the recorded readouts it touches, measured against anchor-matched RANDOM removals of equal size? (zero calls; informs the author's rebuild-or-disclose decision and DECIDES NOTHING about it)",
+    "date": "2026-09-23"
+  },
+  "script": {
+    "path": "tools/analysis/split_exposure_sensitivity.py + split_exposure_child.py (MERGED on main at bfef1e5, from d3270d5)",
+    "sha16": "split_exposure_sensitivity.py blob:145749acd2f9b6e4aaf0ba579747ad98311bf24a / sha256-lf16:aae4bce3f9be1cbd; split_exposure_child.py blob:a8df433ec75952759f385a478b64a093613251d8 / sha256-lf16:23a719ffe6c6eac0",
+    "commit": "bfef1e5"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_split_exposure_sensitivity_rr.md",
+    "commit": "1f386d2",
+    "verdict": "READY at d3270d5 (supersedes the NOT READY f33ca79); merged bfef1e5; real-data dry-run C0 PASS 13 / 13, rc 0; 0 outbound, 0 refusals; hazards (a)-(d) printed; selftest 58 / 58",
+    "script": "split_exposure_sensitivity.py blob:145749acd2f9b6e4aaf0ba579747ad98311bf24a / sha256-lf16:aae4bce3f9be1cbd; split_exposure_child.py blob:a8df433ec75952759f385a478b64a093613251d8 / sha256-lf16:23a719ffe6c6eac0",
+    "conditions": [
+      "C1 run from merged main (bfef1e5) at the two pins; ONE rule-7 window of 3.5 h at 8 workers (measured about 2.9-3.1 h; the CERT cell is 21.6 CPU-h of it); W1-W5 enforced; >= 12 GB free RAM; NOTHING ELSE CPU-heavy; NEVER shared with CERT-DIRECTION-STREAM unless both PIDs are admitted by the window's W1-W5 check",
+      "C2 D8 recorded as a DOCUMENTED LIMIT with the registrar's acceptance (below); if the code changes, the pins change and need a short re-check (selftest plus a dry-run C0 13 of 13)",
+      "C3 the post-run review re-measures the null SD, DEFF, n_eff and MDE per cell against the registered support word, printed beside each cell's deciding statistic"
+    ],
+    "documented_limits": "D8 (MEDIUM), ACCEPTED AS A DOCUMENTED LIMIT (the reviewer's second option): the audit hook refuses write-opens but NOT the file-system events that destroy without opening (os.rename / os.replace, os.remove / os.unlink, os.truncate, os.rmdir and related shutil calls): an os.replace onto a DB is caught AFTERWARDS by the fingerprint check; a remove or truncate of a file went UNDETECTED in a synthetic test. EXPOSURE IS NIL for this run: those calls occur 0 times in the 7 originals and in 8 of the 9 helpers; pool_guard.py's 6 uses sit in its export and selftest paths, which no analysis path of this instrument reaches. Closing it in code would change the pins and need a new selftest and another C0 13 / 13 dry-run; the run does not wait on it. QUEUED (LOW, engineering): SES-ROUTE-HOOK-FS-EVENTS: add those calls to the hook's refusals, with a negative control, BEFORE ANY REUSE of the route on other originals. D9 (LOW): the hook's URI check (_immutable_or_memory) is a SUFFIX match, not a parse; a crafted URI ending in \"?mode=ro&immutable=1\" with mode=rw earlier passes the hook, yet in the reviewer's test it still WROTE NOTHING (SQLite's last-wins parsing); the same follow-up item replaces it by a parse.",
+    "record": "docs/judge_v2_program.md L15086-L15096"
+  },
+  "go": "n/a: ZERO calls; below the 4,000-match rule; no plan amendment owed. The author asked for new tests from today's findings (relayed by the coordinator), recorded as the DECISION TO SCHEDULE. Operational gates: an instrument, a committed adversarial-reviewer READY, a zero-call --dry-run, one rule-7 window.",
+  "run": {
+    "outcome_file": "experiment_results/split_exposure_sensitivity_outcome.txt blob:9553deb1ffb8b62c0557b086ed8ce37f908c2260 / sha256-lf16:3c7a9958b9d22c70 (LF; working tree identical)",
+    "outcome_commit": "912bcd0",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae / paeec37aa28063c75 (per consumer)",
+    "date": "2026-09-24",
+    "window": "overran to 3 h 54 m (registered 3.5 h) with no other process"
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-24_split_exposure_sensitivity_post.md",
+    "commit": "6151311",
+    "verdict": "ACCEPT the outcome with D1-D4 carried in the record and the chip; every recomputed figure reproduces to the digit; no verdict of record moves; D1 HIGH (CERT flag conditional on arm stream 42), D2-D4 MEDIUM, D5-D7 LOW"
+  },
+  "criteria": [
+    {
+      "id": "C0",
+      "text": "VALIDITY, first, pre-empting: each consumer's recorded headline reproduces to the digit; the exposed sets have 28 / 70 / 14 / 74 ids and match the data-steward's derivation; inputs unchanged",
+      "result": "HELD",
+      "value": "13 of 13 consumers reproduce their recorded headline to the digit",
+      "denominator": "per consumer"
+    },
+    {
+      "id": "C1",
+      "text": "per cell, FLAGGED iff the observed shift lies outside the null's central 95% (2.5th-97.5th percentiles of R anchor-matched random removals; R 1,000 for cells (a)-(e), 200 for CERT); the point against the null's quantiles decides; k = 0 is UNDETERMINED BY SUPPORT",
+      "result": "n/a",
+      "value": "f-CERT x E74 FLAGGED, direction LEAK, DESCRIPTIVE-ONLY cell: -7.15 -> -3.45 (+3.70 edges); null R 200 mean +0.78 SD 1.354 [-1.96, +3.25], pct 0.990; reviewer R 1,000 pct 0.984, P 0.017 [0.0099, 0.0271]; FLAGGED at arm stream 42 only (5-stream average +0.96, about the 0.90 percentile, not flagged; D1). The other 12 cells NOT FLAGGED",
+      "denominator": "13 consumer x set cells"
+    },
+    {
+      "id": "C2",
+      "text": "CONSEQUENCE, DESCRIPTIVE-ONLY: whether each consumer's recorded verdict is the same with and without the exposed questions",
+      "result": "n/a",
+      "value": "DESCRIPTIVE: CHANGED on a-E70 (PASS -> FAIL; base rate 610 / 1,000) and f-CERT (HELD -> UNDETERMINED; base rate 780 / 1,000); SAME on the other 11",
+      "denominator": "per cell"
+    },
+    {
+      "id": "C3",
+      "text": "THE FAMILY READING: FLAG count against 0.65 expected under the global null (P(>=2) 0.14)",
+      "result": "n/a",
+      "value": "FLAGGED 1 of 13; expected 0.65; P(X >= 1 | 13, 0.05) = 0.4867",
+      "denominator": "13 cells"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "RUBRIC-512 / -SS / -R x E28, x E70: NOT FLAGGED; delta -0.02pp [-0.30, +0.25]; percentile in [0.05, 0.95]",
+      "result": "HELD",
+      "value": "NOT FLAGGED on all six rubric cells; deltas inside [-0.30, +0.25]pp; percentiles inside [0.05, 0.95]",
+      "denominator": "cells (a)-(c)"
+    },
+    {
+      "id": "P2",
+      "text": "LEAF-POWERED x E28, x E70: NOT FLAGGED; delta 0.00pp [-0.20, +0.20]",
+      "result": "HELD",
+      "value": "NOT FLAGGED; deltas inside [-0.20, +0.20]pp",
+      "denominator": "cell (d)"
+    },
+    {
+      "id": "P3",
+      "text": "ladder cells x E14: NOT FLAGGED; delta 0.00pp [-0.15, +0.15]",
+      "result": "HELD",
+      "value": "NOT FLAGGED; deltas inside [-0.15, +0.15]pp",
+      "denominator": "cells (e)"
+    },
+    {
+      "id": "P4",
+      "text": "CERT-UNDER-FILTER x E74: NOT FLAGGED; percentile 0.93 [0.80, 0.99]",
+      "result": "FAILED",
+      "value": "f-CERT FLAGGED (fails the NOT FLAGGED clause); percentile clause holds: 0.990 at R 200 (inclusive), 0.984 at R 1,000",
+      "denominator": "cell (f)"
+    },
+    {
+      "id": "P5",
+      "text": "0 FLAGGED cells of 13 [0, 1]; C2 unchanged on every SCOREABLE cell",
+      "result": "HELD",
+      "value": "1 FLAGGED in [0, 1]; C2 changed on no SCOREABLE cell",
+      "denominator": "13 cells"
+    },
+    {
+      "id": "P6",
+      "text": "C0: every consumer reproduces; 0 cells UNDETERMINED BY SUPPORT at E70; at most 3 at E14",
+      "result": "HELD",
+      "value": "C0 failed: none; E70 UNDETERMINED BY SUPPORT: none; E14: 0",
+      "denominator": "consumers"
+    }
+  ],
+  "falsifier": {
+    "text": "P5 fails at >= 2 FLAGS. A leak-direction FLAG on a SCOREABLE cell adds a [QUALIFIED] bracket to that consumer (its number stands) and goes to the author's rebuild-or-disclose item; an opposite-direction FLAG on a SCOREABLE rubric cell with a de-exposed estimate outside the recorded band qualifies the closure sentence 'induced cell rubrics are worth 0 to +1pp'. NOT OVERTURNED: any recorded verdict, pools, trees, boards.",
+    "fired": false,
+    "result": "NOT FIRED: 1 flag (< 2); no [QUALIFIED] branch fires (f-CERT is DESCRIPTIVE-ONLY)"
+  },
+  "numbers_of_record": {
+    "f_CERT_shift": "Delta_W -7.15 -> -3.45, +3.70 edges (752 -> 754 established edges, 13 anchor clusters; 201 matches on 69 exposed questions removed)",
+    "f_CERT_null_R200": "mean +0.78, SD 1.354, central 95% [-1.96, +3.25], percentile 0.990 (Random(14714))",
+    "f_CERT_null_R1000_reviewer": "mean +0.65, SD 1.433, [-2.20, +3.45], percentile 0.984, P(null >= obs) 17 / 1,000 = 0.017, exact 95% [0.0099, 0.0271]",
+    "f_CERT_arm_streams": "21 streams: mean +1.65, SD 1.50, range [-1.90, +3.70] (stream 42 largest); 5-stream average +0.96, about the 0.90 percentile (4 of 40), not flagged",
+    "f_CERT_excess_over_null": "+3.05 edges (R 1,000); +0.80 of +3.70 in the 7 anchors with no removals",
+    "f_CERT_support": "DEFF 1.558 re-measured (registered 1.636), n_eff 482.8; MDE 3.79 (R 200) / 4.01 (R 1,000) edges > +3.70: DESCRIPTIVE-ONLY",
+    "C2_base_rates": "PASS -> FAIL / CHANGED under the matched null: a-E70 610 / 1,000; a-E28 400 / 1,000; f-CERT 780 / 1,000",
+    "a_E70_RUBRIC512": "+1.797 -> +1.728 pp (41:25, p 0.0640), shift -0.069, pct 0.302 of the null",
+    "family": "1 of 13 FLAGGED; P(X >= 1 | 13, 0.05) = 0.4867"
+  },
+  "sentence_of_record": "SPLIT-EXPOSURE-SENSITIVITY (zero calls): on 12 of 13 cells (the rubric family RUBRIC-512 / -SS / -R, LEAF-POWERED, LADDER, STACK, STACK-v2, J6), removing the content-exposed questions moves the recorded headline no more than anchor-matched random removals of the same number of questions do (every shift inside the null's central 95%; six of the cells cannot change their recorded verdict at any draw). On CERT-UNDER-FILTER (DESCRIPTIVE-ONLY), removing the 69 exposed judged questions (201 verdicts) moves Delta_W from -7.15 to -3.45 (+3.70, toward 0); against anchor-matched random removals this is the 99.0th percentile at the registered R = 200 and the 98.4th at R = 1,000 (null mean +0.65, SD 1.43; exceedance 0.017, exact 95% [0.010, 0.027]), at the registered arm stream 42 only: stream 42 gives the largest of 21 observed shifts (mean +1.65, range -1.90 to +3.70), and averaged over five streams the shift is +0.96, about the 90th percentile of the same null, not flagged. One flag in 13 cells is what the global null gives 49% of the time. It changes no recorded verdict and qualifies no number of record. [run 912bcd0, review 6151311, zero calls; denominators: 13 consumer x exposed-set cells; f-CERT over 752 established edges in 13 anchor clusters (9,142 matches on 2,811 questions; 201 exposed matches on 69 questions removed); nulls R = 1,000 for cells (a)-(e), R = 200 for f-CERT (reviewer's R = 1,000 beside); pool p2dca21ab5f4ef3ae, id-disjoint only; no recorded verdict moves]",
+  "chips": [
+    "REGISTERED 2026-09-23, BEFORE ANY CODE",
+    "C0 HELD 13/13",
+    "f-CERT FLAGGED (DESCRIPTIVE-ONLY) AT ARM STREAM 42 ONLY; NOT FLAGGED ON THE 5-STREAM AVERAGE (D1)",
+    "12 OF 13 NOT FLAGGED",
+    "P4 FAILED; FALSIFIER NOT FIRED",
+    "ZERO CALLS",
+    "INFORMS REBUILD-OR-DISCLOSE; DECIDES NOTHING"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-23",
+      "by": "registrar (the data-steward's sets, relayed by the coordinator)",
+      "text": "Evidence committed before any re-score: E28 / E70 / E14 / E74 at the registration's paths, byte-identical (sha256 pinned); E74 = E70 u E14; four READY conditions (a)-(d). docs/judge_v2_program.md L14829-L14841."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (builder's stop, relayed by the coordinator)",
+      "text": "Partial build 7175a18 (blob:bc6a83874d3d81d4e6bd8d3557252286e7d54b2f / sha256-lf16:6c7c90258150d353; CERT x E74 only). Route (A) ruled for the 12 other cells: an in-process read-only redirect of sqlite3.connect for each original imported unedited, one subprocess per consumer, API keys removed and a socket guard, C0 the execution witness (conditions A1-A7). Route (B) queued by widening STACK-JUDGE-RO-CACHE. r4 re-derive as registered; r7, r8, r10 confirmed. docs/judge_v2_program.md L14867-L14881."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (READY review f33ca79)",
+      "text": "NOT READY at 4934a28 (D1 BLOCKER; D2-D5); the builder is fixing all; window re-priced 3.5 h; must not share a window with CERT-DIRECTION-STREAM (back to back). docs/judge_v2_program.md L14883-L14897."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (re-review 1f386d2; merge bfef1e5)",
+      "text": "READY; merged bfef1e5; C0 13 / 13 on real data; D8 accepted as a documented limit (exposure nil; SES-ROUTE-HOOK-FS-EVENTS queued for any reuse); D9 LOW; run conditions C1-C3 (3.5 h at 8 workers; never with CERT-DIRECTION-STREAM unless both PIDs admitted). docs/judge_v2_program.md L15086-L15096."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (the coordinator's relay)",
+      "text": "RAN (912bcd0): as printed, C0 13/13; f-CERT FLAGGED (leak direction, descriptive cell; percentile 0.990; Delta_W -7.15 -> -3.45); a-E70 C2 CHANGED; P4 FAILED; falsifier not fired; the window overran to 3 h 54 m, no other process. Outcome NOT recorded until the post-run review lands. docs/judge_v2_program.md L15302-L15318."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (run 912bcd0; review 6151311)",
+      "text": "OUTCOME recorded; C0 HELD 13 / 13; f-CERT FLAGGED (DESCRIPTIVE-ONLY) at arm stream 42 only (D1); 12 NOT FLAGGED; P4 FAILED; falsifier NOT FIRED; RUBRIC-512 [QUALIFIED] bracket inserted (D3); two items queued. docs/judge_v2_program.md L15450-L15483."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "That exposure causes CERT's filter advantage, or any mechanism: the null matches anchor and question count, not twin status; the exposed set is typical on key accuracy (percentile 0.54), rows, keep share, key-decidable share and tie share, so measured difficulty does not explain the shift, and unmeasured differences are not excluded.",
+    "A leak effect in the family: 1 of 13 flagged, P(X >= 1) = 0.487; the falsifier did not fire.",
+    "That CERT's C1 or RUBRIC-512's verdict is exposure-driven: both C2 CHANGED readings happen for 78% (CERT) and 61% (RUBRIC-512 x E70) of random removals of the same size.",
+    "A leak size: +0.80 of the +3.70 lies in anchors where nothing was removed; the excess over the null mean is +3.05 at stream 42 and about +1.6 averaged over five streams.",
+    "Anything about the rubric line's closure: all rubric cells are inside their nulls; RUBRIC-512-SS and -R move by 0.00-0.09 pp.",
+    "Anything about the rebuild-or-disclose decision (author-owned), other trees, pools or boards, or content-disjointness (the sets are the norm-v1 twin sets of record).",
+    "(registered) board-level consumers (x12, x20, GROK-CALIB, Kotlin c0d3f708, RECIPE-GROK): not re-fitted here",
+    "(registered) the RK-1 kit's exposure (unmeasured)",
+    "(registered) the internal-node labelling exposure (seeded, unreproduced; E74 contains all of E70)"
+  ],
+  "ledger": {
+    "row_id": "SPLIT-EXPOSURE-SENSITIVITY",
+    "version": "v204 (adjudicated; chips replaced; audit OK); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "CONTENT-DISJOINT-SPLIT-AUDIT",
+    "SPLIT-FOLLOWUPS",
+    "CERT-UNDER-FILTER"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing and reopens nothing; posts nothing; proposes no recipe change"
+  },
+  "support": "Per cell (planning k from p2dca exposed shares; measured by the instrument): DEFF declared pilot 1.2 then measured from the null's SD (CERT 1.636 measured, 605675c); n_eff 788 / 655 / 806 / 787 / 459.5; SE 0.049-0.135pp (CERT 1.66 edges); MDE 0.14-0.38pp (CERT 4.65). SCOREABLE (Delta* > MDE): RUBRIC-512-SS, RUBRIC-512-R, LEAF-POWERED (x E28, x E70), LADDER, STACK, STACK-v2. DESCRIPTIVE-ONLY: RUBRIC-512 (p 0.0498 on the boundary), J6 (p 0.043), CERT (upper end -0.08). STRUCTURAL: the consequence is BOUNDED (-SS / -R / LEAF-POWERED x E28, LADDER, STACK, STACK-v2 cannot change what the record says at any draw). docs/judge_v2_program.md L14701-L14756",
+  "sources": [
+    "docs/judge_v2_program.md L14701-L14756",
+    "the coordinator's relay of the author's request (2026-09-23)",
+    "docs/judge_v2_program.md L14829-L14841",
+    "docs/judge_v2_program.md L14867-L14881",
+    "docs/judge_v2_program.md L14883-L14897",
+    "docs/reviews/READY_split_exposure_sensitivity_rr.md (1f386d2); docs/judge_v2_program.md L15086-L15096",
+    "docs/judge_v2_program.md L15302-L15318",
+    "docs/judge_v2_program.md L15450-L15483",
+    "docs/reviews/2026-09-24_split_exposure_sensitivity_post.md (6151311)",
+    "experiment_results/split_exposure_sensitivity_outcome.txt (912bcd0)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "exposed_sets": {
+    "E28": {
+      "path": "docs/agents/results/evidence/SPLIT-EXPOSURE_E28.txt",
+      "sha256": "525aad9a16e6106623cee915f2cb115c5f35a94450710aec61fd58281c287815",
+      "ids": 28
+    },
+    "E70": {
+      "path": "docs/agents/results/evidence/SPLIT-EXPOSURE_E70.txt",
+      "sha256": "0dfea2fcdf8af2bb35eb7a28e540f2378d5464146ac9442d619533d18a450326",
+      "ids": 70
+    },
+    "E14": {
+      "path": "docs/agents/results/evidence/SPLIT-EXPOSURE_E14.txt",
+      "sha256": "2b758ed2d955d409b89acb6db64a95cd3507836ee02730176aeea9723f669e6f",
+      "ids": 14
+    },
+    "E74": {
+      "path": "docs/agents/results/evidence/SPLIT-EXPOSURE_E74.txt",
+      "sha256": "1ca79db5764ba80d62cfabaa8c1d0b6b3980de658a22ff802c580c0b09e91bd1",
+      "ids": 74
+    },
+    "id_space_and_key": "eval question_id (p2dca21ab5f4ef3ae judgeable, no sentinels); twin key = the norm-v1 stem; reference row gpt-4o-2024-08-06 (stems identical across renderings on all 3,445)",
+    "relations": "E28 (and E37, E26) inside E70; E70 and E14 share 10; E74 = E70 u E14 exactly",
+    "provenance": "re-derived independently by the data-steward (28 / 70 / 14 / 74, 0 differences), matching the reviewers' lists (1df2cf1, 8ebfa7a, 605675c) id for id; committed byte-identical before any re-score (docs/judge_v2_program.md L14829-L14841)",
+    "x12_support": "x12 support (the review 605675c item 7, and the steward's count, equal): E28 27 qids / 80 rows; E70 65 / 193; E14 14 / 40; E74 69 / 201 of x12's 9,142 verdict rows on 2,811 judged qids"
+  },
+  "ready_conditions": [
+    "(a) E14 is a REPRODUCTION of the ladder's 150-per-anchor cap draw (Random(556) in rowid order), with NO logged corpus as a witness; the 45 twins BEFORE the cap do not depend on the draw",
+    "(b) internal-node labelling was NOT reproduced (seeded, unreproduced), so E74 still contains ALL of E70 (the internal-node exposure is not separable)",
+    "(c) E28 relies on the saved members equalling the members at induction time, witnessed by the 17 / 17 [JUDGE-LEAK] log lines the corpus model reproduces",
+    "(d) any consumer keyed on another id space must CONVERT THROUGH THE OPTIONS KEY, never by question text (CONTEXT.md rule 6)"
+  ],
+  "route_A_conditions": [
+    "A1 IMPORT UNEDITED, PINNED: each original is imported as it stands; its blob and sha256-lf16 are printed and checked at launch against the pins the READY records (the blob that produced the recorded headline where the record names one; otherwise the blob at the READY, with C0 as the witness)",
+    "A2 THE REDIRECT: sqlite3.connect is wrapped FOR THE DURATION OF THAT CONSUMER'S CALL ONLY; every open, whatever the original asked for, becomes file:<absolute path>?mode=ro&immutable=1 AFTER the -wal / -journal emptiness check (a non-empty one refuses: a failed precondition); the connection log (path, URI, count) is printed per consumer; the wrapper is removed after the call",
+    "A3 NO WRITE CAN LAND: the redirected connections are read-only and immutable, so any real write (INSERT / UPDATE / DELETE, a CREATE of a MISSING table, a committed change) raises and the consumer's cell is UNDETERMINED (BY VALIDITY); a CREATE TABLE IF NOT EXISTS on an EXISTING table and a no-op commit are admitted only because they write nothing; sha256_16, size and mtime of every opened file are asserted unchanged after each consumer",
+    "A4 ZERO CALLS, ENFORCED: each consumer runs with every judge API key removed from its environment and a socket guard that refuses any outbound connection; a cache miss therefore REFUSES instead of posting; the run's call count is printed (must be 0)",
+    "A5 ONE SUBPROCESS PER CONSUMER: the CERT cell (which stubs stack_judge) and every original run in separate processes, so no stub, monkeypatch or module state is shared; STACK, STACK-v2 and LEAF-POWERED import the REAL stack_judge only inside their own redirected subprocess",
+    "A6 THE HEADLINE IS CAPTURED FROM THE ORIGINAL'S OWN COMPUTATION (its return value, or its printed headline parsed by a pinned pattern that the READY reviews), never re-implemented; the removal is applied to the original's INPUT (its verdict rows / scored set), never to its code",
+    "A7 C0 IS THE EXECUTION WITNESS: the recorded headline must reproduce TO THE DIGIT through the redirect before any removal; a consumer that does not is UNDETERMINED (BY VALIDITY) and excluded, the others proceed; the READY includes a NEGATIVE CONTROL showing the redirect refuses a real write (a synthetic original that INSERTs) and a missing-table CREATE"
+  ],
+  "builder_readings": "r4 RE-DERIVE (as registered; the review's -3.45 was re-derived too); r7 leak directions confirmed (J6 two-sided descriptive); r8 literal reading confirmed (a CERT flag is printed only); r10 the registered support word stands; r1-r3, r5, r6, r9, r11 uncontested (docs/judge_v2_program.md L14867-L14881)",
+  "ready_history": [
+    {
+      "file": "docs/reviews/READY_split_exposure_sensitivity.md",
+      "commit": "f33ca79",
+      "verdict": "NOT READY at 4934a28: D1 BLOCKER (the write check reads total_changes on closed connections; 5 of 13 cells UNDETERMINED BY VALIDITY; 8 of 13 PASSED C0; 0 outbound; removal fidelity confirmed); D2 hazards (a)-(d) not printed; D3-D5 redirect bypasses (dbapi2.connect, Connection(), open()), raw _socket bypass, env stripping ineffective (keys read from ROOT/.env), helpers not pinned",
+      "script": "split_exposure_sensitivity.py blob:4bb615547d6f65722a6ce2ad3691da514b3a9ab2 / sha256-lf16:ab53335b154db3ae; split_exposure_child.py blob:177ed5367be7eb466f8ff79ec9ffe37b08dde5c2 / sha256-lf16:0a322a3d77a525ad",
+      "record": "docs/judge_v2_program.md L14883-L14897"
+    }
+  ],
+  "plain_description": {
+    "sq": "Data hygiene",
+    "what": "For 13 recorded results that used questions whose near-duplicate copies leaked into the construction side, removes the exposed questions and re-scores each result. Each shift is compared with removing the same number of random questions from the same subjects (no judge calls).",
+    "why": "Questions were split by id rather than by content, so some copies leaked. This measures whether the leak moved the results, to inform the author's rebuild-or-disclose decision (it decides nothing itself).",
+    "information": "Shifts no larger than random removals would mean the leak did not change results. Larger shifts would point to contamination. Result: on 12 of 13 results the shift is within random variation. One certificate-filter readout moved unusually: around the 99th percentile at the registered random stream, but only about the 90th when averaged over several streams. One flag in 13 is what chance gives about half the time. No recorded verdict changes, and this does not prove that no leak mechanism exists. It re-scores results on the older question pool, which is now ruled history, not evidence.",
+    "written": "2026-10-07"
+  }
+}

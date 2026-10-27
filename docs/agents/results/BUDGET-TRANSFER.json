@@ -1,0 +1,150 @@
+{
+  "id": "BUDGET-TRANSFER",
+  "title": "BUDGET-TRANSFER: does the fitted widener survive a change of ROSTER? (zero calls; the x12 parameters applied COLD to the 20-model board)",
+  "question": "SYSTEMATIC-BUDGET ships tau(A) = exp(-3.2326 + 3.3133 A) on one roster; x20 carries 12,394 cached verdicts over 20 models, all keyed. On the fully out-of-sample pairs with the x12 parameters applied cold: is the realised wrong-direction rate at or below nominal; does the cold budget still call >= 60%; does b1 refit on x20 land inside the x12 CI [1.72, 7.87]; what is the raw certificate's own wrong-call rate on this roster?",
+  "kind": "zero-call",
+  "state": "UNDETERMINED",
+  "registration": {
+    "commit": "81bfdab",
+    "program_lines": "docs/judge_v2_program.md L2730-L2762",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-14 (before any run, ZERO calls) — BUDGET-TRANSFER: does the fitted widener survive a change of roster?",
+    "outcome_heading": [
+      "L2790: - **BUDGET-TRANSFER (2026-09-14, zero calls): the registered FALSIFIER FIRED. ...** (first run, on the sparse board; withdrawn)",
+      "L2999: - **CORRECTION 2026-09-14, and it retracts my own headline from the same evening: BUDGET-TRANSFER's ...** (the retraction; also withdrawn)",
+      "L3099: ## REVIEW of the 2026-09-14/15 session (2026-09-15, zero calls) — three headline conclusions are artefacts",
+      "L3188: - **BUDGET-TRANSFER, CORRECTED (2026-09-15, zero calls): on the honest design the answer is the one the registration pre-committed - UNDETERMINED - and both of last night's verdicts, \"the falsifier fired\" and \"the budget transfers\", are withdrawn together.**"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "tools/analysis/budget_transfer.py",
+    "sha16": "69b554e4488854b2",
+    "commit": "2b583e3 (first run; corrected rerun at 4ec8f18, later 13f2142)"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/budget_transfer.txt (sections A sparse board, labelled; B the honest design)",
+    "outcome_commit": "010713b",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (2,811 judged questions on the merged board of record x12 9,142 + x20 12,394 = 21,536 verdicts; the sparse x20-alone board is retained, labelled)",
+    "date": "2026-09-14 (first run) / 2026-09-15 (corrected rerun)"
+  },
+  "review": {
+    "file": "docs/review_session_2026-09-14.md (the adversarial review of the 2026-09-14/15 session, ba12200; programme L3099-L3145 'REVIEW of the 2026-09-14/15 session') and the corrections by insertion it required",
+    "commit": "ba12200",
+    "verdict": "the review found every x20 analysis ran on the sparse board (0 verdicts on the 66 original pairs) and that the retraction over-corrected on 2 events where the registration had pre-committed UNTESTED; the corrected rerun (honest design) reads UNDETERMINED; RESOLVE_budget.md's deleted amendment restored as a bracketed correction"
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "PRIMARY: on fully out-of-sample edges with the x12 parameters cold, the realised wrong-direction rate at or below nominal (UNDERPOWERED if the edges cannot decide)",
+      "result": "UNDETERMINED",
+      "value": "honest design (fit on x12, score only the 1,647 edges whose verdicts are new, on the merged board): 1,104 called, 10 wrong of which 2 established, nominal 1.59; INTERNAL (both models new) 377 edges: 253 called, 1(0) wrong, nominal 0.38; CROSS 1,270: 851 called, 9(2), 1.21; established-only 1,053 called, 2 wrong, 1.23 nominal = 1.6x: two events against 1.6 expected cannot be told from calibrated or from 2x: UNDETERMINED, as pre-committed; the 6.3x on all labels is driven by 8 key-indeterminate pairs",
+      "denominator": "1,647 new-verdict edges on the merged board of record; McNemar-established counts on the anchor's judged questions"
+    },
+    {
+      "id": "(2)",
+      "text": "UTILITY: the cold budget still calls at least 60%",
+      "result": "HELD",
+      "value": "70.3% of merged-board edges called",
+      "denominator": "1,647 edges"
+    },
+    {
+      "id": "(3)",
+      "text": "b1 refit on x20 alone inside the x12 CI [1.72, 7.87]",
+      "result": "DELIVERED",
+      "value": "on the new-verdict pairs +2.0821 all labels, +1.9918 established: inside the CI and weakly identified on 2 established events; reported, not adjudicated (the sparse-board refit on all established x20 edges read +4.1080)",
+      "denominator": "new-verdict pairs"
+    },
+    {
+      "id": "(4)",
+      "text": "the raw certificate's own wrong-call rate on x20",
+      "result": "DELIVERED",
+      "value": "2.21% wrong on the new pairs (0.69% established); the budget keeps 2 established errors for 187 correct calls surrendered, gate A < 0.70 keeps 4 for 174, A < 0.80 keeps 5 for 49",
+      "denominator": "1,310 raw called of 1,647"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "b1 refit on x20 comes in LOWER than 3.31; the cold budget is CONSERVATIVE on x20; criterion (1) comes back UNDERPOWERED on the internal pairs",
+      "result": "HELD",
+      "value": "b1 +2.08 (lower); INTERNAL 253 called / 1(0) wrong at nominal 0.38 (underpowered); (1) UNDETERMINED: 'transfer is UNTESTED rather than demonstrated and the shipped parameter must be published as roster-specific', as the registration said",
+      "denominator": "1,647 edges"
+    }
+  ],
+  "falsifier": {
+    "text": "if the cold budget's realised rate EXCEEDS nominal on x20, the parameter does not transfer and RESOLVE must refit per roster or fall back to the agreement gate",
+    "fired": false,
+    "note": "the first reading (2026-09-14) declared it FIRED (CROSS 6.9x vs SHARED 0.0x) and amended RESOLVE_budget.md; that rested on wrong-direction labels without the McNemar establishment filter and on a board with 0 verdicts on the 66 original pairs; the same-evening retraction ('IT DOES TRANSFER') over-corrected on 2 events; both withdrawn 2026-09-15; the falsifier did NOT fire; the off-roster prohibition in RESOLVE_budget.md stays, marked untested rather than established"
+  },
+  "numbers_of_record": {
+    "honest_design": "INTERNAL 377 / raw 295 / 1(0) / budget 253 / 1(0) / nominal 0.38 / 2.6x, established 238 / 0 / 0.29; CROSS 1,270 / 1,015 / 28(9) / 851 / 9(2) / 1.21 / 7.4x, established 815 / 2 / 0.93 = 2.1x; NEW all 1,647 / 1,310 / 29(9) / 1,104 / 10(2) / 1.59 / 6.3x, established 1,053 / 2 / 1.23 = 1.6x; SHARED (in-sample sanity) 891 / 769 / 13(8) / 679 / 3(2) / 1.10 / 2.7x",
+    "sparse_board_retained": "x20 alone (0 verdicts on the 66 original pairs): SHARED 599 called / 0 wrong, CROSS 800 / 2 established (1.7x), INTERNAL 242 / 0; b1 on all established x20 edges +4.1080; the sparse table is kept, labelled, so the retracted numbers have a home",
+    "utility": "70.3%",
+    "refit": "+2.0821 all / +1.9918 established on the new-verdict pairs",
+    "raw": "2.21% wrong (0.69% established) on the new pairs"
+  },
+  "sentence_of_record": "BUDGET-TRANSFER, CORRECTED (2026-09-15, zero calls): on the honest design (fit on x12, score only the 1,647 edges whose verdicts are new, on the merged board of record) the answer is the one the registration pre-committed, UNDETERMINED: 1,104 called, 10 wrong of which 2 established, against 1.59 nominal; utility 70.3%; b1 refit +2.08 all / +1.99 established, inside the x12 CI and weakly identified; the raw certificate on the new pairs 2.21% wrong (0.69% established). The parameter is published as roster-specific with transfer UNTESTED; both verdict flips of 2026-09-14 ('the falsifier fired'; 'IT DOES TRANSFER') were readings of a board that did not contain the comparison they described and are withdrawn; the 'overfitting signature' and the 'sign reversal' with them; the off-roster prohibition in RESOLVE_budget.md stays, marked untested rather than established.",
+  "chips": [
+    "BOTH VERDICTS WITHDRAWN",
+    "UNDETERMINED, AS PRE-REGISTERED"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-14",
+      "by": "the registrar's same-evening CORRECTION (programme L2999; ledger [UNDER CORRECTION] / the retraction text in the observed cell)",
+      "text": "the first reading (CROSS 6.9x vs SHARED 0.0x, 'overfitting signature', falsifier fired, RESOLVE_budget.md amended) rested on wrong-direction labels to which the McNemar establishment filter had not been applied; applied consistently SHARED 599 / 0, CROSS 800 / 2 (1.7x), INTERNAL 242 / 0; b1 on established x20 edges +4.1080 inside the CI; the 'sign reversal' was noise in a stratum with zero wrong calls; the falsifier did NOT fire."
+    },
+    {
+      "date": "2026-09-15",
+      "by": "the adversarial REVIEW (docs/review_session_2026-09-14.md, ba12200; programme L3099) and the corrected rerun (L3188, 010713b; ledger v95 observed cell [CORRECTED 2026-09-15, honest design])",
+      "text": "every x20 analysis ran on a board that is not the board of record (x20 alone: 0 verdicts on the 66 original pairs), so the SHARED / CROSS / INTERNAL strata do not mean fitted / half-fitted / unfitted and the retraction over-corrected on 2 events; on the honest design 1,104 called / 10 wrong (2 established) / nominal 1.59 -> UNDETERMINED as pre-registered; b1 +2.08 / +1.99 inside the x12 CI; utility 70.3%; 'the overfitting signature', 'the sign reversal' and 'IT DOES TRANSFER' all withdrawn; the sparse-board table kept, labelled."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "transfer across rosters (untested at the operating point: 2 established events)",
+    "that the parameter is roster-specific (nothing supports it either)",
+    "a nominal confidence off the fitting roster (RESOLVE_budget.md's prohibition stays, marked untested)"
+  ],
+  "ledger": {
+    "row_id": "BUDGET-TRANSFER",
+    "version": "v95 (row added v88 at 875df2c; [UNDER CORRECTION] v92; [CORRECTED 2026-09-15, honest design] v95 at 010713b); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "SYSTEMATIC-BUDGET",
+    "ARENA-V2-X20",
+    "X20-MERGED",
+    "BUDGET-LOMO",
+    "JUDGE-TRANSFER"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L2730-L2762 (registration 81bfdab): question, criteria, prediction, falsifier",
+    "docs/judge_v2_program.md outcome bullets and corrections at the headings listed in registration.outcome_heading (first run 2026-09-14; REVIEW L3099; X20-MERGED L3146 00deff3; corrected reruns L3188 010713b / L3281 d4eec8d)",
+    "docs/review_session_2026-09-14.md (ba12200): the adversarial review that found the sparse-board artefact and the McNemar rule's backward application",
+    "experiment_results/x12_crossdomain/budget_transfer.txt (sections A sparse board, labelled; B the honest design) (010713b)",
+    "docs/test_ledger.html row BUDGET-TRANSFER (v95 (row added v88 at 875df2c; [UNDER CORRECTION] v92; [CORRECTED 2026-09-15, honest design] v95 at 010713b)): chips verbatim, observed cell with its CORRECTED / UNDER CORRECTION insertions, evidence",
+    "script sha16 = sha256 of tools/analysis/budget_transfer.py at 2b583e3, first 16 hex (identity, computed by the registrar 2026-09-22; sha at the first-run commit 2b583e3; the corrected rerun is at 4ec8f18)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' or '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Takes the formula that decides when a pairwise ranking call is confident enough, fitted on the 12-model board, and applies it unchanged to new pairs on the 20-model board. It counts how often the confident calls point the wrong way. No judge calls.",
+    "why": "Checks whether the confidence formula still works when the set of models changes, or only fits the roster it was trained on.",
+    "information": "Error rates at or below the promised level would mean the formula transfers. Higher rates would mean it must be refitted for each roster. Result: undetermined, as the registration expected. There were only 2 confirmed wrong calls against about 1.6 expected, which is too few to decide. The formula still made 70% of the possible calls. Two earlier, opposite readings were withdrawn. The formula is published as fitted to one roster, with transfer untested. Later ruled history rather than evidence, because it ran on the older question pool.",
+    "written": "2026-10-07"
+  }
+}

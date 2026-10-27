@@ -1,0 +1,156 @@
+{
+ "id": "KEY-INFO-V2",
+ "title": "KEY-INFO-V2: LOO Brier key information of AF-U cells over the marginal, summed over 18 models, vs K_0 (KI1) and vs 200 random within-source cell sets (KI2) on the union data (zero calls; REGISTERED 2026-10-04)",
+ "question": "Does knowing the cell predict which models are right, beyond source?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "the commit that writes it (parent bd5ca001)",
+  "program_lines": "docs/judge_v2_program.md L24291-L24302",
+  "program_lines_as_of": "the commit that writes them, parent bd5ca001, re-grepped",
+  "date": "2026-10-04",
+  "provenance": "docs/literature/2026-10-04_testing_logic_review.md (bd5ca001) section 3; the author's Go (docs/agents/plans/2026-10-04_W1_W2_schedule.md (be8e54d3))"
+ },
+ "script": {
+  "path": "tools/analysis/key_info_v2.py",
+  "sha16": "blob:37f5935c (LF; per the outcome and the review row 15)",
+  "commit": "c9b982d9 (branch zero-call-route-readouts; merged b0525292)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_route_readouts.md",
+  "commit": "b0525292",
+  "blob": "54b99df4 (LF)",
+  "verdict": "READY under C1-C5"
+ },
+ "go": "the author's Go for zero-call windows (2026-10-04)",
+ "run": {
+  "outcome_file": "experiment_results/archv2/key_info_v2/outcome.txt (write-once; never committed); backup E:/TaxoArena_backup_2026-10-04_route_trio/key_info_v2/outcome.txt (SHA256SUMS.txt)",
+  "outcome_sha256": "bb365d2abc2f478b883e2e3fe7776ed03f6cd428e48163d5da0e7cce01bc32c0",
+  "outcome_commit": "run from main after 0e34eb56 (never committed)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "pv2_1575de61bb20e977 (B0-2 pool check rc 0; read-only views, sha256 before = after)",
+  "date": "2026-10-04",
+  "concurrency": "concurrency with GRANULARITY-GT (and another agent's tree_like --mutants): all zero-call CPU readers, no construction or site null (rule 7 not engaged); view sha256 before = after = pins; ruled non-affecting by the review"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_route_trio.md",
+  "commit": "b5ed5e96",
+  "blob": "a8e4f5fc (LF)",
+  "verdict": "VALID (KI1 qualified R-KI1)"
+ },
+ "criteria": [
+  {
+   "id": "KI1",
+   "text": "DECIDING (point and interval, like G13): D = KI(AF-U) - mean KI(K_0); AF-BETTER iff D > spread_K AND 95% > 0; K0-BETTER iff D < -spread_K AND 95% < 0; NEITHER otherwise. Verdict line: DESCRIPTIVE-ONLY for AF-BETTER at the prediction (pilot DEFF 1.6 declared; SE 0.0016)",
+   "result": "HELD",
+   "value": "K0-BETTER: D = -0.024800 < -spread_K 0.017640, two-stage 95% [-0.043451, -0.006149]; realised SE 0.009516 (5.8x the registered 0.0016), DEFF 1.468, n_eff 4,023, MDE80 0.0266. QUALIFIER R-KI1: K0-BETTER for AF-U as built; about half of D (-0.0123 of -0.0248) comes from the 191 EVAL items AF-U files into another source's leaf (D-4), which K_0 files by source. On the 5,716 own-source-filed items D = -0.0129 < spread_K 0.0218 (NEITHER; unregistered, descriptive).",
+   "denominator": "5,907 EVAL items / 5,404 components (Kish 1.311); 18 models; K_0 seeds 0-4"
+  },
+  {
+   "id": "KI2",
+   "text": "DECIDING (point vs percentile): BEYOND-SOURCE iff KI(AF-U) > RWS p97.5; NOT-BEYOND otherwise. SCOREABLE as a classification",
+   "result": "HELD",
+   "value": "BEYOND-SOURCE: KI(AF-U) 0.438381 > RWS p97.5 0.123399 (min 0.089051, median 0.110064, max 0.125831; MC SE 0.000928); own-leaf variant p97.5 0.1388 (R-RWS) and the 5,716 own-source items (0.4517) unchanged",
+   "denominator": "5,907 EVAL items; 200 RWS draws"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "D +0.002 [-0.005, +0.010]; KI1 NEITHER 0.65, AF-BETTER 0.20, K0-BETTER 0.15",
+   "result": "FAILED",
+   "value": "D -0.0248 outside [-0.005, +0.010]; KI1 K0-BETTER occurred (p 0.15); Brier 1.1850",
+   "denominator": "union EVAL 5,907 items / 5,404 components"
+  },
+  {
+   "id": "P2",
+   "text": "KI2 BEYOND-SOURCE 0.60",
+   "result": "HELD",
+   "value": "KI2 BEYOND-SOURCE occurred (p 0.60); Brier 0.3200",
+   "denominator": "union EVAL 5,907 items / 5,404 components"
+  },
+  {
+   "id": "P3",
+   "text": "KI(declared) > KI(AF-U) with probability 0.80 (descriptive, cross)",
+   "result": "HELD",
+   "value": "KI(declared) - KI(AF-U) +0.031140 > 0 (p 0.80); Brier 0.0800",
+   "denominator": "union EVAL 5,907 items / 5,404 components"
+  }
+ ],
+ "falsifier": {
+  "text": "F-KI fires iff KI2 NOT-BEYOND: AF-U carries no correctness information beyond random within-source cells.",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "KI1_D": "-0.024800, two-stage 95% [-0.043451, -0.006149]; spread_K 0.017640; SE 0.009516 (registered 0.0016; 5.8x), DEFF 1.468, n_eff 4,023, MDE80 0.0266; 5,907 / 5,404; K0-BETTER WITH R-KI1",
+  "KI1_own_source_subset": "D -0.01288 vs subset spread_K 0.02175 on the 5,716 own-source-filed items: NEITHER (unregistered, descriptive); the 191 cross-source items contribute -0.0123 of -0.0248",
+  "KI_arms": "AF-U 0.438381; K_0 s0-s4 0.470172 / 0.464005 / 0.469174 / 0.460022 / 0.452532; SRC 0.170501; declared 0.469521",
+  "KI2": "KI(AF-U) 0.438381 > RWS p97.5 0.123399 (200 draws; profile 183 blocks, not the registered 123; own-leaf variant p97.5 0.1388)",
+  "kish": "1.311 (R-SUP)"
+ },
+ "sentence_of_record": "KEY-INFO-V2 (2026-10-04, 0 calls) — VALID; KI2 BEYOND-SOURCE, F-KI not fired. On 5,907 EVAL items / 5,404 components, AF-U's [SC] cells carry LOO Brier key information 0.438 (summed over 18 models), above the 97.5th percentile (0.123) of 200 random within-source cell sets (profile 183 blocks, not the registered 123; the own-leaf variant, 0.139, leaves it above). KI1 K0-BETTER: D = -0.0248, two-stage 95% [-0.0435, -0.0061], beyond spread_K 0.0176 (realised SE 0.0095, 5.8x the registered 0.0016). K0-BETTER for AF-U as built; about half of D (-0.0123 of -0.0248) comes from the 191 EVAL items AF-U files into another source's leaf (D-4), which K_0 files by source. On the 5,716 own-source-filed items D = -0.0129 < spread_K 0.0218 (NEITHER; unregistered, descriptive). Brier information is not routing value.",
+ "chips": [
+  "REGISTERED 2026-10-04, BEFORE ANY CODE; not built",
+  "VALID (POST-RUN b5ed5e96): KI2 BEYOND-SOURCE (0.438 &gt; RWS p97.5 0.123); KI1 K0-BETTER (QUALIFIED R-KI1); F-KI NOT FIRED",
+  "R-KI1: K0-BETTER FOR AF-U AS BUILT; HALF OF D FROM 191 CROSS-SOURCE FILINGS; NEITHER ON THE 5,716 OWN-SOURCE ITEMS (DESCRIPTIVE); SE 5.8&times; REGISTERED; BRIER INFORMATION IS NOT ROUTING VALUE"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-04",
+   "by": "registrar (pre-data; READY_route_readouts)",
+   "text": "C1 D-4 asymmetry (favours NOT-BEYOND); C5 KI = 18 x loo_imp mean, EVAL held out; D3."
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (POSTRUN b5ed5e96)",
+   "text": "outcome recorded; duties applied: R-RS-P1, R-KN-HEAD, R-KN-TS, R-KI1 (HIGH), R-RWS (183 vs 123 blocks), R-SUP (realised SE; Kish 1.311); concurrency with GRANULARITY-GT disclosed (non-affecting). docs/judge_v2_program.md L24487-L24498 (section \"## KEY-INFO-V2 (2026-10-04, 0 calls) — VALID (POSTRUN b5ed5e96) ...\"; _as_of the commit that writes it, parent 4572dbd4, re-grepped); OUTCOME brackets on the registration lines."
+  }
+ ],
+ "does_not_show": [
+  "that AF-U's partition is worse than K_0's when both file by source (NEITHER there, descriptive; R-KI1)",
+  "a routing gain (Brier information is not decision value)",
+  "a label-free result ([SC])",
+  "judged quantities",
+  "other corpora or draws"
+ ],
+ "ledger": {
+  "row_id": "KEY-INFO-V2",
+  "version": "v385 (2026-10-04: OUTCOME bracket, OK + WARN chips) | v382 (2026-10-04: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "UNION-AF-ROUTE",
+  "ROUTE-SOURCE-NULL"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none (no judge, rubric, reference, frontier, temperature or LR)"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "minutes",
+  "agent_hours": "about 2-3 h",
+  "reads_pool": true
+ },
+ "outputs": "never committed: stored on E: with SHA256SUMS.txt; temp on E: via scratch_dir",
+ "sources": [
+  "docs/judge_v2_program.md L24291-L24302 (_as_of the commit that writes it, parent bd5ca001, re-grepped)",
+  "docs/literature/2026-10-04_testing_logic_review.md (bd5ca001)",
+  "docs/agents/plans/2026-10-04_W1_W2_schedule.md (be8e54d3)",
+  "docs/reviews/POSTRUN_route_trio.md (b5ed5e96; blob a8e4f5fc, LF)",
+  "docs/judge_v2_program.md L24487-L24498 (section \"## KEY-INFO-V2 (2026-10-04, 0 calls) — VALID (POSTRUN b5ed5e96) ...\"; _as_of the commit that writes it, parent 4572dbd4, re-grepped)",
+  "E:/TaxoArena_backup_2026-10-04_route_trio/SHA256SUMS.txt"
+ ],
+ "last_update": "2026-10-04",
+ "plain_description": {
+  "sq": "SQ1 Use",
+  "what": "No calls. On the combined dataset (about 5,900 held-out questions, 18 models), the test measured how much knowing a question's tree cell improves prediction of which models answer correctly. It compared this with k-means cells and with 200 random cell sets of the same size within each source.",
+  "why": "It asks whether cells carry real information about model strengths beyond simply knowing which benchmark a question came from.",
+  "information": "Beating the random cells means the cells are meaningful. Beating k-means would favour the tree as an index. Result: done. The tree's cells carry clearly more information than random cells within the same source. But k-means did somewhat better than the tree as built, and about half of that gap comes from 191 questions the tree files under another source. All of this uses source labels ('source-conditioned'). It is predictive information, not a measured routing gain.",
+  "written": "2026-10-07"
+ }
+}

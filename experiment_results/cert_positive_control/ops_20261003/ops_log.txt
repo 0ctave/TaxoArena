@@ -1,0 +1,81 @@
+== 2026-10-02T10:29:02+02:00 worktree /z/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/rp12-r2-run HEAD b5653fb7f4cb13dd5db5c6fd8dd19437b93d80d0; moved 604 (579 raw-identical, 25 CRLF-rendering, all filtered-hash identical) to experiment_results/_backup/rp12_r2_run_untracked_20261003; checkout rc 0; untracked 22
+== sidecars
+-rw-r--r-- 1 octav 197609 32768 Oct  2 08:14 ./embeddings_cache.db-shm
+-rw-r--r-- 1 octav 197609     0 Oct  2 08:14 ./embeddings_cache.db-wal
+-rw-r--r-- 1 octav 197609 32768 Oct  2 08:14 ./mmlu_pro_dataset_cache_v2.db-shm
+-rw-r--r-- 1 octav 197609     0 Oct  2 08:14 ./mmlu_pro_dataset_cache_v2.db-wal
+-rw-r--r-- 1 octav 197609 32768 Oct  2 08:14 ./multicorpus_cache_v1.db-shm
+-rw-r--r-- 1 octav 197609     0 Oct  2 08:14 ./multicorpus_cache_v1.db-wal
+-rw-r--r-- 1 octav 197609 32768 Oct  2 08:14 ./snapshots.db-shm
+-rw-r--r-- 1 octav 197609     0 Oct  1 10:07 ./snapshots.db-wal
+== 2026-10-02T10:29:10+02:00 $ python tools/analysis/cert_positive_control.py --selftest
+rc=0
+== 2026-10-02T10:29:10+02:00 $ python tools/analysis/cert_positive_control.py --mutants
+rc=0
+== 2026-10-02T10:29:29+02:00 $ python tools/analysis/v2_union_pool.py --dry-run
+rc=1
+== STOP: step 3 v2_union_pool.py --dry-run rc 1 (DATA-V2-RO database not found under the worktree's data_v2; it exists at main repo data_v2/). Not patched; --dry-run/--prepare/--hashes/arm not run. No java started.
+== 2026-10-02T10:30:38+02:00 RESUME per coordinator ruling: TAXOARENA_DATA_ROOT='Z:\FAC\TUBerlin\THESIS\TaxoArena'
+== resolution: cert_positive_control.py L1143 --data-root default=os.environ.get('TAXOARENA_DATA_ROOT', ROOT) -> with the variable set, snapshots.db / embeddings_cache.db / multicorpus_cache_v1.db resolve to Z:\FAC\TUBerlin\THESIS\TaxoArena\ (MAIN), not rp12-r2-run. Kotlin arm: workingDir=rootDir (worktree), File("snapshots.db"), EmbedderReadGuard.resolveCacheFile(null)=File(EmbeddingCache.DB_OF_RECORD) relative -> rp12-r2-run (not redirected).
+== 2026-10-02T10:30:38+02:00 $ TAXOARENA_DATA_ROOT=... python tools/analysis/v2_union_pool.py --dry-run
+rc=0
+== STOP per ruling: the variable would redirect the cert script's snapshots.db and embeddings_cache.db to MAIN; --dry-run/--prepare/--hashes/arm not run.
+== 2026-10-02T10:31:14+02:00 RESUME (ruling 2): TAXOARENA_DATA_ROOT unset; --data-root Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run on every cert step; env TAXOARENA_DATA_ROOT='unset'
+== $ python tools/analysis/cert_positive_control.py --dry-run --data-root Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run
+rc=0
+== resolved (--data-root Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run; os.path.join as in L222/L299/L300):
+Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\snapshots.db 1144037376
+Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\embeddings_cache.db 806920192
+Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\multicorpus_cache_v1.db 1949741056
+== 2026-10-02T10:31:26+02:00 $ python tools/analysis/cert_positive_control.py --prepare --data-root Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run
+rc=0
+== 2026-10-02T10:31:31+02:00 $ python tools/analysis/cert_positive_control.py --hashes before --data-root Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run
+rc=0
+== 2026-10-02T10:31:54+02:00 RULE-7 WINDOW
+Erreurÿ: Argument ou option non valide - ®ÿC:/Program Files/Git/FOÿ¯.
+Entrez "TASKLIST /?" pour afficher la syntaxe.
+no java/python/ollama processes
+free RAM GB: 32,1
+snapshots.db exclusive-open FREE
+embeddings_cache.db exclusive-open FREE
+multicorpus_cache_v1.db exclusive-open FREE
+mmlu_pro_dataset_cache_v2.db exclusive-open FREE
+== process listing (powershell Get-Process)
+
+   Id ProcessName         CPU       WS
+   -- -----------         ---       --
+42448 ollama      1057,671875 98570240
+42336 ollama app     1,609375 80322560
+
+
+
+== ollama ps:
+NAME    ID    SIZE    PROCESSOR    CONTEXT    UNTIL 
+ollama PID 42448 CPU-seconds over 10 s: 0,00
+== admitted PIDs: 42448 ollama, 42336 ollama app (idle: ollama ps empty, 0.00 CPU-s/10 s); no java/python; free RAM 32.1 GB; probe FREE x4; no git write under src/ since checkout
+== 2026-10-02T10:32:28+02:00 START $ .\gradlew.bat certPositiveControl --console=plain --offline --no-daemon -PjvmThreads=12 -PnullReps=300 "-DsnapshotId=20261001_094311_Headless_Run_Auto_ge" "-DsliceDim=512" "-DsepBar=0.0145" "-DdropTop=0" "-Dwhiten=false" "-DdeclaredLabels=experiment_results/cert_positive_control/declared_labels.tsv" "-Dg12Sites=experiment_results/archv2/rp12_r2/g12/G12_sites.csv" "-DoutDir=experiment_results/cert_positive_control/arm" "-Di1Form=live" "-Di1Bracket=docs/judge_v2_program.md L23470"
+== 2026-10-02T11:06:24+02:00 END rc=0 wall 33 min
+== 2026-10-02T11:06:49+02:00 $ gradlew.bat --stop
+'gradlew.bat' n'est pas reconnu en tant que commande interne
+ou externe, un programme ex‚cutable ou un fichier de commandes.
+rc=1
+== PID check
+no java/python
+== 2026-10-02T11:06:50+02:00 $ python tools/analysis/cert_positive_control.py --hashes after --data-root Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run
+[CPC] heavy foreign processes (java): none
+[CPC] embeddings_cache.db per-table hashes (after): {"agent_ratings": "e3b0c44298fc1c14", "embeddings": "641ff6fad35bd1af", "gmm_vectors": "e3b0c44298fc1c14", "match_history": "e3b0c44298fc1c14", "queries": "8c15ceb667a633a2"}
+rc=0
+-rw-r--r-- 1 octav 197609 0 Oct  2 08:14 embeddings_cache.db-wal
+-rw-r--r-- 1 octav 197609 0 Oct  2 08:14 multicorpus_cache_v1.db-wal
+-rw-r--r-- 1 octav 197609 0 Oct  1 10:07 snapshots.db-wal
+== 2026-10-02T11:07:09+02:00 retry via powershell: .\gradlew.bat --stop (cmd attempt above lost cwd)
+No Gradle daemons are running.
+rc=0
+no java
+== mmlu wal:
+ls: cannot access 'mmlu_pro_dataset_cache_v2.db-wal': No such file or directory
+c5fe7f4667336aa64caef6d92be604c158b4b9013c17c9aca99accd3422bc217 */z/FAC/TUBerlin/THESIS/TaxoArena/experiment_results/cert_positive_control/ops_20261003/arm/identity.csv
+270e3491a9c651f7a41235505ddb2a8188917bed17ef00d092acad7c7f21ec15 */z/FAC/TUBerlin/THESIS/TaxoArena/experiment_results/cert_positive_control/ops_20261003/arm/replicates.csv
+26ffd266485844dc9f74cd90f4c89650978b31faa9db8a3d9ccfbd8d6d08a0e2 */z/FAC/TUBerlin/THESIS/TaxoArena/experiment_results/cert_positive_control/ops_20261003/arm/sites.csv
+0e3764e833a28c31eef39dd2a80c2d625d276caff34e43dbf29a9a696ac06c0a */z/FAC/TUBerlin/THESIS/TaxoArena/experiment_results/cert_positive_control/ops_20261003/arm/status.txt
+c0a20662047c6314ee57e64f5537e66525af3471b818607a88cb4afdfe2b3aef */z/FAC/TUBerlin/THESIS/TaxoArena/experiment_results/cert_positive_control/ops_20261003/declared_labels.tsv

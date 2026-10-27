@@ -1,0 +1,383 @@
+Starting a Gradle Daemon, 3 stopped Daemons could not be reused, use --status for details
+Configuration on demand is an incubating feature.
+Calculating task graph as no cached configuration is available for tasks: bootRun --args=--config experiment_configs/gemma_own_bar/g_af.toml
+> Task :checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :processResources UP-TO-DATE
+> Task :compileKotlin UP-TO-DATE
+> Task :compileJava NO-SOURCE
+> Task :classes UP-TO-DATE
+> Task :resolveMainClassName
+
+> Task :processAot
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+[BOOT] TaxoAdapt starting � pid=64476, java=21.0.6, jar=file:/Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/gemma-own-bar-run/build/classes/kotlin/main/
+[THREAD-CAP] requested=12 availableProcessors=12 heapEstimate=n/a budget=16.94GB
+Page de codes active�: 65001
+
+> Task :compileAotKotlin NO-SOURCE
+> Task :processAotResources
+> Task :compileAotJava FROM-CACHE
+> Task :aotClasses
+
+> Task :bootRun
+[BOOT] TaxoAdapt starting � pid=40584, java=21.0.6, jar=file:/Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/gemma-own-bar-run/build/classes/kotlin/main/
+[THREAD-CAP] requested=12 availableProcessors=12 heapEstimate=n/a budget=16.94GB
+[BOOT] corpusDbPath from TOML: taxoadapt.eval.db-path=intent_s1_build/m_af_g.db
+Page de codes active�: 65001
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+20:13:44.717 [WARN ] EmbeddingCache - [EMB-CACHE] -Dtaxoarena.embeddingCacheFile: model 'embeddinggemma:latest' reads the EXPLICIT cache file Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\gemma-own-bar-run\intent_s1_work\g_af_20261003_200327\intent_emb_gemma.db
+20:13:44.728 [INFO ] EmbeddingCache - SQLite Embedding, GMM & Query Cache initialized successfully.
+20:13:44.748 [INFO ] ModelEvalStore - ModelEvalStore schema ready.
+20:13:44.753 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+20:13:44.783 [WARN ] ArcConfig - LLM provider is AZURE but AZURE_AI_ENDPOINT/AZURE_AI_API_KEY are blank. Create a root-level .env (see .env.example) or export these variables. Falling back to the Ollama chat model at http://localhost:11434 so the application can still start.
+20:13:44.821 [INFO ] LLMClient - [ARENA-PACING] request pacing at 4.0 req/s, semaphore capacity 4
+20:13:44.831 [ERROR] RankingService - Failed to initialize database tables: [SQLITE_CANTOPEN] Unable to open the database file (unable to open database file)
+org.sqlite.SQLiteException: [SQLITE_CANTOPEN] Unable to open the database file (unable to open database file)
+	at org.sqlite.core.DB.newSQLException(DB.java:1179)
+	at org.sqlite.core.DB.newSQLException(DB.java:1190)
+	at org.sqlite.core.DB.throwex(DB.java:1150)
+	at org.sqlite.core.NativeDB._open_utf8(Native Method)
+	at org.sqlite.core.NativeDB._open(NativeDB.java:82)
+	at org.sqlite.core.DB.open(DB.java:216)
+	at org.sqlite.SQLiteConnection.open(SQLiteConnection.java:268)
+	at org.sqlite.SQLiteConnection.<init>(SQLiteConnection.java:67)
+	at org.sqlite.jdbc3.JDBC3Connection.<init>(JDBC3Connection.java:28)
+	at org.sqlite.jdbc4.JDBC4Connection.<init>(JDBC4Connection.java:19)
+	at org.sqlite.JDBC.createConnection(JDBC.java:106)
+	at org.sqlite.JDBC.connect(JDBC.java:79)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:683)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:253)
+	at taxonomy.service.TaxonomyRankingService.getConnection(TaxonomyRankingService.kt:104)
+	at taxonomy.service.TaxonomyRankingService.ensureDatabaseInitialized(TaxonomyRankingService.kt:189)
+	at taxonomy.service.TaxonomyRankingService.<init>(TaxonomyRankingService.kt:169)
+	at java.base/jdk.internal.reflect.DirectConstructorHandleAccessor.newInstance(DirectConstructorHandleAccessor.java:62)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:502)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:486)
+	at kotlin.reflect.jvm.internal.calls.CallerImpl$Constructor.call(CallerImpl.kt:41)
+	at kotlin.reflect.jvm.internal.KCallableImpl.call(KCallableImpl.kt:108)
+	at org.springframework.beans.BeanUtils$KotlinDelegate.instantiateClass(BeanUtils.java:932)
+	at org.springframework.beans.BeanUtils.instantiateClass(BeanUtils.java:190)
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:145)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:318)
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:189)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1381)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1218)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:563)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:346)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:254)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1664)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1552)
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:913)
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791)
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:240)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1381)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1218)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:563)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:346)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:254)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1664)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1552)
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:913)
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791)
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:240)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1381)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1218)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:563)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:346)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:254)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1664)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1552)
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:913)
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791)
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:240)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1381)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1218)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:563)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:346)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:207)
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:768)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:325)
+	at taxonomy.ApplicationKt.main(Application.kt:90)
+20:13:44.860 [INFO ] HeadlessRunner - Starting Headless Benchmark Mode with config: experiment_configs/gemma_own_bar/g_af.toml
+20:13:44.898 [INFO ] RatingsDbGuard - [DB-GUARD] ratings database 'Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/gemma-own-bar-run/experiment_results/gemma_own_bar/g_af/seed_42/ratings_intent_s1.db' is not tracked; safe to write
+20:13:44.925 [INFO ] HeadlessRunner - Loaded CLI Configuration: HeadlessCliConfig(snapshotId=unsaved, models=[], queryLimit=0, category=null, confidenceGate=0.65, parallelism=6, questionsPerRound=12, reservedOnly=true, resumeBenchmark=false, profileMode=false, profileSeTarget=0.15, profileStrataFile=null, maxQueryReuse=2147483647, matchFilter=none, tau=1.0E-6, enableFinalMetrics=false, adaptiveBarFile=null, embeddingSliceDim=768, splitDropTopPcs=null, splitWhiten=null, proposalMemo=null, conditions=[MAIN, ORACLE, GENERIC_JUDGE, RANDOM_SCHEDULER], outputDir=experiment_results/gemma_own_bar/g_af, testRatio=0.3, seed=42, seeds=[], splitSeed=null, constructionOrderShuffleSeed=null, anchorFree=true, proposalAcceptMultiplier=null, reservedPoolFile=experiment_configs/intent_s1/gate_ids_massive_s1.json, v2PoolFile=null, unionRoutingItemKey=false, v2ForeignMembers=[], pool=p9d1bbcd0ee6b8988, acknowledgedEvalMembers=[], regenerateSplit=false, runPipeline=true, maxDepth=8, minClusterSize=55, proposalSeparationBar=0.043748, membershipFloor=0.25, routingBeamGamma=0.2, descentMargin=0.12, acceptanceZ=2.0, marginalEps=null, maxK=null, excludeFromAnchoring=[], expectedWithheldQueries=null, enableRefitGate=false, defaultKappaPrior=10.0, enableLabeling=false, judgeInduction=false, datasetType=INTENT, corpora=null, corpusDbPath=intent_s1_build/m_af_g.db, unionSnapshots=[], unionRootRouting=descent, runBenchmark=false, runTrickle=true, domains=[], enableStableQuestionIds=null, enableResidualRouting=null, enableResidualSplitGate=null, fusionSimilarityThreshold=0.9, effectiveSupportFloor=2.0, numIterations=50, runBaselines=false, enableGtWarmStart=false, maxLeafAssignments=5, dagMode=DAG_MAX, enableProfiling=true, judgeSeesOptions=null, judgeOptionMode=null, judgeRecipe=null, judgeRecipeKit=null, judgeRecipeModel=null, judgeRecipeMaxTokens=null, judgeRecipeTemperature=null)
+20:13:44.925 [WARN ] HeadlessRunner - [ANCHOR-FREE] anchor-free construction ACTIVE: no category anchors, every train query starts at the root (the DAG is NOT the production path)
+20:13:44.926 [INFO ] HeadlessRunner - [SLICE] embedding slice width = 768, split PCA dropTop=0 whiten=false
+20:13:44.926 [INFO ] HeadlessRunner - [CORPUS] corpora=[INTENT] corpusDbPath=intent_s1_build/m_af_g.db
+20:13:44.927 [INFO ] HeadlessRunner - [JUDGE-RECIPE] disabled: judge = Mistral-Large-3 on the langchain4j path (byte-identical to the board of record)
+20:13:46.491 [INFO ] Diagnostics - [DIAG] diagnostics bundle open at Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\gemma-own-bar-run\experiment_results\gemma_own_bar\g_af\seed_42\diagnostics
+20:13:46.491 [INFO ] HeadlessRunner - ==================================================
+20:13:46.491 [INFO ] HeadlessRunner - STARTING PIPELINE AND EVALUATION WITH SEED: 42
+20:13:46.491 [INFO ] HeadlessRunner - ==================================================
+20:13:46.491 [INFO ] HeadlessRunner - Headless pipeline execution enabled. Starting DAG generation pipeline...
+20:13:46.492 [INFO ] HeadlessRunner - Loading dataset for domains: []
+20:13:46.558 [WARN ] DatasetFetcher - [INTENT] fetched 11502 INTENT rows (build DB: 9826 TRAIN + 1676 GATE, 0 EVAL) of corpus 'massive', arm 'M-AF-g' from the local table 'intent_corpus' of 'intent_s1_build/m_af_g.db'; embeddings from the working copy Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/gemma-own-bar-run/intent_s1_work/g_af_20261003_200327/intent_emb_gemma.db; no network access (no remote fallback)
+20:13:46.590 [INFO ] DatasetFetcher - Fetched 11502 Intent queries across 18 categories.
+20:13:46.600 [INFO ] HeadlessRunner - Splitting dataset from the explicit reserved-pool file experiment_configs/intent_s1/gate_ids_massive_s1.json (seed ignored for the split)
+20:13:46.611 [INFO ] DatasetFetcher - Train/test split from reserved file 'gate_ids_massive_s1.json': 9826 train / 1676 test (file lists 1676 ids; 0 not present in the loaded dataset).
+20:13:46.627 [INFO ] DatasetFetcher - [POOL] recorded p9d1bbcd0ee6b8988 (file gate_ids_massive_s1.json, 1676 judgeable ids; sentinels excluded); nothing activated
+20:13:47.286 [INFO ] DatasetFetcher - [SPLIT-SIDE] 9826 train (0 gate) / 1676 test; every item's side == f(item); |gate ∩ eval| = 0; pool p9d1bbcd0ee6b8988; FunctionStamp(normaliserVersion=norm-v1, keyRule=ck-v1, modulus=1000, evalUpper=300, gateLower=300, gateUpper=400, poolId=p9d1bbcd0ee6b8988)
+20:13:47.317 [INFO ] HeadlessRunner - [POOL] recorded p9d1bbcd0ee6b8988 (seed=42, gate=0, closedByContent=0); nothing activated
+20:13:47.318 [WARN ] Diagnostics - [EMB-CACHE] construction reads the explicit embedding cache file Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/gemma-own-bar-run/intent_s1_work/g_af_20261003_200327/intent_emb_gemma.db (-Dtaxoarena.embeddingCacheFile); source sha256 b187b82f90ce98376ba3ffac100157493fd8c5ee52dfa88f707738dde2acf512 (-Dtaxoarena.embeddingCacheSourceSha256)
+20:13:47.319 [INFO ] HeadlessRunner - Running GMM splitting and trickle routing pipeline...
+20:13:47.325 [INFO ] Engine - Starting Taxonomy Adaptation: INTENT
+20:13:47.327 [INFO ] Engine - 
+┌── TAXONOMY CONFIGURATION PARAMETERS ─────────────────────
+│ Execution Settings:
+│   - Dataset Type:         INTENT
+│   - Num Iterations:       50
+│   - Early Stopping:       true
+│   - Labeling:             false
+│   - Selected Domains:     [All]
+│   - Split Dataset:        true
+│   - Test Split Ratio:     0.3
+├── LLM & Embedding Models:
+│   - LLM Provider:         AZURE
+│   - Embedding Provider:   OLLAMA
+│   - Embedding Model:      embeddinggemma:latest
+│   - Judge Model:          Mistral-Large-3
+│   - Labeling Model:       Mistral-Large-3
+│   - Max Judge Generality: 1
+├── Advanced Mathematical Formalism Controls:
+│   - DAG Mode:             DAG_MAX
+│   - Max Depth:            8
+│   - Min Cluster Size:     55
+│   - Separation Bar:       0.043748
+│   - Slice Dim / PCA:      768 / dropTop=0 whiten=false
+│   - Lexicographic Tau:    1.0E-6
+│   - Anchor-Free:          true (ANCHOR-FREE arm; no category anchors)
+│   - Membership Floor:     0.25
+│   - Routing Beam Gamma:   0.2
+│   - Descent Margin:       0.12
+│   - Fusion Sim Threshold: 0.9
+│   - Eff Support Floor:    2.0
+│   - Default Kappa Prior:  10.0
+└──────────────────────────────────────────────────────────
+20:13:47.327 [WARN ] Engine - [ANCHOR-FREE] anchor-free construction ACTIVE: no category anchors, every train query starts at the root and the root is a split site (ANCHOR-FREE arm; this DAG is NOT the production path)
+20:13:47.328 [INFO ] Engine - Phase 1: Precomputing Embeddings...
+20:13:47.584 [INFO ] EmbeddingCache - All 9826 requested embeddings are already cached on disk.
+20:13:47.587 [INFO ] Engine - Dimension check passed: model=768 dims, minRequired=768 (maxDepth=8)
+20:13:47.597 [WARN ] Engine - [ANCHOR-FREE] 9826 train queries placed at the root (no anchors); the root is the only split site at iteration 1
+20:13:47.601 [INFO ] Engine - Bootstrap: Seeding GMMs with 100% ground-truth data...
+20:13:47.605 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+20:13:47.854 [INFO ] Fitter - [FITTER] Fitting complete (1 depths, 1 nodes)
+20:13:47.857 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 541.5721     | 10.0000      | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+20:13:47.862 [INFO ] Engine - Initial DAG Structure (Before Statistical Fitting)
+20:13:47.871 [INFO ] Operations - 
+┌── TAXONOMY DAG HIERARCHY ───────────────────────────────
+│ INTENT [q_dir=9826, q_rec=9826, mass=9826.0 - Leaf] (vMF kappa: 541.572)
+└─────────────────────────────────────────────────────────
+20:13:47.874 [INFO ] Engine - STARTING EVOLUTION ITERATION 1
+20:14:12.368 [INFO ] Splitter - [NO-SPLIT] 'INTENT' reason=min-pair n=9826 k=2 emK=2 sep=0.0212 bar=0.0437
+20:14:13.198 [INFO ] Splitter - [NO-SPLIT] 'INTENT' reason=min-pair n=9826 k=2 emK=3 sep=0.0287 bar=0.0437
+20:14:13.676 [INFO ] Splitter - [NO-SPLIT] 'INTENT' reason=min-pair n=9826 k=2 emK=4 sep=0.0220 bar=0.0437
+20:14:13.694 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+20:14:14.049 [INFO ] Fitter - [FIT-μ]  iter=1: mean_MLE_drift=1.000, oscillating_nodes=0/1, earlyout_rate=1.00
+20:14:14.050 [INFO ] Fitter - [FIT-κ]  iter=1: prior_dominated=0/1 (0.0%), median_kfinal=541.57, median_alpha=0.00
+20:14:14.051 [INFO ] Fitter - [FITTER] Fitting complete (1 depths, 1 nodes)
+20:14:14.054 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 541.5721     | 10.0000      | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+20:14:14.059 [INFO ] Engine - [REFIT-DELTA] Iteration 1 | 0.000e+00 (M-step inert, as expected)
+20:14:14.060 [INFO ] Engine - [J-TRACK] Iteration 1 | J_after_trickle: 0.000000 (Trickle Delta: 0.000000) | J_after_edits: 0.000000 (Edits Delta: 0.000000)
+20:14:14.065 [INFO ] Engine - [J-RESOLUTION] Iteration 1 | J=0.000000 SE_boot=0.000e+00 (B=0) | tau=1.000e-06 SE/tau=0.0 | 2*SE=0.000e+00
+20:14:14.066 [INFO ] Engine - Iteration 1 completed in 26191ms.
+20:14:14.067 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 1 (1 leaves, 0 internal) | Total Mass: 9826.00 ===
+20:14:14.084 [INFO ] Engine - === DAG after iteration 1 ===
+20:14:14.096 [INFO ] Operations - 
+┌── TAXONOMY HIERARCHY ───────────────────────────────────
+│ INTENT [q_dir=9826, q_rec=9826, mass=9826.0, Leaf] (kappa: 541.6)
+└─────────────────────────────────────────────────────────
+20:14:14.096 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 1) ===
+20:14:14.097 [INFO ] Engine - GROW: 3 attempted (0 accepted, 0 rejected, 3 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+20:14:14.100 [INFO ] Engine - [CONVERGENCE] Iteration 1 | GED converged=false | J stationary=true (streak 1/5, editsDelta=0.000e+00, trickleDelta=0.000e+00)
+20:14:14.103 [INFO ] Engine - STARTING EVOLUTION ITERATION 2
+20:14:14.258 [INFO ] Splitter - [NO-SPLIT] 'INTENT' reason=min-pair n=9826 k=2 emK=2 sep=0.0212 bar=0.0437
+20:14:14.472 [INFO ] Splitter - [NO-SPLIT] 'INTENT' reason=min-pair n=9826 k=2 emK=3 sep=0.0287 bar=0.0437
+20:14:14.713 [INFO ] Splitter - [NO-SPLIT] 'INTENT' reason=min-pair n=9826 k=2 emK=4 sep=0.0220 bar=0.0437
+20:14:14.725 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+20:14:14.796 [INFO ] Fitter - [FIT-μ]  iter=2: mean_MLE_drift=1.000, oscillating_nodes=0/1, earlyout_rate=1.00
+20:14:14.796 [INFO ] Fitter - [FIT-κ]  iter=2: prior_dominated=0/1 (0.0%), median_kfinal=541.57, median_alpha=0.00
+20:14:14.796 [INFO ] Fitter - [FITTER] Fitting complete (1 depths, 1 nodes)
+20:14:14.800 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 541.5721     | 10.0000      | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+20:14:14.802 [INFO ] Engine - [REFIT-DELTA] Iteration 2 | 0.000e+00 (M-step inert, as expected)
+20:14:14.802 [INFO ] Engine - [J-TRACK] Iteration 2 | J_after_trickle: 0.000000 (Trickle Delta: 0.000000) | J_after_edits: 0.000000 (Edits Delta: 0.000000)
+20:14:14.806 [INFO ] Engine - [J-RESOLUTION] Iteration 2 | J=0.000000 SE_boot=0.000e+00 (B=0) | tau=1.000e-06 SE/tau=0.0 | 2*SE=0.000e+00
+20:14:14.806 [INFO ] Engine - Iteration 2 completed in 703ms.
+20:14:14.808 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 1 (1 leaves, 0 internal) | Total Mass: 9826.00 ===
+20:14:14.823 [INFO ] Engine - === DAG Changes in iteration 2 ===
+20:14:14.824 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│   (No structural changes in this iteration)
+└──────────────────────────────────────────────────────────
+20:14:14.824 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 2) ===
+20:14:14.824 [INFO ] Engine - GROW: 3 attempted (0 accepted, 0 rejected, 3 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+20:14:14.826 [INFO ] Stabilizer - GED Analysis (Iter 2): +0/-0 nodes, +0/-0 relations.
+20:14:14.826 [INFO ] Engine - [CONVERGENCE] Iteration 2 | GED converged=false | J stationary=true (streak 2/5, editsDelta=0.000e+00, trickleDelta=0.000e+00)
+20:14:14.826 [INFO ] Engine - STARTING EVOLUTION ITERATION 3
+20:14:14.961 [INFO ] Splitter - [NO-SPLIT] 'INTENT' reason=min-pair n=9826 k=2 emK=2 sep=0.0212 bar=0.0437
+20:14:15.172 [INFO ] Splitter - [NO-SPLIT] 'INTENT' reason=min-pair n=9826 k=2 emK=3 sep=0.0287 bar=0.0437
+20:14:15.413 [INFO ] Splitter - [NO-SPLIT] 'INTENT' reason=min-pair n=9826 k=2 emK=4 sep=0.0220 bar=0.0437
+20:14:15.427 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+20:14:15.549 [INFO ] Fitter - [FIT-μ]  iter=3: mean_MLE_drift=1.000, oscillating_nodes=0/1, earlyout_rate=1.00
+20:14:15.549 [INFO ] Fitter - [FIT-κ]  iter=3: prior_dominated=0/1 (0.0%), median_kfinal=541.57, median_alpha=0.00
+20:14:15.549 [INFO ] Fitter - [FITTER] Fitting complete (1 depths, 1 nodes)
+20:14:15.553 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 541.5721     | 10.0000      | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+20:14:15.555 [INFO ] Engine - [REFIT-DELTA] Iteration 3 | 0.000e+00 (M-step inert, as expected)
+20:14:15.555 [INFO ] Engine - [J-TRACK] Iteration 3 | J_after_trickle: 0.000000 (Trickle Delta: 0.000000) | J_after_edits: 0.000000 (Edits Delta: 0.000000)
+20:14:15.557 [INFO ] Engine - [J-RESOLUTION] Iteration 3 | J=0.000000 SE_boot=0.000e+00 (B=0) | tau=1.000e-06 SE/tau=0.0 | 2*SE=0.000e+00
+20:14:15.557 [INFO ] Engine - Iteration 3 completed in 731ms.
+20:14:15.558 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 1 (1 leaves, 0 internal) | Total Mass: 9826.00 ===
+20:14:15.568 [INFO ] Engine - === DAG Changes in iteration 3 ===
+20:14:15.568 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│   (No structural changes in this iteration)
+└──────────────────────────────────────────────────────────
+20:14:15.568 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 3) ===
+20:14:15.568 [INFO ] Engine - GROW: 3 attempted (0 accepted, 0 rejected, 3 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+20:14:15.568 [INFO ] Stabilizer - GED Analysis (Iter 3): +0/-0 nodes, +0/-0 relations.
+20:14:15.568 [INFO ] Engine - [CONVERGENCE] Iteration 3 | GED converged=false | J stationary=true (streak 3/5, editsDelta=0.000e+00, trickleDelta=0.000e+00)
+20:14:15.569 [INFO ] Engine - STARTING EVOLUTION ITERATION 4
+20:14:15.692 [INFO ] Splitter - [NO-SPLIT] 'INTENT' reason=min-pair n=9826 k=2 emK=2 sep=0.0212 bar=0.0437
+20:14:15.893 [INFO ] Splitter - [NO-SPLIT] 'INTENT' reason=min-pair n=9826 k=2 emK=3 sep=0.0287 bar=0.0437
+20:14:16.126 [INFO ] Splitter - [NO-SPLIT] 'INTENT' reason=min-pair n=9826 k=2 emK=4 sep=0.0220 bar=0.0437
+20:14:16.138 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+20:14:16.268 [INFO ] Fitter - [FIT-μ]  iter=4: mean_MLE_drift=1.000, oscillating_nodes=0/1, earlyout_rate=1.00
+20:14:16.268 [INFO ] Fitter - [FIT-κ]  iter=4: prior_dominated=0/1 (0.0%), median_kfinal=541.57, median_alpha=0.00
+20:14:16.268 [INFO ] Fitter - [FITTER] Fitting complete (1 depths, 1 nodes)
+20:14:16.272 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 541.5721     | 10.0000      | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+20:14:16.274 [INFO ] Engine - [REFIT-DELTA] Iteration 4 | 0.000e+00 (M-step inert, as expected)
+20:14:16.275 [INFO ] Engine - [J-TRACK] Iteration 4 | J_after_trickle: 0.000000 (Trickle Delta: 0.000000) | J_after_edits: 0.000000 (Edits Delta: 0.000000)
+20:14:16.277 [INFO ] Engine - [J-RESOLUTION] Iteration 4 | J=0.000000 SE_boot=0.000e+00 (B=0) | tau=1.000e-06 SE/tau=0.0 | 2*SE=0.000e+00
+20:14:16.278 [INFO ] Engine - Iteration 4 completed in 709ms.
+20:14:16.278 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 1 (1 leaves, 0 internal) | Total Mass: 9826.00 ===
+20:14:16.286 [INFO ] Engine - === DAG Changes in iteration 4 ===
+20:14:16.286 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│   (No structural changes in this iteration)
+└──────────────────────────────────────────────────────────
+20:14:16.286 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 4) ===
+20:14:16.286 [INFO ] Engine - GROW: 3 attempted (0 accepted, 0 rejected, 3 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+20:14:16.286 [INFO ] Stabilizer - GED Analysis (Iter 4): +0/-0 nodes, +0/-0 relations.
+20:14:16.286 [INFO ] Engine - [CONVERGENCE] Iteration 4 | GED converged=false | J stationary=true (streak 4/5, editsDelta=0.000e+00, trickleDelta=0.000e+00)
+20:14:16.287 [INFO ] Engine - STARTING EVOLUTION ITERATION 5
+20:14:16.391 [INFO ] Splitter - [NO-SPLIT] 'INTENT' reason=min-pair n=9826 k=2 emK=2 sep=0.0212 bar=0.0437
+20:14:16.588 [INFO ] Splitter - [NO-SPLIT] 'INTENT' reason=min-pair n=9826 k=2 emK=3 sep=0.0287 bar=0.0437
+20:14:16.819 [INFO ] Splitter - [NO-SPLIT] 'INTENT' reason=min-pair n=9826 k=2 emK=4 sep=0.0220 bar=0.0437
+20:14:16.830 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+20:14:17.063 [INFO ] Fitter - [FIT-μ]  iter=5: mean_MLE_drift=1.000, oscillating_nodes=0/1, earlyout_rate=1.00
+20:14:17.063 [INFO ] Fitter - [FIT-κ]  iter=5: prior_dominated=0/1 (0.0%), median_kfinal=541.57, median_alpha=0.00
+20:14:17.064 [INFO ] Fitter - [FITTER] Fitting complete (1 depths, 1 nodes)
+20:14:17.067 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 541.5721     | 10.0000      | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+20:14:17.069 [INFO ] Engine - [REFIT-DELTA] Iteration 5 | 0.000e+00 (M-step inert, as expected)
+20:14:17.069 [INFO ] Engine - [J-TRACK] Iteration 5 | J_after_trickle: 0.000000 (Trickle Delta: 0.000000) | J_after_edits: 0.000000 (Edits Delta: 0.000000)
+20:14:17.070 [INFO ] Engine - [J-RESOLUTION] Iteration 5 | J=0.000000 SE_boot=0.000e+00 (B=0) | tau=1.000e-06 SE/tau=0.0 | 2*SE=0.000e+00
+20:14:17.071 [INFO ] Engine - Iteration 5 completed in 783ms.
+20:14:17.072 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 1 (1 leaves, 0 internal) | Total Mass: 9826.00 ===
+20:14:17.080 [INFO ] Engine - === DAG Changes in iteration 5 ===
+20:14:17.080 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│   (No structural changes in this iteration)
+└──────────────────────────────────────────────────────────
+20:14:17.080 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 5) ===
+20:14:17.080 [INFO ] Engine - GROW: 3 attempted (0 accepted, 0 rejected, 3 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+20:14:17.080 [INFO ] Stabilizer - GED Analysis (Iter 5): +0/-0 nodes, +0/-0 relations.
+20:14:17.080 [INFO ] Stabilizer - Convergence streak: 1/5
+20:14:17.080 [INFO ] Engine - [CONVERGENCE] Iteration 5 | GED converged=false | J stationary=true (streak 5/5, editsDelta=0.000e+00, trickleDelta=0.000e+00)
+20:14:17.082 [INFO ] Engine - Early stopping triggered in iteration 5 due to convergence (J stationarity).
+20:14:17.089 [INFO ] Diagnostics - [DIAG] diagnostics bundle closed (completed) at Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\gemma-own-bar-run\experiment_results\gemma_own_bar\g_af\seed_42\diagnostics
+20:14:17.089 [ERROR] HeadlessRunner - Headless Benchmark failed with error
+java.lang.IllegalStateException: [ANCHOR-FREE] construction ended with the root as a single leaf: the root was never split (or lost every child). This is the vacuous outcome, not a negative result; see diagnostics/proposals.csv for the root's GROW rows (siteId=n00000001)
+	at taxonomy.TaxonomyEngine$adaptTaxonomy$2.invokeSuspend(TaxonomyEngine.kt:786)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at taxonomy.runner.HeadlessBenchmarkRunner.runHeadlessBenchmark(HeadlessBenchmarkRunner.kt:388)
+	at taxonomy.runner.HeadlessBenchmarkRunner.run(HeadlessBenchmarkRunner.kt:350)
+	at org.springframework.boot.SpringApplication.lambda$callRunner$5(SpringApplication.java:788)
+	at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:82)
+	at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:60)
+	at org.springframework.util.function.ThrowingConsumer$1.accept(ThrowingConsumer.java:86)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:796)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:787)
+	at org.springframework.boot.SpringApplication.lambda$callRunners$3(SpringApplication.java:772)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:510)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:772)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:325)
+	at taxonomy.ApplicationKt.main(Application.kt:90)
+20:14:17.090 [INFO ] ModelEvalStore - SQLite evaluation store database connection closed cleanly via shutdown hook.
+20:14:17.090 [INFO ] DatasetFetcher - SQLite dataset fetcher database connection closed cleanly via shutdown hook.
+20:14:17.093 [INFO ] SnapshotManager - SQLite snapshot database connection closed cleanly via shutdown hook.
+20:14:17.097 [INFO ] RankingService - SQLite database connection closed cleanly via shutdown hook.
+
+> Task :bootRun FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':bootRun'.
+> Process 'command 'C:\Users\octav\.jdks\graalvm-jdk-21.0.6\bin\java.exe'' finished with non-zero exit value 1
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 47s
+7 actionable tasks: 4 executed, 1 from cache, 2 up-to-date
+Configuration cache entry stored.
+rc=1
+Stopping Daemon(s)
+1 Daemon stopped

@@ -1,0 +1,60 @@
+=== CONSENSUS-FIT: how much of a model's standing is correctness, and how much is agreeing with the field ===
+
+(1) MATCH-LEVEL logistic regression of the verdict on two signed contrasts
+  ARENA-13 arm A - ENSEMBLE reference (n=1800 matches, 29 ties)
+      intercept                                    +1.402 +- 0.083 | z= +16.9 | odds x4.06
+      KEY  (the answer key favours this model)     +0.516 +- 0.097 | z=  +5.3 | odds x1.68
+      REF  (the reference agrees with this model)  +1.380 +- 0.099 | z= +13.9 | odds x3.97
+      REF / KEY ratio 2.68 -> the reference pulls HARDER than correctness
+
+  x12 MAIN - the DEPLOYED grok reference (n=9142 matches, 1911 ties)
+      intercept                                    -0.740 +- 0.029 | z= -25.7 | odds x0.48
+      KEY  (the answer key favours this model)     +0.788 +- 0.069 | z= +11.4 | odds x2.20
+      REF  (the reference agrees with this model)  +2.177 +- 0.072 | z= +30.4 | odds x8.82
+      REF / KEY ratio 2.76 -> the reference pulls HARDER than correctness
+
+(2) judge accuracy on key-decidable matches, split by what the reference agrees with (both datasets pooled)
+      reference agrees with the KEY-CORRECT model    n= 5167 | accuracy 0.922
+      reference agrees with the WRONG model          n=  491 | accuracy 0.226
+      reference agrees with neither                  n=  391 | accuracy 0.657
+
+(3) MODEL-LEVEL fit, n=13 models: BT theta ~ standardised key accuracy + standardised ensemble agreement
+      key accuracy        +1.206 +- 0.456  (t=+2.65)
+      ensemble agreement  +0.352 +- 0.456  (t=+0.77)
+      R-squared 0.970 | simple correlations: theta~accuracy 0.984, theta~agreement 0.974, accuracy~agreement 0.982
+      permutation p (10,000 shuffles): key accuracy 0.6391 | ensemble agreement 0.8857
+      leave-one-model-out: the agreement coefficient stays positive in 13 of 13 refits (range +0.195 to +0.455)
+      COLLINEARITY: accuracy and agreement correlate at 0.982 across the roster (VIF 27.5), so at n=13 the two
+      model-level coefficients are NOT separately identified - which is why the permutation test, whose null
+      distribution is correspondingly wide, cannot reject either of them. Better models agree with the field
+      more, ACROSS the roster; the two come apart only WITHIN a question, which is what the match-level fits use.
+      CAVEAT: n=13 models. The match-level fits above carry the statistical weight; this one carries the units.
+
+      model                              theta    key acc   agrees with the field
+      grok-4-1-fast-reasoning            +2.156    0.849     0.882
+      gemini-3.1-pro_5-shots             +1.855    0.913     0.863
+      iask_pro                           +1.844    0.817     0.877
+      arx_0314                           +1.362    0.834     0.897
+      gpt-4o-2024-08-06                  +1.245    0.750     0.847
+      deepseek-chat-v2_5                 +0.398    0.657     0.734
+      Meta-Llama-3_1-70B-Instruct        -0.225    0.630     0.710
+      Qwen1.5-72B-Chat                   -0.355    0.474     0.650
+
+(4) what the consensus coefficient accounts for at the top of the board
+      grok-4-1-fast-reasoning leads gemini-3.1-pro_5-shots by +0.301 theta while scoring 0.849 against 0.913 on the key.
+      its consensus advantage is 0.882 - 0.863 = +0.018 agreement, worth +0.027 theta at the fitted coefficient,
+      i.e. 9% of the gap. Equalising agreement alone does not reverse the order.
+
+(5) DESCRIPTIVE, not registered - what the arm A intercept is standing in for
+      On the 120 arm A matches where NEITHER the key nor the reference favours a side, the new contestant
+      still wins 0.683 (the fitted intercept, which is not saturated, puts it at 0.803). Whatever that is, it is
+      not consensus alignment: it is what makes the judge prefer that model with no evidence either way.
+      THREE CANDIDATES, and this fit cannot separate them:
+        - genuine quality the key does not capture;
+        - style: its traces come from a different generation run than the twelve contestants;
+        - POSITION: arm A was single order and the new contestant was ALWAYS Model A, so nothing cancelled
+          the position effect. FLIP-PROV measured a 13.9% FLIP RATE (later decomposed by POSITION-DECOMP into
+          ~6pp position and ~6pp noise) and ORDER-1 showed the board
+          itself depends on which single order is kept (rho 0.958 against 0.986).
+      Separating them costs one reversed-order pass over a sample of arm A. Until that is bought, the
+      ARENA-13 (1) failure should be attributed to the single-order design as readily as to the reference.

@@ -1,0 +1,141 @@
+{
+ "id": "FITSET-INTENT",
+ "title": "FITSET-INTENT: does the class-pure leaf-mean refit improve fine filing on INTENT-S1's anchored trees (M-AN, C-AN), beyond MMLU-Pro? (zero calls; REGISTERED 2026-10-03)",
+ "question": "Is FITSET-FAITHFUL's stage-0 gain more than an MMLU-Pro effect?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "the commit that writes it (parent 2cb20cca)",
+  "program_lines": "docs/judge_v2_program.md L23888-L23899",
+  "program_lines_as_of": "the commit that writes them, parent 2cb20cca, re-grepped",
+  "date": "2026-10-03",
+  "heading": "## Registered 2026-10-03 (before any code or call) — FITSET-INTENT: does FITSET-FAITHFUL's leaf-mean refit on class-pure TRAIN fit sets also improve fine filing ...",
+  "provenance": "docs/agents/plans/2026-10-03_15h_schedule.md (the orchestrator) under the autonomous-scheduling authorisation; criteria etc. the registrar's"
+ },
+ "script": {
+  "path": "tools/analysis/fitset_intent.py",
+  "sha16": "blob eaa29686 (merged 6910deda from fitset-intent 33fb11cb)",
+  "commit": "6910deda"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_fitset_intent.md",
+  "commit": "6910deda"
+ },
+ "go": "autonomous-scheduling authorisation (zero calls, cheap)",
+ "run": {
+  "outcome_file": "experiment_results/intent_transfer/fitset_intent_outcome.txt (sha256 064964ea...; never committed; backup E:/TaxoArena_backup_2026-10-03_fitset_intent)",
+  "outcome_commit": "run from main 6910deda + f1f916d4",
+  "calls": 0,
+  "cce": 0,
+  "pool": "own intent DBs",
+  "date": "2026-10-03"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_fitset_intent.md",
+  "commit": "06f03005",
+  "verdict": "VALID (W-1..W-5)"
+ },
+ "criteria": [
+  {
+   "id": "FI1",
+   "text": "per corpus D = P(A-refit) - P(A) (fine filing); HELD iff 95% interval > 0 AND D > spread_K (k-means at k = L, 5-seed, in-run); REVERSED symmetric; UNDETERMINED otherwise; BEYOND-MMLU iff HELD on >= 1 corpus. Verdict line: DESCRIPTIVE-ONLY at prediction (SE 0.00357 / 0.00308; MDE80 0.0100 / 0.0086; bars 0.015 / 0.010)",
+   "result": "UNDETERMINED",
+   "value": "MASSIVE D +0.0049 [-0.0006, +0.0103] (net +24 / 4,946; bar 0.0376); CLINC D -0.0264 [-0.0333, -0.0192] (net -176 / 6,672; bar 0.0529): the refit HURTS on CLINC (interval below 0); READING NOT-SHOWN",
+   "denominator": "EVAL MASSIVE 4,946 / 4,923; CLINC 6,672 / 6,672; DEFF 1.052 (FITSET-FAITHFUL, tree-arm)"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "D +0.005 [-0.005, +0.020] per corpus; FI1 HELD on >= 1 corpus 0.25",
+   "result": "FAILED",
+   "value": "MASSIVE +0.0049 HELD; CLINC -0.0264 outside [-0.005, +0.020]; HELD-on-any did not occur (Brier 0.0625)",
+   "denominator": "EVAL MASSIVE 4,946 / 4,923; CLINC 6,672 / 6,672; DEFF 1.052 (FITSET-FAITHFUL, tree-arm)"
+  },
+  {
+   "id": "P2",
+   "text": "discordance 0.03 [0.01, 0.08]",
+   "result": "FAILED",
+   "value": "MASSIVE 0.0376 HELD; CLINC 0.0929 > 0.08",
+   "denominator": "EVAL MASSIVE 4,946 / 4,923; CLINC 6,672 / 6,672; DEFF 1.052 (FITSET-FAITHFUL, tree-arm)"
+  }
+ ],
+ "falsifier": {
+  "text": "F-FI fires iff FI1 NOT-SHOWN on both corpora: the stage-0 gain is not shown beyond MMLU-Pro.",
+  "fired": true
+ },
+ "numbers_of_record": {
+  "MASSIVE": "D +0.0049 [-0.0006, +0.0103]; net +24 / 4,946; spread_K 0.0376",
+  "CLINC": "D -0.0264 [-0.0333, -0.0192]; net -176 / 6,672; spread_K 0.0529 (Work -0.1159, Auto And Commute -0.0939)",
+  "bars": "HELD needed 186 net items, REVERSED 353; bars 2.5x / 5.3x planning"
+ },
+ "sentence_of_record": "NOT-SHOWN; F-FI fires. On known-answer intent corpora the class-pure leaf-mean refit does not reproduce FITSET-FAITHFUL's stage-0 gain: flat within noise on MASSIVE, and worse than as built on CLINC. FITSET-FAITHFUL's sentence keeps 'mostly MMLU-Pro' as a scope limit, and adds: 'on CLINC (C-AN) the same refit lowers fine filing (interval below 0)'. [\"Re-estimating the leaf MEANS of S1's anchored trees M-AN (82 leaves) and C-AN (131 leaves) on the TRAIN items of each anchor's declared coarse class; leaves and topology fixed; one draw; qwen3 512\". Anchored trees only, with ADDED TRAIN-label use. Never \"label-free\"; never \"a construction with declared fit sets\". FI1 CLINC UNDETERMINED under the registered bar, but the refit HURTS: D -0.0264, 95% [-0.0333, -0.0192] (net -176 / 6,672 items), interval wholly below 0. It is not REVERSED only because |D| is below the k-means seed spread 0.0529.]",
+ "chips": [
+  "REGISTERED 2026-10-03, BEFORE ANY CODE; not built",
+  "VALID (POST-RUN 06f03005): FI1 UNDETERMINED x2; NOT-SHOWN; F-FI FIRES",
+  "CLINC REFIT HURTS (&minus;0.0264, INTERVAL BELOW 0; WORK, AUTO AND COMMUTE); BARS = k-MEANS SPREAD 0.038 / 0.053; MMLU-PRO-SPECIFIC"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-03",
+   "by": "registrar (pre-data)",
+   "text": "B-1 aggregate identity from S1's printed D_fd / D1 / delta_c (s1_items.csv has 0 AN rows); B-2 four confounds (incl. k-means-spread bar and DEFF transported from MMLU-Pro); B-3 two empty C-AN leaves keep original means, every anchor split. Brackets L23892, L23894."
+  },
+  {
+   "date": "2026-10-03",
+   "by": "registrar (POSTRUN 06f03005)",
+   "text": "outcome recorded; FITSET-FAITHFUL scope bracketed (L23823); memo v2 #8' narrowed. docs/judge_v2_program.md L24001-L24009 (section \"## FITSET-INTENT (2026-10-03, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent b8f7cbee)"
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (consistency check 2026-10-04; zero calls)",
+   "text": "the 'chips' list had drifted from the ledger row's chips (wording or replaced chips); the chips of record are the ledger's, copied verbatim into 'chips_ledger_verbatim' (ledger v379); 'chips' is kept as history."
+  }
+ ],
+ "does_not_show": [
+  "a construction with declared fit sets (S1 unauthorised)",
+  "anchor-free trees",
+  "parity",
+  "MMLU-Pro"
+ ],
+ "ledger": {
+  "row_id": "FITSET-INTENT",
+  "version": "v368 (2026-10-03: OUTCOME bracket, OK + WARN chips) | v362 (2026-10-03: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "FITSET-FAITHFUL",
+  "INTENT-TRANSFER-S1"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "minutes",
+  "agent_hours": "about 1.5 h",
+  "reads_pool": false
+ },
+ "outputs": "never committed: pinned by sha256, backed up to E:",
+ "sources": [
+  "docs/judge_v2_program.md L23888-L23899 (_as_of the commit that writes it, parent 2cb20cca, re-grepped)",
+  "docs/agents/plans/2026-10-03_15h_schedule.md"
+ ],
+ "last_update": "2026-10-04",
+ "chips_ledger_verbatim": [
+  "plan: REGISTERED 2026-10-03, BEFORE ANY CODE; not built",
+  "ok: VALID (POST-RUN 06f03005): FI1 UNDETERMINED x2; NOT-SHOWN; F-FI FIRES",
+  "warn: CLINC REFIT HURTS (−0.0264, INTERVAL BELOW 0); BARS = k-MEANS SPREAD 0.038 / 0.053; MMLU-PRO-SPECIFIC"
+ ],
+ "plain_description": {
+  "sq": "SQ3 Taxonomy",
+  "what": "Takes trees on intent-classification datasets with known answers (MASSIVE and CLINC) whose top levels follow the declared classes. It re-estimates each leaf's centre using only training items of the matching declared class, keeps the tree shape fixed, and measures fine-level filing accuracy. No calls.",
+  "why": "An earlier refit (FITSET-FAITHFUL) improved filing on MMLU-Pro. This checks whether that gain carries beyond MMLU-Pro.",
+  "information": "A gain here would make the refit a general improvement. No gain limits it to MMLU-Pro. Result: not shown. The refit is flat within noise on MASSIVE and makes filing worse on CLINC. The earlier gain keeps the limit \"mostly MMLU-Pro\". This applies to label-anchored trees only, one draw, and the refit itself uses training labels, so it is not label-free.",
+  "written": "2026-10-07"
+ }
+}

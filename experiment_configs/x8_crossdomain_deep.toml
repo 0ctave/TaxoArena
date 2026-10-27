@@ -1,0 +1,98 @@
+# CROSS-DOMAIN 8-MODEL ARENA — one Bradley-Terry scale over every domain at once.
+#
+# WHY THIS RUN EXISTS (2026-08-08). The settled r8 batch runs one domain per config, so each
+# domain gets its own BT fit on its own scale and no comparison is ever made between a
+# mathematics cell and a psychology cell. Between-cell heterogeneity measured WITHIN a domain
+# is indistinguishable from its shuffled null (Cochran's Q/df 0.44 observed against 0.40
+# shuffled, median I-squared 0.00, 104 pairs).
+#
+# But the model x domain interaction is large and already present in THIS roster. Screening
+# every candidate's ground-truth accuracy against an additive model + model effect + domain
+# effect:
+#
+#   arx_0314          math +0.90   psychology -0.59   (spread 1.49 logits)
+#   Llama-2-7b-hf     law  +0.53   math       -0.71   (spread 1.24)
+#   gpt-4o-2024-08-06 math +0.45   engineering-0.22   (spread 0.67)
+#   Qwen1.5-72B-Chat  history +0.24 physics   -0.37   (spread 0.61)
+#
+# The roster's mean spread is 0.76 logits against 0.67 across all 47 candidates, so it is
+# ABOVE average on profile diversity. A 1.49-logit swing is roughly 4x the ~0.4 the
+# heterogeneity test can detect. The structure is there; the per-domain run design factors it
+# out. This run puts every cell on one scale so the interaction can land in a single fit.
+#
+# PREDICTION, registered here before the run: Cochran's Q/df across cells rises well above its
+# shuffled null for pairs involving arx_0314 and Llama-2-7b-hf, driven by mathematics cells
+# against law and psychology cells. If Q/df stays near the null with all 87 cells on one
+# scale, the interaction is not recoverable by this arena at this evidence depth and
+# task-conditional routing has no measured basis in this roster.
+#
+# MAIN ONLY. C5 exists to contrast the cell-scoped rubric against a generic one, which is a
+# different question and doubles the judge spend. Nothing here needs it.
+#
+# NOT REGISTERED as a thesis result. Exploratory; the settled batch stands as published.
+#
+# ── OUTCOME (2026-08-10, run of 2026-08-08: 4,186 verdicts, 8,372 judge calls) ──
+#
+# The registered test did NOT confirm the prediction. Per-pair Q/df for the named
+# pairs: median 0.84 against a shuffled null of 0.76 (0.72 vs 0.73 at cell-min n=3),
+# no named pair below p_emp 0.05; the only two significant pairs of 21 are unnamed,
+# about what alpha=0.05 hands out by chance. All four registered directional
+# contrasts have the CORRECT sign (arx_0314 math over law+psych +8.8pp z=+1.79;
+# Llama-2-7b law over math +7.9pp z=+1.52; sign test 4/4, p=0.0625 one-sided) but
+# none reach significance. Script: tools/analysis/crossdomain_pair_qdf.py.
+#
+# POST-HOC (devised after the null result; cannot rescue the registration): pooling
+# all 4,186 verdicts into one likelihood-ratio test -- additive BT against
+# per-group BT over Math / Law+Psychology / other -- gives LRT 19.24 against a
+# within-pair permutation null of median 2.51, p95 9.68: p_perm = 0.003. The two
+# registered models carry the two largest named-direction swings (arx_0314 +0.50
+# logits toward math, Llama-2-7b-hf +0.59 toward law+psych; the ground-truth screen
+# predicted ~1.5 and ~1.2, so the arena recovers the direction at a third to a half
+# of the screened magnitude). Script: tools/analysis/crossdomain_interaction_lrt.py.
+#
+# READING. The interaction is present and recoverable from arena verdicts, but not
+# by the per-pair route this registration named: placement stopping retires
+# lopsided pairs the moment their ORDER is pinned, and the interaction lives in
+# those pairs' per-cell margins, which the rule deliberately declines to fund (the
+# Llama-2-7b pairs ended with 2-5 usable cells of 87). A confirmatory run should
+# pre-register the pooled LRT as the primary test.
+#
+datasetType   = "MMLU_PRO"
+models        = [
+    "gemini-3.1-pro_5-shots",
+    "arx_0314",
+    "gpt-4o-2024-08-06",
+    "Meta-Llama-3_1-70B-Instruct",
+    "Qwen1.5-72B-Chat",
+    "Meta-Llama-3_1-8B",
+    "Yi-6b-Chat",
+    "Llama-2-7b-hf"
+]
+snapshotId    = "20260727_042523_Headless_Run_Auto_ge"
+# category deliberately ABSENT: the whole reserved pool routes, across every domain's cells.
+queryLimit    = 0
+outputDir     = "experiment_results/x8_crossdomain_deep"
+testRatio     = 0.3
+seed          = 42
+
+runPipeline        = false
+regenerateSplit    = false   # load-bearing: use the canonical reserved pool as-is
+runBenchmark       = true
+runTrickle         = false
+runBaselines       = false
+enableFinalMetrics = false
+enableLabeling     = false   # rubrics already in the snapshot
+judgeInduction     = false
+
+conditions         = ["MAIN"]
+questionsPerRound  = 250
+confidenceGate     = 0.0
+parallelism        = 4
+reservedOnly       = true
+
+dagMode = "DAG_MAX"
+maxDepth              = 8
+minClusterSize        = 55
+proposalSeparationBar = 0.025
+
+judgeOptionMode = "RESOLVED"

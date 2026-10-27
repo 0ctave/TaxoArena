@@ -1,0 +1,42 @@
+STAGE 1c UNION ROOT ROUTING — rule "sourceGate" (experiment_configs/multicorpus/union_s42_sourcegate.toml), 2026-09-11, zero LLM calls
+Same graft as stage 1b: the six per-corpus snapshots (BBH 20260911_135229, MATH 20260911_140810, MUSR 20260911_141022,
+IFEVAL 20260911_141054, GPQA 20260911_140945, MMLU_PRO_LB 20260911_135112) under a union root — 6 corpus roots, 239 nodes,
+143 leaves, root vMF on 15,226 region embeddings (kappa 339.2, shrinkage 0.8370); union pool paeec37aa28063c75 (6,482 ids,
+52 domains) recorded and activated on multicorpus_cache_v1.db ([POOL-PIN]). Nothing was rebuilt and no node was refitted;
+the assembly is re-run only because the union mode saves its own snapshot (20260911_144214_Union_graft_of_6_cor). Wall 77 s.
+
+Rule. `unionRootRouting = "sourceGate"` replaces the union ROOT step only: the corpus is picked first, by the nearest
+per-corpus ROOT direction (each per-corpus tree's own root vMF, grafted unchanged, cosine on its own slice width), and
+the PRODUCTION descent then runs inside that corpus tree. Source accuracy below is the gate's own pick, reported
+independently of whether the in-corpus descent then reaches a leaf (0 did not). Held-out embeddings come from the cache
+(0 misses). Single-corpus construction and routing are untouched.
+
+Held-out routing on the union (6,482 queries, 0 unrouted):
+  standard Top-1 (routed leaf's dominant training domain == designed (source, domain) key): 72.05% [70.94, 73.12]
+  per source (validation/MAIN_union_routing.csv; source = the gate's corpus pick == true source,
+  domain = routed depth-2 anchor == designed domain):
+    source        n   top1    source  domain
+    BBH        1728  91.03%  91.03%  91.03%
+    GPQA        358  87.99%  88.27%  87.99%
+    IFEVAL      162  90.74%  90.74%  90.74%
+    MATH        398  65.58%  94.97%  65.58%
+    MMLU_PRO_LB 3609  59.49%  78.05%  58.55%
+    MUSR        227 100.00% 100.00% 100.00%
+    ALL        6482  72.05%  84.20%  71.52%
+  source flow (validation/MAIN_union_source_flow.csv), true source -> gated corpus root:
+    MMLU_PRO_LB -> GPQA 323, MATH 250, BBH 118, IFEVAL 97, MUSR 4 (2,817 of 3,609 stay);
+    BBH -> IFEVAL 87, MMLU_PRO_LB 50, MATH 18; GPQA -> MMLU_PRO_LB 32, MATH 8, BBH 2;
+    MATH -> BBH 10, MMLU_PRO_LB 10; IFEVAL -> MMLU_PRO_LB 7, BBH 6, MATH 2; MUSR 227/227 stay.
+
+Paired against the "descent" baseline on the same 6,482 queries (validation/MAIN_union_routing_queries.csv):
+  Top-1   -0.03pp  (3 gains, 5 losses, McNemar p = 0.72)
+  source  -0.02pp  (5 gains, 6 losses, McNemar p = 1.00)
+  domain  -0.02pp  (4 gains, 5 losses, McNemar p = 1.00)
+
+Reading. sourceGate is a NULL: it changes 8 of 6,482 verdicts and none of the per-source rates by more than 0.2pp. The
+reason is structural — the production descent's first step from the union root is already, in effect, an argmax over the
+six corpus-root directions, so hard-gating on the same directions reproduces it. Its source flow is the stage-1b flow
+question for question (MMLU-Pro -> GPQA 323 vs 324, -> MATH 250 vs 251), which confirms that the 22% of MMLU-Pro
+questions the union gives away are lost at the ROOT DIRECTIONS, not at the beam width or the descent gate: a per-corpus
+root vMF fitted on a whole corpus is simply too coarse to separate MMLU-Pro from its neighbours, whatever rule reads it.
+That is the negative result that makes flatLeaf the fix: the discriminative information lives in the leaf centroids.

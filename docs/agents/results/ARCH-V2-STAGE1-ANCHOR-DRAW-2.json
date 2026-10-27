@@ -1,0 +1,118 @@
+{
+  "id": "ARCH-V2-STAGE1-ANCHOR-DRAW-2",
+  "title": "ARCH-V2: the stage-1 anchor RE-DRAW on the ARCH-V2-SPLIT-DRAW-2 supply (7 of the 14 MMLU-Pro anchors, stratified by size, design.choose_strata)",
+  "question": "Which 7 of the 14 MMLU-Pro anchors form stage 1 (and contain the pilot's 2), drawn once on the split of record 5a3e756 under a newly registered seed",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "5b89159 (the R4 record of ARCH-V2-SPLIT-DRAW-2; the seed carries the full sha of e2623b4)",
+    "program_lines": "docs/judge_v2_program.md L16193-L16200 (paragraph \"THE STAGE-1 ANCHOR RE-DRAW, REGISTERED NOW BEFORE ANY CODE TOUCHES IT\")",
+    "program_lines_as_of": "the commit that writes this record",
+    "date": "2026-09-24",
+    "rule": "unchanged from the arena-specialist's ruling 53eccb6 (docs/judge_v2_program.md L15985-L15994)"
+  },
+  "script": {
+    "path": "tools/analysis/archv2_stage1_anchor_draw.py (with tools/analysis/archv2_pilot/stage1.py, common.py; archv2_arena/design.py choose_strata, streams.py)",
+    "sha16": "archv2_stage1_anchor_draw.py blob:90cf17a7f17d4be32fda000ad95474957039be9b / sha256-lf16:e0474092c8708940; archv2_pilot package_lf16 61eea0337e9ec8bc; frozen instrument_lf16 876d01413318bd7b; stage1.py blob:cfae76b06fb74919ee7b10b9dbad94817403a787 / sha256-lf16:1e81e58fc7dfc4bb; common.py blob:467d0efb4bc13b386f655a7980b830a78f44280f / sha256-lf16:e7dc47adc40fb081; design.py blob:4959cb525c8d07a26d19358c3f98342d5b28b3d2 / sha256-lf16:becd63768eedb8fc; streams.py blob:30c23f9700a1309cda059c76bfe6fcbc6c41d64b / sha256-lf16:315a30993d340650",
+    "commit": "91ea66e (main; merged by path from 4450dfd, 12 of 12 blobs equal)"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_archv2_stage1_draw_2.md",
+    "commit": "a254a1d",
+    "at": "4450dfd (on main as 91ea66e)",
+    "review_blob": "blob:89f57892155908f9c2d4995af3d8de4fbcc34cf4 / sha256-lf16:853af7303bd5830a",
+    "verdict": "READY; no blocker, no HIGH; MEDIUM-1 (the stage-1 JSON pin kind: sha256-lf plus blob); LOW-1..5"
+  },
+  "go": "n/a (0 calls); drawing authorises no stage-1 call (stage 1 needs the author's go)",
+  "run": {
+    "outcome_file": "experiment_results/archv2/stage1_anchor_draw_2/archv2_stage1_anchors_2.json",
+    "outcome_commit": "e4f0658",
+    "calls": 0,
+    "cce": 0,
+    "pool": "pv2_41dbd3dbcd399df0 (mmlu-pro-v2; 3,400 EVAL components / 3,492 EVAL items)",
+    "date": "2026-09-24",
+    "dry_run": "experiment_results/archv2/stage1_anchor_draw_2/archv2_stage1_anchors_2_dryrun.txt (6a88c9f, before the draw; blob:b8c374227e61636502f38da0f22e7af1523d1fff / sha256-lf 07eb0a36d41112328559cac9100e308dc8f46702c9d60c4d8e1c6dc66aa504cd)",
+    "transcript": "experiment_results/archv2/stage1_anchor_draw_2/archv2_stage1_anchors_2_run.txt (e4f0658; blob:8e78a66f64a287550918b8a29c57208dc7f1957d / sha256-lf 5a14b3e59bfa81190a40646c56b9ce1672b6480943fe481b315d008cb43e0d8d)",
+    "exit": "0 (relayed by the coordinator)"
+  },
+  "review": {
+    "file": "docs/reviews/READY_archv2_stage1_draw_2.md",
+    "commit": "a254a1d",
+    "verdict": "the post-draw check of the READY (step 4) MET: the 7 anchors, counts_digest, seed and streams_digest equal the reviewer's independent prediction made before the draw; no separate post-draw review filed (the registration requires none)"
+  },
+  "criteria": [
+    {
+      "id": "POST-DRAW",
+      "text": "the 7 anchors equal the READY's predicted 7 and counts_digest is 08bc48d1... (READY step 4)",
+      "result": "HELD",
+      "value": "anchors chemistry, computer science, economics, health, math, other, philosophy; counts_digest 08bc48d1a27b896074549128fbcf639b81da3addd9a85e893dbefe20d7cd8a4f",
+      "denominator": "14 anchors, 3,492 EVAL items of pv2_41dbd3dbcd399df0"
+    },
+    {
+      "id": "ONCE",
+      "text": "drawn once with the registered master; dry-run transcript committed before the record run; runner pinned in the output",
+      "result": "HELD",
+      "value": "dry-run 6a88c9f before record e4f0658; runner block = READY pins",
+      "denominator": "1 record draw"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none registered (a draw); a mismatch with the READY's independent prediction would have voided the record draw",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "anchors": "chemistry, computer science, economics, health, math, other, philosophy (7 of 14; experiment_results/archv2/stage1_anchor_draw_2/archv2_stage1_anchors_2.json)",
+    "seed": "4030866750177695589 (stream stage1-anchors, master ARCHV2-STAGE1-ANCHORS-2:e2623b4b69e664a9f222abc8b1121dc19d92cceb, numpy PCG64)",
+    "counts_digest": "08bc48d1a27b896074549128fbcf639b81da3addd9a85e893dbefe20d7cd8a4f (14 anchors, 3,492 EVAL items)",
+    "streams_digest": "359096bcbe6c74b0f9be31941a94365614517de9e9302eb362df66dcdd9db082",
+    "counts": "math 405, physics 387, chemistry 346, law 289, engineering 288, other 277, economics 250, psychology 239, business 234, health 204, biology 189, philosophy 148, computer science 128, history 108 (EVAL items; judgeable identical; sum 3,492)",
+    "groups_and_picks": "[math, physics] -> math; [chemistry, law] -> chemistry; [engineering, other] -> other; [economics, psychology] -> economics; [business, health] -> health; [biology, philosophy] -> philosophy; [computer science, history] -> computer science",
+    "output_json": "experiment_results/archv2/stage1_anchor_draw_2/archv2_stage1_anchors_2.json blob:7b7a41d8d7b285b663eba3fbf4ba2d8bb38c883c / sha256-lf 777e2f6a4cd8ee0d1ce92659f8c3ad4f72a45319d166135dd918575d0ace5e43 (sha256-crlf16:3a0764c64beb3cba; working tree LF, 0 CR)",
+    "eval_view": "e35b7518878205837bfd16266dfdd8a6e76a226ed67957796d1d33cb72b5e369 (sha256-bytes; unchanged in sha, size and mtime after the draw, relayed)"
+  },
+  "sentence_of_record": "ARCH-V2-STAGE1-ANCHOR-DRAW-2 (2026-09-24, 0 calls; draw e4f0658): the 7 stage-1 anchors of record are chemistry, computer science, economics, health, math, other, philosophy, drawn once with the registered master ARCHV2-STAGE1-ANCHORS-2:e2623b4b... (seed 4030866750177695589) from pool pv2_41dbd3dbcd399df0 (3,492 EVAL items, 14 anchors), equal to the READY reviewer's independent pre-draw prediction [supersedes draw 1 (1463759) for forward use; both draws disclosed; no stage-1 call authorised]",
+  "chips": [],
+  "brackets": [
+    {
+      "date": "2026-09-24",
+      "by": "registrar (record draw e4f0658; READY a254a1d)",
+      "text": "RAN ONCE; post-draw check MET; supersedes draw 1 (1463759) for forward use; MEDIUM-1 pin kind recorded as sha256-lf plus blob. docs/judge_v2_program.md L16223-L16233."
+    }
+  ],
+  "does_not_show": [
+    "anything about the pilot or stage 1 beyond which 7 anchors they use",
+    "no separate post-draw adversarial review was filed (draw 1 had the light review 2706184); the check of record is the READY's independent pre-draw prediction",
+    "pilot.py's STAGE1_RECORD_SHA256 is not yet pinned; MEDIUM-1 (raw-bytes hashing under core.autocrlf) is owed by the engine-coder before that pin"
+  ],
+  "ledger": {
+    "row_id": null,
+    "version": "v247 (version note only; no section-7 row, as for draw 1 at v239)"
+  },
+  "depends_on": [
+    "ARCH-V2-SPLIT-DRAW-2",
+    "ARCH-V2-STAGE1-ANCHOR-DRAW"
+  ],
+  "supersedes": "ARCH-V2-STAGE1-ANCHOR-DRAW (draw 1463759; for forward use only; it stays of record for what ran on it)",
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing"
+  },
+  "support": "N/A: a registered draw; no estimate",
+  "sources": [
+    "docs/judge_v2_program.md L16223-L16233 (section \"## ARCH-V2-STAGE1-ANCHOR-DRAW-2 (2026-09-24, 0 calls; draw e4f0658) — RAN ONCE ...\")",
+    "docs/judge_v2_program.md L16193-L16200 (the registration)",
+    "experiment_results/archv2/stage1_anchor_draw_2/archv2_stage1_anchors_2.json (e4f0658)",
+    "experiment_results/archv2/stage1_anchor_draw_2/archv2_stage1_anchors_2_run.txt (e4f0658)",
+    "docs/reviews/READY_archv2_stage1_draw_2.md (a254a1d)"
+  ],
+  "last_update": "2026-09-24 (registrar: RAN ONCE e4f0658 recorded; docs/judge_v2_program.md L16223-L16233)",
+  "plain_description": {
+    "sq": "Engineering/infrastructure",
+    "what": "A one-time random draw with no model calls. Using a pre-registered seed, it picked which 7 of the 14 MMLU-Pro subject areas form stage 1 of the new (v2) architecture, stratified by size. It was redone on the new data split.",
+    "why": "It fixes the stage-1 subjects in advance and at random, so that later results cannot come from choosing subjects after seeing the data.",
+    "information": "It produces a fixed, auditable list of subjects. A mismatch with the reviewer's independent prediction would have voided the draw. Result: done. The subjects are chemistry, computer science, economics, health, math, other and philosophy. They match the reviewer's prediction. This draw replaces the first draw for future use. It says nothing about stage-1 results.",
+    "written": "2026-10-07"
+  }
+}

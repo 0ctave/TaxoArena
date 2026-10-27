@@ -1,0 +1,143 @@
+{
+  "id": "FRONTIER-FIT",
+  "title": "FRONTIER-FIT: FRAMEWORK item 5: can a widener fitted on the frontier edges alone reach a readable calibration status, and is the frontier band BANDED by rule? (zero calls)",
+  "question": "Widener fit on the 75 frontier-internal per-anchor edges (26 wrong; 53 established / 13 wrong), in sample, LOAO, raw and shipped, plus the off-frontier cold fit; the pooled x12 tier object (6 frontier pairs); the composed KEYED rule on the 75 per-anchor cells.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "eaf1dbf",
+    "program_lines": "docs/judge_v2_program.md L3603-L3611 (by reference; docs/design/FRAMEWORK.md L358 item 5); the Block 1 record bullet at L3707",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-15 (before any run) — BY REFERENCE: the 26 tests in docs/design/FRAMEWORK.md \"Tests to register before shipping\" (commit 8d77f7b), with the criteria, predictions and call counts stated there, scheduled in docs/plan_2026-09-15.md",
+    "outcome_heading": [
+      "L3662: ## Block 1 record (2026-09-15/16, zero calls) — FRAMEWORK items 1-12, 14-16: fourteen zero-call tests built, each adversarially checked; verdicts of record below (checker's number wins where it refutes the builder)",
+      "L3707: - **FRONTIER-FIT (2026-09-15, zero calls): criterion FAIL by arithmetic, status UNDETERMINED, prediction 1 holds by construction; prediction 2 \"BANDED by rule confirmed\" is PARTLY: confirmed on the pooled tier object, a fiat override on the per-anchor cells.**"
+    ],
+    "date": "2026-09-15"
+  },
+  "script": {
+    "path": "tools/analysis/frontier_fit.py",
+    "sha16": "1e3a0ecd21005b73",
+    "commit": "7076615"
+  },
+  "ready": null,
+  "go": "n/a (0 calls; Block 1)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/frontier_fit.txt",
+    "outcome_commit": "7076615",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (pool_guard.assert_pool_of_record() first; union pool paeec37aa28063c75 by explicit id where used)",
+    "date": "2026-09-15/16"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); each Block 1 test was 'adversarially checked' at build time and the checker's number wins where it refutes the builder (Block 1 record header L3662-L3663); the checker-confirmed defects are listed in the bullet",
+    "commit": "7076615",
+    "verdict": ""
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "nominal >= 3 on the frontier fit at 0.975",
+      "result": "FAILED",
+      "value": "frontier fit in sample 0 called / nominal 0.000; LOAO 1 / 0(0) / 0.016; raw 31 / 5(2) / 0.187 (26.8x); shipped 4 / 0(0); off-frontier cold 12 / 2(1) / 0.063 (record row reproduced); ceiling 0.025 x 75 = 1.875 under any fit: unreachable (CONFIRMED)",
+      "denominator": "75 frontier-internal per-anchor edges / 26 wrong"
+    },
+    {
+      "id": "(2)",
+      "text": "b1 identified (established profile > 3.84)",
+      "result": "FAILED",
+      "value": "established 53: b0 -0.7550 / b1 +0.1354, delta-dev 0.002; all-label 0.386; profile sets [-9.8, 8.5] / [-8.7, 12.4] contain 0; anchor bootstrap P(b1 <= 0) 0.25, corr(b0, b1) -0.999",
+      "denominator": "53 established / 13 wrong"
+    },
+    {
+      "id": "status",
+      "text": "status word by the power rule",
+      "result": "UNDETERMINED",
+      "value": "max nominal at any threshold 0.90-0.975 is the raw 1.16; the frontier fit's own max 0.231",
+      "denominator": "75 edges"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "UNDETERMINED",
+      "result": "HELD",
+      "value": "holds on the Stage 6 definition (called-set nominal), by arithmetic",
+      "denominator": "75 edges"
+    },
+    {
+      "id": "P2",
+      "text": "frontier band BANDED by rule confirmed",
+      "result": "FAILED",
+      "value": "PARTLY (checker; builder PASS): pooled x12 tier object CONFIRMED (0 of 6 frontier pairs under shipped or frontier widener; raw separates 4 incl. key-contradicted arx > iask 144:99, p 0.0047); per-anchor 75 under the composed KEYED rule: shipped widener + decline ORDERS 4 frontier-internal edges (Law arx > gemini 0.9969, Law gemini > gpt-4o 0.9935, Engineering gemini > gpt-4o 0.9830, Engineering gpt-4o > iask 0.9930, all right-direction), so BANDED holds there by fiat override and 'confirmed' is vacuous (no calibrated fit can exist on 75 edges)",
+      "denominator": "6 pooled frontier pairs; 75 per-anchor cells"
+    }
+  ],
+  "falsifier": {
+    "text": "none beyond the criteria (registered by reference)",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "frontier_fit": "in sample 0 called / nominal 0.000; LOAO 1 / 0(0) / 0.016; raw 31 / 5(2) / 0.187 (26.8x); shipped 4 / 0(0); off-frontier cold 12 / 2(1) / 0.063; ceiling 1.875",
+    "identification": "established 53: b0 -0.7550 / b1 +0.1354, delta-dev 0.002; all-label 0.386; profile sets contain 0; P(b1 <= 0) 0.25; corr(b0, b1) -0.999",
+    "off_frontier_cold_on_frontier": "detectably under-budgeted: 14.08 nominal vs 26 wrong (1.85x, P 0.003)",
+    "per_anchor_composed_rule": "shipped widener + decline orders 4 frontier-internal edges (all right-direction); frontier-fit LOAO 1; off-frontier cold 10 (1 KEY-CONTRADICTED); raw + decline 25 (2 KEY-CONTRADICTED)",
+    "corrections": "13 (not 7) of the 22 unestablished edges are wrong-labelled; the anchor-bootstrap upper limit +74.9 is a ridge-tail artefact (fresh seed +16.5)"
+  },
+  "sentence_of_record": "FRONTIER-FIT (2026-09-15, zero calls): criterion FAIL by arithmetic (the frontier fit calls 0 in sample; the nominal ceiling on 75 edges is 1.875 under any fit), b1 not identified (delta-dev 0.002; profile sets contain 0), status UNDETERMINED; prediction 1 holds by construction; prediction 2 'BANDED by rule confirmed' is PARTLY: confirmed on the pooled tier object (0 of 6 frontier pairs), a fiat override on the per-anchor cells, where MMLU-Pro cells are keyed (ORDERED-KEY needs no status) and the framework's own composed rule orders 4 frontier-internal edges under the shipped fit. The off-frontier cold fit is detectably under-budgeted on the frontier (14.08 nominal vs 26 wrong, P 0.003).",
+  "chips": [
+    "CRITERION FAIL BY ARITHMETIC",
+    "STATUS UNDETERMINED",
+    "PREDICTION 2 PARTLY (checker; builder PASS)"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-23",
+      "by": "the registrar (insertion only, zero calls; on the coordinator's relay of the systematic_budget re-review 73f2dc2)",
+      "text": "This test's status_word (tools/analysis/frontier_fit.py L157-L164) is a KNOWN DIVERGENT implementation of FRAMEWORK L101's rule: it emits 'DETECTABLY MISCALIBRATED' instead of 'MISCALIBRATED' and decides with p < 0.05, so P = 0.05 exactly lands on the opposite side from L101's 'NOT DETECTABLY iff P > 0.05'. No recorded verdict moves: all 26 status words in frontier_fit.txt are 'UNDETERMINED (nominal < 3)'. Queue item STATUS-WORD-UNIFY (engineering) routes it through calibration_status.py with a byte-inertness proof; code not changed."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a readable calibration status on the frontier (unreachable on 75 edges)",
+    "that 'BANDED by rule' is a finding on the per-anchor cells (a fiat override)"
+  ],
+  "ledger": {
+    "row_id": "FRONTIER-FIT",
+    "version": "v103 (684be03); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "FRONTIER",
+    "SYSTEMATIC-BUDGET",
+    "TIER-HONEST",
+    "KEY-TIE-DECLINE"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "the frontier order (CONTEXT.md section 5: FRONTIER, AGGREGATE, ORACLE); FRONTIER-FIT is the rule-8 comparator NEWCOMER-PLACEMENT-LIVE and PLACEMENT-CEILING read"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L3603-L3611 (by-reference registration eaf1dbf) and docs/design/FRAMEWORK.md L358 item 5: criterion, prediction, call count",
+    "docs/judge_v2_program.md L3707 ff. (Block 1 record bullet, 7076615): the criterion table, predictions scored, checker-confirmed defects, script and output",
+    "experiment_results/x12_crossdomain/frontier_fit.txt (7076615)",
+    "docs/test_ledger.html row FRONTIER-FIT (v103 684be03): chips verbatim, design / criteria / observed cells, evidence",
+    "script sha16 = sha256 of tools/analysis/frontier_fit.py at 7076615 (its first commit), first 16 hex (identity, computed by the registrar 2026-09-22; later edited at 13f2142 for the pool_guard change)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' heading and the '- **ID (...)**' bullet line inside the Block 1 record, to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Tries to fit the 'widener' (a correction that inflates uncertainty so that separations between models are not over-called) using only the 75 per-cell comparisons among the top (frontier) models. It also checks whether the rule that keeps the frontier 'banded' (left unordered) holds. No judge calls.",
+    "why": "It checks whether the calibration of the separation certificate can be verified in the frontier region, where the judge is weakest.",
+    "information": "A readable calibration status would tell us whether frontier separations can be trusted. Result: done. The criterion fails by simple arithmetic: 75 comparisons are too few to ever reach a readable status, so the status is undetermined. 'Banded by rule' is confirmed on the pooled board (0 of 6 frontier pairs ordered), but on the per-cell edges it is only a manual override. A correction fitted away from the frontier detectably under-covers frontier errors. Older p2dca question family, later ruled 'history, not evidence'.",
+    "written": "2026-10-07"
+  }
+}

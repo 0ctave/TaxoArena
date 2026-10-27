@@ -1,0 +1,133 @@
+{
+  "id": "ARENA-V3-COMPILED",
+  "title": "ARENA-V3-COMPILED: the paper's board, rebuilt from the interventions that survived rather than from the RK-1b card (1,250 calls against 18,300 for the withdrawn ARENA-V3)",
+  "question": "Three boards on one judge (Mistral, the x12 MAIN judge): A = ARENA-V2 as published; B = + the answer-disagreement filter, ZERO new calls; C = + AGGREGATE's replicate tie-break on B's 625 ties; all statistics with bootstrap CIs, decisive-and-correct reported separately from correct-given-committed; (1) C beats A by >= 3pp on common decidable matches, p < 0.05; (2) rho >= 0.967 and <= 1 violation; (3) <= 70% of the unfiltered call count; (4) dual reporting.",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "15b1c77",
+    "program_lines": "docs/judge_v2_program.md L1943-L1993 (registration) and L1994-L2040 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-14 (before any call) — ARENA-V3-COMPILED: the paper's board from the interventions that actually survived",
+    "outcome_heading": [
+      "L1994: - **ARENA-V3-COMPILED OUTCOME (2026-09-14): the paper's board, for 1,250 calls instead of 18,300. Two criteria"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "tools/analysis/arena_v3_compiled.py",
+    "sha16": "87d351c7faabf92b (at e4c71cb)",
+    "commit": "e4c71cb"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (1,250 calls; replaces the 18,300-call ARENA-V3, withdrawn)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/arenav3_outcome.txt",
+    "outcome_commit": "e7fa044",
+    "calls": 1250,
+    "cce": "not stated",
+    "pool": "x12 MAIN (9,142 ARENA-V2 verdicts; B's 625 ties re-judged)",
+    "date": "2026-09-14"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); CI discipline applied in the outcome against the author's own result",
+    "commit": "e7fa044",
+    "verdict": "(1) FAIL (+2.2pp vs the +3pp bar); (2) (3) PASS; (4) PREDICTION HELD: the tie-break makes the judge DECIDE and the added decisions are below its average; 'the filter does not cost board quality and halves the bill'"
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "C beats A by >= 3pp on common decidable matches, p < 0.05",
+      "result": "FAILED",
+      "value": "C 0.868 vs A 0.846 on the same 4,106 decidable matches, +2.2pp against +3pp, discordance 0:92 (C can only differ where A abstained), McNemar p = 4.0e-28",
+      "denominator": "4,106 common decidable matches"
+    },
+    {
+      "id": "(2)",
+      "text": "rho >= 0.967 and <= 1 violation",
+      "result": "HELD",
+      "value": "B rho 0.9860 [0.972, 0.986], 1 violation; C the same board; A 0.9720 [0.958, 0.986], 2 violations; A's and B's CIs overlap heavily, so the honest claim is 'does not cost board quality', not 'improves'",
+      "denominator": "12-model board"
+    },
+    {
+      "id": "(3)",
+      "text": "<= 70% of the unfiltered call count",
+      "result": "HELD",
+      "value": "B 10,552 calls with no new spend; C 11,802 (65%) vs A's 18,284",
+      "denominator": "call counts"
+    },
+    {
+      "id": "(4)",
+      "text": "dual reporting",
+      "result": "HELD",
+      "value": "decisive-and-correct 0.852 -> 0.868 while correct-given-committed FALLS 0.918 -> 0.903: the tie-break makes the judge DECIDE, and the decisions it adds are below its average (AGGREGATE's 0.75-0.86 at board scale)",
+      "denominator": "4,106"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "correct-given-committed falls while decisive-and-correct rises",
+      "result": "HELD",
+      "value": "0.918 -> 0.903 / 0.852 -> 0.868",
+      "denominator": "4,106"
+    }
+  ],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "the cost result is solid; the quality result is directional; supersedes the withdrawn ARENA-V3 (RK-1b card rerun)"
+  },
+  "numbers_of_record": {
+    "boards": "A rho 0.9720 [0.958, 0.986], 2 viol., 18,284 calls; B 0.9860 [0.972, 0.986], 1 viol., 10,552; C same board, 11,802 (65%)",
+    "accuracy": "C 0.868 vs A 0.846 (+2.2pp; 0:92; p 4.0e-28)",
+    "dual": "decisive-and-correct 0.852 -> 0.868; correct-given-committed 0.918 -> 0.903"
+  },
+  "sentence_of_record": "ARENA-V3-COMPILED (2026-09-14, 1,250 calls): A rho 0.9720 [0.958, 0.986], 2 violations, 18,284 calls; B (+ answer-disagreement filter, zero new calls) 0.9860 [0.972, 0.986], 1 violation, 10,552 calls; C (+ replicate tie-break) the same board at 11,802 calls (65%); (1) FAILS on effect size: C 0.868 vs A 0.846 on the same 4,106 decidable matches, +2.2pp against a +3pp bar (0:92, p = 4.0e-28); (4) the registered prediction HELD and is the result: decisive-and-correct 0.852 -> 0.868 while correct-given-committed FALLS 0.918 -> 0.903, the tie-break makes the judge decide and its added decisions are below its average; CI discipline: A's and B's rho CIs overlap heavily, so the honest claim is 'the filter does not cost board quality and halves the bill', not 'the filter improves the board'.",
+  "chips": [
+    "(1) FAIL",
+    "(2)(3) PASS",
+    "(4) PREDICTION HELD"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a board-quality improvement from the filter (directional; CIs overlap)",
+    "a +3pp accuracy gain from the tie-break at board scale"
+  ],
+  "ledger": {
+    "row_id": "ARENA-V3-COMPILED",
+    "version": "v80 (e7fa044); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "ARENA-V2",
+    "ARENA-V3",
+    "MATCH-FILTER",
+    "AGGREGATE",
+    "FILTER-BOARD"
+  ],
+  "supersedes": "ARENA-V3",
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L1943-L2040 (15b1c77 / e7fa044)",
+    "experiment_results/x12_crossdomain/arenav3_outcome.txt (e7fa044)",
+    "docs/test_ledger.html row ARENA-V3-COMPILED (v80): chips verbatim, observed cell, evidence",
+    "script sha16 = sha256 of tools/analysis/arena_v3_compiled.py at e4c71cb (first commit), first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ4 Price",
+    "what": "Three versions of the model leaderboard, all built with the same judge. A is the published board. B adds a filter that skips matches where both models gave the same answer, at no new cost. C adds an extra re-judging step to break B's ties. The test compares ranking quality, judge accuracy and the number of judge calls.",
+    "why": "It asks whether the paper's leaderboard can be rebuilt more cheaply and more accurately from the changes that held up in earlier tests.",
+    "information": "It shows whether cheaper judging costs ranking quality, and whether tie-breaking actually helps the judge. Result: done. The filter cut judge calls from about 18,300 to about 10,550 with no loss in ranking quality. The honest claim is \"no cost, about half the bill\", not \"a better board\", because the confidence intervals overlap. The tie-break missed its target: +2.2 points of accuracy against a +3-point bar. It makes the judge commit to more matches, but the extra decisions are less accurate than its average. This belongs to the older question pool, which is now ruled history, not evidence.",
+    "written": "2026-10-07"
+  }
+}

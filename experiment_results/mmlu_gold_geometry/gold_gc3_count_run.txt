@@ -1,0 +1,56 @@
+== GC-3 read-only count 2026-10-01T08:21:53+02:00 main de018cf9; all DBs mode=ro&immutable=1; java 0; script:
+import sqlite3,json,sys,hashlib
+sys.path.insert(0,'tools/analysis'); import mmlu_gold_geometry as G
+W='Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/rp12-b0-run/'
+c=sqlite3.connect('file:'+W+'snapshots.db?mode=ro&immutable=1',uri=True)
+g=json.loads(c.execute("select graph from snapshots where id='20261001_070346_Headless_Run_Auto_ge'").fetchone()[0])
+ns=g['nodes'].values() if isinstance(g['nodes'],dict) else g['nodes']
+ids=set()
+for x in ns: ids.update(x['queryIds']); ids.update(x.get('residualQueries') or [])
+print('[GC-3] B0 MMLU_PRO_LB snapshot 20261001_070346_Headless_Run_Auto_ge: distinct node queryIds+residual', len(ids))
+import io,contextlib
+buf=io.StringIO()
+with contextlib.redirect_stdout(buf):
+    kept,L,sm=G.assemble(G.DB_FILE,G.EMB_FILE,G.SIDE_FILE,None)
+texts=[v['text'] for v in kept.values()]
+for lab,path in (('worktree',W+'embeddings_cache.db'),('main','Z:/FAC/TUBerlin/THESIS/TaxoArena/embeddings_cache.db')):
+    e=sqlite3.connect('file:'+path+'?mode=ro&immutable=1',uri=True)
+    dt={}
+    for i,t in e.execute('select id, distilled_text from queries'):
+        if i in ids: dt[i]=t
+    S=set(dt.values())
+    hit=sum(1 for t in texts if t in S)
+    print('[GC-3] %s embeddings_cache.db: root ids found %d of %d; kept items %d; kept text == a root-id distilled_text: %d; shortfall %d'%(lab,len(dt),len(ids),len(texts),hit,len(texts)-hit))
+-- output
+[GC-3] B0 MMLU_PRO_LB snapshot 20261001_070346_Headless_Run_Auto_ge: distinct node queryIds+residual 6993
+[GOLD-GEOM] REFUSED: no raw MMLU-Pro leaderboard sample file found
+rc=1
+
+== GC-3 rerun 2026-10-01T08:22:06+02:00 (first attempt refused inside assemble: raw_files None not globbed by assemble; no count made); script:
+import sqlite3,json,sys,hashlib
+sys.path.insert(0,'tools/analysis'); import mmlu_gold_geometry as G
+W='Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/rp12-b0-run/'
+c=sqlite3.connect('file:'+W+'snapshots.db?mode=ro&immutable=1',uri=True)
+g=json.loads(c.execute("select graph from snapshots where id='20261001_070346_Headless_Run_Auto_ge'").fetchone()[0])
+ns=g['nodes'].values() if isinstance(g['nodes'],dict) else g['nodes']
+ids=set()
+for x in ns: ids.update(x['queryIds']); ids.update(x.get('residualQueries') or [])
+print('[GC-3] B0 MMLU_PRO_LB snapshot 20261001_070346_Headless_Run_Auto_ge: distinct node queryIds+residual', len(ids))
+import io,contextlib
+buf=io.StringIO()
+with contextlib.redirect_stdout(buf):
+    import glob; kept,L,sm=G.assemble(G.DB_FILE,G.EMB_FILE,G.SIDE_FILE,sorted(glob.glob(G.RAW_GLOB))[:G.RAW_N])
+texts=[v['text'] for v in kept.values()]
+for lab,path in (('worktree',W+'embeddings_cache.db'),('main','Z:/FAC/TUBerlin/THESIS/TaxoArena/embeddings_cache.db')):
+    e=sqlite3.connect('file:'+path+'?mode=ro&immutable=1',uri=True)
+    dt={}
+    for i,t in e.execute('select id, distilled_text from queries'):
+        if i in ids: dt[i]=t
+    S=set(dt.values())
+    hit=sum(1 for t in texts if t in S)
+    print('[GC-3] %s embeddings_cache.db: root ids found %d of %d; kept items %d; kept text == a root-id distilled_text: %d; shortfall %d'%(lab,len(dt),len(ids),len(texts),hit,len(texts)-hit))
+-- output2
+[GC-3] B0 MMLU_PRO_LB snapshot 20261001_070346_Headless_Run_Auto_ge: distinct node queryIds+residual 6993
+[GC-3] worktree embeddings_cache.db: root ids found 6993 of 6993; kept items 6988; kept text == a root-id distilled_text: 6988; shortfall 0
+[GC-3] main embeddings_cache.db: root ids found 6993 of 6993; kept items 6988; kept text == a root-id distilled_text: 6988; shortfall 0
+rc=0

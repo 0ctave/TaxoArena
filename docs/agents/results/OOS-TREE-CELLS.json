@@ -1,0 +1,133 @@
+{
+ "id": "OOS-TREE-CELLS",
+ "title": "OOS-TREE-CELLS: do INTENT-S1's anchor-free tree cells (C-AF) detect CLINC oos_plus OOS as well as flat k-means at matched k (within 0.010 AUROC)? (zero calls; REGISTERED 2026-10-03)",
+ "question": "Is label-free abstention available from tree cells, not only flat cells?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "the commit that writes it (parent 2cb20cca)",
+  "program_lines": "docs/judge_v2_program.md L23875-L23886",
+  "program_lines_as_of": "the commit that writes them, parent 2cb20cca, re-grepped",
+  "date": "2026-10-03",
+  "heading": "## Registered 2026-10-03 (before any code or call) — OOS-TREE-CELLS: on CLINC150 (oos_plus OOS pool) and the same qwen3 256-d S0 vectors, do INTENT-TRANSFER-S1' ...",
+  "provenance": "docs/agents/plans/2026-10-03_15h_schedule.md (the orchestrator) under the autonomous-scheduling authorisation; criteria etc. the registrar's"
+ },
+ "script": {
+  "path": "tools/analysis/oos_tree_cells.py",
+  "sha16": "blob 74a5cbf0 (merged 665b817d from oos-tree-cells 515c9380)",
+  "commit": "665b817d"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_oos_tree_cells.md",
+  "commit": "665b817d"
+ },
+ "go": "autonomous-scheduling authorisation (zero calls, cheap)",
+ "run": {
+  "outcome_file": "experiment_results/oos_tree_cells/outcome.txt (sha256 dcec3bdf...) + oos_tree_scores.csv (fe8ebb9e...); never committed; backup E:/TaxoArena_backup_2026-10-03_oos_tree_cells (SHA256SUMS OK)",
+  "outcome_commit": "run from main 665b817d + 93f4c359; outcome untracked",
+  "calls": 0,
+  "cce": 0,
+  "pool": "none (S0 / S1 DBs read-only)",
+  "date": "2026-10-03"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_oos_tree_cells.md",
+  "commit": "b9b67b11",
+  "verdict": "VALID (W-1..W-6)"
+ },
+ "criteria": [
+  {
+   "id": "OT1",
+   "text": "Delta_T = A(C-AF cells) - mean_s A(k-means k = L); EQUIVALENT iff 90% interval inside +/-0.010 (INTERVAL decides); DIFFERENT iff |Delta| > 0.010 AND 95% excludes 0; NEITHER otherwise. Verdict line: SCOREABLE (seen single-seed point -0.0022; SE 0.0012)",
+   "result": "HELD",
+   "value": "EQUIVALENT within +/-0.010, and below: Delta_T -0.00516, 90% [-0.00715, -0.00316], 95% [-0.00754, -0.00278], SE 0.00121",
+   "denominator": "CLINC in-scope EVAL 6,672 + oos_plus OOS 1,350 (Kish 1.0000); paired stratified component bootstrap B 2,000"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "Delta_T -0.002 [-0.008, +0.004]; OT1 EQUIVALENT 0.80, NEITHER 0.18, DIFFERENT 0.02",
+   "result": "HELD",
+   "value": "-0.00516 in [-0.008, +0.004] (wide band; the seen -0.0022 was against K's lowest seed)",
+   "denominator": "CLINC in-scope EVAL 6,672 + oos_plus OOS 1,350 (Kish 1.0000); paired stratified component bootstrap B 2,000"
+  },
+  {
+   "id": "P2",
+   "text": "A(C-AN) 0.965 [0.950, 0.975] (descriptive)",
+   "result": "HELD",
+   "value": "A(C-AN) 0.96826 in [0.950, 0.975]",
+   "denominator": "CLINC in-scope EVAL 6,672 + oos_plus OOS 1,350 (Kish 1.0000); paired stratified component bootstrap B 2,000"
+  }
+ ],
+ "falsifier": {
+  "text": "F-OT fires iff OT1 KMEANS-BETTER: abstention stays a flat-partition property ('flat cells only').",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "OT1": "Delta_T -0.00516, 90% [-0.00715, -0.00316], 95% [-0.00754, -0.00278], SE 0.00121 (A(T) 0.96776)",
+  "C-AN": "0.96826 (descriptive; 512 slice, anchored)",
+  "peers": "T - kNN(k10) +0.0059 [+0.0039, +0.0078]; T - marginal Mahalanobis +0.040; kNN k1 0.97707",
+  "labelled": "T - (a) -0.0086; T - (b) -0.0060; T - S0 K150 -0.0070",
+  "FPR95": "T 0.205, K_0 0.199, S0 0.158"
+ },
+ "sentence_of_record": "EQUIVALENT within +/-0.010 AUROC, and below: label-free C-AF tree cells (139 leaves) detect out-of-scope queries 0.0052 AUROC below flat spherical k-means at matched k (Delta_T -0.00516, 90% [-0.00715, -0.00316]; the 95% interval [-0.00754, -0.00278] excludes 0) (CLINC oos_plus, qwen3 256 RAW, one draw, 5 k-means seeds)",
+ "chips": [
+  "REGISTERED 2026-10-03, BEFORE ANY CODE; not built",
+  "VALID (POST-RUN b9b67b11): OT1 EQUIVALENT WITHIN 0.010; F-OT NOT FIRED",
+  "AND BELOW k-MEANS (&minus;0.0052, 95% EXCLUDES 0); NEVER &ldquo;EQUAL&rdquo; / &ldquo;AS GOOD AS&rdquo;; kNN k=1 CAVEAT; LABELLED / K-150 ASYMMETRIC; C-AN DESCRIPTIVE"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-03",
+   "by": "registrar (pre-data)",
+   "text": "OT-R2 identity (T-C6 0.96776 / 0.96999; OOS-BASELINES digits) refuses otherwise; OT-R3 registered SE 0.0012 verdict line governs, measured SE beside; OT-R5 C-AN at its 512 slice, descriptive only; OT-R1, OT-R4 record lines. Brackets L23879, L23881, L23882."
+  },
+  {
+   "date": "2026-10-03",
+   "by": "registrar (POSTRUN b9b67b11)",
+   "text": "outcome recorded; memo v2 change 8 upgraded; ONLINE-REPLAY-LOMO / ESCALATION-RC read under OT1 EQUIVALENT. docs/judge_v2_program.md L23975-L23987 (section \"## OOS-TREE-CELLS (2026-10-03, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent 964511fd)"
+  }
+ ],
+ "does_not_show": [
+  "OOS on real traffic or other corpora / embedders",
+  "MMLU-Pro or capability text",
+  "anchored cells as label-free",
+  "parity outside +/-0.010"
+ ],
+ "ledger": {
+  "row_id": "OOS-TREE-CELLS",
+  "version": "v365 (2026-10-03: OUTCOME bracket, OK + WARN chips) | v362 (2026-10-03: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "OOS-BASELINES",
+  "INTENT-TRANSFER-S1"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "minutes",
+  "agent_hours": "about 1.5 h",
+  "reads_pool": false
+ },
+ "outputs": "never committed: pinned by sha256, backed up to E:",
+ "sources": [
+  "docs/judge_v2_program.md L23875-L23886 (_as_of the commit that writes it, parent 2cb20cca, re-grepped)",
+  "docs/agents/plans/2026-10-03_15h_schedule.md"
+ ],
+ "last_update": "2026-10-03",
+ "plain_description": {
+  "sq": "SQ2 Trust",
+  "what": "On the CLINC intent dataset, uses the anchor-free tree's cells (139 leaves, built without labels) to flag out-of-scope queries. It compares this with flat k-means using the same number of clusters.",
+  "why": "It asks whether the tree can support abstention (saying \"this question is outside what we cover\") as well as flat clusters can.",
+  "information": "If equivalent, the tree can be used for both routing and abstention. Result: done. The two are equivalent within the ±0.01 margin. Tree cells are very slightly worse (about 0.005 lower detection score, a difference that is statistically real but tiny). One dataset, one embedder, one draw.",
+  "written": "2026-10-07"
+ }
+}

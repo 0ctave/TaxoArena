@@ -1,0 +1,176 @@
+{
+  "id": "REF-QUALITY-MONITOR",
+  "title": "REF-QUALITY-MONITOR: is per-cell reference-correct rate the continual per-cell quality signal? with DIFFICULTY-PROXY-WIDENER as the secondary leg, registered expecting UNDETERMINED (zero calls; plan A4)",
+  "question": "Across the boards of record, is the per-(anchor, cache) reference-correct rate on keyed audit mass a sufficient per-cell statistic for the judge's key-decidable accuracy, so that a continual pipeline can MONITOR each cell's quality from the reference alone? Secondary: does the key-free plurality-agreement proxy predict wrong(established) edges as a second covariate in the widener, LOAO, at matched utility? The monitor MONITORS; it never gates.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "62c4084",
+    "program_lines": "docs/judge_v2_program.md L5524-L5586; pre-run note L5594 (1534a4a): files of record, ref_correct read from the caches' column, the proxy P an anchor-level covariate, the x12 cache opened read-write by systematic_budget.build with bytes verified unchanged, KOTLIN ref_correct joined by match_id [re-lined 2026-09-22: batch-1 lines were read at 9c1f37b-era HEAD and shifted by +2 by later insertions]",
+    "program_lines_as_of": "6aa2a0d",
+    "heading": "## Registered 2026-09-17 (before any code or call) — REF-QUALITY-MONITOR: is per-cell reference-correct rate the continual per-cell quality signal? with DIFFICULTY-PROXY-WIDENER as the secondary leg, registered expecting UNDETERMINED (zero calls; plan A4; lens docs/agents/leads/2026-09-17_judge_continual.md Lead 2, 2026-09-17_arena_profile.md L9)",
+    "outcome_heading": [
+      "L5679: ## REF-QUALITY-MONITOR (2026-09-18, zero judge calls) — C1 HELD on paper (56-cell Spearman +0.857 [+0.646, +0.899]; every per-cache 14-cell reading >= 0.8) but "
+    ],
+    "date": "2026-09-17"
+  },
+  "script": {
+    "path": "tools/analysis/ref_quality_monitor.py",
+    "sha16": "23c4518a62777b64",
+    "commit": "866812d"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/ref_quality_monitor_outcome.txt",
+    "outcome_commit": "f5e447b",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-18",
+    "other_files": [
+      "experiment_results/x12_crossdomain/ref_quality_monitor_cells.csv (56 rows, f5e447b)",
+      "experiment_results/x12_crossdomain/difficulty_proxy_widener.txt (f5e447b)"
+    ]
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-18_profile_batch1.md section REF-QUALITY-MONITOR",
+    "commit": "46f44e8",
+    "verdict": "numbers CONFIRMED; the registration's '14 + x20's 14 independent reference readings' REFUTED (14 readings, one vintage; honest 14-cell +0.837, 28-cell +0.887, C1 holds on both); D1 HIGH C1 is an accounting identity (A = ref x 0.93 + (1 - ref) x 0.34, residual -0.09); D2 HIGH the monitor cannot move between judge draws (a reference-vintage / difficulty monitor, not a judge-quality monitor); D3 the -0.357 within-reference-correct correlation is a selection effect"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "Spearman(reference-correct rate, accuracy A) across the 14 x 4 cells >= 0.8 (interval printed; per-cache 14-cell values each scored against 0.8)",
+      "result": "HELD",
+      "value": "+0.857 [+0.646, +0.899] (56 cells); per cache X12 +0.824, GROK-CALIB +0.859, KOTLIN +0.807, X20 +0.965; convention B +0.864; the checker's honest 14-cell +0.837 and 28-cell +0.887: HELD AS AN IDENTITY (D1): A = ref x A|ok + (1 - ref) x A|wrong with A|ok ~0.93 and A|wrong ~0.34 nearly constant; the mechanical prediction has Spearman +0.857 with A to 3 dp",
+      "denominator": "56 cells = 14 anchors x 4 caches (kd n 124-675); question bootstrap within anchor B = 300; 14 reference readings (one vintage), four judge draws"
+    },
+    {
+      "id": "C2",
+      "text": "(secondary, DIFFICULTY-PROXY-WIDENER) the proxy covariate: established wrong calls at matched utility not above the A-only widener under LOAO, AND b2 identified (delta-deviance >= 3.84); registered expecting UNDETERMINED",
+      "result": "UNDETERMINED",
+      "value": "A + P fit b2 -1.9828, delta-deviance of b2 = 0: 0.74 vs 3.84 -> NOT identified; profile interval of b2 [-6.5, +5.0]; LOAO A + P 675 of 920 called (utility 73.4%), wrong 7 (established 4), nominal 1.04; A-only at matched utility 675 / 5 (3) / 1.07; every status UNDETERMINED (nominal < 3); power at b2 = -1.983: 0.145 (mean events 27.8)",
+      "denominator": "x12 MAIN edges 920 unfiltered / 891 filtered, 809 established, 26 wrong-direction established events"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "(plan) C1 HELD (>= 0.8); the judge lens's finer 0.85-0.95 recorded as the lens's",
+      "result": "HELD",
+      "value": "+0.857 with the identity qualification; the lens's band: +0.857 inside on the 56-cell reading, +0.837 below it on the honest 14-cell reading",
+      "denominator": "56 / 14 cells"
+    },
+    {
+      "id": "P2",
+      "text": "(plan) C2 UNDETERMINED (26-40 events)",
+      "result": "HELD",
+      "value": "26 events, UNDETERMINED",
+      "denominator": "809 established edges"
+    },
+    {
+      "id": "P3",
+      "text": "(registrar's blind addition) accuracy A within reference-correct varies less than half as much across cells as accuracy A overall (range ratio < 0.5)",
+      "result": "HELD",
+      "value": "0.418 (0.103 vs 0.245) on the number; the ratio rests partly on the selection effect of D3",
+      "denominator": "56 cells"
+    }
+  ],
+  "falsifier": {
+    "text": "C1 Spearman < 0.5 on the 56-cell reading AND on the per-cache 14-cell readings: overturns the claim that per-cell reference-correct rate is the continual per-cell quality signal; the pipeline has no key-free per-cell quality statistic until one is registered",
+    "fired": false,
+    "note": "not triggered on any reading; what it would have overturned is instead re-read by the checker: the number holds and the sentence does not (D1-D2)"
+  },
+  "numbers_of_record": {
+    "run": "2026-09-18 ~00:45, 80 s; caches X12 9,142 (2,811 q; ref graded 9,123), GROK-CALIB 9,142 (11 INVALID + 1 reclassified), KOTLIN 9,123 (17 INVALID; ref_correct joined from X12 9,123 / 9,123), X20 12,394 (2,646 q; 124 pairs, 0 shared with x12); reference-less 19 / 19 / 0 / 19 excluded; OPTIONS-key join 2,688 1:1 / 3 multi / 120 none; ref_correct vs (ref_letter == gt) disagree on 5 questions (21 matches; 30 in X20), used as is",
+    "C1_spearman": "56-cell +0.857 [+0.646, +0.899]; per cache +0.824 [+0.648, +0.943] / +0.859 [+0.495, +0.925] / +0.807 [+0.556, +0.934] / +0.965 [+0.560, +0.952]; convention B +0.864 [+0.675, +0.905] (+0.877 / +0.820 / +0.811 / +0.895); honest 14-cell +0.837; 28-cell +0.887",
+    "reference_rate_range": "x12 / GROK-CALIB / KOTLIN vintage 0.672 (History) .. 0.954 (Math); X20 schedule 0.748 (Philosophy) .. 0.974 (Business); X12 == GROK-CALIB == KOTLIN exactly on 14 / 14 anchors; X20 identical (ref_correct, ref_letter) on all 2,646 shared questions",
+    "identity": "A_pred = 0.932 ref + 0.340 (1 - ref): Spearman +0.857 with A; residual Spearman(ref, A - A_pred) = -0.094",
+    "residual": "A within reference-correct ranges 0.103 (0.873-0.976) vs 0.245 overall (0.684-0.929), ratio 0.418; Spearman(ref rate, A within ref-correct) -0.357 [-0.556, -0.014] (per cache -0.086 / -0.398 / -0.565 / -0.288): a selection effect (D3); per anchor across the 4 caches 0.775-0.816 on 12 anchors, Math 0.258, Philosophy -0.775",
+    "proxy_leg": "P mean 0.629, range 0.487-0.776, between-anchor SD 0.0814 vs within-anchor 0.0077 (~14 effective values); Spearman(A, P) over established +0.432; A-only b0 -2.6463, b1 +2.1430, nll 61.843; A + P b0 -1.4087, b1 +2.2221, b2 -1.9828, nll 61.472; delta-deviance 0.74; LOAO A + P 675 / 7 (4) / 1.04; A-only matched (t = 0.9759) 675 / 5 (3) / 1.07; A-only at 0.975 676 / 5 (3) / 1.09; power 0.145"
+  },
+  "sentence_of_record": "REF-QUALITY-MONITOR: C1 HELD on paper (56-cell +0.857; honest 14-cell +0.837, one reference vintage replicated across four judge draws; x20 carries the identical reference on all 2,646 shared questions), but the correlation is the identity A = ref * 0.93 + (1 - ref) * 0.34 (residual -0.09), i.e. CONSENSUS-FIT restated. The reference-correct rate is a per-cell DIFFICULTY / REFERENCE-VINTAGE monitor that needs the key and is constant across judge draws; it says nothing about the judge between vintages. The -0.357 within-reference-correct correlation is a selection effect. Proxy leg UNDETERMINED (26 events, b2 not identified). No Stage-9 'per-cell judge quality monitor' is licensed.",
+  "chips": [
+    "C1 HELD (IDENTITY)",
+    "14 REFERENCE READINGS, NOT 56",
+    "MONITORS THE VINTAGE / DIFFICULTY, NOT THE JUDGE",
+    "KEY-DERIVED",
+    "PROXY LEG UNDETERMINED (26 EVENTS)"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-18",
+      "by": "REVIEW, pre-run note (programme L5592, 1534a4a)",
+      "text": "(i) files of record ref_quality_monitor_outcome.txt + _cells.csv + difficulty_proxy_widener.txt; (ii) reference-correct rate read from the caches' ref_correct column (the kit's grade), disagreeing with ref_letter == gt on 5 questions, printed as hygiene; (iii) the proxy P is the mean plurality share over the ANCHOR's judged questions (within-anchor SD 0.0078 vs between-anchor 0.081: an anchor-level term competing with b0 across 14 cells); UNDETERMINED if b2 is not identified or nominal < 3; (iv) systematic_budget.build opens the x12 cache read-write, bytes and mtime verified unchanged; (v) KOTLIN ref_correct joined by match_id 9,123 / 9,123; a write-once guard added before --run."
+    },
+    {
+      "date": "2026-09-18",
+      "by": "the adversarial reviewer (docs/reviews/2026-09-18_profile_batch1.md, 46f44e8), recorded in the outcome section as the reading of record; consequence for FRAMEWORK Stage 9",
+      "text": "the registration's '14 + x20's 14 independent reference readings' is refuted (14 readings, one vintage); C1 is an accounting identity; the reference-correct rate on keyed audit mass may be read each epoch as the per-cell REFERENCE / DIFFICULTY monitor beside the canary and arm B; no 'per-cell judge quality monitor' is licensed."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "CORRECTIONS_2026-09-23 (registrar)",
+      "text": "[CORRECTED 2026-09-23 by the registrar (line pointer only, zero calls; no number, no criterion and no sentence moves): registration.program_lines names docs/judge_v2_program.md L5524, and that was exact when it was written. After commit cd83eac inserted four one-line correction brackets mid-file (hunks @@ -3911,0 / -6535,0 / -6692,0 / -6949,0 @@), the heading of record \"## Registered 2026-09-17 (before any code or call) — REF-QUALITY-MONITOR: is per-cell reference-correct rate the continual per-cell quality  ...\" stands at L5525, +1; the whole span shifts by the same +1. Verified at HEAD by sed -n '5525p' docs/judge_v2_program.md. The map for every such pointer is the programme's \"## Line-shift map, appended 2026-09-23\" section: +0 up to old L3911, +1 to L6535, +2 to L6692, +3 to L6949, +4 below. The recorded span is left standing beside this bracket, not rewritten.]"
+    },
+    {
+      "date": "2026-09-23",
+      "by": "INCONSISTENCIES-PASS (registrar, zero calls; insertion only)",
+      "text": "NAME 2026-09-23 by INCONSISTENCIES-PASS (registrar, zero calls; insertion only): the registration wrote ref_quality_monitor.txt; the file of record is experiment_results/x12_crossdomain/ref_quality_monitor_outcome.txt (tracked), with ref_quality_monitor_cells.csv and difficulty_proxy_widener.txt, fixed before the run by the [NOTE 2026-09-18 by REVIEW (pre-run, REF-QUALITY-MONITOR)], 1534a4a. [ledger: evidence cell of row REF-QUALITY-MONITOR, v132]"
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a per-cell statistic of the JUDGE that moves between draws or vintages",
+    "a key-free monitor (the reference rate needs the key)",
+    "a widener gain from P (b2 not identified at 26 events; power 0.145)",
+    "anything about gating (ABSTAIN, REF-CONF, J2-D closed)",
+    "reference accuracy as an inference-time signal (SYSTEMATIC-BUDGET correction (a) stands)",
+    "that a second reference vintage would move the monitor in the direction of judge accuracy (untested; one vintage)"
+  ],
+  "ledger": {
+    "row_id": "REF-QUALITY-MONITOR",
+    "version": "v113 [v132 2026-09-23: INCONSISTENCIES-PASS insertion in this row]; [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "TOPIC-DIFFICULTY",
+    "SYSTEMATIC-SIGNAL",
+    "SYSTEMATIC-BUDGET",
+    "UNFILTERED-ADOPT",
+    "DECOMP",
+    "CONSENSUS-FIT",
+    "REF-CONF",
+    "ABSTAIN",
+    "J2-D",
+    "DESIGN-PROBES",
+    "GROK-CALIB",
+    "JUDGE-WIRING-BOARD",
+    "KTD-CHECK"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L5522-L5584 (registration 62c4084) and the pre-run note L5592 (1534a4a): question, hygiene, instruments, criteria, predictions, falsifier",
+    "docs/judge_v2_program.md L5677-L5754 (outcome section, f5e447b): every number, the refuted denominator, criteria and predictions scored, defects D1-D4, does-not-show, the sentence of record",
+    "docs/reviews/2026-09-18_profile_batch1.md section REF-QUALITY-MONITOR (46f44e8): CONFIRMED status, the refutation, D1-D3, chips",
+    "experiment_results/x12_crossdomain/ref_quality_monitor_outcome.txt, _cells.csv, difficulty_proxy_widener.txt (f5e447b)",
+    "docs/test_ledger.html row REF-QUALITY-MONITOR (v113): chips verbatim, evidence (62c4084, 1534a4a, f5e447b)",
+    "script sha16 = sha256 of tools/analysis/ref_quality_monitor.py at 866812d, first 16 hex (identity, computed by the registrar 2026-09-20)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' lines to grep -n regardless of line drift; line numbers re-lined 2026-09-22 as of programme HEAD 6aa2a0d (shift +2 from the batch-1 reading)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Tests whether the rate at which the reference answer is correct in each cell can serve as an ongoing per-cell judge-quality signal. A secondary check covers a difficulty-proxy widener. No calls.",
+    "why": "It asks whether there is a cheap per-cell monitor of judge quality.",
+    "information": "A strong link would license a per-cell quality monitor. Result: the correlation held on paper (+0.84), but it is just an identity: the judge agrees when the reference is right. So it monitors difficulty and the reference, not the judge, and it needs the answer key. The secondary check is undetermined. No per-cell judge monitor is licensed. A later ruling classes this run's judged data as history.",
+    "written": "2026-10-07"
+  }
+}

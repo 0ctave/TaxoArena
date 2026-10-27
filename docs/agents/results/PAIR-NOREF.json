@@ -1,0 +1,135 @@
+{
+  "id": "PAIR-NOREF",
+  "title": "PAIR-NOREF: does FORMAT-REF's displacement finding hold in the PAIRWISE format the arena actually deploys? (1,882 calls)",
+  "question": "R3's 944 key-decidable matches, dual order, grok-4-1-fast-non-reasoning, v2 mechanics, clean anchor rubric, byte-identical to stack_v2_promptv2_grok.db except the reference block is removed and the verify sentence swapped exactly as pointwise_judge.py does it; (1) PRIMARY delta KEY < 0 with a CI excluding zero replicates displacement; (2) delta REF; (3) the clean pairwise reference effect on accuracy; (4) tie rate; predictions delta KEY -0.3 to -0.8, delta REF +1.2 to +2.0, accuracy +6 to +10pp, ties +3-8pp; if delta KEY is not negative the lead claim narrows to 'a reference displaces the judge's reasoning when it grades, and merely outweighs it when it compares'.",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "e144feb",
+    "program_lines": "docs/judge_v2_program.md L1876-L1907 (registration) and L1908-L1942 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-14 (before any call) — PAIR-NOREF: does the displacement finding hold in the format we actually deploy?",
+    "outcome_heading": [
+      "L1908: - **PAIR-NOREF OUTCOME (2026-09-14): DISPLACEMENT DOES NOT REPLICATE in the deployed format. The lead claim"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "tools/analysis/pair_noref.py",
+    "sha16": "b26a75e18a7055e1 (at 1ee0f5c)",
+    "commit": "1ee0f5c"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (1,882 calls; 1,888 registered)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/pairnoref_outcome.txt",
+    "outcome_commit": "2c4b944",
+    "calls": 1882,
+    "cce": "not stated",
+    "pool": "R3's 944 key-decidable matches",
+    "date": "2026-09-14"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/)",
+    "commit": "2c4b944",
+    "verdict": "(1) NOT REPLICATED; CLAIM NARROWED AS REGISTERED; (3) the clean pairwise reference effect +12.6pp supersedes the +11.8pp"
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "delta KEY < 0 with a CI excluding zero",
+      "result": "FAILED",
+      "value": "delta KEY -0.022 [-0.240, +0.191]: removing the reference leaves correctness-weighting untouched, and the CI EXCLUDES the pointwise -0.560, so the formats genuinely differ; the claim narrows to the wording fixed before the run",
+      "denominator": "944 paired"
+    },
+    {
+      "id": "(2)",
+      "text": "delta REF",
+      "result": "DELIVERED",
+      "value": "-1.596 [-1.904, -1.388]: pairwise gains +1.60 of reference-following without giving up any correctness-weighting",
+      "denominator": "944"
+    },
+    {
+      "id": "(3)",
+      "text": "the clean pairwise reference effect on accuracy",
+      "result": "DELIVERED",
+      "value": "+12.6pp in the deployed configuration (0.864 vs 0.738, 144:25, p = 1.6e-21), superseding the +11.8pp whose comparator was a v1-prompt cell-rubric cache; decomposition: on committed verdicts only 0.929 vs 0.897, so 74% of the reference's apparent accuracy value is the judge abstaining less, 26% is discrimination",
+      "denominator": "944"
+    },
+    {
+      "id": "(4)",
+      "text": "tie rate",
+      "result": "DELIVERED",
+      "value": "0.070 -> 0.177 without the reference",
+      "denominator": "944"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "delta KEY -0.3 to -0.8; delta REF +1.2 to +2.0; accuracy +6 to +10pp; ties +3-8pp",
+      "result": "FAILED",
+      "value": "delta KEY -0.022 (not negative); |delta REF| 1.60 HELD; accuracy +12.6 (above the band); ties +10.7pp (above)",
+      "denominator": "944"
+    }
+  ],
+  "falsifier": {
+    "text": "if delta KEY is not negative the displacement finding is pointwise-only and the lead claim narrows",
+    "fired": true,
+    "note": "the claim narrows as registered: a reference displaces the judge's own assessment when it GRADES and merely outweighs it when it COMPARES; with RK-1b (~86% abstention) and AGGREGATE (+8.0pp from abstention alone), three independent demonstrations that on a benchmark scoring ties as errors most measured 'accuracy' is the rate at which the judge commits"
+  },
+  "numbers_of_record": {
+    "delta_KEY": "-0.022 [-0.240, +0.191] (pointwise -0.560 excluded)",
+    "delta_REF": "-1.596 [-1.904, -1.388]",
+    "reference_effect": "+12.6pp (0.864 vs 0.738, 144:25, p 1.6e-21); committed-only 0.929 vs 0.897 (74% abstention / 26% discrimination)",
+    "ties": "0.070 -> 0.177"
+  },
+  "sentence_of_record": "PAIR-NOREF (2026-09-14, 1,882 calls): DISPLACEMENT DOES NOT REPLICATE in the deployed format: delta KEY -0.022 [-0.240, +0.191], the CI excluding the pointwise -0.560, so the formats genuinely differ; the claim narrows to the wording fixed before the run: a reference displaces the judge's own assessment when it GRADES and merely outweighs it when it COMPARES (pairwise gains +1.60 of reference-following, delta REF -1.596 [-1.904, -1.388], without giving up correctness-weighting); (3) the clean number the programme lacked: the reference is worth +12.6pp in the deployed configuration (0.864 vs 0.738, 144:25, p = 1.6e-21), superseding the +11.8pp; (4) ties 0.070 -> 0.177; on committed verdicts only 0.929 vs 0.897, so 74% of the reference's apparent accuracy value is the judge abstaining less.",
+  "chips": [
+    "(1) NOT REPLICATED",
+    "CLAIM NARROWED AS REGISTERED"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "displacement in the pairwise format",
+    "a reference effect that is mostly discrimination (74% is abstention)"
+  ],
+  "ledger": {
+    "row_id": "PAIR-NOREF",
+    "version": "v78 (2c4b944); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "FORMAT-REF",
+    "CONSENSUS-FIT",
+    "POINTWISE",
+    "J2-R",
+    "RECIPE-GROK",
+    "AGGREGATE",
+    "RK-1b"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L1876-L1942 (e144feb / 2c4b944)",
+    "experiment_results/x12_crossdomain/pairnoref_outcome.txt (2c4b944)",
+    "docs/test_ledger.html row PAIR-NOREF (v78): chips verbatim, observed cell, evidence",
+    "script sha16 = sha256 of tools/analysis/pair_noref.py at 1ee0f5c (first commit), first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Re-judges 944 head-to-head matches in both orders with the reference answer removed from the judge prompt, everything else identical, and compares with the version that has the reference.",
+    "why": "An earlier finding was that a reference makes the judge stop thinking for itself when grading single answers; this checks it in the head-to-head format the arena actually uses.",
+    "information": "It shows whether that 'displacement' carries over to comparisons and how much the reference is worth. Result: done; displacement does NOT replicate in head-to-head format (the reference outweighs rather than replaces the judge's own reasoning); the reference adds +12.6 points of accuracy, but about 74% of that comes from the judge declaring fewer ties. On the older p2dca question family, later ruled 'history, not evidence'.",
+    "written": "2026-10-07"
+  }
+}

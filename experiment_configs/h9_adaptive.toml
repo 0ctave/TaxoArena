@@ -1,0 +1,124 @@
+# H9 ADAPTIVE-BAR TREE — registered EXPLORATION (2026-09-07, committed before launch).
+#
+# The within-node null band varies per anchor (p95 0.029-0.075, re-derived on the
+# frozen artifact at d72bcd6), so no single bar can be honest everywhere. This run
+# gates every split AND every fusion at its anchor's own within-node p95
+# (experiment_configs/adaptive_bars_p95.json), via taxonomy.operations.barFor —
+# the first construction whose every accepted split clears the honest null BY
+# CONSTRUCTION. Identical to freeze_mcs55 otherwise (seed 42; labeling/judging/
+# final metrics off).
+#
+# FROZEN EXPECTATIONS (descriptive; deviations reported as-is):
+# - leaf count lands well below 87 (the H9 global-bar sweep collapsed to 19-20 at
+#   flat 0.045; per-anchor bars are gentler where nulls are low, so expect ~30-55);
+# - structure concentrates in the anchors whose splits already cleared their null
+#   (Chemistry, Biology, Engineering, Math, Business);
+# - held-out Top-1 within or near the 20-seed floor (0.750-0.776);
+# - zero cycle-detector fires (create/destroy read the same per-anchor bar).
+# STATUS: exploration for a possible v2 instrument; NOT a replacement for the
+# frozen artifact; per-anchor bars are not captured in the snapshot's
+# EffectiveConfig provenance (disclosed limitation of this exploration).
+#
+# ── AMENDMENT (2026-09-08, from the v2 design review) ── the "structure
+# concentrates where nulls are tight" reading above is PARTLY A GREEDY-SEARCH
+# ARTIFACT, not purely a statistical truth: the frozen Chemistry depth-1 split
+# (sep 0.0968) clears Chemistry's honest p95 at q=0.000, yet the adaptive run
+# gating IN-LOOP at that same p95 left Chemistry unsplit — raising the in-loop
+# bar makes the greedy wander to a different object rather than selecting the
+# certified subset of the good tree. Lesson for v2: certify by POST-HOC scoring
+# and pruning of a permissively built tree, never by in-loop gating
+# (docs/v2_construction_proposals.md, P2 and DON'T list).
+#
+# ── QUANTILE CURVE (2026-09-08, p90/p50 arms, both certified fixed points) ──
+# bar quantile  leaves  depth  heldout Top-1   mu-match vs frozen
+#   p95            35     4       0.742            30/87
+#   p90            45     4       0.737            41/87
+#   p50            70     4       0.755            63/87   <- back INSIDE the
+#                                                             20-seed floor
+#   (frozen 0.025)  87     6       0.775            —
+# READING: texture-aware p50 bars recover 80% of the frozen granularity and
+# floor-level routing while every split still clears at least the MEDIAN of its
+# anchor's honest null — the defensible sweet spot between the fully-certified
+# 35-leaf tree and the functional frozen 87. The granularity-vs-certification
+# trade is now a measured curve, not a choice of rhetoric.
+#
+# ── OUTCOME (2026-09-08, run completed, certified J-stationary at iteration 9) ──
+# 49 nodes / 35 leaves / depth 4; held-out Top-1 0.742 (0.8pp BELOW the 20-seed
+# floor minimum 0.750 — reported as-is; consistent with the flat-bar arms' small
+# real routing cost); anchor drift 0.09pp; zero cycle-detector fires (the
+# per-anchor create/destroy consistency holds).
+#
+# EXPECTATION PARTIALLY WRONG, in an informative direction: structure did NOT
+# concentrate in the big-separation anchors (Chemistry, Biology, Business are
+# UNSPLIT) but in the TIGHT-NULL anchors: Physics 7 sub-leaves, Other 5, Math 4,
+# CS 4, Economics 3, Psychology 3, Engineering 2. Under per-anchor honest nulls,
+# certification is signal RELATIVE to the anchor's own texture — Chemistry's
+# large absolute separations are matched by an equally heavy texture null
+# (p95 0.066) and a fresh greedy build could not certify any split there, while
+# Physics' tight null (p95 0.036) certifies modest separations. The certified
+# taxonomy is a different OBJECT, not a subset of the frozen one (mu-match 30/87).
+#
+# READING: an honest-null-certified tree exists (35 leaves, every split cleared
+# by construction), costs ~3pp routing accuracy, and reshapes WHERE granularity
+# lives. Whether its rubrics judge better than the frozen tree's is an open
+# question for the ladder methodology; the frozen instrument stands.
+#
+datasetType   = "MMLU_PRO"
+
+models        = [
+    "gpt-4o-2024-08-06",
+    "claude-3-5-sonnet-20241022",
+    "gemini-1.5-pro-002",
+    "deepseek-chat-v2_5",
+    "Meta-Llama-3_1-70B-Instruct",
+    "Qwen1.5-72B-Chat",
+    "gpt-4o-mini",
+    "claude-3-5-haiku-20241022",
+    "Mixtral-8x7B-Instruct-v0.1",
+    "c4ai-command-r-v01",
+    "Qwen1.5-14B-Chat",
+    "Meta-Llama-3_1-8B-Instruct",
+    "gemini-1.5-flash-002",
+    "Llama-2-70b-hf",
+    "Llama-2-13b-hf"
+]
+
+category      = ""
+queryLimit    = 0
+outputDir     = "experiment_results/h9_adaptive"
+testRatio     = 0.3
+seed          = 42
+
+runPipeline        = true
+runBenchmark       = false
+runTrickle         = true
+runBaselines       = false
+enableFinalMetrics = false
+enableLabeling     = false
+judgeInduction     = false
+
+dagMode = "DAG_MAX"
+
+maxDepth              = 8
+minClusterSize        = 55
+proposalSeparationBar = 0.025
+tau                   = 1e-6
+acceptanceZ           = 2.0
+enableRefitGate       = false
+
+membershipFloor       = 0.25
+routingBeamGamma      = 0.2
+descentMargin         = 0.12
+
+effectiveSupportFloor = 2.0
+defaultKappaPrior     = 10.0
+
+numIterations         = 50
+maxLeafAssignments    = 5
+
+fusionSimilarityThreshold = 0.90
+enableGtWarmStart         = false
+
+enableProfiling           = true
+
+adaptiveBarFile = "experiment_configs/adaptive_bars_p95.json"

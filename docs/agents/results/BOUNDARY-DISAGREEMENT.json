@@ -1,0 +1,177 @@
+{
+  "id": "BOUNDARY-DISAGREEMENT",
+  "title": "BOUNDARY-DISAGREEMENT: is judge disagreement concentrated at the tree's cell boundaries? (zero judge calls; the MULTI-OWNERSHIP mechanism test)",
+  "question": "The author's MULTI-OWNERSHIP idea (dual-cell judging of questions near a cell boundary) presumes a mechanism: that a judged question with a low routing margin on bareq512_s42 is where the judge cannot decide (more ties, more order flips, more INVALID, more wrong(established) verdicts, a less stable model order). Is it? If absent the line closes at zero calls; if present the bill is stated (Q1 = 562 questions / 4,513 merged matches) and no arm is launched without its own registration.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "7073c97",
+    "program_lines": "docs/judge_v2_program.md L4939-L5021 (the script existed and its --dry-run had passed at registration; no outcome computed) [re-lined 2026-09-22: batch-1 lines were read at 9c1f37b-era HEAD and shifted by +2 by later insertions]",
+    "program_lines_as_of": "6aa2a0d",
+    "heading": "## Registered 2026-09-17 (before running; the script exists, its --dry-run passed, no outcome computed) — BOUNDARY-DISAGREEMENT: is judge disagreement concentrated at the tree's cell boundaries? (zero judge calls; the MULTI-OWNERSHIP mechanism test)",
+    "outcome_heading": [
+      "L5229: ## BOUNDARY-DISAGREEMENT (2026-09-17, zero judge calls) — on the merged board the lowest-margin quintile carries no excess of ties (-0.2pp) or flips (+0.4pp) an"
+    ],
+    "date": "2026-09-17"
+  },
+  "script": {
+    "path": "tools/analysis/boundary_disagreement.py",
+    "sha16": "424cdfb0f60dd17e",
+    "commit": "7073c97"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/boundary_disagreement_outcome.txt",
+    "outcome_commit": "719c671",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-17",
+    "other_files": [
+      "experiment_results/x12_crossdomain/boundary_disagreement_perq.csv (per-question margins, cell, anchor, flag, quintile; 719c671)",
+      "boundary_disagreement_run.log (gitignored, on disk)"
+    ]
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-17_zero_call_batch.md section BOUNDARY-DISAGREEMENT",
+    "commit": "46f44e8",
+    "verdict": "numbers CONFIRMED to the printed digit on every recomputed figure; scoring applied as registered; interpretation PARTLY: 'OVERTURNED / closes' is the registered consequence of C2 FAILED but overstates (D1 HIGH the merged null hides an established x12 schedule effect; D2 HIGH C2 has no power clause and its interval contains the coefficient a 2pp flip gap would produce: not shown, not shown absent; D3 anchor confound; D4 depth-1 secondary positive; D5 scope of the closure)"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "concentration: tie Q1 - Q5 >= +3pp AND flip >= +2pp with intervals excluding 0 -> HELD; covering 0 and narrower than 6pp / 4pp -> FAILED; covering 0 and wider -> UNDETERMINED",
+      "result": "FAILED",
+      "value": "merged: tie -0.2pp [-2.4, +2.1] FAILED, flip +0.4pp [-1.3, +2.1] FAILED; x12: tie +1.7 [-1.2, +4.5] FAILED (width 5.8pp, at the power edge), flip +2.7 [+0.4, +5.2] HELD; grok tie +0.9 / flip +0.8 UNDETERMINED; kotlin tie +1.6 / flip +2.0 UNDETERMINED; x20 (rates only) tie -1.5 FAILED, flip -1.2 UNDETERMINED; Spearman(leaf margin, per-question share) merged tie -0.012, flip -0.034, disagreement -0.012, wrongA +0.017",
+      "denominator": "merged board 21,519 matches on 2,808 x12-judged questions with a margin; quintiles of 561-562 questions (cut-points 0.0175 / 0.0394 / 0.0666 / 0.1024); Q1 4,513 vs Q5 4,006 merged matches; B = 2,000 question-clustered, seed 42"
+    },
+    {
+      "id": "C2",
+      "text": "within-cell: leaf-FE logistic coefficient of z(m_leaf) on flip < 0 with the cluster-robust 95% interval excluding 0 -> HELD; C2' the same with the difficulty control",
+      "result": "FAILED",
+      "value": "merged beta -0.024 (SE 0.025) [-0.074, +0.025], 87 cells, n 21,519 -> FAILED; C2' margin -0.026 [-0.075, +0.024], difficulty -0.098 [-0.145, -0.051] -> NOT HELD; x12 -0.065 [-0.141, +0.011] FAILED (anchor-FE -0.086 [-0.155, -0.016]); grok -0.039 FAILED; kotlin -0.061 [-0.132, +0.009] FAILED; x20 +0.002; checker D2: no power clause and the merged interval contains -0.057, the coefficient a 2pp flip gap would produce: NOT SHOWN rather than shown absent",
+      "denominator": "87 leaf cells, n 21,519 merged verdicts"
+    },
+    {
+      "id": "C3",
+      "text": "wrong(established) Q1 - Q5 under A and B, both intervals covering 0 and <= 10pp wide -> HELD (no difference)",
+      "result": "HELD",
+      "value": "merged A +1.2pp [-2.3, +4.6], B +0.0pp [-2.5, +2.6]; x12 A +1.5 / B -0.5, grok A +1.9 / B -0.3, kotlin A +1.5 / B -0.2: HELD on all",
+      "denominator": "established key-decidable matches per quintile 1,613 / 1,463 / 1,603 / 1,550 / 1,540 of 1,818 / 1,685 / 1,807 / 1,743 / 1,757; 2,202 of 2,941 edge tests established (distinct edges 2,648, D7)"
+    },
+    {
+      "id": "C4",
+      "text": "order stability: instability Q1 - Q5 interval excluding 0 and positive -> boundary quintile less stable; else NOT SHOWN",
+      "result": "n/a",
+      "value": "NOT SHOWN: merged +0.001 [-0.021, +0.026] (x12 +0.001; grok +0.004; kotlin +0.004); rho(quintile board, key) 0.955-0.970 on merged",
+      "denominator": "20 models, B 2,000"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P-orch",
+      "text": "(orchestrator, blind) Q1 tie share 3-6pp above Q5; flip 2-4pp above; Spearman |rho| < 0.15; the within-cell effect survives (C2); wrong(established) does not differ (C3)",
+      "result": "FAILED",
+      "value": "tie FAILED (-0.2); flip FAILED (+0.4); |rho| < 0.15 HELD (tie -0.012, flip -0.034); C2 survives FAILED; C3 no difference HELD",
+      "denominator": "merged board"
+    },
+    {
+      "id": "P-arena",
+      "text": "(arena specialist, blind) 'mostly difficulty wearing a boundary costume': tie +1 to +4pp; flip +1 to +3pp; |rho| < 0.10; C2 HELD but C2' NOT HELD; wrong(established) within +-2pp with both intervals covering 0; instability covers 0; two-candidate flag moves the tie share by < 2pp; grok and kotlin carry x12's tie sign; the af margin's gradient weaker than bareq512's",
+      "result": "FAILED",
+      "value": "tie FAILED (-0.2); flip FAILED (+0.4); |rho| < 0.10 HELD; C2 HELD / C2' NOT HELD FAILED (C2 FAILED outright); wrong(est) HELD (+1.2 / +0.0); instability HELD (+0.001 [-0.021, +0.026]); two-candidate HELD (-0.2pp [-2.2, +1.8]); grok / kotlin carry x12's tie sign HELD (+0.9, +1.6 vs +1.7); af weaker FAILED (af tie +1.1 vs bareq512 -0.2: bareq512's gradient is zero); difficulty is the only term with a signal (merged -0.098 [-0.145, -0.051] on flip)",
+      "denominator": "merged board"
+    }
+  ],
+  "falsifier": {
+    "text": "C1 FAILED on the merged board and on x12, or C2 FAILED -> the MULTI-OWNERSHIP mechanism is OVERTURNED: dual-cell judging targets nothing; no E4 judged arm; the line closes at zero calls. C1 and C2 HELD but C2' NOT HELD -> the mechanism is question difficulty. C3 FAILED toward MORE wrong(established) at the boundary -> a widener predictor candidate.",
+    "fired": true,
+    "note": "FIRES through C2 (C2 FAILED on the merged board); the C1 leg as registered ('FAILED on the merged board and on x12') is NOT met (x12 flip HELD +2.7 [+0.4, +5.2]); scope of the closure (checker): MULTI-OWNERSHIP as a JUDGING MECHANISM under the deployed recipe on the merged board; NOT closed: multi-ownership as an attribution or reporting choice, the x12 schedule gradient, the depth-1 secondary margin"
+  },
+  "numbers_of_record": {
+    "tree_and_population": "bareq512_s42 snapshot 20260909_212117_Headless_Run_Auto_ge (158 nodes / 87 leaves / sliceDim 512; run-dir vs snapshots.db |dmu| max 5.0e-07); margin population P0 = 2,808 of 2,811 x12-judged questions (OPTIONS-key join 3,441 of 3,445 unique, 4 ambiguous dropped); caches x12 9,131 / x20 12,388 / merged 21,519 / grok 9,131 (10 INVALID) / kotlin 9,112 (17 INVALID) with a margin; run 2026-09-17 19:48",
+    "C1_merged": "tie -0.2 [-2.4, +2.1]; flip +0.4 [-1.3, +2.1]",
+    "C1_x12": "tie +1.7 [-1.2, +4.5]; flip +2.7 [+0.4, +5.2] HELD",
+    "C2_merged": "-0.024 (SE 0.025) [-0.074, +0.025]; C2' margin -0.026, difficulty -0.098 [-0.145, -0.051]",
+    "C3_merged": "A +1.2pp [-2.3, +4.6]; B +0.0pp [-2.5, +2.6]",
+    "C4_merged": "+0.001 [-0.021, +0.026]",
+    "schedule_effect_checker_D1": "on the same 2,643 questions x12 (66 original pairs) flip Q1 - Q5 +2.9pp [+0.4, +5.4] vs x20 (124 novel pairs) -1.2pp [-3.6, +1.1]; paired difference +4.15pp [+1.04, +7.50], P(<= 0) = 0.005; x20 leaf-FE +0.002 [-0.060, +0.063]",
+    "anchor_confound_checker_D3": "Q1 / Q5 counts Psychology 78 / 7, Biology 52 / 10, Law 27 / 124, Engineering 10 / 68; within-anchor standardised x12 tie +3.5pp [+0.3, +6.8], flip +3.8pp [+1.1, +6.5]; Q1 questions easier on the key (0.563 vs 0.488)",
+    "free_instruments": "Kotlin two-candidate flag (314 vs 2,494 q) merged tie -0.2pp [-2.2, +1.8], flip +0.1pp [-1.6, +1.9]; cross-judge disagreement x12 vs grok Q1 - Q5 +2.0pp [-0.4, +4.6], x12 vs kotlin +1.5pp [-1.0, +4.2]; af_s42 margin merged tie +1.1 [-1.1, +3.2], flip +0.3 [-1.4, +1.9]; depth-1 secondary merged tie +2.5 [+0.2, +4.5], flip +2.5 [+0.7, +4.3], wrong(est) A +3.3 [-0.5, +7.0], B +2.6 [-0.2, +5.6]; x20 depth-1 wrong(est) B +4.8 [+1.8, +8.1] (anchor-confounded; an unregistered lead, D4)",
+    "dual_cell_arm_vacuity": "under STACK-v2 the only cell-dependence is the anchor rubric; 225 of the 314 router two-candidate questions have both candidates in the same anchor: the arm would post the identical prompt on 72% of its targets (89 questions would get a different rubric)",
+    "bill_not_launched": "Q1 = 562 questions / 4,513 merged matches; Kotlin two-candidate set 314 questions / 2,652 merged matches"
+  },
+  "sentence_of_record": "BOUNDARY-DISAGREEMENT (2026-09-17, zero calls): on the merged board of record (21,519 matches, 2,808 questions) the lowest-margin quintile shows no excess of ties (-0.2pp [-2.4, +2.1]) or order flips (+0.4pp [-1.3, +2.1]) over the highest, and the leaf-FE within-cell flip coefficient is -0.024 [-0.074, +0.025] (C1 FAILED, C2 FAILED, C3 HELD no difference, C4 NOT SHOWN); the registered falsifier fires through C2, so no dual-cell arm is launched and MULTI-OWNERSHIP as a judging mechanism closes at zero calls. Qualifiers of record: (i) the merged null averages two schedules that disagree on the same 2,643 questions: the x12 66-pair schedule reads flip +2.9pp [+0.4, +5.4] (C1 flip HELD; anchor-FE -0.086 [-0.155, -0.016]; within-anchor standardised tie +3.5pp [+0.3, +6.8], flip +3.8pp [+1.1, +6.5]) and the x20 124-novel-pair schedule -1.2pp [-3.6, +1.1] (leaf-FE +0.002), paired difference +4.2pp [+1.0, +7.5]; (ii) C2 has no power clause and its merged interval contains -0.057, the coefficient a 2pp flip gap would produce, so the mechanism is not shown rather than shown absent; (iii) the raw quintile contrast is anchor-confounded (Q1/Q5: Psychology 78/7, Law 27/124) and Q1 questions are easier on the key (0.563 vs 0.488), so difficulty does not account for the x12 signal; (iv) the depth-1 secondary margin reads positive on merged (tie +2.5 [+0.3, +4.6], flip +2.5 [+0.7, +4.3]) and wrong(established) B +4.8pp [+1.7, +8.1] on x20 alone, anchor-confounded (Q5 one-third Law), an unregistered lead only; (v) under STACK-v2 the only cell-dependence is the anchor rubric and 225 of the 314 router two-candidate questions have both candidates in one anchor, so a dual-cell arm would post the identical prompt on 72% of its targets; multi-ownership as an attribution or reporting choice (a question contributing to two cells' boards) was not tested and remains open. [Registrar's note: the checker's intervals in (iv) differ from the outcome file's by 0.1pp (file: tie [+0.2, +4.5], B [+1.8, +8.1]), bootstrap re-draw noise; the file's intervals are the numbers of record.]",
+  "chips": [
+    "C1 FAILED, C2 FAILED (MERGED)",
+    "C3 HELD: NO DIFFERENCE",
+    "C4 NOT SHOWN",
+    "MULTI-OWNERSHIP CLOSED AS A JUDGING MECHANISM; ATTRIBUTION / REPORTING UNTESTED",
+    "x12 SCHEDULE READS A FLIP GRADIENT THE MERGED NULL AVERAGES AWAY; C2 NOT SHOWN RATHER THAN SHOWN ABSENT"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-17",
+      "by": "the adversarial reviewer D1 / D2 / D5 (docs/reviews/2026-09-17_zero_call_batch.md, 46f44e8), recorded in the outcome section (719c671) as the qualifiers of record",
+      "text": "'OVERTURNED' is carried by C2 alone (the C1 leg is not met: x12 flip HELD); C2 has no power clause and its interval contains -0.057; the mechanism is NOT SHOWN, not shown absent; what closes is multi-ownership as a JUDGING MECHANISM on the merged board; attribution / reporting untested; the dual-cell arm is near-vacuous by construction under STACK-v2."
+    },
+    {
+      "date": "2026-09-17",
+      "by": "the registrar (outcome section, 719c671)",
+      "text": "the checker's intervals in qualifier (iv) differ from the outcome file's by 0.1pp (file: tie [+0.2, +4.5], B [+1.8, +8.1]), bootstrap re-draw noise; the file's intervals are the numbers of record."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "CORRECTIONS_2026-09-23 (registrar)",
+      "text": "[CORRECTED 2026-09-23 by the registrar (line pointer only, zero calls; no number, no criterion and no sentence moves): registration.program_lines names docs/judge_v2_program.md L4939, and that was exact when it was written. After commit cd83eac inserted four one-line correction brackets mid-file (hunks @@ -3911,0 / -6535,0 / -6692,0 / -6949,0 @@), the heading of record \"## Registered 2026-09-17 (before running; the script exists, its --dry-run passed, no outcome computed) — BOUNDARY-DISAGREEMENT: is judge di ...\" stands at L4940, +1; the whole span shifts by the same +1. Verified at HEAD by sed -n '4940p' docs/judge_v2_program.md. The map for every such pointer is the programme's \"## Line-shift map, appended 2026-09-23\" section: +0 up to old L3911, +1 to L6535, +2 to L6692, +3 to L6949, +4 below. The recorded span is left standing beside this bracket, not rewritten.]"
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "that the mechanism is absent on the x12 schedule (flip +2.7 [+0.4, +5.2] on x12; leaf-FE -0.065 [-0.141, +0.011])",
+    "anything about multi-ownership as an attribution or reporting choice",
+    "a widener predictor (C3 HELD, no difference)",
+    "a difference in order stability (C4 NOT SHOWN at instability 0.014-0.026)"
+  ],
+  "ledger": {
+    "row_id": "BOUNDARY-DISAGREEMENT",
+    "version": "v112; [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "ANCHOR-PROFILE-INTERVAL",
+    "KTD-CHECK",
+    "STACK-v2",
+    "GROK-CALIB",
+    "JUDGE-WIRING-BOARD",
+    "ARENA-V2-X20"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "MULTI-OWNERSHIP as a JUDGING MECHANISM (low-margin questions carry judge disagreement under the deployed recipe on the merged board) closed at zero calls; no E4 dual-cell judged arm. NOT closed: multi-ownership as an attribution or reporting choice; the x12 schedule gradient; the depth-1 secondary margin. Not a CONTEXT.md section 5 line."
+  },
+  "sources": [
+    "docs/judge_v2_program.md L4937-L5019 (registration 7073c97): question, instrument, hygiene, criteria C1-C4 with the resolution rule, the two blind prediction sets, falsifier, bill",
+    "docs/judge_v2_program.md L5227-L5332 (outcome section, 719c671): every number, criteria and predictions scored, the falsifier's scope, defects D1-D9, does-not-show, the sentence of record with the registrar's note",
+    "docs/reviews/2026-09-17_zero_call_batch.md section BOUNDARY-DISAGREEMENT (46f44e8): CONFIRMED status, D1-D9, the sentence of record",
+    "experiment_results/x12_crossdomain/boundary_disagreement_outcome.txt and _perq.csv (719c671)",
+    "docs/test_ledger.html row BOUNDARY-DISAGREEMENT (v112): chips verbatim, evidence (7073c97, 719c671)",
+    "script sha16 = sha256 of tools/analysis/boundary_disagreement.py at 7073c97, first 16 hex (identity, computed by the registrar 2026-09-20; script unchanged since registration)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' lines to grep -n regardless of line drift; line numbers re-lined 2026-09-22 as of programme HEAD 6aa2a0d (shift +2 from the batch-1 reading)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "No judge calls. On about 21,500 existing judged matches, the test compared questions that sit near a cell boundary (low routing margin) with questions deep inside a cell. It looked for more ties, more verdicts that flip when the answer order is swapped, and less stable model rankings.",
+    "why": "It checks the idea behind 'multi-ownership' (judging boundary questions in two cells): that the judge struggles most at cell boundaries.",
+    "information": "An excess of disagreement at boundaries would justify a paid dual-cell judging run. No excess would close that idea for free. Result: done. On the merged board there was no clear excess of ties or flips, so no dual-cell run was launched and the idea closes as a judging mechanism. Qualifier: on one of the two schedules (x12) flips were somewhat higher at boundaries, so the mechanism is 'not shown', not shown to be absent. Note: this record belongs to the older question pool, which the author ruled 'history, not evidence'.",
+    "written": "2026-10-07"
+  }
+}

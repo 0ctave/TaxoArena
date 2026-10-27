@@ -1,0 +1,401 @@
+package taxonomy.integration
+
+import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.add
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.mockito.Mockito.mock
+import taxonomy.config.TaxonomyConfig
+import taxonomy.utils.TaxonomyPerformanceTracker
+import taxonomy.dataset.EmbeddingCache
+import taxonomy.dataset.EvalIngestValidator
+import taxonomy.dataset.MMLUDatasetFetcher
+import taxonomy.dataset.ModelEvalLoader
+import taxonomy.dataset.ModelEvalStore
+import taxonomy.model.BenchmarkRequest
+import taxonomy.model.ModelSource
+import taxonomy.model.GraphNode
+import taxonomy.model.Embedding
+import taxonomy.operations.TaxonomyLlmClient
+import taxonomy.operations.TaxonomyOperations
+import taxonomy.service.DomainEvaluation
+import taxonomy.service.TaxonomyArenaService
+import taxonomy.service.TaxonomyBenchmarkService
+import taxonomy.service.TaxonomyRankingService
+import taxonomy.service.TaxonomyService
+import java.io.File
+import java.nio.file.Files
+import java.sql.DriverManager
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
+
+/**
+ * End-to-end integration test for the precomputed-results arena benchmark.
+ *
+ * Drives the *real* data pipeline — ZIP parse → ingest (cross-referencing the
+ * mmlu_pro + embeddings tables) → reserved-pool sync → results-matrix intersection →
+ * benchmark aggregation — against temp-isolated SQLite files. Only the LLM judge is
+ * stubbed: [FakeArenaService] overrides the routing/judging step with a fixed verdict,
+ * so the test asserts on the data plumbing rather than on vMF routing math.
+ *
+ * Synthetic dataset: 2 models × 8 questions (ids 1..8), categories math (1-4) and
+ * physics (5-8). Four questions (1, 2, 5, 6 — spanning both categories) are reserved.
+ */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class BenchmarkE2EIntegrationTest {
+
+    private data class Q(
+        val id: Int,
+        val text: String,
+        val category: String,
+        val answer: String,
+        val answerIndex: Int,
+        /** False for a question the eval ZIP knows but the local mmlu_pro cache does not. */
+        val inMmluPro: Boolean = true
+    )
+
+    private val options = listOf("first", "second", "third", "fourth")
+
+    private val questions = listOf(
+        Q(1, "math q1: 2+2?", "math", "A", 0),
+        Q(2, "math q2: derivative of x^2?", "math", "B", 1),
+        Q(3, "math q3: integral of 1?", "math", "A", 0),
+        Q(4, "math q4: prime after 7?", "math", "C", 2),
+        Q(5, "physics q5: unit of force?", "physics", "A", 0),
+        Q(6, "physics q6: speed of light?", "physics", "B", 1),
+        Q(7, "physics q7: Newton's 2nd law?", "physics", "A", 0),
+        Q(8, "physics q8: charge of electron?", "physics", "D", 3),
+        // Known to the eval data but absent from the local cache, so its link must stay
+        // unresolved. Not reserved, so it does not disturb the benchmark assertions.
+        Q(9, "physics q9: not in the local cache", "physics", "A", 0, inMmluPro = false),
+    )
+
+    private val reservedIds = setOf(1, 2, 5, 6)
+    /** The pool, recorded by id and addressed by id (FRAMEWORK item 18); stratified like the split. */
+    private val poolIds = mapOf("math" to listOf(1, 2), "physics" to listOf(5, 6))
+    private val poolId = taxonomy.dataset.ReservedPool.computePoolId(poolIds)
+    private val modelA = "model-alpha"
+    private val modelB = "model-beta"
+
+    private lateinit var store: ModelEvalStore
+    private lateinit var benchmarkService: TaxonomyBenchmarkService
+    private lateinit var tmp: File
+    private lateinit var mockOps: TaxonomyOperations
+    private lateinit var mockTaxonomyService: TaxonomyService
+    private lateinit var mockEmbeddingCache: EmbeddingCache
+    private lateinit var datasetFetcher: MMLUDatasetFetcher
+    private lateinit var datasetDbPath: String
+
+    /**
+     * Subclass of the real arena service that bypasses embedding/routing/LLM calls and
+     * returns a fixed high-confidence verdict — the "stubbed judge". Constructor deps are
+     * mocked (Mockito bypasses their constructors), and the only overridden method is the
+     * one the benchmark service calls.
+     */
+    private class FakeArenaService(
+        ops: TaxonomyOperations,
+        taxService: TaxonomyService,
+        embCache: EmbeddingCache
+    ) : TaxonomyArenaService(
+        TaxonomyConfig(),
+        taxService,
+        mock(TaxonomyLlmClient::class.java),
+        embCache,
+        ops,
+        mock(ModelEvalStore::class.java),
+        mock(TaxonomyRankingService::class.java),
+        TaxonomyPerformanceTracker()
+    ) {
+        override suspend fun evaluateWithPrecomputedTraces(
+            query: String,
+            options: List<String>,
+            modelA: String,
+            traceA: String,
+            modelB: String,
+            traceB: String,
+            expectedNodeId: String?,
+            frozenLeafIds: Set<String>?,
+            gtAnswer: String?,
+            assignedLeafIds: List<String>?,
+            condition: String,
+            isCorrectA: Boolean?,
+            isCorrectB: Boolean?,
+            evalQuestionId: Int?
+        ): List<DomainEvaluation> = listOf(
+            DomainEvaluation(
+                domain = "stub-leaf-judge",
+                winner = "Model A",
+                rationale = "fixed verdict",
+                confidence = 0.95,
+                nodeId = expectedNodeId ?: "root"
+            )
+        )
+    }
+
+    @BeforeAll
+    fun setup() {
+        tmp = Files.createTempDirectory("benchmark-e2e").toFile()
+        val datasetDb = File(tmp, "dataset.db").absolutePath      // holds mmlu_pro + eval_results
+        datasetDbPath = datasetDb
+        val embeddingDb = File(tmp, "embeddings.db").absolutePath // holds embeddings cache
+        val reservedFile = File(tmp, "reserved_test_queries.json")
+
+        // Seed mmlu_pro (so links resolve mmlu_pro_row_id) in the dataset DB.
+        //
+        // Inserted in REVERSE order deliberately. mmlu_pro.id is a local AUTOINCREMENT rowid
+        // and eval question_id is an upstream id; they are unrelated spaces that merely happen
+        // to overlap numerically. Seeding in list order made them an identity mapping, under
+        // which a correct text-join and a wrong id-equality join produce byte-identical rows —
+        // so this fixture could not distinguish them, and in production the id-equality path
+        // mislinked every one of a Math run's 405 reserved questions before anyone noticed.
+        // Reversed, eval question_id 1 ("math q1") must resolve to mmlu_pro.id 8; an
+        // id-equality join still links 8 rows, so cardinality assertions still pass, but every
+        // row points at the wrong question and `links resolve to the correct question text`
+        // fails.
+        DriverManager.getConnection("jdbc:sqlite:$datasetDb").use { c ->
+            c.createStatement().use { s ->
+                s.execute("CREATE TABLE IF NOT EXISTS mmlu_pro (id INTEGER PRIMARY KEY AUTOINCREMENT, question TEXT)")
+            }
+            c.prepareStatement("INSERT INTO mmlu_pro (question) VALUES (?)").use { ps ->
+                questions.filter { it.inMmluPro }.reversed()
+                    .forEach { ps.setString(1, it.text); ps.executeUpdate() }
+            }
+        }
+
+        // Seed embeddings cache (so links get has_embedding = 1) in the embedding DB.
+        DriverManager.getConnection("jdbc:sqlite:$embeddingDb").use { c ->
+            c.createStatement().use { s ->
+                s.execute("CREATE TABLE IF NOT EXISTS embeddings (query TEXT PRIMARY KEY, vector BLOB)")
+            }
+            c.prepareStatement("INSERT INTO embeddings (query) VALUES (?)").use { ps ->
+                questions.forEach { ps.setString(1, it.text); ps.executeUpdate() }
+            }
+        }
+
+        // reserved_test_queries.json: category -> reserved question texts.
+        val reservedByCategory = questions
+            .filter { it.id in reservedIds }
+            .groupBy { it.category }
+            .mapValues { (_, qs) -> qs.map { it.text } }
+        reservedFile.writeText(buildReservedJson(reservedByCategory))
+
+        // Build per-model eval ZIPs (model A answers all "A", model B all "B").
+        val zipA = buildEvalZip(tmp, "model_outputs_$modelA", predFor = { "A" })
+        val zipB = buildEvalZip(tmp, "model_outputs_$modelB", predFor = { "B" })
+
+        store = ModelEvalStore(dbPath = datasetDb)
+        datasetFetcher = mock(MMLUDatasetFetcher::class.java)
+        val loader = ModelEvalLoader(
+            store = store,
+            datasetFetcher = datasetFetcher,
+            datasetDbPath = datasetDb,
+            embeddingDbPath = embeddingDb,
+            reservedFilePath = reservedFile.absolutePath
+        )
+
+        // Run the real load chain, then record the pool (nothing is activated, no row is flagged).
+        runBlocking {
+            loader.loadFromZip(zipA.absolutePath, modelA)
+            loader.loadFromZip(zipB.absolutePath, modelB)
+        }
+        assertEquals(poolId, store.recordReservedPool(poolIds))
+
+        val dummyRoot = GraphNode(id = "root", label = "stub-leaf-judge", depth = 0, judgePrompt = "stub prompt")
+        mockTaxonomyService = mock(TaxonomyService::class.java)
+        org.mockito.Mockito.`when`(mockTaxonomyService.getGraph()).thenReturn(dummyRoot)
+        org.mockito.Mockito.`when`(mockTaxonomyService.activeSnapshotId()).thenReturn("stubbed-snapshot")
+
+        mockEmbeddingCache = mock(EmbeddingCache::class.java)
+        runBlocking {
+            org.mockito.Mockito.`when`(mockEmbeddingCache.getOrCreate(org.mockito.ArgumentMatchers.anyString() ?: ""))
+                .thenReturn(floatArrayOf(0.1f, 0.2f))
+        }
+
+        mockOps = mock(TaxonomyOperations::class.java)
+        org.mockito.Mockito.`when`(mockOps.routeQuery(
+            org.mockito.ArgumentMatchers.any(Embedding::class.java) ?: Embedding("", "", floatArrayOf()),
+            org.mockito.ArgumentMatchers.any(GraphNode::class.java) ?: dummyRoot,
+            org.mockito.ArgumentMatchers.anyInt(),
+            org.mockito.ArgumentMatchers.any(),
+            org.mockito.ArgumentMatchers.anyBoolean()
+        )).thenReturn(mapOf(dummyRoot to 1.0))
+    }
+
+    private fun recreateBenchmarkService() {
+        val rankingDb = File(tmp, "ratings_${System.nanoTime()}.db")
+        System.setProperty("ranking.db.path", rankingDb.absolutePath)
+        val rankingService = TaxonomyRankingService()
+
+        benchmarkService = TaxonomyBenchmarkService(
+            arenaService = FakeArenaService(mockOps, mockTaxonomyService, mockEmbeddingCache),
+            rankingService = rankingService,
+            datasetFetcher = datasetFetcher,
+            taxonomyService = mockTaxonomyService,
+            evalStore = store,
+            config = TaxonomyConfig(),
+            perfTracker = TaxonomyPerformanceTracker(),
+            // Points at the same temp dataset DB the store writes, so the pre-flight
+            // validator votes over this fixture's two models rather than the production cache.
+            ingestValidator = EvalIngestValidator(datasetDbPath)
+        )
+    }
+
+    @org.junit.jupiter.api.AfterAll
+    fun tearDown() {
+        System.clearProperty("ranking.db.path")
+        tmp.deleteRecursively()
+    }
+
+    @BeforeEach
+    fun cleanDatabase() {
+        recreateBenchmarkService()
+    }
+
+    @Test
+    fun `pipeline loads both models and links the reserved pool`() {
+        assertEquals(setOf(modelA, modelB), store.getLoadedModels().toSet())
+        assertEquals(
+            2 * questions.size, store.getStats()["totalRows"],
+            "2 models × ${questions.size} questions"
+        )
+        assertEquals(
+            reservedIds.size,
+            store.getLinkedReservedQuestionIds(listOf(modelA, modelB), poolId).size,
+            "4 reserved questions, all cross-linked to mmlu_pro + embeddings"
+        )
+    }
+
+    @Test
+    fun `links resolve to the correct question text, not merely to some row`() {
+        // The assertion that actually discriminates. Cardinality checks pass under a wrong
+        // join; only comparing the linked mmlu_pro row's text against the eval row's text
+        // catches an id-space conflation. With mmlu_pro seeded in reverse, an id-equality
+        // join links the right NUMBER of rows and the wrong ones.
+        DriverManager.getConnection("jdbc:sqlite:$datasetDbPath").use { c ->
+            c.prepareStatement(
+                """
+                SELECT l.question_id, l.question_text, m.question
+                FROM eval_question_link l
+                JOIN mmlu_pro m ON m.id = l.mmlu_pro_row_id
+                """.trimIndent()
+            ).use { ps ->
+                val rs = ps.executeQuery()
+                var checked = 0
+                while (rs.next()) {
+                    val qid = rs.getInt("question_id")
+                    assertEquals(
+                        rs.getString("question"), rs.getString(2),
+                        "question_id $qid is linked to an mmlu_pro row holding a different question"
+                    )
+                    checked++
+                }
+                assertEquals(
+                    questions.count { it.inMmluPro }, checked,
+                    "every cached question must be linked exactly once"
+                )
+            }
+
+            // The uncached question must resolve to nothing rather than to a coincidental row.
+            c.prepareStatement(
+                "SELECT mmlu_pro_row_id FROM eval_question_link WHERE question_id = ?"
+            ).use { ps ->
+                ps.setInt(1, questions.first { !it.inMmluPro }.id)
+                val rs = ps.executeQuery()
+                assertTrue(rs.next(), "the unmatched question still gets a link row")
+                rs.getInt(1)
+                assertTrue(rs.wasNull(), "a question absent from mmlu_pro must have a NULL row id")
+            }
+        }
+    }
+
+    @Test
+    fun `runBenchmark over the reserved pool yields one result per reserved question`() = runBlocking {
+        val req = BenchmarkRequest(
+            models = listOf(ModelSource(modelA), ModelSource(modelB)),
+            updateRankings = false,
+            parallelism = 2,
+            poolId = poolId
+        )
+        val report = benchmarkService.runBenchmark(req)
+
+        // The pool, by id -> exactly the 4 reserved questions.
+        assertEquals(reservedIds.size, report.queryResults.size)
+
+        // Each query carries the pairwise agreement entry (shape, not value).
+        val pairKey = "${modelA}_vs_${modelB}"
+        report.queryResults.forEach { qr ->
+            assertTrue(pairKey in qr.judgeAccuracyAgreement, "missing pair key for query '${qr.query}'")
+        }
+
+        // Per-category stats cover both ground-truth categories present in the reserved pool.
+        val categories = report.perCategoryStats.map { it.domain }.toSet()
+        assertTrue(categories.containsAll(setOf("math", "physics")), "categories were $categories")
+
+        assertEquals(1, report.totalModelPairs)
+    }
+
+    @Test
+    fun `no pool widens the benchmark to all shared questions`() = runBlocking {
+        val reservedReq = BenchmarkRequest(
+            models = listOf(ModelSource(modelA), ModelSource(modelB)),
+            updateRankings = false,
+            poolId = poolId
+        )
+        val allReq = reservedReq.copy(poolId = null)
+
+        val reservedReport = benchmarkService.runBenchmark(reservedReq)
+        recreateBenchmarkService()
+        val allReport = benchmarkService.runBenchmark(allReq)
+
+        assertEquals(reservedIds.size, reservedReport.queryResults.size)
+
+        val judged = allReport.queryResults.map { it.query }.toSet()
+        val inScope = questions.map { it.text }.toSet()
+        assertTrue(inScope.containsAll(judged), "judged questions outside the shared set: ${judged - inScope}")
+        assertEquals(questions.size, allReport.queryResults.size)
+        assertTrue(
+            allReport.queryResults.size > reservedReport.queryResults.size,
+            "no pool (${allReport.queryResults.size}) should exceed the pool (${reservedReport.queryResults.size})"
+        )
+    }
+
+    // ─── helpers ────────────────────────────────────────────────────────────
+
+    private fun buildReservedJson(byCategory: Map<String, List<String>>): String =
+        buildJsonObject {
+            byCategory.forEach { (cat, texts) ->
+                put(cat, buildJsonArray { texts.forEach { add(it) } })
+            }
+        }.toString()
+
+    private fun buildEvalZip(dir: File, baseName: String, predFor: (Q) -> String): File {
+        val arr = buildJsonArray {
+            questions.forEach { q ->
+                add(buildJsonObject {
+                    put("question_id", q.id)
+                    put("question", q.text)
+                    put("options", buildJsonArray { options.forEach { add(it) } })
+                    put("answer", q.answer)
+                    put("answer_index", q.answerIndex)
+                    put("category", q.category)
+                    put("pred", predFor(q))
+                    put("model_outputs", "Reasoning for ${q.text}. Final answer: ${predFor(q)}")
+                })
+            }
+        }
+        val zip = File(dir, "$baseName.zip")
+        ZipOutputStream(zip.outputStream()).use { zos ->
+            zos.putNextEntry(ZipEntry("results.json"))
+            zos.write(arr.toString().toByteArray(Charsets.UTF_8))
+            zos.closeEntry()
+        }
+        return zip
+    }
+}

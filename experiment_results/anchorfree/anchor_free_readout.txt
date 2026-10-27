@@ -1,0 +1,50 @@
+=== ANCHOR-FREE readout (registered 2026-09-16; zero LLM calls) ===
+  pool of record: p2dca21ab5f4ef3ae (pool_guard.assert_pool_of_record) | flatLeaf rule: max cosine of the first-sliceDim slice vs vmfMu
+  anchor-free af/seed_42 | snapshot iteration 13 | manifest: commit e3557647, seed 42, split pool p8a29d8f3ff75aa55 (NOT the pool of record: part of the held-out set was on this tree's train side), train 8219 / test 3781
+  control     o0/seed_42 | snapshot iteration 10 | manifest: commit c0f5ff77, seed 42, split pool p8a29d8f3ff75aa55 (NOT the pool of record: part of the held-out set was on this tree's train side), train 8219 / test 3781
+  corpus: 12000 mmlu_pro rows, 11769 distinct texts; held-out 3445 (pool rows 3507); train 8324 distinct texts; 14 categories
+
+  readout                                                                af/seed_42                         o0/seed_42
+  --------------------------------------------------------------------------------------------------------------------
+  (1) held-out purity, leaf majority-train label               0.715 [0.700, 0.730]               0.779 [0.764, 0.792]
+      leaves used by held-out / with no train member                             81 / 0                             86 / 0
+      train-side purity of the leaf labels                                    0.714                              0.768
+      depth-1 cell via the leaf's ancestor                     0.188 [0.175, 0.201]               0.757 [0.743, 0.771]
+      depth-1 cell, direct nearest depth-1 centroid               0.186 [0.173, 0.199]               0.737 [0.722, 0.751]
+  (2) leaves / nodes / max depth / iterations                     81 / 150 / 7 / 13                  86 / 152 / 6 / 10
+      depth-1 cells / slice dim                                             2 / 256                           14 / 256
+      certified sites (site null, cert_site_p95) 16 of 69 sites (defl 35; 300 reps)  5 of 65 sites (defl 21; 300 reps)
+  (3a) F6 key-only LOO Brier improvement x1000, n=10925                                                                      
+      leaf cells over marginal                                              +13.194                            +14.016
+      depth-1 cells over marginal                                            +3.491                            +10.418
+      true category over marginal                                           +10.791                            +10.791
+      leaf minus category                                                    +2.403                             +3.224
+      depth-1 label == category (F6's line)                                    0.0%                              75.6%
+      paired leaf diff (AF - control) x1000, 95% CI            -0.822 [-1.496, -0.168]                            n=10925
+  (3b) key profile split-half R(SB), depth-1 cells R=nan (r nan sd nan, 2 cells, 1722 q/cell) R=0.925 (r 0.861 sd 0.024, 14 cells, 246 q/cell)
+      key profile split-half R(SB), leaves       R=0.829 (r 0.708 sd 0.034, 21 cells, 69 q/cell) R=0.874 (r 0.777 sd 0.044, 12 cells, 79 q/cell)
+  (4) mu-match of control leaves (cos >= 0.95)                                55/86              median best cos 0.962
+
+  Criteria (registered):
+    C1 purity within 10pp of the control: 0.715 vs 0.779 (diff -6.4pp) -> PASS
+    C2 certified sites >= control's - 2: 16 vs 5 -> PASS
+    C3 leaf LOO improvement within 0.001 Brier of the control's: +0.01319 vs +0.01402 (diff -0.00082) -> PASS
+
+  (4) migration matrix: TrueCategory x anchor-free depth-1 cell (held-out pool, leaf-routed then depth-1 ancestor)
+  category              c0     c1   n
+  math                  53    340   393
+  physics               20    359   379
+  chemistry              3    336   339
+  law                  287      0   287
+  other                257     20   277
+  engineering            2    265   267
+  economics            233     17   250
+  psychology           233      5   238
+  business             112    120   232
+  health               202      4   206
+  biology              174     22   196
+  philosophy           143      1   144
+  computer science      68     55   123
+  history              114      0   114
+  TOTAL               1901   1544  3445
+  cells: c0=n00000005 [Emergent Concept #4] major=law; c1=n00000004 [Emergent Concept #3] major=physics

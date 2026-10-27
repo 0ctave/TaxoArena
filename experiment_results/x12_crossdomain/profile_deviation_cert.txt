@@ -1,0 +1,134 @@
+PROFILE-DEVIATION-CERT outcome (2026-09-18 00:48); pool p2dca21ab5f4ef3ae; script tools/analysis/profile_deviation_cert.py
+  caches mode=ro: x12 9142 + x20 12394 = 21536 verdicts, 20 models, 2811 judged q, 14 anchors (x12 cache anchor column mismatches: 0)
+  PROFILE-INTERVAL-ALL C2 classes (registration) agree with profile_interval_all.txt's merged-board table: 14 / 14.
+=== PROFILE-DEVIATION-CERT: is delta'_ac = theta_ac - theta'_m,c certifiable beyond zero? (board of record) ===
+  cells: 20 models x 14 anchors = 280 (the anchor is the cell; no leaf, no sub-anchor row)
+  READING OF RECORD (programme bracket [CORRECTED 2026-09-18 by REVIEW], 1534a4a): PRIOR-MATCHED deviation delta' = theta_ac (per-anchor MM, prior 0.5, the published row) - theta'_m,c (pooled MM with the prior scaled by pooled matches / anchor matches, so both fits carry the same prior-to-data weight).
+  the REGISTERED reading delta = theta_ac - theta_m (pooled MM, prior 0.5) is printed beside every count as "registered; biased by construction (null family rate 80.7-92.1% at nominal 5%)" and is not scored.
+  fit: jf.board_from -> rj.mm_fit (0.5 pseudo-win per side of every observed pair, Jeffreys, BtMmFitter DEFAULT_PRIOR_STRENGTH); batched numpy copy asserted vs rj.mm_fit: max |dtheta| 3.41e-12 over 45 fits
+  resamples: B = 2000, seed 42, questions resampled WITHIN each anchor (random.Random(seed), anchors sorted, B draws each); pooled draw b = union of the anchors' draw b; SD = draw SD (ddof 1); q_cell = 95th pct (numpy linear) of max over the anchor's 20 models of |delta'* - delta'_hat| / SD; CERTIFIED iff |delta'_hat| / SD >= q_cell
+  MM convergence at 1e-12 within 2000 iterations: all boards; prior-matched pooled fits: all
+  routing attenuation caveat (ROUTING-ATTENUATION, printed once): ~20% proportional shrinkage of every contrast at 19% mis-routing (30-35% in the smallest anchors) - a caveat on the MAGNITUDE of every deviation below, not on its sign; the prior-matched reading attenuates |delta'| further for |theta_m| > 1.5 (a certified sign is preserved, a magnitude is not published).
+
+  prior shrinkage per anchor (SD of theta, unpenalised MM / prior-0.5 MM; K-RECONCILE checker (3) measured 1.23-1.82x on the 12-model x12 board) and the prior-matched pooled prior (0.5 x pooled / anchor matches):
+  anchor                  q  matches  shrink unpen.conv   pm prior
+  Biology               181     1605   1.35x        yes       6.71
+  Business              174      695   1.69x        yes      15.49
+  Chemistry             269     1754   1.32x        yes       6.14
+  Computer science      162     1490   1.33x        yes       7.23
+  Economics             178     1394   1.37x        yes       7.72
+  Engineering           162      936   1.54x        yes      11.50
+  Health                129     1210   1.47x        yes       8.90
+  History               119      900   1.66x        yes      11.96
+  Law                   271     1425   1.43x        yes       7.56
+  Math                  304     2881   1.16x        yes       3.74
+  Other                 211     1798   1.25x        yes       5.99
+  Philosophy            132      784   1.59x        yes      13.73
+  Physics               259     2730   1.21x        yes       3.94
+  Psychology            260     1934   1.25x        yes       5.57
+  POOLED               2811    21536   1.02x        yes          -
+  slope of delta_hat on theta_m over the 280 cells: registered -0.2185 (the bias; -0.2185 on the record per the bracket), prior-matched +0.0237
+
+=== per anchor: q_cell(dev) on delta' (the certificate), widened-q beside, registered beside, MAXT pair-level q for scale ===
+  anchor             class (PIA C2)          q   q_dev  cert  marg |     q_w cert_w |   q_key certk   est |   reg_q   reg  regm |  maxt q
+  Biology            FAIL                  181   2.998     1     2 |   1.581      0 |   2.916    18    18 |   3.017     1     6 |   3.437
+  Business           PASS-WITH-INTERVAL    174   3.100     0     4 |   2.313      0 |   3.001     7    11 |   3.080    10    14 |   3.639
+  Chemistry          PASS-WITH-INTERVAL    269   3.032     1     5 |   2.215      1 |   3.001    10    13 |   3.030     3     8 |   3.625
+  Computer science   FAIL                  162   3.019     0     2 |   2.008      0 |   2.990     1     1 |   3.005     7     9 |   3.531
+  Economics          FAIL                  178   3.066     0     3 |   1.614      0 |   2.958    15    18 |   3.065     4     8 |   3.449
+  Engineering        FAIL                  162   3.077     0     2 |   2.448      0 |   2.986    16    19 |   3.088     9    13 |   3.800
+  Health             FAIL                  129   3.040     0     1 |   1.939      0 |   2.933     4     8 |   3.036     3     6 |   3.502
+  History            PASS-WITH-INTERVAL    119   3.122     2     7 |   1.917      0 |   2.893     2     4 |   3.125     5    10 |   3.519
+  Law                PASS-WITH-INTERVAL    271   3.038     4    10 |   2.209      2 |   2.936    16    18 |   3.044     7    10 |   3.547
+  Math               PASS                  304   3.069     5     8 |   2.059      1 |   2.999    11    16 |   3.079     8    15 |   3.550
+  Other              PASS-WITH-INTERVAL    211   3.032     1     7 |   1.598      2 |   2.897     7    11 |   3.028     7    11 |   3.545
+  Philosophy         PASS-WITH-INTERVAL    132   3.114     1     2 |   1.946      0 |   2.866     2     3 |   3.082     9    12 |   3.693
+  Physics            PASS                  259   3.009     4     7 |   2.055      2 |   2.978     6     9 |   3.014     0     7 |   3.431
+  Psychology         PASS-WITH-INTERVAL    260   2.970     3    11 |   1.458      1 |   2.929    12    13 |   2.976     9     9 |   3.568
+  q_dev range 2.970-3.122 (median 3.039); marginal 1.96 count (NOT the count of record): 71 of 280; reg / regm = the registered; biased by construction (null family rate 80.7-92.1% at nominal 5%)
+  widened-q reading on delta': tau_mc = RMS of the model's in-anchor pair wideners exp(-3.2326 + 3.3133 * agree); widened statistic held to the widened-scale q; certified 9 of 280 (beside; the hybrid is not computed)
+
+=== (C1) key-certified share: certified key cells / 280 (unchanged by the bracket) ===
+  overall 127 / 280 = 45.4%; established (Fisher p < 0.05, in vs out, keyed judged questions) 162 / 280
+  per anchor: Biology 18/20, Business 7/20, Chemistry 10/20, Computer science 1/20, Economics 15/20, Engineering 16/20, Health 4/20, History 2/20, Law 16/20, Math 11/20, Other 7/20, Philosophy 2/20, Physics 6/20, Psychology 12/20
+
+=== (C2) judge-certified share: certified judge cells (delta') / 280 ===
+  overall 22 / 280 = 7.9% (marginal 1.96: 71, not of record) | 82 / 280 = 29.3% (registered; biased by construction (null family rate 80.7-92.1% at nominal 5%))
+  per anchor: Biology 1/20, Business 0/20, Chemistry 1/20, Computer science 0/20, Economics 0/20, Engineering 0/20, Health 0/20, History 2/20, Law 4/20, Math 5/20, Other 1/20, Philosophy 1/20, Physics 4/20, Psychology 3/20
+  per anchor (registered; biased by construction (null family rate 80.7-92.1% at nominal 5%)): Biology 1, Business 10, Chemistry 3, Computer science 7, Economics 4, Engineering 9, Health 3, History 5, Law 7, Math 8, Other 7, Philosophy 9, Physics 0, Psychology 9
+  in Physics / Math / Law: 13 of 22 judge-certified (registered; biased by construction (null family rate 80.7-92.1% at nominal 5%): 15 of 82); in FAIL anchors (PREDICTIVE-ONLY, counted, never a claim): 1
+  overlap of the two certified sets: 12 cells in both; 10 only prior-matched; 70 only registered
+  certified list per model on delta' (sign = above (+) / below (-) its own standing; key dev, Fisher p; class; publishable?):
+    Llama-2-13b-hf                 theta_m -1.916  none   [registered-only: Business, Computer science, Economics, Engineering, Other, Philosophy, Psychology]
+    Llama-2-7b-hf                  theta_m -2.172   [registered set: Business, Computer science, Economics, Engineering, Health, History, Law, Other, Philosophy, Psychology]
+      Physics            delta' -0.480 SD 0.116 z  4.16 q 3.01 | reg delta -0.173 z  1.48 | key dev -0.064 (z 3.25, Fisher p 0.00527, est) | PASS                ok
+    Meta-Llama-3_1-70B-Instruct    theta_m -0.186   [registered set: Law]
+      Law                delta' -0.476 SD 0.132 z  3.60 q 3.04 | reg delta -0.446 z  3.35 | key dev -0.152 (z 5.16, Fisher p 9.88e-08, est) | PASS-WITH-INTERVAL  ok
+    Meta-Llama-3_1-8B              theta_m -1.297  none   [registered-only: Business, Engineering, Other, Philosophy]
+    Mixtral-8x7B-Instruct-v0.1     theta_m -0.914  none   [registered-only: Engineering]
+    Qwen1.5-110B                   theta_m -0.783   [registered set: Math]
+      Math               delta' +0.446 SD 0.106 z  4.22 q 3.07 | reg delta +0.547 z  5.20 | key dev -0.028 (z 1.03, Fisher p 0.331) | PASS                wrong key sign
+    Qwen1.5-14B-Chat               theta_m -0.829  none   [registered-only: Computer science]
+    Qwen1.5-72B-Chat               theta_m -0.302  none   [registered-only: Law]
+    Yi-6b-Chat                     theta_m -1.585   [registered set: Business, Economics, Health, Law, Other, Philosophy, Psychology]
+      Chemistry          delta' -0.640 SD 0.127 z  5.05 q 3.03 | reg delta -0.324 z  2.54 | key dev -0.170 (z 8.98, Fisher p 1.4e-12, est) | PASS-WITH-INTERVAL  ok
+      Physics            delta' -0.380 SD 0.098 z  3.88 q 3.01 | reg delta -0.167 z  1.69 | key dev -0.116 (z 5.33, Fisher p 5.18e-06, est) | PASS                ok
+    arx_0314                       theta_m +1.464   [registered set: Business, History, Law, Other, Philosophy, Psychology]
+      Physics            delta' +0.494 SD 0.114 z  4.32 q 3.01 | reg delta +0.301 z  2.61 | key dev +0.032 (z 1.56, Fisher p 0.162) | PASS                ok
+    arx_3                          theta_m +1.549   [registered set: Business, Computer science, Engineering, Math, Philosophy]
+      History            delta' +0.527 SD 0.154 z  3.41 q 3.12 | reg delta +0.018 z  0.12 | key dev +0.031 (z 0.90, Fisher p 0.494) | PASS-WITH-INTERVAL  ok
+      Math               delta' -0.385 SD 0.092 z  4.20 q 3.07 | reg delta -0.585 z  6.37 | key dev +0.051 (z 2.48, Fisher p 0.022, est) | PASS                wrong(established)
+    c4ai-command-r-v01             theta_m -1.009  none   [registered-only: History]
+    claude-3-5-haiku-20241022      theta_m +0.814   [registered set: Computer science, Engineering, Math, Psychology]
+      Math               delta' -0.635 SD 0.110 z  5.80 q 3.07 | reg delta -0.739 z  6.75 | key dev +0.006 (z 0.24, Fisher p 0.851) | PASS                wrong key sign
+      Psychology         delta' +0.539 SD 0.127 z  4.23 q 2.97 | reg delta +0.390 z  3.04 | key dev +0.087 (z 3.28, Fisher p 0.00238, est) | PASS-WITH-INTERVAL  ok
+    claude-3-5-sonnet-20241022     theta_m +1.745   [registered set: Business, Chemistry, Computer science, Engineering, Math]
+      Law                delta' +0.590 SD 0.160 z  3.68 q 3.04 | reg delta +0.173 z  1.07 | key dev -0.129 (z 4.69, Fisher p 2.51e-07, est) | PASS-WITH-INTERVAL  wrong(established)
+      Math               delta' -0.537 SD 0.096 z  5.61 q 3.07 | reg delta -0.763 z  7.90 | key dev +0.030 (z 1.42, Fisher p 0.186) | PASS                wrong key sign
+    deepseek-chat-v2_5             theta_m +0.526   [registered set: Health, Law, Math, Other, Philosophy, Psychology]
+      Law                delta' -0.469 SD 0.111 z  4.24 q 3.04 | reg delta -0.619 z  5.54 | key dev -0.282 (z 10.06, Fisher p 2.85e-23, est) | PASS-WITH-INTERVAL  ok
+      Math               delta' +0.478 SD 0.096 z  4.99 q 3.07 | reg delta +0.396 z  4.12 | key dev +0.083 (z 3.41, Fisher p 0.00141, est) | PASS                ok
+      Philosophy         delta' -0.622 SD 0.155 z  4.01 q 3.11 | reg delta -0.844 z  5.43 | key dev -0.128 (z 2.97, Fisher p 0.00196, est) | PASS-WITH-INTERVAL  ok
+      Psychology         delta' -0.396 SD 0.108 z  3.65 q 2.97 | reg delta -0.514 z  4.73 | key dev +0.011 (z 0.39, Fisher p 0.733) | PASS-WITH-INTERVAL  wrong key sign
+    gemini-3.1-pro_5-shots         theta_m +1.981   [registered set: Business, History, Other, Philosophy, Psychology]
+      Law                delta' +0.686 SD 0.169 z  4.06 q 3.04 | reg delta +0.244 z  1.43 | key dev -0.049 (z 2.44, Fisher p 0.00448, est) | PASS-WITH-INTERVAL  wrong(established)
+      Other              delta' -0.767 SD 0.136 z  5.63 q 3.03 | reg delta -1.132 z  8.34 | key dev -0.050 (z 2.23, Fisher p 0.011, est) | PASS-WITH-INTERVAL  ok
+      Physics            delta' +0.473 SD 0.122 z  3.88 q 3.01 | reg delta +0.223 z  1.82 | key dev +0.018 (z 1.18, Fisher p 0.354) | PASS                ok
+      Psychology         delta' -0.441 SD 0.126 z  3.50 q 2.97 | reg delta -0.784 z  6.22 | key dev -0.024 (z 1.33, Fisher p 0.166) | PASS-WITH-INTERVAL  ok
+    gemma-7b                       theta_m -1.449  none   [registered-only: Biology, Chemistry, Math, Psychology]
+    gpt-4o-2024-08-06              theta_m +1.466   [registered set: Business, Chemistry, Engineering, Math]
+      History            delta' +0.520 SD 0.154 z  3.38 q 3.12 | reg delta +0.045 z  0.29 | key dev -0.011 (z 0.28, Fisher p 0.747) | PASS-WITH-INTERVAL  wrong key sign
+    gpt-4o-mini                    theta_m +0.869  none   [registered-only: Engineering, Law]
+    iask_pro                       theta_m +2.027   [registered set: Business, Computer science, Economics, History, Math, Philosophy, Psychology]
+      Biology            delta' +0.552 SD 0.159 z  3.48 q 3.00 | reg delta +0.141 z  0.88 | key dev +0.071 (z 3.03, Fisher p 0.00924, est) | FAIL                PREDICTIVE-ONLY
+
+=== (C3) wrong(established) among the judge-certified (delta'): denominator = judge-certified count 22 ===
+  wrong key sign 8, of which Fisher-established 3 -> wrong(established) = 3 / 22 = 13.6%
+  (registered; biased by construction (null family rate 80.7-92.1% at nominal 5%): wrong key sign 33, wrong(established) 17 / 82)
+
+=== (C4) variance share of delta' vs theta (sample variances over 280 cells / 20 models) ===
+  judge: var_cells(delta') 0.0562 / (that + var_models(theta_m) 1.9698) = 0.028; mean bootstrap var 0.0195 -> noise-subtracted share 0.018; sampling share 34.7%
+  (registered; biased by construction (null family rate 80.7-92.1% at nominal 5%): var_cells(delta) 0.1548 -> share 0.073, noise-subtracted 0.064, sampling share 12.8%)
+  key:   var_cells(dev_key) 0.01113 / (that + var_models(acc_m) 0.05023) = 0.181; mean bootstrap var 0.00098 -> noise-subtracted share 0.168; sampling share 8.8%
+
+=== (C5) sign agreement of the certified sets (delta') ===
+  of the 22 judge-certified cells, key deviation with the SAME sign: 14 = 63.6%; baseline over all 280 cells: 156 = 55.7%
+  cells certified by BOTH judge and key: 10 (of which same sign 9); key-certified only 117; judge-certified only 12
+  (registered; biased by construction (null family rate 80.7-92.1% at nominal 5%): same sign 49 / 82; baseline 140 / 280)
+
+=== PREDICTIONS (recorded blind) and FALSIFIER - scored on delta' ===
+  P1 key-certified < 30% of 280:            127 = 45.4% -> FAILED
+  P2 judge-certified < 15% of 280:          22 = 7.9% -> HELD  (registered; biased by construction (null family rate 80.7-92.1% at nominal 5%): 82 = 29.3%)
+  P3 >= 50% of judge-certified in Physics/Math/Law: 13 / 22 = 59.1% -> HELD
+  P4 wrong-key-sign (established) 0-2:        3 -> FAILED
+  Falsifier wrong(established) > 5% of judge-certified: 3 / 22 = 13.6% -> TRIGGERED (claim overturned at this support; no 'certified above / below its own standing' for any judge-built cell; C1 stands on the key alone)
+
+=== CRITERIA (C2-C5 on delta'; C1 on the key) ===
+  C1 key-certified share:      127 / 280 = 45.4% -> FAILED (prediction < 30%)
+  C2 judge-certified share:    22 / 280 = 7.9% (1 in FAIL anchors PREDICTIVE-ONLY) -> HELD (prediction < 15%)
+  C3 wrong(established):       3 / 22 -> FAILED
+  C4 variance share:           judge 0.028 (noise-subtracted 0.018), key 0.181 (noise-subtracted 0.168) -> DELIVERED (no threshold registered)
+  C5 sign agreement:           14 / 22 certified same-sign; baseline 55.7% -> DELIVERED (descriptive)
+  CLAIM 'delta_ac carries certifiable content beyond theta_m': FALSIFIED (3 / 22 wrong(established))
+
+  files: Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\x12_crossdomain\profile_deviation_cert.txt (this), Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\x12_crossdomain\profile_deviation_cert_cells.csv (one row per cell), Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\x12_crossdomain\profile_deviation_cert_draws.npz (multiplicity matrices + theta draws, seed 42)

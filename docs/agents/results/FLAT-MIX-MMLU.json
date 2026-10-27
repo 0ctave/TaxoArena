@@ -1,0 +1,342 @@
+{
+  "id": "FLAT-MIX-MMLU",
+  "title": "FLAT-MIX-MMLU: is af_clean_s42 (82 leaves, content-closed) a better partition of MMLU-Pro than a flat vMF mixture / spherical k-means at k = 82 (seeds 0-4), on held-out purity, F6, split-half R and held-out log-likelihood through one instrument? (zero-call; REGISTERED) [DONE 2026-09-26: VALID (post-run review 643995a); C1 FAILED, C2 FAILED, L1 FIRES, reading T-4 (a LIMITATION; mechanism not identified)]",
+  "question": "On MMLU-Pro, is the content-closed anchor-free tree af_clean_s42 (82 leaves) a better PARTITION of the corpus of record than a flat vMF mixture and spherical k-means at the same k = 82 (seeds 0-4), on held-out purity, F6 key-only LOO Brier, split-half R and held-out log-likelihood, all through ONE instrument?",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "the commit that writes this record (parent 3bee93b)",
+    "program_lines": "docs/judge_v2_program.md L20672-L20735",
+    "program_lines_as_of": "_as_of the commit that writes it, parent 3bee93b, re-grepped",
+    "date": "2026-09-26",
+    "heading": "## Registered 2026-09-26 (before any code or call) — FLAT-MIX-MMLU: on MMLU-Pro, is the content-closed anchor-free tree af_clean_s42 (82 leaves) a better PARTITION ...",
+    "provenance": "the author's GMM lead; the tree-construction-specialist's report R2 (scratchpad, not of record); the orchestrator's brief; REGISTRAR CORRECTION: k = 82, not the brief's 81 (81 = af/seed_42's leaves; af_clean_s42 has 82: anchor_free_redraw_outcome.txt L316)"
+  },
+  "script": {
+    "path": "tools/analysis/flat_mix_mmlu.py (--dry-run, --selftest, --mutants, --identity-check, --run, --analyze); imports anchor_free_readout.py 514e74da and free_tests_f4_f7.py f0749d61 (unchanged); MERGED on main",
+    "sha16": "flat_mix_mmlu.py blob:c5cc7934474c6de77c36fb755cb321736d6c3b71 / sha256-lf16:70666bb7c751fd54 / sha256-crlf16:93b52490cec474af (main working file CRLF = the crlf16; the script's own identity normalises CRLF to LF); LF rendering of record",
+    "commit": "346ea3bf97f8cee950aec09fca270d36e403b053 (merge by path from b617888; parent dde660e)",
+    "pre_patch": {
+      "path": "tools/analysis/flat_mix_mmlu.py (--dry-run, --selftest, --mutants, --identity-check, --run, --analyze); imports anchor_free_readout.py and free_tests_f4_f7.py (pin-verified); branch gmm-tests, worktree .claude/worktrees/gmm-tests, NOT MERGED",
+      "sha16": "PRE-PATCH (the build as ruled; the READY pins the post-patch file): flat_mix_mmlu.py blob:c9748494e89acf80d6f9ae13acb41051a11f3837 / sha256-lf16:7fce9aa8918f8ea0 / sha256-crlf16:8835426c93ffcc6f (worktree LF); imported pins unchanged: anchor_free_readout.py blob:514e74da / sha256-lf16:203b62c09b7cfd36; free_tests_f4_f7.py blob:f0749d61 / sha256-lf16:463462338e53019e",
+      "commit": "e79fdb4aa8aa1bd5474c5fe48a14c0b74e6c2860 (branch gmm-tests; parent 31d092e, the registration commit)"
+    }
+  },
+  "ready": {
+    "file": "docs/reviews/READY_mix_lrt_site_flat_mix.md",
+    "commit": "dde660e",
+    "at": "b617888 (branch gmm-tests)",
+    "review_blob": "blob:ecb75543fdfefc197ca34b944de372c2e5c8a852 / sha256-lf16:4efb28fe0b81c0ba (working file equals the blob)",
+    "verdict": "MIX-LRT-SITE: READY-WITH-CONDITIONS. FLAT-MIX-MMLU: READY-WITH-CONDITIONS. Both MERGEABLE by pathspec at the pins",
+    "conditions": {
+      "R1": "MET: data-steward 9073a8a CONFIRMED (ck-v1 = CK-CLOSE-v1 split_side.stem_key at norm-v1, 11,769 / 11,769 texts, 0 mismatches; held-out 3,445 vs fit 8,125: 0 stem_key, 0 exact, 3,445 singleton groups; 171 closure moves absent from the fit set); qualifier beside every FLAT 'held-out' sentence: 'content-closed under stem_key at norm-v1; near-copies below norm-v1 exist at about 1.1-1.3% (37 / 3,445 at cos >= 0.98, 4096 d; 45 at 256 d)'",
+      "R2": "MET (archived by the orchestrator; verified by the registrar): Z:\\FAC\\TUBerlin\\THESIS\\TaxoArena_data\\evidence_2026-09-25\\mix_lrt_fixture\\inner_classes\\ 40 SeparationNullBySizeTest$*.class + SHA256SUMS (40 OK; cmp 40 / 40 identical to build/classes); outer class dfa5a30e7529cd1b (cmp identical) and wnc\\ (Fx.java d3d079cc6a717549, Fx.class 93f09eb31d453c07, fixture_out.txt 8da35e52493ec841) beside it, not in any SHA256SUMS; redraw_dag_snapshots\\ 4 / 4 OK. The reviewer's digest 6aac60eb72afe9b6 REPRODUCED by the registrar (relayed as irreproducible): sha256 of `sha256sum -b 'SeparationNullBySizeTest$'*.class` output = sha256 of the archive's SHA256SUMS; byte identity stays the evidence of record",
+      "R3": "MET by the programme section of this commit (PCA ruling; O2 ruling; KS refuted / identity; D2 disclosure; cost re-projection; the READY with pins)",
+      "R4": "MET 2026-09-26 (relayed; flat_identity.log sha256 d2ba2db377d20033): 'IDENTITY: T through the flat wrapper: M1 0.727 [0.712, 0.741] (recorded 0.727 [0.712, 0.741]), M2 +12.785 (recorded +12.785) -> REPRODUCED', rc 0; P8 scored in the outcome",
+      "R5": "MET: merged by path at 346ea3b (parent dde660e), 3 paths from b617888; blobs re-verified at HEAD and b617888 and by git hash-object; ancestry true",
+      "R6": "OWED (run-operator): (1) FLAT --identity-check; (2) MIX --run until 0 chunks (record [COST], plan.json, the post-drop sum p10 + esc + obs vs 80), then MIX --analyze once; (3) FLAT --run until 12 partitions, then FLAT --analyze; rule 7; one single-threaded python process; kill by PID only; never concurrent; a MIX C1 VOID is a failed precondition and FLAT still runs [DEVIATION 2026-09-26 (the orchestrator's ruling c): FLAT runs BEFORE MIX after MIX's run incident (04:47:49); independent instrument; never concurrent. docs/judge_v2_program.md L21098-L21119 (section \"## Registrar's record 2026-09-26 (insertion only; zero calls; nothing run by the registrar) — MIX-LRT-SITE RUN INCIDENT ...\", _as_of the commit that writes it, parent 346ea3b, re-grepped)]",
+      "R7": "OWED (post-run review re-derives): MIX final admitted B and f per deciding site, CP interval, VOID counts per tree, measured CPU vs P8; FLAT discordance T vs V0 vs the declared 0.20, realised C1 SE (CI width / 3.92) vs 0.00762, realised C2 SE (F6 CI width / 3.92) vs the transported 0.300e-3, spread_V vs each MDE, which leg bound"
+    },
+    "defects": {
+      "D1": "MEDIUM fixture archive held the outer class only (ST-JVM re-executable only while build/ survives): fixed by R2",
+      "D2": "MEDIUM sphere curvature inside the top-10 PCA subspace (radial norm median about 0.3, max 0.47; deciding sites 0.32 / 0.46 / 0.46); inflates the null LR; FAILED-NO-POWER weak: disclosure beside R-e / R-f",
+      "D3": "LOW cost projection noisy (77.8 vs 87.8 after the drop, same blob); OVER print refers to the pre-drop total: R6 records the post-drop sum",
+      "D4": "LOW ST-EQ KS has about alpha power (0.009 vs x1.10 scale): the draw-for-draw identity carries equivalence; ST-EQ (iii) later",
+      "D5": "LOW FLAT selftest never executes paired() or analyze()'s assembly; O2 tested only with C1 FAILED (R3, R3b, R3d survive); code verified by execution",
+      "D6": "LOW MIX run()'s escalation decision not unit-tested (R4c, R4d survive); fail-closed in collect",
+      "D7": "LOW ST-PCA prints the arccos floor (4.7e-8 rad) as the max principal angle; projector distance about 1e-14"
+    },
+    "mutants": "builder: MIX 49 / 49, FLAT 28 / 28 KILLED; reviewer: 7 of 13 KILLED, 6 SURVIVED (1 equivalent, 2 fail-closed downstream, 3 selftest gaps); MIX --selftest 116 checks, FLAT 75, identical to the builder's logs",
+    "not_run_by_reviewer": "--run, --analyze, --identity-check on real data; no LR, BIC, ICL, gain, q, purity, F6 or M4 on real data",
+    "merge": "346ea3b (parent dde660e), by path from b617888, 3 paths",
+    "recorded_in": "docs/judge_v2_program.md L21060-L21096 (section \"## Registrar's record 2026-09-26 (insertion only; zero calls; nothing run; BEFORE any run) — MIX-LRT-SITE and FLAT-MIX-MMLU READY-WITH-CONDITIONS ...\", _as_of the commit that writes it, parent 346ea3b, re-grepped)",
+    "pins": "flat_mix_mmlu.py (1,389 lines) blob:c5cc7934 / sha256-lf16:70666bb7c751fd54 / sha256-crlf16:93b52490cec474af"
+  },
+  "go": "n/a (0 calls, 0 cce; no author decision)",
+  "run": {
+    "outcome_file": "experiment_results/flat_mix_mmlu/flat_mix_mmlu_outcome.txt (blob:9841da6c / sha256-lf16:8a85ffb27511de8f); experiment_results/flat_mix_mmlu/flat_mix_mmlu_arms.csv (blob:6def22c5 / sha256-lf16:9f1baca45ba8ea5e); state/ 13 files (meta.json + 12 partitions; sha256-lf16 listed in the programme section, item 1); LF, 0 CR; write-once",
+    "outcome_commit": "1f2548a (the registrar's commit of the write-once outputs, by path; sha256 re-verified against the review before the commit)",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (read-only, mode=ro&immutable=1; pins of 6 tables, the snapshot graph and 2 jsonl equal before and after)",
+    "date": "2026-09-26 (~04:50 --run; --analyze once; from main at 346ea3b, flat_mix_mmlu.py blob:c5cc7934 / sha256-lf16:70666bb7c751fd54); logs scratchpad gmm_run\\flat_identity.log, flat_run.log, flat_analyze.log (not of record)"
+  },
+  "review": {
+    "file": "docs/reviews/POSTRUN_flat_mix_mmlu.md (643995a; blob:96f57ac5960e4982f2c4e6c495b9bdb38dfc5cd2; LF)",
+    "commit": "643995a",
+    "verdict": "VALID: independent recompute reproduces every printed digit (M1 hits 12/12; M2, M3, M4; spreads; C1, C2, L1, T-4, F1, P1-P8); pins equal before/after; fit 8,125 distinct, 0 exact / 0 stem_key overlap with the 3,445 held-out. Conditions C-a (record the printed words with qualifiers (a)-(d), the R7 table, the order deviation), C-b (bracket T-4's mechanism clause; O disclosed), C-c (V EM stopped at max_iter; insensitive), C-d (future C2 uses the realised SE 0.357e-3). LOW: analyze() prints only the after-pins."
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "PURITY: HELD iff M1(T) - M1(V0) > spread_V(M1) (point) AND the paired bootstrap 95% CI excludes 0 on the positive side (interval), one conjunctive clause; FAILED otherwise; no UNDETERMINED",
+      "result": "FAILED",
+      "value": "M1(T) - M1(V0) = -0.0430, paired bootstrap 95% CI [-0.0557, -0.0293]; spread_V(M1) 0.0305; MDE 0.0213; effective threshold 0.0305 (bound by the seed spread); the CI excludes 0 on the NEGATIVE side",
+      "denominator": "3,445 held-out questions of p2dca21ab5f4ef3ae in 3,445 singleton stem_key groups; 1,000 resamples, seed 20260926"
+    },
+    {
+      "id": "C2",
+      "text": "KEY INFORMATION (F6 x1000): HELD iff M2(T) - M2(V0) > spread_V(M2) AND F6's paired bootstrap 95% CI excludes 0 on the positive side; FAILED otherwise",
+      "result": "FAILED",
+      "value": "M2(T) - M2(V0) = -1.534 x1e-3, F6 paired 95% CI [-2.230, -0.826]; spread_V(M2) 0.822 x1e-3; MDE 0.84; effective threshold 0.840 (bound by the MDE)",
+      "denominator": "10,925 keyed questions, 46 models (F6's boot_mean_ci)"
+    },
+    {
+      "id": "L1",
+      "text": "LOSS FLAG (scored): FIRES iff for M1 or M2, M(T) - M(V0) < -spread_V(M) AND the paired 95% CI excludes 0 on the negative side",
+      "result": "HELD",
+      "value": "FIRES on M1 (-0.0430 < -0.0305, CI hi -0.0293 < 0) AND on M2 (-1.534 < -0.822, CI hi -0.826 < 0); margins beyond the spread 0.0125 and 0.71e-3; reading T-4 ('HELD' here = the flag fired)",
+      "denominator": "as C1 / C2"
+    },
+    {
+      "id": "R",
+      "text": "(reported only) the same three vs K0 (spread_K); M3 split-half R and M4 held-out log-likelihood for every arm (M4 favours V by construction); O = o0_clean_s42 on every measure",
+      "result": "n/a",
+      "value": "REPORTED ONLY: vs K0 M1 -0.0438 [-0.0569, -0.0287], M2 -0.938 [-1.576, -0.288] x1e-3 (no win, loss yes); M4 T - V0 -1.3530 [-1.7164, -0.9475] nats (by construction), T - K0 -0.8054; O M1 0.770 [0.756, 0.784], M2 +13.949, M3 0.847 (14 cells), M4 416.7910",
+      "denominator": "as above"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1a",
+      "text": "M1(T) - M1(V0) = -0.005 (80% interval [-0.025, +0.015])",
+      "result": "FAILED",
+      "value": "-0.0430",
+      "denominator": "3,445"
+    },
+    {
+      "id": "P1b",
+      "text": "C1 FAILED with probability 0.80",
+      "result": "HELD",
+      "value": "C1 FAILED",
+      "denominator": "3,445"
+    },
+    {
+      "id": "P2a",
+      "text": "M2(T) - M2(V0) = +0.3 x1e-3 (80% interval [-1.0, +1.5] x1e-3)",
+      "result": "FAILED",
+      "value": "-1.534 x1e-3",
+      "denominator": "10,925"
+    },
+    {
+      "id": "P2b",
+      "text": "C2 FAILED with probability 0.75",
+      "result": "HELD",
+      "value": "C2 FAILED",
+      "denominator": "10,925"
+    },
+    {
+      "id": "P3",
+      "text": "spread_V(M1) = 0.008 (80% interval [0.003, 0.020])",
+      "result": "FAILED",
+      "value": "0.0305 (about 4x)",
+      "denominator": "5 V seeds"
+    },
+    {
+      "id": "P4",
+      "text": "M4: V0 above T in mean nats per question: probability 0.85",
+      "result": "HELD",
+      "value": "V0 416.9797, T 415.6267",
+      "denominator": "3,445"
+    },
+    {
+      "id": "P5",
+      "text": "|M1(K0) - M1(V0)| <= 0.010: probability 0.70",
+      "result": "HELD",
+      "value": "0.0009",
+      "denominator": "3,445"
+    },
+    {
+      "id": "P6",
+      "text": "L1 fires: probability 0.15",
+      "result": "HELD",
+      "value": "L1 fired (M1 and M2)",
+      "denominator": "as C1 / C2"
+    },
+    {
+      "id": "P7",
+      "text": "reading (T-1) 0.65, (T-2) 0.12, (T-3) 0.08, (T-4) 0.10, (T-5) 0.05; HELD iff (T-1)",
+      "result": "FAILED",
+      "value": "observed T-4 (registered 0.10)",
+      "denominator": "the run"
+    },
+    {
+      "id": "P8",
+      "text": "identity check reproduces T's M1 0.727 [0.712, 0.741] and M2 +12.785 to the printed digits: probability 0.95",
+      "result": "HELD",
+      "value": "M1 0.727 [0.712, 0.741], M2 +12.785 (REPRODUCED)",
+      "denominator": "the READY's identity check"
+    }
+  ],
+  "falsifier": {
+    "text": "F1 fires iff C1 HELD or C2 HELD or L1 FIRES: it overturns the registered expectation that the TOPIC-PARTITION-20NG sentence of record ('its value on this corpus is the split discipline, the support per cell and the certificate, not the partition') holds on MMLU-Pro; a WIN needs a second seed before any sentence of record; a LOSS becomes a stated limitation; no recorded number is revised.",
+    "fired": true,
+    "outcome": "F1 FIRES (L1 FIRED): the expectation that the TOPIC-PARTITION-20NG sentence holds on MMLU-Pro as worded is overturned; it transfers IN A STRONGER FORM ('not a better partition, and measurably a worse one'): a STATED LIMITATION; TOPIC-PARTITION-20NG stands on 20NG"
+  },
+  "numbers_of_record": {
+    "tree_of_record": "af_clean_s42: snapshot 20260917_201353, commit 190cb485, 82 leaves / 151 nodes / depth 8 / 14 iterations; train 8,230 (843 gate) / test 3,770; [SPLIT-CLOSURE] 171; 8,125 texts at the root (build.out L71)",
+    "tree_readout_of_record": "held-out purity 0.727 [0.712, 0.741] (n 3,445); F6 leaf over marginal +12.785 x1e-3 (n 10,925); split-half R leaves 0.786 (22 cells) (anchor_free_af_clean_s42_readout.txt)",
+    "support": "C1: n 3,445, DEFF 1.0 declared, discordance 0.20 declared, SE sqrt(0.20 / 3,445) = 0.00762, MDE80 0.0213; C2: SE (0.201 + 0.976) / 3.92 = 0.300 x1e-3 transported from the recorded paired F6 CI -0.409 [-0.976, +0.201], MDE80 0.84 x1e-3; effective bar max(MDE, spread_V)",
+    "C1_purity_T_minus_V0": "-0.0430, 95% CI [-0.0557, -0.0293] (n 3,445 held-out; spread_V 0.0305) -> FAILED; L1 on M1",
+    "C2_F6_T_minus_V0": "-1.534 x1e-3, 95% CI [-2.230, -0.826] (n 10,925 keyed; spread_V 0.822 x1e-3) -> FAILED; L1 on M2",
+    "arms_M1_M2": "T 0.727 [0.712, 0.741] / +12.785; O 0.770 [0.756, 0.784] / +13.949 (reported only); V0 0.770 [0.755, 0.784] / +14.318; V1 0.768 / +13.725; V2 0.743 / +14.429; V3 0.773 / +13.607; V4 0.758 / +13.730; K0 0.771 [0.756, 0.784] / +13.723; K1 0.746 / +12.523; K2 0.751 / +13.361; K3 0.763 / +13.156; K4 0.766 / +14.105 (M1 on 3,445; M2 x1e-3 on 10,925)",
+    "M4_descriptive": "T 415.6267, V0 416.9797, T - V0 -1.3530 nats [-1.7164, -0.9475] (V maximises this likelihood: by construction, not a result)",
+    "spreads": "spread_V M1 0.0305, M2 0.822 x1e-3, M4 0.8441; spread_K M1 0.0244, M2 1.582 x1e-3, M4 0.8221",
+    "R7_realised_support": "C1: discordance 0.1533 (declared 0.20); SE 0.00663 analytic (CI/3.92 0.00674) vs registered 0.00762 (conservative); realised MDE 0.0186. C2: SE 0.357e-3 analytic (CI/3.92 0.358e-3) vs transported 0.300e-3 (19% optimistic); realised MDE 1.00e-3 vs 0.84e-3; the loss -1.534e-3 still clears it (by 0.53e-3)",
+    "seed_robustness_descriptive": "T below all 5 V (min 0.743) and all 5 K (min 0.746) on M1; below 5/5 V (min +13.607) and 4/5 K (K1 +12.523 lower) on M2. T - V1 (median by M1) -0.0415 [-0.0546, -0.0279]; T - V2 (worst by M1) -0.0160 [-0.0293, -0.0023]; T - V3 (worst by M2) M2 -0.822 [-1.452, -0.142] x1e-3; every paired CI below 0",
+    "spread_V_mechanism_descriptive": "local optima, not EM non-convergence: V0-V4 stopped at the 200-iteration cap; continued EM converged within 33-94 more iterations, M1 moved <= 0.0020, M2 <= 0.16e-3, train ll <= 0.037 nats; pairwise ARI V about 0.55, K 0.50, V0 vs K0 0.63",
+    "O_vs_V0_descriptive": "O (o0_clean_s42, 84 leaves; config differs from T only by anchorFree; mcs 55 both) M1 0.770 vs V0 0.770; F6 +13.949 vs +14.318: TIES; reported only, NOT scored"
+  },
+  "sentence_of_record": "FLAT-MIX-MMLU (2026-09-26, 0 calls; post-run review 643995a VALID): On MMLU-Pro, the anchor-free tree af_clean_s42 (82 leaves) is a worse partition than a flat vMF mixture at k = 82: held-out purity -4.3 pp [-5.6, -2.9], key information -1.5e-3 [-2.2, -0.8], both beyond the seed spread. [held-out = the 3,445 judgeable questions of p2dca21ab5f4ef3ae, content-closed under stem_key at norm-v1, with near-copies below norm-v1 at about 1.1% (37 / 3,445 at cos >= 0.98, 4096 d); one tree (seed 42), one flat comparator of record (V0), one corpus; key information = F6 key-only LOO Brier on the 10,925 keyed questions of both sides (the F2-CLEAN caveat); P3 FAILED (spread_V 0.0305, about 4x the predicted 0.008, bound the purity threshold); reading T-4, a LIMITATION, but its mechanism ('the size floor and the greedy cuts') is NOT identified: the anchored control O (reported only; same mcs 55 and splitter) ties V0; not a claim that V is a better taxonomy (M4 is by construction); nothing about routing, boards, judges or profiles; no scored comparison of O or K.]",
+  "chips": [
+    "REGISTERED 2026-09-26, BEFORE ANY CODE [plan]",
+    "VALID (POST-RUN 643995a); RUN 346ea3b, OUTPUTS 1f2548a; C1 FAILED, C2 FAILED, L1 FIRES (M1 AND M2): READING T-4, F1 FIRES (A LIMITATION): PURITY -4.3 PP [-5.6, -2.9], F6 -1.5e-3 [-2.2, -0.8] VS FLAT vMF V0 AT k = 82 [null]",
+    "P1b P2b P4 P5 P6 P8 HELD; P1a P2a P3 P7 FAILED (P3: spread_V 0.0305, ~4x); R7: C2 SE 0.357e-3 VS TRANSPORTED 0.300e-3 (19% OPTIMISTIC), LOSS STILL CLEARS MDE 1.00e-3 [warn]",
+    "0 CALLS; ~10 CPU-MIN, SINGLE-THREADED [plan]",
+    "A WIN NEEDS A SECOND SEED BEFORE ANY SENTENCE OF RECORD [warn]",
+    "HELD-OUT = CONTENT-CLOSED AT NORM-V1 ONLY: 37/3,445 FIT NEAR-COPIES AT COS >= 0.98; C2 SE TRANSPORTED, MAY BE OPTIMISTIC [warn]",
+    "T-4 MECHANISM NOT IDENTIFIED: O (REPORTED ONLY; SAME mcs 55 / SPLITTER) TIES V0 (0.770); ONE TREE / ONE COMPARATOR / ONE CORPUS; NOT 'V IS A BETTER TAXONOMY' (M4 BY CONSTRUCTION) [warn]"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-26",
+      "by": "registrar (zero calls; insertion only; before the READY and before any data)",
+      "text": "BUILT at e79fdb4 (branch gmm-tests, base 31d092e, unmerged; pins re-derived, pre-patch, in script); dry-run read (no statistic; fit set 8,125, held-out 3,445, 0 overlap, 3,445 singleton twin groups); PRE-DATA RULINGS B1-B8 recorded; B5 RULED (T-5, derived from the registration's own example); objection O1 (L1 is scored), note O2 (B6 and the descriptive M4); REQUIRED CODE CHANGES RC6, RC7 before the READY; line-end brackets at L20681, L20684, L20692, L20693, L20706, L20710, L20735; state registered -> built. docs/judge_v2_program.md L20864-L20919 (section \"## Registrar's record 2026-09-26 (insertion only; zero calls; nothing run; BEFORE the READY and before any data) — MIX-LRT-SITE and FLAT-MIX-MMLU BUILT ...\"; _as_of the commit that writes it, parent 6402b0a, re-grepped)"
+    },
+    {
+      "date": "2026-09-26",
+      "by": "registrar (zero calls; insertion only; before any run; READY condition R3)",
+      "text": "READY-WITH-CONDITIONS (dde660e, read in full) and MERGED at 346ea3b (flat_mix_mmlu.py blob:c5cc7934 / sha256-lf16:70666bb7c751fd54, re-verified). R3 recorded: O2 NARROWED as the orchestrator's pre-data ruling (a degenerate M4 refit voids M4 only; B6 stands for V); MDEs C1 0.02133, C2 0.8407e-3, scoreable only as a win / loss above max(MDE, spread_V); C2 SE transported, may be optimistic. R1 met (steward 9073a8a; near-copy qualifier beside every 'held-out' sentence); R5 met; R4 (identity check) and R6 owed, AFTER MIX-LRT-SITE; R7 owed. Line-end brackets at L20679, L20692, L20714, L20733, L20735, L20899. docs/judge_v2_program.md L21060-L21096 (section \"## Registrar's record 2026-09-26 (insertion only; zero calls; nothing run; BEFORE any run) — MIX-LRT-SITE and FLAT-MIX-MMLU READY-WITH-CONDITIONS ...\", _as_of the commit that writes it, parent 346ea3b, re-grepped)"
+    },
+    {
+      "date": "2026-09-26",
+      "by": "registrar (zero calls; insertion only; run incident of MIX-LRT-SITE)",
+      "text": "R6 ORDER DEVIATION (the orchestrator's ruling (c)): FLAT runs before MIX after MIX's crash at 04:47:49; R4 MET (--identity-check REPRODUCED, M1 0.727 [0.712, 0.741], M2 +12.785, rc 0); --run complete (12 partitions); --analyze owed; state READY -> running. docs/judge_v2_program.md L21098-L21119 (section \"## Registrar's record 2026-09-26 (insertion only; zero calls; nothing run by the registrar) — MIX-LRT-SITE RUN INCIDENT ...\", _as_of the commit that writes it, parent 346ea3b, re-grepped)"
+    },
+    {
+      "date": "2026-09-26",
+      "by": "registrar (zero calls; insertion only; outcome; post-run review 643995a)",
+      "text": "OUTCOME: VALID; C1 FAILED, C2 FAILED, L1 FIRES on M1 and M2, reading T-4, F1 FIRES (a LIMITATION: 'a measurably worse partition'); P1b P2b P4 P5 P6 P8 HELD, P1a P2a P3 P7 FAILED; outputs committed 1f2548a. T-4's MECHANISM CLAUSE bracketed NOT IDENTIFIED (L20705): O (reported only; config differs by anchorFree only, mcs 55) ties V0, DESCRIPTIVE, not scored. R7: C1 SE 0.00663 vs 0.00762 (conservative); C2 SE 0.357e-3 vs transported 0.300e-3 (19% optimistic), realised MDE 1.00e-3 still cleared; future C2 uses 0.357e-3 (C-d). spread_V = local optima (EM cap immaterial). R6 order deviation accepted as immaterial; LOW: analyze() prints only the after-pins (equality enforced). Candidate follow-up FLAT-MIX-ANCHORED drafted, NOT registered. State running -> done. docs/judge_v2_program.md L21121-L21274 (section \"## FLAT-MIX-MMLU (2026-09-26, 0 calls) — VALID (post-run review 643995a): C1 FAILED, C2 FAILED, L1 FIRES on M1 AND M2, reading T-4, F1 FIRES ...\", _as_of the commit that writes it, parent 1f2548a, re-grepped)"
+    }
+  ],
+  "does_not_show": [
+    "anything yet: registered, not built, not run [SUPERSEDED 2026-09-26 at the outcome: the test ran; see the items below]",
+    "equivalence: a tie reads 'not shown better at MDE 2.1 pp / 0.84 x1e-3', never 'equal'",
+    "anything about routing (the router role and the multi-corpus result are not re-tested), the judge, the boards or a profile",
+    "near-duplicate leakage below norm-v1 (not measured)",
+    "a second seed",
+    "the o0_clean_s42 comparison (reported only)",
+    "near-duplicate leakage below norm-v1 as an effect on any measure (the steward COUNTS 37 / 3,445 held-out with a fit near-copy at cos >= 0.98, 4096 d; 45 at 256 d; descriptive, 9073a8a)",
+    "the mechanism: T-4's clause 'the size floor and the greedy cuts' is NOT identified; O (reported only; same mcs 55 and splitter) ties V0",
+    "generalisation: that trees or this construction are worse partitions in general (no second tree seed, no second content-closed anchor-free tree, no second corpus)",
+    "anything about routing, boards, judges, profiles or the frontier (the multi-corpus router result is not re-tested)",
+    "that V is a better TAXONOMY (no certificate, names or support floor; its M4 advantage +1.353 nats is by construction)",
+    "any SCORED comparison of O or K (both reported only; O vs T is not a scored contrast)",
+    "a size of the loss sharper than the CIs (against the worst V seed the purity loss is -0.0160 [-0.0293, -0.0023])"
+  ],
+  "ledger": {
+    "row_id": "FLAT-MIX-MMLU",
+    "version": "v304 (2026-09-26: OUTCOME: an outcome bracket in the observed cell; chip READY-WITH-CONDITIONS ... --ANALYZE OWED [run] -> VALID (POST-RUN 643995a) ... C1 FAILED, C2 FAILED, L1 FIRES ... READING T-4, F1 FIRES (A LIMITATION) ... [null]; chip WIN / LOSS SCOREABLE ... [plan] -> P1b ... HELD; P1a ... FAILED ... R7 ... [warn]; a T-4 MECHANISM NOT IDENTIFIED ... [warn] chip added) | v303 (2026-09-26: READY + merge: a bracket in the observed cell; chip BUILT ... -> READY-WITH-CONDITIONS dde660e; MERGED 346ea3b ... [plan]; a held-out / C2-SE warn chip added; R6 deviation: chip -> RUNNING BEFORE MIX ... [run]) | v300 (2026-09-26: built + pre-data rulings: a bracket in the observed cell; chip NOT BUILT, NOT READY, NOT RUN -> BUILT e79fdb4 (UNMERGED); PRE-DATA RULINGS B1-B8 RECORDED (B5: T-5); RC6, RC7 OWED; READY PENDING; NOT RUN; class plan unchanged) | v298 (2026-09-26: registered; a new section-7 row, PLAN chips and one WARN chip)"
+  },
+  "depends_on": [
+    "TOPIC-PARTITION-20NG (the C1 form and the sentence under test)",
+    "ANCHOR-FREE-REDRAW (af_clean_s42 of record)",
+    "ANCHOR-FREE (the readout instrument)",
+    "CONTENT-DISJOINT-SPLIT-AUDIT (the closure)"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "reopens nothing in CONTEXT section 5; records a LIMITATION for the construction chapter (the anchor-free tree af_clean_s42 is a worse partition of MMLU-Pro than a flat vMF mixture at k = 82); closes no line"
+  },
+  "cost": {
+    "calls_expected": 0,
+    "cce_expected": 0,
+    "calls_max": 0,
+    "cce_max": 0,
+    "machine": "~10 CPU-min (EM k 82 on 8,125 x 256, <= 200 iterations x 5 seeds; k-means x 5; readout functions); single-threaded; chunks <= 4 min; a pool reader (rule 7)",
+    "agent": "engine-coder ~2 h; READY (with the identity check); run-operator; post-run review",
+    "source": "the registration (the report's estimate; not priced by the cost-estimator)"
+  },
+  "support": {
+    "a": "C1: 3,445 held-out (stem_key twin groups; count printed by the script); C2: 10,925 keyed; paired",
+    "b": "C1: DEFF 1.0 declared pilot assumption (Kish m-bar printed); C2: transported from the recorded paired F6 CI (af_clean_s42 minus af/seed_42)",
+    "c": "C1 3,445; C2 inside the transported SE",
+    "d": "C1 sqrt(0.20 / 3,445) = 0.00762 (d = 0.20 declared); C2 1.177 / 3.92 = 0.300 x1e-3",
+    "e": "C1 2.80 x 0.00762 = 0.0213; C2 2.80 x 0.300 = 0.84 x1e-3; effective bar max(MDE, spread_V)",
+    "f": "a WIN or LOSS above max(MDE, spread_V) SCOREABLE; the predicted tie DESCRIPTIVE-ONLY",
+    "g": "the CI leg reachable; the seed-spread leg does not shrink with n, so a WIN is reachable only if the true difference exceeds spread_V"
+  },
+  "held_out_population": "the 3,445 judgeable questions of p2dca21ab5f4ef3ae; HELD-OUT admissible for af_clean_s42 (content-closed under stem_key at norm-v1, [SPLIT-CLOSURE] 171; sentinels in the key set; one corpus; no families; twins clustered); near-duplicates below norm-v1 not measured; READY check: ck-v1 == CK-CLOSE-v1 stem_key (data-steward) [2026-09-26 registrar, R1 of READY dde660e: steward 9073a8a CONFIRMED; every 'held-out' sentence carries 'content-closed under stem_key at norm-v1; near-copies below norm-v1 exist at about 1.1-1.3% (37 / 3,445 at cos >= 0.98, 4096 d; 45 at 256 d)'.]",
+  "readings": {
+    "T-1": "C1, C2 FAILED, L1 not fired: the 20NG sentence transfers ('not shown to partition better at MDE ...')",
+    "T-2": "C2 HELD only: new pro-tree sentence candidate, provisional until a second seed",
+    "T-3": "C1 HELD: the tree partitions better on MMLU-Pro; second seed required",
+    "T-4": "L1 fired, C1 / C2 FAILED: a limitation for the construction chapter",
+    "T-5": "mixed: joined, no sentence"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L20672-L20735 (section \"## Registered 2026-09-26 (before any code or call) — FLAT-MIX-MMLU: on MMLU-Pro, is the content-closed anchor-free tree af_clean_s42 (82 leaves) a better PARTITION ...\"; _as_of the commit that writes it, parent 3bee93b, re-grepped)",
+    "experiment_results/anchorfree/redraw/anchor_free_af_clean_s42_readout.txt; anchor_free_redraw_outcome.txt L316; af_clean_s42.build.out L27-L32, L71",
+    "docs/judge_v2_program.md L10286-L10287 (TOPIC-PARTITION-20NG C1), L10338-L10341 (its verdict rule), L11442 (its outcome), L14306-L14307 (af_clean_s42 content-closed)",
+    "docs/judge_v2_program.md L20864-L20919 (section \"## Registrar's record 2026-09-26 (insertion only; zero calls; nothing run; BEFORE the READY and before any data) — MIX-LRT-SITE and FLAT-MIX-MMLU BUILT ...\"; _as_of the commit that writes it, parent 6402b0a, re-grepped)",
+    "branch gmm-tests e79fdb4 (tools/analysis/flat_mix_mmlu.py); session scratchpad flat_dry.txt (sha256 9b488caca753bf7b...): not a file of record",
+    "docs/judge_v2_program.md L21060-L21096 (section \"## Registrar's record 2026-09-26 (insertion only; zero calls; nothing run; BEFORE any run) — MIX-LRT-SITE and FLAT-MIX-MMLU READY-WITH-CONDITIONS ...\", _as_of the commit that writes it, parent 346ea3b, re-grepped)",
+    "docs/reviews/READY_mix_lrt_site_flat_mix.md (dde660e; blob:ecb75543fdfefc197ca34b944de372c2e5c8a852 / sha256-lf16:4efb28fe0b81c0ba (working file equals the blob))",
+    "docs/reviews/STEWARD_ckv1_af_clean.md (9073a8a; blob:e99c0ee381ccc3bc3d3ab57ae47d89a4624663a9 / sha256-lf16:c682d32576c63ffb): CONFIRMED",
+    "the orchestrator's relay of 2026-09-26 (O2 ruling; merge 346ea3b)",
+    "docs/judge_v2_program.md L21098-L21119 (section \"## Registrar's record 2026-09-26 (insertion only; zero calls; nothing run by the registrar) — MIX-LRT-SITE RUN INCIDENT ...\", _as_of the commit that writes it, parent 346ea3b, re-grepped)",
+    "session scratchpad gmm_run\\ (not files of record): mix_run.log sha256 6ce686fe9d88be4e (= incident\\mix_run.log), incident\\diag2.log 81757e9b35d2a016, flat_identity.log d2ba2db377d20033, flat_run.log, mix_dry.log",
+    "docs/judge_v2_program.md L21121-L21274 (section \"## FLAT-MIX-MMLU (2026-09-26, 0 calls) — VALID (post-run review 643995a): C1 FAILED, C2 FAILED, L1 FIRES on M1 AND M2, reading T-4, F1 FIRES ...\", _as_of the commit that writes it, parent 1f2548a, re-grepped)",
+    "docs/reviews/POSTRUN_flat_mix_mmlu.md (643995a; blob:96f57ac5960e4982f2c4e6c495b9bdb38dfc5cd2; LF): VALID; the words of record, qualifiers (a)-(d), R7 table, sections 3-5",
+    "experiment_results/flat_mix_mmlu/flat_mix_mmlu_outcome.txt (blob:9841da6c / sha256-lf16:8a85ffb27511de8f); flat_mix_mmlu_arms.csv (blob:6def22c5); state/ (13 files); committed 1f2548a",
+    "experiment_results/anchorfree/redraw/{af,o0}_clean_s42/seed_42/diagnostics/config.toml: `diff` by the registrar (anchorFree key, headers, outputDir only; minClusterSize = 55 in both)",
+    "session scratchpad gmm_run\\flat_identity.log, flat_run.log, flat_analyze.log; rev_mix\\post_flat.log (not files of record)"
+  ],
+  "last_update": "2026-09-26 (registrar: registered before any code; ledger v298); 2026-09-26 (registrar: BUILT e79fdb4, pre-data rulings B1-B8, B5 ruled T-5, RC6-RC7 owed; ledger v300); 2026-09-26 (registrar: READY-WITH-CONDITIONS dde660e, merged 346ea3b, R3 recorded (O2 ruling); state READY; ledger v303); 2026-09-26 (registrar: R4 met (REPRODUCED); R6 order deviation, FLAT before MIX; --run complete; state running; ledger v303); 2026-09-26 (registrar: OUTCOME recorded; post-run review 643995a VALID; outputs committed 1f2548a; C1 FAILED, C2 FAILED, L1 FIRES, T-4 (mechanism not identified), F1 FIRES; state done; ledger v304)",
+  "build": {
+    "evidence_relayed": "65 selftest checks; --mutants 25/25 killed (no log found in the scratchpad: relayed only)",
+    "dry_run": "flat_dry.txt ([SCRIPT] blob:c9748494 = the committed blob; sha256 9b488caca753bf7b...): no statistic; FIT SET 8,125 ids == 8,125 distinct texts (asserted), 8,125/8,125 embedded; held-out 3,445 (3,445 distinct texts); train 8,324 texts; fit texts among held-out 0; 3,445 stem_key twin groups, 0 with more than one question; T 82 leaves / 151 nodes; O 84 leaves / 145 nodes; keyed F6 10,925 questions, 46 models; 12 partitions; synthetic cost EM <= 0.7, k-means <= 0.5 CPU-min",
+    "owed_at_ready": "data-steward: ck-v1 == CK-CLOSE-v1 split_side.stem_key; --identity-check (M1 0.727 [0.712, 0.741], M2 +12.785); selftest + mutants re-run on the READY blob with logs filed"
+  },
+  "pre_data_rulings": {
+    "by": "the orchestrator, 2026-09-26 (B5 handed to and ruled by the registrar); recorded by the registrar",
+    "B1": "V init = spherical k-means++ seeding with the seed + ONE hard M-step (no full k-means before EM)",
+    "B2": "M4 refit for T, K, O on the 8,125 fit texts; O on the same set",
+    "B3": "bootstrap seed 20260926",
+    "B4": "outcome path experiment_results/flat_mix_mmlu/ (write-once)",
+    "B5": "RULED BY THE REGISTRAR, DERIVED (not AMBIGUOUS): C1 HELD with L1 FIRED on M2 reads (T-5), recorded joined \"C1 HELD / L1 FIRED on M2\", no sentence: the mirror image under M1 <-> M2 of (T-5)'s own example \"C2 HELD with L1 fired on M1\"; (T-3)'s \"(with or without C2)\" is silent on L1; L1 cannot fire on M1 when C1 HELD. F1 FIRES; P7 FAILED. OBJECTION O1: L1 is \"scored\" (L20698) and in F1 (L20727), not descriptive; the ruling does not rest on it",
+    "B6": "a lost-responsibility component, a one-member cell or an underflowing ive VOIDs the seed; the analysis refuses (accepted). NOTE O2: the same refusals sit in the descriptive M4 refit of T, K, O, so a descriptive measure can block C1 / C2 (a failed precondition, never an outcome)",
+    "B7": "every held-out stem_key group is a singleton: Kish m-bar 1, DEFF = 1 EXACTLY for the twin clustering (measured); the C1 SE still rests on the declared discordance 0.20; verdict line unchanged",
+    "B8": "extra modes --analyze, --identity-check, --mutants accepted"
+  },
+  "required_code_changes": {
+    "RC6 (B5)": "reading(): c1 and l1 -> (\"T-5\", False), printed joined \"C1 HELD / L1 FIRED on M2\"; READING_TEXT \"T-3/T-5\" retired; st_branches asserts the joined T-5, F1 FIRES with both triggers, P7 FAILED; docstring CRITERIA",
+    "RC7 (B6, words only)": "the four \"no registered handling\" refusals (log_cd ive underflow; banerjee_kappa one-member/degenerate cell; vmf_em lost responsibility and empty k-means++ seed) cite ruling B6; docstring M4; behaviour unchanged"
+  },
+  "rulings_at_ready": {
+    "by": "R3 of the READY dde660e, recorded by the registrar; O2 is the ORCHESTRATOR'S pre-data ruling (the programme held only the registrar's note at L20899)",
+    "O2": "NARROWED: a degenerate descriptive M4 refit (one-member cell, ive underflow, lost responsibility in the refit of T, K or O) VOIDs M4 for that arm only (printed VOID; the M4 prediction UNSCOREABLE) and never blocks C1, C2 or L1; B6 stands for the scored V fits (VOID seed, analysis REFUSES); confirmed by the reviewer's execution (claim 1i: C1 HELD, reading T-3, P4 UNSCOREABLE; paired() d4 None, d1 intact); selftest gap D5",
+    "MDE": "C1 SE sqrt(0.20 / 3,445) = 0.007619, MDE 0.02133; C2 SE (0.201 + 0.976) / 3.92 = 0.30026e-3, MDE 0.8407e-3; scoreable only as a WIN or LOSS exceeding max(MDE, spread_V); tie DESCRIPTIVE-ONLY; C1's d = 0.20 declared; C2's SE TRANSPORTED from a tree-vs-tree pair, may be optimistic"
+  },
+  "run_progress": {
+    "date": "2026-09-26",
+    "identity_check": "REPRODUCED (rc 0)",
+    "run": "--run complete ~04:50: 12 partitions written (K0-K4, O, T, V0-V4); '[PIN] before == after on every pinned table / row / file'; no measure printed",
+    "analyze": "OWED (once, write-once)",
+    "logs": "session scratchpad gmm_run\\ (not files of record): mix_run.log sha256 6ce686fe9d88be4e (= incident\\mix_run.log), incident\\diag2.log 81757e9b35d2a016, flat_identity.log d2ba2db377d20033, flat_run.log, mix_dry.log",
+    "recorded_in": "docs/judge_v2_program.md L21098-L21119 (section \"## Registrar's record 2026-09-26 (insertion only; zero calls; nothing run by the registrar) — MIX-LRT-SITE RUN INCIDENT ...\", _as_of the commit that writes it, parent 346ea3b, re-grepped)"
+  },
+  "follow_ups": {
+    "FLAT-MIX-ANCHORED": "DRAFTED, NOT REGISTERED (queue): score O (o0_clean_s42) against a flat vMF mixture V at k = O's leaf count (84), seeds 0-4, same instrument, with the realised C2 SE 0.357e-3 in its Support; motivated by the DESCRIPTIVE O vs V0 tie ('the anchors, not the construction itself, may carry partition quality')",
+    "MIX-FLAT-SELFTEST-GAPS": "drafted (queue): add the review's LOW (analyze() prints both before- and after-pins) to the FLAT half"
+  },
+  "plain_description": {
+    "sq": "SQ3 Taxonomy",
+    "what": "Compares the label-free tree af_clean_s42 (82 leaves) on MMLU-Pro against flat clusterings with the same number of groups (a von Mises-Fisher mixture and spherical k-means, 5 seeds), on held-out purity, how much the groups predict model correctness, reliability and held-out likelihood.",
+    "why": "Asks whether building a hierarchy gives a better partition of questions than simply clustering flat into the same number of groups.",
+    "information": "If the tree wins, the hierarchical construction adds value as a partition; if it loses, the tree's benefit must come from elsewhere. Result: done; the tree is a WORSE partition than the flat mixture (purity -4.3 points, also less predictive), beyond the seed spread. One tree, one corpus; the cause is not identified, and it says nothing about routing or about which is the better taxonomy.",
+    "written": "2026-10-07"
+  }
+}

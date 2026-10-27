@@ -1,0 +1,158 @@
+=== KEY-TIE-DECLINE: decline any separation whose key direction is not established (McNemar p >= 0.05) ===
+  rule applied on top of (i) the raw certificate and (ii) the shipped widener tau(A) = exp(-3.2326 + 3.3133*A)
+  thresholds 0.900, 0.950, 0.975, 0.990, 0.995 | wrong counts as all(McNemar-established) | Meta-Llama-3-70B-Instruct excluded
+
+  DATA CHECK x12: 12 models, 920 edges with any key gap, 891 with gap >= 0.02 (the registered 891), 14 anchors, judged questions per anchor min 119 / max 304
+  key denominator: sb.mcnemar_edge over anchor_qs[anchor] = the anchor's JUDGED questions (not the routed pool).
+
+=== x12: 891 per-anchor edges, decline rule on both bases ===
+  edges 891 | key direction established (McNemar p < 0.05) 809 | unestablished 82 | wrong-direction 44(26)
+  wrong counts are all(McNemar-established). 'surr' = calls the rule declines; 'right surr' = correct
+  calls given up; residue = calls that survive; residue wrong is established by construction.
+  base        thr  called    surr right surr wrong removed      residue  residue wrong
+  raw       0.900     799      44         36        8(0)/19(11)          755         11(11)
+  raw       0.950     769      33         28        5(0)/12(7)          736          7(7)
+  raw       0.975     739      27         23        4(0)/8(4)          712          4(4)
+  raw       0.990     710      22         19        3(0)/6(3)          688          3(3)
+  raw       0.995     693      20         17        3(0)/6(3)          673          3(3)
+  widener   0.900     734      25         23        2(0)/6(4)          709          4(4)
+  widener   0.950     698      18         17        1(0)/3(2)          680          2(2)
+  widener   0.975     665      14         13        1(0)/2(1)          651          1(1)
+  widener   0.990     612       9          9        0(0)/1(1)          603          1(1)
+  widener   0.995     583       7          7        0(0)/0(0)          576          0(0)
+
+  x12 wrong calls at 0.975, widener base:
+    widener 0.975 (2):
+    Law              Meta-Llama-3_1-70B-Instruc vs Qwen1.5-72B-Chat           c=0.9949 gap=0.1107 A=0.475 McNemar 59:29 p=0.0018 -> KEPT (established)
+    History          Qwen1.5-72B-Chat           vs deepseek-chat-v2_5         c=0.9828 gap=0.0336 A=0.605 McNemar 21:17 p=0.6271 -> declined
+  x12 wrong calls at 0.975, raw base:
+    raw 0.975 (8):
+    Law              arx_0314                   vs gpt-4o-2024-08-06          c=0.9867 gap=0.1107 A=0.668 McNemar 45:15 p=0.0001 -> KEPT (established)
+    Law              Meta-Llama-3_1-70B-Instruc vs deepseek-chat-v2_5         c=1.0000 gap=0.1070 A=0.476 McNemar 54:25 p=0.0015 -> KEPT (established)
+    Law              Meta-Llama-3_1-70B-Instruc vs Qwen1.5-72B-Chat           c=1.0000 gap=0.1107 A=0.475 McNemar 59:29 p=0.0018 -> KEPT (established)
+    Other            gemini-3.1-pro_5-shots     vs iask_pro                   c=1.0000 gap=0.0683 A=0.830 McNemar 22:8 p=0.0161 -> KEPT (established)
+    Law              arx_0314                   vs iask_pro                   c=1.0000 gap=0.0318 A=0.822 McNemar 22:12 p=0.1214 -> declined
+    History          arx_0314                   vs gpt-4o-2024-08-06          c=0.9767 gap=0.0420 A=0.866 McNemar 8:3 p=0.2266 -> declined
+    Chemistry        arx_0314                   vs iask_pro                   c=1.0000 gap=0.0219 A=0.891 McNemar 13:8 p=0.3833 -> declined
+    History          Qwen1.5-72B-Chat           vs deepseek-chat-v2_5         c=1.0000 gap=0.0336 A=0.605 McNemar 21:17 p=0.6271 -> declined
+
+  DATA CHECK merged board: x12 9142 + x20 12394 = 21536 verdicts | 20 models | 2811 judged questions | per-anchor edges 2538 (gap >= 0.02) on 14 anchors | key tiers at 0.017: 14
+    tier  0: gemini-3.1-pro_5-shots (0.912)
+    tier  1: arx_0314 (0.833), iask_pro (0.816)
+    tier  2: arx_3 (0.784), claude-3-5-sonnet-202410 (0.782)
+    tier  3: gpt-4o-2024-08-06 (0.750)
+    tier  4: deepseek-chat-v2_5 (0.651)
+    tier  5: gpt-4o-mini (0.631), claude-3-5-haiku-2024102 (0.629), Meta-Llama-3_1-70B-Instr (0.628)
+    tier  6: Qwen1.5-110B (0.492), Qwen1.5-72B-Chat (0.476)
+    tier  7: Mixtral-8x7B-Instruct-v0 (0.417)
+    tier  8: c4ai-command-r-v01 (0.370), Meta-Llama-3_1-8B (0.369)
+    tier  9: Qwen1.5-14B-Chat (0.351)
+    tier 10: gemma-7b (0.313)
+    tier 11: Yi-6b-Chat (0.274)
+    tier 12: Llama-2-13b-hf (0.239)
+    tier 13: Llama-2-7b-hf (0.184)
+  pooled board at CONF 0.95: within 6/7 separated, wrong 3(1) | across 176/183, wrong 5(4)
+  reproduction of x20_merged.txt (6/7, 3(1) | 176/183, 5(4)): OK
+  the registration's '8 within-tier wrong separations' is NOT on this board: the merged board of record has 3 (1
+  established); the superseded sparse board had 8/9 SEPARATED and 6 wrong. Criterion (1) is scored on the 3 that exist.
+
+  key denominator (pooled): sb.mcnemar_edge with anchor_qs = {'POOLED': all 2811 judged questions}.
+
+=== MERGED board, POOLED (190 pairs, x20_merged's TIER-HONEST object) ===
+  edges 190 | key direction established (McNemar p < 0.05) 183 | unestablished 7 | wrong-direction 11(8)
+  wrong counts are all(McNemar-established). 'surr' = calls the rule declines; 'right surr' = correct
+  calls given up; residue = calls that survive; residue wrong is established by construction.
+  base        thr  called    surr right surr wrong removed      residue  residue wrong
+  raw       0.900     186       6          3        3(0)/10(7)          180          7(7)
+  raw       0.950     182       6          3        3(0)/8(5)          176          5(5)
+  raw       0.975     179       6          3        3(0)/8(5)          173          5(5)
+  raw       0.990     178       6          3        3(0)/8(5)          172          5(5)
+  raw       0.995     178       6          3        3(0)/8(5)          172          5(5)
+  widener   0.900     163       5          3        2(0)/2(0)          158          0(0)
+  widener   0.950     159       4          3        1(0)/1(0)          155          0(0)
+  widener   0.975     153       3          2        1(0)/1(0)          150          0(0)
+  widener   0.990     146       3          2        1(0)/1(0)          143          0(0)
+  widener   0.995     141       3          2        1(0)/1(0)          138          0(0)
+
+  by KEY TIER (x20_merged tiering, 0.017 gap over the judged questions):
+  base        thr | ACROSS-tier: called, surr (%), wrong->residue wrong | WITHIN-tier: called, surr, wrong->residue wrong
+  raw       0.900 |   180,    1 (  0.6%),  7(6) ->  6 |    6,   5,  3(1) ->  1
+  raw       0.950 |   176,    1 (  0.6%),  5(4) ->  4 |    6,   5,  3(1) ->  1
+  raw       0.975 |   173,    1 (  0.6%),  5(4) ->  4 |    6,   5,  3(1) ->  1
+  raw       0.990 |   172,    1 (  0.6%),  5(4) ->  4 |    6,   5,  3(1) ->  1
+  raw       0.995 |   172,    1 (  0.6%),  5(4) ->  4 |    6,   5,  3(1) ->  1
+  widener   0.900 |   159,    1 (  0.6%),  1(0) ->  0 |    4,   4,  1(0) ->  0
+  widener   0.950 |   156,    1 (  0.6%),  1(0) ->  0 |    3,   3,  0(0) ->  0
+  widener   0.975 |   151,    1 (  0.7%),  1(0) ->  0 |    2,   2,  0(0) ->  0
+  widener   0.990 |   144,    1 (  0.7%),  1(0) ->  0 |    2,   2,  0(0) ->  0
+  widener   0.995 |   139,    1 (  0.7%),  1(0) ->  0 |    2,   2,  0(0) ->  0
+
+  pooled board: every within-tier separation at 0.95 and what the rule does to it:
+    Meta-Llama-3_1-70B-Instruc vs claude-3-5-haiku-20241022  raw c=1.0000 wid c=0.9994 key 0.628/0.629 right | McNemar 350:351 p=1.0000 -> declined
+    Meta-Llama-3_1-70B-Instruc vs gpt-4o-mini                raw c=1.0000 wid c=0.9995 key 0.628/0.631 right | McNemar 334:342 p=0.7878 -> declined
+    Meta-Llama-3_1-8B          vs c4ai-command-r-v01         raw c=1.0000 wid c=0.9611 key 0.369/0.370 right | McNemar 430:435 p=0.8918 -> declined
+    Qwen1.5-110B               vs Qwen1.5-72B-Chat           raw c=1.0000 wid c=0.9496 key 0.492/0.476 WRONG | McNemar 381:338 p=0.1172 -> declined
+    arx_0314                   vs iask_pro                   raw c=1.0000 wid c=0.7785 key 0.833/0.816 WRONG | McNemar 144:99 p=0.0047 -> KEPT
+    arx_3                      vs claude-3-5-sonnet-20241022 raw c=0.9950 wid c=0.6169 key 0.784/0.782 WRONG | McNemar 149:143 p=0.7699 -> declined
+  pooled board: every across-tier WRONG separation at 0.95:
+    Meta-Llama-3_1-8B          vs Qwen1.5-14B-Chat           raw c=1.0000 wid c=0.9967 key 0.369/0.351 | McNemar 424:374 p=0.0828 -> declined
+    Qwen1.5-14B-Chat           vs c4ai-command-r-v01         raw c=0.9950 wid c=0.8374 key 0.351/0.370 | McNemar 346:401 p=0.0481 -> KEPT
+    arx_0314                   vs claude-3-5-sonnet-20241022 raw c=1.0000 wid c=0.6786 key 0.833/0.782 | McNemar 262:124 p=0.0000 -> KEPT
+    claude-3-5-haiku-20241022  vs deepseek-chat-v2_5         raw c=1.0000 wid c=0.8019 key 0.629/0.651 | McNemar 298:361 p=0.0157 -> KEPT
+    deepseek-chat-v2_5         vs gpt-4o-mini                raw c=1.0000 wid c=0.8172 key 0.651/0.631 | McNemar 312:256 p=0.0209 -> KEPT
+
+  key denominator (per-anchor): sb.mcnemar_edge over aq_mg[anchor] = the anchor's judged questions on the merged board.
+
+=== MERGED board, PER-ANCHOR edges (budget_transfer.edges_from, gap >= 0.02) ===
+  edges 2538 | key direction established (McNemar p < 0.05) 2210 | unestablished 328 | wrong-direction 176(75)
+  wrong counts are all(McNemar-established). 'surr' = calls the rule declines; 'right surr' = correct
+  calls given up; residue = calls that survive; residue wrong is established by construction.
+  base        thr  called    surr right surr wrong removed      residue  residue wrong
+  raw       0.900    2239     186        143       43(0)/73(30)         2053         30(30)
+  raw       0.950    2155     157        125       32(0)/55(23)         1998         23(23)
+  raw       0.975    2079     136        111       25(0)/42(17)         1943         17(17)
+  raw       0.990    2005     117         95       22(0)/33(11)         1888         11(11)
+  raw       0.995    1943      95         79       16(0)/27(11)         1848         11(11)
+  widener   0.900    1987     111         94       17(0)/28(11)         1876         11(11)
+  widener   0.950    1875      80         68       12(0)/19(7)         1795          7(7)
+  widener   0.975    1783      69         60        9(0)/13(4)         1714          4(4)
+  widener   0.990    1677      47         43        4(0)/7(3)         1630          3(3)
+  widener   0.995    1606      36         33        3(0)/5(2)         1570          2(2)
+
+  by KEY TIER (x20_merged tiering, 0.017 gap over the judged questions):
+  base        thr | ACROSS-tier: called, surr (%), wrong->residue wrong | WITHIN-tier: called, surr, wrong->residue wrong
+  raw       0.900 |  2198,  156 (  7.1%), 53(25) -> 25 |   41,  30, 20(5) ->  5
+  raw       0.950 |  2119,  131 (  6.2%), 39(19) -> 19 |   36,  26, 16(4) ->  4
+  raw       0.975 |  2048,  115 (  5.6%), 28(13) -> 13 |   31,  21, 14(4) ->  4
+  raw       0.990 |  1978,   99 (  5.0%), 21(8) ->  8 |   27,  18, 12(3) ->  3
+  raw       0.995 |  1919,   79 (  4.1%), 16(8) ->  8 |   24,  16, 11(3) ->  3
+  widener   0.900 |  1961,   94 (  4.8%), 18(8) ->  8 |   26,  17, 10(3) ->  3
+  widener   0.950 |  1855,   68 (  3.7%), 11(4) ->  4 |   20,  12,  8(3) ->  3
+  widener   0.975 |  1769,   61 (  3.4%),  8(2) ->  2 |   14,   8,  5(2) ->  2
+  widener   0.990 |  1669,   43 (  2.6%),  4(1) ->  1 |    8,   4,  3(2) ->  2
+  widener   0.995 |  1602,   33 (  2.1%),  3(1) ->  1 |    4,   3,  2(1) ->  1
+
+=== REGISTERED CRITERIA ===
+  (1) PRIMARY, as registered: 'removes at least 6 of the 8 within-tier wrong separations for no more than 15% of
+      across-tier calls surrendered'. The object '8 within-tier wrong separations' does not exist on the merged
+      board of record (3 wrong, 1 established); the criterion as written CANNOT PASS and is UNDETERMINED by data-object
+      mismatch. What the rule does on the object that exists:
+        pooled raw      0.950: within-tier wrong 3(1) -> removed 2, residue 1 | across-tier calls 176, surrendered 1 = 0.6%
+        pooled raw      0.975: within-tier wrong 3(1) -> removed 2, residue 1 | across-tier calls 173, surrendered 1 = 0.6%
+        pooled widener  0.950: within-tier wrong 0(0) -> removed 0, residue 0 | across-tier calls 156, surrendered 1 = 0.6%
+        pooled widener  0.975: within-tier wrong 0(0) -> removed 0, residue 0 | across-tier calls 151, surrendered 1 = 0.7%
+        per-anchor raw      0.950: within-tier wrong 16(4) -> removed 12, residue 4 | across-tier calls 2119, surrendered 131 = 6.2%
+        per-anchor raw      0.975: within-tier wrong 14(4) -> removed 10, residue 4 | across-tier calls 2048, surrendered 115 = 5.6%
+        per-anchor widener  0.950: within-tier wrong 8(3) -> removed 5, residue 3 | across-tier calls 1855, surrendered 68 = 3.7%
+        per-anchor widener  0.975: within-tier wrong 5(2) -> removed 3, residue 2 | across-tier calls 1769, surrendered 61 = 3.4%
+      the rule removes exactly the UNESTABLISHED wrong separations and none of the established ones, by
+      construction; on the pooled board of record that is 2 of 3 within-tier wrong separations at 0.95, leaving 1
+      (the established arx/iask inversion), at 0.6% of across-tier calls. On the per-anchor edges it removes 10 of 14 at
+      0.975 for 5.6% of across-tier calls (raw) / 3.4% (widener).
+  (2) x12, widener + decline at 0.975: called 665 -> residue 651 | wrong 2(1) -> residue wrong 1, of which established 1
+      -> holds (tautologically); the residue is established BY CONSTRUCTION of the rule (it declines exactly the unestablished edges), so
+         the criterion carries no information beyond the count: 1 remaining against the predicted 2.
+  (3) cost in calls at every threshold: tables above (x12, pooled merged, per-anchor merged; raw and widener).
+  FALSIFIER (> 25% of across-tier calls to remove the within-tier errors): pooled raw 0.95 = 0.6%, pooled widener 0.975 = 0.7%,
+      per-anchor raw 0.975 = 5.6%, per-anchor widener 0.975 = 3.4% -> does not fire on either object
+  PREDICTION ('removes 7 of 8 at about 10%; (2) holds with 2 remaining'): the 8 do not exist; x12 residue at 0.975 = 1.

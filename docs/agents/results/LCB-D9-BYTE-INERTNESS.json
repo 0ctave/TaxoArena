@@ -1,0 +1,325 @@
+{
+  "id": "LCB-D9-BYTE-INERTNESS",
+  "title": "LCB-D9-BYTE-INERTNESS: is the LCB Kotlin of 4497373 (four src/main blobs) BYTE-INERT on the AG_NEWS smoke construction, leg A a62c7e0 vs leg B 4497373, with an execution discriminator? (engineering; zero calls; D9, the MERGE GATE of LCB-STAGE0-INTERACTION's Kotlin; not a gate of the stage-0 analysis)",
+  "question": "Does replacing the four src/main files of a62c7e0 (TaxonomyConfig.kt, CorpusRegistry.kt, CorpusSource.kt, MMLUDatasetFetcher.kt) by those of 4497373 change any byte of the AG_NEWS smoke construction's outputs (experiment_configs/topic_partition/ag_news_smoke_s42.toml, blob efd82bda), which executes the channels the structural proof did not: (i) TOML parse to DatasetType.valueOf, (ii) the changed `when` for a non-MMLU type, (iii) loadFromDb / finalizeData / the split, (iv) pool recording over the changed CorpusRegistry.KNOWN, (v) snapshot save?",
+  "kind": "engineering",
+  "state": "done",
+  "registration": {
+    "commit": "the commit that writes this record (parent 1ceafae2f1e2b5fc737c68bf5679143ca8114d3b)",
+    "program_lines": "docs/judge_v2_program.md L18662-L18872",
+    "program_lines_as_of": "the commit that writes them, parent 1ceafae, re-grepped",
+    "date": "2026-09-25",
+    "heading": "## Registered 2026-09-25 (before any code or call) — LCB-D9-BYTE-INERTNESS: ...",
+    "provenance": "the tree-construction-specialist's ruling lcb_d9_ruling.md, sha256 7e8f16b03aead981f7f481ad8d9dc94071c4288538948b9c74a0b8a7e58e57a1 (ASCII, LF, 0 CR, 148 lines, 17,748 bytes), recorded VERBATIM between the marker lines L18666 and L18815 (slice re-hashed equal); the placement and the merge-gate label are the orchestrator's decisions; not author decisions"
+  },
+  "script": {
+    "path": "experiment_results/lcb_stage0/d9/helpers/d9_prep.py (V1, V2), experiment_results/lcb_stage0/d9/helpers/d9_leg_check.py (V3, V4, V6, V7, V8), experiment_results/lcb_stage0/d9/helpers/d9_compare.py (C1, R2, reserved_pool readout); the operator runs the scratchpad d9\\ copies after S0 re-hashes them [DELTA READY 1 2026-09-25 (docs/reviews/READY_lcb_d9_delta1.md at 5f7e383 (blob:906653f317f11b4624cd647ab8ba43eb27ed808f)): for the rerun experiment_results/lcb_stage0/d9/helpers/d9_leg_check_v2.py REPLACES d9_leg_check.py (V3, V4 wrap-tolerant + after bootRun, V6 + exit conjunct, V7, V8 per DEV-V8); experiment_results/lcb_stage0/d9/helpers/d9_legrun.cmd is the capture wrapper (S3, S4, S6, S7; DEV-CAP); v1 stays of record, unused]",
+    "sha16": "d9_prep.py file-bytes CRLF sha256 58b0ec87e9477876577e6b2033d797be5e5ead471c3b1080991615d12380a14e / LF of record d839fe6f29135c85da0d24e18f6746f092761b93625bf96cc5c0aef1598c91fb / blob:f30fdb55bf5a15bc81b9db645609edf099846a11; d9_leg_check.py file-bytes CRLF 9ee6d43d82813d93ae11442d03739947184a48f8c25e0e2d56381de080754a50 / LF of record 8317b52a223a4700408e2c26dea45949f5f0ea6ce648c72c464c9d06bdb9e40e / blob:ef28bd93573dca47a71ed9a4a8d7f2b1a1b99feb; d9_compare.py file-bytes LF = LF of record 8636b21591e70a76c1d1a8d52d28ba6a59cfe238db49b4720e99355a438138a8 / blob:743cd1a13101b48eb8b931ae431d76620211a009 (the review labels all three LF; true for d9_compare.py only) [DELTA READY 1: d9_leg_check_v2.py file bytes = LF of record sha256 b2d1ae8df0d1bd354e87e0d3bf9a32c3744cf2e73a49259d6b0eb97f6e037bfd (7,238 B, 0 CR) / blob:e5f2ff7a785c982abbe4877f3a686b9ea21ac224; d9_legrun.cmd file bytes CRLF sha256 e986bb848ebf3b986c535c48bd1abb1034d8f6f2fad83a9f4e2f421af478ca60 (1,879 B, 36 CR) / LF of record 884f6cc41adb6911779a3a61de4c54f69ab26ef4b49ba6c828ea4c5be0fc3acc / blob:8a67bcbff7767246279eed3ea35642d42ce41952; registrar re-hashed, cmp equal to the scratchpad copies]",
+    "commit": "helpers: the commit that writes this READY record (parent 7d5816e); code under test: A a62c7e0ddb7a47f6ba691450c0cdd643cbdbe76d, B 6b9fc7c278121868cb79477a9e12803b36830a3a (NOT MERGED); arm TOML blob:efd82bda [DELTA READY 1: the two new helpers committed of record in the commit that writes programme L19540-L19585]"
+  },
+  "script_at_registration": {
+    "path": "NO HARNESS COMMITTED: the run-operator's two-leg procedure as registered (git worktree add --detach per leg; ./gradlew.bat bootRun --console=plain --offline --no-build-cache \"-Dranking.db.path=ratings_d9_<leg>.db\" --args=\"--config experiment_configs/topic_partition/ag_news_smoke_s42.toml\"); the code under test is pinned",
+    "sha16": "under test at B = 4497373: TaxonomyConfig.kt blob:2825b12d9640f1643e465479d20f07f1ad7aedac / sha256-lf16:61f67a71d6ca9cd3 / sha256-crlf16:1860445fcb273875; CorpusRegistry.kt blob:5b1bbb3a6804ff754bc167a2263c9355b4aa1907 / sha256-lf16:f8f39d7aca0b4666 / sha256-crlf16:6f71693dda26d859; CorpusSource.kt blob:817b1417d8b2961b1c84fb43ba7d9aa8279db12a / sha256-lf16:00af04220803814c / sha256-crlf16:af3dde076e7df6bf; MMLUDatasetFetcher.kt blob:70eedfdf1c8745d9f3a42913ea033681f9f4527f / sha256-lf16:14cfc139d63030d9 / sha256-crlf16:3e511013801eba99; arm TOML blob:efd82bdacc06144439280d3b76923d38527bd7ae",
+    "commit": "A a62c7e0ddb7a47f6ba691450c0cdd643cbdbe76d (= git merge-base main 4497373); B 449737330bc4880566719f05377eec09beaef937 (branch worktree-agent-adb18465164aaf122, NOT MERGED; the tip f646b478 differs in 0 of the pinned paths)"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_lcb_d9.md (blob:106158bee4f7f4a414659c25b5ea118a83c7d203)",
+    "commit": "bf3fa81",
+    "verdict": "READY, as the operator procedure S0-S12 with the three pinned helpers; conditions: (1) the foreign arxout.py job (PID 51368 + 4 workers, observed 15:09) ends first; (2) after the LCB rerun window (DONE 087e43d); the LCB analysis of record runs AFTER D9",
+    "recorded_at": "docs/judge_v2_program.md L19434-L19457 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — LCB-D9-BYTE-INERTNESS READY as the procedure S0-S12 (docs/reviews/READY_lcb_d9.md, bf3fa81); ...\"; _as_of the commit that writes it, parent 7d5816e, re-grepped)"
+  },
+  "go": "n/a: zero calls, 0 cce; the 4,000-match rule does not apply. Operational gate: a 30-minute rule-7 window (W1-W5, >= 12 GB free RAM) after the ARCH-V2-PILOT-K46 posting ends AND after the LCB build window closes",
+  "run": {
+    "outcome_file": "docs/judge_v2_program.md L19587-L19640 (section \"## LCB-D9-BYTE-INERTNESS (2026-09-25, 0 calls) — VALID (post-run review d7eca94); C1 FAILED AS REGISTERED ...\"; _as_of the commit that writes it, parent f222c28, re-grepped); evidence (session scratchpad d9\\, read-only): run_20260925b\\d9_compare.txt (C1; file bytes CRLF sha256 6c5addb85b0041e5d4ffa9f50db4e93060243c1e7eccf1d1ad0643d5b6e638ca / LF rendering 07805b1e1c68e725c6f2c956f9b32a4dc24b962b6b3f0b79461c8b92cdb28c0a), run_20260925b\\aa\\d9_compare.txt (R9; CRLF 899345dbdb6cee754678e50f5533b88053eaecffd585f787a145ebff66bd4040 / LF 160c74ec537362f34869ca388c285dd0c9cc6021722af0473d59e767f16859ba), run_20260925b\\d9_disc.txt (V3-V8, probes; CRLF 1c5ec4707a893902a165d0ab6b607001dc8ed1614f021cac7e7a1035ba4608ef / LF 06cd6be11a43cebb9d1d7e5a395425165a55b3143b95277d0ed56c82aac868a5); SHA256SUMS 82 OK / 0 not-OK (registrar re-ran)",
+    "outcome_commit": "the commit that writes the outcome section (parent f222c28)",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p18579549e6d95873 (the AG smoke's own id split; a smoke pool, not a pool of record; id-disjoint only)",
+    "date": "2026-09-25 (S0' 15:46:21 - S12 15:55:21; leg A 15:51:32-15:52:31 EXIT 0; leg B 15:52:46-15:53:28 EXIT 0; probe B 15:54:03-15:54:08 EXIT 1; probe A 15:54:23-15:54:28 EXIT 1)",
+    "legs": "A a62c7e0ddb7a47f6ba691450c0cdd643cbdbe76d / B 6b9fc7c278121868cb79477a9e12803b36830a3a, fresh worktrees d9-legA / d9-legB (removed at S12), $ST run_20260925b",
+    "validity": "V1-V9 ALL MET (V8 under DEV-V8, floor not applied; V3 transcribed, not re-countable: D8): the run is VALID"
+  },
+  "review": {
+    "file": "docs/reviews/POSTRUN_lcb_d9.md",
+    "commit": "d7eca94",
+    "blob": "blob:08caa30b1d95842dfc325ea39468243d1733c137 / sha256-lf 6049d1f5a8f16f597efd52645e1381fdad1e67be66fa04048201bfe333e5cd37 (file bytes LF, equal)",
+    "verdict": "VALID. C1 FAILED as registered (exit 3; 2 of 21 files). R9 reads NON-DETERMINISM. The change is NOT implicated. D9 stays OPEN. No merge on this run. P1 FAILED, P2 HELD, P3 HELD as transcribed, P4 HELD, P5 FAILED (warm cache). Falsifier FIRED on its trigger; its 'overturns the channel audit' consequence NOT supported. Defects: D1 HIGH (C1 unreachable as registered), D2 MEDIUM (engine), D3-D8 LOW. Follow-ups: A (D9b, recommended now), B (EVAL-METRIC-DETERMINISM, queue), C (N-replicate, not recommended)"
+  },
+  "validity": [
+    "V1 precondition: git diff --name-only A B -- src/main build.gradle.kts settings.gradle.kts gradle.properties gradle/ config/ = exactly the four files; A:<toml> = B:<toml> = efd82bda (if main's src/main moved, A = main HEAD with the same four-file condition)",
+    "V2 input copies: sha256 of each copy printed in each worktree, equal across legs (AG cache DB + -wal copied together, the COPY checkpointed in scratch to one file, copied to both roots; -shm not copied)",
+    "V3 D9-R1: class files containing LIVECODEBENCH / fetchLiveCodeBench / lcbWorkDirGuard: leg A 0 / 0 / 0; leg B >= 3 / >= 1 / >= 1",
+    "V4 D9-R2: each leg's [BOOT] ... jar=file:/.../<its own worktree>/build/classes/kotlin/main/ line names its own worktree [DEV-INSTR / DEV-CAP 2026-09-25: checked by d9_leg_check_v2.py, wrap-tolerant, and >= 1 [BOOT] occurrence must follow '> Task :bootRun'; captured via d9_legrun.cmd]",
+    "V5 D9-R3: leg B's classes on a scratch TOML differing only in datasetType = LIVECODEBENCH and outputDir: exit != 0 AND a line CONTAINING '[LCB] refusing to build LIVECODEBENCH' (registrar's reading R1: the refusal is a check() exception message and may carry an exception-class prefix) AND no 'No enum constant'; optional negative control on leg A",
+    "V6 sanity in BOTH legs: 'Fetched 2000 AG News queries across 4 categories', '[POOL] recorded p18579549e6d95873', '[SPLIT-SIDE] 1400 train (145 gate) / 600 test', exit_reason completed [R5 + DEV-INSTR 2026-09-25: v2 also requires the last EXIT in leg<L>_exit.txt = 0 (D3)]",
+    "V7 embedding-miss count printed per leg and equal",
+    "V8 per-leg build wall time in [1, 8] min [DEV-V8 2026-09-25 (delta READY 1, 5f7e383, D1 HIGH): floor UNREACHABLE at warm cache; read as the 8-min ceiling on duration_ms AND the Gradle time + 'the construction ran' (duration_ms > 0, >= 1 iteration_metrics row); floor NOT applied; observed values disclosed; programme bracket at L18836]",
+    "V9 after the window: main embeddings_cache.db / snapshots.db equal the L6 baseline in both views; main ag_news_smoke_cache_v1.db 1,622,016 B sha256 7cf2082f92e20c55... and -wal 206,032 B sha256 7eea2abd89feb7ae... unchanged in size, mtime and sha; throw-away worktrees removed after the evidence is saved",
+    "a validity failure VOIDS the leg: a failed precondition, never an outcome"
+  ],
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "BYTE-IDENTITY, leg A (a62c7e0) vs leg B (4497373), sha256 per file; THE COUNT OF DIFFERING FILES DECIDES (deterministic; no point / interval / SE; no UNDETERMINED branch). Byte-compared (18): seed_42/dag_snapshots.jsonl, gate_ids.json, fixed_point_certificate.txt, the 11 files of validation/, diagnostics/dag_snapshots.jsonl, proposals.csv, rank_history.csv, config.toml; compared with declared fields dropped (3): diagnostics/iteration_metrics.csv (- wall_ms), ../tuning_ledger.csv (- CommitSHA), diagnostics/run_manifest.json (- commit, branch, dirty, dirty_src, dirty_src_files, dirty_other, dirty_other_files, dirty_files, started_at_millis, finished_at_millis, duration_ms, config_path, proposal_memo_digest_ms); plus the reserved_pool* rows of each leg's AG cache copy (checkpointed copy, ordered, timestamp columns dropped as declared before the run). Excluded: headless_run.log, performance_report.json, the build output. HELD iff 0 differ; FAILED iff >= 1 (one byte in any listed file, or a file present in one leg only, R2). Scored from the run-operator's scratch d9_compare.txt",
+      "result": "FAILED",
+      "value": "FAILED AS REGISTERED: differing 2 of 21 files + file set + 2 pool tables (d9_compare.txt: '[C1] differing: 2 (21 files + file-set + 2 pool tables) -> C1 FAILED', exit 3): validation/MAIN_taxonomy_quality.csv (A 609713d827bccba2 / B 0a9fa8f119cd1fbe) and tuning_ledger.csv without CommitSHA (A fd4f1f41aee3741b / B 3bfb58f6505d76d4); 19 files EQUAL; file set 24 / 24, none in one leg only; reserved_pool 600 rows EQUAL (61dfe77a253869d9); reserved_pool_meta - created_at 1 row EQUAL (dbc1f545eb2fd907). Differing values: DendrogramPurity 0.6867787184488087 vs 0.6867787184488154; SphericalSilhouette 0.12807057880923325 vs 0.12807057880923328; TotalDasguptaCost 2.2377813825989264E8 vs 2.2376868581711334E8; SeparationJ, WeightedLeafPurity, NormalisedSackinIndex EQUAL; tuning_ledger differs only in those 3 columns. Deterministic count; no point / interval (registered). UNREACHABLE AS REGISTERED (review D1 HIGH): the two files were on the record as drifting (FRAMEWORK.md L297, L270; campaign_review_2026-09-10.md L252)",
+      "denominator": "21 files (18 byte-compared + 3 with declared fields dropped) + the reserved_pool* rows of each leg's AG cache copy"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "C1: 0 of 21 files and 0 reserved_pool rows differ (the specialist's written-before-the-run prediction)",
+      "result": "FAILED",
+      "value": "2 of 21 files differ (0 reserved_pool rows differ)",
+      "denominator": "21 files + pool rows"
+    },
+    {
+      "id": "P2",
+      "text": "the pool id is p18579549e6d95873 in both legs (= the 2026-09-22 run; sanity, not C1)",
+      "result": "HELD",
+      "value": "p18579549e6d95873 in both legs",
+      "denominator": "2 legs"
+    },
+    {
+      "id": "P3",
+      "text": "D9-R1 counts: leg A 0 / 0 / 0; leg B 4 / 2 / 1 (the delta review's build-worktree counts; validity bar >= 3 / >= 1 / >= 1)",
+      "result": "HELD",
+      "value": "HELD AS TRANSCRIBED: A 0 / 0 / 0 (LcbWorkDirGuardState 0) over 1,319 class files; B 4 / 2 / 1 (LcbWorkDirGuardState 2) over 1,320 (d9_disc.txt; not independently re-countable: worktrees removed, D8)",
+      "denominator": "class files under build/classes/kotlin/main of each leg"
+    },
+    {
+      "id": "P4",
+      "text": "embedding-miss count 0 in both legs (inferred from the 2026-09-22 run)",
+      "result": "HELD",
+      "value": "0 / 0 (All 1400 requested embeddings are already cached, both legs)",
+      "denominator": "2,000 AG texts per leg"
+    },
+    {
+      "id": "P5",
+      "text": "per-leg build wall time within [1, 8] min (2026-09-22: 114.6 s) [2026-09-25, delta READY 1 (D1): scored AS REGISTERED, FAILED if either leg is below 1 min, cause stated (warm cache, P4 = 0); not reinterpreted; programme bracket at L18864]",
+      "result": "FAILED",
+      "value": "FAILED AS REGISTERED: A duration_ms 11,133 / Gradle 58 s; B 10,825 / 41 s; both below 1 min; cause warm cache (P4 = 0), as DEV-V8 foresaw",
+      "denominator": "2 legs"
+    }
+  ],
+  "falsifier": {
+    "text": "C1 FAILED (>= 1 differing file or pool row) fires; it overturns the specialist's channel audit (no path by which an existing arm's output can change under the four blobs) and the structural proof's sufficiency on that arm; consequence: the Kotlin of 4497373 does NOT merge, D9 stays open, and an A' re-run of leg A (~3 min) decides between the change (A' = A != B) and non-determinism (A' != A; D9 then open under a new registration). It does not touch the LCB stage-0 analysis or any result of record",
+    "fired": true,
+    "reading": "FIRED ON ITS TRIGGER (C1 FAILED). Its consequence 'overturns the specialist's channel audit' is NOT SUPPORTED: the registered A' arbitration (Support (g); R9) reads NON-DETERMINISM (A/A' differs in the same 2 files and fields) and the code cause lies off the changed path. Consequence of record: no merge (L18868); D9 OPEN under LCB-D9B-BYTE-INERTNESS (source: docs/reviews/POSTRUN_lcb_d9.md at d7eca94 (blob:08caa30b1d95842dfc325ea39468243d1733c137; file bytes LF = LF of record, sha256 6049d1f5a8f16f597efd52645e1381fdad1e67be66fa04048201bfe333e5cd37), 'Scoring as registered')"
+  },
+  "support": "(a) 21 files + pool rows of ONE deterministic construction per leg; not a sample; Kish 1 by construction. (b) DEFF NOT APPLICABLE, DECLARED (deterministic comparison; run-to-run non-determinism NOT measured, no A/A leg). (c) n_eff n/a. (d) SE none (exact count). (e) MDE one byte in one file. (f) SCOREABLE. (g) STRUCTURAL: reachable iff the construction is byte-deterministic on identical inputs and code; the 18 byte-compared files carry no path, clock or commit value in the 2026-09-22 output (specialist's scan, corroborated by the registrar); determinism of THIS arm is an assumption: a FAIL without A/A is recorded FAILED, not narrated; the A' re-run is the registered follow-up",
+  "registrar_readings": [
+    "R1 V5's '[LCB] refusing' line: read as a line CONTAINING '[LCB] refusing to build LIVECODEBENCH' (check() exception message; may carry an exception-class prefix)",
+    "R2 a file present under one leg's output and absent under the other's (e.g. in the 2026-09-22 run's empty judging/) is a C1 difference, named by path",
+    "R3 the ruling's 'lcbWorkDir property initialiser runs on every arm' described the uncommitted edit; at 4497373 the field is `internal var lcbWorkDir: java.io.File? = null` with no initialiser code and user.dir is read only inside fetchLiveCodeBench; Q1's conclusion (channels (i)-(v) unexecuted) stands regardless",
+    "R4 B of record = 4497373; the tip f646b478 carries the same pinned bytes; ANY later src/main byte change on the branch voids the proof (Q3)",
+    "R5 (G1, MEDIUM, a reading of V6): exit_reason 'completed' is written in a finally block (the FAILED 11:50 LCB build carries it) and is NOT evidence of success; V6 holds for a leg only with 'BUILD SUCCESSFUL' in its bootRun transcript, no 'BUILD FAILED', and the recorded process exit code 0",
+    "R6 (G2-G5, LOW): G2 AG DB and -wal copied together, only the COPY checkpointed (expected e3415684..., 1,748,992 B); G3 P4 = 0 supported (2,000 / 2,000 AG texts keyed; review read outside the instrument); G4 both legs from one shell, identical environment; G5 'Filename too long' at S11: rm -rf then git worktree prune",
+    "R7 (rule 7): ONE window for S2-S9; W1 scoped to main's embeddings_cache.db and ag_news_smoke_cache_v1.db; free RAM >= 12 GB; admitted PIDs printed; a foreign java.exe / python.exe makes the next step WAIT and is recorded, NEVER killed; a foreign open of either main file during S2 or S12 is a failed precondition (S2 re-runs into a new $ST)",
+    "R8 (ordering): K46 done -> LCB rerun window done (087e43d) -> D9 (S0-S12) -> the LCB analysis of record (not before S12 ends) -> post-run reviews -> merges behind F5",
+    "R9 (2026-09-25, delta READY 1, 5f7e383): see readings"
+  ],
+  "numbers_of_record": {
+    "ruling_sha256": "7e8f16b03aead981f7f481ad8d9dc94071c4288538948b9c74a0b8a7e58e57a1 (lcb_d9_ruling.md; file bytes, ASCII, LF, 0 CR, 148 lines, 17,748 bytes; registrar-verified; slice between the markers re-hashed equal)",
+    "leg_A": "a62c7e0ddb7a47f6ba691450c0cdd643cbdbe76d",
+    "leg_B": "449737330bc4880566719f05377eec09beaef937 [SUPERSEDED 2026-09-25 by the rerun READY 5f3c06e: leg B = 6b9fc7c278121868cb79477a9e12803b36830a3a]",
+    "arm_toml": "experiment_configs/topic_partition/ag_news_smoke_s42.toml blob:efd82bdacc06144439280d3b76923d38527bd7ae (a62c7e0 = 4497373 = main)",
+    "ag_cache_baseline": "ag_news_smoke_cache_v1.db 1,622,016 bytes sha256 7cf2082f92e20c5580520c1ca63c5655e2582c173ed9605cb0179a9ad3b8fd54; -wal 206,032 bytes sha256 7eea2abd89feb7aeffc7c90be37987f87d6f81803f0f8919673527c711d8c306 (registrar, read-only sha256sum, 2026-09-25)",
+    "reference_run_2026-09-22": "pool p18579549e6d95873; 1400 train (145 gate) / 600 test; validation/ 11 files; duration_ms 114618 (experiment_results/topic_partition/ag_news_smoke_s42/seed_42/, registrar-read)",
+    "window": "30 minutes registered; ~12-15 min active expected",
+    "leg_B_6b9fc7c": "6b9fc7c278121868cb79477a9e12803b36830a3a (parent b3e8c94; NOT MERGED); four-file precondition holds (git diff --name-only a62c7e0 6b9fc7c -- src/main build.gradle.kts settings.gradle.kts gradle.properties gradle/ config/ = 4 files, registrar re-ran); pins blob / sha256-lf16 / sha256-crlf16: TaxonomyConfig.kt 2825b12d / 61f67a71d6ca9cd3 / 1860445fcb273875; CorpusRegistry.kt 5b1bbb3a / f8f39d7aca0b4666 / 6f71693dda26d859; CorpusSource.kt 817b1417 / 00af04220803814c / af3dde076e7df6bf; MMLUDatasetFetcher.kt a2a85c03 / 7a408454036d3886 / 728648dbb035e98f (new); D9-R1 discriminator + LcbWorkDirGuardState >= 1 (leg B counts: LIVECODEBENCH 4, fetchLiveCodeBench 2, lcbWorkDirGuard 1, LcbWorkDirGuardState 2; leg A must read 0 for all four) (source: docs/reviews/READY_lcb_stage0.md at 5f3c06e, '## 3. The D9 pins move to 6b9fc7c: CONFIRMED')",
+    "input_baseline_ready": "main ag_news_smoke_cache_v1.db 1,622,016 B sha256 7cf2082f... + -wal 206,032 B sha256 7eea2abd... (= the registration's baseline); main embeddings_cache.db 804,462,592 B sha256 52229e1ebfdda76e..., -wal 0 B; predicted copies: checkpointed AG copy e3415684318c937c8e9073e1eb189c1f5a89006c0444794c20cf7b79ba527430 (1,748,992 B), embeddings copy 52229e1e... (source: docs/reviews/READY_lcb_d9.md at bf3fa81, '**Input baseline**' and '**Predicted copy hashes**')",
+    "incident_legA_void_2026-09-25": "INSTRUMENT VOID, NOT AN OUTCOME (DEV-INC): leg A a62c7e0 15:20:12-15:21:10, exit 0, BUILD SUCCESSFUL in 58s; run_manifest duration_ms 10,445 ms; v1 VOID on V4 and V8; V3 {0,0,0,0} over 1,319 class files; V6 Fetched x2 / POOL x2 / SPLIT-SIDE x1 / exit_reason completed / EXIT 0; V7 0 misses (cache-hit 1400); leg B NOT run; no C1; main DBs unchanged (ag 7cf2082f 1,622,016 B + -wal 7eea2abd 206,032 B; embeddings 52229e1e 804,462,592 B, -wal 0; snapshots.db 1,065,541,632 B); legA_bootrun.log sha256 32871118521077bd342646bfa33db7dc2404f0aaf01a1a74fe6a91e2bd46e9e5 (source: docs/reviews/READY_lcb_d9_delta1.md at 5f7e383, per-claim table)",
+    "d4_warm_vs_cold_reference": "DESCRIPTIVE, not D9: 2 of 21 C1 objects differ (MAIN_taxonomy_quality.csv; tuning_ledger.csv - CommitSHA): DendrogramPurity 0.6867787184488174 vs 0.6867787184488098; TotalDasguptaCost 2.2409421312346172E8 vs 2.2410760359757888E8; 19 of 21 equal (source: delta READY 1, D4)",
+    "helpers_delta1": "d9_leg_check_v2.py LF sha256 b2d1ae8df0d1bd354e87e0d3bf9a32c3744cf2e73a49259d6b0eb97f6e037bfd / blob:e5f2ff7a785c982abbe4877f3a686b9ea21ac224; d9_legrun.cmd CRLF file bytes sha256 e986bb848ebf3b986c535c48bd1abb1034d8f6f2fad83a9f4e2f421af478ca60 / LF 884f6cc41adb6911779a3a61de4c54f69ab26ef4b49ba6c828ea4c5be0fc3acc / blob:8a67bcbff7767246279eed3ea35642d42ce41952; v2 tests 18/18 (run_tests.py sha256 5b3e55f2f2f98f19...) (source: delta READY 1; registrar re-hashed)",
+    "c1_count": "2 differing of 21 files + file set + 2 pool tables (d9_compare.txt, exit 3)",
+    "c1_differing_values": "MAIN_taxonomy_quality.csv / tuning_ledger.csv: DendrogramPurity A 0.6867787184488087 vs B 0.6867787184488154; SphericalSilhouette 0.12807057880923325 vs 0.12807057880923328; TotalDasguptaCost 2.2377813825989264E8 vs 2.2376868581711334E8 (A-B 0.0042%); SeparationJ, WeightedLeafPurity, NormalisedSackinIndex equal (review claim 8a)",
+    "r9_aa": "A' (VOID leg pseudoroot, a62c7e0) vs A: 2 differing, the same 2 files; DendrogramPurity 0.6867787184488174 vs 0.6867787184488087; TotalDasguptaCost 2.2409421312346172E8 vs 2.2377813825989264E8 (0.141%); SphericalSilhouette equal (aa\\d9_compare.txt; review claim 9)",
+    "ref_vs_A": "the 2026-09-22 cold reference (89495507, src/main identical) vs A: 2 differing, same files; REF-A TDC 0.147%; MAIN_taxonomy_quality.csv 4 distinct sha256 over 4 runs (A', A, B, REF); every other compared file 1 distinct (review claim 9a)",
+    "tdc_spread": "AG smoke (m = 1,400; 4 runs): CV 0.085%, range 0.151%; bareq512 (hygiene labelfree10/11/12): CV 0.29%, range 0.577%; DP about 1e-14 absolute, SS about 1e-16 or less (review, 'Magnitude')",
+    "v3": "A 1,319 class files {0,0,0,0}; B 1,320 {LIVECODEBENCH 4, fetchLiveCodeBench 2, lcbWorkDirGuard 1, LcbWorkDirGuardState 2} (d9_disc.txt; transcribed)",
+    "v8": "A duration_ms 11,133 / Gradle 58 s; B 10,825 / 41 s; 10 iteration_metrics rows each; below the 1-min floor True / True (not applied, DEV-V8); under the 8-min ceiling",
+    "v5_probes": "S6' B: EXIT 1, '[LCB] refusing to build LIVECODEBENCH ... table 'embeddings' holds 39631 rows (a warm cache)' present, no 'No enum constant'; S7' A: EXIT 1, 'No enum constant' x1, refusal absent",
+    "v9_main": "unchanged S0'->S12: ag 7cf2082f... 1,622,016 B + -wal 7eea2abd... 206,032 B; embeddings 52229e1e... 804,462,592 B, -wal 0; snapshots.db 1,065,541,632 B, -wal 0; -shm mtime moved after the operator's own mode=ro pin reads (D3)"
+  },
+  "sentence_of_record": "LCB-D9-BYTE-INERTNESS (2026-09-25, 0 calls; the rerun under delta READY 1, legs A a62c7e0 / B 6b9fc7c; VALID by post-run review d7eca94): C1 FAILED as registered: 2 of 21 files differ (validation/MAIN_taxonomy_quality.csv; tuning_ledger.csv without CommitSHA), only in DendrogramPurity, SphericalSilhouette and TotalDasguptaCost; the file set and both reserved_pool* tables are equal [R9: A/A' on the same commit and inputs differs in the same 2 files and fields, so the reading is NON-DETERMINISM and the change is NOT implicated; C1 was unreachable as registered (the drift was on the record: FRAMEWORK.md L297); inertness on the other 19 files is DESCRIPTIVE ONLY, not C1; D9 stays OPEN under LCB-D9B-BYTE-INERTNESS; no merge]",
+  "chips": [
+    "REGISTERED 2026-09-25 (BEFORE THE RUN)",
+    "NOT RUN",
+    "MERGE GATE FOR THE LCB KOTLIN (NOT AN ANALYSIS GATE)",
+    "ZERO CALLS; 30-MIN RULE-7 WINDOW AFTER THE LCB WINDOW",
+    "READY 2026-09-25 (PROCEDURE S0-S12, bf3fa81; A a62c7e0 / B 6b9fc7c): D9 NEXT AFTER THE FOREIGN arxout.py JOB ENDS; THE LCB ANALYSIS AFTER S12; MERGE NOT READY UNTIL C1 HOLDS [REPLACED IN THE LEDGER 2026-09-25 v280 by the next chip]",
+    "D9 LEG A 2026-09-25 15:20–15:21 INSTRUMENT VOID (FAILED PRECONDITION, NOT AN OUTCOME; LEG B NOT RUN; MAIN UNCHANGED); RERUN READY UNDER DELTA 1 (5f7e383: DEV-V8 / DEV-CAP / DEV-INSTR; R9 A/A′ DESCRIPTIVE); ANALYSIS AFTER S12; MERGE NOT READY UNTIL C1 HOLDS [REPLACED IN THE LEDGER 2026-09-25 v281 by the next chip]",
+    "D9 RAN 2026-09-25 15:46–15:55 (REVIEW d7eca94: VALID): C1 FAILED AS REGISTERED (2 / 21 FILES: MAIN_taxonomy_quality.csv, tuning_ledger.csv; DP / SS / TDC ONLY); R9 A/A′ SAME FILES → NON-DETERMINISM, CHANGE NOT IMPLICATED; C1 UNREACHABLE AS REGISTERED (D1); D9 OPEN: D9b REGISTERED (NOT READY); MERGE NOT READY"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-25",
+      "by": "registrar (registration; zero calls; insertion only)",
+      "text": "REGISTERED before the run at docs/judge_v2_program.md L18662-L18872 (section \"## Registered 2026-09-25 (before any code or call) — LCB-D9-BYTE-INERTNESS: ...\"; the ruling VERBATIM between the marker lines L18666 and L18815, i.e. L18667-L18814; _as_of the commit that writes it, parent 1ceafae, re-grepped), from the tree-construction-specialist's ruling (verbatim, sha256 7e8f16b03aead981f7f481ad8d9dc94071c4288538948b9c74a0b8a7e58e57a1); placement and the merge-gate label the orchestrator's; carried in ledger row LCB-STAGE0-INTERACTION at v270 (no row of its own at registration)"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (zero calls; insertion only)",
+      "text": "PLACEMENT UNCHANGED. The LCB-STAGE0 window may now run beside the ARCH-V2-PILOT-K46 posting (L4.1-L4.7, docs/reviews/READY_lcb_stage0.md, top section \"# L4 RULING: the LCB-STAGE0 build window beside the PILOT-K46 run of record, 2026-09-25\" / \"## (c) REPLACEMENT TEXT FOR L4\", commit ab90e24 (blob:0ba8d494a90df42bebda2b81bc91a0456c724145 / sha256-lf16:c5ca5ef7dc2f029b; working tree LF, equal); the author's \"do both, start the LCB build now and register parallel posting\"); this run still waits for the K46 posting to end AND for the LCB window to close, and never overlaps either (the ruling covers the LCB window only). Programme brackets at L18868 and L18872; docs/judge_v2_program.md L18874-L18906 (section \"## Author's decision and registrar's record 2026-09-25 (insertion only; zero calls; no LCB outcome value read) — \"do both\": the LCB-STAGE0-INTERACTION rule-7 build window MAY run beside the ARCH-V2-PILOT-K46 posting ...\"; the ruling's L4 VERBATIM between the marker lines L18880 and L18894; lines _as_of the commit that writes them, parent ab90e24, re-grepped)."
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (insertion only; zero calls)",
+      "text": "LEG B RE-PINNED 4497373 -> 6b9fc7c (the LCB guard fix after the build-window incident; READY_lcb_stage0.md at 5f3c06e section 3, CONFIRMED); D9-R1 gains LcbWorkDirGuardState >= 1; the catch-Throwable at HeadlessBenchmarkRunner L909/L922 unchanged inside the D9 bytes (LOW residual, disclosed); placement unchanged; recorded at docs/judge_v2_program.md L19241-L19271 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; no LCB outcome value read) — LCB-STAGE0-INTERACTION BUILD-WINDOW INCIDENT (11:48-11:51, exit 1 after the snapshot; b3e8c94) and RERUN READY ...\"; _as_of the commit that writes it, parent 5f3c06e, re-grepped)"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (zero calls; insertion only; nothing run)",
+      "text": "READY recorded: docs/reviews/READY_lcb_d9.md (bf3fa81), READY as the procedure S0-S12 with three pinned helpers, now committed of record under experiment_results/lcb_stage0/d9/helpers/ (two of the three pins are CRLF file-byte renderings; LF of record printed beside them); readings R5 (G1 into V6), R6 (G2-G5), R7 (rule-7 window), R8 (ordering) added; C1, P1-P5, falsifier and Support unchanged; docs/judge_v2_program.md L19434-L19457 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — LCB-D9-BYTE-INERTNESS READY as the procedure S0-S12 (docs/reviews/READY_lcb_d9.md, bf3fa81); ...\"; _as_of the commit that writes it, parent 7d5816e, re-grepped); ledger v278"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (zero calls; insertion only; nothing run)",
+      "text": "DELTA READY 1 recorded (docs/reviews/READY_lcb_d9_delta1.md at 5f7e383 (blob:906653f317f11b4624cd647ab8ba43eb27ed808f)): the 15:20-15:21 leg A is an INSTRUMENT VOID (DEV-INC; leg B never run; no C1; main DBs unchanged); deviations DEV-V8 (from D1 HIGH: V8 floor unreachable at warm cache; ceiling + construction-ran; P5 scored as registered), DEV-CAP (d9_legrun.cmd capture), DEV-INSTR (d9_leg_check_v2.py replaces v1; tests 18/18); reading R9 (A/A', descriptive, not C1); D4 disclosed; defects D2, D3, D5-D7 listed; the rerun READY as R0, R1, S0'-S12 with fresh worktrees and $ST run_20260925b; helpers committed of record; docs/judge_v2_program.md L19540-L19585 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — LCB-D9-BYTE-INERTNESS DELTA READY 1 (docs/reviews/READY_lcb_d9_delta1.md, 5f7e383): the 15:20-15:21 leg A is an INSTRUMENT VOID (DEV-INC), not an outcome; ...\"; _as_of the commit that writes it, parent 5f7e383, re-grepped); ledger v280"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (outcome; zero calls; insertion only)",
+      "text": "OUTCOME recorded at docs/judge_v2_program.md L19587-L19640 (section \"## LCB-D9-BYTE-INERTNESS (2026-09-25, 0 calls) — VALID (post-run review d7eca94); C1 FAILED AS REGISTERED ...\"; _as_of the commit that writes it, parent f222c28, re-grepped): VALID; C1 FAILED as registered (2 of 21 files, DP / SS / TDC only); R9 non-determinism; change not implicated; P1 FAILED, P2 HELD, P3 HELD as transcribed, P4 HELD, P5 FAILED as registered; falsifier fired on its trigger, consequence not supported; D1 HIGH recorded as a registrar and reviewer miss, and the reachability practice extended to criteria vs known non-determinism on the record; line-end brackets at L18857 (g), L19558 (D4 superseded), L19585 (delta READY STATE) and docs/design/FRAMEWORK.md L297 (code cause); D9 OPEN under LCB-D9B-BYTE-INERTNESS (docs/judge_v2_program.md L19642-L19714 (section \"## Registered 2026-09-25 (before any code or call) — LCB-D9B-BYTE-INERTNESS: ...\"; _as_of the commit that writes it, parent f222c28, re-grepped)); EVAL-METRIC-DETERMINISM queued (drafted) at docs/judge_v2_program.md L19716-L19730 (section \"## Queued 2026-09-25 (DRAFTED, NOT REGISTERED; no code, no call) — EVAL-METRIC-DETERMINISM: ...\"; _as_of the commit that writes it, parent f222c28, re-grepped); ledger v281"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (LCB-D9B-BYTE-INERTNESS outcome; zero calls; insertion only)",
+      "text": "D9 (the merge gate) DISCHARGED BY LCB-D9B-BYTE-INERTNESS (post-run review 5a51d52: VALID; S5c exit 0; C1' HELD 0/24; C2 HELD 0/24; V1-V11 all MET) under the declared-drop words only (the four src/main blobs of 6b9fc7c against a62c7e0 are byte-inert on every compared field except DendrogramPurity, SphericalSilhouette and TotalDasguptaCost, which are declared non-deterministic and NOT tested (AG_NEWS smoke, one A/B pair and one A/A2 pair, C1' 0/24, C2 0/24)); this record's outcome (C1 FAILED as registered) stands and is not rescored; docs/judge_v2_program.md L19897-L19974 (section \"## LCB-D9B-BYTE-INERTNESS (2026-09-25, 0 calls) — DISCHARGED: S5c exit 0; C1' HELD (0 of 24) and C2 HELD (0 of 24) ...\"; _as_of the commit that writes it, parent 3187b6f, re-grepped); line-end bracket at L19640; ledger v285"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (merge / archive record; zero calls; insertion only)",
+      "text": "evidence archived at TaxoArena_data\\evidence_2026-09-25\\d9 (run_20260925b SHA256SUMS 82 OK, re-verified in the archive; incident_legA_void_20260925; ops_*; helpers) and postrun_d9 (Z:\\FAC\\TUBerlin\\THESIS\\TaxoArena_data\\evidence_2026-09-25; copied by the orchestrator; file counts equal to the scratchpad's; the scratchpad is temporary); docs/judge_v2_program.md L20054-L20090 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — LCB-STAGE0-INTERACTION's Kotlin, tests and configs MERGED at ca4afcd ... and the session evidence ARCHIVED at TaxoArena_data\\evidence_2026-09-25 ...\"; _as_of the commit that writes it, parent c16ab01, re-grepped)"
+    }
+  ],
+  "does_not_show": [
+    "that the byte run will pass (the audit is an analytical prediction)",
+    "that PinnedPoolsReproduceTest or the golden tests ran on the LCB classes",
+    "the MMLU-Pro offset-0 path through mmlu_pro_dataset_cache_v2.db, a multi-corpus union run, the TUI or the site-null harness (covered only through the shared fetcher init and the shared `when`)",
+    "that fetchLiveCodeBench / lcbWorkDirGuard behave correctly (the LCB window's L5 / L8 job)",
+    "that the embedding-miss count is 0 (inferred)",
+    "the determinism of this arm on identical inputs (no A/A leg; support (g))",
+    "anything about LCB outcomes, any tree of record, any pool of record or any judged number",
+    "that the legs will pass V1-V9, that arxout.py has ended, or that the reviewer's executed helper checks transfer to the live legs beyond the helpers' logic (READY 2026-09-25)",
+    "that the rerun's legs will pass V1-V9 or that C1 will hold; that DendrogramPurity and TotalDasguptaCost are run-to-run deterministic (R9 measures that); the D4 mechanism; that d9_legrun.cmd behaves identically with the real Gradle (stub only); any number from the VOID leg as a D9 result (delta READY 1, 2026-09-25)",
+    "the V3 class counts by an independent count (transcribed; worktrees removed, D8) (post-run review d7eca94)",
+    "the mechanism by an instrumented run (code-read; consistent with 4 runs) (post-run review d7eca94)",
+    "that SeparationJ is deterministic in general (equal in 4 of 4 runs here); that the cal_iso baseline quality CSVs carry the jitter (post-run review d7eca94)",
+    "that the change is inert: C1 FAILED; the inertness on the other 19 files is DESCRIPTIVE ONLY, and 'C1 held on 19 files' would be criterion substitution (C-7, SUBSTITUTED) (registrar)",
+    "that the three drifting fields are unaffected by the change (uninformative at n = 1 pair) (registrar)"
+  ],
+  "ledger": {
+    "row_id": "LCB-STAGE0-INTERACTION (carried in that row; no row of its own at registration)",
+    "version": "v270 (2026-09-25: registered, a bracket in the LCB row's observed cell and the chip 'D9 RULED 2026-09-25: BYTE RUN REGISTERED ...' [warn]) | v273 (2026-09-25: leg B re-pinned to 6b9fc7c, carried in the LCB row's v273 bracket) | v278 (2026-09-25: READY (procedure S0-S12, bf3fa81); the LCB row's D9 chip replaced and a bracket in its observed cell) | v280 (2026-09-25: DELTA READY 1 (5f7e383): leg A INSTRUMENT VOID, rerun READY under DEV-V8 / DEV-CAP / DEV-INSTR, R9; a bracket in the LCB row's observed cell and the D9 chip replaced) | v281 (2026-09-25: OUTCOME: a bracket in the LCB row's observed cell and the D9 chip replaced by 'D9 RAN ... C1 FAILED AS REGISTERED ... NON-DETERMINISM ... D9 OPEN: D9b REGISTERED ...' [warn]; a NOTE in the P7-FIX row)"
+  },
+  "depends_on": [
+    "LCB-STAGE0-INTERACTION (the Kotlin under test; the delta READY 1ceafae confirmed the pins)",
+    "ARCH-V2-PILOT-K46 (its posting must end first)",
+    "GUARD-22-RENAME-PROOF (the form of the proof, cited)",
+    "TOPIC-PARTITION-20NG (the AG smoke of 2026-09-22 is its smoke arm; cited, not revised)",
+    "LCB-STAGE0-INTERACTION's rerun build window (R1-R11, READY 5f3c06e) must have closed"
+  ],
+  "supersedes": null,
+  "superseded_by": "LCB-D9B-BYTE-INERTNESS (for the D9 merge gate only: DISCHARGED 2026-09-25; this outcome stands as recorded)",
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing; D9 (the merge gate of LCB-STAGE0-INTERACTION's Kotlin) stays OPEN, carried by LCB-D9B-BYTE-INERTNESS; reopens no closed line"
+  },
+  "cost": {
+    "calls_expected": 0,
+    "cce_expected": 0,
+    "calls_max": 0,
+    "cce_max": 0,
+    "machine": "~12-15 min active; 30-min rule-7 window registered (CPU lane)",
+    "source": "the ruling's Machine time; PROVISIONAL, the experiment-manager's to confirm"
+  },
+  "sources": [
+    "the programme: docs/judge_v2_program.md L18662-L18872 (section \"## Registered 2026-09-25 (before any code or call) — LCB-D9-BYTE-INERTNESS: ...\"; the ruling VERBATIM between the marker lines L18666 and L18815, i.e. L18667-L18814; _as_of the commit that writes it, parent 1ceafae, re-grepped)",
+    "lcb_d9_ruling.md (session scratchpad), sha256 7e8f16b03aead981f7f481ad8d9dc94071c4288538948b9c74a0b8a7e58e57a1",
+    "docs/reviews/READY_lcb_stage0.md at 1ceafae (the delta READY's (3): pins, counts, KDoc and user.dir items)",
+    "the orchestrator's relay of 2026-09-25 (A = a62c7e0, B = 4497373; placement after the LCB window; merge gate, not an analysis gate)",
+    "read-only checks at HEAD 1ceafae: git merge-base main 4497373; git diff --name-only (four-file precondition; tip f646b478 vs 4497373); git rev-parse of the TOML at a62c7e0 / 4497373 / main; git show 4497373:MMLUDatasetFetcher.kt (the guard's messages); sha256sum of ag_news_smoke_cache_v1.db and -wal; the 2026-09-22 smoke output (log lines, validation count, duration_ms, a scan for paths and date stamps)",
+    "docs/judge_v2_program.md L18874-L18906 (section \"## Author's decision and registrar's record 2026-09-25 (insertion only; zero calls; no LCB outcome value read) — \"do both\": the LCB-STAGE0-INTERACTION rule-7 build window MAY run beside the ARCH-V2-PILOT-K46 posting ...\"; the ruling's L4 VERBATIM between the marker lines L18880 and L18894; lines _as_of the commit that writes them, parent ab90e24, re-grepped)",
+    "docs/judge_v2_program.md L19241-L19271 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; no LCB outcome value read) — LCB-STAGE0-INTERACTION BUILD-WINDOW INCIDENT (11:48-11:51, exit 1 after the snapshot; b3e8c94) and RERUN READY ...\"; _as_of the commit that writes it, parent 5f3c06e, re-grepped)",
+    "docs/reviews/READY_lcb_d9.md at bf3fa81 (blob:106158bee4f7f4a414659c25b5ea118a83c7d203): verdict, pins, input baseline, findings G1-G5, operator procedure S0-S12, rule-7 conditions",
+    "docs/judge_v2_program.md L19434-L19457 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — LCB-D9-BYTE-INERTNESS READY as the procedure S0-S12 (docs/reviews/READY_lcb_d9.md, bf3fa81); ...\"; _as_of the commit that writes it, parent 7d5816e, re-grepped); helper renderings re-hashed by the registrar (sha256sum of the file bytes, of the CR-stripped bytes, git hash-object)",
+    "docs/reviews/READY_lcb_d9_delta1.md at 5f7e383 (blob:906653f317f11b4624cd647ab8ba43eb27ed808f): verdict, per-claim table (claims 1-6), mechanism and V8 notes, defects D1-D7, the new instrument (v2, d9_legrun.cmd, tests), deviations and R9, the amended step list",
+    "docs/judge_v2_program.md L19540-L19585 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — LCB-D9-BYTE-INERTNESS DELTA READY 1 (docs/reviews/READY_lcb_d9_delta1.md, 5f7e383): the 15:20-15:21 leg A is an INSTRUMENT VOID (DEV-INC), not an outcome; ...\"; _as_of the commit that writes it, parent 5f7e383, re-grepped); helper, test-harness and incident-log renderings re-hashed by the registrar (sha256sum of file bytes, of CR-stripped bytes, git hash-object)",
+    "docs/reviews/POSTRUN_lcb_d9.md at d7eca94 (blob:08caa30b1d95842dfc325ea39468243d1733c137; file bytes LF = LF of record, sha256 6049d1f5a8f16f597efd52645e1381fdad1e67be66fa04048201bfe333e5cd37): verdict, per-claim table (claims 1-16), code cause, 'What D9 can and cannot conclude', defects D1-D8, follow-ups A-C, 'Prior recorded numbers that may carry this jitter', 'What this review does not show'",
+    "operator evidence, session scratchpad d9\\run_20260925b\\ (d9_compare.txt, aa\\d9_compare.txt, d9_disc.txt, leg / probe exit files; SHA256SUMS re-checked by the registrar, 82 OK) and d9\\ops_20260925b\\S2_prep.txt (V1, V2)",
+    "docs/judge_v2_program.md L19587-L19640 (section \"## LCB-D9-BYTE-INERTNESS (2026-09-25, 0 calls) — VALID (post-run review d7eca94); C1 FAILED AS REGISTERED ...\"; _as_of the commit that writes it, parent f222c28, re-grepped)",
+    "docs/judge_v2_program.md L19897-L19974 (section \"## LCB-D9B-BYTE-INERTNESS (2026-09-25, 0 calls) — DISCHARGED: S5c exit 0; C1' HELD (0 of 24) and C2 HELD (0 of 24) ...\"; _as_of the commit that writes it, parent 3187b6f, re-grepped)",
+    "docs/judge_v2_program.md L20054-L20090 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — LCB-STAGE0-INTERACTION's Kotlin, tests and configs MERGED at ca4afcd ... and the session evidence ARCHIVED at TaxoArena_data\\evidence_2026-09-25 ...\"; _as_of the commit that writes it, parent c16ab01, re-grepped)"
+  ],
+  "last_update": "2026-09-25 (registrar: evidence archived at TaxoArena_data\\evidence_2026-09-25\\d9, postrun_d9; ledger v287)",
+  "ready_delta1": {
+    "file": "docs/reviews/READY_lcb_d9_delta1.md (blob:906653f317f11b4624cd647ab8ba43eb27ed808f)",
+    "commit": "5f7e383",
+    "verdict": "READY for the rerun, as the amended step list R0, R1, S0'-S12 (review section \"## Amended step list\"); needs fresh worktrees, a fresh $ST (run_20260925b, created by d9_prep, not by hand) and the two new pinned files d9_leg_check_v2.py and d9_legrun.cmd; neither C1 nor V3, V6 or V7 is weakened; the execution proof unchanged (V3 counts, R3 probe) and tightened (V4 requires the bootRun JVM's own [BOOT] line)",
+    "steps": "R0 preserve the A' material (pseudoroot; no SQLite open; SHA256SUMS_R0) BEFORE any removal; R1 remove d9-legA / d9-legB (G5 fallback); S0' pins d9_prep 58b0ec87 CRLF / d9_compare 8636b215 LF / d9_leg_check_v2 b2d1ae8d LF / d9_legrun.cmd e986bb84 CRLF, no java.exe / python.exe (WAIT), >= 12 GB, L6 pins, git diff a62c7e0 HEAD over the four pins = 0; S1 fresh worktrees A a62c7e0 / B 6b9fc7c; S2 d9_prep [V2] PASS (e3415684 / 52229e1e); S3' leg A via d9_legrun.cmd + v2 ALL VALIDITY CHECKS PASS, V3 0/0/0/0; S4' leg B, V3 >= 3/1/1/1 (predicted 4/2/1/2); S5 C1 d9_compare (exit 0 HELD / 3 FAILED); S5b R9 A/A' into $ST\\aa; S6' probe via d9_legrun.cmd (EXIT != 0, refusal line, no 'No enum constant', CR/LF-stripped search); S7' optional; S8-S12 as in the READY (v2 + probe lines appended to d9_disc.txt; S12 V9 against claim 4)",
+    "recorded_at": "docs/judge_v2_program.md L19540-L19585 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — LCB-D9-BYTE-INERTNESS DELTA READY 1 (docs/reviews/READY_lcb_d9_delta1.md, 5f7e383): the 15:20-15:21 leg A is an INSTRUMENT VOID (DEV-INC), not an outcome; ...\"; _as_of the commit that writes it, parent 5f7e383, re-grepped)"
+  },
+  "deviations": [
+    {
+      "id": "DEV-INC",
+      "date": "2026-09-25",
+      "source": "delta READY 1 (5f7e383), claims 1-6",
+      "text": "The S0-S3 leg A of 2026-09-25 15:20-15:21 (a62c7e0; exit 0, BUILD SUCCESSFUL in 58s) is an INSTRUMENT VOID (a failed precondition), NOT an outcome: d9_leg_check.py v1 (9ee6d43d) returned VOID on V4 (PowerShell 5.1 *> word-wrapped the [BOOT] ErrorRecord at 120 columns; breaks at 1-based lines 16->17 processAot pid 52524 and 33->34 bootRun pid 48144) and V8 (below the 1-min floor); leg B NEVER run (no build dir), NO C1 computed; main DBs UNCHANGED (claim 4); evidence scratchpad d9\\incident_legA_void_20260925\\ (legA_bootrun.log UTF-16LE BOM, 793 CRLF lines, sha256 32871118521077bd342646bfa33db7dc2404f0aaf01a1a74fe6a91e2bd46e9e5 file bytes, registrar re-hashed; outputDir_copy 24/24 identical), d9\\ops_20260925\\, d9\\run_20260925\\; its outputs serve only as R9's A' leg"
+    },
+    {
+      "id": "DEV-V8",
+      "date": "2026-09-25",
+      "source": "delta READY 1 (5f7e383), defect D1 HIGH",
+      "text": "V8 [1, 8] min is UNREACHABLE for a warm-cache leg (P4 = 0 misses, the registration's own prediction; the floor came from the cold 114,618 ms run with 1,400 embeddings; the VOID leg read duration_ms 10,445 ms / Gradle 58 s / START-END 58 s); V8 is read as the 8-min CEILING on run_manifest duration_ms AND on the Gradle 'BUILD SUCCESSFUL in' time, plus 'the construction ran' (duration_ms > 0, >= 1 data row in diagnostics/iteration_metrics.csv); the 1-min FLOOR IS NOT APPLIED; both legs' observed values and 'below the registered floor: True/False' disclosed in the outcome. P5 scored AS REGISTERED: FAILED if either leg is below 1 min, cause stated. The prior READY bf3fa81 should have caught it by its own G3 (the reviewer's admission), and the registrar's READY record 22cb37e (R6) did not connect G3 to V8 either; programme bracket at L18836"
+    },
+    {
+      "id": "DEV-CAP",
+      "date": "2026-09-25",
+      "source": "delta READY 1 (5f7e383), defects D2, D7",
+      "text": "S3, S4, S6, S7 capture through d9_legrun.cmd (cmd redirection '> <log> 2>&1'; START / EXIT <rc> / END; exits with the Gradle code; refuses a bad leg, a missing stage, an existing log or exit file, a bad 4th argument) instead of PowerShell *>; bootRun arguments unchanged byte for byte (executed against a stub gradlew.bat: argv as registered, a 180-char stderr line on one line, $LASTEXITCODE 0/3/1, refusals exit 2; not executed with the real Gradle). Pins: file bytes CRLF sha256 e986bb848ebf3b986c535c48bd1abb1034d8f6f2fad83a9f4e2f421af478ca60; LF 884f6cc41adb6911779a3a61de4c54f69ab26ef4b49ba6c828ea4c5be0fc3acc; blob:8a67bcbff7767246279eed3ea35642d42ce41952"
+    },
+    {
+      "id": "DEV-INSTR",
+      "date": "2026-09-25",
+      "source": "delta READY 1 (5f7e383), defects D2, D3",
+      "text": "d9_leg_check_v2.py (file bytes = LF sha256 b2d1ae8df0d1bd354e87e0d3bf9a32c3744cf2e73a49259d6b0eb97f6e037bfd; blob:e5f2ff7a785c982abbe4877f3a686b9ea21ac224) REPLACES d9_leg_check.py for the rerun; v1 stays pinned 9ee6d43d82813d93ae11442d03739947184a48f8c25e0e2d56381de080754a50 (CRLF), unused. V4 wrap-tolerant (re-join up to 3 continuation lines; jar= = the leg's own classes dir; >= 1 occurrence after '> Task :bootRun'; unrecoverable token VOID); V6 adds R5's exit conjunct (last EXIT in leg<L>_exit.txt = 0); V8 per DEV-V8; V3, V6 sanity strings, V7 verbatim; d9_prep.py, d9_compare.py unchanged. Tests d9v2test\\run_tests.py (sha256 5b3e55f2f2f98f1984c051dc1db6b169150c9ff019a275001f7163bca581658d): 18 of 18 as expected, 0 mismatches (T1: v2 PASSES the incident transcript)"
+    }
+  ],
+  "readings": [
+    "R9 (from D4; DESCRIPTIVE, NOT C1; delta READY 1, 5f7e383): after S5, d9_compare.py on (the incident leg A pseudo-root built at R0, the new leg A) into $ST\\aa (S5b): A/A' on identical input copies (e3415684 / 52229e1e) and the same commit a62c7e0. If C1 FAILS and A/A' differs in the same file(s): NON-DETERMINISM under Support (g), D9 stays open under a new registration; if A/A' is EQUAL, a C1 failure reads the change. The '[V7] ... NOT EQUAL (VOID)' line in $ST\\aa is an artefact (no misses files) and is ignored. Recorded as the A/A' result, never as C1; it does not replace the registration of Support (g)'s A' follow-up",
+    "D4 DISCLOSURE (MEDIUM; risk (g) made concrete): the VOID warm leg A vs the 2026-09-22 COLD reference output (89495507; 0 src/main files differ from a62c7e0) differ in 2 of 21 C1 objects: validation/MAIN_taxonomy_quality.csv (DendrogramPurity 0.6867787184488174 vs 0.6867787184488098; TotalDasguptaCost 2.2409421312346172E8 vs 2.2410760359757888E8) and tuning_ledger.csv without CommitSHA (same two values); the other 19 equal. Mechanism NOT VERIFIED (computeTotalDasguptaCost, AdditionalMetrics.kt L100-L149 at a62c7e0, samples 5,000 pairs by index with a fixed seed; a different point order may move it). An input-state dependence of two quality metrics, NOT a D9 result; both D9 legs start from byte-identical warm copies",
+    "R1-R8: see registrar_readings (unchanged)"
+  ],
+  "defects_delta1": [
+    "D1 HIGH: V8's registered bar [1, 8] min unreachable for a warm leg (DEV-V8); the READY bf3fa81's own miss (G3 not connected to V8 / P5)",
+    "D2 MEDIUM: V4 in v1 not robust to the capture the READY prescribed (PowerShell *>; its test used a synthetic unbroken transcript); DEV-CAP AND DEV-INSTR, both required",
+    "D3 MEDIUM: R5 names three V6 conjuncts, v1 enforced two; the recorded exit code read by no check; v2 (T9 / T9b)",
+    "D4 MEDIUM (descriptive): two C1 metrics depend on input state; reading R9 and the D4 disclosure",
+    "D5 LOW: S2's first attempt refused because $ST run_20260925 existed (ops_20260925\\S2_prep.txt rc 1; S2b V2 PASS); amended S2: do NOT create $ST",
+    "D6 LOW: S9's 'no java.exe' not met at S12 (S12_V9.txt 15:21:59: PID 29384 Gradle daemon, PID 57664 Kotlin compile daemon); S0' re-checks and WAITS",
+    "D7 LOW: S6's refusal check a plain substring search a PowerShell capture could split; probe via d9_legrun.cmd, CR/LF-stripped search",
+    "claim 1 LOW: the operator's line numbers 0-based (1-based 16->17, 33->34)"
+  ],
+  "defects_postrun": [
+    "D1 HIGH (registration defect; owned by the D9 registration, READY bf3fa81, delta READY 5f7e383 AND the registrar): C1 unreachable at any budget: MAIN_taxonomy_quality.csv and tuning_ledger.csv drift run to run on the record (FRAMEWORK.md L297 since 8d77f7b, L270; campaign_review_2026-09-10.md L252); Support (g) called determinism an assumption without checking (grep over L18662-L18872 for P7 / campaign_review / evaluation path / cd037c0 = 0 hits); the registrar's READY and delta READY records carried it forward. PRACTICE EXTENDED: a criterion's objects are checked against known non-determinism on the record before acceptance (first application: LCB-D9B-BYTE-INERTNESS Support (g))",
+    "D2 MEDIUM (engine; open since 2026-09-14, ungated): three evaluation metrics depend on the order of a list filled by parallel routing; TDC carries 0.1-0.6% estimator noise -> EVAL-METRIC-DETERMINISM (drafted)",
+    "D3 LOW: main embeddings_cache.db-shm mtime bumped by the operator's own [PIN mode=ro] reads (content unchanged)",
+    "D4 LOW: foreign processes in the rule-7 window: archv2_pilot selftest (PID 48696, admitted) at S2; rc_probe.py (PID 11276, NOT admitted) at S9; no overlap with S3 / S4; no effect",
+    "D5 LOW: legs shared the Gradle and Kotlin compile daemons; compileKotlin ran in both; no effect",
+    "D6 LOW: S6_tomldiff.txt compared LF against CRLF (67 lines); CR-stripped diff = the 2 registered lines",
+    "D7 LOW: S9's first gradlew --stop from the wrong directory; Kotlin daemon 14180 alive at S9",
+    "D8 LOW: V3 not re-derivable after the run (no class-file list kept)"
+  ],
+  "descriptive_not_c1": "DESCRIPTIVE ONLY, NOT C1 (never promoted to DISCHARGED): inert on every output deterministic in 4 of 4 runs: 19 of 21 files, the file set, reserved_pool (600 rows) and reserved_pool_meta, and within the two failing files SeparationJ, WeightedLeafPurity, NormalisedSackinIndex and every tuning_ledger column except DP, SS, TDC and CommitSHA; A-B distance (TDC 0.0042%, DP 6.7e-15, SS 2.8e-17) inside A/A' (TDC 0.141%, DP 8.7e-15, SS 0), n = 1 pair each",
+  "code_cause": "CODE-READ, NOT INSTRUMENTED (review section '## The non-determinism: code-level cause'): TaxonomyOperations.reassignQueries (L278 ff.) appends to leaf.queries (synchronizedList, GraphNode.kt L41) in thread-completion order (L309, L336, L348); TaxonomyMetrics.generateReport inherits it (L123, L186); TotalDasguptaCost (AdditionalMetrics.kt L100-L149) samples 5,000 of 979,300 pairs by index with Random(0) -> order-dependent Monte-Carlo sample; DendrogramPurity (HierarchicalMetrics.kt L98 ff.) and SphericalSilhouette (StatisticsUtils.kt L564 ff.) sum in list order; computeTripletAccuracy (AdditionalMetrics.kt L235, L248) same list, not in C1; none of the 4 changed src/main files is on this path",
+  "plain_description": {
+    "sq": "Engineering/infrastructure",
+    "what": "An engineering check. It asks whether merging four code files that add LiveCodeBench support changes any output byte of a small AG_NEWS tree build, by comparing the build before and after the change.",
+    "why": "New code must not silently change existing trees before it is merged.",
+    "information": "Identical outputs would clear the merge. Differences would block it, unless they come from run-to-run randomness. Result: done. The check failed as registered: 2 of 21 files differed, in three quality metrics. A repeat of the old code alone showed the same differences, so the cause is non-determinism in those metrics, not the change. The 19 other identical files are descriptive only, the merge was not done, and the question moved to a follow-up test.",
+    "written": "2026-10-07"
+  }
+}

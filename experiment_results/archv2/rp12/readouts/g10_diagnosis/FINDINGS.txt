@@ -1,0 +1,7 @@
+G10 diagnosis (tree-construction-specialist, 2026-10-01; read-only; zero calls). B0 vs B0' (pinned commit 6d04e840; TOMLs differ in outputDir only).
+A2 gate_ids.json: only split_v2.configSha256Lf differs (TOML sha, varies with outputDir); gate ids equal. artefacts() strips it in A4/A5 but not A2.
+A4 snapshot row: settings / reserved_queries / config equal once the TOML sha is stripped. Node ids, kappa, mu, weights and query membership IDENTICAL. Every populated node has the same queryId SET in a different ORDER: bbh 36/36, gpqa 3/3, ifeval 5/5, math 9/9, mmlu_pro_lb 74/74, musr 6/6, graft_flatleaf 133/133. A1 (dag snapshot) equal but records counts only.
+A3 MAIN_taxonomy_quality.csv + A4 metrics: TotalDasguptaCost rel 6e-5..1.0e-2 (gpqa 3287530.66 -> 3321063.93); tripletAccuracy 4e-3..0.105 (mmlu_pro_lb 0.8954 -> 0.8013); SphericalSilhouette / DendrogramPurity <= 4e-16. All other validation files byte-equal.
+Cause: reassignQueries runs chunks across 12 threads and appends each query in thread-completion order; OrderedSums keeps the tree bit-identical; Dasgupta/triplet sample pairs by position with fixed Random(0), so order changes the sample. Ruled out HashMap order, time seeds, DB row order.
+Why B1-B3 passed: they dropped DP/SS/TDC rows and the quality CSV pending EVAL-METRIC-DETERMINISM (prog L21739) and never read the snapshot row (TDC 0.52% diff noted L22072).
+Graft: writes no dag_snapshots.jsonl or gate_ids.json; G10 should compare A3/A4/A5 with A1/A2 N/A.

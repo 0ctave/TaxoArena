@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="taxonomy.service.AzureInferenceJudgeClientTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-10-01T07:10:14" hostname="HORTENSIA" time="0.091">
+  <properties/>
+  <testcase name="posts the exact bytes to the inference route with the api-key header and parses provenance()" classname="taxonomy.service.AzureInferenceJudgeClientTest" time="0.052"/>
+  <testcase name="a content-filter 400 is an empty content with finish_reason content_filter and the body's id()" classname="taxonomy.service.AzureInferenceJudgeClientTest" time="0.006"/>
+  <testcase name="500 six times throws after six attempts with the full schedule()" classname="taxonomy.service.AzureInferenceJudgeClientTest" time="0.017"/>
+  <testcase name="a plain 400 throws without retry()" classname="taxonomy.service.AzureInferenceJudgeClientTest" time="0.005"/>
+  <testcase name="backoff schedule is min(2^attempt * 3, 60) seconds()" classname="taxonomy.service.AzureInferenceJudgeClientTest" time="0.001"/>
+  <testcase name="a missing key is refused before any request()" classname="taxonomy.service.AzureInferenceJudgeClientTest" time="0.003"/>
+  <testcase name="429 then 200 is two attempts with the 3 s first backoff()" classname="taxonomy.service.AzureInferenceJudgeClientTest" time="0.006"/>
+  <system-out><![CDATA[09:10:14.114 [WARN ] AzureInferenceJudgeClient - [JUDGE-RECIPE] HTTP 500 on attempt 1/6; backing off 3000 ms
+09:10:14.116 [WARN ] AzureInferenceJudgeClient - [JUDGE-RECIPE] HTTP 500 on attempt 2/6; backing off 6000 ms
+09:10:14.117 [WARN ] AzureInferenceJudgeClient - [JUDGE-RECIPE] HTTP 500 on attempt 3/6; backing off 12000 ms
+09:10:14.118 [WARN ] AzureInferenceJudgeClient - [JUDGE-RECIPE] HTTP 500 on attempt 4/6; backing off 24000 ms
+09:10:14.119 [WARN ] AzureInferenceJudgeClient - [JUDGE-RECIPE] HTTP 500 on attempt 5/6; backing off 48000 ms
+09:10:14.138 [WARN ] AzureInferenceJudgeClient - [JUDGE-RECIPE] HTTP 429 on attempt 1/6; backing off 3000 ms
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

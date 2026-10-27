@@ -1,0 +1,194 @@
+2026-10-03T19:11:03+02:00
+487e0093719c184c98bca53bc9bc61c193559690abb206d77010fd77f81c09a2 *intent_transfer_corpora_v1.db
+9e100e04fc91b137a075b8abedbc87d2b29a6dc2244c5f242b1c587004a4ee74 *intent_emb_qwen3.db
+b187b82f90ce98376ba3ffac100157493fd8c5ee52dfa88f707738dde2acf512 *intent_emb_gemma.db
+52229e1ebfdda76ebaed3e461eeee80ae654dfb35ac480eb9cb9868bb0269769 *embeddings_cache.db
+cdf3a47888017a1a5c153f14724187ab067d0783fa2362f913b61e452993938b *mmlu_pro_dataset_cache_v2.db
+3f7f5e9a470baba3a66d0dbc870bf772739ae60cc415615b0c4f54e0f4793e4e *snapshots_frozen.db
+### STEP1 export 2026-10-03T19:11:31+02:00
+[INTENT-S1-EXPORT] pin intent_transfer_corpora_v1.db: sha256 487e0093719c184c98bca53bc9bc61c193559690abb206d77010fd77f81c09a2 [PIN OK]
+[INTENT-S1-EXPORT] export M-AF-g -> Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/gemma-own-bar-run\intent_s1_build\m_af_g.db: 11502 rows, table sha256 6ce9bdf8494be7d9, file sha256 aa87fc707a4d116b (EVAL rows 0)
+rc=0
+### calibrate-plan
+[GOB] CALIBRATION PLAN (NOT launched; rule 7 W1-W5 per leg; one JVM at a time; -PjvmThreads per the THREAD-CAP):
+  0. DATA_ROOT Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/gemma-own-bar-run holds the pinned ingest DB and intent_emb_{qwen3,gemma}.db (S1's run layout) and a FRESH
+     intent_s1_build/m_af_g.db: python tools/analysis/intent_s1_export.py --export M-AF-g (table sha must be 6ce9bdf8494be7d9)
+  1. working copies: copy intent_emb_qwen3.db (pin 9e100e04fc91b137a075b8abedbc87d2b29a6dc2244c5f242b1c587004a4ee74) and intent_emb_gemma.db (pin b187b82f90ce98376ba3ffac100157493fd8c5ee52dfa88f707738dde2acf512) to Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/gemma-own-bar-run/gemma_own_bar_work/cal_<ts>/;
+     each copy's sha256 = its pin (the arm re-checks and refuses otherwise)
+  2. gradlew.bat gemmaOwnBar -PjvmThreads=<cap> -DgobArm=iso -DoutDir=Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/gemma-own-bar-run\experiment_results/gemma_own_bar/cal/iso
+  3. gradlew.bat gemmaOwnBar -PjvmThreads=<cap> -DsiteNullHeap=<per [SITENULL-HEAP]> -DgobArm=qwen3_256 -DoutDir=Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/gemma-own-bar-run\experiment_results/gemma_own_bar/cal/null_qwen3_256 -DgobBuildDb=Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/gemma-own-bar-run/intent_s1_build/m_af_g.db -DgobEmbDb=<copy of intent_emb_qwen3.db> -DgobEmbSha256=9e100e04fc91b137a075b8abedbc87d2b29a6dc2244c5f242b1c587004a4ee74
+  4. gradlew.bat gemmaOwnBar -PjvmThreads=<cap> -DsiteNullHeap=<per [SITENULL-HEAP]> -DgobArm=gemma768 -DoutDir=Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/gemma-own-bar-run\experiment_results/gemma_own_bar/cal/null_gemma768 -DgobBuildDb=Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/gemma-own-bar-run/intent_s1_build/m_af_g.db -DgobEmbDb=<copy of intent_emb_gemma.db> -DgobEmbSha256=b187b82f90ce98376ba3ffac100157493fd8c5ee52dfa88f707738dde2acf512
+  5. python tools/analysis/gemma_own_bar.py --calibrate --dry-run ; then --calibrate (bar_g.json, write-once; pin its sha256)
+[INTENT-S1-EXPORT] pin intent_transfer_corpora_v1.db: sha256 487e0093719c184c98bca53bc9bc61c193559690abb206d77010fd77f81c09a2 [PIN OK]
+[GOB] PREFLIGHT re-derived MASSIVE salt-1 TRAIN: 9826 distinct texts, set sha256 6f7f9acefa454871, table sha 6ce9bdf8494be7d9 (= S1's export manifest)
+[GOB] PREFLIGHT build DB Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/gemma-own-bar-run\intent_s1_build\m_af_g.db: arm M-AF-g, 9826 TRAIN rows, set sha256 6f7f9acefa454871, table sha 6ce9bdf8494be7d9 -> MATCHES
+[GOB] PREFLIGHT Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/gemma-own-bar-run\intent_emb_qwen3.db: model qwen3-embedding:latest native_dim 4096; 9826 of 9826 TRAIN texts have a vector; pin 9e100e04fc91b137
+[GOB] PREFLIGHT Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/gemma-own-bar-run\intent_emb_gemma.db: model embeddinggemma:latest native_dim 768; 9826 of 9826 TRAIN texts have a vector; pin b187b82f90ce9837
+rc=0
+b187b82f90ce98376ba3ffac100157493fd8c5ee52dfa88f707738dde2acf512 *gemma_own_bar_work/cal_20261003_191141/intent_emb_gemma.db
+9e100e04fc91b137a075b8abedbc87d2b29a6dc2244c5f242b1c587004a4ee74 *gemma_own_bar_work/cal_20261003_191141/intent_emb_qwen3.db
+### STEP3 W-probe iso 2026-10-03T19:12:19+02:00 (java 65024 = idle Gradle daemon, main build finished 19:10:52, no client)
+[W] free RAM 26.6 GB (OK)
+[W] java: "java.exe","65024","Console","1","775ÿ968 Ko"
+[W] exclusive FREE intent_s1_build/m_af_g.db
+[W] RESULT FREE
+### STEP3 iso rc=0 (log null_iso.log; --stop stopped 2 daemons incl. idle 65024)
+### STEP4 W-probe qwen3 2026-10-03T19:13:33+02:00
+[W] free RAM 27.6 GB (OK)
+[W] java: Informationÿ: aucune tƒche en service ne correspond aux critŠres sp‚cifi‚s.
+[W] exclusive FREE intent_s1_build/m_af_g.db
+[W] exclusive FREE gemma_own_bar_work/cal_20261003_191141/intent_emb_qwen3.db
+[W] RESULT FREE
+### STEP4 qwen3 rc=0 p95=0.038906 (null_qwen3_256.log)
+### STEP5 W-probe gemma 2026-10-03T19:24:19+02:00
+[W] free RAM 27.6 GB (OK)
+[W] java: Informationÿ: aucune tƒche en service ne correspond aux critŠres sp‚cifi‚s.
+[W] exclusive FREE intent_s1_build/m_af_g.db
+[W] exclusive FREE gemma_own_bar_work/cal_20261003_191141/intent_emb_gemma.db
+[W] RESULT FREE
+### STEP5 gemma rc=0 p95=0.068082 (null_gemma768.log)
+### STEP6 calibrate --dry-run 2026-10-03T20:01:04+02:00
+[GOB] CALIBRATE (DRY RUN, writes nothing): zero calls; docs/judge_v2_program.md L23915-L23927 (_as_of d50c47d4), "## Registered 2026-10-03 (before any code or call) — GEMMA-OWN-BAR: ..."
+[INTENT-S1-EXPORT] pin intent_transfer_corpora_v1.db: sha256 487e0093719c184c98bca53bc9bc61c193559690abb206d77010fd77f81c09a2 [PIN OK]
+[GOB] TRAIN-ONLY: both legs read the 9826 distinct MASSIVE salt-1 TRAIN texts (set sha256 6f7f9acefa454871 = the re-derivation; build table 6ce9bdf8494be7d9); no GATE or EVAL text
+[GOB] NULL qwen3_256 slice 256: p95 0.038906 (rank 285 of 300; max 0.060991; reached 300 of 300); working copy sha256 9e100e04fc91b137 = pin
+[GOB] NULL gemma768  slice 768: p95 0.068082 (rank 285 of 300; max 0.069405; reached 300 of 300); working copy sha256 b187b82f90ce9837 = pin
+[GOB] DECIDING BAR bar_g = 0.025 x 0.068082 / 0.038906 = 0.043748 (the TOML carries 0.043748; GOB-B1)
+[GOB] WIDTH-ONLY BAR (descriptive; isotropic, n 406): 0.025 x p95_iso(768) 0.002996 / p95_iso(256) 0.006882 = 0.010885; at 512 0.014663 (record 0.0145)
+[GOB] D1 identity (descriptive): p95_iso(256) 0.0069 vs record 0.0069 REPRODUCED; p95_iso(512) 0.0040 vs record 0.0040 REPRODUCED
+[GOB] DRY RUN: bar file NOT written (would be Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/gemma-own-bar-run\experiment_results/gemma_own_bar\bar_g.json)
+rc=0
+### STEP6 calibrate 2026-10-03T20:01:10+02:00
+[GOB] DECIDING BAR bar_g = 0.025 x 0.068082 / 0.038906 = 0.043748 (the TOML carries 0.043748; GOB-B1)
+[GOB] WIDTH-ONLY BAR (descriptive; isotropic, n 406): 0.025 x p95_iso(768) 0.002996 / p95_iso(256) 0.006882 = 0.010885; at 512 0.014663 (record 0.0145)
+[GOB] D1 identity (descriptive): p95_iso(256) 0.0069 vs record 0.0069 REPRODUCED; p95_iso(512) 0.0040 vs record 0.0040 REPRODUCED
+[GOB] bar file written: Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/gemma-own-bar-run\experiment_results/gemma_own_bar\bar_g.json sha256 76f2ed35ab00af3d8b50858247794234a05bffbbc726cf78012a62126b5abe26
+rc=0
+76f2ed35ab00af3d8b50858247794234a05bffbbc726cf78012a62126b5abe26 *experiment_results/gemma_own_bar/bar_g.json
+### write-config
+[GOB] config Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/gemma-own-bar-run\experiment_configs/gemma_own_bar/g_af.toml: proposalSeparationBar = 0.043748 (bar file sha256 76f2ed35ab00af3d), outputDir = experiment_results/gemma_own_bar/g_af; all else = experiment_configs/intent_s1/m_af_g.toml
+[GOB] config written: Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/gemma-own-bar-run\experiment_configs/gemma_own_bar/g_af.toml blob 650b04392a620f388d67a12b9c9203201c927854
+rc=0
+### check-config
+[GOB] config check: Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/gemma-own-bar-run\experiment_configs/gemma_own_bar/g_af.toml = the regenerated bytes (blob 650b04392a620f388d67a12b9c9203201c927854)
+rc=0
+### launch-plan
+[GOB] BUILD PLAN G-AF (NOT launched; after --calibrate and --write-config; rule 7 W1-W5; a backup first):
+  1. python tools/analysis/gemma_own_bar.py --check-config   (experiment_configs/gemma_own_bar/g_af.toml = m_af_g.toml + bar_g, two keys)
+  2. build DB Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/gemma-own-bar-run/intent_s1_build/m_af_g.db: the FRESH export of step 0 of --calibrate-plan (GOB-B2); intent_s1_export.py verify passes; table sha 6ce9bdf8494be7d9
+  3. copy intent_emb_gemma.db (sha256 must be b187b82f90ce98376ba3ffac100157493fd8c5ee52dfa88f707738dde2acf512) -> Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/gemma-own-bar-run/intent_s1_work/g_af_<ts>/intent_emb_gemma.db; copy sha256 = pin
+  4. gradlew.bat bootRun -PjvmThreads=<cap> -Dtaxoarena.embeddingCacheFile=<copy> -Dtaxoarena.embeddingCacheSourceSha256=b187b82f90ce98376ba3ffac100157493fd8c5ee52dfa88f707738dde2acf512 -Dtaxoadapt.llm.embedding-model=embeddinggemma:latest -Dranking.db.path=Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/gemma-own-bar-run/experiment_results/gemma_own_bar/g_af/seed_42/ratings_intent_s1.db --args="--config experiment_configs/gemma_own_bar/g_af.toml"
+  5. after exit: the pinned emb DBs and the ingest DB re-hashed unchanged; '[INTENT] fetched' with 9826 / 1676; then --run --dry-run
+rc=0
+### STEP7 pre-build table hashes 2026-10-03T20:01:24+02:00
+[TBL] embeddings_cache.db immutable=1 agent_ratings 0 e3b0c44298fc1c14
+[TBL] embeddings_cache.db immutable=1 embeddings 39631 e099bb2e6244b352
+[TBL] embeddings_cache.db immutable=1 gmm_vectors 0 e3b0c44298fc1c14
+[TBL] embeddings_cache.db immutable=1 match_history 0 e3b0c44298fc1c14
+[TBL] embeddings_cache.db immutable=1 queries 31986 295f60bc91bb24af
+[TBL] embeddings_cache.db immutable=1 sqlite_sequence 0 e3b0c44298fc1c14
+[TBL] embeddings_cache.db ro agent_ratings 0 e3b0c44298fc1c14
+[TBL] embeddings_cache.db ro embeddings 39631 e099bb2e6244b352
+[TBL] embeddings_cache.db ro gmm_vectors 0 e3b0c44298fc1c14
+[TBL] embeddings_cache.db ro match_history 0 e3b0c44298fc1c14
+[TBL] embeddings_cache.db ro queries 31986 295f60bc91bb24af
+[TBL] embeddings_cache.db ro sqlite_sequence 0 e3b0c44298fc1c14
+[TBL] mmlu_pro_dataset_cache_v2.db immutable=1 active_reserved_pool 1 515d70f2be2c3d81
+[TBL] mmlu_pro_dataset_cache_v2.db immutable=1 ag_news 2000 668868edb7a45bcc
+[TBL] mmlu_pro_dataset_cache_v2.db immutable=1 arc 0 e3b0c44298fc1c14
+[TBL] mmlu_pro_dataset_cache_v2.db immutable=1 corpus_registry 1 44627558c5a37678
+[TBL] mmlu_pro_dataset_cache_v2.db immutable=1 eval_question_link 12257 f286744508cecbd1
+[TBL] mmlu_pro_dataset_cache_v2.db immutable=1 eval_results 560379 46bee9aa25c46d8d
+[TBL] mmlu_pro_dataset_cache_v2.db immutable=1 mmlu_original 0 e3b0c44298fc1c14
+[TBL] mmlu_pro_dataset_cache_v2.db immutable=1 mmlu_pro 12000 119b085a21395fc9
+[TBL] mmlu_pro_dataset_cache_v2.db immutable=1 reserved_pool 146568 5e8358a673928a8e
+[TBL] mmlu_pro_dataset_cache_v2.db immutable=1 reserved_pool_meta 49 480562b0917f2826
+[TBL] mmlu_pro_dataset_cache_v2.db immutable=1 sqlite_sequence 2 37ebb0214e696803
+[TBL] mmlu_pro_dataset_cache_v2.db immutable=1 twenty_newsgroups 0 e3b0c44298fc1c14
+[TBL] mmlu_pro_dataset_cache_v2.db ro active_reserved_pool 1 515d70f2be2c3d81
+[TBL] mmlu_pro_dataset_cache_v2.db ro ag_news 2000 668868edb7a45bcc
+[TBL] mmlu_pro_dataset_cache_v2.db ro arc 0 e3b0c44298fc1c14
+[TBL] mmlu_pro_dataset_cache_v2.db ro corpus_registry 1 44627558c5a37678
+[TBL] mmlu_pro_dataset_cache_v2.db ro eval_question_link 12257 f286744508cecbd1
+[TBL] mmlu_pro_dataset_cache_v2.db ro eval_results 560379 46bee9aa25c46d8d
+[TBL] mmlu_pro_dataset_cache_v2.db ro mmlu_original 0 e3b0c44298fc1c14
+[TBL] mmlu_pro_dataset_cache_v2.db ro mmlu_pro 12000 119b085a21395fc9
+[TBL] mmlu_pro_dataset_cache_v2.db ro reserved_pool 146568 5e8358a673928a8e
+[TBL] mmlu_pro_dataset_cache_v2.db ro reserved_pool_meta 49 480562b0917f2826
+[TBL] mmlu_pro_dataset_cache_v2.db ro sqlite_sequence 2 37ebb0214e696803
+[TBL] mmlu_pro_dataset_cache_v2.db ro twenty_newsgroups 0 e3b0c44298fc1c14
+[TBL] m_af_g.db immutable=1 corpus_questions 11502 628dc45df6e4f2db
+[TBL] m_af_g.db immutable=1 eval_question_link 11502 7b170895b0bba007
+[TBL] m_af_g.db immutable=1 intent_build_meta 16 873589e9253215e6
+[TBL] m_af_g.db immutable=1 intent_corpus 11502 98639a1b397db170
+[TBL] m_af_g.db immutable=1 sqlite_sequence 1 f63459c557b304ea
+[TBL] m_af_g.db ro corpus_questions 11502 628dc45df6e4f2db
+[TBL] m_af_g.db ro eval_question_link 11502 7b170895b0bba007
+[TBL] m_af_g.db ro intent_build_meta 16 873589e9253215e6
+[TBL] m_af_g.db ro intent_corpus 11502 98639a1b397db170
+[TBL] m_af_g.db ro sqlite_sequence 1 f63459c557b304ea
+### STEP7 backup E:/TaxoArena_backup_2026-10-03_gemma_own_bar/pre_build SHA256SUMS OK (0 failures)
+b187b82f90ce98376ba3ffac100157493fd8c5ee52dfa88f707738dde2acf512 *intent_s1_work/g_af_20261003_200327/intent_emb_gemma.db
+### STEP7 W-probe build 2026-10-03T20:03:28+02:00
+[W] free RAM 22.9 GB (OK)
+[W] java: "java.exe","59668","Console","1","1ÿ008ÿ600 Ko"
+"java.exe","59088","Console","1","850ÿ244 Ko"
+[W] exclusive FREE intent_s1_build/m_af_g.db
+[W] exclusive FREE intent_s1_work/g_af_20261003_200327/intent_emb_gemma.db
+[W] exclusive FREE embeddings_cache.db
+[W] exclusive FREE mmlu_pro_dataset_cache_v2.db
+[W] RESULT FREE
+### STEP7 re-probe after peer (cert-pc-k2-known gradle builds 20:03, 20:09) 2026-10-03T20:13:21+02:00
+[W] free RAM 24.5 GB (OK)
+[W] java: Informationÿ: aucune tƒche en service ne correspond aux critŠres sp‚cifi‚s.
+[W] exclusive FREE intent_s1_build/m_af_g.db
+[W] exclusive FREE intent_s1_work/g_af_20261003_200327/intent_emb_gemma.db
+[W] exclusive FREE embeddings_cache.db
+[W] exclusive FREE mmlu_pro_dataset_cache_v2.db
+[W] RESULT FREE
+### STEP7 build rc=1 (build_g_af.log): [ANCHOR-FREE] root never split; proposals.csv root GROW: best sep 0.02874 (emK=3) < bar 0.04375, every iter 1-5; artefacts copied to E:/TaxoArena_backup_2026-10-03_gemma_own_bar/incident_build_g_af
+### post-build pin re-hash
+487e0093719c184c98bca53bc9bc61c193559690abb206d77010fd77f81c09a2 *intent_transfer_corpora_v1.db
+b187b82f90ce98376ba3ffac100157493fd8c5ee52dfa88f707738dde2acf512 *intent_emb_gemma.db
+9e100e04fc91b137a075b8abedbc87d2b29a6dc2244c5f242b1c587004a4ee74 *intent_emb_qwen3.db
+16617c1453b03606c06a49ad5d3cd4b6a59ea04f03de243df99c7bac0fb81a7c *intent_s1_work/g_af_20261003_200327/intent_emb_gemma.db
+[TBL] embeddings_cache.db ro agent_ratings 0 e3b0c44298fc1c14
+[TBL] embeddings_cache.db ro embeddings 39631 e099bb2e6244b352
+[TBL] embeddings_cache.db ro gmm_vectors 0 e3b0c44298fc1c14
+[TBL] embeddings_cache.db ro match_history 0 e3b0c44298fc1c14
+[TBL] embeddings_cache.db ro queries 31986 295f60bc91bb24af
+[TBL] embeddings_cache.db ro sqlite_sequence 0 e3b0c44298fc1c14
+[TBL] mmlu_pro_dataset_cache_v2.db ro active_reserved_pool 1 515d70f2be2c3d81
+[TBL] mmlu_pro_dataset_cache_v2.db ro ag_news 2000 668868edb7a45bcc
+[TBL] mmlu_pro_dataset_cache_v2.db ro arc 0 e3b0c44298fc1c14
+[TBL] mmlu_pro_dataset_cache_v2.db ro corpus_registry 1 44627558c5a37678
+[TBL] mmlu_pro_dataset_cache_v2.db ro eval_question_link 12257 f286744508cecbd1
+[TBL] mmlu_pro_dataset_cache_v2.db ro eval_results 560379 46bee9aa25c46d8d
+[TBL] mmlu_pro_dataset_cache_v2.db ro mmlu_original 0 e3b0c44298fc1c14
+[TBL] mmlu_pro_dataset_cache_v2.db ro mmlu_pro 12000 119b085a21395fc9
+[TBL] mmlu_pro_dataset_cache_v2.db ro reserved_pool 146568 5e8358a673928a8e
+[TBL] mmlu_pro_dataset_cache_v2.db ro reserved_pool_meta 49 480562b0917f2826
+[TBL] mmlu_pro_dataset_cache_v2.db ro sqlite_sequence 2 37ebb0214e696803
+[TBL] mmlu_pro_dataset_cache_v2.db ro twenty_newsgroups 0 e3b0c44298fc1c14
+[TBL] m_af_g.db ro ag_news 0 e3b0c44298fc1c14
+[TBL] m_af_g.db ro arc 0 e3b0c44298fc1c14
+[TBL] m_af_g.db ro corpus_questions 11502 628dc45df6e4f2db
+[TBL] m_af_g.db ro corpus_registry 1 44627558c5a37678
+[TBL] m_af_g.db ro eval_question_link 11502 7b170895b0bba007
+[TBL] m_af_g.db ro eval_results 0 e3b0c44298fc1c14
+[TBL] m_af_g.db ro intent_build_meta 16 873589e9253215e6
+[TBL] m_af_g.db ro intent_corpus 11502 98639a1b397db170
+[TBL] m_af_g.db ro mmlu_original 0 e3b0c44298fc1c14
+[TBL] m_af_g.db ro mmlu_pro 0 e3b0c44298fc1c14
+[TBL] m_af_g.db ro reserved_pool 1676 d3f5e0a57f5a518e
+[TBL] m_af_g.db ro reserved_pool_meta 1 0a941b1bf03b1958
+[TBL] m_af_g.db ro sqlite_sequence 1 f63459c557b304ea
+[TBL] m_af_g.db ro twenty_newsgroups 0 e3b0c44298fc1c14
+### STEP8 --run --dry-run 2026-10-03T20:15:24+02:00
+[GOB] DRY RUN (no EVAL statistic; nothing written): zero calls. docs/judge_v2_program.md L23915-L23927 (_as_of d50c47d4), "## Registered 2026-10-03 (before any code or call) — GEMMA-OWN-BAR: ..."
+[GOB] bar file Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/gemma-own-bar-run\experiment_results/gemma_own_bar\bar_g.json sha256 76f2ed35ab00af3d8b50858247794234a05bffbbc726cf78012a62126b5abe26: bar_g 0.043748 (TOML 0.043748)
+[GOB] REFUSING: G-AF build ABSENT or incomplete at Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/gemma-own-bar-run\experiment_results/gemma_own_bar/g_af\seed_42: 0 distinct Snapshot ID lines (exactly one required)
+[GOB] REFUSED: G-AF build ABSENT or incomplete at Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/gemma-own-bar-run\experiment_results/gemma_own_bar/g_af\seed_42: 0 distinct Snapshot ID lines (exactly one required)
+rc=1
+### STEP8 --run NOT executed: --run --dry-run REFUSED (rc=1, 0 Snapshot ID lines; build vacuous). C3 brackets present (7a1a8655) but no guard bypassed.
+### END 2026-10-03T20:15:49+02:00; wall 19:11:03 -> now

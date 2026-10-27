@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="taxonomy.ProposalMemoReplayTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-10-01T07:09:26" hostname="HORTENSIA" time="0.429">
+  <properties/>
+  <testcase name="on mode - identical proposal twice runs the action once and replays id and label consumption exactly()" classname="taxonomy.ProposalMemoReplayTest" time="0.342"/>
+  <testcase name="iteration 1 is never memoized()" classname="taxonomy.ProposalMemoReplayTest" time="0.005"/>
+  <testcase name="shadow mode skips nothing and reports zero mismatches()" classname="taxonomy.ProposalMemoReplayTest" time="0.012"/>
+  <testcase name="on mode - a lossy-memo hit is never stored in the exact memo()" classname="taxonomy.ProposalMemoReplayTest" time="0.007"/>
+  <testcase name="a mutated input never hits()" classname="taxonomy.ProposalMemoReplayTest" time="0.012"/>
+  <testcase name="on mode - the uncached-base double execution is replayed and the base is primed()" classname="taxonomy.ProposalMemoReplayTest" time="0.01"/>
+  <testcase name="shadow mode counts a stored rejection that the full evaluation now accepts as a mismatch()" classname="taxonomy.ProposalMemoReplayTest" time="0.012"/>
+  <testcase name="an action with unrestored side effects is never stored()" classname="taxonomy.ProposalMemoReplayTest" time="0.008"/>
+  <testcase name="memo self-disables on a counter invariant violation and falls back to full evaluation()" classname="taxonomy.ProposalMemoReplayTest" time="0.008"/>
+  <testcase name="per-run reset drops entries()" classname="taxonomy.ProposalMemoReplayTest" time="0.005"/>
+  <testcase name="off mode never consults or fills the exact memo()" classname="taxonomy.ProposalMemoReplayTest" time="0.004"/>
+  <system-out><![CDATA[09:09:26.286 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+09:09:26.603 [INFO ] Diagnostics - [DIAG] diagnostics bundle open at C:\Users\octav\AppData\Local\Temp\memo-replay14681416940989161486\diagnostics
+09:09:26.604 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+09:09:26.617 [INFO ] Operations - [MEMO-X HIT] GROW 'A' action='k2' exact_state(digest=95f5b6020d00,replayed=REJECTED,ids=+2,labels=+2,since_iter=2)
+09:09:26.619 [ERROR] Diagnostics - [DIAG] iteration_metrics.csv contains ONLY a header — nothing was ever recorded to it. The file parses and looks valid, so this will not surface later: its producer is not wired up.
+09:09:26.625 [INFO ] Diagnostics - [DIAG] diagnostics bundle closed (completed) at C:\Users\octav\AppData\Local\Temp\memo-replay14681416940989161486\diagnostics
+09:09:26.629 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+09:09:26.635 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+09:09:26.640 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+09:09:26.646 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+09:09:26.655 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+09:09:26.667 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+09:09:26.672 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+09:09:26.676 [INFO ] Operations - [MEMO-X HIT] GROW 'A' action='k2' exact_state(digest=0428015deb47,replayed=REJECTED,ids=+4,labels=+4,since_iter=2,primed)
+09:09:26.678 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+09:09:26.684 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'E' w=0.0 res=0 ch=0 par=0
+09:09:26.686 [INFO ] Operations - [GROW ACCEPTED] 'A' Delta J = 0.000000, Delta V = -1
+09:09:26.688 [ERROR] ProposalMemo - [MEMO-X SHADOW MISMATCH] outcome REJECTED (iter 2) vs ACCEPTED (iter 3) at site 'n00000002' GROW action='k2'
+09:09:26.690 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+09:09:26.697 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+09:09:26.703 [ERROR] ProposalMemo - [MEMO-X] DISABLED for the rest of the run: execution 2 of action 'k2' at site 'n00000002' consumed ids=3 labels=3 vs first ids=2 labels=2
+09:09:26.705 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+09:09:26.710 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

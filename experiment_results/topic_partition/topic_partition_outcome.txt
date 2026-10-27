@@ -1,0 +1,243 @@
+TOPIC-PARTITION-20NG readout (registration docs/judge_v2_program.md L10030-L10390, commit 6aa2a0d); script_sha 1bb31e964f059791; date 2026-09-23; 300-rep site nulls; 1000 bootstrap resamples; 1000 permutations; rng seed 20260922
+pool: the corpus's own split (seed 42, ratio 0.30, per label) recorded in the separate ingest DB; no arena pool (p2dca, paeec) read or written; zero judge calls
+ingest manifest twenty_newsgroups_cache_v1.db.manifest.json: raw 18846 short 1808 dup 117 kept 16921 leak 380 sha fc27ef38a1b5daedf7d3b07dc48cd53f14d86a4bbd7aa42236a03f756fa46e75
+========================================================================================================================
+ARM ng_af_s42 (T1): build.out present; snapshot 20260922_195728_Headless_Run_Auto_ge; built True; pool pf844849e133cda4e; closure 0; slice line [SLICE] embedding slice width = 256, split PCA dropTop=0 whiten=false; trickle Total Queries 5076
+  denominators: ingest rows 16921 (distinct texts 16921); TRAIN in leaves 11845 distinct ids (13246 leaf slots); held-out 5076 distinct texts (5076 reserved ids); neither (closure routing-only / dropped) 0; leaves 110; sites 101; held-out texts inside a leaf: 0 (must be 0)
+  vectors: 16921 of 16921 texts present (4096-d); slice 256
+Q3 TRANSFER (arm ng_af_s42, T1; bar 0.025, slice 256): built = True (vacuity guard fired: False); leaves = 110 (> 7: True; > 20: True); sites = 101; iterations to stop = 15; fetched (16921, '20 Newsgroups', 20)
+  depth reached 8; depth-blocked leaves (depth 8, n >= 110) = 4 of 110 leaves; proposals.csv bars seen []
+  root n00000001 (TWENTY_NEWSGROUPS): depth 0 n 11845 k 2 observed 0.061713 site p95 0.050961 margin 1.211 cert_site_p95 True (deflated p95 nan, cert_deflated True [diagnostic only]); no min-pair refusal row
+  depth-1 n00000004 (Emergent Concept #3): depth 1 n 5891 k 2 observed 0.042300 site p95 0.033308 margin 1.270 cert_site_p95 True (deflated p95 nan, cert_deflated True [diagnostic only]); no min-pair refusal row
+  depth-1 n00000005 (Emergent Concept #4): depth 1 n 6065 k 2 observed 0.038280 site p95 0.045768 margin 0.836 cert_site_p95 False (deflated p95 nan, cert_deflated True [diagnostic only]); no min-pair refusal row
+  beside R1 af_clean_s42: root 0.042461 / p95 0.037214 / margin 1.141 (n00000001); discursive 0.059496 / 0.028375 / 2.097 (n00000005); quantitative 0.025148 / 0.033733 / 0.746 (n00000004); K-SELECTION R1' n00000004 0.056502 / 0.033471 / 1.688
+  certified share (cert_site_p95, 300 reps, null bar 0.0250): 16 of 101 = 0.158 [0.100, 0.242]; R1 14 of 69 = 0.203 (per-draw band 10-16 of 64-69); deflated (diagnostic, never the certificate): 37 of 101
+  by site-size band (this arm vs the record's four free draws; p95 falls with n, so a larger corpus certifies more easily: not like-for-like): n<200 1/27 (record 3/66 = 0.045); 200-400 2/34 (record 11/103 = 0.107); 400-800 3/21 (record 14/52 = 0.269); >=800 10/19 (record 24/47 = 0.511)
+Q1 PARTITION (arm ng_af_s42, T1): denominator n_eval = 5076 distinct held-out texts of the corpus's own split; TRAIN = 11845 distinct texts in 110 leaves (13246 leaf slots); slice 256
+  tree leaves (L=110)                purity 0.6673 [0.6542, 0.6801] (3387/5076)  opt 0.6742  pur7 0.8160  NMI20 0.5422 ARI20 0.1855  NMI7 0.4009 ARI7 0.0633  cells 110 (ho 110; med support 40; <30: 23; empty: 0)
+  k-means k=L seed 0                 purity 0.6789 [0.6659, 0.6916] (3446/5076)  opt 0.6862  pur7 0.8235  NMI20 0.5442 ARI20 0.1835  NMI7 0.4007 ARI7 0.0577  cells 110 (ho 110; med support 44; <30: 22; empty: 0)
+  k-means k=L seed 1                 purity 0.6834 [0.6705, 0.6961] (3469/5076)  opt 0.6903  pur7 0.8203  NMI20 0.5457 ARI20 0.1866  NMI7 0.3986 ARI7 0.0575  cells 110 (ho 110; med support 43; <30: 16; empty: 0)
+  k-means k=L seed 2                 purity 0.6795 [0.6665, 0.6922] (3449/5076)  opt 0.6828  pur7 0.8225  NMI20 0.5383 ARI20 0.1746  NMI7 0.3952 ARI7 0.0556  cells 110 (ho 110; med support 46; <30: 16; empty: 0)
+  k-means k=L seed 3                 purity 0.6702 [0.6572, 0.6830] (3402/5076)  opt 0.6765  pur7 0.8162  NMI20 0.5400 ARI20 0.1772  NMI7 0.3957 ARI7 0.0567  cells 110 (ho 110; med support 44; <30: 23; empty: 0)
+  k-means k=L seed 4                 purity 0.6785 [0.6655, 0.6912] (3444/5076)  opt 0.6872  pur7 0.8219  NMI20 0.5435 ARI20 0.1762  NMI7 0.3997 ARI7 0.0567  cells 110 (ho 110; med support 44; <30: 16; empty: 0)
+  k-means k=20 seed 0 (reference)    purity 0.6340 [0.6206, 0.6471] (3218/5076)  opt 0.6361  pur7 0.8095  NMI20 0.6160 ARI20 0.4638  NMI7 0.4971 ARI7 0.2456  cells 20 (ho 20; med support 246; <30: 0; empty: 0)
+  k-means k=20 seed 1 (reference)    purity 0.6062 [0.5927, 0.6195] (3077/5076)  opt 0.6074  pur7 0.7987  NMI20 0.6036 ARI20 0.4431  NMI7 0.4932 ARI7 0.2339  cells 20 (ho 20; med support 239; <30: 0; empty: 0)
+  k-means k=20 seed 2 (reference)    purity 0.6409 [0.6276, 0.6539] (3253/5076)  opt 0.6424  pur7 0.8030  NMI20 0.6168 ARI20 0.4628  NMI7 0.4962 ARI7 0.2386  cells 20 (ho 20; med support 236; <30: 0; empty: 0)
+  k-means k=20 seed 3 (reference)    purity 0.6247 [0.6113, 0.6379] (3171/5076)  opt 0.6265  pur7 0.8006  NMI20 0.6157 ARI20 0.4513  NMI7 0.4951 ARI7 0.2400  cells 20 (ho 20; med support 237; <30: 0; empty: 0)
+  k-means k=20 seed 4 (reference)    purity 0.6038 [0.5903, 0.6172] (3065/5076)  opt 0.6042  pur7 0.7841  NMI20 0.6003 ARI20 0.4396  NMI7 0.4766 ARI7 0.2224  cells 20 (ho 20; med support 238; <30: 0; empty: 0)
+  k-means k=7 seed 0 (reference)     purity 0.3282 [0.3154, 0.3413] (1666/5076)  opt 0.3308  pur7 0.6578  NMI20 0.5157 ARI20 0.2787  NMI7 0.4867 ARI7 0.3560  cells 7 (ho 7; med support 805; <30: 0; empty: 0)
+  k-means k=7 seed 1 (reference)     purity 0.3280 [0.3152, 0.3411] (1665/5076)  opt 0.3308  pur7 0.6608  NMI20 0.5173 ARI20 0.2797  NMI7 0.4882 ARI7 0.3603  cells 7 (ho 7; med support 763; <30: 0; empty: 0)
+  k-means k=7 seed 2 (reference)     purity 0.3288 [0.3160, 0.3419] (1669/5076)  opt 0.3316  pur7 0.6582  NMI20 0.5166 ARI20 0.2791  NMI7 0.4870 ARI7 0.3558  cells 7 (ho 7; med support 800; <30: 0; empty: 0)
+  k-means k=7 seed 3 (reference)     purity 0.3282 [0.3154, 0.3413] (1666/5076)  opt 0.3312  pur7 0.6564  NMI20 0.5155 ARI20 0.2776  NMI7 0.4864 ARI7 0.3539  cells 7 (ho 7; med support 807; <30: 0; empty: 0)
+  k-means k=7 seed 4 (reference)     purity 0.3280 [0.3152, 0.3411] (1665/5076)  opt 0.3308  pur7 0.6606  NMI20 0.5171 ARI20 0.2795  NMI7 0.4879 ARI7 0.3600  cells 7 (ho 7; med support 764; <30: 0; empty: 0)
+  Ward k=L                           purity 0.6844 [0.6715, 0.6970] (3474/5076)  opt 0.6893  pur7 0.8268  NMI20 0.5497 ARI20 0.1929  NMI7 0.4043 ARI7 0.0610  cells 110 (ho 110; med support 41; <30: 23; empty: 0)
+  HDBSCAN mcs=55 (k=3, train noise 0.927) purity 0.1401 [0.1308, 0.1499] (711/5076)  opt 0.1401  pur7 0.4234  NMI20 0.2407 ARI20 0.0694  NMI7 0.2646 ARI7 0.1869  cells 3 (ho 3; med support 2133; <30: 0; empty: 0)
+  random (tree cells, labels permuted) seed 0 purity 0.0524 [0.0466, 0.0589] (266/5076)  opt 0.1225  pur7 0.1954  NMI20 0.0636 ARI20 0.0003  NMI7 0.0250 ARI7 0.0002  cells 110 (ho 110; med support 40; <30: 23; empty: 0)
+  random (tree cells, labels permuted) seed 1 purity 0.0526 [0.0468, 0.0591] (267/5076)  opt 0.1170  pur7 0.1952  NMI20 0.0628 ARI20 0.0002  NMI7 0.0234 ARI7 -0.0002  cells 110 (ho 110; med support 40; <30: 23; empty: 0)
+  random (tree cells, labels permuted) seed 2 purity 0.0500 [0.0444, 0.0564] (254/5076)  opt 0.1198  pur7 0.1950  NMI20 0.0624 ARI20 0.0002  NMI7 0.0215 ARI7 -0.0001  cells 110 (ho 110; med support 40; <30: 23; empty: 0)
+  random (tree cells, labels permuted) seed 3 purity 0.0489 [0.0433, 0.0551] (248/5076)  opt 0.1196  pur7 0.1944  NMI20 0.0635 ARI20 0.0003  NMI7 0.0235 ARI7 0.0002  cells 110 (ho 110; med support 40; <30: 23; empty: 0)
+  random (tree cells, labels permuted) seed 4 purity 0.0487 [0.0431, 0.0549] (247/5076)  opt 0.1184  pur7 0.1913  NMI20 0.0615 ARI20 0.0001  NMI7 0.0220 ARI7 0.0001  cells 110 (ho 110; med support 40; <30: 23; empty: 0)
+  k-means k=L on FULL 4096-d (seed 0) purity 0.6913 [0.6784, 0.7039] (3509/5076)  opt 0.7002  pur7 0.8282  NMI20 0.5585 ARI20 0.1873  NMI7 0.4101 ARI7 0.0586  cells 110 (ho 110; med support 46; <30: 22; empty: 0)
+  NMI(20) tree - kmeans0 = -0.0020 (ARI diff 0.0020); k-means seed spread (max - min over 5 seeds) = 0.0074; 1000-resample fixed-partition bootstrap CI [-0.0081, 0.0036] (ARI [-0.0065, 0.0103]); n_eval 5076
+  sensitivity excluding leak documents (112 of 5076 held-out excluded; n=4964): tree purity 0.6674 (delta +0.0148 pp) NMI20 0.5429; kmeans0 purity 0.6791 NMI20 0.5448
+  sensitivity excluding documents > 8,000 chars (87 of 5076 held-out excluded; n=4989): tree purity 0.6661 (delta -0.1192 pp) NMI20 0.5413; kmeans0 purity 0.6763 NMI20 0.5434
+  (train documents > 8,000 chars: 219 of 11845; held-out leak documents: 112 of 5076 = 0.0221)
+Q2 TOPICS (arm ng_af_s42): denominator per site = the site's TRAIN members (union of descendant leaves' queryIds; 11845 distinct train ids over 13246 leaf slots); 101 sites (internal nodes with >= 2 children); labels from the ingest DB only
+  sites with H_20 = 0 (single-label member set; printed, not dropped): 1 of 101
+  depth-1 cells (k = 2 at the root; root members 11845 of 11845 train ids):
+    n00000004 (Emergent Concept #3): n=5828 majority group comp (0.518) majority label comp.sys.ibm.pc.hardware (0.109)
+    n00000005 (Emergent Concept #4): n=6017 majority group talk (0.338) majority label soc.religion.christian (0.108)
+  migration matrix 7-group x depth-1 cell, TRAIN (row = group, n; columns = n00000004,n00000005):
+    alt.atheism              n=  504  n00000004:0.012  n00000005:0.988
+    comp                     n= 3085  n00000004:0.978  n00000005:0.022
+    misc.forsale             n=  598  n00000004:0.952  n00000005:0.048
+    rec                      n= 2417  n00000004:0.324  n00000005:0.676
+    sci                      n= 2524  n00000004:0.561  n00000005:0.439
+    soc.religion.christian   n=  659  n00000004:0.014  n00000005:0.986
+    talk                     n= 2058  n00000004:0.013  n00000005:0.987
+  migration matrix 7-group x depth-1 cell, HELD-OUT (leaf-routed, depth-1 ancestor; n_eval 5076):
+    alt.atheism              n=  216  n00000004:0.042  n00000005:0.958
+    comp                     n= 1323  n00000004:0.986  n00000005:0.014
+    misc.forsale             n=  256  n00000004:0.973  n00000005:0.027
+    rec                      n= 1036  n00000004:0.347  n00000005:0.653
+    sci                      n= 1081  n00000004:0.532  n00000005:0.468
+    soc.religion.christian   n=  282  n00000004:0.025  n00000005:0.975
+    talk                     n=  882  n00000004:0.017  n00000005:0.983
+  depth-1 held-out purity (train-majority): 7-group 0.4277 [0.4141, 0.4414] (2171/5076); 20-label 0.1084 [0.1001, 0.1172] (550/5076); k = 2
+  depth-d cuts (TRAIN, n=11845; deepest node at depth <= d on the doc's max-cosine path; tree depth 8):
+    d=1  cells    2  NMI_7 0.2962  NMI_20 0.2472
+    d=2  cells    4  NMI_7 0.4569  NMI_20 0.3882
+    d=3  cells   10  NMI_7 0.4812  NMI_20 0.5133  <- argmax NMI_7
+    d=4  cells   21  NMI_7 0.4586  NMI_20 0.5514  <- argmax NMI_20
+    d=5  cells   41  NMI_7 0.4243  NMI_20 0.5392
+    d=6  cells   68  NMI_7 0.4021  NMI_20 0.5235
+    d=7  cells  100  NMI_7 0.3872  NMI_20 0.5182
+    d=8  cells  110  NMI_7 0.3837  NMI_20 0.5161
+  per-label best-Jaccard node (TRAIN; label n -> node, depth, J, node n):
+    alt.atheism                n= 504 -> n00000136 depth 4 J 0.3109 n 626
+    comp.graphics              n= 612 -> n00000171 depth 5 J 0.4936 n 550
+    comp.os.ms-windows.misc    n= 611 -> n00000266 depth 6 J 0.2231 n 206
+    comp.sys.ibm.pc.hardware   n= 642 -> n00000073 depth 3 J 0.3054 n 1598
+    comp.sys.mac.hardware      n= 600 -> n00000315 depth 5 J 0.3050 n 474
+    comp.windows.x             n= 620 -> n00000172 depth 5 J 0.5742 n 430
+    misc.forsale               n= 598 -> n00000035 depth 4 J 0.4037 n 699
+    rec.autos                  n= 597 -> n00000036 depth 4 J 0.4366 n 808
+    rec.motorcycles            n= 597 -> n00000036 depth 4 J 0.2260 n 808
+    rec.sport.baseball         n= 594 -> n00000029 depth 3 J 0.8268 n 566
+    rec.sport.hockey           n= 629 -> n00000027 depth 3 J 0.8272 n 619
+    sci.crypt                  n= 630 -> n00000037 depth 4 J 0.4224 n 296
+    sci.electronics            n= 624 -> n00000039 depth 4 J 0.3968 n 580
+    sci.med                    n= 638 -> n00000113 depth 5 J 0.5370 n 464
+    sci.space                  n= 632 -> n00000038 depth 4 J 0.3860 n 280
+    soc.religion.christian     n= 659 -> n00000137 depth 4 J 0.4957 n 741
+    talk.politics.guns         n= 583 -> n00000060 depth 4 J 0.4078 n 1067
+    talk.politics.mideast      n= 600 -> n00000061 depth 4 J 0.7115 n 610
+    talk.politics.misc         n= 496 -> n00000232 depth 7 J 0.2143 n 303
+    talk.religion.misc         n= 379 -> n00000030 depth 3 J 0.1875 n 1331
+  per-group best-Jaccard node:
+    alt.atheism                n= 504 -> n00000136 depth 4 J 0.3109 n 626
+    comp                       n=3085 -> n00000008 depth 2 J 0.7782 n 3416
+    misc.forsale               n= 598 -> n00000035 depth 4 J 0.4037 n 699
+    rec                        n=2417 -> n00000011 depth 2 J 0.5226 n 1452
+    sci                        n=2524 -> n00000024 depth 3 J 0.3774 n 1151
+    soc.religion.christian     n= 659 -> n00000137 depth 4 J 0.4957 n 741
+    talk                       n=2058 -> n00000031 depth 3 J 0.5620 n 1669
+  median best depth / median best J: 20 labels 4.0 / 0.4058 (n=20); 7 groups 3.0 / 0.4957 (n=7)
+  leaves at max-Jaccard >= 0.5: 1 of 110 (0.009); median leaf max J 0.1023
+  certification vs alignment at 20 labels (Y_s = NMI_20 of the child partition; 101 sites = 16 certified + 85 uncertified at cert_site_p95; median site n 1301.0 vs 284.0):
+    (i) raw gap certified - uncertified = 0.1215 (confounded by size and depth)
+    (ii) depth-stratified gap = 0.0740; strata: 0-1: c2/u1 gap -0.0114; 2: c4/u0 gap -; 3: c2/u8 gap -0.1064; 4: c6/u12 gap 0.1510; >=5: c2/u64 gap 0.0663
+    (iii) OLS Y ~ cert + log n + depth (HC1): cert 0.0865 (SE 0.0395), log n 0.0041 (SE 0.0225), depth -0.0146 (SE 0.0154), intercept 0.1827
+    (iv) one-sided permutation p (certified higher; 1000 permutations of the flag WITHIN depth strata) = 0.0480
+  certification vs alignment at 7 groups (Y_s = NMI_7 of the child partition; 101 sites = 16 certified + 85 uncertified at cert_site_p95; median site n 1301.0 vs 284.0):
+    (i) raw gap certified - uncertified = 0.1206 (confounded by size and depth)
+    (ii) depth-stratified gap = 0.0888; strata: 0-1: c2/u1 gap 0.0107; 2: c4/u0 gap -; 3: c2/u8 gap 0.0018; 4: c6/u12 gap 0.1200; >=5: c2/u64 gap 0.1213
+    (iii) OLS Y ~ cert + log n + depth (HC1): cert 0.0796 (SE 0.0368), log n 0.0127 (SE 0.0243), depth -0.0117 (SE 0.0134), intercept 0.0613
+    (iv) one-sided permutation p (certified higher; 1000 permutations of the flag WITHIN depth strata) = 0.0030
+========================================================================================================================
+ARM ng_af_bareq512_s42 (T1b): build.out present; snapshot 20260923_043423_Headless_Run_Auto_ge; built True; pool pf844849e133cda4e; closure 0; slice line [SLICE] embedding slice width = 512, split PCA dropTop=0 whiten=false; trickle Total Queries 5076
+  denominators: ingest rows 16921 (distinct texts 16921); TRAIN in leaves 11845 distinct ids (12772 leaf slots); held-out 5076 distinct texts (5076 reserved ids); neither (closure routing-only / dropped) 0; leaves 100; sites 97; held-out texts inside a leaf: 0 (must be 0)
+  site null experiment_results/topic_partition/site_null_ng_af_bareq512_s42.csv ABSENT: this arm's certification is UNDETERMINED (C0's null clause FAILED; every criterion and prediction that reads the null is UNDETERMINED); a partial null still refuses
+  vectors: 16921 of 16921 texts present (4096-d); slice 512
+Q3 TRANSFER (arm ng_af_bareq512_s42, T1b; bar 0.0145, slice 512): built = True (vacuity guard fired: False); leaves = 100 (> 7: True; > 20: True); sites = 97; iterations to stop = 15; fetched (16921, '20 Newsgroups', 20)
+  depth reached 8; depth-blocked leaves (depth 8, n >= 110) = 17 of 100 leaves; proposals.csv bars seen []
+  root n00000001 (TWENTY_NEWSGROUPS): no site-null row; no min-pair refusal row
+  depth-1 n00000004 (Emergent Concept #3): no site-null row; no min-pair refusal row
+  depth-1 n00000005 (Emergent Concept #4): no site-null row; no min-pair refusal row
+  beside R1 af_clean_s42: root 0.042461 / p95 0.037214 / margin 1.141 (n00000001); discursive 0.059496 / 0.028375 / 2.097 (n00000005); quantitative 0.025148 / 0.033733 / 0.746 (n00000004); K-SELECTION R1' n00000004 0.056502 / 0.033471 / 1.688
+  site null: ABSENT (certified share UNDETERMINED)
+Q1 PARTITION (arm ng_af_bareq512_s42, T1b): denominator n_eval = 5076 distinct held-out texts of the corpus's own split; TRAIN = 11845 distinct texts in 100 leaves (12772 leaf slots); slice 512
+  tree leaves (L=100)                purity 0.6793 [0.6663, 0.6920] (3448/5076)  opt 0.6842  pur7 0.8272  NMI20 0.5526 ARI20 0.2038  NMI7 0.4078 ARI7 0.0682  cells 100 (ho 100; med support 45; <30: 15; empty: 0)
+  k-means k=L seed 0                 purity 0.6765 [0.6635, 0.6892] (3434/5076)  opt 0.6832  pur7 0.8207  NMI20 0.5494 ARI20 0.1864  NMI7 0.4050 ARI7 0.0609  cells 100 (ho 100; med support 50; <30: 10; empty: 0)
+  k-means k=L seed 1                 purity 0.6840 [0.6711, 0.6966] (3472/5076)  opt 0.6887  pur7 0.8231  NMI20 0.5498 ARI20 0.1885  NMI7 0.4030 ARI7 0.0598  cells 100 (ho 100; med support 49; <30: 7; empty: 0)
+  k-means k=L seed 2                 purity 0.6935 [0.6806, 0.7060] (3520/5076)  opt 0.6978  pur7 0.8325  NMI20 0.5573 ARI20 0.1951  NMI7 0.4079 ARI7 0.0624  cells 100 (ho 100; med support 48; <30: 11; empty: 0)
+  k-means k=L seed 3                 purity 0.6842 [0.6713, 0.6968] (3473/5076)  opt 0.6901  pur7 0.8274  NMI20 0.5535 ARI20 0.1924  NMI7 0.4093 ARI7 0.0623  cells 100 (ho 100; med support 49; <30: 10; empty: 0)
+  k-means k=L seed 4                 purity 0.6763 [0.6633, 0.6891] (3433/5076)  opt 0.6803  pur7 0.8233  NMI20 0.5497 ARI20 0.1894  NMI7 0.4059 ARI7 0.0610  cells 100 (ho 100; med support 48; <30: 12; empty: 0)
+  k-means k=20 seed 0 (reference)    purity 0.6377 [0.6244, 0.6508] (3237/5076)  opt 0.6377  pur7 0.8065  NMI20 0.6305 ARI20 0.4769  NMI7 0.5064 ARI7 0.2438  cells 20 (ho 20; med support 248; <30: 0; empty: 0)
+  k-means k=20 seed 1 (reference)    purity 0.6489 [0.6357, 0.6619] (3294/5076)  opt 0.6519  pur7 0.8176  NMI20 0.6336 ARI20 0.4814  NMI7 0.5093 ARI7 0.2318  cells 20 (ho 20; med support 232; <30: 0; empty: 0)
+  k-means k=20 seed 2 (reference)    purity 0.6117 [0.5982, 0.6250] (3105/5076)  opt 0.6133  pur7 0.8034  NMI20 0.6237 ARI20 0.4727  NMI7 0.5031 ARI7 0.2439  cells 20 (ho 20; med support 242; <30: 0; empty: 0)
+  k-means k=20 seed 3 (reference)    purity 0.6464 [0.6331, 0.6594] (3281/5076)  opt 0.6489  pur7 0.8132  NMI20 0.6315 ARI20 0.4896  NMI7 0.5062 ARI7 0.2366  cells 20 (ho 20; med support 246; <30: 0; empty: 0)
+  k-means k=20 seed 4 (reference)    purity 0.6363 [0.6230, 0.6495] (3230/5076)  opt 0.6383  pur7 0.8091  NMI20 0.6283 ARI20 0.4758  NMI7 0.5039 ARI7 0.2288  cells 20 (ho 20; med support 242; <30: 0; empty: 0)
+  k-means k=7 seed 0 (reference)     purity 0.3359 [0.3230, 0.3490] (1705/5076)  opt 0.3359  pur7 0.6763  NMI20 0.5420 ARI20 0.2916  NMI7 0.5115 ARI7 0.3833  cells 7 (ho 7; med support 808; <30: 0; empty: 0)
+  k-means k=7 seed 1 (reference)     purity 0.3359 [0.3230, 0.3490] (1705/5076)  opt 0.3359  pur7 0.6763  NMI20 0.5420 ARI20 0.2916  NMI7 0.5115 ARI7 0.3833  cells 7 (ho 7; med support 808; <30: 0; empty: 0)
+  k-means k=7 seed 2 (reference)     purity 0.3363 [0.3234, 0.3494] (1707/5076)  opt 0.3363  pur7 0.6759  NMI20 0.5419 ARI20 0.2919  NMI7 0.5113 ARI7 0.3828  cells 7 (ho 7; med support 806; <30: 0; empty: 0)
+  k-means k=7 seed 3 (reference)     purity 0.3359 [0.3230, 0.3490] (1705/5076)  opt 0.3359  pur7 0.6765  NMI20 0.5412 ARI20 0.2908  NMI7 0.5116 ARI7 0.3834  cells 7 (ho 7; med support 809; <30: 0; empty: 0)
+  k-means k=7 seed 4 (reference)     purity 0.3359 [0.3230, 0.3490] (1705/5076)  opt 0.3359  pur7 0.6765  NMI20 0.5412 ARI20 0.2905  NMI7 0.5116 ARI7 0.3832  cells 7 (ho 7; med support 809; <30: 0; empty: 0)
+  Ward k=L                           purity 0.6749 [0.6619, 0.6877] (3426/5076)  opt 0.6791  pur7 0.8213  NMI20 0.5570 ARI20 0.2143  NMI7 0.4119 ARI7 0.0686  cells 100 (ho 100; med support 49; <30: 20; empty: 0)
+  HDBSCAN mcs=55 (k=4, train noise 0.914) purity 0.1927 [0.1821, 0.2038] (978/5076)  opt 0.1927  pur7 0.5321  NMI20 0.3452 ARI20 0.1084  NMI7 0.3649 ARI7 0.2691  cells 4 (ho 4; med support 1138; <30: 0; empty: 0)
+  random (tree cells, labels permuted) seed 0 purity 0.0518 [0.0460, 0.0583] (263/5076)  opt 0.1170  pur7 0.1939  NMI20 0.0575 ARI20 0.0003  NMI7 0.0211 ARI7 0.0002  cells 100 (ho 100; med support 45; <30: 15; empty: 0)
+  random (tree cells, labels permuted) seed 1 purity 0.0522 [0.0464, 0.0587] (265/5076)  opt 0.1182  pur7 0.1946  NMI20 0.0560 ARI20 0.0004  NMI7 0.0210 ARI7 0.0000  cells 100 (ho 100; med support 45; <30: 15; empty: 0)
+  random (tree cells, labels permuted) seed 2 purity 0.0508 [0.0451, 0.0572] (258/5076)  opt 0.1152  pur7 0.1923  NMI20 0.0573 ARI20 0.0001  NMI7 0.0202 ARI7 -0.0002  cells 100 (ho 100; med support 45; <30: 15; empty: 0)
+  random (tree cells, labels permuted) seed 3 purity 0.0465 [0.0410, 0.0526] (236/5076)  opt 0.1154  pur7 0.1935  NMI20 0.0567 ARI20 0.0001  NMI7 0.0207 ARI7 0.0003  cells 100 (ho 100; med support 45; <30: 15; empty: 0)
+  random (tree cells, labels permuted) seed 4 purity 0.0479 [0.0423, 0.0541] (243/5076)  opt 0.1151  pur7 0.1891  NMI20 0.0561 ARI20 -0.0000  NMI7 0.0189 ARI7 -0.0002  cells 100 (ho 100; med support 45; <30: 15; empty: 0)
+  k-means k=L on FULL 4096-d (seed 0) purity 0.6984 [0.6856, 0.7109] (3545/5076)  opt 0.7069  pur7 0.8377  NMI20 0.5636 ARI20 0.2020  NMI7 0.4148 ARI7 0.0632  cells 100 (ho 100; med support 48; <30: 14; empty: 0)
+  NMI(20) tree - kmeans0 = 0.0032 (ARI diff 0.0175); k-means seed spread (max - min over 5 seeds) = 0.0079; 1000-resample fixed-partition bootstrap CI [-0.0026, 0.0090] (ARI [0.0092, 0.0255]); n_eval 5076
+  sensitivity excluding leak documents (112 of 5076 held-out excluded; n=4964): tree purity 0.6791 (delta -0.0186 pp) NMI20 0.5532; kmeans0 purity 0.6767 NMI20 0.5503
+  sensitivity excluding documents > 8,000 chars (87 of 5076 held-out excluded; n=4989): tree purity 0.6775 (delta -0.1785 pp) NMI20 0.5520; kmeans0 purity 0.6751 NMI20 0.5485
+  (train documents > 8,000 chars: 219 of 11845; held-out leak documents: 112 of 5076 = 0.0221)
+Q2 TOPICS (arm ng_af_bareq512_s42): denominator per site = the site's TRAIN members (union of descendant leaves' queryIds; 11845 distinct train ids over 12772 leaf slots); 97 sites (internal nodes with >= 2 children); labels from the ingest DB only
+  sites with H_20 = 0 (single-label member set; printed, not dropped): 0 of 97
+  depth-1 cells (k = 2 at the root; root members 11845 of 11845 train ids):
+    n00000004 (Emergent Concept #3): n=5652 majority group comp (0.532) majority label comp.sys.ibm.pc.hardware (0.113)
+    n00000005 (Emergent Concept #4): n=6193 majority group talk (0.329) majority label soc.religion.christian (0.105)
+  migration matrix 7-group x depth-1 cell, TRAIN (row = group, n; columns = n00000004,n00000005):
+    alt.atheism              n=  504  n00000004:0.008  n00000005:0.992
+    comp                     n= 3085  n00000004:0.975  n00000005:0.025
+    misc.forsale             n=  598  n00000004:0.960  n00000005:0.040
+    rec                      n= 2417  n00000004:0.302  n00000005:0.698
+    sci                      n= 2524  n00000004:0.517  n00000005:0.483
+    soc.religion.christian   n=  659  n00000004:0.015  n00000005:0.985
+    talk                     n= 2058  n00000004:0.010  n00000005:0.990
+  migration matrix 7-group x depth-1 cell, HELD-OUT (leaf-routed, depth-1 ancestor; n_eval 5076):
+    alt.atheism              n=  216  n00000004:0.032  n00000005:0.968
+    comp                     n= 1323  n00000004:0.979  n00000005:0.021
+    misc.forsale             n=  256  n00000004:0.988  n00000005:0.012
+    rec                      n= 1036  n00000004:0.338  n00000005:0.662
+    sci                      n= 1081  n00000004:0.574  n00000005:0.426
+    soc.religion.christian   n=  282  n00000004:0.032  n00000005:0.968
+    talk                     n=  882  n00000004:0.015  n00000005:0.985
+  depth-1 held-out purity (train-majority): 7-group 0.4263 [0.4128, 0.4400] (2164/5076); 20-label 0.1080 [0.0997, 0.1168] (548/5076); k = 2
+  depth-d cuts (TRAIN, n=11845; deepest node at depth <= d on the doc's max-cosine path; tree depth 8):
+    d=1  cells    2  NMI_7 0.2982  NMI_20 0.2433
+    d=2  cells    4  NMI_7 0.4505  NMI_20 0.3903
+    d=3  cells    8  NMI_7 0.4739  NMI_20 0.4911  <- argmax NMI_7
+    d=4  cells   16  NMI_7 0.4632  NMI_20 0.5439
+    d=5  cells   33  NMI_7 0.4424  NMI_20 0.5621  <- argmax NMI_20
+    d=6  cells   56  NMI_7 0.4217  NMI_20 0.5487
+    d=7  cells   81  NMI_7 0.4065  NMI_20 0.5446
+    d=8  cells  100  NMI_7 0.3950  NMI_20 0.5338
+  per-label best-Jaccard node (TRAIN; label n -> node, depth, J, node n):
+    alt.atheism                n= 504 -> n00000142 depth 6 J 0.3184 n 440
+    comp.graphics              n= 612 -> n00000159 depth 5 J 0.5297 n 520
+    comp.os.ms-windows.misc    n= 611 -> n00000255 depth 6 J 0.2474 n 347
+    comp.sys.ibm.pc.hardware   n= 642 -> n00000046 depth 3 J 0.3043 n 1484
+    comp.sys.mac.hardware      n= 600 -> n00000046 depth 3 J 0.2738 n 1484
+    comp.windows.x             n= 620 -> n00000098 depth 4 J 0.6615 n 656
+    misc.forsale               n= 598 -> n00000300 depth 5 J 0.5340 n 396
+    rec.autos                  n= 597 -> n00000052 depth 5 J 0.5613 n 435
+    rec.motorcycles            n= 597 -> n00000053 depth 5 J 0.3344 n 269
+    rec.sport.baseball         n= 594 -> n00000049 depth 3 J 0.7352 n 664
+    rec.sport.hockey           n= 629 -> n00000048 depth 3 J 0.8554 n 603
+    sci.crypt                  n= 630 -> n00000085 depth 5 J 0.4448 n 351
+    sci.electronics            n= 624 -> n00000065 depth 5 J 0.3884 n 309
+    sci.med                    n= 638 -> n00000088 depth 5 J 0.5962 n 524
+    sci.space                  n= 632 -> n00000041 depth 4 J 0.4279 n 289
+    soc.religion.christian     n= 659 -> n00000075 depth 5 J 0.5382 n 830
+    talk.politics.guns         n= 583 -> n00000086 depth 5 J 0.4519 n 911
+    talk.politics.mideast      n= 600 -> n00000043 depth 4 J 0.6914 n 562
+    talk.politics.misc         n= 496 -> n00000247 depth 7 J 0.1813 n 325
+    talk.religion.misc         n= 379 -> n00000075 depth 5 J 0.1865 n 830
+  per-group best-Jaccard node:
+    alt.atheism                n= 504 -> n00000142 depth 6 J 0.3184 n 440
+    comp                       n=3085 -> n00000008 depth 2 J 0.7711 n 3238
+    misc.forsale               n= 598 -> n00000300 depth 5 J 0.5340 n 396
+    rec                        n=2417 -> n00000011 depth 2 J 0.5025 n 1261
+    sci                        n=2524 -> n00000024 depth 3 J 0.3479 n 1126
+    soc.religion.christian     n= 659 -> n00000075 depth 5 J 0.5382 n 830
+    talk                       n=2058 -> n00000010 depth 2 J 0.4047 n 5006
+  median best depth / median best J: 20 labels 5.0 / 0.4483 (n=20); 7 groups 3.0 / 0.5025 (n=7)
+  leaves at max-Jaccard >= 0.5: 1 of 100 (0.010); median leaf max J 0.1094
+  certification vs alignment: no site null (UNDETERMINED)
+========================================================================================================================
+C0 gate: HELD -- manifest asserted by the build log ('Fetched N ... across 20 categories', N = kept 16921): (16921, '20 Newsgroups', 20); pool recorded pf844849e133cda4e and verified by pool_guard --pool --db --id-file: True; T1 null complete at 300 reps on every site: True; fail-closed checks (held-out in no leaf, vectors, sliceDim, null snapshot): True
+C1 (Q1; rule: HELD if NMI(20)_tree - NMI(20)_kmeans0 > seed spread AND the 1,000-resample bootstrap CI excludes 0; FAILED otherwise, F1 fires): FAILED -- diff -0.0020, spread 0.0074, CI [-0.0081, 0.0036], n_eval 5076; F1' (tree below k-means by > 0.05 with the CI excluding 0): does not fire
+C2 (Q2; rule: HELD if the depth-stratified certified - uncertified NMI_20 gap > 0 with permutation p < 0.05 (and the OLS cert coefficient > 0); FAILED otherwise, F2 fires): HELD -- stratified gap 0.0740, p 0.0480, OLS cert 0.0865 (HC1 SE 0.0395), 16 certified / 85 uncertified sites
+C3 (Q3; rule: HELD if T1 builds with > 20 leaves AND the root and at least one depth-1 site certify; PARTIAL if T1 builds (> 7 leaves) but fails either clause; FAILED if T1 is not built): HELD -- T1 leaves 110 > 20; root certified; depth-1 certified 1 of 2
+C3 beside, T1b (same clauses, its own null at its own bar): UNDETERMINED -- T1b built (leaves 100) but no complete site null
+PREDICTIONS (tree-construction-specialist's ranges; scored where computed):
+  P1   HELD         built at 0.025: HELD; leaves 95-175: HELD; sites 80-150: HELD; depth 8 reached: HELD; depth-blocked leaves 2-15: HELD; iterations 12-20: HELD (leaves 110, sites 101, depth 8, blocked 4, iterations 15)
+  P2   FAILED       root k = 2: HELD; root observed 0.045-0.10: HELD; root p95 0.040-0.075: HELD; root margin 1.1-1.8: HELD; root certified: HELD; both depth-1 sites certified: FAILED; depth-1 observed 0.04-0.10: FAILED; depth-1 p95 0.030-0.060: HELD (root k 2 obs 0.061713 p95 0.050961 margin 1.211; depth-1 sites 2 certified 1)
+  P3   FAILED       certified share 22-38%: 0.158 (16/101): FAILED; n >= 800 band 50-75%: 0.526 (10/19): HELD; below n 400 near the record's ~10% (read as 5-15%): 0.049 (3/61): FAILED
+  P4   FAILED       NMI20 tree 0.42-0.58: 0.5422: HELD; NMI20 k-means k=L 0.44-0.60: 0.5442: HELD; tree - kmeans0 in [-0.06, +0.02]: -0.0020: HELD; seed spread 0.005-0.02: 0.0074: HELD; C1 FAILED: FAILED: HELD; Ward 0.40-0.58: 0.5497: HELD; NMI7 tree 0.35-0.50: 0.4009: HELD; NMI7 k-means 0.36-0.52: 0.4007: HELD; ARI20 tree 0.18-0.35: 0.1855: HELD; ARI20 k-means 0.20-0.38: 0.1835: FAILED; k=20 NMI 0.55-0.70: 0.6160: HELD; k=20 ARI 0.35-0.55: 0.4638: HELD; k=20 purity 0.60-0.75: 0.6340: HELD; k=7 NMI(7) 0.45-0.65: 0.4867: HELD
+  P5   FAILED       purity tree 0.68-0.82: 0.6673: FAILED; purity k-means 0.70-0.84: 0.6789: FAILED; purity Ward 0.66-0.82: 0.6844: HELD; tree at 7 groups 0.80-0.90: 0.8160: HELD; random purity 0.10-0.17: 0.052,0.053,0.050,0.049,0.049: FAILED; random NMI20 0.03-0.08: 0.064,0.063,0.062,0.064,0.061: HELD; random ARI 0.000 +- 0.003: 0.0003,0.0002,0.0002,0.0003,0.0001: HELD
+  P6   FAILED       train noise 35-80%: 0.927: FAILED; k 8-40: 3: FAILED; held-out NMI20 0.35-0.60: 0.2407: FAILED
+  P7   HELD         depth-1 7-group purity 0.35-0.60 (k=2): 0.4277: HELD; depth-1 20-label purity 0.10-0.25: 0.1084: HELD; technical vs discursive (registrar's rule: comp.* majority cell n00000004 (0.978) != talk.* majority cell n00000005 (0.987); rec.* cell n00000005 share 0.676): HELD; best 7-group depth 3-4: 3: HELD
+  P8   FAILED       median best depth 3-5 (point 4): 4.0: HELD; median best J 0.40-0.60: 0.4058: HELD; religion triad J < 0.40 for >= 2 of 3: 2: HELD; comp.os.ms-windows.misc < 0.45: 0.2231: HELD; comp.sys.ibm.pc.hardware < 0.45: 0.3054: HELD; >= 6 of the ten at J >= 0.5: 4: FAILED; leaves at J >= 0.5 15-35%: 0.009: FAILED
+  P9   FAILED       raw gap +0.10..+0.30: 0.1215: HELD; depth-stratified gap +0.00..+0.10: 0.0740: HELD; permutation p in [0.02, 0.6]: 0.0480: HELD; C2 FAILED: HELD: FAILED
+  P10  FAILED       leak documents 1-4% of held-out: 0.0221: HELD; purity change when excluded < 0.5 pp: 0.015 pp: HELD; short-dropped 2-5% of 18846: 1808 = 0.0959: FAILED; duplicate-dropped 1-4%: 117 = 0.0062: FAILED
+  P11  UNDETERMINED T1b builds: HELD; more leaves than T1: 100 vs 110: FAILED; certified share comparison: UNDETERMINED; NMI(20) within 0.03 of T1's: |0.5526 - 0.5422| = 0.0104: HELD
+  P12  FAILED       embedding + T1 build 45-80 min: 36.0 min (FAILED); T1 null 55-90 min: 53.3 min (FAILED); T1b null 40-90 min: 2.9 min (FAILED); smoke 3 min (read as <= 6): 2.1 min (HELD); readout 6-15 min: 4.7 min (FAILED)
+VERDICT (the only sentences of record; printed only under the registered conditions):
+  On a corpus with known topics the anchor-free recipe of record builds and certifies, and partitions the embedding space no better than k-means at the same number of parts; its value on this corpus is the split discipline, the support per cell and the certificate, not the partition.
+  The per-corpus pair (512 / 0.0145) builds on this corpus.
+readout wall time 4.7 min

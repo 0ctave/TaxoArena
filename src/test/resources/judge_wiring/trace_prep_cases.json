@@ -1,0 +1,184 @@
+[
+ {
+  "label": "envelope unwrap + RESOLVED injection",
+  "model_output": "{\"response\": \"Let's think step-by-step:\\n\\u03b7 = 1 \\u2212 300/500 = 0.4.\\nThe answer is (A).\", \"reason_code\": \"A\", \"difficulty\": 0}",
+  "pred": "A",
+  "options": [
+   "40.0%",
+   "60.0%",
+   "25.0%",
+   "\u03b7 = 1 \u2212 T_c/T_h \u2248 0.4",
+   ""
+  ],
+  "mode": "RESOLVED",
+  "expected": "Let's think step-by-step:\n\u03b7 = 1 \u2212 300/500 = 0.4.\nThe answer is (A).\n\n[This model's selected answer: (A) 40.0%]"
+ },
+ {
+  "label": "envelope unwrap, no injection under OPTIONS",
+  "model_output": "{\"response\": \"Let's think step-by-step:\\n\\u03b7 = 1 \\u2212 300/500 = 0.4.\\nThe answer is (A).\", \"reason_code\": \"A\", \"difficulty\": 0}",
+  "pred": "A",
+  "options": [
+   "40.0%",
+   "60.0%",
+   "25.0%",
+   "\u03b7 = 1 \u2212 T_c/T_h \u2248 0.4",
+   ""
+  ],
+  "mode": "OPTIONS",
+  "expected": "Let's think step-by-step:\n\u03b7 = 1 \u2212 300/500 = 0.4.\nThe answer is (A)."
+ },
+ {
+  "label": "verbatim under BLIND",
+  "model_output": "Efficiency is 60% \u2014 see below.\r\nThe answer is (B).",
+  "pred": "B",
+  "options": [
+   "40.0%",
+   "60.0%",
+   "25.0%",
+   "\u03b7 = 1 \u2212 T_c/T_h \u2248 0.4",
+   ""
+  ],
+  "mode": "BLIND",
+  "expected": "Efficiency is 60% \u2014 see below.\r\nThe answer is (B)."
+ },
+ {
+  "label": "lowercase pred resolves",
+  "model_output": "Efficiency is 60% \u2014 see below.\r\nThe answer is (B).",
+  "pred": "b",
+  "options": [
+   "40.0%",
+   "60.0%",
+   "25.0%",
+   "\u03b7 = 1 \u2212 T_c/T_h \u2248 0.4",
+   ""
+  ],
+  "mode": "RESOLVED",
+  "expected": "Efficiency is 60% \u2014 see below.\r\nThe answer is (B).\n\n[This model's selected answer: (B) 60.0%]"
+ },
+ {
+  "label": "pred with a paren is not a letter: no injection",
+  "model_output": "Efficiency is 60% \u2014 see below.\r\nThe answer is (B).",
+  "pred": " (E)",
+  "options": [
+   "40.0%",
+   "60.0%",
+   "25.0%",
+   "\u03b7 = 1 \u2212 T_c/T_h \u2248 0.4",
+   ""
+  ],
+  "mode": "RESOLVED",
+  "expected": "Efficiency is 60% \u2014 see below.\r\nThe answer is (B)."
+ },
+ {
+  "label": "pred resolves to an EMPTY option text: no injection",
+  "model_output": "Efficiency is 60% \u2014 see below.\r\nThe answer is (B).",
+  "pred": "E",
+  "options": [
+   "40.0%",
+   "60.0%",
+   "25.0%",
+   "\u03b7 = 1 \u2212 T_c/T_h \u2248 0.4",
+   ""
+  ],
+  "mode": "RESOLVED",
+  "expected": "Efficiency is 60% \u2014 see below.\r\nThe answer is (B)."
+ },
+ {
+  "label": "pred out of range: no injection",
+  "model_output": "Efficiency is 60% \u2014 see below.\r\nThe answer is (B).",
+  "pred": "K",
+  "options": [
+   "40.0%",
+   "60.0%",
+   "25.0%",
+   "\u03b7 = 1 \u2212 T_c/T_h \u2248 0.4",
+   ""
+  ],
+  "mode": "RESOLVED",
+  "expected": "Efficiency is 60% \u2014 see below.\r\nThe answer is (B)."
+ },
+ {
+  "label": "no pred: no injection",
+  "model_output": "Efficiency is 60% \u2014 see below.\r\nThe answer is (B).",
+  "pred": null,
+  "options": [
+   "40.0%",
+   "60.0%",
+   "25.0%",
+   "\u03b7 = 1 \u2212 T_c/T_h \u2248 0.4",
+   ""
+  ],
+  "mode": "RESOLVED",
+  "expected": "Efficiency is 60% \u2014 see below.\r\nThe answer is (B)."
+ },
+ {
+  "label": "blank output, pred in range -> selected-option fallback",
+  "model_output": "",
+  "pred": "C",
+  "options": [
+   "40.0%",
+   "60.0%",
+   "25.0%",
+   "\u03b7 = 1 \u2212 T_c/T_h \u2248 0.4",
+   ""
+  ],
+  "mode": "RESOLVED",
+  "expected": "The model selected option C: \"25.0%\"."
+ },
+ {
+  "label": "blank output, pred out of range -> predicted fallback",
+  "model_output": "  \n",
+  "pred": "Z",
+  "options": [
+   "40.0%",
+   "60.0%",
+   "25.0%",
+   "\u03b7 = 1 \u2212 T_c/T_h \u2248 0.4",
+   ""
+  ],
+  "mode": "RESOLVED",
+  "expected": "The model predicted: \"Z\"."
+ },
+ {
+  "label": "no output, no pred",
+  "model_output": null,
+  "pred": null,
+  "options": [
+   "40.0%",
+   "60.0%",
+   "25.0%",
+   "\u03b7 = 1 \u2212 T_c/T_h \u2248 0.4",
+   ""
+  ],
+  "mode": "RESOLVED",
+  "expected": "The model did not provide a prediction."
+ },
+ {
+  "label": "envelope with empty response stays raw",
+  "model_output": "{\"response\": \"\", \"reason_code\": \"B\"}",
+  "pred": "B",
+  "options": [
+   "40.0%",
+   "60.0%",
+   "25.0%",
+   "\u03b7 = 1 \u2212 T_c/T_h \u2248 0.4",
+   ""
+  ],
+  "mode": "RESOLVED",
+  "expected": "{\"response\": \"\", \"reason_code\": \"B\"}\n\n[This model's selected answer: (B) 60.0%]"
+ },
+ {
+  "label": "brace but not JSON stays raw",
+  "model_output": "{not json",
+  "pred": "A",
+  "options": [
+   "40.0%",
+   "60.0%",
+   "25.0%",
+   "\u03b7 = 1 \u2212 T_c/T_h \u2248 0.4",
+   ""
+  ],
+  "mode": "RESOLVED",
+  "expected": "{not json\n\n[This model's selected answer: (A) 40.0%]"
+ }
+]

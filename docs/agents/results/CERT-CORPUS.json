@@ -1,0 +1,128 @@
+{
+  "id": "CERT-CORPUS",
+  "title": "CERT-CORPUS: FRAMEWORK item 8: the calibration status and the widener's sign and utility on the checker cells (MATH, IFEVAL) from GEN-ARENA's cache (zero calls)",
+  "question": "Widener fit and raw miscalibration read on GEN-ARENA's cache (3,000 valid verdicts, 8 models, ties 48.5%) after item 7: 54 unfiltered edges (MATH 27 / 2 wrong (1 est), IFEVAL 27 / 7 (2 est)); all-label and established-label fits, in-sample and LOCO, domains floor 200/100; bootstrap B=300 seed 42 plus B=2000 and seeds 7 / 137; products: the widener's SIGN on checker cells and UTILITY (share of 54 edges called at 0.975 against SYSTEMATIC-BUDGET's 60% bar).",
+  "kind": "zero-call",
+  "state": "UNDETERMINED",
+  "registration": {
+    "commit": "eaf1dbf",
+    "program_lines": "docs/judge_v2_program.md L3603-L3611 (by reference; docs/design/FRAMEWORK.md L361 item 8); the Block 1 record bullet at L3744",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-15 (before any run) — BY REFERENCE: the 26 tests in docs/design/FRAMEWORK.md \"Tests to register before shipping\" (commit 8d77f7b), with the criteria, predictions and call counts stated there, scheduled in docs/plan_2026-09-15.md",
+    "outcome_heading": [
+      "L3662: ## Block 1 record (2026-09-15/16, zero calls) — FRAMEWORK items 1-12, 14-16: fourteen zero-call tests built, each adversarially checked; verdicts of record below (checker's number wins where it refutes the builder)",
+      "L3744: - **CERT-CORPUS (2026-09-16, zero calls): UNDETERMINED (nominal < 3) on every population, draw and denominator; prediction HELD; the two products need brackets (all-label identification is seed-fragile; utility must be published per cell, 33.3% on IFEVAL).**"
+    ],
+    "date": "2026-09-15"
+  },
+  "script": {
+    "path": "tools/analysis/cert_corpus.py",
+    "sha16": "9c4ad7541ae8b60b",
+    "commit": "7076615"
+  },
+  "ready": null,
+  "go": "n/a (0 calls; Block 1)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/cert_corpus.txt",
+    "outcome_commit": "7076615",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (pool_guard.assert_pool_of_record() first; union pool paeec37aa28063c75 by explicit id where used)",
+    "date": "2026-09-15/16"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); each Block 1 test was 'adversarially checked' at build time and the checker's number wins where it refutes the builder (Block 1 record header L3662-L3663); the checker-confirmed defects are listed in the bullet",
+    "commit": "7076615",
+    "verdict": ""
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "calibration status by the power rule",
+      "result": "UNDETERMINED",
+      "value": "all-label fit b0 -4.8881 / b1 +6.8161: in-sample 32/54 called, 0(0) wrong, nominal 0.057; LOCO 30/54, 0(0), 0.020; domains floor 200/100 LOCO 0.231 / 0.441 (in-sample floor 100 0.485, the true maximum); raw 45/54, 2(0) wrong (both indeterminate, p 1.00 / 0.66), nominal 0.030 empirical / 0.052 Gaussian; nominal 3 needs ~53x the edges: UNDETERMINED on every population, draw and denominator",
+      "denominator": "54 unfiltered edges (MATH 27, IFEVAL 27)"
+    },
+    {
+      "id": "sign",
+      "text": "product: the widener's SIGN on checker cells",
+      "result": "DELIVERED",
+      "value": "positive on every population containing the IFEVAL row; all-label dDev 3.81 at seed 42 B=300 but 3.93 / 3.98 / 3.97 on the B=2000 tail and seeds 7 / 137 (identified; the 3.81-3.98 bracket); established-label profile degenerate (step at A 0.678), dDev 2.44-2.97 on every draw, not identified -> Stage 6 gate fails, FALLBACK, edges BANDED-JUDGED; MATH domains alone negative with flat profiles (not a finding); checker PARTLY",
+      "denominator": "54 edges; 3 established"
+    },
+    {
+      "id": "utility",
+      "text": "product: UTILITY (share of 54 edges called at 0.975; 60% bar)",
+      "result": "DELIVERED",
+      "value": "pooled 59.3% in sample (32/54; 11 correct calls surrendered to remove 2 indeterminate wrong), 55.6% LOCO; per cell MATH 23/27 = 85.2%, IFEVAL 9/27 = 33.3% (the widener withdraws 12 of 21 raw IFEVAL calls); raw 83.3%; below the bar, but the builder's FAIL is a verdict word the item does not carry (readout only)",
+      "denominator": "54 edges"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "UNDETERMINED (nominal < 3)",
+      "result": "HELD",
+      "value": "largest nominal anywhere 0.485",
+      "denominator": "54 edges"
+    }
+  ],
+  "falsifier": {
+    "text": "none beyond the power-rule status (registered readout)",
+    "fired": false,
+    "note": "under the hardest reading (item 7's verdict of record governs: MATH PREDICTIVE-ONLY) the checker-cell product is IFEVAL alone: sign +, dDev 1.02 not identified, utility 33.3%; the two BRIDGE-breaking edges are not called at 0.975 (c_raw 0.680 / 0.913): BANDED, not KEY-CONTRADICTED"
+  },
+  "numbers_of_record": {
+    "fit": "all-label b0 -4.8881 / b1 +6.8161; in-sample 32/54, 0(0), nominal 0.057; LOCO 30/54, 0(0), 0.020; domains-floor LOCO 0.231 / 0.441; raw 45/54, 2(0), nominal 0.030 / 0.052",
+    "identification": "all-label dDev 3.81 (seed 42, B=300) / 3.93 / 3.98 / 3.97 (B=2000, seeds 7 / 137); established dDev 2.44-2.97 (not identified); IFEVAL alone dDev 1.02",
+    "utility": "pooled 59.3% in sample / 55.6% LOCO; MATH 85.2%, IFEVAL 33.3%; raw 83.3%",
+    "Dc_8_model": "MATH 0.9899 [0.9849, 0.9943], IFEVAL 1.0000 (no R1 distill on this board) re-admits MATH after item 7 classed it PREDICTIVE-ONLY",
+    "split_note": "GEN-ARENA's split is a Random(42) re-derivation, not the union pool (overlap 114/394 MATH, 55/162 IFEVAL)"
+  },
+  "sentence_of_record": "CERT-CORPUS (2026-09-16, zero calls): UNDETERMINED (nominal < 3) on every population, draw and denominator (largest nominal anywhere 0.485; nominal 3 needs ~53x the edges); prediction HELD; the widener's sign is positive on every population containing the IFEVAL row, with the all-label identification straddling the bar (dDev 3.81-3.98 across draws) and absent on established labels (Stage 6 gate fails, FALLBACK, edges BANDED-JUDGED); utility 59.3% pooled in sample, 85.2% on MATH and 33.3% on IFEVAL, to be published per cell.",
+  "chips": [
+    "UNDETERMINED (NOMINAL < 3) ON EVERY POPULATION, DRAW AND DENOMINATOR",
+    "PREDICTION HELD"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-23",
+      "by": "the registrar (insertion only, zero calls; on the coordinator's relay of the systematic_budget re-review 73f2dc2)",
+      "text": "This test's status_word (tools/analysis/cert_corpus.py L260-L268) is a KNOWN DIVERGENT implementation of FRAMEWORK L101's rule in its PARENTHETICAL text only (its words and its P > 0.05 boundary match L101; it prints '(nominal x < 3)' and, in the 3-9 band, the smallest callable ratio L101 names). No recorded verdict moves: all 17 status words in cert_corpus.txt are on the nominal < 3 branch. Routing it through calibration_status.py would change the parenthetical of those 16 valued lines, so STATUS-WORD-UNIFY must either keep a local formatter or pre-register that textual diff; code not changed."
+    }
+  ],
+  "does_not_show": [
+    "an identified b1 on established labels (2.44-2.97 on every draw)",
+    "a calibration status readable at any denominator",
+    "a utility above the 60% bar on IFEVAL (33.3%)"
+  ],
+  "ledger": {
+    "row_id": "CERT-CORPUS",
+    "version": "v103 (684be03)"
+  },
+  "depends_on": [
+    "GEN-ARENA",
+    "CHECKER-ANSWER-INGEST",
+    "SYSTEMATIC-BUDGET",
+    "TIER-HONEST"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L3603-L3611 (by-reference registration eaf1dbf) and docs/design/FRAMEWORK.md L361 item 8: criterion, prediction, call count",
+    "docs/judge_v2_program.md L3744 ff. (Block 1 record bullet, 7076615): the criterion table, predictions scored, checker-confirmed defects, script and output",
+    "experiment_results/x12_crossdomain/cert_corpus.txt (7076615)",
+    "docs/test_ledger.html row CERT-CORPUS (v103 684be03): chips verbatim, design / criteria / observed cells, evidence",
+    "script sha16 = sha256 of tools/analysis/cert_corpus.py at 7076615 (its first commit), first 16 hex (identity, computed by the registrar 2026-09-22; later edited at 13f2142 for the pool_guard change)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' heading and the '- **ID (...)**' bullet line inside the Block 1 record, to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06"
+  ],
+  "last_update": "2026-09-23",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Using cached verdicts from a generative arena (MATH and instruction-following, 3,000 verdicts, 8 models), the test asked two things. Is the judge-based certificate's confidence calibrated? Does a correction that widens its uncertainty point the right way and stay useful?",
+    "why": "The certificate attached to each cell is only trustworthy if its confidence statements can be checked against answer keys.",
+    "information": "A calibrated result would let the certificate be read at face value on these tasks. An undetermined one means there is not enough checkable data. Result: UNDETERMINED everywhere: the data falls about 50x short of what a readable calibration status needs. The correction points the expected way wherever instruction-following is included, but only borderline. On the stricter labels it is not identified. Its usefulness is 85% on MATH and only 33% on instruction-following, below the 60% bar.",
+    "written": "2026-10-07"
+  }
+}

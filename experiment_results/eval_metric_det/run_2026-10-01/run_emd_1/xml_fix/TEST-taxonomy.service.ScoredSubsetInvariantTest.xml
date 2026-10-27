@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="taxonomy.service.ScoredSubsetInvariantTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-01T07:10:15" hostname="HORTENSIA" time="0.114">
+  <properties/>
+  <testcase name="one scored question outside the pool refuses the run after printing 1()" classname="taxonomy.service.ScoredSubsetInvariantTest" time="0.04"/>
+  <testcase name="a clean matrix prints the pool id and 0, and the run proceeds()" classname="taxonomy.service.ScoredSubsetInvariantTest" time="0.038"/>
+  <testcase name="no pool prints NONE and the existing WARN()" classname="taxonomy.service.ScoredSubsetInvariantTest" time="0.036"/>
+  <system-out><![CDATA[09:10:15.095 [INFO ] ModelEvalStore - ModelEvalStore schema ready.
+09:10:15.158 [INFO ] ModelEvalStore - Reserved pool 'peaf433006800d687' recorded: 4 question(s) across 1 domain(s); nothing activated.
+09:10:15.185 [INFO ] RankingService - SQLite Agent Ratings V2, Match History, and Bradley-Terry schema initialized.
+09:10:15.188 [INFO ] BenchmarkService - [ARENA-INGEST] corpus: 2 model(s), consensusQuestions=6 (quorum=2), reservedPool=4 question(s)
+09:10:15.188 [INFO ] BenchmarkService - [ARENA-INGEST] note: consensus question count is 6, not the MMLU-Pro test size (12032) — coverage is scored against the corpus, not the constant
+09:10:15.188 [INFO ] BenchmarkService - [ARENA-INGEST] note: reserved pool holds only 4 question(s); reserved coverage is a coarse signal at this size
+09:10:15.188 [INFO ] BenchmarkService - [ARENA-INGEST] PASS m-a rows=6
+09:10:15.188 [INFO ] BenchmarkService - [ARENA-INGEST] PASS m-b rows=6
+09:10:15.188 [INFO ] BenchmarkService - [ARENA-INGEST] summary: 2 PASS, 0 WARN, 0 FAIL
+09:10:15.193 [INFO ] BenchmarkService -   m-a: total=6 reserved=4 math=6 reserved_math=4
+09:10:15.193 [INFO ] BenchmarkService -   m-b: total=6 reserved=4 math=6 reserved_math=4
+09:10:15.197 [INFO ] BenchmarkService - reserved_pool_id=peaf433006800d687
+09:10:15.197 [INFO ] BenchmarkService - scored_minus_eval=1
+09:10:15.225 [INFO ] RankingService - SQLite Agent Ratings V2, Match History, and Bradley-Terry schema initialized.
+09:10:15.226 [INFO ] BenchmarkService - [ARENA-INGEST] corpus: 2 model(s), consensusQuestions=6 (quorum=2), reservedPool=4 question(s)
+09:10:15.226 [INFO ] BenchmarkService - [ARENA-INGEST] note: consensus question count is 6, not the MMLU-Pro test size (12032) — coverage is scored against the corpus, not the constant
+09:10:15.226 [INFO ] BenchmarkService - [ARENA-INGEST] note: reserved pool holds only 4 question(s); reserved coverage is a coarse signal at this size
+09:10:15.226 [INFO ] BenchmarkService - [ARENA-INGEST] PASS m-a rows=6
+09:10:15.226 [INFO ] BenchmarkService - [ARENA-INGEST] PASS m-b rows=6
+09:10:15.226 [INFO ] BenchmarkService - [ARENA-INGEST] summary: 2 PASS, 0 WARN, 0 FAIL
+09:10:15.231 [INFO ] BenchmarkService -   m-a: total=6 reserved=4 math=6 reserved_math=4
+09:10:15.231 [INFO ] BenchmarkService -   m-b: total=6 reserved=4 math=6 reserved_math=4
+09:10:15.234 [INFO ] BenchmarkService - reserved_pool_id=peaf433006800d687
+09:10:15.234 [INFO ] BenchmarkService - scored_minus_eval=0
+09:10:15.234 [INFO ] BenchmarkService - Benchmark: 4 questions, 2 models
+09:10:15.234 [INFO ] BenchmarkService - [ARENA-POOL] questions=4 models=2 pool=peaf433006800d687 constructionDomain=<all> | eval_results category composition: math=4
+09:10:15.234 [INFO ] BenchmarkService - Answer matrix completeness check: 100% complete! No missing model answers across all 4 queries.
+09:10:15.235 [INFO ] BenchmarkService - Pre-routing complete: 0 questions routed, 4 outliers discarded, 0 out-of-scope domain queries filtered
+09:10:15.235 [INFO ] BenchmarkService - Scheduling params: SchedulingParams(minComparisonsPerLeaf=6, targetConvergenceFraction=0.7, separationThreshold=1.0, queriesPerPair=1, budgetPerPair=5, maxRounds=10, minTotalComparisons=2, maxConcurrentPerModel=2, questionsPerRound=12)
+09:10:15.235 [INFO ] BenchmarkService - [ARENA-BUDGET] seeded 0 per-(leaf,pair) budgets from leaf size: range [0, 0], run-global fallback was 5
+09:10:15.235 [INFO ] BenchmarkService - Benchmark scope: 0 eligible leaf nodes
+09:10:15.236 [INFO ] BenchmarkService - [ARENA-SCHED] round 0: per-cell confidence gate (gap > 2.5*sigma on that cell's own theta/SE) — root gate=0/1 n>=5:0
+09:10:15.236 [INFO ] BenchmarkService - [ARENA-SCHED] round 0: selectTargetNodes returned no candidate leaves — ending the MAIN arm.
+09:10:15.236 [INFO ] BenchmarkService - [ARENA-AGREE] decidable comparisons: 0 of 0 (0.0%); agreement is reported over the decidable subset only
+09:10:15.236 [INFO ] BenchmarkService - MAIN condition finished. Captured budget limit: 0 verdicts (leaf-credited was 0; the arms are matched on verdicts because only the partitioned arm can inflate the leaf-credited count).
+09:10:15.236 [INFO ] MatchFilter - [MATCH-FILTER] matchFilter="none": 0 match(es) scheduled, no filtering applied.
+09:10:15.236 [WARN ] BenchmarkService - [ARENA-VERDICT] no judged comparisons — every result came from cache or was skipped
+09:10:15.236 [INFO ] BenchmarkService - GT Rank Correlation — Spearman ρ = 0.00, Kendall τ = 0.00 (n=2 models, All Domains)
+09:10:15.262 [INFO ] RankingService - SQLite Agent Ratings V2, Match History, and Bradley-Terry schema initialized.
+09:10:15.263 [INFO ] BenchmarkService - [ARENA-INGEST] corpus: 2 model(s), consensusQuestions=6 (quorum=2), reservedPool=0 question(s)
+09:10:15.263 [INFO ] BenchmarkService - [ARENA-INGEST] note: consensus question count is 6, not the MMLU-Pro test size (12032) — coverage is scored against the corpus, not the constant
+09:10:15.263 [INFO ] BenchmarkService - [ARENA-INGEST] note: no reserved pool given — the arena is unrestricted (reserved coverage not checked)
+09:10:15.264 [INFO ] BenchmarkService - [ARENA-INGEST] PASS m-a rows=6
+09:10:15.264 [INFO ] BenchmarkService - [ARENA-INGEST] PASS m-b rows=6
+09:10:15.264 [INFO ] BenchmarkService - [ARENA-INGEST] summary: 2 PASS, 0 WARN, 0 FAIL
+09:10:15.268 [INFO ] BenchmarkService -   m-a: total=6 reserved=0 math=6 reserved_math=0
+09:10:15.269 [INFO ] BenchmarkService -   m-b: total=6 reserved=0 math=6 reserved_math=0
+09:10:15.270 [INFO ] BenchmarkService - reserved_pool_id=NONE
+09:10:15.270 [INFO ] BenchmarkService - scored_minus_eval=NONE
+09:10:15.270 [INFO ] BenchmarkService - Benchmark: 6 questions, 2 models
+09:10:15.270 [INFO ] BenchmarkService - [ARENA-POOL] questions=6 models=2 pool=NONE constructionDomain=<all> | eval_results category composition: math=6
+09:10:15.270 [WARN ] BenchmarkService - [ARENA-POOL] no pool — the arena is NOT restricted to a held-out split, so it may judge questions the taxonomy was built on. Never a run of record.
+09:10:15.270 [INFO ] BenchmarkService - Answer matrix completeness check: 100% complete! No missing model answers across all 6 queries.
+09:10:15.271 [INFO ] BenchmarkService - Pre-routing complete: 0 questions routed, 6 outliers discarded, 0 out-of-scope domain queries filtered
+09:10:15.271 [INFO ] BenchmarkService - Scheduling params: SchedulingParams(minComparisonsPerLeaf=6, targetConvergenceFraction=0.7, separationThreshold=1.0, queriesPerPair=1, budgetPerPair=5, maxRounds=10, minTotalComparisons=2, maxConcurrentPerModel=2, questionsPerRound=12)
+09:10:15.271 [INFO ] BenchmarkService - [ARENA-BUDGET] seeded 0 per-(leaf,pair) budgets from leaf size: range [0, 0], run-global fallback was 5
+09:10:15.272 [INFO ] BenchmarkService - Benchmark scope: 0 eligible leaf nodes
+09:10:15.272 [INFO ] BenchmarkService - [ARENA-SCHED] round 0: per-cell confidence gate (gap > 2.5*sigma on that cell's own theta/SE) — root gate=0/1 n>=5:0
+09:10:15.272 [INFO ] BenchmarkService - [ARENA-SCHED] round 0: selectTargetNodes returned no candidate leaves — ending the MAIN arm.
+09:10:15.272 [INFO ] BenchmarkService - [ARENA-AGREE] decidable comparisons: 0 of 0 (0.0%); agreement is reported over the decidable subset only
+09:10:15.272 [INFO ] BenchmarkService - MAIN condition finished. Captured budget limit: 0 verdicts (leaf-credited was 0; the arms are matched on verdicts because only the partitioned arm can inflate the leaf-credited count).
+09:10:15.272 [INFO ] MatchFilter - [MATCH-FILTER] matchFilter="none": 0 match(es) scheduled, no filtering applied.
+09:10:15.272 [WARN ] BenchmarkService - [ARENA-VERDICT] no judged comparisons — every result came from cache or was skipped
+09:10:15.272 [INFO ] BenchmarkService - GT Rank Correlation — Spearman ρ = 0.00, Kendall τ = 0.00 (n=2 models, All Domains)
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

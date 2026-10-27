@@ -1,0 +1,205 @@
+{
+ "id": "SCALE-AGREE",
+ "title": "SCALE-AGREE: label-free agreement between embedders across k (kNN overlap, k-means AMI, CKA), normalised by the qwen3 q4-vs-q8 copy; qwen3 vs gemma deciding (zero calls; REGISTERED 2026-10-04)",
+ "question": "Do embedders agree at coarse k and diverge at fine k?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "633255f2",
+  "program_lines": "docs/judge_v2_program.md L24375-L24386",
+  "program_lines_as_of": "the commit that writes them, parent b7fb6bc8, re-grepped",
+  "date": "2026-10-04",
+  "provenance": "docs/literature/2026-10-04_embedding_structure_tests.md (ea418fcb; blob 6623b828); docs/agents/plans/2026-10-04_literature_shortlist.md (68a3d731); the author's Go (docs/agents/plans/2026-10-04_W1_W2_schedule.md (be8e54d3))",
+  "commit_note": "[2026-10-04 registrar] commit filled from the outcome header ('registration commit 633255f2'); was 'the commit that writes it (parent b7fb6bc8)'"
+ },
+ "script": {
+  "path": "tools/analysis/scale_agree.py",
+  "sha16": "d18bf94ea1bbffa2 (sha256-lf16)",
+  "blob": "92131d5b (LF)",
+  "commit": "ccc69914 (merge of zero-call-trio 3374d4f9)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_zero_call_trio.md",
+  "commit": "981c2903",
+  "blob": "875bb465 (LF)",
+  "verdict": "READY (D-1 fixed; post-run P-SA1)"
+ },
+ "go": "the author's Go for zero-call windows (2026-10-04)",
+ "run": {
+  "outcome_file": "E:/TaxoArena_backup_2026-10-04_scale_agree/scale_agree_outcome.txt (sha256 2a1fa578c6c351399332fce3d1f2ec892a8b1e11e3aba63503c3202c8f6db12d; 13,220 B; write-once, never committed; SHA256SUMS.txt OK)",
+  "outcome_commit": "run from main (code merged ccc69914); outcome not committed",
+  "calls": 0,
+  "cce": 0,
+  "pool": "none read (six intent DBs + ingest, PIN OK each; rule 7 not engaged)",
+  "date": "2026-10-04",
+  "incident": "first launch killed by a tool time limit at about 1 h before any output (no partial outcome); run of record 19:38:31-21:01:02, rc 0 (C-SA4)"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_scale_agree.md",
+  "commit": "b4ac8349",
+  "blob": "46a60d9c (LF)",
+  "verdict": "VALID with word conditions C-SA1 (HIGH), C-SA2, C-SA3 (MEDIUM), C-SA4, C-SA5 (LOW); P-SA1 discharged; bootstrap recompute deferred (row 6 UNDETERMINED)",
+  "p_sa2": {
+   "file": "docs/reviews/POSTRUN_scale_agree.md",
+   "section": "## P-SA2 recompute (2026-10-06; reviewer; zero calls; discharges P-SA2 and row 6)",
+   "commit": "f9104ec0",
+   "verdict": "CONFIRMED (row 6 UNDETERMINED -> CONFIRMED; SC1 FAILED, C-SA1 / C-SA2 stand)"
+  }
+ },
+ "criteria": [
+  {
+   "id": "SC1",
+   "text": "DECIDING: per corpus DECREASES iff Spearman(normalised AMI(qwen3, gemma), k) <= -0.7 AND slope 95% interval < 0; HELD iff both corpora; FAILED iff neither; MIXED otherwise. Verdict line: SCOREABLE (SE 0.004 per log2 k; MDE80 0.011)",
+   "result": "FAILED",
+   "value": "massive does not decrease (rho +0.762; slope +0.0463 [+0.0077, +0.0694]); clinc does not decrease (rho +1.000; slope +0.0812 [+0.0678, +0.0924]); seed-bootstrap B 2,000; words C-SA1: neither 'fine diverges' nor 'fine agrees more' is supported label-free",
+   "denominator": "8 k values x 25 crossed seed pairs per corpus; MASSIVE 9,870 / CLINC 13,487 TRAIN rows"
+  },
+  {
+   "id": "SC2",
+   "text": "DESCRIPTIVE: k* (normalised AMI < 0.8) per pair vs gold counts",
+   "result": "n/a",
+   "value": "NOT SCOREABLE: k* = 2 for all 10 pair-corpora = the grid floor; censored 'k* <= 2' (C-SA3)",
+   "denominator": "5 pairs x 2 corpora"
+  },
+  {
+   "id": "SC3",
+   "text": "DESCRIPTIVE: prompt pairs above every embedder pair at every k",
+   "result": "FAILED",
+   "value": "massive False, clinc False (descriptive)",
+   "denominator": "2 corpora x 8 k"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "slope -0.04 [-0.08, 0.00] per log2 k; SC1 HELD 0.60",
+   "result": "FAILED",
+   "value": "+0.0463 / +0.0812 outside [-0.08, 0.00]; SC1 HELD did not occur, Brier 0.3600",
+   "denominator": "2 corpora"
+  },
+  {
+   "id": "P2",
+   "text": "k* between gold counts 0.55 (descriptive)",
+   "result": "n/a",
+   "value": "NOT SCOREABLE: k* censored at the grid floor (C-SA3); printed Brier 0.3025 uninformative",
+   "denominator": "2 corpora"
+  },
+  {
+   "id": "P3",
+   "text": "prompt pairs above embedder pairs at every k 0.70 (descriptive)",
+   "result": "FAILED",
+   "value": "does not hold on either corpus (descriptive); Brier 0.4900",
+   "denominator": "2 corpora"
+  }
+ ],
+ "falsifier": {
+  "text": "F-SC fires iff SC1 FAILED: 'coarse holds, fine diverges' has no label-free support.",
+  "fired": true,
+  "scope": "C-SA2: no label-free support FROM THIS INSTRUMENT; the instrument is biased against decreases at low k, so not evidence against the reconciliation; not 'refuted'"
+ },
+ "numbers_of_record": {
+  "SC1_massive": "slope +0.0463 per log2 k, 95% seed-bootstrap [+0.0077, +0.0694] (B 2,000); rho +0.762; 8 k x 25 crossed seed pairs; 9,870 TRAIN rows",
+  "SC1_clinc": "slope +0.0812 per log2 k, 95% seed-bootstrap [+0.0678, +0.0924] (B 2,000); rho +1.000; 8 k x 25 crossed seed pairs; 13,487 TRAIN rows",
+  "Support": "bootstrap SE 0.0161 / 0.0063 (naive 0.0068 / 0.0030); realised DEFF 5.64 / 4.55 vs bracketed worst case 5; MDE80 0.0450 / 0.0177 (massive / clinc)",
+  "gemma_self_AMI_k2": "0.21 massive / 0.24 clinc (review, k = 2; reason for C-SA1)",
+  "Brier": "P1 0.3600; P3 0.4900 (descriptive); P2 not scoreable",
+  "w256_not_of_record": "FAILED; massive rho +0.548, clinc rho +1.000 (R-SA5)",
+  "P-SA2_recompute": "independent refit of 240 partitions + independent crossed bootstrap (B 2,000, seed 20261004): MASSIVE [+0.0077, +0.0694] SD 0.0161, CLINC [+0.0678, +0.0924] SD 0.0063, to the digit; MC SD of the bounds <= 0.0019 over 200 seeds; lower bound > 0 in 200/200 seeds on both corpora",
+  "Support_B20000": "DEFF 5.70 / 4.54 (naive SE 0.0068 / 0.0030), n_eff 4.4 / 5.5 seed pairs, MDE80 0.0453 / 0.0177 (massive / clinc; P-SA2 recompute, MC-level gap to 5.64 / 4.55)"
+ },
+ "sentence_of_record": "SCALE-AGREE (2026-10-04, 0 calls) — VALID; SC1 FAILED, F-SC FIRED (no label-free support FROM THIS INSTRUMENT, not 'refuted'). On MASSIVE / CLINC TRAIN (9,870 / 13,487 rows; 8 k x 25 crossed seed pairs; native width), SC1 FAILED; the normalised AMI slope is positive on both corpora (+0.0463 [+0.0077, +0.0694]; +0.0812 [+0.0678, +0.0924] per log2 k), which the instrument also produces under a scale-uniform null, so neither 'fine diverges' nor 'fine agrees more' is supported label-free. [POSTRUN docs/reviews/POSTRUN_scale_agree.md, b4ac8349; C-SA1, C-SA2, C-SA3; bootstrap recompute owed (P-SA2); outcome not committed, sha256 2a1fa578...] [CORRECTED 2026-10-06 by SCALE-AGREE (registrar; docs/reviews/POSTRUN_scale_agree.md section '## P-SA2 recompute (2026-10-06; reviewer; zero calls; discharges P-SA2 and row 6)' (f9104ec0)): P-SA2 DISCHARGED, CONFIRMED: both intervals reproduced to the digit by an independent refit; the recompute is no longer owed.]",
+ "chips": [
+  "REGISTERED 2026-10-04, BEFORE ANY CODE; not built",
+  "VALID (POST-RUN b4ac8349): SC1 FAILED; F-SC FIRED: NO LABEL-FREE SUPPORT FROM THIS INSTRUMENT (NOT REFUTED)",
+  "C-SA1: NEITHER &#x27;FINE DIVERGES&#x27; NOR &#x27;FINE AGREES MORE&#x27; SUPPORTED LABEL-FREE (NORMALISER BIASED UP AT SMALL K); P2 NOT SCOREABLE (K* CENSORED); BOOTSTRAP RECOMPUTE OWED",
+  "P-SA2 DISCHARGED (POST-RUN f9104ec0): INTERVALS CONFIRMED TO THE DIGIT; LOWER BOUND &gt; 0 IN 200/200 SEEDS; SC1 FAILED STANDS"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-04",
+   "by": "registrar (pre-data; READY_zero_call_trio)",
+   "text": "NOT READY pending the D-1 fix: the 5 x 5 crossed seed grid is not 25 independent pairs; Support (b)-(d) bracketed (n_eff 5-25; worst-case SE 0.0089, MDE80 0.025; SCOREABLE stands at -0.04); SA-R4 t(24) REJECTED, deciding interval = seed bootstrap (B 2,000); SA-R1 TRAIN rows only; SA-R3 native deciding, not width-matched to F-GL qwen3 1024 (D-9); SA-R5 den = mean over 25 q4-q8 pairs. Code fix + delta review owed. L24378, L24379, L24381, L24382."
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (pre-data; READY_zero_call_trio.md)",
+   "text": "READY (delta 981c2903; no new reading). Post-run P-SA1: each corpus's DECREASES word must follow rho <= -0.7 AND the seed-bootstrap upper bound < 0, not the ANOVA t(4) or t(24) bound (own mutant X2 survived). DD-2: bootstrap SE about 0.89x; t(4) quoted beside if signs disagree. L24381."
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (OUTCOME; docs/reviews/POSTRUN_scale_agree.md (b4ac8349; blob 46a60d9c, LF))",
+   "text": "OUTCOME brackets on READOUTS AND CRITERIA, SUPPORT, PREDICTIONS and FALSIFIER (L24381-L24384): SC1 FAILED with C-SA1 words; realised DEFF 5.64 / 4.55; P1 FAILED, P2 NOT SCOREABLE, P3 does not hold; F-SC FIRED scoped (C-SA2)."
+  },
+  {
+   "date": "2026-10-06",
+   "by": "registrar (POST-RUN DUTY; docs/reviews/POSTRUN_scale_agree.md section '## P-SA2 recompute (2026-10-06; reviewer; zero calls; discharges P-SA2 and row 6)' (f9104ec0))",
+   "text": "P-SA2 DISCHARGED, CONFIRMED: MASSIVE [+0.0077, +0.0694], CLINC [+0.0678, +0.0924] reproduced to the digit (240-partition refit, own bootstrap); MC SD <= 0.0019, lower bound > 0 in 200/200 seeds; DEFF 5.70 / 4.54 at B 20,000. SC1 FAILED, C-SA1, C-SA2 stand. D-3 discharged for this run. Backup of record E:/TaxoArena_backup_2026-10-04_scale_agree (the only one; SHA256SUMS 8/8 OK); the brief's '2026-10-05' name never entered the record. Bracket at prog L24612; registrar's record L24802-L24806 (_as_of parent f9104ec0)."
+  }
+ ],
+ "does_not_show": [
+  "that fine-scale divergence is refuted (C-SA2)",
+  "that agreement increases with k (C-SA1)",
+  "any k* above the grid floor (C-SA3)",
+  "which embedder is better (D3, the author's)",
+  "any partition's correctness",
+  "anything at 256-d or on MMLU-Pro as decisive"
+ ],
+ "ledger": {
+  "row_id": "SCALE-AGREE",
+  "version": "v404 (2026-10-06: P-SA2 bracket, OK chip) | v391 (2026-10-04: OUTCOME bracket, NULL + WARN chips) | v383 (2026-10-04: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "GOLD-LEVEL-EMB"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; no Gaussian-mixture LR / BIC, MDL or Bayesian evidence (MIX-LRT-SITE untouched); no judge, rubric, reference, frontier, temperature"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "CPU about 1 h (MMLU-Pro descriptive arm is a pool reader)",
+  "agent_hours": "about 2 h",
+  "reads_pool": false
+ },
+ "outputs": "never committed: stored on E: with SHA256SUMS.txt; temp under E:/TaxoArena_tmp via scratch_dir",
+ "sources": [
+  "docs/reviews/POSTRUN_scale_agree.md section '## P-SA2 recompute (2026-10-06; reviewer; zero calls; discharges P-SA2 and row 6)' (f9104ec0)",
+  "docs/judge_v2_program.md section \"## Registrar's record 2026-10-06 (insertion only; zero calls; nothing run) — SCALE-AGREE post-run duty P-SA2 discharged (CONFIRMED)\" (L24802-L24806, _as_of parent f9104ec0, re-grepped); bracket L24612",
+  "docs/judge_v2_program.md L24602-L24616 (_as_of the commit that writes it, parent b4ac8349, re-grepped); OUTCOME brackets L24381-L24384",
+  "docs/reviews/POSTRUN_scale_agree.md (b4ac8349; blob 46a60d9c, LF)",
+  "E:/TaxoArena_backup_2026-10-04_scale_agree/scale_agree_outcome.txt (sha256 2a1fa578c6c351399332fce3d1f2ec892a8b1e11e3aba63503c3202c8f6db12d; 13,220 B; write-once, never committed; SHA256SUMS.txt OK)",
+  "docs/judge_v2_program.md L24375-L24386 (_as_of the commit that writes it, parent b7fb6bc8, re-grepped)",
+  "docs/literature/2026-10-04_embedding_structure_tests.md (ea418fcb; blob 6623b828)",
+  "docs/agents/plans/2026-10-04_literature_shortlist.md (68a3d731)",
+  "docs/reviews/READY_zero_call_trio.md (10a5aa3d; blob 4dd640a1, LF); merge e8504eb2",
+  "docs/reviews/READY_zero_call_trio.md delta (981c2903; blob 875bb465, LF)",
+  "docs/judge_v2_program.md section \"## Registrar's record 2026-10-04 (insertion only; zero calls; nothing run; pre-data) — CELL-STRATA-EVAL and CELL-DIFFICULTY READY ...\" (L24530-L24534, _as_of 14ab172d, re-grepped)"
+ ],
+ "last_update": "2026-10-06",
+ "label_status": "AF-U [SC] where used",
+ "review_pending": "none; P-SA1 and P-SA2 discharged",
+ "post_run_duties": [
+  {
+   "id": "P-SA2",
+   "state": "DISCHARGED",
+   "text": "recompute the deciding seed-bootstrap intervals (review row 6 UNDETERMINED; per-seed-pair AMI grid not saved, D-3): about 72 min of full CPU at native, owed after TREE-LIKE releases the machine (rule 7) [2026-10-06 registrar: DISCHARGED, CONFIRMED (docs/reviews/POSTRUN_scale_agree.md section '## P-SA2 recompute (2026-10-06; reviewer; zero calls; discharges P-SA2 and row 6)' (f9104ec0))]"
+  },
+  {
+   "id": "P-SA1",
+   "state": "DISCHARGED",
+   "text": "word follows rho AND the seed-bootstrap bound (review row 7)"
+  }
+ ],
+ "disclosure": "C-SA4: first attempt killed at about 1 h with no output; run of record 19:38:31-21:01:02 rc 0. R-SA5: 256-d line not of record.",
+ "plain_description": {
+  "sq": "SQ5 Invariance",
+  "what": "Without labels, compares how two embedding models (qwen3 vs gemma) group the same texts, at increasing numbers of k-means clusters, on MASSIVE and CLINC. Scores are scaled against a near-copy of qwen3. No calls.",
+  "why": "It asks whether different embedders agree at coarse levels but disagree at fine ones, which bears on whether the tree depends on the embedder.",
+  "information": "A clear trend would show where the embedders diverge. Result: the prediction failed. Agreement rises slightly with more clusters, but the method produces the same trend under a null, so it gives no label-free support either way. That is not a refutation. It does not say which embedder is better.",
+  "written": "2026-10-07"
+ }
+}

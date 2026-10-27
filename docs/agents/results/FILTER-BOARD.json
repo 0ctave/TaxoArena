@@ -1,0 +1,104 @@
+{
+  "id": "FILTER-BOARD",
+  "title": "FILTER-BOARD: does the answer-disagreement filter preserve board quality, or does dropping 36% of matches cost something? (zero calls)",
+  "question": "Apply the filter to R3's 1,971 doubly-judged matches and rebuild both formats' boards: rho, top-4 violations and decidable accuracy, filtered vs unfiltered.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "a42dd82",
+    "program_lines": "docs/judge_v2_program.md L978-L985 (a bullet following SCHEDULING; not separately registered)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "- **FILTER-BOARD (2026-09-13, zero calls): the answer-disagreement filter is strictly safe on the board.**",
+    "outcome_heading": [
+      "L978: the same bullet"
+    ],
+    "date": "2026-09-13"
+  },
+  "script": {
+    "path": "n/a (free check; scratch script, no script of record; the output file is the record)",
+    "sha16": "n/a",
+    "commit": "a42dd82"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/filterboard_outcome.txt",
+    "outcome_commit": "a42dd82",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-13"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); descriptive; re-read by PROFILE-R-FILTERED (2026-09-18) for the profile's reliability, which the filter does NOT preserve (0.7183 -> 0.5613)",
+    "commit": "a42dd82",
+    "verdict": "SAFE on the board; improves pairwise"
+  },
+  "criteria": [
+    {
+      "id": "readout",
+      "text": "descriptive: rho, top-4 violations and decidable accuracy, filtered vs unfiltered",
+      "result": "DELIVERED",
+      "value": "keeps 1,264 of 1,971 (64.1%; 16.9% on frontier pairs alone) and ALL 941 key-decidable pairs (100%, not 99.8%); pairwise rho 0.9790 -> 0.9860 with violations unchanged at 1; pointwise 0.9930 -> 0.9930, 0 violations; decidable accuracy identical (0.864, 0.808)",
+      "denominator": "R3's 1,971 doubly-judged matches"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none (descriptive)",
+    "fired": false,
+    "note": "validates shipping the scheduler option (MATCH-FILTER); PROFILE-R-FILTERED later showed the filter does not preserve the anchor profile's reliability (0.5613 vs 0.7183), so the newcomer profile bill is not halved by it"
+  },
+  "numbers_of_record": {
+    "kept": "1,264 of 1,971 (64.1%); all 941 key-decidable pairs",
+    "boards": "pairwise rho 0.9790 -> 0.9860 (1 violation); pointwise 0.9930 -> 0.9930 (0)",
+    "accuracy": "0.864 / 0.808 unchanged"
+  },
+  "sentence_of_record": "FILTER-BOARD (2026-09-13, zero calls): the answer-disagreement filter is strictly safe on the board: it keeps 1,264 of 1,971 matches (64.1%) and ALL 941 key-decidable pairs; pairwise rho 0.9790 -> 0.9860 with violations unchanged at 1; pointwise 0.9930 -> 0.9930; decidable accuracy identical since nothing decidable is dropped. Validates shipping the scheduler option. [PROFILE-R-FILTERED 2026-09-18: the filter does NOT preserve the anchor profile's reliability (0.7183 -> 0.5613); FILTER-BOARD's board safety stands.]",
+  "chips": [
+    "SAFE — and improves pairwise"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-18",
+      "by": "PROFILE-R-FILTERED (the filter's effect on the profile's reliability; FILTER-BOARD named as 'not overturned')",
+      "text": "the filter is safe for boards (this row) and the placement protocol, but the judge-built anchor profile's split-half R falls 0.7183 -> 0.5613 under it; the newcomer profile-coverage bill is not halved."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "that the filter preserves the anchor profile's reliability (it does not: PROFILE-R-FILTERED)"
+  ],
+  "ledger": {
+    "row_id": "FILTER-BOARD",
+    "version": "v62 (a42dd82); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "SCHEDULING",
+    "MATCH-FILTER",
+    "POINTWISE",
+    "PROFILE-R-FILTERED"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L978-L985 (a42dd82)",
+    "experiment_results/x12_crossdomain/filterboard_outcome.txt (a42dd82)",
+    "docs/test_ledger.html row FILTER-BOARD (v62): chips verbatim, evidence (filterboard_outcome.txt)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (rubric_v2_design.md / multi_corpus_design.md lines as of their last commits named in sources)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ4 Price",
+    "what": "Takes about 2,000 matches that were judged twice, removes those where both models gave the same answer, and rebuilds the leaderboards with and without the filter. No new judge calls.",
+    "why": "It checks whether skipping same-answer matches, which saves about a third of the judging, harms the leaderboard.",
+    "information": "It shows whether a cheap filter is safe to ship. Result: done. The filter kept 64% of matches, including every match whose answer key could decide the winner. Ranking agreement held or slightly rose (0.979 to 0.986), and violations stayed at 1. So it is safe for leaderboards. A later test found that it does lower the reliability of the per-model skill profile (0.72 to 0.56). This belongs to the older question pool, which is now ruled history, not evidence.",
+    "written": "2026-10-07"
+  }
+}

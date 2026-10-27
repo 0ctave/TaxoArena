@@ -1,0 +1,28 @@
+package taxonomy.tui.state
+
+data class ArenaUiState(
+    // Precomputed-answers mode (no live generation): models + question_id come from
+    // the loaded MMLU-Pro eval_results roster rather than hardcoded model names.
+    val usePrecomputed: Boolean = true,
+    val loadedModels: List<String> = emptyList(),
+
+    val isEnteringArenaQuestionId: Boolean = false,
+    val arenaQuestionIdInput: String = "",
+
+    val isEnteringArenaQuery: Boolean = false,
+    val arenaQueryInput: String = "",
+
+    val isEnteringArenaModelA: Boolean = false,
+    val arenaModelAInput: String = "",
+
+    val isEnteringArenaModelB: Boolean = false,
+    val arenaModelBInput: String = "",
+
+    // True while a single-node judge generation (R in NODE_DETAIL) is in flight.
+    val isGeneratingJudge: Boolean = false,
+
+    // Leaderboard sub-view (toggled with "l" while in Arena mode).
+    val isViewingLeaderboard: Boolean = false,
+    val leaderboard: List<taxonomy.service.LeaderboardGroup> = emptyList(),
+    val leaderboardScrollOffset: Int = 0
+)

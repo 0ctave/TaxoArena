@@ -1,0 +1,187 @@
+=== FRONTIER-FIT: the widener fitted on the frontier-internal edges alone (FRAMEWORK.md item 5, zero calls) ===
+  pool of record p2dca21ab5f4ef3ae asserted | frontier band = arx_0314, iask_pro, gemini-3.1-pro_5-shots, gpt-4o-2024-08-06
+  widener tau(A) = exp(b0 + b1*A) in quadrature with the bootstrap SD; call iff min(c_raw, Phi(|m|/sqrt(s^2+tau^2))) >= 0.975
+  wrong counts are all(McNemar-established); key denominator = the anchor's JUDGED x12 questions (systematic_budget.mcnemar_edge over anchor_qs)
+
+=== DATA CHECK ===
+  x12: 12 models | 920 edges with any key gap (60 wrong) | 891 with gap >= 0.02 (44 wrong) | 14 anchors, judged questions per anchor 119-304
+  frontier-internal edges among the 891: 75, wrong-direction 26(13) -> registered object (75, 26): REPRODUCED
+  of the 75: key direction established (McNemar p < 0.05) 53, unestablished 22; wrong among established 13, among unestablished 13
+  frontier-internal edges among the unfiltered 920 (secondary): 84, wrong 31(13)
+  off-frontier edges (the complement inside the 891): 816, wrong 18(13) = 2.2% vs 34.7% on the frontier slice
+  anchors carrying frontier edges: 14 (Biology 5, Business 5, Chemistry 6, Computer science 5, Economics 5, Engineering 6, Health 5, History 5, Law 6, Math 6, Other 5, Philosophy 6, Physics 5, Psychology 5)
+  ARITHMETIC: at 0.975 each called edge contributes at most 0.025 to the nominal, so nominal <= 1.875 on 75 edges and <= 2.100 on 84;
+  'nominal >= 3' needs >= 120 called edges at 0.975. The criterion is unreachable on this object under ANY fit.
+
+=== FITS ===
+  shipped x12 fit (budget_transfer.B0/B1, fitted on all 891 INCLUDING these 75): b0 = -3.2326 | b1 = +3.3133
+  off-frontier fit (the 816 non-frontier edges of the 891): b0 = -2.3643 | b1 = +1.4548  (record: b1 1.455)
+  FRONTIER fit (the 75 frontier-internal edges):          b0 = -2.0278 | b1 = +2.3410 | nll 44.7970
+    agreement on the 75: min 0.542 / median 0.847 / max 0.930; tau at A = 0.60 / 0.70 / 0.80 / 0.90: 0.536 / 0.678 / 0.856 / 1.082
+    bootstrap s on the 75: median 0.236 (p10 0.175, p90 0.295); linear predictor b0 + b1*A over the data range: [-0.76, 0.15]
+    vectorised twin of systematic_budget.nll at the point estimate: 44.796984 vs 44.796984 (|diff| 1.4e-14)
+
+=== (A) THE 75 FRONTIER-INTERNAL EDGES AT 0.975 (the registered operating point) ===
+  'nominal' = sum(1 - c) over the called set; ratio = wrong / nominal; decl.residue = calls surviving the key-tie decline (McNemar p >= 0.05 declines)
+  certificate                       thr   called/N    wrong  nominal   ratio  decl.residue     res.wrong   status by the power rule
+  raw (tau = 0)                   0.975     31/75      5(2)    0.187   26.8x            25          2(2)   UNDETERMINED (nominal < 3)
+  shipped x12 fit (in sample)     0.975      4/75      0(0)    0.034    0.0x             4          0(0)   UNDETERMINED (nominal < 3)
+  off-frontier fit, cold          0.975     12/75      2(1)    0.063   31.9x            10          1(1)   UNDETERMINED (nominal < 3)
+  FRONTIER fit, in sample         0.975      0/75      0(0)    0.000       -             0          0(0)   UNDETERMINED (nominal < 3)
+  FRONTIER fit, LOAO within 75    0.975      1/75      0(0)    0.016    0.0x             1          0(0)   UNDETERMINED (nominal < 3)
+  reproduction of the record's cold off-frontier row (12 called / 2 wrong / nominal 0.06): 12 / 2 / 0.063 -> OK
+  reproduction of the record's raw frontier row (31 called / 5 wrong): 31 / 5 -> OK
+  utility on the 75: raw (tau = 0) 41.3%; shipped x12 fit (in sample) 5.3%; off-frontier fit, cold 16.0%; FRONTIER fit, in sample 0.0%; FRONTIER fit, LOAO within 75 1.3%
+
+=== (B) DIAGNOSTIC, NOT THE OPERATING POINT: the same certificates at 0.90 / 0.95 / 0.975 on the 75 ===
+  (at 0.90 the nominal ceiling is 7.5, so a calibration read becomes arithmetically possible there)
+  certificate                       thr   called/N    wrong  nominal   ratio  decl.residue     res.wrong   status by the power rule
+  raw (tau = 0)                   0.900     48/75     13(7)    1.160   11.2x            38          7(7)   UNDETERMINED (nominal < 3)
+  raw (tau = 0)                   0.950     41/75      9(5)    0.580   15.5x            33          5(5)   UNDETERMINED (nominal < 3)
+  raw (tau = 0)                   0.975     31/75      5(2)    0.187   26.8x            25          2(2)   UNDETERMINED (nominal < 3)
+  shipped x12 fit (in sample)     0.900     11/75      2(1)    0.422    4.7x            10          1(1)   UNDETERMINED (nominal < 3)
+  shipped x12 fit (in sample)     0.950      8/75      0(0)    0.195    0.0x             8          0(0)   UNDETERMINED (nominal < 3)
+  shipped x12 fit (in sample)     0.975      4/75      0(0)    0.034    0.0x             4          0(0)   UNDETERMINED (nominal < 3)
+  off-frontier fit, cold          0.900     24/75      5(2)    0.854    5.9x            19          2(2)   UNDETERMINED (nominal < 3)
+  off-frontier fit, cold          0.950     14/75      2(1)    0.137   14.6x            12          1(1)   UNDETERMINED (nominal < 3)
+  off-frontier fit, cold          0.975     12/75      2(1)    0.063   31.9x            10          1(1)   UNDETERMINED (nominal < 3)
+  FRONTIER fit, in sample         0.900      4/75      0(0)    0.231    0.0x             4          0(0)   UNDETERMINED (nominal < 3)
+  FRONTIER fit, in sample         0.950      1/75      0(0)    0.033    0.0x             1          0(0)   UNDETERMINED (nominal < 3)
+  FRONTIER fit, in sample         0.975      0/75      0(0)    0.000       -             0          0(0)   UNDETERMINED (nominal < 3)
+  FRONTIER fit, LOAO within 75    0.900      2/75      0(0)    0.049    0.0x             2          0(0)   UNDETERMINED (nominal < 3)
+  FRONTIER fit, LOAO within 75    0.950      2/75      0(0)    0.049    0.0x             2          0(0)   UNDETERMINED (nominal < 3)
+  FRONTIER fit, LOAO within 75    0.975      1/75      0(0)    0.016    0.0x             1          0(0)   UNDETERMINED (nominal < 3)
+
+=== (C) IS b1 IDENTIFIED ON THE FRONTIER SLICE? ===
+  framework definition (Stage 6): the ESTABLISHED-label profile rejects b1 = 0 at delta-deviance 3.84
+  established labels (53 edges, 13 wrong): free fit b0 -0.7550 b1 +0.1354 nll 26.1304 | b1 = 0 fit b0 -0.6475 nll 26.1312 | delta-deviance 0.002 -> b1 NOT identified (b1 = 0 not rejected)
+  all labels         (75 edges, 26 wrong): free fit b0 -2.0278 b1 +2.3410 nll 44.7970 | b1 = 0 fit b0 -0.1592 nll 44.9899 | delta-deviance 0.386 -> does not reject b1 = 0
+  profile-likelihood 95% set for b1 (b0 profiled, grid [-20, 30] step 0.1): all labels [-8.7, 12.4] contains 0 | established [-9.8, 8.5] contains 0
+  x12 reference: b1 = +3.3133 on 891, anchor-clustered CI [1.72, 7.87]; established refit +2.1430; BUDGET-TRANSFER's INTERNAL set [-4.0, 2.75]
+  anchor-clustered bootstrap of the frontier fit (1000 resamples of the 14 anchors, 1000 usable): b1 median +2.416, 95% [-22.214, +74.915], P(b1 <= 0) = 0.251; b0 95% [-58.015, +19.755]; corr(b0, b1) -0.999
+  LOAO fold b1 range inside the 75: [-0.131, +3.747]
+
+=== (D) THE 75 EDGES: certificate under each fit, key label, McNemar on the anchor's judged questions ===
+  anchor           pair                    A   c_raw shipped   offfr   front    LOAO  |m|/s    key McNemar b:c p
+  Biology          arx vs gemini       0.906  0.9800  0.7513  0.8985  0.6929  0.6692   2.05  right   1:15  p=0.0005
+  Biology          arx vs gpt-4o       0.890  0.5933  0.5209  0.5395  0.5152  0.5133   0.18  right  11:5   p=0.2101 (unest.)
+  Biology          gemini vs gpt-4o    0.873  0.9967  0.7898  0.9238  0.7201  0.6982   2.30  right  21:1   p=0.0000
+  Biology          gemini vs iask      0.910  0.9500  0.7034  0.8452  0.6546  0.6347   1.66  WRONG  14:1   p=0.0010
+  Biology          gpt-4o vs iask      0.927  1.0000  0.8868  0.9935  0.8178  0.7802   4.64  right   2:9   p=0.0654 (unest.)
+  Business         arx vs gemini       0.897  0.9800  0.7272  0.8757  0.6711  0.6452   2.01  right   0:15  p=0.0001
+  Business         arx vs gpt-4o       0.866  0.5800  0.5282  0.5503  0.5202  0.5175   0.21  WRONG  14:5   p=0.0636 (unest.)
+  Business         gemini vs gpt-4o    0.855  0.9633  0.7291  0.8568  0.6677  0.6477   1.77  right  24:0   p=0.0000
+  Business         gemini vs iask      0.899  0.7833  0.5889  0.6661  0.5656  0.5551   0.74  right  16:0   p=0.0000
+  Business         gpt-4o vs iask      0.868  0.8133  0.6312  0.7207  0.5957  0.5829   0.92  right   8:15  p=0.2100 (unest.)
+  Chemistry        arx vs gemini       0.899  1.0000  0.7635  0.9227  0.7000  0.7161   2.77  right   5:18  p=0.0106
+  Chemistry        arx vs gpt-4o       0.748  0.9200  0.7127  0.7986  0.6427  0.6346   1.44  right  46:5   p=0.0000
+  Chemistry        arx vs iask         0.891  1.0000  0.7826  0.9389  0.7142  0.7296   3.15  WRONG  13:8   p=0.3833 (unest.)
+  Chemistry        gemini vs gpt-4o    0.734  1.0000  0.9582  0.9933  0.8704  0.8527   3.97  right  58:3   p=0.0000
+  Chemistry        gemini vs iask      0.869  0.5500  0.5181  0.5339  0.5129  0.5136   0.16  WRONG  25:7   p=0.0021
+  Chemistry        gpt-4o vs iask      0.778  1.0000  0.9490  0.9958  0.8594  0.8514   5.13  right   6:41  p=0.0000
+  Computer science arx vs gemini       0.870  0.9567  0.7232  0.8520  0.6656  0.6428   1.67  right   4:13  p=0.0490
+  Computer science arx vs gpt-4o       0.802  0.7600  0.6146  0.6825  0.5784  0.5699   0.82  right  18:4   p=0.0043
+  Computer science gemini vs gpt-4o    0.784  0.9967  0.8598  0.9528  0.7665  0.7440   2.73  right  26:3   p=0.0000
+  Computer science gemini vs iask      0.839  0.8733  0.6489  0.7450  0.6054  0.5920   1.13  right  17:6   p=0.0347
+  Computer science gpt-4o vs iask      0.814  0.9767  0.7230  0.8421  0.6565  0.6390   1.87  right   5:16  p=0.0266
+  Economics        arx vs gemini       0.888  0.9800  0.7430  0.8889  0.6826  0.6456   2.10  right   0:18  p=0.0000
+  Economics        arx vs iask         0.914  0.8167  0.5983  0.6910  0.5733  0.5556   0.92  right   4:8   p=0.3877 (unest.)
+  Economics        gemini vs gpt-4o    0.870  0.9667  0.7567  0.8880  0.6927  0.6579   1.90  right  20:1   p=0.0000
+  Economics        gemini vs iask      0.891  0.8867  0.6483  0.7649  0.6094  0.5859   1.27  right  16:2   p=0.0013
+  Economics        gpt-4o vs iask      0.897  0.8033  0.6087  0.6954  0.5805  0.5628   0.83  right   5:10  p=0.3018 (unest.)
+  Engineering      arx vs gemini       0.694  0.9033  0.7791  0.8305  0.6992  0.6555   1.25  right   6:33  p=0.0000
+  Engineering      arx vs gpt-4o       0.596  0.9500  0.8656  0.8961  0.7579  0.6652   1.75  right  31:8   p=0.0003
+  Engineering      arx vs iask         0.708  0.9700  0.8112  0.8829  0.7164  0.6716   1.81  WRONG  16:11  p=0.4421 (unest.)
+  Engineering      gemini vs gpt-4o    0.573  0.9967  0.9830  0.9898  0.9178  0.7945   3.00  right  55:4   p=0.0000
+  Engineering      gemini vs iask      0.690  0.5833  0.5268  0.5341  0.5177  0.5134   0.12  WRONG  36:4   p=0.0000
+  Engineering      gpt-4o vs iask      0.542  1.0000  0.9930  0.9956  0.9416  0.8046   3.49  right  15:34  p=0.0094
+  Health           arx vs gemini       0.891  1.0000  0.7919  0.9399  0.7232  0.7047   2.79  right   3:10  p=0.0923 (unest.)
+  Health           arx vs gpt-4o       0.891  0.8333  0.6260  0.7214  0.5933  0.5850   0.94  WRONG   7:3   p=0.3438 (unest.)
+  Health           gemini vs gpt-4o    0.868  0.8900  0.6924  0.8022  0.6428  0.6320   1.25  right  15:4   p=0.0192
+  Health           gemini vs iask      0.898  0.6333  0.5591  0.6075  0.5438  0.5397   0.43  WRONG   9:4   p=0.2668 (unest.)
+  Health           gpt-4o vs iask      0.875  0.9700  0.7467  0.8825  0.6847  0.6704   1.92  right   4:10  p=0.1796 (unest.)
+  History          arx vs gemini       0.832  0.6400  0.5629  0.5993  0.5448  0.5537   0.37  right   4:12  p=0.0768 (unest.)
+  History          arx vs gpt-4o       0.866  0.9767  0.7870  0.9046  0.7198  0.7622   1.85  WRONG   8:3   p=0.2266 (unest.)
+  History          gemini vs gpt-4o    0.773  0.9633  0.8081  0.8985  0.7235  0.7525   1.87  WRONG  18:5   p=0.0106
+  History          gemini vs iask      0.829  0.8800  0.6982  0.7966  0.6431  0.6699   1.23  WRONG  13:5   p=0.0963 (unest.)
+  History          gpt-4o vs iask      0.863  0.7100  0.5787  0.6284  0.5575  0.5703   0.47  WRONG   3:8   p=0.2266 (unest.)
+  Law              arx vs gemini       0.749  1.0000  0.9969  0.9999  0.9667  0.9842   5.75  right  10:49  p=0.0000
+  Law              arx vs gpt-4o       0.668  0.9867  0.8699  0.9216  0.7651  0.8007   2.05  WRONG  45:15  p=0.0001
+  Law              arx vs iask         0.822  1.0000  0.9214  0.9912  0.8353  0.8752   4.10  WRONG  22:12  p=0.1214 (unest.)
+  Law              gemini vs gpt-4o    0.631  1.0000  0.9935  0.9984  0.9432  0.9672   4.17  right  78:9   p=0.0000
+  Law              gemini vs iask      0.732  0.9867  0.8695  0.9425  0.7699  0.8069   2.42  right  55:8   p=0.0000
+  Law              gpt-4o vs iask      0.691  0.9633  0.8202  0.8838  0.7236  0.7562   1.75  right  16:36  p=0.0078
+  Math             arx vs gemini       0.928  1.0000  0.7273  0.9065  0.6738  0.6255   3.19  right   3:16  p=0.0044
+  Math             arx vs gpt-4o       0.827  1.0000  0.7974  0.9349  0.7144  0.6783   3.56  right  40:5   p=0.0000
+  Math             arx vs iask         0.930  0.8567  0.5729  0.6568  0.5545  0.5387   0.99  WRONG  13:5   p=0.0963 (unest.)
+  Math             gemini vs gpt-4o    0.824  1.0000  0.9521  0.9983  0.8722  0.8253   6.02  right  50:2   p=0.0000
+  Math             gemini vs iask      0.913  0.9833  0.6694  0.8212  0.6265  0.5926   2.07  right  24:3   p=0.0000
+  Math             gpt-4o vs iask      0.845  1.0000  0.8481  0.9729  0.7614  0.7147   4.50  right   6:33  p=0.0000
+  Other            arx vs gemini       0.863  0.5300  0.5035  0.5062  0.5025  0.5031   0.03  WRONG   4:17  p=0.0072
+  Other            arx vs gpt-4o       0.844  0.9267  0.7027  0.8220  0.6457  0.6801   1.58  WRONG  15:8   p=0.2100 (unest.)
+  Other            gemini vs gpt-4o    0.806  0.9300  0.7216  0.8306  0.6556  0.6866   1.63  WRONG  27:7   p=0.0008
+  Other            gemini vs iask      0.830  1.0000  0.9022  0.9853  0.8162  0.8675   3.65  WRONG  22:8   p=0.0161
+  Other            gpt-4o vs iask      0.869  0.9767  0.7487  0.8889  0.6844  0.7304   2.13  right   8:14  p=0.2863 (unest.)
+  Philosophy       arx vs gemini       0.847  0.8600  0.6782  0.7756  0.6299  0.6398   1.12  right   2:17  p=0.0007
+  Philosophy       arx vs gpt-4o       0.786  0.9200  0.7452  0.8328  0.6761  0.6864   1.37  WRONG  16:5   p=0.0266
+  Philosophy       arx vs iask         0.885  0.9000  0.6646  0.7786  0.6220  0.6327   1.23  WRONG   7:3   p=0.3438 (unest.)
+  Philosophy       gemini vs gpt-4o    0.750  0.5933  0.5515  0.5731  0.5345  0.5365   0.27  WRONG  29:2   p=0.0000
+  Philosophy       gemini vs iask      0.824  0.5033  0.5018  0.5029  0.5013  0.5014   0.01  right  21:2   p=0.0001
+  Philosophy       gpt-4o vs iask      0.817  0.5500  0.5401  0.5500  0.5282  0.5303   0.23  WRONG   4:12  p=0.0768 (unest.)
+  Physics          arx vs gemini       0.887  0.9967  0.7260  0.8833  0.6674  0.6441   2.53  right   5:21  p=0.0025
+  Physics          arx vs gpt-4o       0.778  1.0000  0.8416  0.9475  0.7449  0.7214   3.21  right  38:10  p=0.0001
+  Physics          gemini vs gpt-4o    0.769  1.0000  0.9693  0.9982  0.8911  0.8652   5.24  right  51:6   p=0.0000
+  Physics          gemini vs iask      0.858  0.5900  0.5258  0.5479  0.5182  0.5157   0.24  right  29:8   p=0.0008
+  Physics          gpt-4o vs iask      0.783  1.0000  0.9588  0.9978  0.8742  0.8460   5.78  right  12:35  p=0.0011
+  Psychology       arx vs gemini       0.869  0.9200  0.6588  0.7743  0.6151  0.6255   1.35  right   5:21  p=0.0025
+  Psychology       arx vs gpt-4o       0.865  0.8333  0.6148  0.7048  0.5823  0.5897   0.99  WRONG  19:5   p=0.0066
+  Psychology       arx vs iask         0.891  0.9533  0.6951  0.8338  0.6451  0.6599   1.71  WRONG  15:4   p=0.0192
+  Psychology       gemini vs gpt-4o    0.812  0.6733  0.5570  0.5921  0.5393  0.5415   0.38  right  35:5   p=0.0000
+  Psychology       gemini vs iask      0.833  0.6300  0.5607  0.6008  0.5426  0.5455   0.42  WRONG  31:4   p=0.0000
+
+=== (E) SECONDARY: the unfiltered frontier slice (any key gap, 84 edges) ===
+  fit: b0 -3.1331 b1 +3.9361 | established 53 (wrong 13): delta-deviance 0.002 -> NOT identified | all-label delta-deviance 1.075
+  certificate                       thr   called/N    wrong  nominal   ratio  decl.residue     res.wrong   status by the power rule
+  raw (tau = 0)                   0.975     35/84      7(2)    0.193   36.2x            25          2(2)   UNDETERMINED (nominal < 3)
+  shipped x12 fit                 0.975      4/84      0(0)    0.034    0.0x             4          0(0)   UNDETERMINED (nominal < 3)
+  off-frontier fit, cold          0.975     14/84      3(1)    0.089   33.7x            10          1(1)   UNDETERMINED (nominal < 3)
+  frontier-84 fit, in sample      0.975      0/84      0(0)    0.000       -             0          0(0)   UNDETERMINED (nominal < 3)
+  frontier-84 fit, LOAO           0.975      2/84      0(0)    0.044    0.0x             2          0(0)   UNDETERMINED (nominal < 3)
+
+=== (F) THE TIER OBJECT: the six frontier pairs on the pooled x12 board (66 pairs, 300 question draws, seed 43) ===
+  key denominator here: all 2811 judged x12 questions as one pseudo-anchor (as KEY-TIE-DECLINE did)
+  reproduction of systematic_budget.txt (raw 63 called / 1 wrong -> budget 57 / 0): raw 63 / 1 -> shipped 57 / 0 -> OK
+  pair                     A       s   c_raw shipped   front    key McNemar b:c p      separated at 0.975 under raw / shipped / frontier (after decline)
+  arx vs gemini        0.862   0.073  1.0000  0.7874  0.7103  right  52:275 p=0.0000   yes / no / no
+  arx vs iask          0.880   0.077  1.0000  0.7805  0.7079  WRONG 144:99  p=0.0047   yes / no / no
+  gemini vs gpt-4o     0.777   0.076  1.0000  0.8811  0.7758  right 507:52  p=0.0000   yes / no / no
+  gpt-4o vs iask       0.813   0.070  1.0000  0.8600  0.7632  right 103:286 p=0.0000   yes / no / no
+  arx vs gpt-4o        0.802   0.070  0.8467  0.5476  0.5313  right 318:90  p=0.0000   no / no / no
+  gemini vs iask       0.845   0.079  0.5900  0.5100  0.5068  WRONG 328:62  p=0.0000   no / no / no
+  raw       frontier pairs separated at 0.975: 4 (wrong 1) -> after decline 4
+  shipped   frontier pairs separated at 0.975: 0 (wrong 0) -> after decline 0
+  frontier  frontier pairs separated at 0.975: 0 (wrong 0) -> after decline 0
+  the frontier fit is applied here across objects (fitted where s ~ 0.24, applied where s ~ 0.08): an extrapolation, printed for the readout only
+
+=== REGISTERED CRITERIA AND PREDICTION ===
+  (1) nominal >= 3 on the frontier fit at 0.975: in sample 0.000 (0 called, 0(0) wrong) | LOAO within the 75: 0.016 (1 called, 0(0) wrong)
+      largest nominal of any certificate on the 75: 0.187; arithmetic ceiling 1.875 -> FAIL, and unreachable by construction (needs >= 120 called edges)
+      calibration status of the frontier fit: UNDETERMINED (nominal < 3)
+      ALTERNATE READING (aggregate, sum(1 - c) over ALL 75 edges vs 26(13) observed wrong; NOT the scored definition):
+        raw Gaussian (tau = 0)         aggregate nominal    8.86 | ratio  2.93x | Poisson P(>= 26 | 8.86) = 0.000 -> aggregate OPTIMISTIC, detectably (P < 0.05)
+        shipped x12 fit                aggregate nominal   20.32 | ratio  1.28x | Poisson P(>= 26 | 20.32) = 0.127 -> aggregate OPTIMISTIC, not detectably
+        off-frontier fit, cold         aggregate nominal   14.08 | ratio  1.85x | Poisson P(>= 26 | 14.08) = 0.003 -> aggregate OPTIMISTIC, detectably (P < 0.05)
+        FRONTIER fit, in sample        aggregate nominal   24.32 | ratio  1.07x | Poisson P(>= 26 | 24.32) = 0.393 -> aggregate OPTIMISTIC, not detectably
+        FRONTIER fit, LOAO within 75   aggregate nominal   25.00 | ratio  1.04x | Poisson P(>= 26 | 25.00) = 0.447 -> aggregate OPTIMISTIC, not detectably
+        even under this reading the aggregate says nothing about the operating point: the called set at 0.975 carries nominal <= 1.875.
+  (2) b1 identified (established-label delta-deviance >= 3.84): 0.002 on 53 established edges -> FAIL; all-label 0.386; profile set [-9.8, 8.5] contains 0; bootstrap 95% [-22.21, +74.91]
+  criterion as a whole ('nominal >= 3 AND b1 identified'): FAIL
+  PREDICTION 'UNDETERMINED': holds - and by arithmetic, not by measurement: on 75 edges at 0.975 no fit can reach the nominal a status word needs.
+  PREDICTION 'frontier band BANDED by rule confirmed': the rule ('no ORDERED edge inside the frontier band under any fit') stands unchallenged:
+      no certificate on the frontier slice has a readable calibration status (max nominal 0.187 < 3), so no frontier edge can be ORDERED-JUDGED;
+      what the fits DO on the frontier at 0.975: raw 31 called / 5(2) wrong; shipped 4 / 0(0); frontier in-sample 0 / 0(0); frontier LOAO 1 / 0(0);
+      on the pooled tier object the frontier pairs separated after widener + decline are: raw 4, shipped 0, frontier fit 0.
+      Read: CONFIRMED in the item's sense (the test could not have overturned the rule at this support); this is confirmation by
+      unreachability, not a measurement that could have gone the other way. The measured content is the identification read in (C)
+      and the raw certificate's 5(2) wrong of 31 called on the frontier (16.1%).
+  elapsed 192 s

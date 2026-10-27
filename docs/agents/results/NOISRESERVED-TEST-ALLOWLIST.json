@@ -1,0 +1,145 @@
+{
+  "id": "NOISRESERVED-TEST-ALLOWLIST",
+  "title": "NOISRESERVED-TEST-ALLOWLIST: a line-level allowlist in NoIsReservedInSourceTest for the 7 recorded data_v2 hits (the red on main since d98b247)",
+  "question": "Can NoIsReservedInSourceTest be made green on main by a line-level allowlist in the test only (exact trimmed text, exact per-file counts, a stale-entry assertion), while a new hit still fails?",
+  "kind": "engineering",
+  "state": "done",
+  "registration": {
+    "commit": "no registration of its own: recorded as the KNOWN PRE-EXISTING RED ON main and queued by the registrar",
+    "program_lines": "docs/judge_v2_program.md L18093 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; BEFORE the pilot) — ARCH-V2-PILOT-K46 (k = 37) delta READY 286a1b0 (at 64ff708): READY TO RUN ...\", L18019-L18100)",
+    "program_lines_as_of": "re-grepped at 7e71cba",
+    "date": "2026-09-25 (queued)"
+  },
+  "script": {
+    "path": "src/test/kotlin/taxonomy/dataset/NoIsReservedInSourceTest.kt (merged on main at 7e71cba by path from small-fixes ae1b243)",
+    "sha16": "blob:b765bd1bb3631f102a5b64dc855af987c4c93ac4 / sha256-lf16:a558ca073900efb2 / sha256-crlf16:c4f6edc35c5b7ef4 (working tree CRLF); previously blob:ed65aa27bbd74b4a23194b63dc02c6ebf9751c8c",
+    "commit": "7e71cba (merge, parent c832a16); build ae1b243 (branch small-fixes, parent 4b85aff)"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_noisreserved_allowlist.md (blob:eff5bafc408554ce6b465773ec31a93ce38d3b5b; LF sha256 0e3d867ab378308680c9a8b70f5aa002c1e9aba856796e52ff76a3c6b973d64a)",
+    "commit": "c832a16"
+  },
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "docs/judge_v2_program.md L20164-L20220 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — BANNED-MODELS-REASON-CORRECTION MERGED at 52474d6 ... and NOISRESERVED-TEST-ALLOWLIST MERGED at 7e71cba after READY c832a16 ...\"), _as_of the commit that writes it, parent 7e71cba, re-grepped (the merge record, items 3-5; engineering, no outcome file under experiment_results)",
+    "outcome_commit": "7e71cba (the merge, by the orchestrator); the record: the commit that writes it (parent 7e71cba)",
+    "calls": 0,
+    "cce": 0,
+    "pool": "n/a (no DB opened)",
+    "date": "2026-09-25",
+    "post_merge_check": "RELAYED (orchestrator, on main): gradlew cleanTest test --offline --no-build-cache --tests taxonomy.dataset.NoIsReservedInSourceTest -> BUILD SUCCESSFUL, tests=2, failures=0",
+    "rule7": "PID 37772 (a leftover read-only python difflib of the ledger HTML from a completed registrar; no DB, no pool) present during the small-fixes Gradle runs; WAIVED by the orchestrator for that process only; not killed (the author may end it); registrar's check: python.exe, created 25/09/2026 19:53:46, command line 'python.exe -'"
+  },
+  "review": {
+    "file": "docs/reviews/READY_noisreserved_allowlist.md",
+    "commit": "c832a16",
+    "verdict": "READY (MERGEABLE by path; no merge condition; F3 is a pre-existing gap, DISCLOSED, recommended as its own queue item)"
+  },
+  "criteria": [
+    {
+      "id": "claim-1",
+      "text": "exactly 7 hits on main at the recorded lines",
+      "result": "HELD",
+      "value": "CONFIRMED by the reviewer's replay: 7 / 7, both trees",
+      "denominator": "3 data_v2 files"
+    },
+    {
+      "id": "claim-9/10",
+      "text": "an extra copy of an allowed line fails; a new hit still fails",
+      "result": "HELD",
+      "value": "M5 and M1, M2, M6, M7 killed",
+      "denominator": "5 mutants"
+    },
+    {
+      "id": "claim-11",
+      "text": "the stale-entry assertion fires",
+      "result": "HELD",
+      "value": "M4 killed",
+      "denominator": "1 mutant"
+    },
+    {
+      "id": "claim-13/14",
+      "text": "old blob red on exactly the 7 lines; new blob green",
+      "result": "HELD",
+      "value": "old 2 / 1 (7 lines); new 2 / 0",
+      "denominator": "2 tests"
+    },
+    {
+      "id": "claim-7",
+      "text": "guard_retired keeps it out of every view",
+      "result": "PARTIAL",
+      "value": "PARTLY: substance holds through guard_retired + gates.py --selftest (5); attribution overstated (F1)",
+      "denominator": "common.py L75-L80; gates.py L1122-L1146"
+    },
+    {
+      "id": "post-merge",
+      "text": "on main after the merge the test is green under cleanTest --no-build-cache",
+      "result": "HELD",
+      "value": "tests=2, failures=0 (relayed)",
+      "denominator": "2 tests"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none registered (engineering); the READY's rule: a surviving mutant among M1, M2, M4-M7 -> NOT READY",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "allowlist": "6 keys, counts 1,1,1,2,1,1 = 7 lines (the READY's row 8)",
+    "mutants": "M1, M2, M4, M5, M6, M7 killed; M3 (re-indent and move) passes as intended (7 run, under cleanTest --no-build-cache)",
+    "suite_READY": "451 tests, 2 known worktree-only failures (the READY's row 15)",
+    "post_merge_main": "tests=2, failures=0, BUILD SUCCESSFUL (relayed)",
+    "blob_after": "blob:b765bd1bb3631f102a5b64dc855af987c4c93ac4 / sha256-lf16:a558ca073900efb2 / sha256-crlf16:c4f6edc35c5b7ef4"
+  },
+  "findings": [
+    "F1 LOW: guard_retired alone is narrower than the claim 'keeps it out of every view' (checks only the response table's columns against RETIRED_NAMES); the pair guard_retired + gates.py --selftest (5) carries it; bracket written on L18093",
+    "F2 LOW: keys are trimmed TEXT + per-file count, not line numbers; a swap passes (delete one ingest.py SELECT-tail line, add identical text in a new reader); accepted, disclosed",
+    "F3 MEDIUM, PRE-EXISTING: the Gradle test task declares no input for tools/**, scripts/**, report/Figures/**, so a plain `test` reports UP-TO-DATE after a tools/ change; it may have hidden the red since d98b247; until fixed (queue GRADLE-TEST-INPUTS) every gate relying on this test uses cleanTest --no-build-cache or --rerun-tasks",
+    "F4 LOW, PRE-EXISTING: the scan skips every line containing 'legacy'; a reader of legacy_is_reserved / retired_legacy_flag is invisible to this test by construction",
+    "F5 INFO: on an over-count the failure lists every copy of the key"
+  ],
+  "sentence_of_record": "NOISRESERVED-TEST-ALLOWLIST (2026-09-25, zero calls): READY c832a16 (no merge condition) and MERGED at 7e71cba by path (NoIsReservedInSourceTest.kt blob ed65aa27 -> b765bd1b / sha256-lf16:a558ca073900efb2): a line-level allowlist (6 keys, 7 lines, exact counts, a stale-entry assertion) for the 7 recorded data_v2 hits; post-merge on main 2 tests / 0 failures under cleanTest --no-build-cache (relayed); the known red on main since d98b247 is CLEARED. [F3 MEDIUM, pre-existing: a plain gradlew test can report UP-TO-DATE after a tools/ change; gates on this test run cleanTest --no-build-cache until GRADLE-TEST-INPUTS merges.]",
+  "chips": [],
+  "chips_note": "no row of its own in docs/test_ledger.html (test hygiene, as VFC-FIXES-2); recorded at v290 as a bracket in row LCB-STAGE0-INTERACTION (whose merge carried this red as its third failure) and in the version note",
+  "brackets": [
+    {
+      "date": "2026-09-25",
+      "by": "registrar (zero calls; insertion only)",
+      "text": "READY c832a16, MERGED at 7e71cba; the red of L18093 CLEARED (bracket at L18093 with F1's two locks and F3's standing rule); NEW queue item GRADLE-TEST-INPUTS (drafted, own review); rule-7 waiver for PID 37772 recorded. docs/judge_v2_program.md L20164-L20220 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — BANNED-MODELS-REASON-CORRECTION MERGED at 52474d6 ... and NOISRESERVED-TEST-ALLOWLIST MERGED at 7e71cba after READY c832a16 ...\"), _as_of the commit that writes it, parent 7e71cba, re-grepped"
+    }
+  ],
+  "does_not_show": [
+    "the post-merge Gradle run or the suite counts as executed by the registrar (relayed; no log read)",
+    "that the allowlist catches a swap or a reader on a 'legacy' line (F2, F4)",
+    "that F3 masked the red since d98b247 (possible, not established)",
+    "that PID 37772 is read-only (the orchestrator's statement; its command line is 'python.exe -')"
+  ],
+  "ledger": {
+    "row_id": "none of its own (a bracket in row LCB-STAGE0-INTERACTION)",
+    "version": "v290 (2026-09-25: merged, red cleared; a bracket in row LCB-STAGE0-INTERACTION; no chip changed)"
+  },
+  "depends_on": [
+    "ARCH-V2-PILOT-K46 (F5; merge after its outcome)"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "clears the known red on main of L18093; closes no line of CONTEXT.md section 5; F3 stays open as GRADLE-TEST-INPUTS"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L20164-L20220 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — BANNED-MODELS-REASON-CORRECTION MERGED at 52474d6 ... and NOISRESERVED-TEST-ALLOWLIST MERGED at 7e71cba after READY c832a16 ...\"), _as_of the commit that writes it, parent 7e71cba, re-grepped",
+    "docs/reviews/READY_noisreserved_allowlist.md at c832a16 (read in full)",
+    "docs/judge_v2_program.md L18093, re-grepped at 7e71cba",
+    "git: c832a16, 7e71cba, ae1b243",
+    "the orchestrator's relay of 2026-09-25 (post-merge run, rule-7 waiver)"
+  ],
+  "last_update": "2026-09-25 (registrar: READY c832a16 and merge 7e71cba recorded; state done; ledger v290)",
+  "plain_description": {
+    "sq": "Engineering/infrastructure",
+    "what": "Fixes a source-code guard test that had been failing on main. The test now allows exactly 7 known, recorded lines, while any new matching line still fails. Mutation tests confirm it behaves this way.",
+    "why": "A guard test that is always red hides new problems. This makes it green again without weakening it.",
+    "information": "A green, strict test restores protection against code that mishandles reserved (held-out) data. Result: done and merged, and the known failure on main is cleared. Caveats: some swap cases may not be caught, and a plain Gradle run can skip the test after tool changes, so a clean rebuild is required.",
+    "written": "2026-10-07"
+  }
+}

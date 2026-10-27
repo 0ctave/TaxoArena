@@ -1,0 +1,180 @@
+{
+ "id": "CERT-PC-SIZE",
+ "title": "CERT-PC-SIZE: does the site-null certificate still certify the declared 14-category partition at G12's depth-1 site sizes (n 486 median, 441 p25; 5 stratified subsamples each)? (zero calls; site nulls; REGISTERED 2026-10-03)",
+ "question": "Is G12's 0 of 60 at depth-1 sizes a sensitivity limit of the certificate?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "the commit that writes it (parent 8841518b)",
+  "program_lines": "docs/judge_v2_program.md L23722-L23750",
+  "program_lines_as_of": "the commit that writes them, parent 8841518b, re-grepped",
+  "date": "2026-10-03",
+  "heading": "## Registered 2026-10-03 (before any code or call) — CERT-PC-SIZE: does the site-null certificate still certify the declared 14-category MMLU-Pro partition when the site is subsampled to G12's depth-1 site sizes (median 486, 25th percentile 441), where the tree's own splits got 0 of 60? (zero calls; no construction; site-null runs, CPU)",
+  "provenance": "the orchestrator's 5-hour schedule (8841518b) under the author's \"be autonomous\" and the autonomous-scheduling authorisation; criteria, Support, predictions, falsifier the registrar's"
+ },
+ "script": {
+  "path": "tools/analysis/cert_pc_size.py + certPositiveControl subsample flags",
+  "sha16": "cert_pc_size.py blob de39c648 (the builder's)",
+  "commit": "88bbf560 (branch cert-pc-size), merged to main 401c64a5"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_cert_pc_size.md",
+  "commit": "fc1d1fe5"
+ },
+ "go": "autonomous-scheduling authorisation; the author's \"schedule the continuation of testing for the next 5 hours, and be autonomous\"",
+ "run": {
+  "outcome_file": "rp12-r2-run experiment_results/cert_pc_size/outcome.txt (sha256-lf16:6f01fbb56eb0b486; untracked, never committed) + pcs_sites.csv (7e5fb38e8cc2e989)",
+  "outcome_commit": "ops 11752248 (rp12-r2-run at 88bbf560); backup E:\\TaxoArena_backup_2026-10-03_cert_pc_size (SHA256SUMS 6/6 OK)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "pv2_1575de61bb20e977 (B0-2 check); emb hashes before == after",
+  "date": "2026-10-03"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_cert_pc_size.md",
+  "commit": "541fde40",
+  "verdict": "VALID (W-1..W-4)"
+ },
+ "criteria": [
+  {
+   "id": "IDENTITY",
+   "text": "precondition: the full-size root reproduces 0.107803 and k_d 0",
+   "result": "HELD",
+   "value": "reproduced PC1: 0.107803, k_d 0, null p95 / max 0.041626 / 0.042414",
+   "denominator": "5 stratified subsamples per size (n 486, 441; 264 descriptive), each a site with 300 null replicates (DEFF 1.0 by construction)"
+  },
+  {
+   "id": "PS1",
+   "text": "n 486: CERTIFIED-AT-SIZE iff >= 4 of 5 subsamples certified (k_d <= 14, C0 comparable); NOT-CERTIFIED-AT-SIZE iff <= 1; MIXED otherwise; NOT EVALUABLE if >= 2 fail C0 (the POINT of the counts decides). Verdict line: SCOREABLE as a classification",
+   "result": "HELD",
+   "value": "CERTIFIED-AT-SIZE (n 486): 5 of 5 certified, k_d 0 of 300 each, C0 comparable 5/5; gate not exercised",
+   "denominator": "5 stratified subsamples per size (n 486, 441; 264 descriptive), each a site with 300 null replicates (DEFF 1.0 by construction)"
+  },
+  {
+   "id": "PS2",
+   "text": "n 441: the same rule",
+   "result": "HELD",
+   "value": "CERTIFIED-AT-SIZE (n 441): 5 of 5; NOT an independent replicate of PS1 (D-5: 207-260 of 441 shared)",
+   "denominator": "5 stratified subsamples per size (n 486, 441; 264 descriptive), each a site with 300 null replicates (DEFF 1.0 by construction)"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "PS1 CERTIFIED-AT-SIZE 0.55, MIXED 0.20, NOT-CERTIFIED-AT-SIZE 0.25",
+   "result": "n/a",
+   "value": "CERTIFIED-AT-SIZE occurred (prior 0.55); 3-way Brier 0.3050",
+   "denominator": "5 stratified subsamples per size (n 486, 441; 264 descriptive), each a site with 300 null replicates (DEFF 1.0 by construction)"
+  },
+  {
+   "id": "P2",
+   "text": "PS2 CERTIFIED-AT-SIZE 0.50",
+   "result": "HELD",
+   "value": "PS2 CERTIFIED-AT-SIZE (p 0.50); Brier 0.2500",
+   "denominator": "5 stratified subsamples per size (n 486, 441; 264 descriptive), each a site with 300 null replicates (DEFF 1.0 by construction)"
+  },
+  {
+   "id": "P3",
+   "text": "n 486 median declared statistic 0.11 [0.09, 0.14]; null p95 0.07 [0.05, 0.10]",
+   "result": "HELD",
+   "value": "median declared 0.108987 in [0.09, 0.14]; null p95 0.055332 in [0.05, 0.10]",
+   "denominator": "5 stratified subsamples per size (n 486, 441; 264 descriptive), each a site with 300 null replicates (DEFF 1.0 by construction)"
+  },
+  {
+   "id": "P4",
+   "text": "C0 comparable on every subsample 0.85",
+   "result": "HELD",
+   "value": "C0 comparable 15 of 15; Brier 0.0225",
+   "denominator": "5 stratified subsamples per size (n 486, 441; 264 descriptive), each a site with 300 null replicates (DEFF 1.0 by construction)"
+  }
+ ],
+ "falsifier": {
+  "text": "F-PS fires iff PS1 NOT-CERTIFIED-AT-SIZE: G12's 0 of 60 at depth 1 is read as a sensitivity limit at those sizes; if CERTIFIED-AT-SIZE, N-1's empty set reads 'the tree's depth-1 splits are less separated than the declared level at the same n' (k and population caveats). F-TAX N-1 and F2 stand.",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "PS1": "n 486: 5 of 5 certified (k_d 0/300 each)",
+  "PS2": "n 441: 5 of 5 certified (overlaps PS1, 47-59%)",
+  "n264": "5 of 5 (descriptive)",
+  "statistics": "declared 0.103843-0.118311 vs null max 0.053578-0.062095; C0 p95 0.002205-0.004715 vs null p95 0.048377-0.056704",
+  "G12_beside": "13 of G12's 14 TOP splits below their own null median (G12 site null of record; descriptive)"
+ },
+ "sentence_of_record": "On R2's B0 MMLU_PRO_LB member root (draw 5a3e756 TRAIN; qwen3 512-slice; sepBar 0.0145; 300 reps), the declared 14-category MMLU-Pro partition, stratified-subsampled to G12's depth-1 site sizes, is CERTIFIED by its own site null at n 486 (PS1, 5 of 5 subsamples) and n 441 (PS2, 5 of 5), and descriptively at n 264 (5 of 5); k_d 0 of 300 everywhere (p 1/301); C0 comparable 15 of 15. [\"The site-null certificate is not size-limited at G12's depth-1 sizes for structure of the declared 14-category strength: its bar there (null p95 about 0.05-0.06) is cleared with margin. G12's 0 of 60 is therefore NOT explained by n alone. The tree's data-driven depth-1 splits are less separated than the declared level at the same n, and 13 of G12's 14 TOP splits fall below their own null median.\" Mandatory caveats beside it: (i) NOT k-matched: 14 groups vs 2. (ii) NOT population-matched: all categories vs within one anchor; CERT-POSITIVE-CONTROL's PC3, descriptive, found 0 of 14 declared src partitions certified inside anchors, src geometry unknown. (iii) Nothing is shown about whether certifiable 2-way structure EXISTS inside an anchor, nor about the certificate's power for it there. F-TAX N-1 and F2 stand.]",
+ "chips": [
+  "REGISTERED 2026-10-03, BEFORE ANY CODE; not built",
+  "VALID (POST-RUN 541fde40): PS1, PS2 CERTIFIED-AT-SIZE 5/5; F-PS NOT FIRED",
+  "NOT SIZE-LIMITED FOR DECLARED-STRENGTH STRUCTURE; NOT k- OR POPULATION-MATCHED; NOTHING ON 2-WAY STRUCTURE INSIDE AN ANCHOR; PS2 OVERLAPS PS1; F-TAX N-1, F2 STAND; D-1 OWED"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-03",
+   "by": "registrar (pre-data rulings Q-1, Q-2)",
+   "text": "NOT EVALUABLE gate read first (CR-3); a DEGENERATE subsample counts toward the >= 2 gate with C0 failures (Support (g)); counts printed. section \"## Registrar's record 2026-10-03 (insertion only; zero calls; nothing run; pre-data) — CERT-PC-SIZE built ...\" (L23767-L23772, _as_of the commit that writes it, parent 484b9129)"
+  },
+  {
+   "date": "2026-10-03",
+   "by": "registrar (POSTRUN 541fde40)",
+   "text": "outcome recorded; CPC's W-2 superseded for the size question only. docs/judge_v2_program.md L23782-L23792 (section \"## CERT-PC-SIZE (2026-10-03, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent 541fde40)"
+  },
+  {
+   "date": "2026-10-03",
+   "by": "registrar",
+   "text": "merged to main 401c64a5. section \"## Registrar's record 2026-10-03 (insertion only; zero calls; nothing run; pre-data) — INTENT-TRANSFER-S1 READY ...\" (L23794-L23799, _as_of the commit that writes it, parent f6485dee)"
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (consistency check 2026-10-04; zero calls)",
+   "text": "the 'chips' list had drifted from the ledger row's chips (wording or replaced chips); the chips of record are the ledger's, copied verbatim into 'chips_ledger_verbatim' (ledger v379); 'chips' is kept as history."
+  }
+ ],
+ "does_not_show": [
+  "a certificate of any tree site",
+  "power for 2-3-way splits or within one anchor (k, population not matched)",
+  "other members, draws, slices or recipes",
+  "geometric clusters; a mode test"
+ ],
+ "ledger": {
+  "row_id": "CERT-PC-SIZE",
+  "version": "v358 (2026-10-03: OUTCOME bracket, OK + WARN chips) | v355 (2026-10-03: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "CERT-POSITIVE-CONTROL",
+  "ARCH-V2-E-T-R2"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "3 sizes x 5 subsamples x (300-rep null + C0), about 35 min per size (estimate)",
+  "agent_hours": "engine-coder about 1.5 h",
+  "reads_pool": true
+ },
+ "outputs": "never committed: pinned by sha256, backed up to E: (memory bulky-outputs-not-in-git)",
+ "sources": [
+  "docs/judge_v2_program.md L23722-L23750 (section \"## Registered 2026-10-03 (before any code or call) — CERT-PC-SIZE: does the site-null certificate still certify the decl ...\"; _as_of the commit that writes it, parent 8841518b, re-grepped)",
+  "docs/agents/results/CERT-POSITIVE-CONTROL.json (PC1, W-2)",
+  "experiment_results/archv2/rp12_r2/g12/G12_sites.csv (depth-1 n)",
+  "docs/agents/plans/2026-10-03_5h_schedule.md (8841518b)",
+  "docs/judge_v2_program.md L23782-L23792 (section \"## CERT-PC-SIZE (2026-10-03, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent 541fde40)",
+  "docs/reviews/POSTRUN_cert_pc_size.md (541fde40)"
+ ],
+ "last_update": "2026-10-04",
+ "chips_ledger_verbatim": [
+  "plan: REGISTERED 2026-10-03, BEFORE ANY CODE; not built",
+  "ok: VALID (POST-RUN 541fde40): PS1, PS2 CERTIFIED-AT-SIZE 5/5; F-PS NOT FIRED",
+  "warn: NOT SIZE-LIMITED FOR DECLARED-STRENGTH STRUCTURE; NOT k- OR POPULATION-MATCHED; NOTHING ON 2-WAY STRUCTURE INSIDE AN ANCHOR; PS2 OVERLAPS PS1; F-TAX N-1, F2 STAND"
+ ],
+ "plain_description": {
+  "sq": "SQ3 Taxonomy",
+  "what": "Takes the 14 declared MMLU-Pro subject categories and shrinks them to the small sample sizes of the tree's first-level splits (486, 441 and 264 questions). It then checks whether the split certificate, which compares against random reshuffles, still certifies them. No judge calls.",
+  "why": "An earlier test certified 0 of 60 first-level tree splits. This test checks whether that happened only because the samples were too small for the certificate.",
+  "information": "If the known-real categories fail at these sizes, the earlier zero means nothing. If they pass, the tree's splits really are weaker. Result: the declared categories were certified in 5 of 5 subsamples at every size. So the certificate is not limited by sample size here, and the tree's own first-level splits are less separated than the declared categories. Caveat: this compares 14 groups against 2-way splits, on different populations.",
+  "written": "2026-10-07"
+ }
+}

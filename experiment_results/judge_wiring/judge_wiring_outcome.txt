@@ -1,0 +1,15 @@
+=== JUDGE-WIRING: Kotlin recipe path vs the Python RECIPE-GROK cache on the frozen 600-match set (hash ae92da306544f453) ===
+  Kotlin db experiment_results\judge_wiring\kotlin_ae92da306544f453.db | run_meta: judge grok-4-1-fast-non-reasoning | recipe STACK-v2 | max_tokens 8192 | temperature omitted | kit 4ac924b429a578eee308997a307523d455e91cca7169aee167f35919300e504b | fingerprint e8c7edbc45f50a24 | set ae92da306544f453 | started 2026-09-16T08:15:28
+  Python cache experiment_results\x12_crossdomain\stack_v2_promptv2_grok.db | judge grok-4-1-fast-non-reasoning | max_tokens 8192 | temperature omitted | kit of record 4ac924b429a578eee308997a307523d455e91cca7169aee167f35919300e504b
+  paired 600 of 600 (complete)
+  payload sha equality (Kotlin posted bytes == Python bytes, both orders): 600/600
+  Kotlin finish_reason over 1200 calls: {'stop': 1199, 'length': 1} | matches touched by the NON_TERMINATED rule: 1 (the Python cache had no such rule; expected 0 at 8192)
+  invalid: Kotlin 2 | Python 0
+  raw 3-way agreement (winner identical incl. TIE/INVALID): 0.888 | tie rate Kotlin 0.274 vs Python 0.273 | flip rate Kotlin 0.206 vs Python 0.204 (valid n=598)
+  key-decidable paired matches: 276
+  convention A (TIE / INVALID / non-terminated wrong): Kotlin 0.837 (n=276) vs Python 0.848 (n=276) | delta -1.1pp  95% CI [-3.2, +0.7]pp (question-clustered bootstrap) | McNemar discordant 3:6 p=0.5078 (full key-decidable set, n=276) -> OK
+  convention B (committed verdicts only):        Kotlin 0.888 (n=260) vs Python 0.914 (n=256) | delta -2.6pp  95% CI [-4.7, -0.6]pp (question-clustered bootstrap) | McNemar discordant 3:6 p=0.5078 (full key-decidable set, n=276) -> FAIL
+                                                 McNemar discordant 0:2 p=0.5000 (both arms committed, n=251 of 276 key-decidable)
+  test-retest floor of the deployed judge on byte-identical prompts: 0.057 (DECOMP); a paired delta inside +/-1.9pp is within that floor
+  JUDGE-WIRING REGISTERED (|delta| <= 1.9pp under both conventions): FAIL
+  consequence on FAIL: no mixed-judge board until a whole-board re-judge (FRAMEWORK.md item 25)

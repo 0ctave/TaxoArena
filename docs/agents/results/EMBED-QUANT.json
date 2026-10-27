@@ -1,0 +1,176 @@
+{
+  "id": "EMBED-QUANT",
+  "title": "EMBED-QUANT: is qwen3-embedding's Q4_K_M quantisation a confound of the intent-corpus embedder contrasts (EQ1 TOST of fine NMI at d_q* = 1024, Q8_0 vs Q4_K_M, within the in-run seed spread)? (zero calls; done: NOT-A-CONFOUND on the two SCOREABLE corpora)",
+  "question": "Is qwen3-embedding's Q4_K_M quantisation a confound of the intent-corpus embedder contrasts, i.e. is fine NMI at d_q* equivalent between Q4_K_M and a higher-precision tag (Q8_0) within the k-means seed spread?",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "the commit that writes this record (parent eb161866)",
+    "program_lines": "docs/judge_v2_program.md L22738-L22760",
+    "program_lines_as_of": "the commit that writes them, parent eb161866, re-grepped",
+    "date": "2026-10-01",
+    "heading": "## Registered 2026-10-01 (before any code or call) — EMBED-QUANT: is qwen3-embedding's Q4_K_M quantisation a confound of the intent-corpus embedder contrasts, ...",
+    "provenance": "docs/agents/plans/2026-10-02_next_registrations.md (ce0d0f17) section '## 4. EMBED-QUANT (OPTION for the author; ...)', registered as drafted; the author's go \"yes download it and run the quant test\" (plan Amendment 33); tag qwen3-embedding:8b-q8_0 over F16 (C: 25 GB free; the orchestrator's brief)"
+  },
+  "script": {
+    "path": "tools/analysis/embed_quant_writer.py + tools/analysis/embed_quant.py (+ experiment_configs/embed_quant_pins.json blob:e3b5bdd33e694886ab58d7903bbd3a9e18335dcd, \"q8\": null) [2026-10-01 registrar: \"q8\" pinned 771666bc... (sha256-bytes), C-EQ-4]",
+    "sha16": "writer blob:1b2abdc8617f84f3 / readout blob:3930cf4bc5e77beb (git blob, LF; no CRLF rendering per the review)",
+    "commit": "31b3c69c (merged 04954aee)"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_embed_quant.md",
+    "commit": "9ad94e12",
+    "verdict": "MERGEABLE by path; READY for the writer --embed --go then the readout --run after the registrar pins the Q8 file, under C-EQ-1..C-EQ-5 (C-EQ-1 discharged 2026-10-01); D1 MEDIUM owed, D2/D3 LOW"
+  },
+  "go": "plan Amendment 33: the author's \"yes download it and run the quant test\" (download ~8 GB Q8_0; 0 calls, the 4k-match rule not engaged)",
+  "run": {
+    "outcome_file": "experiment_results/embed_quant/outcome.txt (blob:23c931f2f8dd5a31aaea480bb2cbb758281ba9d9, LF, git hash-object; nmi_q.csv, cos_q.csv, readout_run.txt)",
+    "outcome_commit": "eec43e8d",
+    "calls": 0,
+    "cce": 0,
+    "pool": "none (S0's intent DBs; pins ingest 487e0093719c184c / Q4 9e100e04fc91b137 / Q8 771666bc8563d972, sha256-bytes, unchanged before/after)",
+    "date": "2026-10-01",
+    "script": "tools/analysis/embed_quant.py blob:3930cf4bc5e77bebd38309c74cf4ecf8eeba74d0 (LF; CRLF 8fa995b9d6729ac0 per the review); writer blob:1b2abdc8617f84f3cfd00c9778e3bbb94ae63d6f (LF)"
+  },
+  "review": {
+    "file": "docs/reviews/POSTRUN_embed_quant.md",
+    "commit": "0342bb94",
+    "verdict": "VALID; EQ1 NOT-A-CONFOUND recomputed to the digit, decided by MASSIVE + Banking77 (SCOREABLE); CLINC DESCRIPTIVE-ONLY; C-EQ-5 DEFF re-measured; wording conditions W-EQ-1..W-EQ-4 (applied by the registrar); D1 MEDIUM still OWED"
+  },
+  "criteria": [
+    {
+      "id": "IDENTITY",
+      "text": "precondition (refuses, no readout): the Q4 arm at d 1024, seeds 0-4, reproduces EMBED-DIM-SLICE's qwen3@1024 seed-mean EVAL fine NMI 0.76554 / 0.92810 / 0.84900 and spreads 0.01428 / 0.00417 / 0.01043 (5 dp)",
+      "result": "HELD",
+      "value": "REPRODUCED: Q4 seeds 0-4 NMI 0.76554 / 0.92810 / 0.84900; spreads 0.01428 / 0.00417 / 0.01043",
+      "denominator": "3 corpora"
+    },
+    {
+      "id": "EQ1",
+      "text": "DECIDING; TOST; the INTERVAL decides EQUIVALENT, POINT AND INTERVAL decide DIFFERENT: per corpus D_q = mean_{s=0..19} NMI_EVAL(Q8, 1024) - mean_{s=0..19} NMI_EVAL(Q4, 1024) at K_f 60/150/77; delta_c = in-run max-min over seeds 0-4 of the Q4 arm's EVAL fine NMI; SE_total = sqrt(SE_boot^2 + var_seed/20), var_seed = sample variance over 20 seeds of the per-seed Q8-Q4 difference; EQUIVALENT iff D_q +/- 1.645 SE_total inside +/-delta_c; DIFFERENT iff |D_q| > delta_c AND D_q +/- 1.96 SE_total excludes 0; NEITHER otherwise. NOT-A-CONFOUND iff EQUIVALENT on >= 2 of 3; CONFOUND-CANDIDATE iff DIFFERENT on >= 2 of 3; MIXED (UNDETERMINED) otherwise",
+      "result": "HELD",
+      "value": "NOT-A-CONFOUND (EQUIVALENT on MASSIVE and Banking77, the two SCOREABLE corpora; CLINC EQUIVALENT DESCRIPTIVE-ONLY): D_q MASSIVE +0.00030, 90% [-0.00340, +0.00401] inside +/-0.01428; Banking77 +0.00091, [-0.00215, +0.00397] inside +/-0.01043; CLINC +0.00090, [-0.00168, +0.00348] inside +/-0.00417 (descriptive; NEITHER under the registration's transported SE_boot, per the review); DIFFERENT on 0",
+      "denominator": "EVAL fine: MASSIVE 4,946 items / 4,923 components; CLINC 6,672 / 6,672; Banking77 3,908 / 3,905; 20 seeds per arm"
+    },
+    {
+      "id": "EQ2",
+      "text": "DESCRIPTIVE-ONLY: per-text cos(Q8, Q4) at d_q* renormalised; median and min over 57,350 texts and per corpus",
+      "result": "n/a",
+      "value": "DESCRIPTIVE-ONLY: median cos(Q8, Q4) 0.992032, min 0.873615 (57,350 texts); per corpus median 0.992396 / 0.992212 / 0.991429",
+      "denominator": "57,350 texts"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "verdict NOT-A-CONFOUND 0.70, CONFOUND-CANDIDATE 0.10, MIXED 0.20",
+      "result": "HELD",
+      "value": "event NOT-A-CONFOUND true; Briers 0.0900 / 0.0100 / 0.0400 (one-vs-rest)",
+      "denominator": "EQ1 verdict"
+    },
+    {
+      "id": "P2",
+      "text": "|D_q| 0.003 [0.000, 0.010] on each corpus (80%; the draft names no level)",
+      "result": "HELD",
+      "value": "|D_q| 0.00030 / 0.00090 / 0.00091, all in [0.000, 0.010] (3 of 3)",
+      "denominator": "3 corpora"
+    },
+    {
+      "id": "P3",
+      "text": "median cos(Q8, Q4) at d_q* >= 0.98: 0.85",
+      "result": "HELD",
+      "value": "median 0.992032; Brier 0.0225",
+      "denominator": "57,350 texts"
+    }
+  ],
+  "falsifier": {
+    "text": "F-EQ fires iff EQ1 reads CONFOUND-CANDIDATE: overturns the use of the Q4 tag as 'qwen3' in every intent-corpus embedder contrast (S0 C1a, SLOTSWAP M3, EMBED-DIM-SLICE DS1, CARD-PROTOCOL CP1); those rows then carry 'Q4_K_M; the higher-precision model differs'",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "support": "DEFF (Kish, measured in S0) 1.0093 / 1.0000 / 1.0015; n_eff 4,900 / 6,672 / 3,902; SE_boot transported from S0 0.00289 / 0.00137 / 0.00247; paired seed term 0.00194 / 0.00057 / 0.00142; SE_total 0.00348 / 0.00148 / 0.00285; 90% half-widths 0.00573 / 0.00244 / 0.00469; planning delta_c 0.01428 / 0.00417 / 0.01043 (EMBED-DIM-SLICE qwen3@1024)",
+    "mde": "TOST MDE80 (delta - |D_true|) 2.487 x SE_total = 0.00865 / 0.00368 / 0.00709; DIFFERENT at 80% needs |D_true| >= 0.01721 / 0.00542 / 0.01283",
+    "verdict_line": "at |D_q| = 0.003: MASSIVE SCOREABLE (0.01128 > 0.00865), CLINC DESCRIPTIVE-ONLY (0.00117 < 0.00368), Banking77 SCOREABLE thin (0.00743 > 0.00709); EQ1 SCOREABLE as a 2-of-3 rule resting on MASSIVE AND Banking77; EQ2 DESCRIPTIVE-ONLY",
+    "structural_leg": "delta_c is a seed spread fixed by the corpus; at infinite budget EQUIVALENT iff |D_true| < delta_c, DIFFERENT iff > delta_c; all three verdicts reachable",
+    "EQ1_D_q": "MASSIVE +0.00030 (90% [-0.00340, +0.00401]; 4,946 EVAL items), CLINC +0.00090 ([-0.00168, +0.00348]; 6,672; DESCRIPTIVE-ONLY), Banking77 +0.00091 ([-0.00215, +0.00397]; 3,908); delta_c 0.01428 / 0.00417 / 0.01043; 20 seeds per arm",
+    "support_as_run": "DEFF re-measured (C-EQ-5) 1.0093 / 1.0000 / 1.0015, n_eff 4,900 / 6,672 / 3,902; SE_boot 0.00093 / 0.00041 / 0.00076; seed term 0.00205 / 0.00151 / 0.00170; SE_total 0.00226 / 0.00157 / 0.00186; TOST MDE80 0.00561 / 0.00390 / 0.00463",
+    "CLINC_basic_95": "[+0.00009, +0.00168] (descriptive; item bootstrap, partitions fixed; reviewer's stream [+0.00000, +0.00173]): a small Q8-higher item-level shift, not a seed-robust difference, never DIFFERENT",
+    "EQ2": "median 0.992032, min 0.873615 over 57,350 texts"
+  },
+  "sentence_of_record": "EMBED-QUANT (2026-10-01, 0 calls; run eec43e8d, post-run review 0342bb94 VALID): Q4_K_M vs Q8_0: EQUIVALENT within the seed spread at d 1024 on MASSIVE (D_q +0.00030, 90% [-0.00340, +0.00401] inside +/-0.01428; 4,946 EVAL items) and Banking77 (+0.00091, [-0.00215, +0.00397] inside +/-0.01043; 3,908), the two SCOREABLE corpora (TOST; CLINC EQUIVALENT DESCRIPTIVE-ONLY); EQ1 NOT-A-CONFOUND, F-EQ not fired. [qwen3 precision above Q8_0 untested: the quantisation tag is narrowed to \"quantisation: Q4_K_M ~ Q8_0 (EMBED-QUANT); above Q8_0 untested; prompts RAW\", not deleted; CLINC's BASIC interval is a small item-level shift, never DIFFERENT; quantisation is not shown to explain gemma's edge (the shift's upper bound, about +0.004, is about a tenth of the edge); prompts stay uncontrolled until CP1; the embedder of record (qwen3) is unchanged; D3 is the author's]",
+  "chips": [
+    "REGISTERED; not built [plan]",
+    "READY 9ad94e12 / MERGED 04954aee (C-EQ-1..5) [plan]",
+    "VALID (POST-RUN 0342bb94); RUN eec43e8d: EQ1 NOT-A-CONFOUND (EQUIVALENT ON MASSIVE, BANKING77, THE TWO SCOREABLE; CLINC EQUIVALENT DESCRIPTIVE-ONLY); F-EQ NOT FIRED [ok]",
+    "Q4_K_M ~ Q8_0 ONLY; ABOVE Q8_0 UNTESTED; PROMPTS RAW UNCONTROLLED; NOT SHOWN TO EXPLAIN GEMMA&#x27;S EDGE; EMBEDDER OF RECORD UNCHANGED [warn]"
+  ],
+  "brackets": [
+    {
+      "date": "2026-10-01",
+      "by": "registrar (C-EQ-1; zero calls)",
+      "text": "QB1-QB6 recorded at the INSTRUMENT line: QB1 two new scripts importing S0 and embedder_arms.py unchanged (embedder_arms blob pinned in S0 DB metadata); QB2 route parity Q8 vs Q8 only, cos(Q8, Q4) printed with no bar; QB3 SE_boot = SD of paired draws, BASIC interval descriptive; QB4 S0 C1 fine stream, paired; QB5 EQ2 per corpus over kept rows; QB6 P1 one-vs-rest Briers, P2 inclusive. D2 (dry-run re-reads Q4 EVAL) recorded. D1 MEDIUM (three writer guards not selftested) OWED, no effect on this run. Criteria, Support, predictions, falsifier unchanged."
+    },
+    {
+      "date": "2026-10-01",
+      "by": "registrar",
+      "text": "C-EQ-4 discharged: experiment_configs/embed_quant_pins.json \"q8\" = sha256-bytes 771666bc8563d972f6c3fea4d987925365cdcb0ce7f56815a8436d0a9fd26266 (intent_emb_qwen3_q8.db, 57,350 texts, qwen3-embedding:8b-q8_0), from writer_go2.log (a874b922), re-hashed (match). Writer COMPLETE after one resume (background time limit at 51,584); T4 resume parity PASS min 0.999848; T3 repeatability PASS; T2 cos(Q8, Q4) on 20 texts printed with no bar: median 0.991307-0.991525, min 0.976993-0.979189 over slices 256/1024/4096. Pre-data; state stays READY. docs/judge_v2_program.md L22826-L22831 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data) — EMBED-QUANT Q8 file pinned (C-EQ-4): ...\"; _as_of the commit that writes it, parent a874b922, re-grepped)"
+    },
+    {
+      "date": "2026-10-01",
+      "by": "registrar (per docs/reviews/POSTRUN_embed_quant.md (0342bb94))",
+      "text": "OUTCOME recorded, VALID; W-EQ-1..4 applied (narrowed tag; never '3 of 3' without CLINC's descriptive status; CLINC BASIC never DIFFERENT; not shown to explain gemma's edge, prompts uncontrolled until CP1, embedder of record unchanged); C-EQ-5 DEFF re-measured by the reviewer; D1 still OWED; EMBED-DIM-SLICE's quantisation tag narrowed (bracket + chip); docs/judge_v2_program.md L22833-L22844 (section \"## EMBED-QUANT (2026-10-01, 0 calls) — VALID (post-run review docs/reviews/POSTRUN_embed_quant.md, 0342bb94): EQ1 NOT-A-CONFOUND ...\"; _as_of the commit that writes it, parent 0342bb94, re-grepped)"
+    }
+  ],
+  "does_not_show": [
+    "that quantisation explains gemma's edge (Q4->Q8 90% upper bound about +0.004 vs DS1 edge +0.03329 / +0.04386)",
+    "that the edge is a property of the models: prompts RAW, uncontrolled until CP1",
+    "anything about F16/BF16 or full precision (Q8_0 is itself quantised), or gemma's precision",
+    "slices other than 1024, card prompts, MMLU-Pro",
+    "a change of the embedder of record (qwen3 stays; D3 is the author's); never 'gemma is the better embedder'",
+    "a seed-robust CLINC difference"
+  ],
+  "ledger": {
+    "row_id": "EMBED-QUANT",
+    "version": "v333 (2026-10-01: OUTCOME bracket, three chips) | v331 (2026-10-01: new row, PLAN chip)"
+  },
+  "depends_on": [
+    "EMBED-DIM-SLICE",
+    "INTENT-TRANSFER-S0"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "value": false,
+    "text": "closes nothing; CONTEXT §5 lines not touched"
+  },
+  "cost": {
+    "calls": 0,
+    "cce": 0,
+    "download": "~8 GB (qwen3-embedding:8b-q8_0)",
+    "embeddings": "57,350 texts, one Ollama qwen3 pass, planning 60-150 min (unsourced)",
+    "cpu": "~1 h"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L22738-L22760 (section \"## Registered 2026-10-01 (before any code or call) — EMBED-QUANT: is qwen3-embedding's Q4_K_M quantisation a confound of the intent-corpus embedder contrasts, ...\"; _as_of the commit that writes it, parent eb161866, re-grepped)",
+    "docs/agents/plans/2026-10-02_next_registrations.md §4 (ce0d0f17)",
+    "docs/plan_2026-09-15.md Amendment 33",
+    "experiment_results/embed_dim_slice/outcome.txt blob:b183890b (qwen3@1024 NMI, spreads, measured SE(D*))",
+    "docs/agents/results/INTENT-TRANSFER-S0.json (emb_pins; Kish)",
+    "docs/reviews/READY_embed_quant.md (9ad94e12): QB1/QB2, D1, D2, pins, C-EQ-1..5",
+    "tools/analysis/embed_quant.py docstring \"BUILDER'S READINGS\": QB3-QB6",
+    "docs/judge_v2_program.md L22819-L22824 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data) — EMBED-QUANT READY (C-EQ-1 bracketed: QB1-QB6, D2, D1 owed); ...\"; _as_of the commit that writes it, parent 04954aee, re-grepped)",
+    "experiment_results/embed_quant/writer_go.log, writer_go2.log (a874b922); docs/judge_v2_program.md L22826-L22831",
+    "experiment_results/embed_quant/outcome.txt (eec43e8d)",
+    "docs/reviews/POSTRUN_embed_quant.md (0342bb94): verdict, DEFF re-measure, W-EQ-1..4, CLINC transported-SE sensitivity",
+    "docs/judge_v2_program.md L22833-L22844 (section \"## EMBED-QUANT (2026-10-01, 0 calls) — VALID (post-run review docs/reviews/POSTRUN_embed_quant.md, 0342bb94): EQ1 NOT-A-CONFOUND ...\"; _as_of the commit that writes it, parent 0342bb94, re-grepped)"
+  ],
+  "last_update": "2026-10-01",
+  "owed": "D1 (MEDIUM, READY_embed_quant 9ad94e12): three writer guards not selftested; no effect on this run",
+  "plain_description": {
+    "sq": "SQ5 Invariance",
+    "what": "Clusters three intent datasets (MASSIVE, Banking77, CLINC) with k-means using the qwen3 embedding model at two compression levels (4-bit Q4_K_M vs 8-bit Q8_0) and checks whether cluster quality is the same within the normal seed-to-seed noise.",
+    "why": "The thesis uses a compressed embedder; if compression changed the clusters, embedder comparisons could be an artefact of compression.",
+    "information": "Equivalence clears compression as a confound; a difference would require re-running with higher precision. Result: done; equivalent within seed noise on MASSIVE and Banking77 (CLINC equivalent but descriptive only), so not a confound between these two levels. Precision above 8-bit is untested, and it does not explain why another embedder (gemma) scored higher.",
+    "written": "2026-10-07"
+  }
+}

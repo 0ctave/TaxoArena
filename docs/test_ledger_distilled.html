@@ -1,0 +1,195 @@
+<title>TaxoArena Distilled</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --paper:#F6F5F1; --ink:#1F2A33; --muted:#5B6770; --rule:#D9DBD3; --card:#FFFFFF;
+    --accent:#1C5D6B; --accent-soft:#E2ECEE;
+    --pass:#2E6B4A; --pass-soft:#E1EEE6; --fail:#9A3B2E; --fail-soft:#F4E3DF; --und:#8A6A1E; --und-soft:#F3EBD6;
+    --mono-bg:#EEF0EB;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:#151A1D; --ink:#E3E6E1; --muted:#98A3A8; --rule:#2B3438; --card:#1C2327;
+      --accent:#6FB3C2; --accent-soft:#17303A;
+      --pass:#7CC49B; --pass-soft:#16302A; --fail:#E3907F; --fail-soft:#3A2220; --und:#D8B25A; --und-soft:#332A12;
+      --mono-bg:#222B2F;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:#151A1D; --ink:#E3E6E1; --muted:#98A3A8; --rule:#2B3438; --card:#1C2327;
+    --accent:#6FB3C2; --accent-soft:#17303A;
+    --pass:#7CC49B; --pass-soft:#16302A; --fail:#E3907F; --fail-soft:#3A2220; --und:#D8B25A; --und-soft:#332A12;
+    --mono-bg:#222B2F;
+  }
+  body { background:var(--paper); color:var(--ink); margin:0; font-family:"Source Sans 3",system-ui,sans-serif; font-size:16px; line-height:1.55; }
+  .wrap { max-width:76ch; margin:0 auto; padding-block:3rem 5rem; padding-inline:1.25rem; }
+  h1 { font-family:"Newsreader",Georgia,serif; font-weight:600; font-size:2.4rem; line-height:1.1; margin:0 0 .5rem; text-wrap:balance; }
+  h2 { font-family:"Newsreader",Georgia,serif; font-weight:600; font-size:1.45rem; margin:3rem 0 .4rem; text-wrap:balance; }
+  h2 small { font-family:"JetBrains Mono",monospace; font-weight:400; font-size:.72rem; color:var(--muted); letter-spacing:.04em; margin-left:.6rem; }
+  p { max-width:66ch; }
+  .meta { font-family:"JetBrains Mono",monospace; font-size:.74rem; color:var(--muted); }
+  .thesis { border-left:3px solid var(--accent); padding:.2rem 0 .2rem 1.1rem; margin:1.6rem 0 2.2rem; }
+  .thesis p { margin:.4rem 0; }
+  .lead { color:var(--muted); font-size:1.02rem; }
+  .finding { display:grid; grid-template-columns: 9.5rem 1fr; gap:.2rem 1.1rem; padding:.95rem 0; border-top:1px solid var(--rule); }
+  .finding:last-child { border-bottom:1px solid var(--rule); }
+  .id { font-family:"JetBrains Mono",monospace; font-size:.74rem; color:var(--accent); padding-top:.2rem; word-break:break-word; }
+  .id span { display:block; color:var(--muted); font-size:.66rem; margin-top:.3rem; letter-spacing:.03em; }
+  .what { font-weight:600; }
+  .num { font-family:"JetBrains Mono",monospace; font-size:.8rem; color:var(--ink); background:var(--mono-bg); padding:.35rem .55rem; border-radius:4px; font-variant-numeric:tabular-nums; margin:.35rem 0; }
+  .so { color:var(--muted); font-size:.95rem; }
+  .chip { font-family:"JetBrains Mono",monospace; font-size:.64rem; letter-spacing:.05em; padding:.14rem .5rem; border-radius:99px; white-space:nowrap; vertical-align:middle; margin-left:.35rem; }
+  .pass { background:var(--pass-soft); color:var(--pass); }
+  .fail { background:var(--fail-soft); color:var(--fail); }
+  .und  { background:var(--und-soft);  color:var(--und); }
+  .neu  { background:var(--accent-soft); color:var(--accent); }
+  .tablewrap { overflow-x:auto; margin:.8rem 0 1.2rem; }
+  table { border-collapse:collapse; font-size:.86rem; min-width:34rem; }
+  th { text-align:left; font-size:.66rem; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); border-bottom:2px solid var(--rule); padding:.4rem .6rem; }
+  td { border-bottom:1px solid var(--rule); padding:.4rem .6rem; vertical-align:top; font-variant-numeric:tabular-nums; }
+  td.n { font-family:"JetBrains Mono",monospace; font-size:.8rem; }
+  ul { padding-left:1.2rem; } li { margin:.3rem 0; max-width:66ch; }
+  .say { background:var(--card); border:1px solid var(--rule); border-radius:8px; padding:1rem 1.2rem; margin:1rem 0; }
+  .say h3 { font-family:"Newsreader",Georgia,serif; font-weight:600; font-size:1.1rem; margin:0 0 .5rem; }
+  @media (max-width:560px) { .finding { grid-template-columns:1fr; } .id span { display:inline; margin-left:.5rem; } }
+</style>
+
+<div class="wrap">
+  <h1>TaxoArena Distilled</h1>
+  <p class="lead">The findings that carry the paper, extracted from the full ledger (v110, 194 rows). Each entry gives the finding, the number behind it, the verdict as registered, and what it changes. The full ledger id is the pointer to the evidence.</p>
+  <p class="meta">record at 2026-09-17 · HEAD 3b7518a · every number is verification fidelity against a key, a checker, or a possibly wrong reference; no human preference data anywhere</p>
+
+  <div class="thesis">
+    <p><b>What the chain is.</b> Build a taxonomy on the train side only, route held-out questions to its cells, rank models exactly where a key exists, judge with one frozen recipe where it does not, and publish pair directions only at a stated calibration status. Every published number is checkable against ground truth, and the record refuses what it cannot support.</p>
+    <p><b>What the campaign found.</b> The judge's accuracy comes from the reference answer and the verify-first mechanics, not from anything grown on the tree. The frontier order cannot be recovered by any judge, reference or budget. The tree earns its place through routing, question support and the split, and the geometry alone certifies more structure than the category labels impose.</p>
+  </div>
+
+  <h2>Construction and the split <small>what the tree is and is not</small></h2>
+
+  <div class="finding"><div class="id">D1 · D2 · D3<span>slice width</span></div><div>
+    <div class="what">Certifiable structure peaks at a 512-dimensional slice; bareq512 is the promoted tree.</div>
+    <div class="num">512: 13/13 certified vs 7/9 at 256; 1024: 6/66 and 6/73, Top-1 flat-to-better, ARI 0.697</div>
+    <div class="so">Width buys certification up to 512 and routing beyond it. The promoted tree is the one every board uses. <span class="chip pass">PASS</span> <span class="chip fail">1024 TURNS</span></div></div></div>
+
+  <div class="finding"><div class="id">H9-1 · H9-REM · P7-FIX<span>construction variance</span></div><div>
+    <div class="what">The construction is bit-reproducible, its seed floor is 2.6pp of Top-1, and its order dependence is a quarter of that floor.</div>
+    <div class="num">3/3 identical rebuilds · 20-seed floor Top-1 0.750–0.776 · order arms o0–o3 spread 0.25pp, 85–86 of 86 leaves re-identified</div>
+    <div class="so">Leaf identity is a sample draw; anchors and routing are invariant. The greedy loop's order is not a hidden variable. <span class="chip pass">NEAR-INERT</span></div></div></div>
+
+  <div class="finding"><div class="id">H9b · P2<span>honest nulls</span></div><div>
+    <div class="what">The separation bar sits below the within-node null band, and site-level certification is rare.</div>
+    <div class="num">p95 null band 0.029–0.075 vs bar 0.025 · 6/66 sites certified on the frozen tree; trunk = 5 depth-1 splits</div>
+    <div class="so">Behavioural validation is load-bearing; "certified" is a strong word and the record uses it sparingly. <span class="chip fail">P2 FALSIFIED</span></div></div></div>
+
+  <div class="finding"><div class="id">ANCHOR-FREE<span>2026-09-17</span></div><div>
+    <div class="what">A tree grown from the embeddings alone, no category anchors, loses 6.4 points of category purity, keeps the key-visible capability information, and certifies three times as many split sites as the anchored control.</div>
+    <div class="num">purity 0.715 vs 0.779 · key-only leaf information 13.2 vs 14.0 per 1000 · certified 16/69 vs 5/65 · first split = quantitative / discursive</div>
+    <div class="so">The anchors buy the category names and cost certifiable structure. The framework's "anchors are a reporting convenience" stands outright. All three registered criteria passed against a prediction that they would not. <span class="chip pass">C1 C2 C3 PASS</span></div></div></div>
+
+  <div class="finding"><div class="id">INCIDENT · AUDIT · OPTION-A · SPLIT-FUNCTION-IMPL<span>hygiene</span></div><div>
+    <div class="what">The arena pool was not the frozen tree's held-out split; the claims that survive on the clean subset are named, and the split is now a function of the item, enforced per row in both languages.</div>
+    <div class="num">71% of arena questions were train-side + in rubric induction · clean 1,020: ρ 0.951 stands, LRT p=0.002 stands, RUBRIC and H7-random withdrawn · gate/eval overlap 0, scored/eval overlap 0, 3/3 rebuilds reproduce the pinned pools</div>
+    <div class="so">Disclosed, re-analysed, and made impossible to repeat: nothing is "activated" any more, the pool is declared and verified by id, and judging a tree with eval members is refused. <span class="chip und">INCIDENT</span> <span class="chip pass">GUARDED</span></div></div></div>
+
+  <h2>Routing <small>is there anything to route</small></h2>
+
+  <div class="finding"><div class="id">ROUTER-REGRET-MMLU · MC-ROUTER · MC-E2E · MATH-FIX<span>routing gain</span></div><div>
+    <div class="what">On MMLU-Pro there is nothing to route; on a six-corpus union there is a real router gain, and inferring the cell costs almost nothing.</div>
+    <div class="num">MMLU-Pro: gemini best in 14/14 anchors, gain 0.000 · union: +2.7pp mean over three seeds after the extraction artefact was fixed, metadata cost +0.7pp</div>
+    <div class="so">The router claim lives on heterogeneous task families, not on a single benchmark with a dominant model. <span class="chip pass">REAL</span> <span class="chip und">SEED-SENSITIVE</span></div></div></div>
+
+  <div class="finding"><div class="id">MC-FED · MC-ROOT · DESIGN-PROBES<span>anchor layer</span></div><div>
+    <div class="what">Federated construction recovers certification the joint union loop starves, and flat nearest-leaf routing beats the anchor descent on both corpora.</div>
+    <div class="num">certified 13 vs 5 · union routing 81.6% vs 72.1% (+9.5pp, p=1.8e-82) · MMLU-Pro flat 0.764 vs 0.753</div>
+    <div class="so">The anchor layer is reporting granularity, not a routing mechanism. <span class="chip pass">PASS</span></div></div></div>
+
+  <h2>The judge <small>where accuracy comes from</small></h2>
+
+  <div class="finding"><div class="id">J2 · J2-R · PAIR-NOREF · STACK-v2<span>the recipe</span></div><div>
+    <div class="what">A cached reasoning-model reference plus verify-first mechanics makes a cheap judge as accurate as a reasoning judge, at one reasoning call per question.</div>
+    <div class="num">reference worth +12.6pp (0.864 vs 0.738) · STACK-v2 0.865 Mistral / 0.864 grok on R3's 944 key-decidable pairs · reasoning judge with reference 0.879</div>
+    <div class="so">One frozen recipe for every cell; the judge model's identity is nearly irrelevant once reference and mechanics are shared. <span class="chip pass">PRODUCTION JUDGE</span> <b>[P-FAM 2026-09-27: p2dca judged family &mdash; history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]</b></div></div></div>
+
+  <div class="finding"><div class="id">RUBRIC · LADDER · RUBRIC-512-R · J6 · RK-1 · LEAF-POWERED · STACK-NORUBRIC<span>the rubric line</span></div><div>
+    <div class="what">Rubric text is worth nothing to discrimination at any granularity, for any judge tier, however it is written.</div>
+    <div class="num">generic 0.761, anchor 0.774, stratum 0.757, leaf 0.770 · reasoning judge 24:24 · contrastive rubric −1.8pp (worse) · leaf vs anchor changes correctness on 2.0% of matches · anchor rubric = +1.5pp decisiveness, +0.2pp discrimination</div>
+    <div class="so">The specific-judge hypothesis the thesis started from is closed; the one cell-derived increment that moved a verdict is a data-only card, and it is abstention. <span class="chip fail">CLOSED</span> <b>[P-FAM 2026-09-27: p2dca judged family &mdash; history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]</b></div></div></div>
+
+  <div class="finding"><div class="id">REF-CHECKLIST<span>2026-09-17</span></div><div>
+    <div class="what">A per-question verification checklist written by the reference model, without the answer, is worth about as much as no reference at all.</div>
+    <div class="num">no reference 0.734 · checklist 0.749 · answer reference 0.845 · both 0.851 (n=826) · no rescue where the answer is wrong (+2.5pp, CI spans 0)</div>
+    <div class="so">The value of a reference is its correctness as an answer; its leakage is the price of that value; no rubric-shaped substitute exists per cell or per question. <span class="chip fail">PRIMARY FAIL</span> <b>[P-FAM 2026-09-27: p2dca judged family &mdash; history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]</b></div></div></div>
+
+  <div class="finding"><div class="id">ORACLE · JUDGE-2x2 · ARXIASK<span>the reference ceiling</span></div><div>
+    <div class="what">A perfect reference buys 16 points on the hardest questions and still does not recover the frontier order; the judge's own error is the larger half.</div>
+    <div class="num">0.612 → 0.777 with the answer key (55:6, p=5e-11) · reference-induced error 0.165 vs irreducible 0.223 · arx vs iask 0.528 vs key 0.593, p=0.41</div>
+    <div class="so">A cheap judge does not need to solve the question, it needs the right answer; and even then it cannot order two models 1.7pp apart. <span class="chip pass">CEILING SIZED</span> <b>[P-FAM 2026-09-27: p2dca judged family &mdash; history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]</b></div></div></div>
+
+  <div class="finding"><div class="id">L1 · L1-R · L1-V2 · H7<span>length</span></div><div>
+    <div class="what">The length bias is causal and it is about demonstrated reasoning, not bytes; instruction cannot remove it and the verify-first mechanics reduce it.</div>
+    <div class="num">truncating the correct answer drops correct verdicts 0.766 → 0.259 (183:1); padding null · drop 0.507 → 0.421 → 0.318 across L1, L1-V, L1-V2 · length clause null</div>
+    <div class="so">A design lever (give the judge a way to verify), not a prompt lever. <span class="chip pass">MECHANISM</span> <b>[P-FAM 2026-09-27: p2dca judged family &mdash; history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]</b></div></div></div>
+
+  <div class="finding"><div class="id">DECOMP · TEMP-0 · POSITION-FULL<span>noise floor</span></div><div>
+    <div class="what">The judge's test-retest disagreement on byte-identical prompts is 5.7%, temperature 0 does not lower it, and position bias is a property of contested matches only.</div>
+    <div class="num">5.7% floor · 0.050 at T=0 vs 0.057 (n.s.) · cross-tier flip 0.055 below the floor vs frontier 0.182</div>
+    <div class="so">Every paired result under ±3pp is inside a floor no configuration removes. <span class="chip pass">MEASURED</span> <b>[P-FAM 2026-09-27: p2dca judged family &mdash; history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]</b></div></div></div>
+
+  <h2>Boards and certification <small>what can be ordered</small></h2>
+
+  <div class="finding"><div class="id">X12 · ARENA-V2 · ARENA-V2-X20 · JUDGE-WIRING-BOARD<span>the board</span></div><div>
+    <div class="what">The judged board recovers the key ranking and a real model × domain interaction; the production code path reproduces the research board exactly.</div>
+    <div class="num">ARENA-V2 ρ 0.972, key-decidable 0.852, anchor LRT p=0.001 · 20 models ρ 0.963 · Kotlin board ρ 0.993 over judged questions, Spearman 1.000 to the Python board</div>
+    <div class="so">The paper publishes from the shipped code, with the Python caches as comparators. <span class="chip pass">BOARD OF RECORD</span></div></div></div>
+
+  <div class="finding"><div class="id">FRONTIER · AGGREGATE · M1/M2 · FRONTIER-FIT<span>the frontier</span></div><div>
+    <div class="what">No judge, reference, tie-break or budget recovers the order inside the frontier band; the record declines it by rule.</div>
+    <div class="num">24 consecutive Mistral rows: median top-4 violations 3.0 at every budget from 250 to 36,871 matches · three levers sized (+16.4, 13.5, +8.0pp) and arx/iask still 0.50, p&gt;0.29</div>
+    <div class="so">Budget buys global stability at 2,000 matches and nothing at the frontier. <span class="chip fail">DECLINED BY RULE</span></div></div></div>
+
+  <div class="finding"><div class="id">SYSTEMATIC-BUDGET · KEY-TIE-DECLINE · GROK-CALIB<span>the certificate</span></div><div>
+    <div class="what">The raw certificate is 7 to 10 times miscalibrated; an agreement-shaped widener plus a key-tie decline removes the established miscalibration and leaves one that is no longer detectable.</div>
+    <div class="num">raw 739 called / 8 wrong vs 0.83 nominal · widener LOAO 663 / 3(2) / 1.27 · pooled 20-model board 150 of 190 called, 0 wrong · grok's own board: b1 identified, utility 74.9%, 2(1) wrong vs 1.1</div>
+    <div class="so">ORDERED edges are published at 0.975 with "calibration UNDETERMINED" printed beside them; the word "calibrated" is never used. <span class="chip und">UNDETERMINED AT THE OPERATING POINT</span></div></div></div>
+
+  <div class="finding"><div class="id">JUDGE-WIRING-BOARD · BUDGET-TRANSFER · JUDGE-TRANSFER<span>fragility</span></div><div>
+    <div class="what">The widener's identification flips between two draws of the same judge on the same bytes, and its transfer across roster or judge is undetermined.</div>
+    <div class="num">Δdeviance 4.47 vs 2.26 against 3.84 on ~26 established events · new-verdict edges 2(1) wrong vs 1.59 nominal</div>
+    <div class="so">A nominal confidence is never published off the fitting roster or judge; the identification rule needs a power statement. <span class="chip und">RE-DRAW FRAGILE</span></div></div></div>
+
+  <div class="finding"><div class="id">PROFILE-RELIABILITY · ANCHOR-PROFILE-INTERVAL · PROFILE-TREE-ROBUST<span>the profile</span></div><div>
+    <div class="what">The anchor-level capability profile is publishable with its interval; anything below the anchor does not survive a change of tree.</div>
+    <div class="num">anchor R 0.67–0.72, interval [0.61, 0.83]; key 0.91 · sub-anchor residual on re-celled questions key −0.071, judge −0.084 · ~210 questions per cell to reach 0.70</div>
+    <div class="so">The anchor is the reporting ceiling on a data ground; no judge or tree improvement moves it. <span class="chip und">WITH INTERVAL</span> <span class="chip fail">SUB-ANCHOR CLOSED</span></div></div></div>
+
+  <h2>Economics <small>what a call buys</small></h2>
+
+  <div class="tablewrap"><table>
+    <tr><th>question</th><th>answer</th><th>ledger id</th></tr>
+    <tr><td>Matches for a stable 12-model board</td><td class="n">2,000 (ρ ≥ 0.93 in 100% of draws)</td><td class="n">M2</td></tr>
+    <tr><td>Filter's cost to the board</td><td class="n">none; halves the bill (10,552 vs 18,284 calls, ρ 0.986 vs 0.972)</td><td class="n">ARENA-V3-COMPILED · SCHEDULING</td></tr>
+    <tr><td>Placing a newcomer at 400 matches</td><td class="n">3 tiers mid-board; the whole frontier near the top (FAIL by falsifier)</td><td class="n">NEWCOMER-PLACEMENT-LIVE</td></tr>
+    <tr><td>Escalating to a reasoning judge on the residue</td><td class="n">+0.000 on committed verdicts; not adopted</td><td class="n">ESCALATE-LLAMA-LAW</td></tr>
+    <tr><td>Cheap judge with an exact checker reference (MATH, terminated traces)</td><td class="n">0.958 / 0.993; cap-hit traces cost 16.5% of pairs</td><td class="n">STAGE3-MATH-CAPFREE · CHECKER-ANSWER-INGEST</td></tr>
+    <tr><td>Reference model with a better answer</td><td class="n">+4 to +8pp exists in principle; fails leakage and termination gates</td><td class="n">REF-QUAL-KIMI-JSON</td></tr>
+    <tr><td>Memoising proposals across iterations</td><td class="n">safe, 0 hits, +55% wall time; off</td><td class="n">PERF-8-MEMO</td></tr>
+  </table></div>
+
+  <h2>What the full chain lets you say</h2>
+  <div class="say"><h3>Claims with a number behind each</h3><ul>
+    <li>Given a corpus with model traces, the pipeline builds a taxonomy on the train side only, routes held-out questions, ranks models exactly where a key exists, judges where it does not, and publishes ORDERED pair directions at 0.975 with their calibration status printed. <b>[P-FAM 2026-09-27: p2dca judged family &mdash; history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]</b></li>
+    <li>The judge's accuracy is the reference's correctness as an answer plus verify-first mechanics; nothing induced on the tree, at any granularity, adds discrimination. <b>[P-FAM 2026-09-27: p2dca judged family &mdash; history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]</b></li>
+    <li>The production code path produces the research board to the test-retest floor. <b>[P-FAM 2026-09-27: p2dca judged family &mdash; history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]</b></li>
+    <li>Tiers, bands and a router's undominated set per cell are certified; the anchor-level profile is published with its interval. <b>[P-FAM 2026-09-27: p2dca judged family &mdash; history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]</b></li>
+    <li>The corpus's category labels are not its geometry: an unlabelled tree keeps the capability structure and certifies more of its splits.</li>
+  </ul></div>
+  <div class="say"><h3>Claims the record refuses</h3><ul>
+    <li>That the certificate is calibrated, or that a nominal confidence transfers off its fitting roster or judge.</li>
+    <li>That any judge orders two models 1.7pp apart, or any order inside the frontier band.</li>
+    <li>Per-question ranks (5.7% floor, 41% of wrong-direction labels indeterminate), sub-anchor capability rows, and any preference claim.</li>
+    <li>That the deployment has not drifted: the canary's floor is read at pass 2, on or after 2026-09-22.</li>
+  </ul></div>
+
+  <p class="meta">Full ledger: docs/test_ledger.html (194 rows, corrections only by insertion, last bracket wins). Programme: docs/judge_v2_program.md. Design of record: docs/design/FRAMEWORK.md with 28 bracketed corrections. Wrong counts are written as wrong(established), the established count by exact McNemar on the anchor's judged questions.</p>
+</div>

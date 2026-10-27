@@ -1,0 +1,46 @@
+CLEAN mode: reserved side restricted to the tree's active held-out pool paeec37aa28063c75 (6482 questions)
+MATH-FIX overlay: 5181 corrected (question, model) cells
+MC-E2E: 21606 questions routed over 143 federated leaves (dim 512) | predicted source 0.962 | predicted source+domain 0.813
+arms: best single | TRUE source | TRUE source/domain | PRED source | PRED source/domain | PRED leaf | oracle
+
+  CLEAN: reserved side restricted to the tree's held-out pool, 1946 of 6481 kept (30.0%)
+seed 42 (reserved n=1946)
+  best single          0.5699 ± 0.0118
+  TRUE source          0.5966 ± 0.0105
+  TRUE source/domain   0.6089 ± 0.0110
+  PRED source          0.6007 ± 0.0105
+  PRED source/domain   0.6136 ± 0.0109
+  PRED leaf            0.6033 ± 0.0111
+  oracle               0.9178 ± 0.0061
+  DEPLOYED gain (PRED source/domain - best single): +0.0437 ± 0.0092 -> REAL
+  oracle-metadata gain +0.0391 ± 0.0087 | METADATA COST -0.0046
+
+  CLEAN: reserved side restricted to the tree's held-out pool, 1973 of 6481 kept (30.4%)
+seed 137 (reserved n=1973)
+  best single          0.5839 ± 0.0120
+  TRUE source          0.6031 ± 0.0117
+  TRUE source/domain   0.6204 ± 0.0114
+  PRED source          0.6016 ± 0.0115
+  PRED source/domain   0.6082 ± 0.0113
+  PRED leaf            0.6011 ± 0.0116
+  oracle               0.9159 ± 0.0057
+  DEPLOYED gain (PRED source/domain - best single): +0.0243 ± 0.0098 -> REAL
+  oracle-metadata gain +0.0365 ± 0.0094 | METADATA COST +0.0122
+
+  CLEAN: reserved side restricted to the tree's held-out pool, 1914 of 6481 kept (29.5%)
+seed 2048 (reserved n=1914)
+  best single          0.5878 ± 0.0110
+  TRUE source          0.6019 ± 0.0115
+  TRUE source/domain   0.6348 ± 0.0115
+  PRED source          0.5925 ± 0.0109
+  PRED source/domain   0.6212 ± 0.0110
+  PRED leaf            0.6233 ± 0.0112
+  oracle               0.9190 ± 0.0064
+  DEPLOYED gain (PRED source/domain - best single): +0.0334 ± 0.0090 -> REAL
+  oracle-metadata gain +0.0470 ± 0.0097 | METADATA COST +0.0136
+
+== MC-SEEDS ==
+  deployed gain per seed: +0.0437, +0.0243, +0.0334 | mean +0.0338 | across-seed spread 0.0194 vs mean within-seed SE 0.0093 -> seed-sensitive
+  REGISTERED (1) deployed > best single by > 2 SE in all seeds: PASS
+  REGISTERED (3) spread < within-seed SE: FAIL
+  metadata cost per seed: -0.0046, +0.0122, +0.0136

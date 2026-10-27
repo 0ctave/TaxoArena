@@ -1,0 +1,135 @@
+{
+  "id": "RK-1",
+  "title": "RK-1: does a per-leaf verification kit (knowledge card + failure catalogue + 2 worked neighbours, induced on grok-reasoning from train-side material) beat STACK-v2? (registered 2026-09-10 03:20)",
+  "question": "Both arms fresh and interleaved, Mistral, R3's 1,980 matches; leakage audit clean; registered PRIMARY +1pp on key-decidable at paired McNemar p < 0.05; SECONDARY quantitative > discursive.",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "09a5398",
+    "program_lines": "docs/judge_v2_program.md L221-L261 (registration; design in docs/rubric_v2_design.md) and L277-L289 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "### RK-1 — the verification kit (registered 2026-09-10 03:20, before any judged call; design in docs/rubric_v2_design.md)",
+    "outcome_heading": [
+      "L277: - **RK-1 (2026-09-10 12:35): PRIMARY FAIL — the induced verification kit adds +0.7pp, not"
+    ],
+    "date": "2026-09-10"
+  },
+  "script": {
+    "path": "tools/analysis/rubric_kit.py",
+    "sha16": "8ae10a0ff3b7a7ef (at e29fb79)",
+    "commit": "e29fb79"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (~8k calls, both arms fresh); 3,948 matches, i.e. UNDER the rule, whose denominator is matches and whose \"~8k calls\" is the two-calls-per-match conversion, not a second threshold; no go was owed (registrar 2026-09-23; corrects docs/agents/results/INCONSISTENCIES.md class 8eeddaf item 9, which listed this run as over-rule on its call count).",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/rk1_outcome.txt",
+    "outcome_commit": "e29fb79",
+    "calls": "~8k (3,948 judged; both arms fresh)",
+    "cce": "not stated",
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-10",
+    "other_files": [
+      "experiment_results/x12_crossdomain/stack_v2_kit.db (cache)"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the REVIEW of 2026-09-14 restated the RK-1 / RK-1b split as a control draw (three byte-identical controls at 0.8676 / 0.8581 / 0.8591 against one treatment at 0.8750), see RK-1b-GROK's bracket",
+    "commit": "e29fb79",
+    "verdict": "FAIL (+0.7pp, p = 0.39); induced content without worked solutions is not a lever"
+  },
+  "criteria": [
+    {
+      "id": "PRIMARY",
+      "text": "+1pp on key-decidable at p < 0.05",
+      "result": "FAILED",
+      "value": "944 decidable: kit 0.875 vs STACK-v2 0.868 (28:21, +0.7pp, p = 0.39); top cluster +4.1pp (20:9, p = 0.061), the only signal",
+      "denominator": "944 key-decidable R3 pairs"
+    },
+    {
+      "id": "SECONDARY",
+      "text": "quantitative > discursive",
+      "result": "FAILED",
+      "value": "quantitative +0.7 = discursive +0.8",
+      "denominator": "944"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "RK-1b (data card) and RK-1c (verified solutions) followed; no pool pin at run time (pool-pin audit 2026-09-14); closed line: rubric content"
+  },
+  "numbers_of_record": {
+    "accuracy": "kit 0.875 vs STACK-v2 0.868 (28:21, p = 0.39)",
+    "top_cluster": "+4.1pp (20:9, p = 0.061)",
+    "secondary": "quantitative +0.7 = discursive +0.8"
+  },
+  "sentence_of_record": "RK-1 (2026-09-10, ~8k calls): FAIL: 944 decidable: kit 0.875 vs STACK-v2 0.868 (28:21, +0.7pp, p = 0.39); top cluster +4.1pp (20:9, p = 0.061), the only signal, on the pairs where the judge is weakest; quantitative +0.7 = discursive +0.8 (secondary fail). Induced content without worked solutions is not a lever; RK-1b (data card) and RK-1c (verified solutions) follow.",
+  "chips": [
+    "FAIL (+0.7pp, p=0.39)"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-14",
+      "by": "the REVIEW of 2026-09-14 (carried in RK-1b-GROK's observed cell [RESTATED 2026-09-14])",
+      "text": "the RK-1 / RK-1b PASS-FAIL split is a control draw: three byte-identical STACK-v2 controls at 0.8676 / 0.8581 / 0.8591 against one treatment at 0.8750; honest estimate +1.34pp."
+    },
+    {
+      "date": "2026-09-14",
+      "by": "the pool-pin audit (programme ~L2060)",
+      "text": "rubric_kit.py had no pool pin at run time; assert_pool_of_record added after."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "INCONSISTENCIES-PASS (registrar, zero calls; insertion only)",
+      "text": "PIN 2026-09-23 by INCONSISTENCIES-PASS (registrar, zero calls; insertion only): NO POOL PIN AT RUN TIME. The pool-pin audit of 2026-09-14 (programme, the paragraph ending 'THREE HAD NO PIN AT ALL - j6_rubrics.py, rubric_kit.py and rubric_kit2.py') found rubric_kit.py calling no pool guard when this ran; pool_guard.assert_pool_of_record() was added after the run. The run's pool is the pool of record p2dca21ab5f4ef3ae BY THE FROZEN SPLIT, NOT BY A CHECK. The after-the-fact check (the cache's question ids against experiment_configs/reserved_pool_frozen_p2dca.json, read-only) is OPEN and was not done in this pass. [ledger: observed cell of row RK-1, v132]"
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the SPLIT-FOLLOWUPS review 8ebfa7a (insertion only, zero calls)",
+      "text": "The RK-1 kit material is built from 20260909_212117 leaf members; its twin exposure is UNMEASURED (SPLIT-FOLLOWUPS review 8ebfa7a). The rubric line stays closed. See docs/judge_v2_program.md L14455-L14487 (SPLIT-FOLLOWUPS)."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a kit gain at the registered bar",
+    "a top-cluster gain at p < 0.05 (0.061)"
+  ],
+  "ledger": {
+    "row_id": "RK-1",
+    "version": "v32 (e29fb79) [v132 2026-09-23: INCONSISTENCIES-PASS insertion in this row]; [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "STACK-v2",
+    "J6",
+    "RK-1b",
+    "RK-1c"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "rubric content (CONTEXT.md section 5: J6, RK-1, RK-1c; the data card RK-1b is a substitute for the AGGREGATE tie-break)"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L221-L261 and L277-L289 (09a5398 / e29fb79)",
+    "docs/rubric_v2_design.md (the kit design)",
+    "experiment_results/x12_crossdomain/rk1_outcome.txt (e29fb79)",
+    "docs/test_ledger.html row RK-1 (v32): chips verbatim, observed cell, evidence",
+    "script sha16 = sha256 of tools/analysis/rubric_kit.py at e29fb79, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Gives the LLM judge a per-cell verification kit: a knowledge card, a list of common failures and two worked neighbour examples. It compares judge accuracy with and without the kit on 944 key-decidable matches. About 8,000 judge calls.",
+    "why": "Tests whether cell-specific background material makes the judge more accurate than the existing best recipe.",
+    "information": "A gain would show that the taxonomy can improve the judge itself. No gain would close this route. Result: failed. The gain was +0.7 points (p = 0.39), with a +4.1-point hint in the top cluster that is not significant. There was no difference between quantitative and discursive questions. A later review put the honest estimate near +1.3 points because of control noise. The run had no question-pool check at the time. Later ruled history rather than evidence, because it ran on the older question pool.",
+    "written": "2026-10-07"
+  }
+}

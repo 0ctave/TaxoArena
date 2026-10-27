@@ -1,0 +1,79 @@
+  ok   main --analyze (the run-of-record wiring)
+  ok   main --analyze refuses on a red selftest
+  ok   all CERTIFIED: every printed line, write-once
+  ok   anchor boundaries 4 / 3 / 2 / 1 / 0 of 5; tie at k 14
+  ok   PK levels: 2 / 1 / 0 anchors; MIXED anchors; PK1 486 only, PK2 441 only; F-PK
+  ok   gates: C0 1 / 2, precedence, equality, DEGENERATE 19 / 20, degenerate + C0
+  ok   PK with NOT EVALUABLE anchors (PK-6)
+  ok   IDENTITY refusals (incl. PC1 p95 / max)
+  ok   refusals (incl. D-1 rebuild and pin)
+  ok   labels, populations, twins, allocation, site file
+  ok   helpers
+[PK2] selftest: 11 / 11 passed
+pool: none (no DB opened)
+[PK2] CERT-PC-K2 outcome (tools/analysis/cert_pc_k2.py blob 38fb0dfcde9be33be6f1087e5220e3fd295201c4; cert_pc_size.py blob de39c6488e0dca7dded489f34cbae291af5d3dd5 imported). Zero calls.
+registration: docs/judge_v2_program.md "## Registered 2026-10-03 (before any code or call) — CERT-PC-K2: ..." L23901-L23913 (as registered, d50c47d4)
+arm: certPcK2; snapshot 20261001_094311_Headless_Run_Auto_ge; site file sha256 efcc4e99cf5eed50d04249a28e7aa896b1518f39088102e25055e6a3f65393bb (= SITES_SHA256; rebuilt from the CPC labels sha256 c0a20662047c6314 and TWINS ['q_dd452b7da138bf6f']: byte-identical); reps 300; sliceDim 512; sepBar 0.0145; dropTop 0; whiten false; minClusterSize 55; C0 seed base 20261002; threads 12; embeddings_cache.db per-table hashes before == after
+builder's readings PK-1..PK-9 (docstring); registration query Q-K1 (PK-6: PK with NOT EVALUABLE anchors) to the registrar
+population economics: ori_mmlu 266 / added 238 (registered 266 / 238)
+population math: ori_mmlu 489 / added 316 (registered 489 / 316)
+population physics: ori_mmlu 248 / added 530 (registered 248 / 530)
+IDENTITY: full-size root n 6993, declared 0.107803 (registered 0.107803), k_d 0 of 300 (registered 0); null seeded by n00000001; null p95 0.041626 / max 0.042414 (PC1 of record 0.041626 / 0.042414)
+IDENTITY: REPRODUCED (precondition held; null p95 / max equal PC1's)
+SUPPORT (a) deciding denominator: 3 anchors x 5 subsamples per deciding size (n 486 PK1, n 441 PK2), each a site with 300 null replicates; (b) DEFF 1.0 by construction (independent seeded generator draws; no item-level resampling: a tree-arm DEFF does not apply, D-PR-1); (c) n_eff = 300 replicates per subsample; (d) SE of an exceedance proportion at the bar sqrt(0.05 x 0.95 / 300) = 0.0126 per subsample; (e) MDE80 = 2.80 x SE = 0.0352 per subsample; (g) floor 1/301 = 0.0033 << 0.05; NULL-INFEASIBLE below n 110, DEGENERATE below 20 reached replicates
+SUPPORT: no matches and no questions: wrong(established), the tie conventions A / B and a question-clustered bootstrap are N/A to a null exceedance count
+LIKE WITH LIKE: | site | k | population | partition |
+  | CERT-PC-K2 (this) | 2 | one category | declared source family |
+  | G12 TOP sites (of record) | 2-3 | one anchor (routed) | data-driven split |
+  | CERT-PC-SIZE (of record) | 14 | all categories | declared categories |
+  k- and size-matched to G12; the population is the declared category (labels), not the routed anchor region
+OVERLAP economics (population 504): 5 draws pairwise min / max: n 486 468 / 470 (chance 469), n 441 383 / 390 (chance 386); same-seed n 441 within n 486: [433, 432, 431, 435, 432] of 441 (chance 425); DISCLOSED: n 486 uses 486 of 504 items, the 5 subsamples overlap almost fully
+OVERLAP math (population 805): 5 draws pairwise min / max: n 486 283 / 302 (chance 293), n 441 227 / 250 (chance 242); same-seed n 441 within n 486: [384, 380, 387, 385, 382] of 441 (chance 266)
+OVERLAP physics (population 778): 5 draws pairwise min / max: n 486 294 / 310 (chance 304), n 441 239 / 254 (chance 250); same-seed n 441 within n 486: [401, 408, 402, 400, 402] of 441 (chance 275)
+OVERLAP: the 5 draws of one anchor and the two sizes are NOT independent replicates (CERT-PC-SIZE D-5)
+  K2_economics_n486_d1 n 486 (added/ori 230/256): declared 0.014634; null p05 0.052265 / p50 0.064154 / p95 0.068953 / max 0.072306; k_d 300 of 300, p_d 301/301 = 1.000000; C0 p95 0.000761 (comparable); reached 300; deflated k 300 (p95 0.064911) -> NOT CERTIFIED
+  K2_economics_n486_d2 n 486 (added/ori 230/256): declared 0.014258; null p05 0.051581 / p50 0.063428 / p95 0.068539 / max 0.074016; k_d 300 of 300, p_d 301/301 = 1.000000; C0 p95 0.000915 (comparable); reached 300; deflated k 300 (p95 0.065078) -> NOT CERTIFIED
+  K2_economics_n486_d3 n 486 (added/ori 230/256): declared 0.014867; null p05 0.052809 / p50 0.063784 / p95 0.068361 / max 0.070785; k_d 300 of 300, p_d 301/301 = 1.000000; C0 p95 0.000834 (comparable); reached 300; deflated k 300 (p95 0.065009) -> NOT CERTIFIED
+  K2_economics_n486_d4 n 486 (added/ori 230/256): declared 0.014458; null p05 0.052656 / p50 0.064532 / p95 0.068709 / max 0.072750; k_d 300 of 300, p_d 301/301 = 1.000000; C0 p95 0.000789 (comparable); reached 300; deflated k 300 (p95 0.066300) -> NOT CERTIFIED
+  K2_economics_n486_d5 n 486 (added/ori 230/256): declared 0.014934; null p05 0.052281 / p50 0.064187 / p95 0.068960 / max 0.072360; k_d 300 of 300, p_d 301/301 = 1.000000; C0 p95 0.000846 (comparable); reached 300; deflated k 300 (p95 0.065832) -> NOT CERTIFIED
+  K2_economics_n441_d1 n 441 (added/ori 208/233): declared 0.014551; null p05 0.051511 / p50 0.064097 / p95 0.069366 / max 0.071384; k_d 300 of 300, p_d 301/301 = 1.000000; C0 p95 0.000685 (comparable); reached 300; deflated k 300 (p95 0.064944) -> NOT CERTIFIED
+  K2_economics_n441_d2 n 441 (added/ori 208/233): declared 0.014166; null p05 0.050502 / p50 0.063498 / p95 0.069217 / max 0.073502; k_d 300 of 300, p_d 301/301 = 1.000000; C0 p95 0.001017 (comparable); reached 300; deflated k 300 (p95 0.065065) -> NOT CERTIFIED
+  K2_economics_n441_d3 n 441 (added/ori 208/233): declared 0.014997; null p05 0.051264 / p50 0.064592 / p95 0.069809 / max 0.073274; k_d 300 of 300, p_d 301/301 = 1.000000; C0 p95 0.000955 (comparable); reached 300; deflated k 300 (p95 0.065497) -> NOT CERTIFIED
+  K2_economics_n441_d4 n 441 (added/ori 208/233): declared 0.014191; null p05 0.050880 / p50 0.065403 / p95 0.071182 / max 0.075686; k_d 300 of 300, p_d 301/301 = 1.000000; C0 p95 0.000887 (comparable); reached 300; deflated k 300 (p95 0.066927) -> NOT CERTIFIED
+  K2_economics_n441_d5 n 441 (added/ori 208/233): declared 0.016125; null p05 0.051005 / p50 0.064521 / p95 0.069955 / max 0.074001; k_d 300 of 300, p_d 301/301 = 1.000000; C0 p95 0.000867 (comparable); reached 300; deflated k 300 (p95 0.065584) -> NOT CERTIFIED
+  K2_math_n486_d1      n 486 (added/ori 191/295): declared 0.015878; null p05 0.052677 / p50 0.064216 / p95 0.069132 / max 0.071454; k_d 300 of 300, p_d 301/301 = 1.000000; C0 p95 0.001497 (comparable); reached 300; deflated k 300 (p95 0.064146) -> NOT CERTIFIED
+  K2_math_n486_d2      n 486 (added/ori 191/295): declared 0.014934; null p05 0.049917 / p50 0.061687 / p95 0.066707 / max 0.068671; k_d 300 of 300, p_d 301/301 = 1.000000; C0 p95 0.001594 (comparable); reached 300; deflated k 300 (p95 0.061219) -> NOT CERTIFIED
+  K2_math_n486_d3      n 486 (added/ori 191/295): declared 0.014413; null p05 0.051070 / p50 0.063365 / p95 0.068710 / max 0.073185; k_d 300 of 300, p_d 301/301 = 1.000000; C0 p95 0.001411 (comparable); reached 300; deflated k 300 (p95 0.062317) -> NOT CERTIFIED
+  K2_math_n486_d4      n 486 (added/ori 191/295): declared 0.016542; null p05 0.052581 / p50 0.064889 / p95 0.069803 / max 0.072011; k_d 300 of 300, p_d 301/301 = 1.000000; C0 p95 0.001718 (comparable); reached 300; deflated k 300 (p95 0.063255) -> NOT CERTIFIED
+  K2_math_n486_d5      n 486 (added/ori 191/295): declared 0.014397; null p05 0.052302 / p50 0.065000 / p95 0.069653 / max 0.074828; k_d 300 of 300, p_d 301/301 = 1.000000; C0 p95 0.001498 (comparable); reached 300; deflated k 300 (p95 0.063950) -> NOT CERTIFIED
+  K2_math_n441_d1      n 441 (added/ori 173/268): declared 0.016557; null p05 0.051440 / p50 0.063631 / p95 0.069067 / max 0.072067; k_d 300 of 300, p_d 301/301 = 1.000000; C0 p95 0.001732 (comparable); reached 300; deflated k 300 (p95 0.063365) -> NOT CERTIFIED
+  K2_math_n441_d2      n 441 (added/ori 173/268): declared 0.014956; null p05 0.050275 / p50 0.063650 / p95 0.068039 / max 0.073026; k_d 300 of 300, p_d 301/301 = 1.000000; C0 p95 0.001647 (comparable); reached 300; deflated k 300 (p95 0.063823) -> NOT CERTIFIED
+  K2_math_n441_d3      n 441 (added/ori 173/268): declared 0.015077; null p05 0.051214 / p50 0.064234 / p95 0.069559 / max 0.073341; k_d 300 of 300, p_d 301/301 = 1.000000; C0 p95 0.001625 (comparable); reached 300; deflated k 300 (p95 0.062133) -> NOT CERTIFIED
+  K2_math_n441_d4      n 441 (added/ori 173/268): declared 0.016743; null p05 0.051923 / p50 0.064924 / p95 0.070156 / max 0.072113; k_d 300 of 300, p_d 301/301 = 1.000000; C0 p95 0.001684 (comparable); reached 300; deflated k 300 (p95 0.063815) -> NOT CERTIFIED
+  K2_math_n441_d5      n 441 (added/ori 173/268): declared 0.013884; null p05 0.049999 / p50 0.062647 / p95 0.067977 / max 0.072824; k_d 300 of 300, p_d 301/301 = 1.000000; C0 p95 0.001626 (comparable); reached 300; deflated k 300 (p95 0.061687) -> NOT CERTIFIED
+  K2_physics_n486_d1   n 486 (added/ori 331/155): declared 0.017687; null p05 0.059000 / p50 0.062763 / p95 0.066967 / max 0.068890; k_d 300 of 300, p_d 301/301 = 1.000000; C0 p95 0.002084 (comparable); reached 300; deflated k 300 (p95 0.066824) -> NOT CERTIFIED
+  K2_physics_n486_d2   n 486 (added/ori 331/155): declared 0.016026; null p05 0.059754 / p50 0.063762 / p95 0.068035 / max 0.070015; k_d 300 of 300, p_d 301/301 = 1.000000; C0 p95 0.002194 (comparable); reached 300; deflated k 300 (p95 0.068738) -> NOT CERTIFIED
+  K2_physics_n486_d3   n 486 (added/ori 331/155): declared 0.016746; null p05 0.059027 / p50 0.062997 / p95 0.067314 / max 0.069627; k_d 300 of 300, p_d 301/301 = 1.000000; C0 p95 0.001952 (comparable); reached 300; deflated k 300 (p95 0.068398) -> NOT CERTIFIED
+  K2_physics_n486_d4   n 486 (added/ori 331/155): declared 0.018195; null p05 0.058573 / p50 0.062783 / p95 0.067343 / max 0.071219; k_d 300 of 300, p_d 301/301 = 1.000000; C0 p95 0.001927 (comparable); reached 300; deflated k 300 (p95 0.067089) -> NOT CERTIFIED
+  K2_physics_n486_d5   n 486 (added/ori 331/155): declared 0.017495; null p05 0.056405 / p50 0.062713 / p95 0.066679 / max 0.070646; k_d 300 of 300, p_d 301/301 = 1.000000; C0 p95 0.002213 (comparable); reached 300; deflated k 300 (p95 0.065817) -> NOT CERTIFIED
+  K2_physics_n441_d1   n 441 (added/ori 300/141): declared 0.015966; null p05 0.059500 / p50 0.063960 / p95 0.067888 / max 0.069861; k_d 300 of 300, p_d 301/301 = 1.000000; C0 p95 0.002298 (comparable); reached 300; deflated k 300 (p95 0.068452) -> NOT CERTIFIED
+  K2_physics_n441_d2   n 441 (added/ori 300/141): declared 0.018984; null p05 0.059009 / p50 0.064153 / p95 0.067917 / max 0.071559; k_d 300 of 300, p_d 301/301 = 1.000000; C0 p95 0.002035 (comparable); reached 300; deflated k 300 (p95 0.069115) -> NOT CERTIFIED
+  K2_physics_n441_d3   n 441 (added/ori 300/141): declared 0.016568; null p05 0.054736 / p50 0.063346 / p95 0.067598 / max 0.071098; k_d 300 of 300, p_d 301/301 = 1.000000; C0 p95 0.002330 (comparable); reached 300; deflated k 300 (p95 0.068127) -> NOT CERTIFIED
+  K2_physics_n441_d4   n 441 (added/ori 300/141): declared 0.018182; null p05 0.053650 / p50 0.062625 / p95 0.067028 / max 0.070366; k_d 300 of 300, p_d 301/301 = 1.000000; C0 p95 0.002171 (comparable); reached 300; deflated k 300 (p95 0.068767) -> NOT CERTIFIED
+  K2_physics_n441_d5   n 441 (added/ori 300/141): declared 0.016928; null p05 0.054423 / p50 0.064208 / p95 0.068314 / max 0.074170; k_d 300 of 300, p_d 301/301 = 1.000000; C0 p95 0.002267 (comparable); reached 300; deflated k 300 (p95 0.067827) -> NOT CERTIFIED
+ANCHOR economics n 486: NOT-CERTIFIED; certified 0, not certified 5, NOT EVALUABLE 0 (C0 0, degenerate / infeasible 0) of 5 (gate first: PK-5); median declared 0.014634 vs median null p95 0.068709
+ANCHOR math n 486: NOT-CERTIFIED; certified 0, not certified 5, NOT EVALUABLE 0 (C0 0, degenerate / infeasible 0) of 5 (gate first: PK-5); median declared 0.014934 vs median null p95 0.069132
+ANCHOR physics n 486: NOT-CERTIFIED; certified 0, not certified 5, NOT EVALUABLE 0 (C0 0, degenerate / infeasible 0) of 5 (gate first: PK-5); median declared 0.017495 vs median null p95 0.067314
+PK1 (n 486): K2-NOT; anchors CERTIFIED-AT-SIZE 0, NOT-CERTIFIED 3, MIXED 0, NOT EVALUABLE 0 of 3 (PK-6)
+ANCHOR economics n 441: NOT-CERTIFIED; certified 0, not certified 5, NOT EVALUABLE 0 (C0 0, degenerate / infeasible 0) of 5 (gate first: PK-5); median declared 0.014551 vs median null p95 0.069809
+ANCHOR math n 441: NOT-CERTIFIED; certified 0, not certified 5, NOT EVALUABLE 0 (C0 0, degenerate / infeasible 0) of 5 (gate first: PK-5); median declared 0.015077 vs median null p95 0.069067
+ANCHOR physics n 441: NOT-CERTIFIED; certified 0, not certified 5, NOT EVALUABLE 0 (C0 0, degenerate / infeasible 0) of 5 (gate first: PK-5); median declared 0.016928 vs median null p95 0.067888
+PK2 (n 441): K2-NOT; anchors CERTIFIED-AT-SIZE 0, NOT-CERTIFIED 3, MIXED 0, NOT EVALUABLE 0 of 3 (PK-6)
+F-PK: FIRED (PK1 K2-NOT): the certificate does not certify a declared 2-way partition inside one category at G12's depth-1 sizes; G12's 0 of 60 is then read as possibly a k = 2 / within-category sensitivity limit (CERT-PC-SIZE's "not explained by n alone" narrows to 14-way structure). F-TAX N-1 and F2 stand.
+P1 PK1 readings (K2-CERTIFIABLE 0.35, MIXED 0.30, K2-NOT 0.35): outcome K2-NOT, Brier (3-way sum) 0.6350
+P2 physics CERTIFIED-AT-SIZE at n 486 (p 0.45): event no (NOT-CERTIFIED), Brier 0.2025
+P2 economics CERTIFIED-AT-SIZE at n 486 (p 0.40): event no (NOT-CERTIFIED), Brier 0.1600
+P2 math CERTIFIED-AT-SIZE at n 486 (p 0.35): event no (NOT-CERTIFIED), Brier 0.1225
+P3 C0 comparable on every subsample (p 0.85): event yes (30 of 30 comparable), Brier 0.0225
+DOES NOT SHOW: a certificate of any tree site; that source families are the right sub-taxonomy; other categories, members, draws or slices; a mode test
+[PK2] wrote Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\experiment_results/cert_pc_k2\outcome.txt and Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\experiment_results/cert_pc_k2\pk2_sites.csv (write-once)

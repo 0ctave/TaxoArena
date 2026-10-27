@@ -1,0 +1,102 @@
+{
+  "id": "MC-ROOT",
+  "title": "MC-ROOT: multi-corpus stage 1c: can a different UNION ROOT rule recover the routing the six-way descent loses? (zero calls)",
+  "question": "The same six per-corpus snapshots grafted by unionSnapshots (239 nodes, 143 leaves, pool paeec37aa28063c75), new TOML key unionRootRouting = descent (default) | flatLeaf (nearest leaf centroid over all 143 leaves) | sourceGate (nearest per-corpus root vMF picks the corpus, then the production descent inside it); one union run per rule over the same 6,482 held-out queries; descriptive: union Top-1 (Wilson), routed source and domain accuracy, per-source table; paired McNemar vs descent.",
+  "kind": "engineering",
+  "state": "done",
+  "registration": {
+    "commit": "71d7441",
+    "program_lines": "docs/multi_corpus_design.md L407-L447; no programme section",
+    "program_lines_as_of": "docs/multi_corpus_design.md at 4ec8f18",
+    "heading": "## Stage 1c result (2026-09-11, zero calls): the union root routing rule",
+    "outcome_heading": [
+      "docs/multi_corpus_design.md L407: the same section"
+    ],
+    "date": "2026-09-11"
+  },
+  "script": {
+    "path": "UnionRouting.kt; experiment_configs/multicorpus/union_s42{,_flatleaf,_sourcegate}.toml",
+    "sha16": "n/a (Kotlin engineering; 295 tests green incl. UnionRoutingTest; stage-0a replay bit-identical)",
+    "commit": "71d7441"
+  },
+  "ready": null,
+  "go": "n/a (0 LLM calls)",
+  "run": {
+    "outcome_file": "experiment_results/multicorpus/union_s42{,_flatleaf,_sourcegate}_readout.txt",
+    "outcome_commit": "71d7441",
+    "calls": 0,
+    "cce": 0,
+    "pool": "paeec37aa28063c75 (6,482 held-out union queries); pool p2dca re-pinned after",
+    "date": "2026-09-11"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/)",
+    "commit": "71d7441",
+    "verdict": "flatLeaf PASS (+9.50pp paired, p = 1.8e-82); sourceGate NULL; flatLeaf the recommended default for union runs from stage 2"
+  },
+  "criteria": [
+    {
+      "id": "descriptive",
+      "text": "union Top-1 (Wilson), routed source and domain accuracy per rule; paired McNemar vs descent",
+      "result": "DELIVERED",
+      "value": "descent 72.08% [70.97, 73.16] / source 84.22% / domain 71.54% (reproduces stage 1b); flatLeaf 81.58% [80.62, 82.50] / 95.46% / 81.12%, +9.50pp paired (819 gains, 203 losses, McNemar p = 1.8e-82); MMLU-Pro 59.5% -> 74.1% Top-1 and 78.0% -> 96.2% source, BBH -> 100%; cost on GPQA 88.0% -> 77.7% and MATH 65.6% -> 60.8%; sourceGate 72.05% / 84.20% / 71.52%, 8 of 6,482 verdicts changed (p = 0.72): the leak is in the per-corpus ROOT DIRECTIONS, not the beam / descent gate",
+      "denominator": "6,482 held-out union queries"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "readout hardening: the text-keyed shared query cache lets an MMLU_PRO run rewrite MMLU_PRO_LB categories and zero its Top-1; union profiles now come from the corpus DB's designed keys (memory: shared-query-cache-categories)"
+  },
+  "numbers_of_record": {
+    "descent": "72.08% [70.97, 73.16] / 84.22% / 71.54%",
+    "flatLeaf": "81.58% [80.62, 82.50] / 95.46% / 81.12%; +9.50pp (819:203, p 1.8e-82)",
+    "sourceGate": "72.05% / 84.20% / 71.52%; 8 verdicts changed (p 0.72)",
+    "gates": "295 tests green; stage-0a replay bit-identical; pool p2dca re-pinned"
+  },
+  "sentence_of_record": "MC-ROOT (2026-09-11, zero calls): flatLeaf routing over the 143 union leaves scores 81.58% [80.62, 82.50] Top-1 / 95.46% source / 81.12% domain against the descent's 72.08% / 84.22% / 71.54%, +9.50pp paired (819 gains, 203 losses, p = 1.8e-82), exactly the flat sweep stage 1b called an upper bound; sourceGate changes 8 of 6,482 verdicts (p = 0.72), so the leak is in the per-corpus ROOT DIRECTIONS, not the beam / descent gate; flatLeaf is the recommended default for union runs from stage 2 (key default stays descent so every existing config replays); 295 tests green, stage-0a replay bit-identical, pool p2dca re-pinned.",
+  "chips": [
+    "flatLeaf PASS (+9.5pp)",
+    "sourceGate NULL"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the coordinator's verified record-integrity blocker A1 (insertion only, zero calls; no number of this record moves)",
+      "text": "DISCLOSED 2026-09-23 by the registrar (blocker A1, insertion only, zero calls; NO number of this record moves and nothing above is rewritten): THE UNION TREE THIS RESULT IS ROUTED ON FAILS THE TRAIN-ONLY INVARIANT. Snapshot 20260911_144214 carries 427 distinct EVAL texts among its member slots by exact text and 432 under the split function's own key norm-v1 (FRAMEWORK L229 / L373, `gradlew trainOnlyAudit`, read-only), i.e. 432 of the 6,482 paeec EVAL ids = 6.66% of the routed population were visible to construction. THE WORST-CASE BOUND, which needs no run and is a BOUND AND NOT AN ESTIMATE OF THE EFFECT (it assumes every contaminated item is correct BECAUSE of the contamination, which is the largest the effect can possibly be). UNION TREE 20260911_144214: 432 of 6,482 paeec EVAL ids = 6.66% (exact text 427). At MC-ROOT's Top-1 of 81.58% that is 5,288.0 correct, so a clean reading is at worst (5,288 - 432) / (6,482 - 432) = 4,856 / 6,050 = 80.26%: THE UNION ROUTING HEADLINE CANNOT FALL BY MORE THAN 1.32pp. MC-E2E's +3.38pp router gain and PROFILE-INTERVAL-ALL-UNION's 0.8537 are bounded by the same 6.66% share. MMLU-PRO TREE 20260910_043557: 70 of 3,445 = 2.03% (exact text 37), so AT MOST 2.03pp on any routed proportion - about 5 questions per anchor spread over the 14 bareq512_s42 anchors at 119-304 questions per anchor. THE BOUND IS A WORST CASE AND NOT AN ESTIMATE; no clean re-read was run, and whether to rebuild under content closure (0 judge calls, new snapshot ids, every routed readout moves) or to disclose at this bound is an OPEN AUTHOR DECISION registered in docs/agents/results/SPLIT-FUNCTION-IMPL.json."
+    }
+  ],
+  "does_not_show": [
+    "a fix for the root directions themselves (the descent is left as the replay default)",
+    "[DISCLOSED 2026-09-23 by the registrar (blocker A1, insertion only, zero calls; NO number of this record moves and nothing above is rewritten): THE UNION TREE THIS RESULT IS ROUTED ON FAILS THE TRAIN-ONLY INVARIANT. Snapshot 20260911_144214 carries 427 distinct EVAL texts among its member slots by exact text and 432 under the split function's own key norm-v1 (FRAMEWORK L229 / L373, `gradlew trainOnlyAudit`, read-only), i.e. 432 of the 6,482 paeec EVAL ids = 6.66% of the routed population were visible to construction. THE WORST-CASE BOUND, which needs no run and is a BOUND AND NOT AN ESTIMATE OF THE EFFECT (it assumes every contaminated item is correct BECAUSE of the contamination, which is the largest the effect can possibly be). UNION TREE 20260911_144214: 432 of 6,482 paeec EVAL ids = 6.66% (exact text 427). At MC-ROOT's Top-1 of 81.58% that is 5,288.0 correct, so a clean reading is at worst (5,288 - 432) / (6,482 - 432) = 4,856 / 6,050 = 80.26%: THE UNION ROUTING HEADLINE CANNOT FALL BY MORE THAN 1.32pp. MC-E2E's +3.38pp router gain and PROFILE-INTERVAL-ALL-UNION's 0.8537 are bounded by the same 6.66% share. MMLU-PRO TREE 20260910_043557: 70 of 3,445 = 2.03% (exact text 37), so AT MOST 2.03pp on any routed proportion - about 5 questions per anchor spread over the 14 bareq512_s42 anchors at 119-304 questions per anchor. THE BOUND IS A WORST CASE AND NOT AN ESTIMATE; no clean re-read was run, and whether to rebuild under content closure (0 judge calls, new snapshot ids, every routed readout moves) or to disclose at this bound is an OPEN AUTHOR DECISION registered in docs/agents/results/SPLIT-FUNCTION-IMPL.json.]"
+  ],
+  "ledger": {
+    "row_id": "MC-ROOT",
+    "version": "v51 (71d7441) [UPDATED 2026-09-23 at ledger v130 (audit OK, 227 rows): the blocker-A1 TRAIN-ONLY disclosure, with its counts and its worst-case bound, inserted into this row's observed cell. No number in the row moves.]"
+  },
+  "depends_on": [
+    "MC-FED",
+    "MC-ROUTER",
+    "MC-E2E",
+    "DESIGN-PROBES"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/multi_corpus_design.md L407-L447 (71d7441)",
+    "experiment_results/multicorpus/union_s42{,_flatleaf,_sourcegate}_readout.txt",
+    "UnionRouting.kt",
+    "docs/test_ledger.html row MC-ROOT (v51): chips verbatim, observed cell, evidence",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)"
+  ],
+  "last_update": "2026-09-23",
+  "plain_description": {
+    "sq": "SQ1 Use",
+    "what": "In the merged six-benchmark tree, it compares three rules for routing a new question to a leaf: step-by-step descent from the root, picking the nearest leaf directly ('flat leaf'), or picking the benchmark first. Measured on 6,482 held-out questions.",
+    "why": "Descent through the merged root was losing routing accuracy, and the fix needed to be located.",
+    "information": "It shows which routing rule to use for multi-benchmark runs and where the accuracy loss sits. Result: done, descriptive. Nearest-leaf routing reached 81.6% correct vs 72.1% for descent (+9.5 points, highly significant). Benchmark-first changed almost nothing, so the loss is in the root directions. Nearest-leaf became the recommended default. Later disclosure: about 6.7% of the routed test questions had been visible to the tree's construction, so these numbers carry a contamination caveat (bounded, not re-estimated).",
+    "written": "2026-10-07"
+  }
+}

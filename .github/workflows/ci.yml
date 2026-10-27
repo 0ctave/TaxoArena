@@ -1,0 +1,38 @@
+# Compile-only CI (repo tidy, D-2026-10-27-1). It compiles the main and test sources and nothing
+# else. `test` is NOT run here: some tests read tracked files outside the sparse checkout (src/, gradle/).
+# Actions are pinned to commit SHAs (tag in the trailing comment, resolved with git ls-remote).
+name: CI
+
+on:
+  push: {}
+  pull_request: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "ci-${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            src
+            gradle
+      - uses: gradle/actions/wrapper-validation@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
+        with:
+          cache-provider: basic
+      # The empty local Maven repository makes the job fail if a dependency resolves only from ~/.m2.
+      - run: ./gradlew --no-daemon -Dmaven.repo.local="$RUNNER_TEMP/m2-empty" compileKotlin compileTestKotlin

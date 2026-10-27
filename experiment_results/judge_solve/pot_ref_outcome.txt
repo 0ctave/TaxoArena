@@ -1,0 +1,34 @@
+=== REF-FORM-BY-CELL solve stage (R1 / R2 / C1) | cache grok-reasoning-pot.db | 597 of 597 eligible questions cached | protocol pinned 2026-09-19 00:27:50 ===
+  GUARD: content_filter + length = 0 of 597 eligible (0.0%) [OK] | finish_reason: stop 597
+
+(R1) SOLVE STAGE per cell (eligible questions with a cached row; the incumbent = grok-reasoning.db on the SAME questions; CoT = grok-reasoning-cot.db beside, no execution)
+  cell            n yield | status table                                         | PoT_y PoT_d   inc |   CoT | fix/break (McNemar p) yielded | deploy | CoT fix/break
+  Math          196 0.862 | blocked 1, degenerate 12, error 1, no_pick 13, picked 169 | 0.976 0.842 0.980 | 0.980 |   0 /   2 (p=0.5000) [inc on yielded 0.988] |   0 /  27 |   2 /   2
+  Physics       174 0.764 | degenerate 4, error 1, no_pick 36, picked 133        | 0.977 0.747 0.943 | 0.902 |   1 /   0 (p=1.0000) [inc on yielded 0.970] |   1 /  35 |   0 /   7
+  Chemistry     151 0.848 | degenerate 1, no_pick 22, picked 128                 | 0.969 0.821 0.934 | 0.914 |   0 /   1 (p=1.0000) [inc on yielded 0.977] |   0 /  17 |   2 /   5
+  Engineering    76 0.684 | degenerate 1, no_pick 23, picked 52                  | 0.865 0.592 0.724 | 0.776 |   2 /   0 (p=0.5000) [inc on yielded 0.827] |   2 /  12 |   6 /   2
+  QUANT4        597 0.807 | blocked 1, degenerate 18, error 2, no_pick 94, picked 482 | 0.963 0.777 0.925 | 0.915 |   3 /   3 (p=1.0000) [inc on yielded 0.963] |   3 /  91 |  10 /  16
+
+  C1 (form is a lever on the REFERENCE): among-yielded PoT 0.963 vs incumbent 0.963 on the same 482 q = +0.0pp (bar >= +2pp) | fix 3 : break 3, McNemar p=1.0000 (bar < 0.05) -> FAILED
+  PREDICTIONS: yield 0.807 (0.80-0.92) HELD | degenerate 0.030 (<= 0.05) HELD | fix rate 0.167 on 18 incumbent-wrong yielded (0.25-0.40) FAILED | break rate 0.006 (0.01-0.03) FAILED | among-yielded gain +0.0pp (+1..+3) FAILED | deployment -14.7pp (-3..+2) FAILED
+     Math         PoT among yielded 0.976 (predicted 0.95-0.98) HELD
+     Physics      PoT among yielded 0.977 (predicted 0.92-0.96) FAILED
+     Chemistry    PoT among yielded 0.969 (predicted 0.88-0.93) FAILED
+     Engineering  PoT among yielded 0.865 (predicted 0.80-0.88) HELD  [descriptive row: Engineering UNDETERMINED-by-support]
+
+(R2) LEAKAGE on the reference itself (no judge call): per-contestant answer agreement on the 482 yielded eligible questions
+      Llama-2-13b-hf                 PoT 0.199 | incumbent 0.202 | -0.003 (n=321)
+      Llama-2-7b-hf                  PoT 0.155 | incumbent 0.151 | +0.003 (n=304)
+      Meta-Llama-3_1-70B-Instruct    PoT 0.562 | incumbent 0.568 | -0.006 (n=482)
+      Meta-Llama-3_1-8B              PoT 0.301 | incumbent 0.301 | +0.000 (n=482)
+      Qwen1.5-72B-Chat               PoT 0.539 | incumbent 0.542 | -0.003 (n=295)
+      Yi-6b-Chat                     PoT 0.207 | incumbent 0.200 | +0.007 (n=285)
+      arx_0314                       PoT 0.925 | incumbent 0.925 | +0.000 (n=481)   <- frontier
+      c4ai-command-r-v01             PoT 0.257 | incumbent 0.257 | +0.000 (n=366)
+      deepseek-chat-v2_5             PoT 0.733 | incumbent 0.733 | +0.000 (n=476)
+      gemini-3.1-pro_5-shots         PoT 0.967 | incumbent 0.967 | +0.000 (n=481)   <- frontier
+      gpt-4o-2024-08-06              PoT 0.779 | incumbent 0.777 | +0.002 (n=475)   <- frontier
+      iask_pro                       PoT 0.908 | incumbent 0.908 | +0.000 (n=478)   <- frontier
+  PREDICTION gemini agreement within +-3pp of the incumbent's: +0.0pp -> HELD | worst frontier delta +0.002 (REF-QUAL gate (3) bar 0.03, informational here)
+
+  STATUS: COMPLETE - outcome of record (597 of 597 eligible cached); the judged stage (refform_cell.py) is CONDITIONAL on C1 HELD

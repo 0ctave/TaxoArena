@@ -1,0 +1,39 @@
+=== V2-NONE-TEMPLATE (RP20) | K46-REPOST | registered L22786-L22810 (767ebb79) section 2; interval form NORMAL (C-K1) ===
+POOL pv2_41dbd3dbcd399df0 | store 44724d25aa8653b4 | NONE matches 1846 | arms T / C | judge grok-4-1-fast-non-reasoning | cap 8192 | temperature omitted | N1 sha a031906668b848bc | script sha256-lf16 58f621dc4582616b | interval form normal
+(C0) VALIDITY, FIRST:
+     (a) store sha256 equal before and after                                        PASS  checked at the end
+     (b) identity: NONE scheduled 1846; key-decidable 1258 in 360 components        PASS  1846 scheduled; key-decidable 1258 in 360
+     (c) C bodies byte-identical to the stored bodies                               PASS  3692 of 3692 (registered 3692)
+     (d) T bodies differ from C exactly in the swapped span                         FAIL  0 of 3692
+     (e) every call fingerprinted azure:grok-4-1-fast-non-reasoning                 PASS  {'azure:grok-4-1-fast-non-reasoning': 7384}
+     (f) the pilot's truncation guard (all rows and key-decidable rows <= 5%)       PASS  all 0 of 24, key-decidable 0 of 20
+
+(C1) Delta_A = acc_A(T) - acc_A(C), paired by match, on 1258 key-decidable NONE matches in 360 components: acc 0.7719 - 0.7576 = +0.0143 | 90% normal [+0.0006, +0.0280] percentile [+0.0008, +0.0283] | 95% normal [-0.0020, +0.0306] percentile [-0.0016, +0.0314] | SE 0.0083
+     convention B (committed in both arms, paired; 962 matches): Delta_B = +0.0000, beside, deciding nothing
+     EQUIVALENT iff the 90% CI lies inside (-0.040, +0.040); GAIN / LOSS iff not EQUIVALENT and the 95% CI excludes 0 on that side
+C1: UNDETERMINED BY VALIDITY
+     SUPPORT (C1, MEASURED): n 1258 in 360 CK-CLOSE components (Kish mean cluster size 4.968) | DEFF 1.114 (ANALYTIC: linearised component-clustered variance / iid variance) | n_eff 1129.6 | SE 0.0083 (component-clustered bootstrap, deciding) | MDE80 (2.80 x SE) 0.0233 | beside, NOT a measurement: the bootstrap SE ratio squared 1.120 (0.0083 vs 0.0079 iid; Monte-Carlo noise between two streams)
+     bootstrap SE at seeds 43-62: 43:0.0086, 44:0.0088, 45:0.0085, 46:0.0087, 47:0.0086, 48:0.0085, 49:0.0086, 50:0.0086, 51:0.0085, 52:0.0084, 53:0.0087, 54:0.0085, 55:0.0087, 56:0.0086, 57:0.0084, 58:0.0085, 59:0.0083, 60:0.0085, 61:0.0087, 62:0.0083
+
+(C2) DESCRIPTIVE: TIE share T - C on all 1846 = 0.2627 - 0.2541 = +0.0087
+     d(T, C) on all 1846 = 257/1846 = +0.1392 | 90% normal [+0.1243, +0.1541] percentile [+0.1244, +0.1542] | 95% normal [+0.1214, +0.1570] percentile [+0.1218, +0.1568] | SE 0.0091
+     d(C, K46) (a second v2 time point) = 256/1846 = +0.1387 | 90% normal [+0.1250, +0.1524] percentile [+0.1249, +0.1528] | 95% normal [+0.1223, +0.1550] percentile [+0.1228, +0.1558] | SE 0.0083
+     reversals (T vs C, decisive in both, opposite) 1
+     d(T, C) - d_r(v2) = 0.1392 - 0.1000 = +0.0392 (between-sample; SE 0.0197; 95% lower bound +0.0007)
+     THE SENTENCE CHANGES VERDICTS (d(T, C) above the v2 within-session floor by interval)
+STRATA (descriptive): K46 TIE n 238 Delta_A +0.0168; K46 decisive n 1020 Delta_A +0.0137; health n 658 Delta_A +0.0274; math n 600 Delta_A +0.0000
+     reference-correct / reference-wrong: NOT APPLICABLE (no NONE match carries a reference); contested / cross-tier: NOT BUILT (no registered definition for the v2 roster; for the registrar)
+LEAKAGE (descriptive): per-contestant key accuracy and change share (T / C): Llama-2-13b-hf n 69 acc 0.797/0.783 chg 0.101, Llama-2-70b-hf n 68 acc 0.779/0.779 chg 0.118, Llama-2-7b-hf n 76 acc 0.868/0.895 chg 0.105, Meta-Llama-3-70B n 62 acc 0.694/0.597 chg 0.258, Meta-Llama-3-8B n 62 acc 0.806/0.871 chg 0.097, Meta-Llama-3-8B-Instruct n 52 acc 0.750/0.712 chg 0.115, Meta-Llama-3_1-70B n 68 acc 0.735/0.721 chg 0.103, Meta-Llama-3_1-70B-Instruct n 74 acc 0.770/0.730 chg 0.081, Meta-Llama-3_1-8B n 64 acc 0.734/0.781 chg 0.094, Meta-Llama-3_1-8B-Instruct n 66 acc 0.788/0.742 chg 0.076, Mistral-7B-Instruct-v0.1 n 65 acc 0.862/0.877 chg 0.062, Mistral-7B-Instruct-v0.2 n 67 acc 0.791/0.672 chg 0.164, Mistral-7B-v0.1 n 63 acc 0.810/0.810 chg 0.063, Mistral-7B-v0.2-hf n 60 acc 0.867/0.800 chg 0.100, Mixtral-8x7B-Instruct-v0.1 n 59 acc 0.797/0.780 chg 0.102, Mixtral-8x7B-v0.1 n 74 acc 0.784/0.770 chg 0.095, Phi-3-mini-4k-instruct n 64 acc 0.641/0.641 chg 0.156, Qwen1.5-110B n 54 acc 0.778/0.778 chg 0.111, Qwen1.5-14B-Chat n 57 acc 0.632/0.579 chg 0.211, Qwen1.5-72B-Chat n 59 acc 0.780/0.746 chg 0.085, Qwen1.5-7B-Chat n 67 acc 0.761/0.746 chg 0.060, Yi-34B n 56 acc 0.804/0.839 chg 0.125, Yi-6B n 62 acc 0.839/0.823 chg 0.113, Yi-6b-Chat n 64 acc 0.781/0.766 chg 0.094, arx_0314 n 90 acc 0.756/0.733 chg 0.122, arx_3 n 80 acc 0.713/0.775 chg 0.100, c4ai-command-r-v01 n 56 acc 0.661/0.679 chg 0.125, claude-3-5-haiku-20241022 n 68 acc 0.721/0.676 chg 0.162, claude-3-5-sonnet-20241022 n 89 acc 0.787/0.764 chg 0.079, claude-3.5-sonnet n 83 acc 0.735/0.687 chg 0.181, deepseek-chat-v2_5 n 84 acc 0.810/0.774 chg 0.119, gemini-3.1-pro_5-shots n 83 acc 0.843/0.807 chg 0.036, gemma-7b n 56 acc 0.804/0.750 chg 0.089, gpt-4o-2024-08-06 n 78 acc 0.731/0.744 chg 0.128, gpt-4o-mini n 83 acc 0.771/0.795 chg 0.084, iask_pro n 83 acc 0.831/0.783 chg 0.108, mathstral-7B n 51 acc 0.686/0.784 chg 0.137
+     CONSENSUS-FIT [T]: KEY +1.817 +- 0.081 (n 2331 rows) | REF NOT ESTIMABLE (no reference in the arm)
+     CONSENSUS-FIT [C]: KEY +1.728 +- 0.079 (n 2315 rows) | REF NOT ESTIMABLE (no reference in the arm)
+
+PREDICTIONS (draft; scored on the points):
+  P1 Delta_A = +0.5pp [-2.0, +3.5]                        +0.0143                                      -> UNDETERMINED BY VALIDITY
+  P2 TIE share T - C = -1.0pp [-4.0, +2.0]                +0.0087                                      -> UNDETERMINED BY VALIDITY
+  P3 d(T, C) [0.08, 0.15]; d(T, C) - d_r [-0.03, +0.05]   0.1392 / +0.0392                             -> UNDETERMINED BY VALIDITY
+  P4 d(C, K46) [0.07, 0.15]                               0.1387                                       -> UNDETERMINED BY VALIDITY
+  P5 per-contestant movement <= 3pp (>= 40 kd rows)       max 0.1194 over 37                           -> UNDETERMINED BY VALIDITY
+  P6 fingerprint 7,384 of 7,384; unusable <= 0.3% per arm 7384 calls, foreign none, unusable 0.0000 / 0.0000 -> UNDETERMINED BY VALIDITY
+
+FALSIFIER: NOT EVALUATED (C0 failed or no key-decidable rows).
+ACCOUNTING (day ledgers): V2-NONE-TEMPLATE 7384 of 7750 calls (cache 7384, ledgers 7384) | registered 7384

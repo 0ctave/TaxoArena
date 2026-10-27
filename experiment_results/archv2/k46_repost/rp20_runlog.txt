@@ -1,0 +1,63 @@
+== RP20 + ONE run log, operator, 2026-10-02T00:47:20+02:00, HEAD 18769e1f634fe6ed7bbbe70e4386dab8d6d48c23, k46_repost blob 8c5ce9db5f7cf39577264e222450a3e1f599eae6 sha256-lf16 dd8152585fd7f0d7
+C-K8: C1-v2: HELD
+44724d25aa8653b49cef5ea85e99016f4e27f1c99819edc62073416eeec27793 *experiment_results/archv2/pilot_k46/pilot_k46_verdicts_run2.db
+experiment_results/day_calls_2026-09-24.json
+experiment_results/day_calls_2026-09-25.json
+experiment_results/day_calls_2026-09-26.json
+experiment_results/day_calls_2026-10-01.json
+transport_check rp20 exit 0
+transport_check one exit 0
+dryrun rp20 exit 0
+dryrun one exit 0
+pilot rp20 exit 0 2026-10-02T00:48:05+02:00
+NOTE (coordinator query): pilot guard 'key-decidable 0 of 20' = (kd-unusable ku, kd-total kt) per guard_rows L886-898 / print L1087; KEYS line: 12 matches, key-decidable 10 (x2 arms = 20). Not a defect.
+run rp20 exit 0 2026-10-02T01:29:28+02:00
+pilot one exit 0 2026-10-02T01:30:03+02:00
+run one exit 0 2026-10-02T01:48:57+02:00
+== shas after
+c836470213c40d5f655118ef2217ecdccbe23a0d3bc492b5ff02f9d33a68b2f7 *experiment_results/archv2/k46_repost/k46_repost_rp20.db
+7f5d599c0c6f6d29ec67ecf560b823440eede539569a28b5c9ad8d159b6d3dfa *experiment_results/archv2/k46_repost/k46_repost_one.db
+7f5d599c0c6f6d29ec67ecf560b823440eede539569a28b5c9ad8d159b6d3dfa *experiment_results/_backup/rp20_one_20261002/k46_repost_one.db
+c836470213c40d5f655118ef2217ecdccbe23a0d3bc492b5ff02f9d33a68b2f7 *experiment_results/_backup/rp20_one_20261002/k46_repost_rp20.db
+44724d25aa8653b49cef5ea85e99016f4e27f1c99819edc62073416eeec27793 *experiment_results/archv2/pilot_k46/pilot_k46_verdicts_run2.db
+de0768aaed264efcdab6a3b02ff4ece345b6be9073209556bbb02f13f570ca21 *experiment_results/day_calls_2026-10-02.json
+[
+ {
+  "test": "V2-NONE-TEMPLATE",
+  "launch": "--leg rp20 --pilot 12",
+  "calls": 48,
+  "ts": "2026-10-02 00:48:04"
+ },
+ {
+  "test": "V2-NONE-TEMPLATE",
+  "launch": "--leg rp20 --run",
+  "calls": 7336,
+  "ts": "2026-10-02 01:29:28"
+ },
+ {
+  "test": "REF-PAIRED-V2",
+  "launch": "--leg one --pilot 12",
+  "calls": 48,
+  "ts": "2026-10-02 01:30:02"
+ },
+ {
+  "test": "REF-PAIRED-V2",
+  "launch": "--leg one --run",
+  "calls": 3224,
+  "ts": "2026-10-02 01:48:57"
+ }
+]
+keygrep done (clean); caches backed up to experiment_results/_backup/rp20_one_20261002 (not committed); --analyze NOT run (waits for the reviewed DEFF fix)
+== analyze 2026-10-02T01:50:04+02:00 HEAD 2a7443a2b87b33591626a680c2a8de25e619be20 blob 4159d62eb62c6705de0132da9f336d9df365dcc0 lf16 58f621dc4582616b
+analyze rp20 exit 0
+analyze one exit 0
+== INCIDENT C0(d) 2026-10-02 (artefacts copied to incident_c0d_20261002/ before any probe)
+Both outcomes: (d) FAIL 0 of 3692 / 0 of 1636 -> C1 UNDETERMINED BY VALIDITY.
+ROOT CAUSE (read-only probes): analyze_pair (L1425ff) re-checks each T body via arm_payload -> stored_body (L453) comparing rr.payload_bytes(system,user) to the stored body; rr.payload_bytes uses rr.JUDGE_MODEL, whose module default is "grok-4-1-fast-reasoning" (rejudge_reasoning.py L45). configure_rr() (L296-297, sets JUDGE_MODEL = grok-4-1-fast-non-reasoning) is called only in launch() (L1028), never in the --analyze path. Every stored_body raises "[BODY] <mid> order <n>: rr.payload_bytes(system, user) != the stored body", swallowed by the try/except SystemExit at L1456 -> t_ok 0.
+Rebuilt head: b'{"model": "grok-4-1-fast-reasoning", ...' vs stored b'{"model": "grok-4-1-fast-non-reasoning", ...'.
+Probe with rr.JUDGE_MODEL = JUDGE: rp20 3692 of 3692, one 1636 of 1636 -> the POSTED bodies are sound (also C0(e) 7384/3272 fingerprinted non-reasoning); the defect is analysis-only (present before the DEFF delta too: the delta does not touch these lines).
+Fix owed (engine-coder + delta review): call configure_rr() in analyze_pair/analyze_canary; re-analysis needs the write-once outcome files moved aside (registrar/research-lead decision).
+== re-analyze 2026-10-02T02:19:27+02:00 HEAD 11de1b45c1aab65b2b32d2df59da76ea44440707 blob 74d5fd68de5f46bd3ed3ded26f9c675b56fe32a2
+analyze2 rp20 exit 0
+analyze2 one exit 0
+C0(d) PASS 3692/3692 and 1636/1636; C1 values equal the void run's; accounting 7384 / 3272

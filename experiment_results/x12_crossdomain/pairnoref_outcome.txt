@@ -1,0 +1,26 @@
+=== PAIR-NOREF: the reference toggle in the DEPLOYED pairwise format (944 paired matches) ===
+
+  (1)(2) the signed-contrast fit, paired:
+      pairwise WITH a reference   KEY +0.981 | REF +2.279 | REF-KEY +1.298
+      pairwise WITHOUT one        KEY +0.959 | REF +0.682 | REF-KEY -0.276
+      delta KEY      -0.022  95% CI [-0.240, +0.191]
+      delta REF      -1.596  95% CI [-1.904, -1.388]   <- excludes zero
+      delta REF-KEY  -1.574  95% CI [-2.004, -1.216]   <- excludes zero
+
+  (1) PRIMARY: displacement replicates if the judge weights correctness LESS when a reference is
+      present, i.e. delta KEY (noref minus withref) is POSITIVE with a CI excluding zero.
+      delta KEY -0.022 [-0.240, +0.191] -> NOT replicated: the displacement finding is pointwise-only and the paper must narrow the claim
+      pointwise, for comparison: KEY +0.817 without a reference, +0.257 with one (delta -0.560)
+
+  (3) THE CLEAN PAIRWISE REFERENCE EFFECT ON ACCURACY: with 0.864 | without 0.738 | +0.126 (144:25, McNemar p=1.598e-21)
+      against the confounded +11.8pp in the POINTWISE 2x2 row (v1 prompt + cell rubric comparator)
+      and J2-R's clean +7.6pp on a different judge.
+  (4) TIE RATE: with a reference 0.070 | without 0.177 (+0.107)
+      DECOMPOSITION, since ties score as errors: accuracy on the verdicts the judge COMMITS to is
+      0.929 with a reference (n=878) and 0.897 without (n=777), a gap of +0.032 against the +0.126 headline.
+      So 74% of the reference's apparent accuracy effect is the judge ABSTAINING less, and 26% is
+      better discrimination - the same split RK-1b turned out to have, and the same one AGGREGATE exploits.
+
+  IS PAIRWISE GENUINELY DIFFERENT FROM POINTWISE, or just underpowered here? The pointwise toggle gave
+      delta KEY -0.560; this CI is [-0.240, +0.191], which EXCLUDES it. The formats differ, they are not merely
+      indistinguishable at this sample size.

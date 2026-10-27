@@ -1,0 +1,66 @@
+== 2026-10-04T04:49:49+02:00 HEAD 8419d4ce89a054cd1a4ae1637b74e1f142c54f78; modified 0; java 0
+$ git checkout 1d282351 -- <4 files>
+rc=0
+tools/analysis/cert_k2_deflated.py f5f7f17857053694906fa3e4e57f8020fa2ff0a1 rec f5f7f17857053694906fa3e4e57f8020fa2ff0a1
+src/test/kotlin/taxonomy/CertK2DeflatedArmTest.kt e0f326e1b1bbac069d1b9d07905077f5a18ade16 rec e0f326e1b1bbac069d1b9d07905077f5a18ade16
+src/test/kotlin/taxonomy/SeparationNullBySizeTest.kt cb91cdcd2f01dc80bb69ea31c527da83216a6d9b rec cb91cdcd2f01dc80bb69ea31c527da83216a6d9b
+build.gradle.kts 9a70c27e640f894b51263f777cab06879c639fb0 rec 9a70c27e640f894b51263f777cab06879c639fb0
+M  build.gradle.kts
+A  src/test/kotlin/taxonomy/CertK2DeflatedArmTest.kt
+M  src/test/kotlin/taxonomy/SeparationNullBySizeTest.kt
+A  tools/analysis/cert_k2_deflated.py
+== sidecars
+-rw-r--r-- 1 octav 197609 0 Oct  2 08:14 embeddings_cache.db-wal
+-rw-r--r-- 1 octav 197609 0 Oct  2 08:14 multicorpus_cache_v1.db-wal
+-rw-r--r-- 1 octav 197609 0 Oct  1 10:07 snapshots.db-wal
+== 2026-10-04T04:49:58+02:00 TDR=unset $ python tools/analysis/cert_k2_deflated.py --selftest
+rc=0
+== 2026-10-04T04:50:10+02:00 TDR=unset $ python tools/analysis/cert_k2_deflated.py --mutants
+rc=0
+== 2026-10-04T05:10:52+02:00 $ TAXOARENA_DATA_ROOT=<main> python tools/analysis/v2_union_pool.py --dry-run (scoped)
+rc=0; after: TDR=unset
+== 2026-10-04T05:10:55+02:00 TDR=unset $ python tools/analysis/cert_k2_deflated.py --dry-run --data-root Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run
+rc=0
+== 2026-10-04T05:11:16+02:00 $ python tools/analysis/cert_k2_deflated.py --prepare --data-root Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run
+rc=0
+== 2026-10-04T05:11:19+02:00 $ python tools/analysis/cert_k2_deflated.py --hashes before --data-root Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run
+rc=0
+== 2026-10-04T05:11:25+02:00 RULE-7 WINDOW
+42336 ollama app.exe "C:\Users\octav\AppData\Local\Programs\Ollama\ollama app.exe" 
+42448 ollama.exe C:\Users\octav\AppData\Local\Programs\Ollama\ollama.exe serve
+free RAM GB: 26,5
+snapshots.db exclusive-open FREE
+embeddings_cache.db exclusive-open FREE
+multicorpus_cache_v1.db exclusive-open FREE
+mmlu_pro_dataset_cache_v2.db exclusive-open FREE
+ollama ps:
+NAME    ID    SIZE    PROCESSOR    CONTEXT    UNTIL 
+== admitted PIDs: 42448 ollama, 42336 ollama app (idle); no java/python; probe FREE x4; RAM 26.5 GB; no git write under src/ after the path checkout; no --purge-stale
+== 2026-10-04T05:11:34+02:00 START $ .\gradlew.bat certK2Deflated --console=plain --offline --no-daemon -PjvmThreads=12 -PnullReps=300 "-DsnapshotId=20261001_094311_Headless_Run_Auto_ge" "-DsliceDim=512" "-DsepBar=0.0145" "-DdropTop=0" "-Dwhiten=false" "-DsiteLabels=experiment_results/cert_k2_deflated/site_labels.tsv" "-DoutDir=experiment_results/cert_k2_deflated/arm"
+== 2026-10-04T05:33:04+02:00 END rc=0 wall 1290s
+== 2026-10-04T05:33:15+02:00 $ .\gradlew.bat --stop (powershell)
+No Gradle daemons are running.
+rc=0
+java count: 0
+== 2026-10-04T05:33:16+02:00 $ --hashes after --data-root Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run
+[CPC] heavy foreign processes (java): none
+[DFL] embeddings_cache.db per-table hashes (after): {"agent_ratings": "e3b0c44298fc1c14", "embeddings": "641ff6fad35bd1af", "gmm_vectors": "e3b0c44298fc1c14", "match_history": "e3b0c44298fc1c14", "queries": "8c15ceb667a633a2"}
+rc=0
+-rw-r--r-- 1 octav 197609 0 Oct  2 08:14 embeddings_cache.db-wal
+-rw-r--r-- 1 octav 197609 0 Oct  2 08:14 multicorpus_cache_v1.db-wal
+-rw-r--r-- 1 octav 197609 0 Oct  1 10:07 snapshots.db-wal
+== 2026-10-04T05:33:22+02:00 $ python tools/analysis/cert_k2_deflated.py --analyze
+rc=0
+== 2026-10-04T05:33:36+02:00 $ python tools/analysis/cert_k2_deflated.py --replication
+rc=0
+== 2026-10-04T05:33:52+02:00 backup /e/TaxoArena_backup_2026-10-04_cert_k2_deflated
+15b5b2d9c5d13f05966ebb2092212cce47919e22212d7e8e0e12cd32153e79fa *./arm/replicates.csv
+b73668929fea1fbf7c74ae540c0d3f6a542c72a123d4765f2c44a46d4bf1bbb2 *./arm/sites.csv
+3bf1bdae780ab555f2b97281cd0345b6d1b51c2e3d8bd810ea1147053c41a67a *./arm/status.txt
+4e5e6718ae4c32459636af31e24a4f8ca45e70bea28edc6e9e9af1934bb67219 *./df_sites.csv
+17c31d55e6c1e80830d8eed2049318a611c67b4795364abb1411f79cbdfb3d6a *./emb_hashes_after.json
+17c31d55e6c1e80830d8eed2049318a611c67b4795364abb1411f79cbdfb3d6a *./emb_hashes_before.json
+4d7533beeb87b6a7825cbd9475ae6de5c644d7295cf840b02cc3e66d4d2c9e9e *./outcome.txt
+fdc7eb543eea5ee0f4140d162a1e3446bcd25514f13ade8664ea272fb462b899 *./replication.txt
+00c002394ed99431b0189e5c00c6b7c265a53f6133f6d50197fa0ca8362c0110 *./site_labels.tsv
+== rp12-r2-run left at 8419d4ce + the 4 path-checked-out files of 1d282351 (staged)

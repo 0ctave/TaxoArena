@@ -1,0 +1,566 @@
+\chapter{Experimental Design}\label{ch:experimental-design}
+
+This chapter fixes the configuration under which the method of
+Chapter~\ref{ch:methodology} was instantiated: the corpus and its
+split, the rosters, the conditions, the pre-registrations with what
+each of them fixed in advance, and the statistical protocol.
+Taxonomy-tuning mechanics and the construction ablation matrix are in
+Appendix~\ref{app:tuning-protocol}; rubric-generation mechanics are in
+Appendix~\ref{app:judge-generation}.
+
+\section{Research Questions, Conditions, and Metrics}\label{sec:exp-rqmap}
+
+Table~\ref{tab:rq-map} fixes which condition answers which research
+question, with which metric, and which link of
+Section~\ref{sec:research-questions} it lands on.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Each research question with the condition contrast that
+tests it, the metric that decides it, and the link of the
+three-link argument it sits on.}
+    \label{tab:rq-map}
+    \begin{tabular}{p{0.9cm}p{4.0cm}p{2.6cm}p{4.0cm}c}
+        \toprule
+        RQ & Question & Conditions & Primary metric & Link \\
+        \midrule
+        RQ1 & Do answer-key-blind, domain-conditioned pairwise
+        judgments recover per-domain rankings, and what decides the
+        verdicts?
+        & C1 (main), with C5 (generic) as the rubric control
+        & Per-verdict agreement with the MMLU-Pro key; Spearman $\rho$
+        against ground-truth accuracy, reported under both tie
+        conventions & 3 \\
+        \addlinespace
+        RQ2 & Does a cell-scoped rubric enable better judging
+        than a generic rubric on the same questions?
+        & C1 vs.\ C5, paired on an identical question set
+        & Per-verdict key agreement; Spearman $\rho$ per domain
+        reported alongside & 2 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+The scope is a \textbf{selected-domain study}: the arena evaluates
+ex-ante-selected, high-support domains at high power rather than
+all 14 at matched power. The selection rule is the four-criterion
+substantive rule of Section~\ref{sec:exp-datasets}, applied inside a
+fixed judge-call budget. Eight domains were run: mathematics, physics,
+law, engineering, psychology, philosophy, history and computer science.
+The set was fixed before the settled batch, under an offline
+reordering screen computed at a since-superseded roster; refit at the
+settled roster the screen saturates, so the selection carries no
+endorsement from the refit and the eight domains function as
+replications, not as screened contrasts (full refit numbers and both
+caveats in Section~\ref{sec:res-law}). All eight ran against the same
+snapshot, seed and roster under the paired protocol of
+Section~\ref{sec:exp-arena-conditions}.
+
+\paragraph{Run conditions, identical across all eight domains.}
+Eight-model roster (Table~\ref{tab:roster-r8},
+Appendix~\ref{app:models}), $\binom{8}{2} = 28$ model pairs;
+\texttt{RESOLVED} option mode; the generic arm replays the cell-scoped
+arm's exact $(\text{question}, \text{model pair})$ triples under the
+same cells, so the arms share questions, comparisons and cells by
+construction; the confidence gate disabled in both arms (no verdict was
+removed by it in any domain); an isolated ranking database per run;
+seed 42.
+
+A decisive difference of $|\Delta\rho| \geq 0.007$ --- two steps of the
+Spearman grid at the roster size it was written for --- was registered
+in advance and is \textbf{withdrawn}: a seed replicate showed
+run-to-run spread three to four times that size
+(Section~\ref{sec:exp-metrics}; Appendix~\ref{app:preregs}, addendum
+to P4). Throughout,
+$\Delta\rho = \rho_{\textsc{main}} - \rho_{\textsc{c5}}$ is reported
+for continuity and is not used as a decision rule; the reading
+conventions that govern all of this are collected in one box at the
+head of Chapter~\ref{ch:results}.
+
+\textbf{Every construction and arena result in this thesis is at seed
+42}; no result is a mean over seeds. Seed dispersion has been
+measured twice and neither measurement is an error bar on a headline
+number (Sections~\ref{sec:res-construction}
+and~\ref{sec:arch-requirements}). The canonical configuration values
+are tabulated with their provenance in
+Appendix~\ref{app:tuning-protocol} (Table~\ref{tab:hyperparams}).
+
+\section{Corpus, Split, and Information Separation}\label{sec:exp-datasets}
+
+The corpus is MMLU-Pro~\parencite{wang2024mmlupro}: 12{,}032 questions
+across 14 domains with human-verified reference answers, used in two
+roles. It supplies the ground-truth domain labels that seed the 14
+anchor nodes, and it supplies the per-domain accuracy scores used as
+the post-hoc validation oracle (Section~\ref{sec:meth-validation}).
+All 14 categories seed anchors, including the semantically
+heterogeneous \textit{Other} category, which is retained as a geometric
+anchor --- its queries remain routable mass and may migrate toward
+coherent anchors --- but is not an arena selection candidate.
+AG News~\parencite{zhang2015agnews} was used once, as a pipeline sanity
+check on an independently labelled corpus; the check passed and the
+corpus is not used further.
+
+Taxonomy construction runs on all 14 domains simultaneously, which is
+what allows queries to migrate between anchors and so makes the adapted
+partition differ from the canonical one at all.
+The arena evaluates a roster on ex-ante-selected domains,
+chosen before observing any arena result under a fixed rule: high
+held-out query support; high geometric coherence relative to siblings;
+non-trivial adapted-versus-canonical migration volume; and
+non-degenerate model performance variance under existing MMLU-Pro
+accuracy. Mathematics was the primary candidate under that rule. The offline
+domain screen of Section~\ref{sec:res-law} was added later as a
+stronger instrument than the fourth criterion: it flagged four
+domains, selected law as the first to run, and demoted mathematics to
+a null arm. Its registered limit --- it classifies a domain
+aggregate, not the cells inside one --- is stated with the screen
+itself (Section~\ref{sec:res-law}).
+
+\subsection{The Split}
+
+The corpus is partitioned into two disjoint, stratified subsets:
+\textbf{construction} (taxonomy induction and rubric generation) and
+\textbf{arena-test} (held-out routing and judging only). The split is
+$70/30$ --- $8{,}673$ construction against $3{,}445$ held out --- and is
+stratified by MMLU-Pro top-level category: the corpus is shuffled
+inside each of the 14 categories and cut there, so every category
+contributes the same proportion to each side. It is not stratified any
+finer than that, and in particular not by sub-topic tag.
+
+\textbf{Tuning shares the construction side, and that is a
+limitation.} A three-way split reserving a separate tuning-validation
+subset would be cleaner, and it was rejected because at this corpus size
+it starves the part that matters: the held-out pool already yields only
+$131$ routable questions in the smallest domain, and taking a further
+slice off it would leave several domains with too few questions to judge
+at all. Instead, tuning gates score configurations on
+construction-internal metrics, so no held-out query is seen by any gate.
+
+The property the answer-key-blind claim rests on therefore holds, in
+exactly the scope the code enforces. The reserved filter lives
+in \emph{rubric induction}: no reserved question's text reaches the pool a
+rubric is written from. It does \emph{not} exclude reserved material from the
+partition, whose leaf regions do contain it. So the claim is that no
+arena-test question influenced the rubric it is later judged under --- not
+that the tree was drawn without reserved data.
+
+That claim is verified by measurement rather than by the assertion alone: of
+the $1{,}569$ distinct question texts the settled batch judged, \textbf{zero}
+appear in any leaf's induction pool.
+What is lost is the ability to distinguish a configuration that
+generalises from one that suits the construction set: the tuning
+decisions are validated on the same data that produced them, and a
+reader should treat the chosen hyperparameters as fitted rather than as
+independently confirmed.
+
+One further detail affects what a ``construction-set'' claim means:
+the rubric-induction pool is additionally thinned by a hash filter, so
+a leaf's rubric samples its construction queries
+(Section~\ref{sec:arch-judge}).\footnote{And about $4.2\%$ of MMLU-Pro
+rows --- some 500 of 12{,}032 --- carry no link into the evaluation
+tables; they are believed to be sentinel identifiers, but that has not
+been confirmed, and they are recorded here as unattributed rather than
+explained.}
+
+The arena-test fraction targets approximately 10 held-out queries at
+the smallest leaf under a selected domain. The binding constraint is
+the number of model pairs per leaf, $\binom{8}{2} = 28$ at the settled
+roster, and the bootstrap floor covers all 28 before adaptive
+scheduling begins. The eleven-model figure of $\binom{11}{2} = 55$
+applies only to the reliability-constant fit
+(Section~\ref{sec:disc-debt}).
+
+\subsection{Information Separation}\label{sec:exp-info-separation}
+
+Table~\ref{tab:info-separation} makes the answer-key-blind design
+concrete: at every pipeline phase, only the data marked \checkmark{} is
+accessible to the corresponding component.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Data access by pipeline phase: which split's question
+    texts and which labels/answers each phase may read. A checkmark is
+    access; the two dashes with footnotes mark rows that hold by pool
+    assignment or by an enforced filter rather than trivially.}
+    \label{tab:info-separation}
+    \begin{tabular}{p{3.4cm}cccc}
+        \toprule
+        & \multicolumn{2}{c}{$\mathcal{Q}_{\text{con}}$}
+        & \multicolumn{2}{c}{$\mathcal{Q}_{\text{eval}}$} \\
+        \cmidrule(lr){2-3}\cmidrule(lr){4-5}
+        Phase & text & labels/answers & text & labels/answers \\
+        \midrule
+        Taxonomy construction & \checkmark & \checkmark & ---\textsuperscript{a} & --- \\
+        Rubric generation & \checkmark & \checkmark & ---\textsuperscript{b} & --- \\
+        Held-out routing & --- & --- & \checkmark & --- \\
+        Arena evaluation (judging) & --- & --- & \checkmark & --- \\
+        Post-hoc validation & --- & --- & \checkmark & \checkmark \\
+        \bottomrule
+    \end{tabular}
+    \par\smallskip
+    \footnotesize \textsuperscript{a}Construction is run on the construction
+    split. The reserved \emph{filter}, however, is applied at rubric induction
+    and not here, so this row holds by which pool construction was given rather
+    than by an enforced exclusion. Because roughly $2{,}700$ question texts
+    carry both a construction and a reserved identifier --- a consequence of
+    the two identifier spaces (Appendix~\ref{app:models}) --- a text that is
+    also reserved under some other identifier can appear in a leaf region.
+    \textsuperscript{b}Enforced, and verified: zero of the $1{,}569$ question
+    texts the settled batch judged appear in any leaf's induction pool.
+\end{table}
+
+The evaluation set's labels and reference answers are accessed only in
+the final, post-hoc validation phase, after every verdict has been
+recorded. The rubric-induction filter that enforces the second row is
+audited by a build-failing assertion that recomputes the membership
+test independently and stops the build if the two disagree
+(Section~\ref{sec:arch-judge}).
+
+It guarantees exactly what it says and no more. The judge receives
+neither the answer key nor the multiple-choice options --- its prompt
+is the question stem, the two responses, and the output instructions.
+What it does receive is responses that usually state their own answer,
+$97.6\%$ of stored traces ending by declaring the answering model's
+selected option (range $93.2$--$99.8\%$ across the eight domains). So ``answer-key-blind'' is not ``answer-blind'': the
+key is withheld at the prompt and not at the mechanism, and
+Chapter~\ref{ch:results} turns on the difference.
+
+\section{Rosters and the Exclusion Policy}\label{sec:exp-rosters}
+
+One roster carries every settled result: the eight models of
+Table~\ref{tab:roster-r8} (Appendix~\ref{app:models}), selected to
+span ground-truth accuracy $16.5\%$ to $90.5\%$ so that most model
+pairs are key-decidable at the question counts a domain routes. What
+that selection gives up is stated with the roster: it is not
+length-matched (median stored response $220$ to $1{,}494$ characters,
+$6.79\times$), so verbosity and capability are confounded in the
+settled runs (Section~\ref{sec:disc-debt}).
+
+Three earlier rosters belong to withdrawn or superseded work and are
+recorded in Appendix~\ref{app:models}
+(Section~\ref{sec:roster-earlier}): the eight-model pilot roster,
+whose capture-gap defect made response format and capability
+collinear; the twelve-model length-matched band of the withdrawn
+paired campaign, whose length control is the one property the settled
+selection sacrificed; and the eleven-model band on which the offline
+domain screen and the reliability constant were first fitted. Every
+settled arena run sits on the eight-model roster of
+Table~\ref{tab:roster-r8}.
+
+That roster mismatch has since been resolved for the screen and not
+for the constant. \textbf{The screen is refitted at the settled
+eight-model roster} and saturates there
+(Table~\ref{tab:domain-screen}); its earlier generations are
+superseded and no screen $p$-value from them is carried forward.
+\textbf{The reliability constant was not refitted.} $c = 2.52$
+remains an eleven-model value, it is a property of its roster, and
+the obligation to refit it stands (Section~\ref{sec:disc-debt}).
+
+\paragraph{Ground-truth accuracy, and one accounting decision inside
+it.} Every $\rho$ in this thesis is computed against per-model
+per-domain accuracy exported from the upstream MMLU-Pro evaluation
+outputs.\footnote{By \texttt{tools/analysis/export\_gt\_scores.py},
+into \texttt{model\_domain\_scores.csv}.} A response whose predicted option
+cannot be parsed is scored incorrect. That is not free: on the settled
+roster, blank-prediction rates run $17.4\%$ to $19.7\%$ for its three
+weakest models and below $1\%$ for the other five, so scoring blanks
+as wrong deflates those three by up to $11$ accuracy points. Excluding
+blanks from the denominator instead leaves the roster ordering
+\emph{identical in all eight positions} on the reserved pool, which is
+why every rank-based result here is unaffected by the choice. Both
+columns are exported so the reader can check that claim.
+
+\paragraph{Exclusion is enforced, and it is a measurement, not a
+housekeeping decision.}
+Ten models are excluded at roster load by a hard-coded list that
+raises, each entry carrying its reason: one identifier-space mismatch,
+six archives with no stored reasoning text, and three mixed-format
+models. The mixed-format threshold is format \emph{consistency}, not
+text presence: a model that emits a bare answer on a third of items
+reintroduces the format preference inside its own comparisons. The
+three excluded on that ground emit bare answers on $68.4\%$, $35.4\%$
+and $27.6\%$ of items respectively.
+
+The honest statement of the policy is therefore:
+\emph{response text was not persisted by the generation pipeline for
+several models, and three further models emit a bare answer on more
+than a quarter of items; all are excluded, and the format artifact is
+reported as the measurement that justifies the exclusion.}
+
+One note belongs with it: six of the ten exclusions are for exactly
+the condition the corpus validator's trace-presence check measures and
+declines to act on, because that check has no failure branch. The
+policy is a ratchet on known failures, not a threshold, and it does
+not generalise to any new model.\footnote{And one disambiguation: the
+roster member \texttt{Meta-Llama-3\_1-70B-Instruct} is not the
+excluded \texttt{Meta-Llama-3-70B-Instruct}. They are different
+models, the roster's is clean, and the excluded one sits in a
+different question-identifier space and is what collapsed law to 20
+questions in Section~\ref{sec:res-law}.}
+The full roster tables are in Appendix~\ref{app:models}.
+
+\section{Conditions}\label{sec:exp-arena-conditions}
+
+Across every condition, embeddings are produced by Qwen3-Embedding
+served locally, and the judge is Mistral-Large-3, a single large
+instruction-tuned model accessed through an Azure OpenAI-compatible
+client --- the same judge model for rubric induction and for every
+arena condition.\footnote{The judge identity
+was verified against two independent sources after two project
+documents were found to disagree: the Run~B run log records
+\texttt{Mistral-Large-3} on every judge call (four occurrences of the
+identifier, none of any smaller ``ministral'' variant), and the runtime
+configuration pins \texttt{judge-model: \textquotedbl{}Mistral-Large-3\textquotedbl{}}. The roster
+tables of Appendix~\ref{app:models} state it alongside the rosters.}
+
+Three conditions appear in this thesis: C1 (\textsc{main}); C5
+(\textsc{generic}), registered as \textsc{no-partition} and more
+accurately described as a generic-rubric arm on the same partition
+(see below); and C3, a rubric-free arm. Every paired run uses two of
+them, C1 against C5. Each chapter names them in full at first use
+and by the small-caps short form thereafter; run exports spell the
+generic condition \texttt{GENERIC\_JUDGE}, and the two names denote
+the same condition.\footnote{The identifiers are inherited from an
+earlier design document and are deliberately not renumbered: C2 ---
+re-aggregating C1's verdict set by editorial label --- and C4, an
+optional diagnostic, were cut before any run. C2 could not have
+isolated anything: it shares its entire verdict set with C1, and the
+question it was built to answer --- the per-cell
+adapted-versus-canonical rank difference --- was refuted at its
+premise under pre-registration before the arena ran
+(Section~\ref{sec:res-granularity}).}
+Table~\ref{tab:arena-conditions} states what each condition varies.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Arena conditions. All conditions share the frozen
+    snapshot and the model roster of their run; only the listed factor
+    varies.}
+    \label{tab:arena-conditions}
+    \begin{tabular}{p{0.9cm}p{2.7cm}p{4.4cm}p{4.0cm}}
+        \toprule
+        ID & Condition & Delta from C1 & What it controls \\
+        \midrule
+        C1 & Main
+        & --- (adapted partition, cell-scoped reference-informed rubric)
+        & reference \\
+        \addlinespace
+        C5 & Generic rubric
+        & Replays \textsc{main}'s exact triples under the same cells,
+        judged under a generic MT-Bench-style pairwise prompt
+        & rubric bundle at matched budget; \textbf{not} the partition \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+C3, the rubric-free judge on the same cells, ran
+only inside the withdrawn pilot and carries no result; the isolation
+run that would revive its idea on working code is named as future
+work (Section~\ref{sec:disc-future}). What C5 controls is stated in
+the table in its corrected form: under the replay design of
+Section~\ref{sec:exp-rqmap} and the pooling identity of
+Section~\ref{sec:meth-aggregation}, C5 varies the judge-prompt bundle
+on a fixed partition and nothing else. No
+condition in this thesis removes the partition: a real no-partition
+arm would schedule its own comparisons over the whole domain with no
+cells, holding the rubric fixed --- a new scheduler condition, not a
+configuration change, and it was not run.
+Figure~\ref{fig:design-schematic} draws the design end to end; the
+one fact it exists to make unmissable is that the two arms read a
+single comparison list.
+
+\begin{figure}[htbp]
+\centering
+\footnotesize
+\begin{tikzpicture}[
+  box/.style={draw, rounded corners=1pt, align=center,
+              inner sep=4pt, font=\footnotesize},
+  lbl/.style={font=\scriptsize, text=black!60},
+  arr/.style={->, >=stealth, thick},
+  node distance=4mm and 9mm]
+\node[box] (corpus) {MMLU-Pro with eval coverage\\$12{,}118$ questions};
+\node[box, below left=8mm and -14mm of corpus] (con)
+  {construction split\\$8{,}673$ ($70\%$)};
+\node[box, below right=8mm and -14mm of corpus] (res)
+  {reserved split\\$3{,}445$ ($30\%$)};
+\node[box, below=of con] (tree)
+  {frozen taxonomy + rubrics\\$87$ cells, snapshot \texttt{20260727}};
+\node[box, below=of res] (routed)
+  {routed held-out questions\\$1{,}637$ in $52$ cells};
+\node[box, below=14mm of $(tree.south)!0.5!(routed.south)$] (triples)
+  {\textbf{one comparison list}\\$5{,}161$ (cell, pair, question) triples};
+\node[box, below left=8mm and -16mm of triples] (main)
+  {\textsc{main}\\cell rubric, JSON verdict};
+\node[box, below right=8mm and -16mm of triples] (gen)
+  {\textsc{generic} (C5)\\MT-Bench prompt, \texttt{[[A]]/[[B]]/[[C]]}};
+\draw[arr] (corpus) -- (con);
+\draw[arr] (corpus) -- (res);
+\draw[arr] (con) -- node[lbl, left] {induction (+ tuning)} (tree);
+\draw[arr] (res) -- node[lbl, right] {routing, by the frozen geometry} (routed);
+\draw[arr] (tree) -- (triples);
+\draw[arr] (routed) -- (triples);
+\draw[arr] (triples) -- node[lbl, left, pos=0.6] {judged} (main);
+\draw[arr] (triples) -- node[lbl, right, pos=0.6] {replayed} (gen);
+\node[lbl, below=2mm of $(main.south)!0.5!(gen.south)$, align=center]
+  {the arms share cells, comparisons and aggregation;\\
+   they differ in the judge-prompt bundle and in nothing else};
+\end{tikzpicture}
+\caption{The experimental design: rubric induction reads only the
+construction split, held-out questions are routed by the frozen
+geometry, and both judging arms read \emph{one} comparison list, so
+the contrast isolates the judge-prompt bundle at matched budget.}
+\label{fig:design-schematic}
+\end{figure}
+
+\paragraph{Pairing, and what may be compared across formats.}
+Both arms of the C1-versus-C5 comparison judge an identical question
+set --- the replay design of Section~\ref{sec:exp-rqmap}. Unlike the
+original MT-Bench protocol, which samples independently, here the
+rubric bundle is the treatment and the partition is shared
+infrastructure, so replay is what isolates the treatment; independent
+sampling would add variance orthogonal to the thing under test.
+The two arms parse different verdict formats --- a structured schema
+against \texttt{[[A]]}/\texttt{[[B]]}/\texttt{[[C]]} markers --- with
+three consequences. Winners, the Bradley--Terry ordering derived from
+them, and tie counts \emph{are} comparable, provided ties are defined
+identically on both sides. Judge confidence is \emph{not}: the generic
+arm emits a flat constant. Parse-failure rates are not comparable
+either, and the failure \emph{modes} differ rather than merely the
+rates, because a malformed structured response fails loudly while a
+generic response with no marker returns an invalid verdict silently.
+Operationally this is why the confidence gate is disabled in both
+arms (Section~\ref{sec:arch-judge}).
+
+\section{Pre-Registration}\label{sec:exp-prereg}
+
+Five decision rules were fixed in dated documents before the data they
+govern existed, and four of them govern runs that happened. The dates
+are part of the claim and are stated from the version-control history:
+the granularity analysis, the rubric-specificity test, and the arena
+launch-cost bands were registered on 2026-07-27; the no-partition
+baseline was registered on 2026-07-27, the same day the domain screen
+settled on law (Section~\ref{sec:res-law}), and amended through
+2026-07-30. The documents are recorded in
+Appendix~\ref{app:tuning-protocol}; what each fixed is summarised here,
+because Chapter~\ref{ch:results} calls results ``pre-registered'' and a
+reader is entitled to check the claim.
+
+Five dated addenda extend the registrations --- one closes P2, four
+extend P4; their
+sequence --- what each registered, which were written before the runs
+they govern, and the one written after --- is recorded in
+Appendix~\ref{sec:app-addenda-record}.
+
+What each fixed, in one line each; the registrations themselves are
+in Appendix~\ref{app:preregs}.
+\textbf{Granularity and discriminative power (P1)}: three outcomes
+named in advance, with the primary statistic fixed as the
+\emph{observed} correlation --- the rule that keeps the conclusion
+readable. \textbf{Rubric specificity (P2)}: four directional
+predictions with the confound direction named per measure, plus
+within-arm decision thresholds. \textbf{Arena launch cost (P3)}: cost
+bands not renegotiable after the number is seen, and a void condition
+on constant per-cell cost. \textbf{The no-partition baseline (P4)}:
+the paired design, the primary and secondary outcomes, the
+since-withdrawn decisive difference $|\Delta\rho| \geq 0.007$, four
+void conditions, and the recorded-in-advance prior that with options
+present the comparison would likely come back null. Two of P4's
+provisions are withdrawn in the dated addendum
+(Section~\ref{sec:prereg-addendum-p4}); the registered text is
+preserved unedited, as a registration must be.
+
+\textbf{The mathematics re-run.} It exists because the withdrawn
+campaign's mathematics run carried a scheduler coverage confound; the
+confound, the re-run registration's three readings fixed in advance,
+and the earlier-design taxonomy baselines that are not reported are
+all recorded in Appendix~\ref{sec:app-addenda-record}, together with
+the housekeeping addendum that closed the rubric-specificity
+document.
+
+\section{Metrics and Statistical Protocol}\label{sec:exp-metrics}
+
+\textbf{The primary judge-side metric is per-verdict agreement with the
+MMLU-Pro answer key}, on the subset where exactly one response is
+correct and the judge did not tie. It is a proportion over roughly a
+thousand verdicts per condition. At $p \approx 0.85$ and $n = 1000$ the
+per-arm standard error is about $1.1\%$, so the standard error of the
+paired difference between two arms is about $1.6\%$. Observed gaps run
+from $0.9$ to $4.0$ points, which is why this metric is described as
+leaning rather than as deciding wherever it is quoted.
+
+\textbf{Spearman $\rho$ against ground-truth accuracy is the partition
+metric, and it is heavily quantised.} At $M$ models the grid spacing is
+$6/(M(M^2-1))$: $0.0119$ at $M = 8$, $0.0046$ at $M = 11$, $0.0035$ at
+$M = 12$. A single Spearman value therefore consumes a full arena run to
+produce one number resolvable only to an adjacent transposition, which
+is why it is the secondary statistic everywhere except the partition
+claim, where it is the thing being claimed about.
+
+% RESOLVED 2026-07-31, and not in the way this note anticipated. The seam
+% between the literal 0.007 and two grid steps (0.0069930) no longer needs a
+% ruling, because the threshold itself is withdrawn: two runs of an identical
+% configuration differing only in a scheduler seed gave Delta rho of six and
+% zero grid steps. A rule at two steps cannot adjudicate a quantity whose
+% run-to-run spread is three to four times larger. The paragraph below now
+% states that rather than the ambiguity.
+
+\textbf{The threshold is withdrawn, and the reason supersedes the
+ambiguity it had.} The pre-registration expressed the decisive difference
+two ways at once --- as the number $0.007$ and as two steps of the
+Spearman grid --- which differ by seven millionths and which several
+contrasts landed exactly between. That seam no longer needs resolving,
+because the threshold did not survive a seed replicate: a rule set at
+two grid steps cannot
+separate signal from run-to-run noise three to four times its size.
+$\rho$ is therefore reported for continuity with prior work and is not
+used as a decision rule.
+The replicate behind that statement: two runs of the history domain at
+an identical configuration in \texttt{RESOLVED} mode, seeds 42 and 137,
+moved $\Delta\rho$ by six and zero grid steps while per-verdict
+agreement reproduced to within $0.1$ percentage points.
+
+\textbf{Bradley--Terry $\theta$, never win-rate}, for the
+scheduler-bias reason stated once in
+Section~\ref{sec:meth-scheduling}; the measured cost of the difference
+is reported beside the result it affects
+(Section~\ref{sec:res-c5}).
+
+\textbf{Every $\rho$ is reported under both tie conventions}, per
+rule~D5 of Section~\ref{sec:meth-discipline}; the measured instability
+that forces the rule is Section~\ref{sec:res-tie-policy}.
+
+\textbf{No Bradley--Terry confidence interval is reported anywhere}:
+no Bradley--Terry standard error computed before the variance fix is
+a measurement, and the intervals were never recomputed after it
+(Section~\ref{sec:meth-bt}). Intervals from other estimators ---
+binomial standard errors and exact intervals on proportions, one
+regression confidence interval, percentile intervals over null draws
+--- are reported and labelled as what they are; every bracketed range
+quoted without a label is an interquartile range and says so.
+
+\textbf{Disattenuation is two-sided.} Disattenuation corrects a
+correlation for the measurement error in the two rankings it compares.
+Both sides of
+$\rho(\text{arena ranking}, \text{ground-truth ranking})$ are
+finite-sample per-cell rankings, so the correction is $\rho_{\text{obs}}
+/ r$ with $r = n/(n+c)$, not $\rho_{\text{obs}} / \sqrt{r}$; the
+one-sided form applies only when one measure is perfectly reliable. The
+corrected constant is $c = 2.52$ at the 11-model band, and three
+caveats travel with it wherever it is used: it is a property of the
+roster and must be re-fitted if the roster changes; the interval
+originally quoted for it resamples three fitted points and is not a
+confidence interval; and it was fitted on ground-truth rankings, which
+are noise-free per question, so it is a \emph{ceiling} on arena
+reliability rather than a prediction of it
+(Section~\ref{sec:disc-debt}).
+
+\textbf{Bootstrap resampling counts differ by path and are stated where
+used.} The validation path uses 2{,}000 resamples; the ranking path
+uses 50; the in-run trajectory uses 1. A blanket claim of 2{,}000
+resamples everywhere would be wrong, and figures derived from the
+ranking path are quoted with their own count.
+
+\textbf{No pass/fail threshold on $\rho$.} An earlier design
+pre-specified $\rho > 0.7$ as a criterion. It is retained only as an
+interpretive marker of strong agreement; results below it are reported
+in full and scoped to the domains they were measured on.

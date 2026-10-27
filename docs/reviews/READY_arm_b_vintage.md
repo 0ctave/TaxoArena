@@ -1,0 +1,43 @@
+# READY — ARM-B-VINTAGE (tools/analysis/arm_b_vintage.py, alias ref_remint.py)
+
+Adversarial reviewer, 2026-09-19. Registration docs/judge_v2_program.md L8552-L8733 (c8e0c3f); script commit 4c7cd8b, script sha256[:16] 250b10776b5c97b9; authorised by plan Amendment 6 item 6. Zero API calls made in this review; `--selftest` and `--dry-run` run by the reviewer; caches opened mode=ro; sizes and mtimes of grok-reasoning.db, canary_set.json, canary_baseline_pass1.db compared before and after: unchanged. Reviewer scripts: scratchpad/review_ready/recompute_armb.py, analyze_refusal.py, armb_dryrun_rev.txt.
+
+## Verified (own recomputation; claimed = got)
+
+| claim | got | how |
+|---|---|---|
+| my `--dry-run` output = builder's transcript | byte-identical (diff empty); 0 calls; no cache created | `python tools/analysis/arm_b_vintage.py --dry-run` vs scratchpad/armb_dryrun.txt |
+| canary set 300 matches, 279 distinct q, halves 146 contested / 133 cross, 10 in both | 300 / 279 / 146 / 133 / 10 [3049 4323 6452 7340 7433 8144 8527 9384 9721 11734]; only-contested 136 | recompute_armb.py from canary_set.json (hash 50af669ac6997f9f, pool p2dca) |
+| 13 content-filter questions ABSENT from v0 (not cached rows), none in the canary set -> eligible 279 | pool 3,445 - v0 3,432 = 13 = the log's 13 `HTTP Error 400` ids, set-equal; 0 of the 279 absent | recompute_armb.py |
+| draw seed 42 stratified by half: 105 / 95, 200 ids sorted, sha256 60b1ef3a859abceb...2386 | 105 / 95; ids 107 152 190 210 232 ... 11734 11852 12094; sha256 60b1ef3a859abceb7faa737423876bd58e76261fb9c0ee9654f2f81086352386; all 200 in the pool with v0 rows | own implementation of the draw (contested first, then cross, one Random(42)) |
+| SYSTEM 194 bytes sha 741a6386...7f6e; protocol unchanged since minting | 194 bytes, sha 741a6386599cd5e8d0f0c073eca9ab2ac02b6c2d897304bd37656ce1c3bd7f6e in ALL four versions of judge_solve_map.py (cc8b42c 2026-09-09 15:33 .. b208803); user_prompt identical in all four | `git show <h>:tools/analysis/judge_solve_map.py` x4 |
+| cap of record 4,096 | `call(..., max_tokens=4096)` default in all four versions; `run()` calls `call(model, SYSTEM, user_prompt(...))` without a cap in all four; the log prints none. The registration's "subject to the dry-run's finding" is SATISFIED WITHOUT a cap bracket: the finding is 4,096, established from the git history, not only from today's default | git history above |
+| first payload (q 107) sha 9cf9d535...2e0e, 624 bytes; body keys (model, max_tokens, messages); temperature omitted | body built the way v0's `judge_solve_map.call` built it (json.dumps default) == `rr.payload_bytes` byte-for-byte, sha 9cf9d535e4d7c7fc39643e2af4a4c856d1de947190caffe707b202b4702b2e0e, 624 B; identical for all 200 questions; gt letters agree 200/200 | recompute_armb.py |
+| same deployment | both `load_env`s read AZURE_AI_ENDPOINT + AZURE_GROK_API_KEY (judge_solve_map.py:32-42, rejudge_reasoning.py:63-80) | source |
+| ten L37 stamps | STAMPS tuple = FRAMEWORK L37's ten fields exactly; plus state, response_id | source |
+| gates | `--pilot`/`--run` refuse without ARMB_GO=6, without a committed READY, and while SET_HASH_OF_RECORD is None or != recomputed (all three exercised at import level, 0 calls); `--analyze` refuses an absent cache, writes only ref_remint_PILOT.txt for 12/200 rows (no outcome, no sidecar), reads UNDETERMINED at 6% non-yield with C3 FAILED, ALARM at A = 0.875 (synthetic caches in the scratchpad, all paths redirected) | analyze_refusal.py |
+| alarm bar | 0.94 - 3*sqrt(0.94*0.06/200) = 0.8896; bar of record 0.89 as written | recompute_armb.py |
+
+## Readings decided
+
+1. **Absent rows (item 6).** The 13 refusals are absent rows (judge_solve_map.run caches no error), not `content_filter` rows as the registration says; ids from the log; none in the set. Factual correction by the pre-run bracket; no effect on the draw.
+2. **Sidecar completion_tokens / minted_at from rows (item 7).** `answers.tokens` and `answers.ts` exist per v0 row; the sidecar fills them per question instead of null / the log date. Accepted (better provenance than registered), labelled in the bracket. `tokens` = usage.completion_tokens as reported = VISIBLE tokens: 2,193 of 3,432 rows are exactly 6 (`{"answer": "X"}`), median 6, p95 436, max 993; one row (q 3759) has NULL tokens.
+3. **P6 fails by construction (item 8).** v1 records the same field through call_judge_full; its median will be ~6, not in [400, 1,200]; the p95 < 4,000 leg is vacuous for the same reason (a cap hit is read from finish_reason == length, i.e. C3, never from this field). P6 bears on no criterion; it is scored FAILED-BY-INSTRUMENT by the bracket below, not silently re-banded.
+4. **Fingerprint (item 9).** deployment_fingerprint = `azure:<response model string>` (call_judge_full surfaces no system_fingerprint; the recorded caches show `azure:grok-4-1-fast-non-reasoning`, and `""` inside a refusal body). Delivered with that limitation printed in the outcome; C2 is read on presence of the ten fields.
+5. **The 10 dual-half questions (item 10).** Assigned to contested (any contested match -> contested); the same map serves the P4 by-half readout. Accepted; named in the bracket.
+6. **Alias (item 11).** ref_remint.py runs arm_b_vintage.py via runpy with the same argv; selftest passes through the alias; SCRIPT_SHA is the target's.
+7. **Sequencing with PLACEMENT-STEPS.** Registration (b): an alarm forbids the PLACEMENT-STEPS pilot. Therefore ARM-B-VINTAGE runs FIRST, through `--analyze`; the PLACEMENT-STEPS pilot is launched only after experiment_results/judge_solve/ref_remint_outcome.txt line 2 reads exactly `ALARM STATE: NO ALARM`. Neither script enforces this cross-gate today (placement_steps.py is NOT READY for other reasons; the gate is in its fix list).
+
+## Pre-run bracket text (the registrar appends it to the ARM-B-VINTAGE section BEFORE the first call)
+
+`[PRE-RUN 2026-09-19 by ARM-B-VINTAGE dry-run, reviewer READY docs/reviews/READY_arm_b_vintage.md: SET OF RECORD = 200 of the 279 canary questions, seed 42, stratified by half (contested 105 of 146, cross 95 of 133; the 10 questions with a match in both halves are counted contested: 3049 4323 6452 7340 7433 8144 8527 9384 9721 11734), sorted by id, sha256 60b1ef3a859abceb7faa737423876bd58e76261fb9c0ee9654f2f81086352386, SET_HASH_OF_RECORD 60b1ef3a859abceb; every posting mode refuses any other set. CAP FINDING: v0's cap is 4,096 by judge_solve_map.call's default in every version of the file since before minting (cc8b42c..b208803), run() never passed one, the log prints none: 4,096 of record, no other value found. CORRECTIONS OF FACT: the 13 content-filter questions are ABSENT rows of grok-reasoning.db (ids from grok-reasoning_allreserved.log, = pool minus cache), not cached content_filter rows; none is a canary question, eligible = 279. v0 carries usage.completion_tokens (`tokens`) and `ts` per row: the sidecar's completion_tokens and minted_at are per question from the rows, not null / the log date; `tokens` counts VISIBLE tokens (median 6, 2,193 of 3,432 rows = 6). P6 as written ([400, 1,200]) assumed reasoning tokens in the field; v1's field is the same field, so P6 is scored FAILED-BY-INSTRUMENT if the median reads ~6, bearing on no criterion; cap hits are read from finish_reason (C3). deployment_fingerprint = the response's model string prefixed `azure:`; no system_fingerprint is surfaced. SEQUENCING: this test runs before PLACEMENT-STEPS' pilot (consequence (b)).]`
+
+## Conditions of this READY
+
+- Script of record: sha 250b10776b5c97b9 plus ONE edit, `SET_HASH_OF_RECORD = "60b1ef3a859abceb"` (arm_b_vintage.py L62), committed after the bracket above; any other change to arm_b_vintage.py, ref_remint.py, rejudge_reasoning.py or judge_solve_map.py voids this READY.
+- Pilot = the 12 smallest ids (107 .. 1032); before `--run` the operator confirms the GUARD LINE reads `12 of 12 cached` (a call that raised leaves no row and drops out of the guard denominator; `--analyze` refuses < 200 rows, so nothing reaches the outcome, but the guard is read on cached rows only).
+- If the outcome is UNDETERMINED (C3 FAILED), the sidecar's agreement stamp is provisional (the file is write-once; the registrar records it as such); the re-post decision is the author's.
+- C2 may read NOT DELIVERED on a NULL usage.completion_tokens (v0 has 1 such row of 3,432); the registrar reads the count and the cause, not the label alone.
+- Bill ~200 solves, ~2,000 cce, 0 judge calls (Amendment 6 item 6). Nothing here is a judge call; the 4,000-match rule is untouched.
+
+VERDICT: READY at zero calls, subject to the bracket and the one-line hash edit above.

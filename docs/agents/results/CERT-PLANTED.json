@@ -1,0 +1,178 @@
+{
+ "id": "CERT-PLANTED",
+ "title": "CERT-PLANTED: power curve of the plain J site null for a planted 2-way shift (random direction, random half-split, delta x SD; delta 0 / 0.5 / 1 / 2) inside math, physics, economics TRAIN subsamples at n 486 / 441 (zero calls; machine; REGISTERED 2026-10-04)",
+ "question": "Is the plain site null sensitive to strong 2-way structure at G12's depth-1 sizes?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "b66b075d",
+  "program_lines": "docs/judge_v2_program.md L24304-L24315",
+  "program_lines_as_of": "the commit that writes them, parent bd5ca001, re-grepped",
+  "date": "2026-10-04",
+  "provenance": "docs/literature/2026-10-04_testing_logic_review.md (bd5ca001) section 3; the author's Go (docs/agents/plans/2026-10-04_W1_W2_schedule.md (be8e54d3))"
+ },
+ "script": {
+  "path": "tools/analysis/cert_planted.py + certPlanted arm (src/test/kotlin/taxonomy/SeparationNullBySizeTest.kt, CertPlantedArmTest.kt, build.gradle.kts)",
+  "sha16": "cert_planted.py blob:028f05a2 (sha256-lf16:9138d36ccaee91cf; crlf16 c60a425b945e7ce4); SeparationNullBySizeTest.kt blob:abd9c533 (sha256-lf16:1270d4cb61da9d5e); CertPlantedArmTest.kt blob:ab2620c6 (sha256-lf16:52955bd02720c829); build.gradle.kts blob:2225cb6c (sha256-lf16:a8b7358240b74f38); LF of record, copied from READY_cert_planted row 9",
+  "commit": "8db7be3d (branch cert-planted; base 5312852a; not merged)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_cert_planted.md",
+  "commit": "8093157b",
+  "verdict": "NOT READY on B-1 only; READY on the registrar brackets of this commit (no code change; orchestrator's choice, flagged)"
+ },
+ "go": "the author's Go for zero-call windows (2026-10-04)",
+ "run": {
+  "outcome_file": "E:/TaxoArena_backup_2026-10-05_cert_planted/outcome.txt (sha256 55efbce9dc7ec2be8c188770d0cf2644b8625b29d9ec22d453652ea206254d23; write-once, never committed; SHA256SUMS.txt 21/21 OK)",
+  "outcome_commit": "arm merged eb561a6c; outcome not committed",
+  "calls": 0,
+  "cce": 0,
+  "pool": "TRAIN only; reserved pool not read; rule 7 machine time; pre-arm DB backup E:/TaxoArena_backup_2026-10-04_cert_planted/db",
+  "date": "2026-10-05 (arm 01:05:29-02:00:05 rc 0; --hashes after by hand 04:20:15; --analyze 04:21:21)",
+  "incident": "R-CP1: chain aborted at '--hashes after' (02:00:06) because java PID 71872 was alive (identity UNDETERMINED); re-run by hand 04:20:15, hashes equal before/after; outputs copied by hand to E:/TaxoArena_backup_2026-10-05_cert_planted; L-CP1 ops fix for future chains"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_cert_planted.md",
+  "commit": "cbeb2644",
+  "blob": "a4bb97c4 (LF)",
+  "verdict": "VALID with the scoring and the F-CP words corrected (C-CP1, C-CP2 HIGH; C-CP3, C-CP4 MEDIUM; R-CP1 disclosure; L-CP1 LOW); P-CPL1 discharged"
+ },
+ "criteria": [
+  {
+   "id": "CP0",
+   "text": "gate (n 486): SIZE-OK iff delta 0 certifies <= 1 of 15; else ANTI-CONSERVATIVE (CP1 NOT EVALUABLE)",
+   "result": "HELD",
+   "value": "SIZE-OK: delta 0, n 486 certifies 0 of 15 (0 NOT EVALUABLE)",
+   "denominator": "15 sites at delta 0"
+  },
+  {
+   "id": "CP1",
+   "text": "DECIDING (n 486): SENSITIVE iff delta 2 certifies >= 4 of 5 in >= 2 of 3 categories; INSENSITIVE iff <= 1 of 5 in >= 2 of 3; MIXED otherwise. Verdict line: SCOREABLE (DEFF 1.0 by construction; SE 0.0126; MDE80 0.0352) [AMENDED 2026-10-04 pre-data (orchestrator's choice, flagged): re-anchored at delta 8 on the grid {0, 2, 4, 6, 8, 10, 12}] [CORRECTED 2026-10-04 pre-data (B-1, orchestrator's choice, flagged): delta_dec 8 kept; INSENSITIVE = 'insensitive under a site-own (moment-matched) null', not 'the certificate cannot detect structure'; the delta 0..12 power curve is the descriptive deliverable; Support (f) '1.8 x the delta-0 p95' WITHDRAWN (the null is moment-matched to the planted rows and grows with delta); deciding count about 2-3 effective units (M-2)]",
+   "result": "FAILED",
+   "value": "word of record: INSENSITIVE (SENSITIVE refuted, rule 8 FAILS clause); INSENSITIVE at delta 8, n 486: economics 1, math 0, physics 1 of 5; delta 8 is the crossing point, not a margin (C-CP3); about 2-3 effective units, no interval (C-CP4)",
+   "denominator": "5 subsamples x 3 categories at delta 8, n 486 (about 2-3 effective units, M-2)"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "CP0 SIZE-OK 0.85 (delta 0: 0 [0, 1] of 15)",
+   "result": "HELD",
+   "value": "CP0 SIZE-OK; Brier 0.0225; delta-0 count 0 in [0, 1]",
+   "denominator": "15 sites"
+  },
+  {
+   "id": "P2",
+   "text": "certified of 15 at n 486: delta 0.5 1 [0, 4]; delta 1 6 [2, 12]; delta 2 15 [12, 15] [RESTATED: delta 0: 0 [0,1]; 2: 0 [0,2]; 4: 1 [0,5]; 6: 7 [3,12]; 8: 14 [10,15]; 10: 15 [13,15]; 12: 15 [14,15]] [RESTATED 2026-10-04 (B-1), 0.80 bands: delta 0: 0 [0,1]; 2: 0 [0,1]; 4: 0 [0,1]; 6: 0 [0,3]; 8: 6 [0,10] (additive anchor 9, multiplicative 0); 10, 12: no band scored (anchors 15 / 0), descriptive]",
+   "result": "HELD",
+   "value": "B-1 bands, every band inside: delta 0/2/4 0 in [0,1]; delta 6 0 in [0,3]; delta 8 2 in [0,10]; delta 10/12 12/15 of 15 (no band; nearer the additive anchor, descriptive)",
+   "denominator": "60 sites"
+  },
+  {
+   "id": "P3",
+   "text": "CP1 SENSITIVE 0.70, MIXED 0.15, INSENSITIVE 0.15 [RESTATED: SENSITIVE 0.75, MIXED 0.15, INSENSITIVE 0.10] [RESTATED 2026-10-04 (B-1): SENSITIVE 0.10, MIXED 0.50, INSENSITIVE 0.40]",
+   "result": "FAILED",
+   "value": "INSENSITIVE occurred (0.40), modal MIXED (0.50) did not; three-way Brier 0.6200 (printed 1.3950 is pre-B-1, NOT of record)",
+   "denominator": "3 categories"
+  },
+  {
+   "id": "P4",
+   "text": "median delta* 1 [0.5, 2] [RESTATED: median delta* 6 [4, 8]] [RESTATED 2026-10-04 (B-1): median delta* 10 [10, '> 12']]",
+   "result": "HELD",
+   "value": "median delta* 10 (12, 10, 10) in [10, '> 12'], at the lower edge",
+   "denominator": "3 categories"
+  }
+ ],
+ "falsifier": {
+  "text": "F-CP fires iff CP1 INSENSITIVE: the plain site null is insensitive to strong 2-way structure at depth-1 sizes; G12's 0 of 60 uninformative about 2-way structure. [AMENDED: reads CP1 at delta 8] [CORRECTED 2026-10-04 (B-1): '1.8 x the null p95' withdrawn; fires -> 'the plain J site null, moment-matched to the site's own rows, is insensitive to a planted shift of delta 8 at depth-1 sizes'; not 'the certificate cannot detect structure']",
+  "fired": true,
+  "words_of_record": "the plain J site null, moment-matched to the site's own (planted) rows, is insensitive to a planted 2-way shift of delta 8 at depth-1 sizes; G12's 0 of 60 is uninformative about 2-way structure UNDER THAT NULL (C-CP2; the printed line 239 'insensitive to strong 2-way structure' NOT of record)"
+ },
+ "numbers_of_record": {
+  "seen_pre_arm": "dry-run planted statistic at delta 2: 0.0058-0.0113 (median about 0.0077); no null drawn, no certification seen",
+  "ready_review_proxy": "READY_cert_planted (8093157b) top-eigen proxy (2/pi) lambda1/tr: delta 0 0.029-0.037, delta 8 0.056-0.100 (1.7-3.3 x); delta 8 at n 486 certifies 3/3/3 of 5 (additive calibration) or 0/0/0 (multiplicative); 30/30 delta-8 planted statistics exceed the delta-0 SN p95 0.0667-0.0712; pre-data, no null drawn",
+  "CP0": "0 of 15 certified at delta 0, n 486 (0 NOT EVALUABLE); 300 reps per site",
+  "CP1": "1 / 0 / 1 of 5 certified (economics / math / physics) at delta 8, n 486; about 2-3 effective units, no interval",
+  "power_curve_n486": "certified of 15 at delta 0/2/4/6/8/10/12: 0/0/0/0/2/12/15",
+  "power_curve_n441": "0/0/0/0/4/15/15",
+  "delta_star": "n 486 economics 12, math 10, physics 10 (median 10); n 441 10/10/10",
+  "P-CPL1": "median null p95 delta 0 -> 12 (n 486): economics 0.0690 -> 0.2056, math 0.0692 -> 0.1832, physics 0.0670 -> 0.1997; rises in 30/30 draw-cells",
+  "C-CP3_crossing": "median planted statistic vs median null p95 at delta 8: economics 0.1176 vs 0.1211, math 0.0986 vs 0.1065, physics 0.1129 vs 0.1165; null p95 x 1.5-1.8 delta 0 -> 8; delta* on the statistic scale 0.15-0.23 = 4-6 x G12's TOP 0.037-0.040",
+  "IDENTITY": "n 6,993; k 0; p95 0.041626",
+  "Brier": "P1 0.0225; P3 0.6200 (of record); printed 1.3950 pre-B-1, not of record"
+ },
+ "sentence_of_record": "CERT-PLANTED (2026-10-05, 0 calls) — VALID; CP0 SIZE-OK, CP1 INSENSITIVE, F-CP FIRED under a site-own null. On MMLU-Pro math / physics / economics TRAIN subsamples (n 486; 300 reps per site), a planted 2-way shift of delta 8 certifies 1 / 0 / 1 of 5: the plain J site null, moment-matched to the site's own (planted) rows, is insensitive to a planted 2-way shift of delta 8 at depth-1 sizes; G12's 0 of 60 is uninformative about 2-way structure UNDER THAT NULL. delta 8 is where the self-calibrating null and the planted signal cross (delta* median 10), not a power failure at a supra-threshold shift. [POSTRUN docs/reviews/POSTRUN_cert_planted.md, cbeb2644; C-CP1 (P3 Brier 0.6200, every P2 band inside, P4 inside; the printed scores are not of record), C-CP2, C-CP3, C-CP4; outcome not committed, sha256 55efbce9...]",
+ "chips": [
+  "REGISTERED 2026-10-04, BEFORE ANY CODE; not built",
+  "VALID (POST-RUN cbeb2644): CP0 SIZE-OK; CP1 INSENSITIVE AT DELTA 8 (1/0/1 OF 5); F-CP FIRED UNDER A SITE-OWN (MOMENT-MATCHED) NULL",
+  "C-CP1 / C-CP2: PRINTED P2&ndash;P4 SCORES AND F-CP LINE NOT OF RECORD (P3 BRIER 0.6200); DELTA 8 IS THE CROSSING POINT (C-CP3); ABOUT 2&ndash;3 EFFECTIVE UNITS"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-04",
+   "by": "registrar (pre-data; orchestrator's choice, flagged for the author)",
+   "text": "grid amended to delta {0, 2, 4, 6, 8, 10, 12} after the dry-run showed delta 2 sub-threshold (seen scale disclosed). Criteria touched: DATA OBJECT (grid) L24307; INSTRUMENT (210 sites, CPL-4, CPL-5, new pins owed) L24308; CP1 re-anchored at delta 8 and CPL-6 L24310; SUPPORT (f)/(g) L24311; P2, P3, P4 restated, CPL-7 L24312; F-CP reads CP1 at delta 8 L24313; COST L24315. CP0 and P1 unchanged."
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (pre-data; READY_cert_planted 8093157b; B-1 the orchestrator's choice, flagged for the author)",
+   "text": "B-1: code and grid kept, CP1/F-CP at delta 8; Support (f)/(g) rewritten (null of each planted site built from its own planted rows, grows with delta; '1.8 x' withdrawn); P2/P3/P4 restated across the two calibrations; power curve descriptive deliverable; INSENSITIVE = under a site-own null. M-1 -> post-run duty P-CPL1 (median null p95 at delta 12 > delta 0 per cell, else NOT EVALUABLE). M-2 effective deciding units about 2-3. L-1 Support (a) delta 8. L-2 launch note (merge to main first, path-checkout; disclose). L-3 cost about 1.5 h, window about 2 h, 0 calls. Lines L24308, L24310-L24313, L24315 (_as_of a6daf4a9); registrar's record L24567ff."
+  },
+  {
+   "date": "2026-10-05",
+   "by": "registrar (POSTRUN cbeb2644)",
+   "text": "outcome recorded with the B-1 scores (C-CP1: P3 Brier 0.6200, every P2 band inside, P4 delta* 10 inside, P1 0.0225) and the B-1 F-CP words (C-CP2); P-CPL1 discharged; R-CP1 run incident recorded; OUTCOME brackets on READOUTS AND CRITERIA (L24310), PREDICTIONS (L24312), FALSIFIER (L24313); outcome section L24687-L24699 ('## CERT-PLANTED (2026-10-05, 0 calls) — VALID (POSTRUN cbeb2644) ...'; _as_of the commit that writes it, parent 05987e4c, re-grepped)."
+  }
+ ],
+ "does_not_show": [
+  "that the null is 'insensitive to strong 2-way structure' or that 'the certificate cannot detect structure' (C-CP2)",
+  "a power failure at a supra-threshold shift (C-CP3: delta 8 is the crossing point)",
+  "an interval on the deciding count (C-CP4: about 2-3 effective units)",
+  "anything about a null not moment-matched to the site's own rows (SI-NULL-TRIAD's question)",
+  "other members, draws, slices or k; whether declared sub-structure is geometric"
+ ],
+ "ledger": {
+  "row_id": "CERT-PLANTED",
+  "version": "v395 (2026-10-05: OUTCOME bracket, NULL + WARN chips) | v382 (2026-10-04: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "CERT-PC-K2",
+  "CERT-PC-K2-KNOWN",
+  "CERT-K2-DEFLATED"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none (no judge, rubric, reference, frontier, temperature or LR)"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "211 site nulls, about 1.5 h machine (dry-run 88 min, upper bound); window about 2 h (rule 7)",
+  "agent_hours": "about 2 h",
+  "reads_pool": false
+ },
+ "outputs": "never committed: stored on E: with SHA256SUMS.txt; temp on E: via scratch_dir",
+ "sources": [
+  "docs/judge_v2_program.md L24304-L24315 (_as_of the commit that writes it, parent bd5ca001, re-grepped)",
+  "docs/literature/2026-10-04_testing_logic_review.md (bd5ca001)",
+  "docs/agents/plans/2026-10-04_W1_W2_schedule.md (be8e54d3)",
+  "docs/reviews/READY_cert_planted.md (8093157b); docs/judge_v2_program.md section \"## Registrar's record 2026-10-04 (insertion only; zero calls; nothing run; pre-data) — CERT-PLANTED READY on the brackets of READY_cert_planted ...\" (L24567-L24571, _as_of a6daf4a9)",
+  "docs/reviews/POSTRUN_cert_planted.md (cbeb2644; blob a4bb97c4, LF): every number above copied",
+  "docs/judge_v2_program.md L24687-L24699 and brackets L24310, L24312, L24313 (_as_of the commit that writes them, parent 05987e4c, re-grepped)"
+ ],
+ "last_update": "2026-10-05",
+ "author_review": "the grid amendment and the CP1 re-anchoring at delta 8 (orchestrator's choice): the author may overrule; B-1 resolution (keep delta 8, restate P2/P3; option (b) re-anchor at delta 12 declined): the orchestrator's choice, the author may overrule",
+ "post_run_duties": [
+  "P-CPL1 (M-1): per cell, median null p95 at delta 12 must exceed delta 0's; flat -> the comparator was the cache rows, CP0/CP1/F-CP NOT EVALUABLE [DISCHARGED 2026-10-05 by POSTRUN cbeb2644: null p95 rises with delta in 30/30 draw-cells]"
+ ],
+ "plain_description": {
+  "sq": "SQ2 Trust",
+  "what": "Plants an artificial two-way split of known strength inside real math, physics and economics question samples (about 486 questions each). It then checks whether the certification test for branch points detects that split. No judge calls.",
+  "why": "An earlier build certified 0 of 60 first-level branch points. This test asks whether that zero says anything about the data, or whether the test simply cannot see such structure at these sizes.",
+  "information": "If the planted splits are detected, a zero means there is no real structure. If they are missed, the zero is uninformative. Result: done. At the chosen strength the planted split was certified in only 1, 0 and 1 of 5 cases. Because the null distribution is fitted to the site's own (planted) rows, the test is insensitive at these sizes, so the earlier 0 of 60 is uninformative under that null. This is not a general 'the certificate cannot detect structure' finding: the chosen strength is the point where signal and null cross.",
+  "written": "2026-10-07"
+ }
+}

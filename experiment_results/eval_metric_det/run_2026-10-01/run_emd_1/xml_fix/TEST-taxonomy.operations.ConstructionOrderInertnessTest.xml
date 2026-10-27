@@ -1,0 +1,473 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="taxonomy.operations.ConstructionOrderInertnessTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-01T07:10:10" hostname="HORTENSIA" time="1.511">
+  <properties/>
+  <testcase name="flag absent is deterministic run-to-run()" classname="taxonomy.operations.ConstructionOrderInertnessTest" time="0.482"/>
+  <testcase name="shuffle changes the proposal order()" classname="taxonomy.operations.ConstructionOrderInertnessTest" time="0.426"/>
+  <testcase name="flag absent reproduces the golden topology hash()" classname="taxonomy.operations.ConstructionOrderInertnessTest" time="0.204"/>
+  <testcase name="same shuffle seed reproduces the same topology()" classname="taxonomy.operations.ConstructionOrderInertnessTest" time="0.398"/>
+  <system-out><![CDATA[09:10:10.906 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+09:10:10.909 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+09:10:10.910 [INFO ] Fitter - [FITTER] Fitting complete (2 depths, 4 nodes)
+09:10:10.911 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 15.3491      | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 25.9063      | 15.3491      | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+09:10:10.928 [INFO ] Splitter - Split 'anchor2' (q=200, k=2, sep=0.073, routed=[99, 101], converged=true) -> Spawning 2 children
+09:10:10.955 [INFO ] Splitter - Split 'anchor2' (q=202, k=2, sep=0.071, routed=[99, 103], converged=true) -> Spawning 2 children
+09:10:10.959 [INFO ] Operations - [GROW ACCEPTED] 'anchor2' Delta J = 0.012189, Delta V = 2
+09:10:10.975 [INFO ] Splitter - Split 'anchor0' (q=203, k=2, sep=0.066, routed=[100, 103], converged=true) -> Spawning 2 children
+09:10:10.979 [INFO ] Operations - [GROW ACCEPTED] 'anchor0' Delta J = 0.017718, Delta V = 2
+09:10:10.996 [INFO ] Splitter - Split 'anchor1' (q=203, k=2, sep=0.071, routed=[98, 105], converged=true) -> Spawning 2 children
+09:10:10.999 [INFO ] Operations - [GROW ACCEPTED] 'anchor1' Delta J = 0.031136, Delta V = 2
+09:10:11.000 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+09:10:11.001 [INFO ] Fitter - [FIT-μ]  iter=1: mean_MLE_drift=1.000, oscillating_nodes=0/10, earlyout_rate=1.00
+09:10:11.001 [INFO ] Fitter - [FIT-κ]  iter=1: prior_dominated=0/10 (0.0%), median_kfinal=25.86, median_alpha=0.00
+09:10:11.001 [INFO ] Fitter - [FITTER] Fitting complete (3 depths, 10 nodes)
+09:10:11.002 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 15.3491      | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 25.9365      | 15.3491      | 0               | 0.0000             | 0.0000            
+│ 2     | 25.8947      | 25.9365      | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+09:10:11.014 [INFO ] Splitter - Split 'Emergent Concept #4' (q=102, k=2, sep=0.028, routed=[52, 50], converged=true) -> Spawning 2 children
+09:10:11.045 [INFO ] Splitter - Split 'Emergent Concept #4' (q=102, k=2, sep=0.028, routed=[52, 50], converged=true) -> Spawning 2 children
+09:10:11.048 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #4' Delta J = 0.002386, Delta V = 2
+09:10:11.059 [INFO ] Splitter - Split 'Emergent Concept #3' (q=102, k=2, sep=0.029, routed=[59, 43], converged=true) -> Spawning 2 children
+09:10:11.062 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #3' Delta J = 0.000979, Delta V = 2
+09:10:11.074 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #6' reason=min-pair n=103 k=2 emK=2 sep=0.0246 bar=0.0250
+09:10:11.075 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #6' reason=min-pair n=103 k=2 emK=2 sep=0.0246 bar=0.0250
+09:10:11.077 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #6' reason=min-pair n=103 k=2 emK=2 sep=0.0246 bar=0.0250
+09:10:11.088 [INFO ] Splitter - Split 'Emergent Concept #5' (q=103, k=2, sep=0.026, routed=[58, 45], converged=true) -> Spawning 2 children
+09:10:11.092 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #5' Delta J = 0.002180, Delta V = 2
+09:10:11.103 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #7' reason=min-pair n=102 k=2 emK=2 sep=0.0243 bar=0.0250
+09:10:11.104 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #7' reason=min-pair n=102 k=2 emK=2 sep=0.0243 bar=0.0250
+09:10:11.105 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #7' reason=min-pair n=102 k=2 emK=2 sep=0.0243 bar=0.0250
+09:10:11.117 [INFO ] Splitter - Split 'Emergent Concept #8' (q=109, k=2, sep=0.026, routed=[67, 42], converged=true) -> Spawning 2 children
+09:10:11.120 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #8' Delta J = 0.004405, Delta V = 2
+09:10:11.123 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #12' w=0.0 res=0 ch=0 par=0
+09:10:11.126 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #4' Delta J = -0.004194, Delta V = -1. Reverting.
+09:10:11.127 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #14' w=0.0 res=0 ch=0 par=0
+09:10:11.129 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #3' Delta J = -0.005590, Delta V = -1. Reverting.
+09:10:11.130 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #15' w=0.0 res=0 ch=0 par=0
+09:10:11.132 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #5' Delta J = -0.001893, Delta V = -1. Reverting.
+09:10:11.133 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #17' w=0.0 res=0 ch=0 par=0
+09:10:11.136 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #8' Delta J = -0.002157, Delta V = -1. Reverting.
+09:10:11.136 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+09:10:11.137 [INFO ] Fitter - [FIT-μ]  iter=2: mean_MLE_drift=0.999, oscillating_nodes=0/18, earlyout_rate=1.00
+09:10:11.138 [INFO ] Fitter - [FIT-κ]  iter=2: prior_dominated=0/18 (0.0%), median_kfinal=24.99, median_alpha=0.00
+09:10:11.138 [INFO ] Fitter - [FITTER] Fitting complete (4 depths, 18 nodes)
+09:10:11.138 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 15.3491      | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 25.9364      | 15.3491      | 0               | 0.0000             | 0.0000            
+│ 2     | 25.8961      | 25.9364      | 0               | 0.0000             | 0.0000            
+│ 3     | 20.0584      | 26.0584      | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+09:10:11.177 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+09:10:11.179 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+09:10:11.180 [INFO ] Fitter - [FITTER] Fitting complete (2 depths, 4 nodes)
+09:10:11.180 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 15.3491      | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 25.9063      | 15.3491      | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+09:10:11.197 [INFO ] Splitter - Split 'anchor2' (q=200, k=2, sep=0.073, routed=[99, 101], converged=true) -> Spawning 2 children
+09:10:11.216 [INFO ] Splitter - Split 'anchor2' (q=202, k=2, sep=0.071, routed=[99, 103], converged=true) -> Spawning 2 children
+09:10:11.219 [INFO ] Operations - [GROW ACCEPTED] 'anchor2' Delta J = 0.012189, Delta V = 2
+09:10:11.236 [INFO ] Splitter - Split 'anchor0' (q=203, k=2, sep=0.066, routed=[100, 103], converged=true) -> Spawning 2 children
+09:10:11.238 [INFO ] Operations - [GROW ACCEPTED] 'anchor0' Delta J = 0.017718, Delta V = 2
+09:10:11.255 [INFO ] Splitter - Split 'anchor1' (q=203, k=2, sep=0.071, routed=[98, 105], converged=true) -> Spawning 2 children
+09:10:11.258 [INFO ] Operations - [GROW ACCEPTED] 'anchor1' Delta J = 0.031136, Delta V = 2
+09:10:11.259 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+09:10:11.260 [INFO ] Fitter - [FIT-μ]  iter=1: mean_MLE_drift=1.000, oscillating_nodes=0/10, earlyout_rate=1.00
+09:10:11.260 [INFO ] Fitter - [FIT-κ]  iter=1: prior_dominated=0/10 (0.0%), median_kfinal=25.86, median_alpha=0.00
+09:10:11.260 [INFO ] Fitter - [FITTER] Fitting complete (3 depths, 10 nodes)
+09:10:11.260 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 15.3491      | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 25.9365      | 15.3491      | 0               | 0.0000             | 0.0000            
+│ 2     | 25.8947      | 25.9365      | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+09:10:11.271 [INFO ] Splitter - Split 'Emergent Concept #4' (q=102, k=2, sep=0.028, routed=[52, 50], converged=true) -> Spawning 2 children
+09:10:11.274 [INFO ] Splitter - Split 'Emergent Concept #4' (q=102, k=2, sep=0.028, routed=[52, 50], converged=true) -> Spawning 2 children
+09:10:11.279 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #4' Delta J = 0.002386, Delta V = 2
+09:10:11.289 [INFO ] Splitter - Split 'Emergent Concept #3' (q=102, k=2, sep=0.029, routed=[59, 43], converged=true) -> Spawning 2 children
+09:10:11.292 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #3' Delta J = 0.000979, Delta V = 2
+09:10:11.303 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #6' reason=min-pair n=103 k=2 emK=2 sep=0.0246 bar=0.0250
+09:10:11.304 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #6' reason=min-pair n=103 k=2 emK=2 sep=0.0246 bar=0.0250
+09:10:11.305 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #6' reason=min-pair n=103 k=2 emK=2 sep=0.0246 bar=0.0250
+09:10:11.316 [INFO ] Splitter - Split 'Emergent Concept #5' (q=103, k=2, sep=0.026, routed=[58, 45], converged=true) -> Spawning 2 children
+09:10:11.318 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #5' Delta J = 0.002180, Delta V = 2
+09:10:11.328 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #7' reason=min-pair n=102 k=2 emK=2 sep=0.0243 bar=0.0250
+09:10:11.329 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #7' reason=min-pair n=102 k=2 emK=2 sep=0.0243 bar=0.0250
+09:10:11.330 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #7' reason=min-pair n=102 k=2 emK=2 sep=0.0243 bar=0.0250
+09:10:11.340 [INFO ] Splitter - Split 'Emergent Concept #8' (q=109, k=2, sep=0.026, routed=[67, 42], converged=true) -> Spawning 2 children
+09:10:11.343 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #8' Delta J = 0.004405, Delta V = 2
+09:10:11.344 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #12' w=0.0 res=0 ch=0 par=0
+09:10:11.346 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #4' Delta J = -0.004194, Delta V = -1. Reverting.
+09:10:11.347 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #14' w=0.0 res=0 ch=0 par=0
+09:10:11.348 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #3' Delta J = -0.005590, Delta V = -1. Reverting.
+09:10:11.349 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #15' w=0.0 res=0 ch=0 par=0
+09:10:11.350 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #5' Delta J = -0.001893, Delta V = -1. Reverting.
+09:10:11.351 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #17' w=0.0 res=0 ch=0 par=0
+09:10:11.352 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #8' Delta J = -0.002157, Delta V = -1. Reverting.
+09:10:11.353 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+09:10:11.354 [INFO ] Fitter - [FIT-μ]  iter=2: mean_MLE_drift=0.999, oscillating_nodes=0/18, earlyout_rate=1.00
+09:10:11.354 [INFO ] Fitter - [FIT-κ]  iter=2: prior_dominated=0/18 (0.0%), median_kfinal=24.99, median_alpha=0.00
+09:10:11.355 [INFO ] Fitter - [FITTER] Fitting complete (4 depths, 18 nodes)
+09:10:11.355 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 15.3491      | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 25.9364      | 15.3491      | 0               | 0.0000             | 0.0000            
+│ 2     | 25.8961      | 25.9364      | 0               | 0.0000             | 0.0000            
+│ 3     | 20.0584      | 26.0584      | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+09:10:11.395 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+09:10:11.398 [INFO ] Diagnostics - [DIAG] diagnostics bundle open at C:\Users\octav\AppData\Local\Temp\h9-order-inertness12627213084846238670\plain\diagnostics
+09:10:11.398 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+09:10:11.399 [INFO ] Fitter - [FITTER] Fitting complete (2 depths, 4 nodes)
+09:10:11.399 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 15.3491      | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 25.9063      | 15.3491      | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+09:10:11.416 [INFO ] Splitter - Split 'anchor2' (q=200, k=2, sep=0.073, routed=[99, 101], converged=true) -> Spawning 2 children
+09:10:11.433 [INFO ] Splitter - Split 'anchor2' (q=202, k=2, sep=0.071, routed=[99, 103], converged=true) -> Spawning 2 children
+09:10:11.435 [INFO ] Operations - [GROW ACCEPTED] 'anchor2' Delta J = 0.012189, Delta V = 2
+09:10:11.456 [INFO ] Splitter - Split 'anchor0' (q=203, k=2, sep=0.066, routed=[100, 103], converged=true) -> Spawning 2 children
+09:10:11.458 [INFO ] Operations - [GROW ACCEPTED] 'anchor0' Delta J = 0.017718, Delta V = 2
+09:10:11.474 [INFO ] Splitter - Split 'anchor1' (q=203, k=2, sep=0.071, routed=[98, 105], converged=true) -> Spawning 2 children
+09:10:11.476 [INFO ] Operations - [GROW ACCEPTED] 'anchor1' Delta J = 0.031136, Delta V = 2
+09:10:11.477 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+09:10:11.478 [INFO ] Fitter - [FIT-μ]  iter=1: mean_MLE_drift=1.000, oscillating_nodes=0/10, earlyout_rate=1.00
+09:10:11.478 [INFO ] Fitter - [FIT-κ]  iter=1: prior_dominated=0/10 (0.0%), median_kfinal=25.86, median_alpha=0.00
+09:10:11.478 [INFO ] Fitter - [FITTER] Fitting complete (3 depths, 10 nodes)
+09:10:11.478 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 15.3491      | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 25.9365      | 15.3491      | 0               | 0.0000             | 0.0000            
+│ 2     | 25.8947      | 25.9365      | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+09:10:11.489 [INFO ] Splitter - Split 'Emergent Concept #4' (q=102, k=2, sep=0.028, routed=[52, 50], converged=true) -> Spawning 2 children
+09:10:11.491 [INFO ] Splitter - Split 'Emergent Concept #4' (q=102, k=2, sep=0.028, routed=[52, 50], converged=true) -> Spawning 2 children
+09:10:11.493 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #4' Delta J = 0.002386, Delta V = 2
+09:10:11.503 [INFO ] Splitter - Split 'Emergent Concept #3' (q=102, k=2, sep=0.029, routed=[59, 43], converged=true) -> Spawning 2 children
+09:10:11.505 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #3' Delta J = 0.000979, Delta V = 2
+09:10:11.515 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #6' reason=min-pair n=103 k=2 emK=2 sep=0.0246 bar=0.0250
+09:10:11.517 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #6' reason=min-pair n=103 k=2 emK=2 sep=0.0246 bar=0.0250
+09:10:11.518 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #6' reason=min-pair n=103 k=2 emK=2 sep=0.0246 bar=0.0250
+09:10:11.529 [INFO ] Splitter - Split 'Emergent Concept #5' (q=103, k=2, sep=0.026, routed=[58, 45], converged=true) -> Spawning 2 children
+09:10:11.530 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #5' Delta J = 0.002180, Delta V = 2
+09:10:11.540 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #7' reason=min-pair n=102 k=2 emK=2 sep=0.0243 bar=0.0250
+09:10:11.541 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #7' reason=min-pair n=102 k=2 emK=2 sep=0.0243 bar=0.0250
+09:10:11.542 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #7' reason=min-pair n=102 k=2 emK=2 sep=0.0243 bar=0.0250
+09:10:11.552 [INFO ] Splitter - Split 'Emergent Concept #8' (q=109, k=2, sep=0.026, routed=[67, 42], converged=true) -> Spawning 2 children
+09:10:11.554 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #8' Delta J = 0.004405, Delta V = 2
+09:10:11.555 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #12' w=0.0 res=0 ch=0 par=0
+09:10:11.556 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #4' Delta J = -0.004194, Delta V = -1. Reverting.
+09:10:11.557 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #14' w=0.0 res=0 ch=0 par=0
+09:10:11.560 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #3' Delta J = -0.005590, Delta V = -1. Reverting.
+09:10:11.561 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #15' w=0.0 res=0 ch=0 par=0
+09:10:11.562 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #5' Delta J = -0.001893, Delta V = -1. Reverting.
+09:10:11.562 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #17' w=0.0 res=0 ch=0 par=0
+09:10:11.564 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #8' Delta J = -0.002157, Delta V = -1. Reverting.
+09:10:11.564 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+09:10:11.566 [INFO ] Fitter - [FIT-μ]  iter=2: mean_MLE_drift=0.999, oscillating_nodes=0/18, earlyout_rate=1.00
+09:10:11.566 [INFO ] Fitter - [FIT-κ]  iter=2: prior_dominated=0/18 (0.0%), median_kfinal=24.99, median_alpha=0.00
+09:10:11.566 [INFO ] Fitter - [FITTER] Fitting complete (4 depths, 18 nodes)
+09:10:11.566 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 15.3491      | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 25.9364      | 15.3491      | 0               | 0.0000             | 0.0000            
+│ 2     | 25.8961      | 25.9364      | 0               | 0.0000             | 0.0000            
+│ 3     | 20.0584      | 26.0584      | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+09:10:11.567 [ERROR] Diagnostics - [DIAG] iteration_metrics.csv contains ONLY a header — nothing was ever recorded to it. The file parses and looks valid, so this will not surface later: its producer is not wired up.
+09:10:11.573 [INFO ] Diagnostics - [DIAG] diagnostics bundle closed (completed) at C:\Users\octav\AppData\Local\Temp\h9-order-inertness12627213084846238670\plain\diagnostics
+09:10:11.603 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+09:10:11.607 [INFO ] Diagnostics - [DIAG] diagnostics bundle open at C:\Users\octav\AppData\Local\Temp\h9-order-inertness12627213084846238670\shuffled\diagnostics
+09:10:11.607 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+09:10:11.608 [INFO ] Fitter - [FITTER] Fitting complete (2 depths, 4 nodes)
+09:10:11.608 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 15.3491      | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 25.9063      | 15.3491      | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+09:10:11.625 [INFO ] Splitter - Split 'anchor1' (q=200, k=2, sep=0.072, routed=[97, 103], converged=true) -> Spawning 2 children
+09:10:11.643 [INFO ] Splitter - Split 'anchor1' (q=203, k=2, sep=0.071, routed=[98, 105], converged=true) -> Spawning 2 children
+09:10:11.644 [INFO ] Operations - [GROW ACCEPTED] 'anchor1' Delta J = 0.012409, Delta V = 2
+09:10:11.660 [INFO ] Splitter - Split 'anchor2' (q=202, k=2, sep=0.071, routed=[99, 103], converged=true) -> Spawning 2 children
+09:10:11.662 [INFO ] Operations - [GROW ACCEPTED] 'anchor2' Delta J = 0.018486, Delta V = 2
+09:10:11.678 [INFO ] Splitter - Split 'anchor0' (q=203, k=2, sep=0.066, routed=[100, 103], converged=true) -> Spawning 2 children
+09:10:11.680 [INFO ] Operations - [GROW ACCEPTED] 'anchor0' Delta J = 0.030149, Delta V = 2
+09:10:11.681 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+09:10:11.682 [INFO ] Fitter - [FIT-μ]  iter=1: mean_MLE_drift=1.000, oscillating_nodes=0/10, earlyout_rate=1.00
+09:10:11.682 [INFO ] Fitter - [FIT-κ]  iter=1: prior_dominated=0/10 (0.0%), median_kfinal=25.86, median_alpha=0.00
+09:10:11.682 [INFO ] Fitter - [FITTER] Fitting complete (3 depths, 10 nodes)
+09:10:11.682 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 15.3491      | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 25.9365      | 15.3491      | 0               | 0.0000             | 0.0000            
+│ 2     | 25.8947      | 25.9365      | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+09:10:11.693 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #8' reason=min-pair n=103 k=2 emK=2 sep=0.0246 bar=0.0250
+09:10:11.695 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #8' reason=min-pair n=103 k=2 emK=2 sep=0.0246 bar=0.0250
+09:10:11.696 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #8' reason=min-pair n=103 k=2 emK=2 sep=0.0246 bar=0.0250
+09:10:11.705 [INFO ] Splitter - Split 'Emergent Concept #7' (q=103, k=2, sep=0.026, routed=[58, 45], converged=true) -> Spawning 2 children
+09:10:11.708 [INFO ] Splitter - Split 'Emergent Concept #7' (q=103, k=2, sep=0.026, routed=[58, 45], converged=true) -> Spawning 2 children
+09:10:11.710 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #7' Delta J = 0.001494, Delta V = 2
+09:10:11.720 [INFO ] Splitter - Split 'Emergent Concept #5' (q=102, k=2, sep=0.029, routed=[59, 43], converged=true) -> Spawning 2 children
+09:10:11.722 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #5' Delta J = 0.000782, Delta V = 2
+09:10:11.734 [INFO ] Splitter - Split 'Emergent Concept #6' (q=102, k=2, sep=0.028, routed=[52, 50], converged=true) -> Spawning 2 children
+09:10:11.736 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #6' Delta J = 0.003270, Delta V = 2
+09:10:11.747 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #3' reason=min-pair n=102 k=2 emK=2 sep=0.0243 bar=0.0250
+09:10:11.748 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #3' reason=min-pair n=102 k=2 emK=2 sep=0.0243 bar=0.0250
+09:10:11.748 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #3' reason=min-pair n=102 k=2 emK=2 sep=0.0243 bar=0.0250
+09:10:11.759 [INFO ] Splitter - Split 'Emergent Concept #4' (q=109, k=2, sep=0.026, routed=[67, 42], converged=true) -> Spawning 2 children
+09:10:11.761 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #4' Delta J = 0.004405, Delta V = 2
+09:10:11.762 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #18' w=0.0 res=0 ch=0 par=0
+09:10:11.763 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #4' Delta J = -0.006079, Delta V = -1. Reverting.
+09:10:11.765 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #11' w=0.0 res=0 ch=0 par=0
+09:10:11.766 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #7' Delta J = -0.001893, Delta V = -1. Reverting.
+09:10:11.766 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #13' w=0.0 res=0 ch=0 par=0
+09:10:11.768 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #5' Delta J = -0.002514, Delta V = -1. Reverting.
+09:10:11.769 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #16' w=0.0 res=0 ch=0 par=0
+09:10:11.770 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #6' Delta J = -0.004194, Delta V = -1. Reverting.
+09:10:11.770 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+09:10:11.771 [INFO ] Fitter - [FIT-μ]  iter=2: mean_MLE_drift=0.999, oscillating_nodes=0/18, earlyout_rate=1.00
+09:10:11.772 [INFO ] Fitter - [FIT-κ]  iter=2: prior_dominated=0/18 (0.0%), median_kfinal=24.99, median_alpha=0.00
+09:10:11.772 [INFO ] Fitter - [FITTER] Fitting complete (4 depths, 18 nodes)
+09:10:11.772 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 15.3491      | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 25.9364      | 15.3491      | 0               | 0.0000             | 0.0000            
+│ 2     | 25.8961      | 25.9364      | 0               | 0.0000             | 0.0000            
+│ 3     | 20.0585      | 26.0584      | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+09:10:11.773 [ERROR] Diagnostics - [DIAG] iteration_metrics.csv contains ONLY a header — nothing was ever recorded to it. The file parses and looks valid, so this will not surface later: its producer is not wired up.
+09:10:11.777 [INFO ] Diagnostics - [DIAG] diagnostics bundle closed (completed) at C:\Users\octav\AppData\Local\Temp\h9-order-inertness12627213084846238670\shuffled\diagnostics
+[H9-ORDER] GROW sites iter 1, plain=[n00000004, n00000002, n00000003] shuffled=[n00000003, n00000004, n00000002]
+09:10:11.820 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+09:10:11.821 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+09:10:11.822 [INFO ] Fitter - [FITTER] Fitting complete (2 depths, 4 nodes)
+09:10:11.822 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 15.3491      | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 25.9063      | 15.3491      | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+09:10:11.839 [INFO ] Splitter - Split 'anchor2' (q=200, k=2, sep=0.073, routed=[99, 101], converged=true) -> Spawning 2 children
+09:10:11.857 [INFO ] Splitter - Split 'anchor2' (q=202, k=2, sep=0.071, routed=[99, 103], converged=true) -> Spawning 2 children
+09:10:11.858 [INFO ] Operations - [GROW ACCEPTED] 'anchor2' Delta J = 0.012189, Delta V = 2
+09:10:11.874 [INFO ] Splitter - Split 'anchor0' (q=203, k=2, sep=0.066, routed=[100, 103], converged=true) -> Spawning 2 children
+09:10:11.875 [INFO ] Operations - [GROW ACCEPTED] 'anchor0' Delta J = 0.017718, Delta V = 2
+09:10:11.891 [INFO ] Splitter - Split 'anchor1' (q=203, k=2, sep=0.071, routed=[98, 105], converged=true) -> Spawning 2 children
+09:10:11.893 [INFO ] Operations - [GROW ACCEPTED] 'anchor1' Delta J = 0.031136, Delta V = 2
+09:10:11.894 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+09:10:11.895 [INFO ] Fitter - [FIT-μ]  iter=1: mean_MLE_drift=1.000, oscillating_nodes=0/10, earlyout_rate=1.00
+09:10:11.895 [INFO ] Fitter - [FIT-κ]  iter=1: prior_dominated=0/10 (0.0%), median_kfinal=25.86, median_alpha=0.00
+09:10:11.895 [INFO ] Fitter - [FITTER] Fitting complete (3 depths, 10 nodes)
+09:10:11.895 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 15.3491      | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 25.9365      | 15.3491      | 0               | 0.0000             | 0.0000            
+│ 2     | 25.8947      | 25.9365      | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+09:10:11.907 [INFO ] Splitter - Split 'Emergent Concept #4' (q=102, k=2, sep=0.028, routed=[52, 50], converged=true) -> Spawning 2 children
+09:10:11.913 [INFO ] Splitter - Split 'Emergent Concept #4' (q=102, k=2, sep=0.028, routed=[52, 50], converged=true) -> Spawning 2 children
+09:10:11.914 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #4' Delta J = 0.002386, Delta V = 2
+09:10:11.925 [INFO ] Splitter - Split 'Emergent Concept #3' (q=102, k=2, sep=0.029, routed=[59, 43], converged=true) -> Spawning 2 children
+09:10:11.926 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #3' Delta J = 0.000979, Delta V = 2
+09:10:11.937 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #6' reason=min-pair n=103 k=2 emK=2 sep=0.0246 bar=0.0250
+09:10:11.938 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #6' reason=min-pair n=103 k=2 emK=2 sep=0.0246 bar=0.0250
+09:10:11.939 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #6' reason=min-pair n=103 k=2 emK=2 sep=0.0246 bar=0.0250
+09:10:11.949 [INFO ] Splitter - Split 'Emergent Concept #5' (q=103, k=2, sep=0.026, routed=[58, 45], converged=true) -> Spawning 2 children
+09:10:11.951 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #5' Delta J = 0.002180, Delta V = 2
+09:10:11.961 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #7' reason=min-pair n=102 k=2 emK=2 sep=0.0243 bar=0.0250
+09:10:11.962 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #7' reason=min-pair n=102 k=2 emK=2 sep=0.0243 bar=0.0250
+09:10:11.962 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #7' reason=min-pair n=102 k=2 emK=2 sep=0.0243 bar=0.0250
+09:10:11.973 [INFO ] Splitter - Split 'Emergent Concept #8' (q=109, k=2, sep=0.026, routed=[67, 42], converged=true) -> Spawning 2 children
+09:10:11.974 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #8' Delta J = 0.004405, Delta V = 2
+09:10:11.975 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #12' w=0.0 res=0 ch=0 par=0
+09:10:11.977 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #4' Delta J = -0.004194, Delta V = -1. Reverting.
+09:10:11.977 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #14' w=0.0 res=0 ch=0 par=0
+09:10:11.978 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #3' Delta J = -0.005590, Delta V = -1. Reverting.
+09:10:11.979 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #15' w=0.0 res=0 ch=0 par=0
+09:10:11.980 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #5' Delta J = -0.001893, Delta V = -1. Reverting.
+09:10:11.981 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #17' w=0.0 res=0 ch=0 par=0
+09:10:11.982 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #8' Delta J = -0.002157, Delta V = -1. Reverting.
+09:10:11.982 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+09:10:11.983 [INFO ] Fitter - [FIT-μ]  iter=2: mean_MLE_drift=0.999, oscillating_nodes=0/18, earlyout_rate=1.00
+09:10:11.984 [INFO ] Fitter - [FIT-κ]  iter=2: prior_dominated=0/18 (0.0%), median_kfinal=24.99, median_alpha=0.00
+09:10:11.984 [INFO ] Fitter - [FITTER] Fitting complete (4 depths, 18 nodes)
+09:10:11.984 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 15.3491      | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 25.9364      | 15.3491      | 0               | 0.0000             | 0.0000            
+│ 2     | 25.8961      | 25.9364      | 0               | 0.0000             | 0.0000            
+│ 3     | 20.0584      | 26.0584      | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+[H9-ORDER] flag absent: nodes=18 leaves=10 sha256=c0fb70a1efc83c80f9c417ed0dbaa253605cfa4c4968e780590b932db4a36ace
+09:10:12.024 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+09:10:12.026 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+09:10:12.026 [INFO ] Fitter - [FITTER] Fitting complete (2 depths, 4 nodes)
+09:10:12.027 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 15.3491      | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 25.9063      | 15.3491      | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+09:10:12.043 [INFO ] Splitter - Split 'anchor1' (q=200, k=2, sep=0.072, routed=[97, 103], converged=true) -> Spawning 2 children
+09:10:12.061 [INFO ] Splitter - Split 'anchor1' (q=203, k=2, sep=0.071, routed=[98, 105], converged=true) -> Spawning 2 children
+09:10:12.062 [INFO ] Operations - [GROW ACCEPTED] 'anchor1' Delta J = 0.012409, Delta V = 2
+09:10:12.078 [INFO ] Splitter - Split 'anchor2' (q=202, k=2, sep=0.071, routed=[99, 103], converged=true) -> Spawning 2 children
+09:10:12.079 [INFO ] Operations - [GROW ACCEPTED] 'anchor2' Delta J = 0.018486, Delta V = 2
+09:10:12.095 [INFO ] Splitter - Split 'anchor0' (q=203, k=2, sep=0.066, routed=[100, 103], converged=true) -> Spawning 2 children
+09:10:12.096 [INFO ] Operations - [GROW ACCEPTED] 'anchor0' Delta J = 0.030149, Delta V = 2
+09:10:12.097 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+09:10:12.098 [INFO ] Fitter - [FIT-μ]  iter=1: mean_MLE_drift=1.000, oscillating_nodes=0/10, earlyout_rate=1.00
+09:10:12.098 [INFO ] Fitter - [FIT-κ]  iter=1: prior_dominated=0/10 (0.0%), median_kfinal=25.86, median_alpha=0.00
+09:10:12.098 [INFO ] Fitter - [FITTER] Fitting complete (3 depths, 10 nodes)
+09:10:12.098 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 15.3491      | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 25.9365      | 15.3491      | 0               | 0.0000             | 0.0000            
+│ 2     | 25.8947      | 25.9365      | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+09:10:12.109 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #8' reason=min-pair n=103 k=2 emK=2 sep=0.0246 bar=0.0250
+09:10:12.111 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #8' reason=min-pair n=103 k=2 emK=2 sep=0.0246 bar=0.0250
+09:10:12.112 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #8' reason=min-pair n=103 k=2 emK=2 sep=0.0246 bar=0.0250
+09:10:12.122 [INFO ] Splitter - Split 'Emergent Concept #7' (q=103, k=2, sep=0.026, routed=[58, 45], converged=true) -> Spawning 2 children
+09:10:12.124 [INFO ] Splitter - Split 'Emergent Concept #7' (q=103, k=2, sep=0.026, routed=[58, 45], converged=true) -> Spawning 2 children
+09:10:12.125 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #7' Delta J = 0.001494, Delta V = 2
+09:10:12.135 [INFO ] Splitter - Split 'Emergent Concept #5' (q=102, k=2, sep=0.029, routed=[59, 43], converged=true) -> Spawning 2 children
+09:10:12.136 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #5' Delta J = 0.000782, Delta V = 2
+09:10:12.146 [INFO ] Splitter - Split 'Emergent Concept #6' (q=102, k=2, sep=0.028, routed=[52, 50], converged=true) -> Spawning 2 children
+09:10:12.147 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #6' Delta J = 0.003270, Delta V = 2
+09:10:12.157 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #3' reason=min-pair n=102 k=2 emK=2 sep=0.0243 bar=0.0250
+09:10:12.158 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #3' reason=min-pair n=102 k=2 emK=2 sep=0.0243 bar=0.0250
+09:10:12.159 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #3' reason=min-pair n=102 k=2 emK=2 sep=0.0243 bar=0.0250
+09:10:12.169 [INFO ] Splitter - Split 'Emergent Concept #4' (q=109, k=2, sep=0.026, routed=[67, 42], converged=true) -> Spawning 2 children
+09:10:12.171 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #4' Delta J = 0.004405, Delta V = 2
+09:10:12.172 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #18' w=0.0 res=0 ch=0 par=0
+09:10:12.173 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #4' Delta J = -0.006079, Delta V = -1. Reverting.
+09:10:12.173 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #11' w=0.0 res=0 ch=0 par=0
+09:10:12.174 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #7' Delta J = -0.001893, Delta V = -1. Reverting.
+09:10:12.175 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #13' w=0.0 res=0 ch=0 par=0
+09:10:12.177 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #5' Delta J = -0.002514, Delta V = -1. Reverting.
+09:10:12.178 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #16' w=0.0 res=0 ch=0 par=0
+09:10:12.179 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #6' Delta J = -0.004194, Delta V = -1. Reverting.
+09:10:12.179 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+09:10:12.180 [INFO ] Fitter - [FIT-μ]  iter=2: mean_MLE_drift=0.999, oscillating_nodes=0/18, earlyout_rate=1.00
+09:10:12.180 [INFO ] Fitter - [FIT-κ]  iter=2: prior_dominated=0/18 (0.0%), median_kfinal=24.99, median_alpha=0.00
+09:10:12.180 [INFO ] Fitter - [FITTER] Fitting complete (4 depths, 18 nodes)
+09:10:12.181 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 15.3491      | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 25.9364      | 15.3491      | 0               | 0.0000             | 0.0000            
+│ 2     | 25.8961      | 25.9364      | 0               | 0.0000             | 0.0000            
+│ 3     | 20.0585      | 26.0584      | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+09:10:12.217 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+09:10:12.221 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+09:10:12.223 [INFO ] Fitter - [FITTER] Fitting complete (2 depths, 4 nodes)
+09:10:12.223 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 15.3491      | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 25.9063      | 15.3491      | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+09:10:12.240 [INFO ] Splitter - Split 'anchor1' (q=200, k=2, sep=0.072, routed=[97, 103], converged=true) -> Spawning 2 children
+09:10:12.257 [INFO ] Splitter - Split 'anchor1' (q=203, k=2, sep=0.071, routed=[98, 105], converged=true) -> Spawning 2 children
+09:10:12.258 [INFO ] Operations - [GROW ACCEPTED] 'anchor1' Delta J = 0.012409, Delta V = 2
+09:10:12.275 [INFO ] Splitter - Split 'anchor2' (q=202, k=2, sep=0.071, routed=[99, 103], converged=true) -> Spawning 2 children
+09:10:12.276 [INFO ] Operations - [GROW ACCEPTED] 'anchor2' Delta J = 0.018486, Delta V = 2
+09:10:12.292 [INFO ] Splitter - Split 'anchor0' (q=203, k=2, sep=0.066, routed=[100, 103], converged=true) -> Spawning 2 children
+09:10:12.293 [INFO ] Operations - [GROW ACCEPTED] 'anchor0' Delta J = 0.030149, Delta V = 2
+09:10:12.294 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+09:10:12.295 [INFO ] Fitter - [FIT-μ]  iter=1: mean_MLE_drift=1.000, oscillating_nodes=0/10, earlyout_rate=1.00
+09:10:12.295 [INFO ] Fitter - [FIT-κ]  iter=1: prior_dominated=0/10 (0.0%), median_kfinal=25.86, median_alpha=0.00
+09:10:12.295 [INFO ] Fitter - [FITTER] Fitting complete (3 depths, 10 nodes)
+09:10:12.296 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 15.3491      | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 25.9365      | 15.3491      | 0               | 0.0000             | 0.0000            
+│ 2     | 25.8947      | 25.9365      | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+09:10:12.307 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #8' reason=min-pair n=103 k=2 emK=2 sep=0.0246 bar=0.0250
+09:10:12.308 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #8' reason=min-pair n=103 k=2 emK=2 sep=0.0246 bar=0.0250
+09:10:12.310 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #8' reason=min-pair n=103 k=2 emK=2 sep=0.0246 bar=0.0250
+09:10:12.320 [INFO ] Splitter - Split 'Emergent Concept #7' (q=103, k=2, sep=0.026, routed=[58, 45], converged=true) -> Spawning 2 children
+09:10:12.321 [INFO ] Splitter - Split 'Emergent Concept #7' (q=103, k=2, sep=0.026, routed=[58, 45], converged=true) -> Spawning 2 children
+09:10:12.322 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #7' Delta J = 0.001494, Delta V = 2
+09:10:12.333 [INFO ] Splitter - Split 'Emergent Concept #5' (q=102, k=2, sep=0.029, routed=[59, 43], converged=true) -> Spawning 2 children
+09:10:12.334 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #5' Delta J = 0.000782, Delta V = 2
+09:10:12.344 [INFO ] Splitter - Split 'Emergent Concept #6' (q=102, k=2, sep=0.028, routed=[52, 50], converged=true) -> Spawning 2 children
+09:10:12.345 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #6' Delta J = 0.003270, Delta V = 2
+09:10:12.354 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #3' reason=min-pair n=102 k=2 emK=2 sep=0.0243 bar=0.0250
+09:10:12.355 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #3' reason=min-pair n=102 k=2 emK=2 sep=0.0243 bar=0.0250
+09:10:12.356 [INFO ] Splitter - [NO-SPLIT] 'Emergent Concept #3' reason=min-pair n=102 k=2 emK=2 sep=0.0243 bar=0.0250
+09:10:12.367 [INFO ] Splitter - Split 'Emergent Concept #4' (q=109, k=2, sep=0.026, routed=[67, 42], converged=true) -> Spawning 2 children
+09:10:12.370 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #4' Delta J = 0.004405, Delta V = 2
+09:10:12.372 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #18' w=0.0 res=0 ch=0 par=0
+09:10:12.373 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #4' Delta J = -0.006079, Delta V = -1. Reverting.
+09:10:12.374 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #11' w=0.0 res=0 ch=0 par=0
+09:10:12.375 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #7' Delta J = -0.001893, Delta V = -1. Reverting.
+09:10:12.376 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #13' w=0.0 res=0 ch=0 par=0
+09:10:12.377 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #5' Delta J = -0.002514, Delta V = -1. Reverting.
+09:10:12.378 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #16' w=0.0 res=0 ch=0 par=0
+09:10:12.379 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #6' Delta J = -0.004194, Delta V = -1. Reverting.
+09:10:12.379 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+09:10:12.381 [INFO ] Fitter - [FIT-μ]  iter=2: mean_MLE_drift=0.999, oscillating_nodes=0/18, earlyout_rate=1.00
+09:10:12.381 [INFO ] Fitter - [FIT-κ]  iter=2: prior_dominated=0/18 (0.0%), median_kfinal=24.99, median_alpha=0.00
+09:10:12.381 [INFO ] Fitter - [FITTER] Fitting complete (4 depths, 18 nodes)
+09:10:12.381 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 15.3491      | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 25.9364      | 15.3491      | 0               | 0.0000             | 0.0000            
+│ 2     | 25.8961      | 25.9364      | 0               | 0.0000             | 0.0000            
+│ 3     | 20.0585      | 26.0584      | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

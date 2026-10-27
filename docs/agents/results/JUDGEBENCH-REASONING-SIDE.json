@@ -1,0 +1,375 @@
+{
+  "id": "JUDGEBENCH-REASONING-SIDE",
+  "title": "JUDGEBENCH-REASONING-SIDE: on JudgeBench's GPT-4o split (350 correctness-grounded pairs, NO reference), does a reasoning judge (grok-4-1-fast-reasoning, S1) beat the generic judge (grok-4-1-fast-non-reasoning, G) under the same no-reference STACK-v2 recipe (GENERIC slot), and does the gain depend on the category? (side test, external validity; queue item JUDGEBENCH-CJB-SIDE, the CodeJudgeBench half DECLINED)",
+  "question": "On JudgeBench's GPT split (350 pairs, one response correct and one wrong by an objective check), with no reference shown, does the reasoning deployment of the same grok model reach the gold label more often than the non-reasoning deployment, with byte-identical prompts? Secondary (descriptive only): does the gain differ across JudgeBench's four categories? 'Specialised' = test-time reasoning, not domain specialisation.",
+  "kind": "judged",
+  "state": "READY",
+  "registration": {
+    "commit": "the commit that writes this record (parent f1e9e68); before any code or call; THE BUILDER'S PARENT",
+    "program_lines": "docs/judge_v2_program.md L17330-L17533",
+    "program_lines_as_of": "the commit that writes them, parent f1e9e68, re-grepped",
+    "date": "2026-09-25",
+    "heading": "## Registered 2026-09-25 (before any code or call; zero calls) — JUDGEBENCH-REASONING-SIDE: on JudgeBench's GPT-4o split (350 correctness-grounded pairs, NO reference), does a reasoning judge ...",
+    "provenance": "VERBATIM: the judge-design-specialist's own write judgebench_side_registration_draft.md (scratchpad, not committed), sha256 b9c9b805a9a339b6ca63328f4251e594b27cf2cfd656e416db1e8d83c0d19479 (file bytes, LF, UTF-8, 164 lines, 27,514 bytes; verified by the registrar), verbatim L17335-L17498 (the specialist's file judgebench_side_registration_draft.md, sha256 b9c9b805a9a339b6ca63328f4251e594b27cf2cfd656e416db1e8d83c0d19479, LF, 27,514 bytes; re-hashed between the markers); relayed by the orchestrator. Authority: the author's authorisation of 2026-09-25, verbatim: \"You can register tests for the whole night like the last big session if you identify new good relevent onces you can start them as long as they are not too expensive\"; origin: the author's question of 2026-09-25 (specialised vs generic judges on hard regions) and the experiment-manager's night plan."
+  },
+  "script": {
+    "path": "tools/analysis/judgebench_side.py",
+    "sha16": "sha256-lf16:ed9aac5877e741cf (blob:e8faa08b7d2c7837e22c9fe2b4d8f900dd5caa61; sha256-crlf16:3a34350bb02c0c1c)",
+    "commit": "85a2d9fc1a59d3871dad177d14ee2f8aadd0778a on branch worktree-agent-a908ab11f8ceee064 (chain e5cac52 -> 59f51f5 -> 20a6462 -> 85a2d9f; parent of the chain 6134573); NOT MERGED (git merge-base --is-ancestor 85a2d9f main rc 1)",
+    "files": {
+      "tools/ingest/judgebench_ingest.py": "blob:a2b0878fe75a00720095cebd72a8bf791a7d0a83 / sha256-lf16:eeb4286b619ab6bc / sha256-crlf16:2a28f3f0b5d26075",
+      "experiment_results/judgebench_side/ingest_manifest.json": "blob:87c59f86394a4cb44ec4ed56c8564d5a12264bb4 / sha256-lf16:b00cb01492e301dd / sha256-crlf16:392a59d961aa379f",
+      "tools/analysis/accepted_tests_ledger.py": "BY 3-WAY MERGE ONLY (base 6134573, ours main blob:a4a1d7eedc0846ba601a8aba557166447f22d2e5 with INDUCE-3's CEILINGS, theirs 85a2d9f blob:1d945bb1896ec8cce6abe2ac2dd8533feb818118), NEVER by path restore: result blob:fabb66a8b3d73a3c31053170145c3be7b8e54975 / sha256-lf16:e5f942de85da83d5 / sha256-crlf16:9875b083df114b29 (adds CEILINGS[\"JUDGEBENCH-REASONING-SIDE\"] = 1540)"
+    },
+    "pins_verified_by_registrar": "blobs, sha256-lf16 and sha256-crlf16 of the 3 files at 85a2d9f; the 3-way merge result (git merge-file rc 0, git hash-object fabb66a8); the corpus DB file sha256 and both table shas (mode=ro&immutable=1). The dry-run anchors are the reviewer's."
+  },
+  "ready": {
+    "file": "docs/reviews/READY_judgebench_reasoning_side.md",
+    "commit": "a249f77 (delta-2, READY); earlier sections 5d57795 (delta, NOT READY on D11) and cc7a6d7 (first review, NOT READY on D1 / D2)",
+    "at": "85a2d9f",
+    "section": "# DELTA-2 READY 2026-09-25: JUDGEBENCH-REASONING-SIDE, 85a2d9f (on 20a6462) / ## VERDICT (delta-2)",
+    "review_blob": "blob:17760e7afe66fc7bf2f7ac847731608487cf53ea / sha256-lf16:5ce0f112302a1138 (working tree LF, equal)",
+    "verdict": "READY for posting at 350, 250 and 150; at 150 C1 and P3 DESCRIPTIVE-ONLY by design (D2). Posting awaits the author's size, the post-pilot merge and the binding launch conditions.",
+    "history": [
+      "cc7a6d7 first review of e5cac52: NOT READY (D1 HIGH midnight double-count voids C0(e); D2 HIGH at 150 only)",
+      "5d57795 delta of 59f51f5 + 20a6462: NOT READY (D11 HIGH: selftest reached the real analyze()/pilot_report() on ROOT); D1, D2, D3, D6 FIXED",
+      "a249f77 delta-2 of 85a2d9f: READY at 350 / 250 / 150; D11, D12, D13 FIXED; selftest 92 ok (85 + 7 mutants) under python and -O; ingest 0 failures; dry-run anchors 0 differing lines at 3 sizes"
+    ]
+  },
+  "go": "n/a under the 4,000-match rule (at most 350 matches) | POSTING GATE: THE AUTHOR'S SIZE CHOICE (350 / 250 / 150), STILL OWED, recorded by the registrar (bracket on the POSTING GATE L17502 + plan amendment) before any post | READY a249f77 recorded 2026-09-25 | [SIZE 2026-09-25: THE AUTHOR CHOSE 350 (\"Go for 350 and build it anyway I'll find a way to increase the quota\"; plan Amendment 24): 1,400 calls / about 7,700 cce, ceiling 1,540 / 8,470; at most 350 matches, NO GO needed; the posting gate's size condition MET; launch conditions L2-L5 remain]",
+  "run": null,
+  "review": null,
+  "criteria": [
+    {
+      "id": "C0",
+      "text": "VALIDITY (first; any failure -> UNDETERMINED BY VALIDITY, no reading): (a) source sha256s = pins, 350 GPT rows ingested; (b) selftest body-diff assertions pass (arms differ ONLY in model; temperature absent; max_tokens 8192; SYSTEM differs from stack_norubric's generic system only by REF -> NOREF), payload anchors printed; (c) pilot-12 guard passes in both arms (refuses at >= 2 of 24 unparsed posts); (d) run-level unparsed <= 5% per arm; (e) posted calls <= ceiling, day ledger agrees; (f) cache complete (350 x 2 x 2); (g) lint shows no pool DB opened",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "per arm: 24 pilot posts; 700 run posts"
+    },
+    {
+      "id": "C1",
+      "text": "PRIMARY (SCOREABLE). Pooled paired difference, convention A, S1 - G: REASONING BETTER iff point >= +5.7pp (test-retest floor) AND exact two-sided McNemar p < 0.05; GENERIC BETTER iff point <= -5.7pp AND p < 0.05; otherwise UNDETERMINED. Convention B printed, does not decide. [registrar: the point AND p decide jointly, stated in one place; not a rule-7 defect] [READY 2026-09-25: at size 150 C1 is DESCRIPTIVE-ONLY (branch C1.DESCRIPTIVE_ONLY; point, p and interval printed; F1 still scored)]",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "350 pairs (JudgeBench GPT split, one per question; DEFF 1.00)"
+    },
+    {
+      "id": "C2",
+      "text": "SECONDARY, DESCRIPTIVE-ONLY (does not decide): INTERACTION = gain(reasoning + coding, n 140) - gain(knowledge + math, n 210), convention A, bootstrap CI; beside it: the a-priori difficulty contrast gain(knowledge + reasoning) - gain(math + coding) (hard / easy fixed by the paper's GPT-4o column), the four per-category gains, convention JB",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "140 vs 210 pairs; 252 vs 98; K154 / R98 / M56 / C42"
+    },
+    {
+      "id": "C3",
+      "text": "DESCRIPTIVE: decisiveness vs discrimination decomposition; length (P(choose longer | committed) vs the 0.460 base rate); position (flip rate, first-position win share); strata by category and, for knowledge, by side (EVAL / GATE / TRAIN)",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "per arm, 350 pairs; committed n printed"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "G convention-A accuracy 0.52 (80% interval 0.42-0.62), P = 0.75 [registrar's reading: HELD iff inside the interval]",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "350 pairs"
+    },
+    {
+      "id": "P2",
+      "text": "S1 convention-A accuracy 0.64 (80% interval 0.55-0.75), P = 0.70 [registrar's reading: HELD iff inside the interval]",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "350 pairs"
+    },
+    {
+      "id": "P3",
+      "text": "C1 returns REASONING BETTER, pooled gain about +12pp (80% interval +5 to +20), P = 0.75 [registrar's reading: HELD iff REASONING BETTER and the point in [+5, +20]] [READY 2026-09-25: NOT SCORED at size 150 (C1 DESCRIPTIVE-ONLY there)]",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "350 pairs"
+    },
+    {
+      "id": "P4",
+      "text": "(a) G's tie rate exceeds S1's by >= 5pp, P = 0.75; (b) at least half of the convention-A gain is decisiveness rather than committed accuracy, P = 0.60 [registrar: clauses scored separately; (b) only if the gain > 0, else UNDETERMINED; its share formula OPEN FOR THE READY] [P4b FORMULA 2026-09-25 (READY cc7a6d7 ruling 3; programme L17423): symmetric Shapley split of the conv-A gain, accA = share x disc, share = COMMITTED share = 1 - ties - INVALID (not '1 - tie rate'); decisiveness part = (share_S1 - share_G)(disc_G + disc_S1)/2; discrimination part = (disc_S1 - disc_G)(share_G + share_S1)/2; P4b HELD iff gain > 0 and decisiveness part >= gain/2, FAILED iff gain > 0 and < gain/2, UNDETERMINED iff gain <= 0]",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "350 pairs per arm"
+    },
+    {
+      "id": "P5",
+      "text": "(a) convention-B gain (S1 - G) > 0, P = 0.70; (b) point about +5pp, smaller than convention A's",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "committed verdicts per arm (n printed)"
+    },
+    {
+      "id": "P6",
+      "text": "INTERACTION > 0, P = 0.75, point about +15pp (descriptive contrast)",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "140 vs 210 pairs"
+    },
+    {
+      "id": "P7",
+      "text": "|difficulty contrast| < 10pp, P = 0.65, point about +2pp",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "252 vs 98 pairs"
+    },
+    {
+      "id": "P8",
+      "text": "(a) the largest per-category gain is in reasoning or coding, P = 0.70; (b) the knowledge gain >= 0, P = 0.80",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "K154 / R98 / M56 / C42"
+    },
+    {
+      "id": "P9",
+      "text": "(a) G picks the longer response on committed verdicts more often than S1, P = 0.65; (b) at least one arm above the 0.460 base rate, P = 0.70 [P9b BASE RATE 2026-09-25 (READY cc7a6d7 ruling 5; programme L17428): scored against the MEASURED base rate of the chosen size's schedule; 161/350 = 0.460 at 350 (0 length ties); at 250 / 150 the measured subset rate decides, 0.460 printed beside it]",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "committed verdicts per arm"
+    },
+    {
+      "id": "P10",
+      "text": "(a) S1 run-level unparsed <= 5%, P = 0.85; (b) G <= 2%, P = 0.90",
+      "result": "n/a",
+      "value": "not run",
+      "denominator": "700 posts per arm"
+    }
+  ],
+  "falsifier": {
+    "text": "F1 fires if the pooled convention-A point is <= 0 (S1 no better than G); it would refute the transport of J1's in-corpus result (reasoning grok 0.847 vs non-reasoning grok 0.743 on MMLU-Pro with no reference, +10.4pp, n_dec 946; j1_grok_reasoning_outcome.txt L6). A C0(d) failure is NOT a falsification (UNDETERMINED BY VALIDITY). [registrar: F1 and C1 are scored together and recorded joined]",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "source_draft_sha256": "b9c9b805a9a339b6ca63328f4251e594b27cf2cfd656e416db1e8d83c0d19479 (file bytes, LF, 27,514 bytes; registrar-verified)",
+    "judgebench_gpt_split": "HF ScalerLab/JudgeBench rev 57dd5e0b9817d07f05ec8f45a91b2ce1e310e308, data/gpt-00000-of-00001.jsonl 1,960,188 bytes, sha256 d5106306b38dead1b2e964ecf5534a3e7b2fc4b8d3b8da327599edfcebd76042 (file bytes as served); 350 pairs / 350 unique questions: knowledge 154, reasoning 98, math 56, coding 42; labels A>B 193 / B>A 157 (the specialist's; not re-derived by the registrar)",
+    "judgebench_claude_split": "data/claude-00000-of-00001.jsonl 920,039 bytes, sha256 3b70504588e400613bf5744a20a345da8701b7150be9a30c9db0e6f3d7b70a62; 270 pairs, 269 unique questions; 91 shared with the GPT split; NOT in the registered run (the specialist's)",
+    "longer_is_correct_rate_gpt_split": "0.460 (knowledge 0.442, reasoning 0.418, math 0.518, coding 0.548; the specialist's)",
+    "knowledge_side_map_gpt_split": "EVAL 44 / GATE 18 / TRAIN 92 by exact stem key on the committed side export REG_ARCHV2-SPLIT-2_2929bd46..._side.tsv (table_sha 75b4662e..., 20,544 rows; header registrar-verified); mixed-side, disclosed (the specialist's counts)",
+    "GENERIC_SYSTEM_sha256": "3a5e223c26f32c8e68a1a40b05f1fc9e63a36434eb9613830f5641c06253ddb9 (130 chars; rubric_value_contrast.py L67, blob:9e1541a7bdf1260268c850ccac81db4570c064e4; registrar-verified)",
+    "GENERIC_RUBRIC_sha256": "67f843eb7a632ae5bd411a9debcbaf9dedccd362e0c8355c366c6d85cb89b1dc (81 chars; L69; registrar-verified)",
+    "support": "denominator 350 pairs, Kish mean cluster size 1.00, DEFF 1.00 (source: structure), n_eff 350; SE sqrt((0.33 - 0.11^2) / 350) = 0.0301; MDE 8.4pp (7.3-9.3 over d 0.25-0.40); C1 SCOREABLE at 350 / 300 (9.1) / 250 (10.0), DESCRIPTIVE-ONLY at 150 (12.9); INTERACTION MDE 17.5pp, difficulty 19.1pp, per category 13.0 / 16.2 / 21.5 / 24.8pp: DESCRIPTIVE-ONLY (the text's SUPPORT, arithmetic re-done by the registrar)",
+    "cost_350": "1,400 calls (700 G + 700 S1) = 7,700 cce (a reasoning call priced 10 cce: FRAMEWORK L201's declared reference-solve input transported to a judge call); ceiling 1,540 posted calls / 8,470 cce; pilot 48 calls / 264 cce inside",
+    "cost_variants": "300: 1,200 calls / 6,600 cce; 250: 1,000 / 5,500; 150: 600 / 3,300",
+    "cce_understatement": "the experiment-manager's bill (cce_expected 1,300 / cce_max 2,600 at 1 cce per call) understates about 5x (7,700 / 1,300 = 5.9x; 8,470 / 2,600 = 3.3x)",
+    "in_corpus_baseline_G_form": "PAIR-NOREF, R3 944 kd, grok-fast, anchor rubric: 0.738 conv A, ties 0.177, 0.897 committed (the text's)",
+    "J1_prior": "reasoning grok 0.847 vs grok-fast 0.743 (+10.4pp) and vs Mistral 0.772 (96:25), n_dec 946 (experiment_results/x12_crossdomain/j1_grok_reasoning_outcome.txt L6; registrar-verified)",
+    "corpus_db": "judgebench_corpus_v1.db file sha256 a2ca40b8d4b06126c8b61f6d1f2c2c5a2cd65ad844b542599dedf79efcf2f498; pairs table_sha256 eee0193c4abf8f0003d319a9e7a04f3ba5a641d6498b4ea75d1832d9ab9b2064 (620 rows); meta 41f2bf1d86e6e3e5b2208d8d23f01b428c9386a4450606e84fb36d44461db0cf (15 rows) (review a249f77; re-derived by the registrar)",
+    "SYSTEM_sha256": "3760f9882264b9705154057c550a0bec1c05de56edb820283756b61c063981da (2,015 chars; the reviewer's)",
+    "payload_anchor": "pair 58d81545-6e2e-5388-b1b7-05ec20157459, order 1: G 742b02ecf235180805e921651dac2030c795e5d70a26b3549dffd8b4f2f7793d / S1 b536f9fd1eca82157f8d0b3929f6b85ccc9efe9fff725f3069d39cf8813bfdf9 (the reviewer's dry-runs)",
+    "schedule_sets_350_250_150": "b9e4a23bc5710d2e840c0841e0ed97636c77580a8949dceb4d3ec9c6786654cc / c8765672d9de90c8ba1b3248b8b298ae5115894487c802295e25d3dcf12cf1b8 / dbc0ea2837e94534ce48fbe3d01ae24cccbee84b8865727607c31f804cb24849",
+    "pilot_set": "2bee205c6d63ac75fdc901a5b33c04ec19c8c43564f22a8c9134c6b084fe66c7 (every size; 3 per category)",
+    "payload_sets_G_S1": "350 832e54a9c9a32a4541e49c6d93433735c0992406d5e443edf5227b1c02efa1a0 / 1806a6bee90883bdaf67d632810d0ad285fc8ec2af0f3dc9fbe8258cbfb7707b; 250 a3b2c955264eaf709f1351a511f2195ea79045dd2985fe217e70128b04f8f327 / 54987d1c89e3d0118831faa6bd1222b7052b40b1f266199ff7ed50d551c833b5; 150 0848879ea96d9af169acdc11695035937e52e29d8ef90027367e507a7954ab0d / 4f4df2bfc6a6759bb377fcafb761657a70f8fe9647e492a55bc4718cf9cb7449",
+    "payload_body_source_sha256": "907366e47c3f5ce98b2a6e0d59284ba35bc586b59fb7699916c3280bdda554d9",
+    "selftest_READY": "judgebench_side.py --selftest 92 ok (85 checks + 7 mutant lines, 7 of 7 KILLED), 0 FAIL, python and -O; judgebench_ingest.py --selftest 0 failures (review a249f77)",
+    "MDE_by_size": "C1 8.4 / 10.0 / 12.9pp at 350 / 250 / 150 (review cc7a6d7 claim 21); 150 DESCRIPTIVE-ONLY"
+  },
+  "sentence_of_record": "",
+  "chips": [
+    "REGISTERED 2026-09-25, BEFORE ANY CODE",
+    "MERGED 2026-09-25 AT e0735e3 (85a2d9f BY PATH + accepted_tests_ledger 3-WAY = fabb66a8); READY a249f77; L2 MET ON MAIN; NOT RUN",
+    "SIZE 350 (THE AUTHOR, 2026-09-25, AMENDMENT 24); POSTS AFTER THE K46 OUTCOME ON A FRESH DAY WITH NO K46 ROW AND NO JV2-RATE-PROBE ROW (EARLIEST 2026-09-27: 2026-09-26 IS A PROBE DAY, A6)",
+    "OPEN: --workers 4 ON A 429-HEAVY DAY (NO RATE CONTROL; 70-POST MARGIN ON G); LAUNCH UNDER PLAIN python (NO TRANSPORT PREFLIGHT IN THE DRY-RUN)",
+    "C1 SCOREABLE (MDE 8.4pp); REGION CONTRAST DESCRIPTIVE-ONLY",
+    "≤ 1,540 CALLS / 8,470 CCE; ≤ 350 MATCHES",
+    "CODEJUDGEBENCH HALF DECLINED"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-25",
+      "by": "registrar (registration, verbatim; zero calls)",
+      "text": "REGISTERED before any code or call: docs/judge_v2_program.md L17330-L17533 (section \"## Registered 2026-09-25 (before any code or call; zero calls) — JUDGEBENCH-REASONING-SIDE: on JudgeBench's GPT-4o split ...\"; lines _as_of the commit that writes them, parent f1e9e68, re-grepped); verbatim L17335-L17498 (the specialist's file judgebench_side_registration_draft.md, sha256 b9c9b805a9a339b6ca63328f4251e594b27cf2cfd656e416db1e8d83c0d19479, LF, 27,514 bytes; re-hashed between the markers); registrar's record L17501-L17533. [OF RECORD: the text's 'DRAFT ..., not yet of record' is superseded; the queue id JUDGEBENCH-CJB-SIDE is kept and the CodeJudgeBench half DECLINED inside it (INSTRUMENT (e), L17381).]"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (POSTING GATE, on the orchestrator's instruction)",
+      "text": "REGISTERED; POSTING AWAITS THE AUTHOR'S SIZE CONFIRMATION (350 recommended / 250 / 150 descriptive-only). Not a decision. The specialist re-priced: reasoning calls 10 cce, 350 pairs = 1,400 calls / about 7,700 cce, ceiling 1,540 calls / 8,470 cce; the experiment-manager's ~1,300 calls at 1 cce understated about 5x; far under the 4,000-match rule; a fresh day's cap, never shared with the pilot; the orchestrator puts the size to the author before posting. docs/judge_v2_program.md L17502 (_as_of the commit that writes it, parent f1e9e68)."
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (corrections of the web-survey relay; the specialist's findings)",
+      "text": "[CORRECTED] (1) JudgeBench paper: o3-mini (high) leads ALL four categories, knowledge included (67.53 vs Claude 62.34); no judge x category crossing. (2) CodeJudgeBench: 5,352 pairs per the paper; the HF 6,363 rows include 1,011 repackaged rows; tier ranges corrected (EASY 59.5-99.7%, HARD 36.6-69.2%); the tiers are defined by strong-judge correctness, so CJB is excluded from the registered run. (3) The key question's contrast is DESCRIPTIVE ONLY. None of these claims is of record elsewhere. docs/judge_v2_program.md L17503-L17506 (_as_of the commit that writes them, parent f1e9e68)."
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (READY recorded; zero calls; insertion only)",
+      "text": "READY a249f77 (delta-2 of 85a2d9f, docs/reviews/READY_judgebench_reasoning_side.md): READY for posting at 350, 250 and 150 (at 150 C1 and P3 DESCRIPTIVE-ONLY); after NOT READY at cc7a6d7 (D1 / D2) and 5d57795 (D11). Build NOT MERGED. Pins re-derived by the registrar. Launch conditions L1-L5 binding; L1 (the author's size) STILL OWED. docs/judge_v2_program.md L17984-L18017 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; BEFORE the pilot) — JUDGEBENCH-REASONING-SIDE READY a249f77 (delta-2 at 85a2d9f) ...\"; _as_of the commit that writes them, parent a249f77, re-grepped)."
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (pre-pilot bracket 1 of 3)",
+      "text": "P4b = the symmetric Shapley split of the conv-A gain; decisiveness = the COMMITTED share (1 - ties - INVALID), not '1 - tie rate'; HELD iff decisiveness part >= gain/2; UNDETERMINED iff gain <= 0. Programme L17423 and L17526."
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (pre-pilot bracket 2 of 3)",
+      "text": "P9b scored against the measured base rate for the chosen size (0.460 at 350). Programme L17428."
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (pre-pilot bracket 3 of 3, READY D5)",
+      "text": "judgebench_corpus_v1.db carries key-bearing EVAL copies (44 GPT-split, 41 Claude-split); it is an EXCLUDED INPUT for any construction, labelling, induction, rubric fit, selection or policy fit. Programme L17362 (HYGIENE (c))."
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (zero calls; insertion only; JV2-RATE-PROBE / JV2-PARALLEL-POSTING registration)",
+      "text": "JV2-RATE-PROBE registered (no JudgeBench condition changes): its C3 prints the HTTP overhead at N = 4 beside this test's 10% HTTP margin (770 / 700); under the 09-24 regime CANARY pass 3 spent >= 22% HTTP-429 attempts, so the G arm at --workers 4 could exhaust its HTTP cap on 429s alone (finding F-3). Whether the probe's result changes the --workers 4 launch condition is OPEN, the registrar's to rule after the probe's outcome (its open item 3). X2: the probe never posts on a JudgeBench posting day. docs/judge_v2_program.md L18908-L18977 (section \"## Finding of record 2026-09-25 (registrar; zero calls; read-only evidence of the judge-design-specialist, recorded VERBATIM) — GROK-NR-THROUGHPUT: ...\"; block 1/3 verbatim between the marker lines L18913 and L18966); docs/judge_v2_program.md L18979-L19094 (section \"## Registered 2026-09-25 (before any code or call) — JV2-RATE-PROBE: ...\"; block 2/3 verbatim between the marker lines L18983 and L19059); _as_of the commit that writes them, parent 0c10ea2, re-grepped."
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (author's decisions, relayed verbatim by the orchestrator; zero calls; insertion only)",
+      "text": "THE AUTHOR CHOSE SIZE 350 (\"Go for 350 and build it anyway I'll find a way to increase the quota\"; plan Amendment 24). L1 DISCHARGED; the POSTING GATE's size condition MET. No call may post yet: L2 merge after the ARCH-V2-PILOT-K46 OUTCOME is written (accepted_tests_ledger.py by the 3-way merge, blob fabb66a8); L3 a fresh day after the pilot's last post with no K46 row (2026-09-25 carries K46 rows, so the earliest posting day is 2026-09-26, if that day carries none); L4 --arm both only; L5 backup to E:. Probe X2 unchanged: the probe and this test never share a day. docs/judge_v2_program.md L19341-L19376 (section \"## Author's decisions 2026-09-25 (recorded by the registrar; zero calls; insertion only) — (1) JUDGEBENCH-REASONING-SIDE SIZE = 350 ...\"; _as_of the commit that writes it, parent 95d9821, re-grepped)"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (merge + L2 record; zero calls; insertion only)",
+      "text": "MERGED at e0735e3 (3 paths by path from 85a2d9f; accepted_tests_ledger.py by 3-way merge = blob fabb66a8; pins re-verified at HEAD); L2 MET on main (selftests python and -O 92 ok / 7 of 7, ingest 15 / 0, induce_run_3 556; corpus a2ca40b8 / eee0193c re-hashed; dry-run 350 every anchor, 2026-09-25 refused on K46 rows; no CEILING row); transport preflight True / True; L5 pre-backup equal on E:; findings (a) no transport preflight in the dry-run, launch under plain python, and (b) --workers 4 on a 429-heavy day, OPEN decision; posting READY from 2026-09-26 subject to L3, L4, L5 and the --workers decision; recorded at docs/judge_v2_program.md L20092-L20125 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — JUDGEBENCH-REASONING-SIDE MERGED at e0735e3 ... and LAUNCH CONDITION L2 MET on main ...\"; _as_of the commit that writes it, parent e0735e3, re-grepped); line-end brackets at L18008, L18010, L18014; ledger v288"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (zero calls; insertion only)",
+      "text": "INPUTS TO THE OPEN --workers DECISION: the author's Azure readings of 2026-09-25: quota verbatim \"Tokens per Minute Rate Limit 500000; Requests per Minute Rate Limit 500\", applying to BOTH Grok deployments (reasoning and non-reasoning); StatusCode 09-25 mostly 200 with only a few 429, 09-24 many 429; the 7-day Azure Monitor chart (Model Requests, Sum, by StatusCode, per resource, 09-19..09-25): 200 = 15.05k, 429 = 3.14k, 400 = 0; the orchestrator's chart reading at an INFERRED 30-min bucket: 09-23 about 58/min with no 429, 09-24 about 28 attempts/min with about 40% refused, 09-25 (K46) about 17/min falling to about 3/min with about 0 429; INTERPRETATION, NOT MEASUREMENT: 09-25 = latency (about 3.5 s -> 20 s per call), 09-24 429s consistent with shared-capacity throttling (Global Standard), not the configured quota; the booking-based 40-45/min ceiling estimate bracketed as too pessimistic. THE ORCHESTRATOR RECOMMENDS (not a decision): keep --workers 4 as registered, launch EARLY on the posting day, and on a 429-heavy start STOP EARLY rather than burn the per-arm cap (770 at 350), a recommendation for the launch READY and the operator. This runner has no Retry-After handling. THE DECISION STAYS OPEN for the author or the orchestrator and is recorded before the launch; no criterion, cap, payload or launch condition changes. docs/judge_v2_program.md L20164-L20220 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — BANNED-MODELS-REASON-CORRECTION MERGED at 52474d6 ... and NOISRESERVED-TEST-ALLOWLIST MERGED at 7e71cba after READY c832a16 ...\"), _as_of the commit that writes it, parent 7e71cba, re-grepped"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (zero calls; insertion only)",
+      "text": "OPERATOR RULE (the orchestrator's, JV2-RATE-PROBE pre-data amendment A6; NOT an amendment of this registration): JV2-RATE-PROBE and JudgeBench NEVER POST ON THE SAME DAY, in either direction. The probe side is the probe's registered X2; the JudgeBench side is a new operator condition beside L3-L5, NOT mechanically enforced by this runner (its L3 check reads K46 rows): the run-operator checks the day ledger for JV2-RATE-PROBE rows before any JudgeBench launch. Consequence: a probe posted on 2026-09-26 moves JudgeBench to 09-27 or later. Also (F8): after the probe's ceiling entry merges, this runner's (iii) line prints '+ JV2-RATE-PROBE 0' (printed text only). docs/judge_v2_program.md L20222-L20309 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run; BEFORE the READY and before any data) — JV2-RATE-PROBE BUILT ... and PRE-DATA AMENDMENTS A1-A7 ...\"; _as_of the commit that writes it, parent bd5cfbb, re-grepped)"
+    },
+    {
+      "date": "2026-09-26",
+      "by": "registrar (JV2-RATE-PROBE outcome; zero calls; insertion only)",
+      "text": "JV2-RATE-PROBE OUTCOME (docs/judge_v2_program.md L20478-L20556 (section \"## JV2-RATE-PROBE (2026-09-26, 398 calls) — VALID (post-run review 6ea4f02): C0 HELD, V5 HELD; N* = 12 ...\"; _as_of the commit that writes it, parent ef045a1, re-grepped), item 7; line-end brackets at L20116 and L20125): (1) NO JudgeBench POSTING ON 2026-09-26: it is a probe day under A6 (day_calls_2026-09-26.json: 398 JV2-RATE-PROBE calls, pilot#1 12 + run#2 386); EARLIEST POSTING DAY 2026-09-27. (2) THE C2 OPERATOR CHECK OF READY a34642c IS THE ONLY BARRIER: judgebench_side.py does not refuse a probe day (it checks only PILOT_TEST = 'ARCH-V2-PILOT-K46', L174, L951-L958, per the review); it must print 0 and exit 0 for the launch day. (3) G ARM: the probe (S3 at N = 4: 74.85/min, HTTP overhead 0.000 against the 10% margin, 0 exhausted, AT NIGHT) gives NO REASON TO CHANGE --workers 4 and no daytime assurance; on a 429-heavy start stop early. (4) S1 REASONING ARM (700 calls x 10 cce = 7,000 cce): NOT licensed by the probe (its deployment was not probed); read its HTTP-attempt cap at its own pilot at N = 4, before the run; stop early on a 429-heavy start. (5) THE OPEN --workers ITEM STAYS OPEN (the author's or the orchestrator's), WITH A LEAN TOWARD 4; the probe's open item 3 is ANSWERED. Ledger v296 (bracket; the earliest-day chip 09-26 -> 09-27)."
+    }
+  ],
+  "does_not_show": [
+    "anything about the deployed recipe, which carries the reference",
+    "domain specialisation (the arms differ in test-time reasoning only)",
+    "any claim about the partition's cells (JudgeBench categories are not taxonomy cells; 44 EVAL items are not a cell sample)",
+    "'hard regions' by the partition's own difficulty",
+    "anything about CodeJudgeBench's tiers (declined)",
+    "anything about other contestants (all pairs are gpt-4o-2024-05-13 responses)",
+    "any human preference",
+    "freedom from benchmark contamination",
+    "the word 'calibrated'",
+    "a per-category or region-dependence result (DESCRIPTIVE-ONLY at this size)",
+    "the dataset facts re-derived by the registrar (the specialist's; C0(a) and the READY re-derive them)",
+    "that the 10-cce transport is the true billed ratio",
+    "the author's size choice (still owed)",
+    "the dry-run anchors, selftest counts and mutant kills re-executed by the registrar (the reviewer's)",
+    "that the merge, rebuild and dry-run on main reproduce the pins (launch condition L2 is the executed check)",
+    "lint (pyflakes / ruff not installed)"
+  ],
+  "ledger": {
+    "row_id": "JUDGEBENCH-REASONING-SIDE",
+    "version": "v296 (2026-09-26: a bracket in the observed cell: the JV2-RATE-PROBE outcome; chip POSTS AFTER ... (EARLIEST 2026-09-26) -> ... (EARLIEST 2026-09-27: 2026-09-26 IS A JV2-RATE-PROBE DAY, A6), class warn unchanged) | v291 (2026-09-25: a bracket in the observed cell: A6's operator rule; chips unchanged) | v290 (2026-09-25: a bracket in the observed cell: the Azure inputs and the orchestrator's recommendation; the --workers decision OPEN; chips unchanged) | v288 (2026-09-25: merged + L2 met: bracket in the observed cell; chip BUILT 85a2d9f, NOT MERGED ... -> MERGED ... L2 MET ON MAIN; NOT RUN [plan]; a warn chip OPEN: --workers 4 ...) | v276 (2026-09-25: size 350 by the author; bracket in the observed cell; chip POSTING AWAITS THE AUTHOR'S SIZE CONFIRMATION -> SIZE 350 ..., class warn unchanged); v264 (READY: bracket in the observed cell; chip NOT BUILT, NOT READY, NOT RUN -> BUILT 85a2d9f, NOT MERGED, READY a249f77 (350 / 250 / 150), NOT RUN; class plan unchanged); v260 (a PLAN-chip registration row in section 7, newest first, before ARCH-V2-INDUCE-RUBRIC-3)"
+  },
+  "depends_on": [
+    "ARCH-V2-PILOT-K46",
+    "J1",
+    "PAIR-NOREF",
+    "STACK-NORUBRIC"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing; reopens nothing (not the rubric line, no reference variant, not ESCALATE-LLAMA-LAW, not JUDGE-BY-CELL per-cell routing; the text's CLOSED-LINES STATEMENT L17483-L17484)"
+  },
+  "support": "(a) 350 pairs, one per question, Kish 1.00; (b) DEFF 1.00, source structure; (c) n_eff 350; (d) SE sqrt(0.3179 / 350) = 0.0301; (e) MDE 8.4pp vs 0 (the significance clause governs at d 0.33; floor-clause MDE 8.2pp; at d 0.25 the floor binds, 7.9pp); (f) C1 SCOREABLE at 350 / 300 / 250, DESCRIPTIVE-ONLY at 150; C2 DESCRIPTIVE-ONLY at every size; (g) C1 reachable (no ceiling; finite population 350, 620 with the Claude split); the INTERACTION unscoreable at any size the source affords (the registrar's reading; the text states no structural leg; for the READY)",
+  "owed": [
+    "THE AUTHOR'S SIZE CHOICE (350 / 250 / 150) before any post (L1) [DISCHARGED 2026-09-25: the author chose 350 (plan Amendment 24)]",
+    "the merge after the ARCH-V2-PILOT-K46 run of record, with the re-checks on main (L2)",
+    "post-run: backup of the corpus DB and both caches to E: (L5)"
+  ],
+  "cost": {
+    "calls_expected": 1400,
+    "cce_expected": 7700,
+    "calls_max": 1540,
+    "cce_max": 8470,
+    "size": "350 recommended (250: 1,000 calls / 5,500 cce; 150: 600 / 3,300, descriptive-only)",
+    "reads_pool": false,
+    "posts_llm": true,
+    "source": "the specialist's COST, docs/judge_v2_program.md L17449-L17461"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L17330-L17533 (the verbatim registration L17335-L17498 and the registrar's record L17501-L17533)",
+    "experiment_results/x12_crossdomain/j1_grok_reasoning_outcome.txt L6",
+    "tools/analysis/rubric_value_contrast.py L67, L69 (blob:9e1541a7)",
+    "docs/reviews/READY_judgebench_reasoning_side.md (sections cc7a6d7, 5d57795, a249f77)",
+    "docs/judge_v2_program.md L17984-L18017 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; BEFORE the pilot) — JUDGEBENCH-REASONING-SIDE READY a249f77 (delta-2 at 85a2d9f) ...\"; _as_of the commit that writes them, parent a249f77, re-grepped)",
+    "git objects at 85a2d9f and main (registrar-verified pins)",
+    "docs/judge_v2_program.md L18908-L18977 (section \"## Finding of record 2026-09-25 (registrar; zero calls; read-only evidence of the judge-design-specialist, recorded VERBATIM) — GROK-NR-THROUGHPUT: ...\"; block 1/3 verbatim between the marker lines L18913 and L18966); docs/judge_v2_program.md L18979-L19094 (section \"## Registered 2026-09-25 (before any code or call) — JV2-RATE-PROBE: ...\"; block 2/3 verbatim between the marker lines L18983 and L19059); docs/judge_v2_program.md L19096-L19239 (section \"## Registered 2026-09-25 (before any code; zero calls) — JV2-PARALLEL-POSTING: ...\"; block 3/3 verbatim between the marker lines L19100 and L19214); _as_of the commit that writes them, parent 0c10ea2, re-grepped",
+    "docs/judge_v2_program.md L19341-L19376 (section \"## Author's decisions 2026-09-25 (recorded by the registrar; zero calls; insertion only) — (1) JUDGEBENCH-REASONING-SIDE SIZE = 350 ...\"; _as_of the commit that writes it, parent 95d9821, re-grepped)",
+    "docs/plan_2026-09-15.md Amendment 24 (\"## Amendment 24 (2026-09-25) — \\\"Go for 350 and build it anyway ...\\\" ...\")",
+    "merge commit e0735e3; scratchpad jb_st*.txt, jbm\\, l2main\\ (read); the orchestrator's relay of the engine-coder's and run-operator's reports",
+    "docs/judge_v2_program.md L20092-L20125 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — JUDGEBENCH-REASONING-SIDE MERGED at e0735e3 ... and LAUNCH CONDITION L2 MET on main ...\"; _as_of the commit that writes it, parent e0735e3, re-grepped)",
+    "docs/judge_v2_program.md L20164-L20220 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — BANNED-MODELS-REASON-CORRECTION MERGED at 52474d6 ... and NOISRESERVED-TEST-ALLOWLIST MERGED at 7e71cba after READY c832a16 ...\"), _as_of the commit that writes it, parent 7e71cba, re-grepped",
+    "docs/judge_v2_program.md L20222-L20309 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run; BEFORE the READY and before any data) — JV2-RATE-PROBE BUILT ... and PRE-DATA AMENDMENTS A1-A7 ...\"; _as_of the commit that writes it, parent bd5cfbb, re-grepped)",
+    "docs/judge_v2_program.md L20478-L20556 (section \"## JV2-RATE-PROBE (2026-09-26, 398 calls) — VALID (post-run review 6ea4f02): C0 HELD, V5 HELD; N* = 12 ...\"; _as_of the commit that writes it, parent ef045a1, re-grepped)"
+  ],
+  "last_update": "2026-09-26 (registrar: JV2-RATE-PROBE outcome bracketed: no posting on 09-26 (probe day, A6); earliest 2026-09-27; C2 operator check the only barrier; G arm no reason to change --workers 4; S1 arm not licensed by the probe; the --workers item stays OPEN, lean 4; state READY; ledger v296)",
+  "launch_conditions": [
+    "L1 the author's size choice (350 / 250 / 150), recorded by the registrar: STILL OWED; at 150 C1 and P3 are DESCRIPTIVE-ONLY (F1 still scored) [DISCHARGED 2026-09-25: the author chose 350 (plan Amendment 24); C1 SCOREABLE at 350, MDE 8.4pp]",
+    "L2 merge AFTER the ARCH-V2-PILOT-K46 run of record: runner, ingest and manifest by path from 85a2d9f; accepted_tests_ledger.py by 3-way merge (blob fabb66a8); commit -- <4 paths>; then on main under python and -O re-run induce_run_3_selftest and both JB selftests (92 ok / 7 of 7 KILLED; ingest 0 failures); rebuild the corpus DB and check a2ca40b8 / eee0193c; dry-run at the chosen size and check the anchors",
+    "L3 post on a fresh day, after the pilot's last post, on a day with no K46 row [2026-09-25: 2026-09-25 carries K46 rows (day_calls_2026-09-25.json, entries 06:06:10 and 07:14:34), so the earliest posting day is 2026-09-26, and only if that day carries no K46 row (the K46 poster PID 53840 was alive at 12:54:28)]",
+    "L4 --arm both only; after a rollover exit 6, relaunch the same command",
+    "L5 after the run, back up the corpus DB and both caches (judgebench_side_G_v1.db, judgebench_side_S1_v1.db) to E: under the backup manifest",
+    "[2026-09-25 registrar: L2 MET at e0735e3 (merge + re-checks on main); remaining: L3 (a posting day with no K46 row, earliest 2026-09-26), L4 (--arm both), L5 (backup after the run); plus a plain-python launch with the transport preflight repeated (finding (a)) and the OPEN --workers decision (finding (b)); docs/judge_v2_program.md L20092-L20125 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — JUDGEBENCH-REASONING-SIDE MERGED at e0735e3 ... and LAUNCH CONDITION L2 MET on main ...\"; _as_of the commit that writes it, parent e0735e3, re-grepped)]",
+    "[2026-09-26 registrar: L3 / A6: 2026-09-26 carries 398 JV2-RATE-PROBE calls, so it is NOT a JudgeBench posting day; EARLIEST 2026-09-27, after the READY a34642c C2 operator check prints 0 and exits 0 for the launch day (judgebench_side.py does not refuse a probe day); the --workers decision stays OPEN, lean toward 4; the S1 arm's HTTP-attempt cap read at its own pilot. docs/judge_v2_program.md L20478-L20556 (section \"## JV2-RATE-PROBE (2026-09-26, 398 calls) — VALID (post-run review 6ea4f02): C0 HELD, V5 HELD; N* = 12 ...\"; _as_of the commit that writes it, parent ef045a1, re-grepped), item 7]"
+  ],
+  "open_items_after_READY": [
+    "D4(b) LOW: both_gate is a mistake-guard, spoofable deliberately (hence L4)",
+    "D7 LOW: C0(e) prints the 1,540 label at every size (arm caps 770 / 550 / 330 bind first; cosmetic)",
+    "D9 LOW, pre-existing: accepted_tests_ledger has no cross-test lock (mitigated by L3)",
+    "D12 CLOSED (a249f77): the CEILING row sits on the launch day",
+    "D13 CLOSED (a249f77): a rolled-over pilot exits 6",
+    "D14 INFO: a crash-only mutant reads SURVIVED in the battery (conservative)",
+    "lint UNDETERMINED (pyflakes / ruff not installed)"
+  ],
+  "author_decisions": [
+    {
+      "date": "2026-09-25",
+      "words_verbatim": "Go for 350 and build it anyway I'll find a way to increase the quota",
+      "relayed_by": "orchestrator",
+      "question": "the JUDGEBENCH-REASONING-SIDE size, from 350 / 250 / 150",
+      "decision": "350 (the full GPT-4o split, no draw)",
+      "amendment": "plan Amendment 24",
+      "programme": "docs/judge_v2_program.md L19341-L19376 (section \"## Author's decisions 2026-09-25 (recorded by the registrar; zero calls; insertion only) — (1) JUDGEBENCH-REASONING-SIDE SIZE = 350 ...\"; _as_of the commit that writes it, parent 95d9821, re-grepped)"
+    }
+  ],
+  "size_of_record": "350 pairs (K154 / R98 / M56 / C42, no draw), by the author's decision 2026-09-25 (plan Amendment 24); 1,400 calls / about 7,700 cce, ceiling 1,540 / 8,470; at most 350 matches; C1 SCOREABLE (MDE 8.4pp)",
+  "merge": {
+    "commit": "e0735e3a034f6af21d3192c2ad4355209883c733 (parent c642024; 2026-09-25 19:04:18)",
+    "paths": "judgebench_side.py, judgebench_ingest.py, ingest_manifest.json by path from 85a2d9f; accepted_tests_ledger.py by 3-way merge (base 6134573, ours a4a1d7ee, theirs 85a2d9f)",
+    "pins_at_HEAD": "judgebench_side.py blob:e8faa08b7d2c7837e22c9fe2b4d8f900dd5caa61 / sha256-lf16:ed9aac5877e741cf / sha256-crlf16:3a34350bb02c0c1c; judgebench_ingest.py blob:a2b0878fe75a00720095cebd72a8bf791a7d0a83 / eeb4286b619ab6bc / 2a28f3f0b5d26075; ingest_manifest.json blob:87c59f86394a4cb44ec4ed56c8564d5a12264bb4 / b00cb01492e301dd / 392a59d961aa379f; accepted_tests_ledger.py blob:fabb66a8b3d73a3c31053170145c3be7b8e54975 / e5f942de85da83d5 / 9875b083df114b29 (adds only CEILINGS[JUDGEBENCH-REASONING-SIDE] = 1540); all re-verified by the registrar, equal to the READY record's pins",
+    "pre_merge_check": "clean worktree jb-merge-check (removed): judgebench_side 85 checks + 7/7 mutants (python and -O); ingest 15/0; induce_run_3 556; judge_v2 174; archv2_pilot 282/0; pool_selftest 103/0, 37/37; dry-run 350 matches every anchor; rebuild in the worktree only (a2ca40b8, 620 pairs) (commit message; logs scratchpad jb_st*.txt, jbm\\)",
+    "recorded_at": "docs/judge_v2_program.md L20092-L20125 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — JUDGEBENCH-REASONING-SIDE MERGED at e0735e3 ... and LAUNCH CONDITION L2 MET on main ...\"; _as_of the commit that writes it, parent e0735e3, re-grepped)"
+  },
+  "L2_on_main": {
+    "state": "MET 2026-09-25 at e0735e3",
+    "selftests": "python and -O: judgebench_side 92 ok (85 + 7), 0 check failures, 7 of 7 KILLED; judgebench_ingest 15 ok, 0 failures; induce_run_3 ALL PASS (556)",
+    "rebuild": "sources @ 57dd5e0b: gpt 1,960,188 B d5106306...6042, claude 920,039 B 3b705045...0a62 (= the pins); corpus judgebench_corpus_v1.db sha256 a2ca40b8d4b06126c8b61f6d1f2c2c5a2cd65ad844b542599dedf79efcf2f498, 3,416,064 B (re-hashed by the registrar); pairs eee0193c... (620); meta 41f2bf1d... (15); 0 differing keys vs the manifest; every other root DB, sidecar and day ledger identical before / after",
+    "dry_run_350": "every anchor equal to the READY record (SYSTEM 3760f988, G 742b02ec, S1 b536f9fd, schedule b9e4a23b, pilot 2bee205c, payload sets 832e54a9 / 1806a6be, payload_body 907366e4); BODY-DIFF only 'model'; 2026-09-25 REFUSED (K46 rows, 5352 calls); nothing posted; no CEILING row",
+    "transport_preflight": "AZURE_ENDPOINT is not None True; bool(AZURE_KEY) True (relayed); rr reads .env at rr.ROOT (the main checkout), not TAXOARENA_DATA_ROOT",
+    "L5_prebackup": "E:\\TaxoArena_backup_2026-09-25\\judgebench_side\\judgebench_corpus_v1.db sha256 a2ca40b8... (re-hashed, equal); G / S1 caches not yet created",
+    "rule7": "clean; 25.6 GB free RAM (relayed, not captured)",
+    "evidence": "scratchpad l2main\\ (read by the registrar)",
+    "source": "the run-operator's report relayed by the orchestrator; docs/judge_v2_program.md L20092-L20125 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — JUDGEBENCH-REASONING-SIDE MERGED at e0735e3 ... and LAUNCH CONDITION L2 MET on main ...\"; _as_of the commit that writes it, parent e0735e3, re-grepped)"
+  },
+  "findings_premerge": [
+    "(a) NO TRANSPORT PREFLIGHT IN THE DRY-RUN: rr.load_env() has one call site (judgebench_side.py L1066), on the posting path, after record_ceiling (L1064) writes the 0-call CEILING row; READY-TEMPLATE-TRANSPORT (b) (drafted, not adopted) NOT MET; READY a249f77 did not require it; load_env's only check is an assert (rejudge_reasoning.py L78), stripped under python -O (the URL None pattern): THE LAUNCH RUNS UNDER PLAIN python; the transport preflight repeated before the launch",
+    "(b) THROUGHPUT RISK ON A 429-HEAVY DAY (OPEN DECISION, the author's or the orchestrator's; not decided by the registrar): own ThreadPoolExecutor at --workers 4 per arm (registered), no rate control, no Retry-After; rr retries up to 6 attempts, each counted against the arm cap 770; G's 70-post margin can be exhausted before 700 posts (fails safe at the cap; C0 may read UNDETERMINED); JV2-PARALLEL-POSTING gate (3) does not bind this runner; JV2-RATE-PROBE open item 3 open (probe not built); any --workers change recorded before the launch"
+  ],
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "On JudgeBench's external set of 350 answer pairs (one correct, one wrong by an objective check), with no reference shown, it compares a reasoning version of the grok judge with the standard version, using identical prompts. Per-category differences are descriptive only.",
+    "why": "An outside-validity check: does the in-house finding that a reasoning judge is more accurate (+10pp on MMLU-Pro) carry over to an independent benchmark?",
+    "information": "A gain would support using a reasoning judge beyond our own data. No gain would refute that carry-over. Result: not run yet. The test is registered and READY, waiting for a launch day; nothing is recorded. Even when run, it says nothing about the deployed recipe, which does use a reference.",
+    "written": "2026-10-07"
+  }
+}

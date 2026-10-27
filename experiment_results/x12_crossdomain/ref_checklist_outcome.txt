@@ -1,0 +1,112 @@
+=== REF-CHECKLIST: a verification checklist as a reference in rubric form, three fresh arms on the 944 key-decidable R3 matches (pool p2dca21ab5f4ef3ae) ===
+  judge grok-4-1-fast-non-reasoning | STACK-v2 pairwise: v2 verify-first mechanics + anchor rubric + confidence; dual order, TIE on flip; question block per arm: REF = grok-reasoning reference block; CHECKLIST = verification checklist under the same wrapper; BOTH = reference then checklist
+  max_tokens 8192 | temperature omitted (provider default, as the cached session) | temperature decision: omitted from the payload (provider default), as the cached session: docs/plan_2026-09-15.md Amendment 1, D2
+  wrapper: REF [Reference solution — produced independently, may be wrong] | CHECKLIST [Reference verification checklist — produced independently, may be wrong]
+  provenance: finish_reason, completion tokens, provider, response id, max_tokens, system and prompt shas stored per order
+  scoring: unparsed / non-terminated verdicts kept in the paired set as NON_TERMINATED (wrong under A, not committed under B, never a tie)
+  producing script sha256 (pinned at first launch) 19f422d212d338fc | current 19f422d212d338fc | checklist sha 792ba93d4c88d063 | started 2026-09-17 04:23:28 | resumed 2026-09-17 04:24:27
+
+  CHECKLIST AUDIT: questions 782 | parsed 771 | unparsed 11 (1.4%) | dropped letter 3, ngram 22, short-option 59, numeral 12 | usable 675
+  matches EXCLUDED from all three arms: 118 of 944 (eligible 826)
+  guard REF       n= 826 | unparsed or non-terminated 2 (0.2%)
+  guard CHECKLIST n= 826 | unparsed or non-terminated 0 (0.0%)
+  guard BOTH      n= 826 | unparsed or non-terminated 0 (0.0%)
+
+  PER ARM on the 826 common matches (conventions A / B, ties, flips):
+      REF       conv A 0.845 | conv B 0.921 (committed 758) | ties 0.080 | flips 0.078 of 824 parsed | NT 2
+      CHECKLIST conv A 0.749 | conv B 0.893 (committed 693) | ties 0.161 | flips 0.134 of 826 parsed | NT 0
+      BOTH      conv A 0.851 | conv B 0.919 (committed 765) | ties 0.074 | flips 0.065 of 826 parsed | NT 0
+      RECIPE-GROK conv A 0.857 | conv B 0.925 (committed 765) | ties 0.074 | NT 0   (cache, n=826)
+      PAIR-NOREF  conv A 0.734 | conv B 0.887 (committed 683) | ties 0.173 | NT 0   (cache, n=826)
+
+  (1) PRIMARY: BOTH vs REF on key-decidable, p < 0.05 either direction, with the session floor beside it
+  BOTH vs REF (paired n=826, 675 questions)
+      conv A  BOTH      0.851 (NT 0) | REF         0.845 (NT 2) | delta +0.006  95% CI [-0.015, +0.027] (question-clustered, B=2000) | 37:32 McNemar p=0.6305
+      conv B  BOTH      0.919 (committed 765) | REF         0.921 (committed 758) | delta -0.002  95% CI [-0.015, +0.011]
+      ties    BOTH 0.074 | REF 0.080
+  SESSION FLOOR: REF-fresh vs RECIPE-GROK (byte-identical prompts, other session) (paired n=826, 675 questions)
+      conv A  REF-fresh 0.845 (NT 2) | RECIPE-GROK 0.857 (NT 0) | delta -0.012  95% CI [-0.029, +0.004] (question-clustered, B=2000) | 17:27 McNemar p=0.1742
+      conv B  REF-fresh 0.921 (committed 758) | RECIPE-GROK 0.925 (committed 765) | delta -0.005  95% CI [-0.014, +0.004]
+      ties    REF-fresh 0.080 | RECIPE-GROK 0.074
+      verdict disagreement REF-fresh / RECIPE-GROK 0.071 | DECOMP floor 0.057
+
+  (2) CHECKLIST vs REF: the falsifier line (prediction: CHECKLIST below REF by 3-6pp)
+  CHECKLIST vs REF (paired n=826, 675 questions)
+      conv A  CHECKLIST 0.749 (NT 0) | REF         0.845 (NT 2) | delta -0.096  95% CI [-0.125, -0.067] (question-clustered, B=2000) | 34:113 McNemar p=4.162e-11
+      conv B  CHECKLIST 0.893 (committed 693) | REF         0.921 (committed 758) | delta -0.028  95% CI [-0.050, -0.005]
+      ties    CHECKLIST 0.161 | REF 0.080
+
+  SECONDARY: each fresh arm against the cached comparators
+  CHECKLIST vs RECIPE-GROK (paired n=826, 675 questions)
+      conv A  CHECKLIST 0.749 (NT 0) | RECIPE-GROK 0.857 (NT 0) | delta -0.108  95% CI [-0.139, -0.078] (question-clustered, B=2000) | 32:121 McNemar p=2.226e-13
+      conv B  CHECKLIST 0.893 (committed 693) | RECIPE-GROK 0.925 (committed 765) | delta -0.032  95% CI [-0.053, -0.011]
+      ties    CHECKLIST 0.161 | RECIPE-GROK 0.074
+  BOTH vs RECIPE-GROK (paired n=826, 675 questions)
+      conv A  BOTH      0.851 (NT 0) | RECIPE-GROK 0.857 (NT 0) | delta -0.006  95% CI [-0.026, +0.014] (question-clustered, B=2000) | 27:32 McNemar p=0.6029
+      conv B  BOTH      0.919 (committed 765) | RECIPE-GROK 0.925 (committed 765) | delta -0.007  95% CI [-0.020, +0.007]
+      ties    BOTH 0.074 | RECIPE-GROK 0.074
+  REF vs PAIR-NOREF (paired n=826, 675 questions)
+      conv A  REF       0.845 (NT 2) | PAIR-NOREF  0.734 (NT 0) | delta +0.111  95% CI [+0.083, +0.141] (question-clustered, B=2000) | 116:24 McNemar p=1.151e-15
+      conv B  REF       0.921 (committed 758) | PAIR-NOREF  0.887 (committed 683) | delta +0.034  95% CI [+0.008, +0.060]
+      ties    REF 0.080 | PAIR-NOREF 0.173
+  CHECKLIST vs PAIR-NOREF (paired n=826, 675 questions)
+      conv A  CHECKLIST 0.749 (NT 0) | PAIR-NOREF  0.734 (NT 0) | delta +0.016  95% CI [-0.016, +0.046] (question-clustered, B=2000) | 79:66 McNemar p=0.319
+      conv B  CHECKLIST 0.893 (committed 693) | PAIR-NOREF  0.887 (committed 683) | delta +0.006  95% CI [-0.020, +0.032]
+      ties    CHECKLIST 0.161 | PAIR-NOREF 0.173
+  BOTH vs PAIR-NOREF (paired n=826, 675 questions)
+      conv A  BOTH      0.851 (NT 0) | PAIR-NOREF  0.734 (NT 0) | delta +0.117  95% CI [+0.088, +0.150] (question-clustered, B=2000) | 128:31 McNemar p=3.335e-15
+      conv B  BOTH      0.919 (committed 765) | PAIR-NOREF  0.887 (committed 683) | delta +0.032  95% CI [+0.005, +0.059]
+      ties    BOTH 0.074 | PAIR-NOREF 0.173
+
+  (3) STRATA by the answer reference's correctness (cached grok-reasoning letter vs the key)
+    reference CORRECT (n=707):
+  CHECKLIST vs REF (paired n=707, 581 questions)
+      conv A  CHECKLIST 0.813 (NT 0) | REF         0.929 (NT 2) | delta -0.116  95% CI [-0.147, -0.085] (question-clustered, B=2000) | 18:100 McNemar p=5.725e-15
+      conv B  CHECKLIST 0.944 (committed 609) | REF         0.985 (committed 667) | delta -0.041  95% CI [-0.061, -0.022]
+      ties    CHECKLIST 0.139 | REF 0.054
+  BOTH vs REF (paired n=707, 581 questions)
+      conv A  BOTH      0.945 (NT 0) | REF         0.929 (NT 2) | delta +0.016  95% CI [-0.003, +0.036] (question-clustered, B=2000) | 31:20 McNemar p=0.1608
+      conv B  BOTH      0.990 (committed 675) | REF         0.985 (committed 667) | delta +0.005  95% CI [-0.004, +0.014]
+      ties    BOTH 0.045 | REF 0.054
+    reference WRONG (n=119):
+  CHECKLIST vs REF (paired n=119, 94 questions)
+      conv A  CHECKLIST 0.370 (NT 0) | REF         0.345 (NT 0) | delta +0.025  95% CI [-0.066, +0.124] (question-clustered, B=2000) | 16:13 McNemar p=0.7111
+      conv B  CHECKLIST 0.524 (committed 84) | REF         0.451 (committed 91) | delta +0.073  95% CI [-0.030, +0.183]
+      ties    CHECKLIST 0.294 | REF 0.235
+  BOTH vs REF (paired n=119, 94 questions)
+      conv A  BOTH      0.294 (NT 0) | REF         0.345 (NT 0) | delta -0.050  95% CI [-0.125, +0.017] (question-clustered, B=2000) | 6:12 McNemar p=0.2379
+      conv B  BOTH      0.389 (committed 90) | REF         0.451 (committed 91) | delta -0.062  95% CI [-0.144, +0.018]
+      ties    BOTH 0.244 | REF 0.235
+
+  (4) ANSWER-AGREEMENT of each arm's committed verdicts with every contestant: ref_qualify (3)'s per-contestant share with the verdict in place of the reference letter
+      GEMINI delta  CHECKLIST - REF -0.019 | BOTH - REF -0.056   (REF 0.826 on n=195; prediction: CHECKLIST lower by >= 2pp)
+      contestant                           REF CHECKLIST      BOTH    RECIPE |    CK-REF  BOTH-REF
+      gemini-3.1-pro_5-shots             0.826     0.807     0.770     0.818 |    -0.019    -0.056   <- frontier
+      iask_pro                           0.764     0.775     0.757     0.768 |    +0.011    -0.007   <- frontier
+      arx_0314                           0.757     0.733     0.789     0.763 |    -0.024    +0.032   <- frontier
+      deepseek-chat-v2_5                 0.595     0.596     0.575     0.584 |    +0.002    -0.019
+      Meta-Llama-3_1-70B-Instruct        0.560     0.577     0.564     0.578 |    +0.017    +0.004
+      Qwen1.5-72B-Chat                   0.495     0.500     0.515     0.485 |    +0.005    +0.020
+      gpt-4o-2024-08-06                  0.487     0.530     0.500     0.487 |    +0.043    +0.013   <- frontier
+      c4ai-command-r-v01                 0.277     0.267     0.295     0.292 |    -0.010    +0.018
+      Meta-Llama-3_1-8B                  0.169     0.155     0.133     0.143 |    -0.014    -0.036
+      Yi-6b-Chat                         0.112     0.152     0.118     0.125 |    +0.040    +0.005
+      Llama-2-13b-hf                     0.048     0.037     0.048     0.035 |    -0.011    +0.000
+      Llama-2-7b-hf                      0.000     0.010     0.028     0.010 |    +0.010    +0.028
+      reference-mirroring rate (committed verdicts siding with the model whose answer equals the reference letter, where exactly one side does):
+      REF 0.976 (n=720) | CHECKLIST 0.924 (n=661) | BOTH 0.982 (n=731) | RECIPE-GROK 0.977 (n=726)
+      CONSENSUS-FIT coefficients (format_ref.fit = consensus_fit.logistic of the verdict on the signed contrasts KEY and REF; ties half-weighted; NT skipped):
+      REF         n= 824 | KEY +0.844 +- 0.161 | REF +2.220 +- 0.184 | REF-KEY +1.376
+      CHECKLIST   n= 826 | KEY +0.653 +- 0.133 | REF +1.227 +- 0.142 | REF-KEY +0.574
+      BOTH        n= 826 | KEY +0.747 +- 0.174 | REF +2.523 +- 0.204 | REF-KEY +1.776
+      RECIPE-GROK n= 826 | KEY +0.963 +- 0.162 | REF +2.231 +- 0.186 | REF-KEY +1.268
+      REF coefficient delta  CHECKLIST - REF -0.993 | BOTH - REF +0.303   (the leakage predictor; expected negative under CHECKLIST)
+
+  REGISTERED CRITERIA:
+      (1) BOTH vs REF: delta A +0.006, McNemar p=0.6305 -> not significant; session floor |REF-fresh - RECIPE-GROK| = 0.012 (delta inside the floor)
+      (2) CHECKLIST vs REF: delta A -0.096 (p=4.162e-11) -> below REF, outside the predicted 3-6pp band
+      (3) reference-WRONG stratum, CHECKLIST vs REF: delta A +0.025, p=0.7111, CI [-0.066, +0.124] -> NOT as predicted
+      (3) reference-WRONG stratum, BOTH vs REF: delta A -0.050, p=0.2379, CI [-0.125, +0.017] -> NOT as predicted
+      (4) leakage, gemini-agreement delta CHECKLIST - REF -0.019 -> NEGATIVE as expected (under the predicted 2pp)
+      falsifier line: CHECKLIST alone at or above REF on key-decidable (conv A) -> not fired
+      REGISTERED (1) PRIMARY: FAIL | consequence: no recipe change

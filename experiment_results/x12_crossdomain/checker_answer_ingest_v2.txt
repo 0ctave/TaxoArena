@@ -1,0 +1,87 @@
+CHECKER-ANSWER-INGEST --v2: the CONSISTENT cap proxy (STAGE3-MATH re-registration prerequisite; 0 LLM calls, 0 network)
+producing code hash: sha256 d4b102d26b073427a107d6eb32f725b67ec1ed0d190f86a670205a24be1f1cbd  (tools/analysis/checker_answer_ingest.py)
+[POOL-GUARD] mmlu_pro dataset DB active pool = p2dca21ab5f4ef3ae (pool of record OK)
+[POOL-PIN]   multicorpus DB active pool = paeec37aa28063c75; this script addresses the union pool paeec37aa28063c75 BY EXPLICIT ID
+[V1] checker_answers_v1.db read-only: sha256 cc4a4a29 == cited; math_checker_answers 23832 rows (written 2026-09-15 21:58:18); v1.non_terminated = 1 if the response opens <think> and never closes it (truncation detectable from text)
+corpus: MATH 1324 questions (eval-side in paeec37aa28063c75: 398) | models 18 -> 153 unordered pairs | rows 23832
+KEY DENOMINATOR: eval-side question-pairs = 398 x 153 = 60894; eval-side rows = 398 x 18 = 7164
+
+==============================================================================================================
+THE CONSISTENT NON_TERMINATED PROXY (the checker's rule, applied to every model)
+==============================================================================================================
+  cap       = max_gen_toks 1024, read from the first row of all 126 raw MATH sample files (18 models x 7 subjects), uniform
+  tokens    = cl100k_base count of the stored model_output (tiktoken from local cache C:\Users\octav\AppData\Local\Temp\data-gym-cache\9b5ad71b2ce5302211f9c61530b329a4922fc6a4, network client disabled)
+  abrupt    = last non-whitespace character of the response NOT in ('.', '}', ')', '$', '!', '?'); an empty / whitespace-only response is abrupt
+  cap_hit   = tokens >= cap - 64 = 960  AND  abrupt
+  think     = v1's proxy: the response opens <think> and never closes it
+  non_terminated = think OR cap_hit   (reading B with the consistent proxy: such a response has NO extracted answer)
+
+per-model rates (eval-side = the 398 pool questions; all = the 1324 corpus questions):
+  model                          cap_hit_e   think_e      nt_e    rate_e |   cap_hit >=960 tok  rate_all
+  DeepSeek-R1-Distill-Llama-8B         310       284       336     0.844 |      1062      1168     0.850
+  DeepSeek-R1-Distill-Qwen-32B         249       316       346     0.869 |       867       934     0.877
+  Llama-3.3-70B-Instruct                74         0        74     0.186 |       263       337     0.199
+  Llama-3.2-3B-Instruct                 68         0        68     0.171 |       238       272     0.180
+  OLMo-2-1124-7B-Instruct               65         0        65     0.163 |       221       279     0.167
+  Qwen2.5-Coder-7B-Instruct             65         0        65     0.163 |       203       229     0.153
+  Llama-3.1-70B-Instruct                64         0        64     0.161 |       217       239     0.164
+  Yi-1.5-34B-Chat-16K                   59         0        59     0.148 |       212       246     0.160
+  Qwen2.5-72B-Instruct                  51         0        51     0.128 |       200       220     0.151
+  Qwen2.5-Math-7B-Instruct              50         0        50     0.126 |       180       208     0.136
+  Qwen2.5-7B-Instruct                   38         0        38     0.095 |       133       156     0.100
+  internlm2_5-20b-chat                  37         0        37     0.093 |       142       213     0.107
+  Qwen2.5-32B-Instruct                  31         0        31     0.078 |        95       108     0.072
+  Phi-3.5-mini-instruct                 12         0        12     0.030 |        41        52     0.031
+  Mistral-Small-Instruct-2409           10         0        10     0.025 |        49        54     0.037
+  c4ai-command-r-plus-08-2024            7         0         7     0.018 |        34        42     0.026
+  Mixtral-8x7B-Instruct-v0.1             5         0         5     0.013 |        25        28     0.019
+  Falcon3-10B-Instruct                   2         0         2     0.005 |         4         4     0.003
+  eval-side rows NON_TERMINATED under the consistent proxy: 1320 of 7164 (cap_hit 1197, unclosed <think> 600, both 477); v1's proxy alone: 600  [checker: 1,320 vs the builder's 600]
+
+==============================================================================================================
+D_c under reading B with the CONSISTENT proxy (share of eval-side question-pairs with two non-blank extracted answers; question-bootstrap 95% CI, B=2000, seed 42)
+==============================================================================================================
+  cell (18 models, 153 pairs)           q D_c [95% CI]               offered (not AGREE) [95% CI]
+  MATH (source row)                   398 0.6701 [0.6501, 0.6890]    0.8291 [0.8102, 0.8481]   
+  MATH/Algebra                         92 0.7794 [0.7475, 0.8095]    0.6979 [0.6508, 0.7424]   
+  MATH/Counting & Probability          37 0.7357 [0.6958, 0.7704]    0.8832 [0.8461, 0.9149]   
+  MATH/Geometry                        40 0.6422 [0.5850, 0.6956]    0.9204 [0.8971, 0.9428]   
+  MATH/Intermediate Algebra            84 0.5204 [0.4838, 0.5591]    0.9259 [0.9051, 0.9437]   
+  MATH/Number Theory                   46 0.7202 [0.6758, 0.7631]    0.8284 [0.7829, 0.8720]   
+  MATH/Prealgebra                      58 0.8177 [0.7840, 0.8481]    0.7157 [0.6484, 0.7781]   
+  MATH/Precalculus                     41 0.4349 [0.3749, 0.4928]    0.9484 [0.9283, 0.9649]   
+  18-model source row 0.6701 [0.6501, 0.6890] | min domain cell 0.4349 [0.3749, 0.4928] at MATH/Precalculus   [checker: 0.6701 [0.6501, 0.6890]]
+  16 models without the R1 distills (120 pairs): D_c 0.8167 [0.7952, 0.8380]   [checker: 0.8167 [0.7952, 0.8380]]
+  beside, v1's <think>-only proxy (item 7's reading B of record): 18-model source row 0.8268 [0.8184, 0.8350]   [item 7: 0.8268 [0.8184, 0.8350]]
+  key-decidable share by filter verdict (consistent proxy): DISAGREE 30399 pairs, decidable 13964 (0.4594); UNDETERMINED 20087 pairs, decidable 5027 (0.2503); AGREE 10408 pairs, decidable 47 (0.0045); decidable pairs kept 18991 of 19038 (0.9975)
+  sensitivity of the 18-model source row to the rule:
+    tokens >= 960 AND abrupt (the rule)        18 models D_c 0.6701 [0.6501, 0.6890]; 16 models 0.8167
+    tokens >= 1000 AND abrupt                  18 models D_c 0.7066 [0.6884, 0.7231]; 16 models 0.8579
+    tokens >= 960, abrupt not required         18 models D_c 0.6395 [0.6176, 0.6599]; 16 models 0.7839
+    tokens >= 1010, abrupt not required        18 models D_c 0.7061 [0.6885, 0.7222]; 16 models 0.8569
+
+==============================================================================================================
+8-model GEN-ARENA roster under reading B with the consistent proxy
+==============================================================================================================
+  roster (8 models, 28 pairs): Llama-3.1-70B-Instruct, Llama-3.3-70B-Instruct, Mistral-Small-Instruct-2409, Mixtral-8x7B-Instruct-v0.1, Phi-3.5-mini-instruct, Qwen2.5-32B-Instruct, Qwen2.5-72B-Instruct, Qwen2.5-Math-7B-Instruct
+  (a) STAGE3-MATH's cell: the union pool's 398 MATH questions (item 7's cell rule = source row AND min domain cell):
+      MATH (source row)              q=398 D_c 0.8322 [0.8093, 0.8553]    offered 0.7711 [0.7481, 0.7940]   
+      MATH/Algebra                   q= 92 D_c 0.9445 [0.9142, 0.9709]    offered 0.6099 [0.5586, 0.6592]   
+      MATH/Counting & Probability    q= 37 D_c 0.9527 [0.9189, 0.9797]    offered 0.8060 [0.7452, 0.8601]   
+      MATH/Geometry                  q= 40 D_c 0.8107 [0.7437, 0.8714]    offered 0.8902 [0.8518, 0.9259]   
+      MATH/Intermediate Algebra      q= 84 D_c 0.6735 [0.6144, 0.7330]    offered 0.8907 [0.8559, 0.9197]   
+      MATH/Number Theory             q= 46 D_c 0.8649 [0.8020, 0.9200]    offered 0.7756 [0.7158, 0.8284]   
+      MATH/Prealgebra                q= 58 D_c 0.9624 [0.9335, 0.9871]    offered 0.6392 [0.5690, 0.7051]   
+      MATH/Precalculus               q= 41 D_c 0.5967 [0.5017, 0.6899]    offered 0.9216 [0.8746, 0.9564]   
+      source row 0.8322 [0.8093, 0.8553] | min domain cell 0.5967 [0.5017, 0.6899] at MATH/Precalculus -> item 7 rule (>= 0.95 on the row AND the min cell): NOT MET
+      roster rows on the pool NON_TERMINATED under the consistent proxy: 297 of 3184
+      beside, v1's <think>-only proxy on the same cell: D_c 0.9937 [0.9893, 0.9975] (STAGE3-MATH's held dry-run printed 0.994)
+  (b) the checker's object: GEN-ARENA's own 394 scheduled MATH questions (random.Random(42) re-derived split; 114 in the union pool):
+      D_c 0.8189 [0.7935, 0.8433] offered 0.7592 [0.7361, 0.7831] | scheduled rows at the cap 321 of 3152   [checker: 0.8189 [0.7935, 0.8433], 321 of 3,152]
+      judged MATH matches in the GEN-ARENA cache involving a NON_TERMINATED response: 358 of 1800; UNDETERMINED under the consistent proxy (either side blank, cap-hit OR no extractable answer): 367   [checker's 367 of 1,800 is the UNDETERMINED count]
+      beside, v1's proxy on the same questions: D_c 0.9898 [0.9848, 0.9943]   [item 7: 0.9898]
+
+Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\multicorpus\checker_answers_v2.db already exists (written 2026-09-16 05:14:47 by this script): VERIFIED against the fresh computation: rows differing 0 of 23832; file left untouched
+v2 DB sha256 6cfaf74d647829d179c4b0885215b4f33ac16449957b9a47c49373dd565500f7
+v1 DB sha256 after this run cc4a4a29 (unchanged)
+elapsed 2 s

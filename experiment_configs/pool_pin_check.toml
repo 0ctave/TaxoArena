@@ -1,0 +1,22 @@
+# Pool-pin smoke check: load the frozen snapshot, build nothing, judge nothing.
+# Expected log lines: "Restored reserved_test_queries.json from snapshot ..." then
+# "[POOL-PIN] snapshot 20260727_042523_Headless_Run_Auto_ge -> reserved pool p2dca21ab5f4ef3ae (recorded; nothing activated)"
+# and a "[TRAIN-ONLY] snapshot ..." report line (this snapshot is the 2026-09-09 incident tree; it holds EVAL
+# texts among its members, so judging it needs acknowledgedEvalMembers = ["<snapshotId>:<count>"]).
+# There is no active pool any more (SPLIT-FUNCTION-IMPL): a build records its pool and switches nothing;
+# a judged run names the pool it scores with `pool = "<id>"` and is refused on a mismatch. Verify a pool
+# of record with: python tools/analysis/pool_guard.py --pool p2dca21ab5f4ef3ae
+pool          = "p2dca21ab5f4ef3ae"
+datasetType   = "MMLU_PRO"
+models        = ["gpt-4o-2024-08-06", "claude-3-5-sonnet-20241022"]
+snapshotId    = "20260727_042523_Headless_Run_Auto_ge"
+outputDir     = "experiment_results/pool_pin_check"
+seed          = 42
+
+runPipeline   = false
+runBenchmark  = false
+runTrickle    = false
+runBaselines  = false
+enableFinalMetrics = false
+enableLabeling     = false
+judgeInduction     = false

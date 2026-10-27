@@ -1,0 +1,120 @@
+{
+  "id": "CONTENT-DISJOINT-SPLIT-AUDIT",
+  "title": "CONTENT-DISJOINT-SPLIT-AUDIT: are the pools of record content-disjoint, not only id-disjoint? (zero calls; DESCRIPTIVE audit)",
+  "question": "Enumerate TRAIN / EVAL text twins for every pool of record; state which 'clean split' claims are id-only; propose, without applying, a content-keyed dedup rule for future pools.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "ef5fbd2 (queued HIGH by the registrar on the coordinator's instruction, from ROUTER-CLEAN-POLICY's D2); a DESCRIPTIVE audit with no registered criteria",
+    "program_lines": "docs/judge_v2_program.md L14280-L14340 (the readout section; no registration section)",
+    "date": "2026-09-23"
+  },
+  "script": {
+    "path": "the data-steward's scripts in the session scratchpad content_split_audit/ and the reviewer's in content_split_review/ (not committed; D8: the steward's three inline pieces were not saved)",
+    "sha16": "n/a (scratch scripts)",
+    "commit": null
+  },
+  "ready": null,
+  "go": "n/a (zero calls; reports only)",
+  "run": {
+    "outcome_file": "the data-steward's readout (session scratchpad content_split_audit/) and the programme section L14280-L14340",
+    "outcome_commit": "1df2cf1 (the review; the readout itself is scratch)",
+    "calls": 0,
+    "cce": 0,
+    "pool": "all pools of record: paeec37aa28063c75, p2dca21ab5f4ef3ae, pf844849e133cda4e (20NG), p2035adddedd1becb (BFCL), Multi-SWE",
+    "date": "2026-09-23"
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-23_content_disjoint_split_audit_review.md",
+    "commit": "1df2cf1",
+    "verdict": "RECORDABLE WITH CONDITIONS; claims 1/3/4/5/6/9 CONFIRMED to the digit; claim 2 understated on the judged object (D1); 7 and 8 PARTLY; 3b UNRESOLVED; 10 UNDETERMINED",
+    "blob": "blob:80a8d237729c8c075433812b486038f25c2cbeaf"
+  },
+  "criteria": [],
+  "predictions": [],
+  "falsifier": {
+    "text": "none registered (a descriptive audit)",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "union_paeec": "471 EVAL ids / 427 texts exact; 478 / 432 norm-v1; GPQA 288 (382 pairs, 367 shuffled), MMLU-Pro 185 (68 true duplicates 0.9992; 127 stem-only 0.7533 vs null 0.5342), MATH 3, BBH 2",
+    "p2dca": "37 exact / 70 norm-v1 (all partners unlinked sentinels); KEYED ON THE JUDGED ROW: 64 option-set, 31 FULL ORDERED COPIES judged (1,020 CLEAN: 22 / 11); the steward's 33 / 0 superseded",
+    "clean_1020": "12 exact / 23 norm-v1 frozen-tree members; induction withheld by id",
+    "closure": "engine stem-key closure moves 171 on p2dca: 3,770 / 8,230 (gate 843) = af_clean_s42",
+    "unreproduced": "SPLIT-FUNCTION-IMPL's 3,537 / 860 / 7,603: no reading; engine 3,770 / 843 / 7,387; paeec method 3,552 / 859 / 7,589",
+    "link_hazard": "54 / 19 vs gpt-4o's eval row; 63 / 27 vs the modal row; the link picked the other copy on 51 of 54",
+    "kish_bounds": "rho = 1 upper bounds only: GPQA DEFF in [1, 1.38], n_eff [259, 358]; BFCL family 4.000; Multi-SWE repo 37.76",
+    "zeros": "20NG 0 by ingest rule (3); BFCL 0 (0 of 200 families split); Multi-SWE vacuous by key, repo-family closure 0 of 51",
+    "open_routes": "(a) members: frozen 12/23 of CLEAN, bareq512 37/70, union 427/471; (b) frozen rubric induction by id; (c) ROUTER / MC-E2E policy fits; (d) 31 full-copy judged"
+  },
+  "sentence_of_record": "CONTENT-DISJOINT-SPLIT-AUDIT (2026-09-23, zero calls; data steward, independently recomputed): the pools of record are id-disjoint but not content-disjoint. On the union pool paeec37aa28063c75, 471 EVAL ids (427 distinct texts) have an exact-text TRAIN twin and 478 have one under norm-v1: GPQA 288 (382 pairs, all with the same options and answer, 367 with the options shuffled), MMLU-Pro 185 (68 true duplicates at 0.999 correctness agreement, 127 stem-only variants at 0.753), MATH 3, BBH 2. On the MMLU-Pro pool of record p2dca21ab5f4ef3ae, 37 exact / 70 norm-v1 judgeable ids have a TRAIN twin, every one an unlinked sentinel row. Keyed on the question actually judged, 64 share the option set and 31 are full ordered duplicates. Of the incident's 1,020 CLEAN questions, 12 exact / 23 norm-v1 were frozen-tree members. 20NG (by its ingest's dedup rule), BFCL and Multi-SWE (repo-family closure; no content key) have no cross-side twins. The engine's stem-key closure (since 13f2142) moves 171 rows on p2dca (3,770 / 8,230, the af_clean_s42 split); the SPLIT-FUNCTION-IMPL figure 3,537 is not reproduced by any reading of the data.",
+  "chips": [
+    "ID-DISJOINT, NOT CONTENT-DISJOINT",
+    "31 p2dca QUESTIONS JUDGED ON AN EXACT COPY OF A CONSTRUCTION ROW",
+    "FOUR OPEN ROUTES IN THE TREES OF RECORD",
+    "'1,020 CLEAN' AND 'clean +0.9' ARE ID-ONLY",
+    "3,537 UNREPRODUCED",
+    "CK-CLOSE-v1 ADOPTED (AUTHOR, 2026-09-23)",
+    "DESCRIPTIVE"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-23",
+      "by": "the registrar (insertion only, zero calls)",
+      "text": "Recorded as a DESCRIPTIVE audit on the review 1df2cf1 (blob:80a8d237729c8c075433812b486038f25c2cbeaf); the review's numbers are of record where they differ from the steward's. Claim 10 UNDETERMINED (table not saved); CLAIMS-SWEEP queued."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the SPLIT-FOLLOWUPS review 8ebfa7a (insertion only, zero calls)",
+      "text": "CORRECTED by the SPLIT-FOLLOWUPS review (HIGH, the registrar's own record): (1) CORRECTED 2026-09-23 by the SPLIT-FOLLOWUPS review (8ebfa7a): the tree of record bareq512_s42 is snapshot 20260909_212117_Headless_Run_Auto_ge (a900da0; promoted/bareq512_s42/seed_42/headless_run.log; programme L4948, L5232, L7520; the promoted routing CSV matches its leaves 87 / 87). 20260910_043557 is the label-free hygiene replica (9ff9559, hygiene/bareq512_s42_labelfree.toml) with the same 8,278 members, so 37 / 70 stand on both; the replica differs in 6 leaf ids and one leaf member and is NOT a routing substitute. (2) CORRECTED 2026-09-23 by the SPLIT-FOLLOWUPS review (8ebfa7a): FALSE for the tree of record. 20260909_212117 was built with labelling and induction ON (143 LLM-written labels - not 158: the other 15 are the root and the 14 ground-truth anchors - and 87 induced leaf judgePrompt / judgeRubric). Induction withheld the active pool by EXACT linked text after an 80% hash hold-in, so 29 of the 37 exact twins were withheld; 28 OF THE 33 NORM-V1-ONLY TWINS WERE IN THE INDUCTION CORPORA OF 16 LEAVES, with the key mark and CoT; 28 IS EXACT, NOT AN UPPER BOUND (the corpus model reproduces all 17 [JUDGE-LEAK] log lines). Labelling applies NO reserved filter: 26 twin texts (12 exact, 14 norm-v1-only) were in the leaf labelling prompts of 16 leaves (the sampling is deterministic and was reproduced); internal-node samples are seeded and unreproduced, and all 70 are eligible there. ROUTE (b) APPLIES to RUBRIC-512 (cell arm), RUBRIC-512-SS, RUBRIC-512-R, LEAF-POWERED and rubric_text_stats; the RK-1 kit material is built from 212117 leaf members and its exposure is unmeasured. (3) CORRECTED 2026-09-23 by the SPLIT-FOLLOWUPS review (8ebfa7a): WRONG OBJECT and ID-ONLY. The 14 STACK-v2 anchor rubrics (rubric_ladder.db kind='anchor', ts 2026-09-07 23:54 to 09-08 00:09; ladder sha 4412f923 = the kit's) PREDATE bareq512_s42: rubric_ladder.py (f03cb30) induced them from TRAIN-side mmlu_pro texts assigned to the FROZEN tree 20260727_042523's leaf centroids, withholding p2dca by exact text, capped at 150 per anchor (seed 556). Their corpora hold 0 EXACT and 14 NORM-V1-ONLY twins of p2dca judged questions (Health 8, Law 4, Other 1, Philosophy 1; 5 in the 1,020 CLEAN; 45 before the cap). The STACK-v2 boards (x12, x20, GROK-CALIB, Kotlin c0d3f708, RECIPE-GROK) use 212117 only for routing and the anchor map. (4) RESOLVED 2026-09-23 (SPLIT-FOLLOWUPS review 8ebfa7a, claim C): NO. 11 snapshots, 10 tomls and 11 build logs show no labelling and no induction in the union tree 20260911_144214, its six grafts or the per-corpus snapshots (positive control on 212117). 'does not show' item 5 is RESOLVED. See docs/judge_v2_program.md L14455-L14487 (SPLIT-FOLLOWUPS)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (the author's decision, relayed)",
+      "text": "CK-CLOSE-v1 ADOPTED by the author (\"Yes I prefer this version to handle the data\"; plan Amendment 13) for NEW pools, constructions and policy fits, with the four conditions of 1df2cf1; the chip changed from 'CK-CLOSE-v1 PROPOSED, NOT ADOPTED (AUTHOR-OWNED)'. The rebuild-or-disclose decision for the objects of record stays OPEN and author-owned. docs/judge_v2_program.md L15013-L15025."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (merge 3fdc11b; READY e9fe11c + 744d91f)",
+      "text": "CK-CLOSE-v1's Python half merged: tools/analysis/content_closure.py blob:1533cb5a56c8e001ddc65d3e2ec0cc4b56aa87e3 / sha256-lf16:d362aad31f650cc0, selftest 36 / 36; real-data audit 35 MATCH / 0 MISMATCH (paeec 543 moved, 2 REAL label conflicts; p2dca 171 = 75 + 96, sentinel leg refuses with 96; BFCL / Multi-SWE 0 moved; 20NG not implemented, -wal). The 89 / 84 are answer-text differences, an UPPER BOUND on label conflicts. docs/judge_v2_program.md L15052-L15068."
+    }
+  ],
+  "does_not_show": [
+    "the effect of the twins on any routed or judged readout (only the A1 worst-case bound exists)",
+    "near-duplicates below norm-v1 (paraphrase, punctuation beyond NFKC / whitespace / ASCII case, 20NG quoted replies)",
+    "the content of the 20NG WAL tail (708,672 B, 09-23 04:30)",
+    "where 3,537 / 860 / 7,603 came from",
+    "whether the union tree 20260911_144214 ran labelling or rubric induction over twin-bearing members",
+    "a DEFF: the Kish figures are rho = 1 bounds, not measured correlations",
+    "the steward's claims table (not saved); only the reviewer's five spot-checks"
+  ],
+  "ledger": {
+    "row_id": "CONTENT-DISJOINT-SPLIT-AUDIT",
+    "version": "v159 (2026-09-23; a section-7 row with warn chips)"
+  },
+  "depends_on": [
+    "ROUTER-CLEAN-POLICY",
+    "SPLIT-FUNCTION-IMPL"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing; it reports. Adopting CK-CLOSE-v1 and rebuild-or-disclose are author-owned."
+  },
+  "sources": [
+    "docs/reviews/2026-09-23_content_disjoint_split_audit_review.md (1df2cf1, blob:80a8d237729c8c075433812b486038f25c2cbeaf)",
+    "the session scratchpad content_split_audit/ (steward) and content_split_review/ (reviewer)",
+    "docs/agents/queue.json item CONTENT-DISJOINT-SPLIT-AUDIT",
+    "docs/judge_v2_program.md L15013-L15025",
+    "docs/judge_v2_program.md L15052-L15068"
+  ],
+  "last_update": "2026-09-23 (registrar: content_closure.py merged; docs/judge_v2_program.md L15052-L15068)",
+  "plain_description": {
+    "sq": "Data hygiene",
+    "what": "An audit of whether the training and evaluation pools share questions with the same text, not only different IDs. It covers the union pool, the MMLU-Pro pool of record, 20 Newsgroups, BFCL and Multi-SWE. No calls.",
+    "why": "If evaluation questions have text twins on the training side, tree-building and rubric writing may have seen them, which would weaken evaluation claims.",
+    "information": "Zero twins would make the splits clean. Twins would need to be disclosed, or the data rebuilt. Result: done (descriptive). The pools are ID-disjoint but not content-disjoint. 471 union evaluation IDs have an exact-text training twin, mostly GPQA and MMLU-Pro. On the MMLU-Pro pool of record, 37 exact (70 normalised) have one, and 31 judged questions are full copies. 20 Newsgroups, BFCL and Multi-SWE have no cross-side twins. The effect on any readout is not measured.",
+    "written": "2026-10-07"
+  }
+}

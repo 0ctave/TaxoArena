@@ -1,0 +1,292 @@
+=== MAXT-MULTIPLICITY: simultaneous (max-t) critical value per cell from the existing resamples ===
+  item 6, FRAMEWORK.md 'Tests to register before shipping' (commit 8d77f7b), registered by reference at eaf1dbf
+  marginal call, raw: c_raw = max(p, 1-p) >= 0.975 (sb.craw, the empirical draw share; its Gaussian equivalent is |m|/s >= 1.960)
+  marginal call, widener: min(c_raw, Phi(|m|/sqrt(s^2 + tau^2))) >= 0.975 (sb.cbud), tau = exp(-3.2326 + 3.3133*A), i.e. also |m|/sd_w >= 1.960
+  simultaneous call: the marginal call AND |m|/sd >= q_cell, q_cell = 95th percentile over draws of max over all pairs of |d*-d_hat|/s;
+  sd = s for raw, sd_w = sqrt(s^2 + tau^2) for the widener (primary, hardest); 'sim(raw z)' = widener marginal AND |m|/s >= q_cell (sensitivity)
+  strict variant: additionally c_raw >= Phi(q_cell) (every draw on one side at B = 300/400)
+  decline: exact McNemar p < 0.05 on the cell's JUDGED questions (systematic_budget.mcnemar_edge); Meta-Llama-3-70B-Instruct excluded
+  framework ORDERED = widener + decline at 0.975; the stress pass's 756 -> 605 (-20.0%) was a raw 1.96*s call on another object
+
+=== DATA CHECK: the regenerated resamples against the committed tables ===
+  x12: 9142 verdicts, 12 models, 14 anchors (>= 200 verdicts), B = 300 per anchor, pooled B = 300 over 2811 judged questions
+  merged: x12 9142 + x20 12394 = 21536 verdicts, 20 models, 14 anchors, B = 300 per anchor, pooled B = 400 over 2811 judged questions
+  x12 per-anchor (920)   mine  920 vs cached  920 | unmatched 0 / 0 | max|dm| 0.0e+00 max|ds| 0.0e+00 max|dp| 0.0e+00 | direction mismatches 0 -> REPRODUCED
+  merged per-anchor (2538) mine 2538 vs cached 2538 | unmatched 0 / 0 | max|dm| 0.0e+00 max|ds| 0.0e+00 max|dp| 0.0e+00 | direction mismatches 0 -> REPRODUCED
+  merged pooled (190)    mine  190 vs cached  190 | unmatched 0 / 0 | max|dm| 0.0e+00 max|ds| 0.0e+00 max|dp| 0.0e+00 | direction mismatches 0 -> REPRODUCED
+  marginal counts against the committed .txt records (called, wrong):
+    x12 891 raw 0.975                got  739/8    record  739/8    OK
+    x12 891 widener 0.975            got  665/2    record  665/2    OK
+    x12 891 raw+decline              got  712/4    record  712/4    OK
+    x12 891 widener+decline          got  651/1    record  651/1    OK
+    x12 920 raw 0.975                got  748/11   record  748/11   OK
+    x12 pooled raw                   got   63/1    record   63/1    OK
+    x12 pooled widener               got   57/0    record   57/0    OK
+    merged 2538 raw 0.975            got 2079/42   record 2079/42   OK
+    merged 2538 widener              got 1783/13   record 1783/13   OK
+    merged 2538 widener+decline      got 1714/4    record 1714/4    OK
+    merged pooled raw                got  179/8    record  179/8    OK
+    merged pooled widener+decline    got  150/0    record  150/0    OK
+    x12 pooled arx vs iask widener c = 0.7805 (record 0.7805) OK
+  RESAMPLES OF RECORD: every check reproduced - these are the existing resamples
+
+=== (1) SIMULTANEOUS CRITICAL VALUE PER CELL (bootstrap max-t, family-wise 0.05 two-sided; marginal is 1.960) ===
+  board    cell                   M pairs    B   q_cell  q(mean-c)  q/1.96 q(1st h) q(2nd h)
+  q(1st h) / q(2nd h): the same quantile from the first / second half of the draws (B/2 each) - the stability of a 95th percentile
+  x12      Biology               12    66  300    3.158      3.159    1.61    3.109    3.249
+  x12      Business              12    66  300    3.382      3.292    1.73    3.222    3.515
+  x12      Chemistry             12    66  300    3.362      3.346    1.72    3.456    3.277
+  x12      Computer science      12    66  300    3.365      3.352    1.72    3.336    3.431
+  x12      Economics             12    66  300    3.253      3.257    1.66    3.358    3.160
+  x12      Engineering           12    66  300    3.378      3.291    1.72    3.373    3.306
+  x12      Health                12    66  300    3.265      3.212    1.67    3.153    3.225
+  x12      History               12    66  300    3.234      3.175    1.65    3.162    3.190
+  x12      Law                   12    66  300    3.288      3.234    1.68    3.239    3.246
+  x12      Math                  12    66  300    3.307      3.259    1.69    3.339    3.300
+  x12      Other                 12    66  300    3.234      3.256    1.65    3.286    3.192
+  x12      Philosophy            12    66  300    3.447      3.428    1.76    3.506    3.387
+  x12      Physics               12    66  300    3.189      3.150    1.63    3.196    3.333
+  x12      Psychology            12    66  300    3.325      3.244    1.70    3.294    3.166
+  x12      POOLED                12    66  300    3.168      3.156    1.62    3.111    3.141
+  merged   Biology               20   190  300    3.437      3.427    1.75    3.387    3.448
+  merged   Business              20   190  300    3.639      3.561    1.86    3.499    3.689
+  merged   Chemistry             20   190  300    3.625      3.599    1.85    3.590    3.492
+  merged   Computer science      20   190  300    3.531      3.521    1.80    3.631    3.410
+  merged   Economics             20   190  300    3.449      3.465    1.76    3.373    3.535
+  merged   Engineering           20   190  300    3.800      3.753    1.94    3.722    3.637
+  merged   Health                20   190  300    3.502      3.530    1.79    3.453    3.420
+  merged   History               20   190  300    3.519      3.477    1.80    3.485    3.371
+  merged   Law                   20   190  300    3.547      3.507    1.81    3.544    3.606
+  merged   Math                  20   190  300    3.550      3.533    1.81    3.555    3.566
+  merged   Other                 20   190  300    3.545      3.532    1.81    3.546    3.405
+  merged   Philosophy            20   190  300    3.693      3.594    1.88    3.680    3.715
+  merged   Physics               20   190  300    3.431      3.377    1.75    3.370    3.246
+  merged   Psychology            20   190  300    3.568      3.565    1.82    3.403    3.533
+  merged   POOLED                20   190  400    3.453      3.470    1.76    3.481    3.423
+  x12 per-anchor: q_cell range 3.16-3.45, median 3.31 (stress pass on ratings_x12 categories: 3.21-4.51)
+  merged per-anchor: q_cell range 3.43-3.80, median 3.55 (stress pass on ratings_x12 categories: 3.21-4.51)
+  pooled: x12 3.17 (66 pairs), merged 3.45 (190 pairs). At B = 300 the 95th percentile of the max rests on the top 15 draws;
+  at B = 400 on the top 20. The quantile is a registered readout, not a calibrated constant.
+
+=== (2a) x12 PER-ANCHOR, 920 edges (any key gap, the honest denominator) ===
+  key denominator: the anchor's JUDGED questions (anchor_qs), 12-model x12 board
+  edges 920 | key established 809 | wrong-direction 60(26)
+  wrong counts as all(McNemar-established). fall = 1 - simultaneous / marginal, on the called count.
+  certificate        rule            called wrong(est)     fall
+  raw                marginal           748     11(4)       -
+                     simultaneous       635      5(2)   15.1%
+                     strict             630      5(2)   15.8%
+  raw+decline        marginal           712      4(4)       -
+                     simultaneous       622      2(2)   12.6%
+                     strict             617      2(2)   13.3%
+  widener            marginal           666      2(1)       -
+                     simultaneous       506      0(0)   24.0%
+                     sim(raw z)         607      2(1)    8.9%
+                     strict             504      0(0)   24.3%
+  widener+decline    marginal           651      1(1)       -
+                     simultaneous       504      0(0)   22.6%
+                     sim(raw z)         599      1(1)    8.0%
+                     strict             502      0(0)   22.9%
+  per cell, framework ORDERED (widener + decline, 0.975): marginal -> simultaneous -> strict; wrong(est)
+  cell                 q_cell edges  marginal         simultaneous     strict          
+  Biology                3.16    65    47   0(0)        34   0(0)        34   0(0)     
+  Business               3.38    66    40   0(0)        29   0(0)        28   0(0)     
+  Chemistry              3.36    66    52   0(0)        43   0(0)        43   0(0)     
+  Computer science       3.36    66    48   0(0)        37   0(0)        37   0(0)     
+  Economics              3.25    65    44   0(0)        32   0(0)        32   0(0)     
+  Engineering            3.38    66    48   0(0)        39   0(0)        38   0(0)     
+  Health                 3.26    66    44   0(0)        33   0(0)        33   0(0)     
+  History                3.23    65    41   0(0)        33   0(0)        33   0(0)     
+  Law                    3.29    66    51   1(1)        43   0(0)        43   0(0)     
+  Math                   3.31    66    51   0(0)        47   0(0)        47   0(0)     
+  Other                  3.23    65    42   0(0)        30   0(0)        30   0(0)     
+  Philosophy             3.45    66    43   0(0)        30   0(0)        30   0(0)     
+  Physics                3.19    66    53   0(0)        47   0(0)        47   0(0)     
+  Psychology             3.33    66    47   0(0)        27   0(0)        27   0(0)     
+
+=== (2b) x12 PER-ANCHOR, 891 edges (key gap >= 0.02, the registered population) ===
+  key denominator: the anchor's JUDGED questions (anchor_qs), 12-model x12 board
+  edges 891 | key established 809 | wrong-direction 44(26)
+  wrong counts as all(McNemar-established). fall = 1 - simultaneous / marginal, on the called count.
+  certificate        rule            called wrong(est)     fall
+  raw                marginal           739      8(4)       -
+                     simultaneous       632      4(2)   14.5%
+                     strict             627      4(2)   15.2%
+  raw+decline        marginal           712      4(4)       -
+                     simultaneous       622      2(2)   12.6%
+                     strict             617      2(2)   13.3%
+  widener            marginal           665      2(1)       -
+                     simultaneous       506      0(0)   23.9%
+                     sim(raw z)         606      2(1)    8.9%
+                     strict             504      0(0)   24.2%
+  widener+decline    marginal           651      1(1)       -
+                     simultaneous       504      0(0)   22.6%
+                     sim(raw z)         599      1(1)    8.0%
+                     strict             502      0(0)   22.9%
+
+=== (2c) x12 POOLED, 66 pairs ===
+  key denominator: all 2811 judged x12 questions
+  edges 66 | key established 65 | wrong-direction 2(2)
+  wrong counts as all(McNemar-established). fall = 1 - simultaneous / marginal, on the called count.
+  certificate        rule            called wrong(est)     fall
+  raw                marginal            63      1(1)       -
+                     simultaneous        63      1(1)    0.0%
+                     strict              63      1(1)    0.0%
+  raw+decline        marginal            62      1(1)       -
+                     simultaneous        62      1(1)    0.0%
+                     strict              62      1(1)    0.0%
+  widener            marginal            57      0(0)       -
+                     simultaneous        51      0(0)   10.5%
+                     sim(raw z)          57      0(0)    0.0%
+                     strict              51      0(0)   10.5%
+  widener+decline    marginal            57      0(0)       -
+                     simultaneous        51      0(0)   10.5%
+                     sim(raw z)          57      0(0)    0.0%
+                     strict              51      0(0)   10.5%
+
+=== (2d) MERGED PER-ANCHOR, 2,538 edges (key gap >= 0.02, budget_transfer's population) ===
+  key denominator: the anchor's JUDGED questions on the merged board, 20 models
+  edges 2538 | key established 2210 | wrong-direction 176(75)
+  wrong counts as all(McNemar-established). fall = 1 - simultaneous / marginal, on the called count.
+  certificate        rule            called wrong(est)     fall
+  raw                marginal          2079     42(17)       -
+                     simultaneous      1716     15(6)   17.5%
+                     strict            1714     15(6)   17.6%
+  raw+decline        marginal          1943     17(17)       -
+                     simultaneous      1663      6(6)   14.4%
+                     strict            1661      6(6)   14.5%
+  widener            marginal          1783     13(4)       -
+                     simultaneous      1370      1(1)   23.2%
+                     sim(raw z)        1646      9(3)    7.7%
+                     strict            1370      1(1)   23.2%
+  widener+decline    marginal          1714      4(4)       -
+                     simultaneous      1352      1(1)   21.1%
+                     sim(raw z)        1602      3(3)    6.5%
+                     strict            1352      1(1)   21.1%
+  per cell, framework ORDERED (widener + decline, 0.975): marginal -> simultaneous -> strict; wrong(est)
+  cell                 q_cell edges  marginal         simultaneous     strict          
+  Biology                3.44   182   119   0(0)        88   0(0)        88   0(0)     
+  Business               3.64   181   113   0(0)        89   0(0)        89   0(0)     
+  Chemistry              3.62   184   137   0(0)       118   0(0)       118   0(0)     
+  Computer science       3.53   185   130   0(0)        97   0(0)        97   0(0)     
+  Economics              3.45   179   114   0(0)        85   0(0)        85   0(0)     
+  Engineering            3.80   182   128   0(0)        94   0(0)        94   0(0)     
+  Health                 3.50   182   110   0(0)        86   0(0)        86   0(0)     
+  History                3.52   182   112   0(0)        91   0(0)        91   0(0)     
+  Law                    3.55   177   134   3(3)       109   1(1)       109   1(1)     
+  Math                   3.55   185   138   0(0)       118   0(0)       118   0(0)     
+  Other                  3.55   177   115   0(0)        87   0(0)        87   0(0)     
+  Philosophy             3.69   179   107   1(1)        78   0(0)        78   0(0)     
+  Physics                3.43   182   142   0(0)       127   0(0)       127   0(0)     
+  Psychology             3.57   181   115   0(0)        85   0(0)        85   0(0)     
+
+=== (2e) MERGED POOLED, 190 pairs (the board of record) ===
+  key denominator: all 2811 judged questions of the merged board
+  edges 190 | key established 183 | wrong-direction 11(8)
+  wrong counts as all(McNemar-established). fall = 1 - simultaneous / marginal, on the called count.
+  certificate        rule            called wrong(est)     fall
+  raw                marginal           179      8(5)       -
+                     simultaneous       174      6(4)    2.8%
+                     strict             174      6(4)    2.8%
+  raw+decline        marginal           173      5(5)       -
+                     simultaneous       169      4(4)    2.3%
+                     strict             169      4(4)    2.3%
+  widener            marginal           153      1(0)       -
+                     simultaneous       126      0(0)   17.6%
+                     sim(raw z)         153      1(0)    0.0%
+                     strict             126      0(0)   17.6%
+  widener+decline    marginal           150      0(0)       -
+                     simultaneous       126      0(0)   16.0%
+                     sim(raw z)         150      0(0)    0.0%
+                     strict             126      0(0)   16.0%
+
+=== (2f) SENSITIVITY: framework ORDERED (widener + decline) under q_cell from each half of the draws ===
+  x12 per-anchor, 920        marginal  651 | q from 1st half ->  499 (fall  23.3%) | q from 2nd half ->  505 (fall  22.4%)
+  merged per-anchor, 2538    marginal 1714 | q from 1st half -> 1357 (fall  20.8%) | q from 2nd half -> 1359 (fall  20.7%)
+  x12 pooled, 66             marginal   57 | q from 1st half ->   51 (fall  10.5%) | q from 2nd half ->   51 (fall  10.5%)
+  merged pooled, 190         marginal  150 | q from 1st half ->  126 (fall  16.0%) | q from 2nd half ->  127 (fall  15.3%)
+
+=== (3) TIER MAPS under the marginal and the simultaneous ORDERED call (widener + decline, 0.975) ===
+  adjacency reading-down by draw-mean theta; every pair on the board; inside = ORDERED edges inside a tier;
+  inv(est) = cross-tier key inversions, all(McNemar-established) on the cell's judged questions.
+
+  x12 (12 models):
+  cell                 | MARGINAL: tiers sizes | inside | inv(est) | SIMULTANEOUS: tiers sizes | inside | inv(est)
+  Biology              |  1 [12]           |  47/ 47 | 0(0) |  1 [12]           |  34/ 34 | 0(0)
+  Business             |  1 [12]           |  40/ 40 | 0(0) |  1 [12]           |  29/ 29 | 0(0)
+  Chemistry            |  5 [5, 1, 1, 2, 3 |   2/ 52 | 0(0) |  1 [12]           |  43/ 43 | 0(0)
+  Computer science     |  1 [12]           |  48/ 48 | 0(0) |  1 [12]           |  37/ 37 | 0(0)
+  Economics            |  1 [12]           |  44/ 44 | 0(0) |  1 [12]           |  32/ 32 | 0(0)
+  Engineering          |  1 [12]           |  48/ 48 | 0(0) |  1 [12]           |  39/ 39 | 0(0)
+  Health               |  2 [4, 8]         |  13/ 44 | 0(0) |  1 [12]           |  33/ 33 | 0(0)
+  History              |  1 [12]           |  41/ 41 | 0(0) |  1 [12]           |  33/ 33 | 0(0)
+  Law                  |  2 [4, 8]         |  19/ 51 | 0(0) |  1 [12]           |  43/ 43 | 0(0)
+  Math                 |  4 [5, 2, 3, 2]   |   1/ 51 | 0(0) |  2 [7, 5]         |  12/ 47 | 0(0)
+  Other                |  1 [12]           |  42/ 42 | 0(0) |  1 [12]           |  30/ 30 | 0(0)
+  Philosophy           |  2 [4, 8]         |  11/ 43 | 0(0) |  1 [12]           |  30/ 30 | 0(0)
+  Physics              |  4 [5, 2, 2, 3]   |   3/ 53 | 0(0) |  2 [9, 3]         |  20/ 47 | 0(0)
+  Psychology           |  3 [4, 7, 1]      |   8/ 47 | 0(0) |  1 [12]           |  27/ 27 | 0(0)
+  POOLED               |  6 [4, 1, 2, 3, 1 |   1/ 57 | 0(0) |  2 [7, 5]         |  16/ 51 | 0(0)
+  POOLED / marginal: 6 tiers, ORDERED 57, inside a tier 1, cross-tier key inversions 0 (established 0)
+    tier  1: iask_pro, gemini-3.1-pro_5-shots, arx_0314, gpt-4o-2024-08-06
+    tier  2: deepseek-chat-v2_5
+    tier  3: Meta-Llama-3_1-70B-Instruc, Qwen1.5-72B-Chat
+    tier  4: c4ai-command-r-v01, Meta-Llama-3_1-8B, Yi-6b-Chat
+    tier  5: Llama-2-13b-hf
+    tier  6: Llama-2-7b-hf
+  POOLED / simultaneous: 2 tiers, ORDERED 51, inside a tier 16, cross-tier key inversions 0 (established 0)
+    tier  1: iask_pro, gemini-3.1-pro_5-shots, arx_0314, gpt-4o-2024-08-06, deepseek-chat-v2_5, Meta-Llama-3_1-70B-Instruc, Qwen1.5-72B-Chat
+    tier  2: c4ai-command-r-v01, Meta-Llama-3_1-8B, Yi-6b-Chat, Llama-2-13b-hf, Llama-2-7b-hf
+
+  merged (20 models):
+  cell                 | MARGINAL: tiers sizes | inside | inv(est) | SIMULTANEOUS: tiers sizes | inside | inv(est)
+  Biology              |  1 [20]           | 119/119 | 0(0) |  1 [20]           |  88/ 88 | 0(0)
+  Business             |  1 [20]           | 113/113 | 0(0) |  1 [20]           |  89/ 89 | 0(0)
+  Chemistry            |  3 [9, 8, 3]      |  17/137 | 0(0) |  1 [20]           | 118/118 | 0(0)
+  Computer science     |  1 [20]           | 130/130 | 0(0) |  1 [20]           |  97/ 97 | 0(0)
+  Economics            |  1 [20]           | 114/114 | 0(0) |  1 [20]           |  85/ 85 | 0(0)
+  Engineering          |  1 [20]           | 128/128 | 0(0) |  1 [20]           |  94/ 94 | 0(0)
+  Health               |  1 [20]           | 110/110 | 0(0) |  1 [20]           |  86/ 86 | 0(0)
+  History              |  1 [20]           | 112/112 | 0(0) |  1 [20]           |  91/ 91 | 0(0)
+  Law                  |  2 [10, 10]       |  44/134 | 3(3) |  1 [20]           | 109/109 | 0(0)
+  Math                 |  2 [18, 2]        | 103/138 | 0(0) |  1 [20]           | 118/118 | 0(0)
+  Other                |  2 [19, 1]        |  96/115 | 0(0) |  1 [20]           |  87/ 87 | 0(0)
+  Philosophy           |  1 [20]           | 107/107 | 0(0) |  1 [20]           |  78/ 78 | 0(0)
+  Physics              |  2 [16, 4]        |  80/142 | 0(0) |  1 [20]           | 127/127 | 0(0)
+  Psychology           |  2 [19, 1]        |  96/115 | 0(0) |  1 [20]           |  85/ 85 | 0(0)
+  POOLED               |  3 [9, 9, 2]      |  35/150 | 0(0) |  1 [20]           | 126/126 | 0(0)
+  POOLED / marginal: 3 tiers, ORDERED 150, inside a tier 35, cross-tier key inversions 0 (established 0)
+    tier  1: iask_pro, gemini-3.1-pro_5-shots, claude-3-5-sonnet-20241022, arx_3, gpt-4o-2024-08-06, arx_0314, gpt-4o-mini, claude-3-5-haiku-20241022, deepseek-chat-v2_5
+    tier  2: Meta-Llama-3_1-70B-Instruc, Qwen1.5-72B-Chat, Qwen1.5-110B, Qwen1.5-14B-Chat, Mixtral-8x7B-Instruct-v0.1, c4ai-command-r-v01, Meta-Llama-3_1-8B, gemma-7b, Yi-6b-Chat
+    tier  3: Llama-2-13b-hf, Llama-2-7b-hf
+  POOLED / simultaneous: 1 tiers, ORDERED 126, inside a tier 126, cross-tier key inversions 0 (established 0)
+    tier  1: iask_pro, gemini-3.1-pro_5-shots, claude-3-5-sonnet-20241022, arx_3, gpt-4o-2024-08-06, arx_0314, gpt-4o-mini, claude-3-5-haiku-20241022, deepseek-chat-v2_5, Meta-Llama-3_1-70B-Instruc, Qwen1.5-72B-Chat, Qwen1.5-110B, Qwen1.5-14B-Chat, Mixtral-8x7B-Instruct-v0.1, c4ai-command-r-v01, Meta-Llama-3_1-8B, gemma-7b, Yi-6b-Chat, Llama-2-13b-hf, Llama-2-7b-hf
+
+  reproduction, merged pooled at 0.975: raw marginal 11 tiers, 7 inversions (4 est) [record 11 / 7 (4)] OK
+  reproduction, merged pooled widener + decline marginal: 3 tiers [9, 9, 2], 0 inversions, 35 of 150 inside [record 3 [9, 9, 2], 0, 35 of 150] OK
+  x12 per-anchor over 14 cells: tiers 29 -> 16 | ORDERED inside a tier 367 -> 442 | cross-tier key inversions 0(0) -> 0(0)
+  merged per-anchor over 14 cells: tiers 21 -> 14 | ORDERED inside a tier 1369 -> 1352 | cross-tier key inversions 3(3) -> 0(0)
+
+=== (4) SUPPLEMENT (not registered): the decline component under a within-cell Bonferroni (alpha / pairs) ===
+  x12 920        widener + Bonferroni-decline: marginal 613 called, 0 wrong | simultaneous 491 called, 0 wrong
+  merged 2538    widener + Bonferroni-decline: marginal 1555 called, 0 wrong | simultaneous 1299 called, 0 wrong
+  x12 pooled     widener + Bonferroni-decline: marginal 56 called, 0 wrong | simultaneous 51 called, 0 wrong
+  merged pooled  widener + Bonferroni-decline: marginal 149 called, 0 wrong | simultaneous 126 called, 0 wrong
+
+=== REGISTERED READOUT AND PREDICTION ('ORDERED falls by 15-25%') ===
+  framework ORDERED = widener + decline at 0.975; fall = 1 - simultaneous / marginal (called counts)
+  x12 per-anchor, 920        ORDERED  651 ->  504 (fall  22.6%; strict  502,  22.9%; sim(raw z)  599,   8.0%) wrong 1(1) -> 0(0) | raw  748 ->  635 ( 15.1%) wrong 11(4) -> 5(2) | PASS (22.6% is in 15-25%)
+  x12 per-anchor, 891        ORDERED  651 ->  504 (fall  22.6%; strict  502,  22.9%; sim(raw z)  599,   8.0%) wrong 1(1) -> 0(0) | raw  739 ->  632 ( 14.5%) wrong 8(4) -> 4(2) | PASS (22.6% is in 15-25%)
+  x12 pooled, 66             ORDERED   57 ->   51 (fall  10.5%; strict   51,  10.5%; sim(raw z)   57,   0.0%) wrong 0(0) -> 0(0) | raw   63 ->   63 (  0.0%) wrong 1(1) -> 1(1) | FAIL (10.5% is outside 15-25%)
+  merged per-anchor, 2538    ORDERED 1714 -> 1352 (fall  21.1%; strict 1352,  21.1%; sim(raw z) 1602,   6.5%) wrong 4(4) -> 1(1) | raw 2079 -> 1716 ( 17.5%) wrong 42(17) -> 15(6) | PASS (21.1% is in 15-25%)
+  merged pooled, 190         ORDERED  150 ->  126 (fall  16.0%; strict  126,  16.0%; sim(raw z)  150,   0.0%) wrong 0(0) -> 0(0) | raw  179 ->  174 (  2.8%) wrong 8(5) -> 6(4) | PASS (16.0% is in 15-25%)
+  registered boards (x12 920, x12 pooled, merged 2538, merged pooled): 3 PASS, 1 FAIL, 0 UNDETERMINED -> prediction FAIL
+  per-anchor reading (the object the 756 -> 605 figure came from: x12 920 and merged 2538 only): PASS
+  product consequence: under the simultaneous call the shipped tier map of the 20-model pooled board of record is 1 tier(s) [20]
+  (marginal: 3 [9, 9, 2]); the 12-model x12 pooled board gives 2 tier(s) [7, 5] (marginal 6). The fine product (the partial order) keeps 126 / 150 ORDERED edges.
+  hardest reading applied: the widened statistic is held to q_cell; the prediction must hold on every registered board.
+  the band is NOT robust to which statistic q_cell is applied to: with the widener left at its marginal gate and the raw
+  |m|/s held to q_cell (the scale the max-t was computed on), the fall is 8.0%, 0.0%, 6.5%, 0.0% on the four registered boards - below the
+  band everywhere; the widener at 0.975 already removes most of the edges the raw max-t removes, so the two corrections overlap.
+  the readout itself (per-cell q_cell, both counts per cell, tier maps under both) is above; the tier maps of the
+  shipped product are the SIMULTANEOUS ones by the framework's rule.

@@ -1,0 +1,19 @@
+THREAD-CAP B2 + B3 OUTCOME (2026-09-29; run-operator; zero calls; main HEAD 32c4c72; READY 3da93fc / READY_w0_delta2 + delta3; C7-1 discharged per brief; B1 done 7eb4714; B4 NOT run)
+ARM: AG_NEWS smoke construction, experiment_configs/topic_partition/ag_news_smoke_s42.toml blob:efd82bdacc06144439280d3b76923d38527bd7ae; one detached worktree at 32c4c72 for all three legs (same worktree, code and input copies); before each leg the inputs ag_news_smoke_cache_v1.db (sha256 e3415684...7430) and embeddings_cache.db (sha256 52229e1e...9769) re-copied byte-identical from main (inputs.sha256 per leg); gradlew bootRun --offline --no-daemon --no-build-cache -PjvmThreads=N
+PINS: build.gradle.kts blob:982cbbba2daee3e5be7d5eb141526e12f0d64ddf (= B1's 226229c9 + 3 lines, the C-ET-5 embeddingCacheFile forward; applyThreadCap unchanged); d9b_compare.py blob:209eb2e661d7d0f4fb50b302e266605e89a251d8, sha256-lf16:55b961cac7165688 (= the registered pin)
+LEGS: A12a N=12 EXIT 0 wall_s 52 | A12b N=12 EXIT 0 wall_s 21 | A8 N=8 EXIT 0 wall_s 23 (gradle BUILD SUCCESSFUL 51s / 20s / 22s; each tree 18 nodes, 10 leaves)
+WITNESS A12a: [THREAD-CAP] requested=12 availableProcessors=12 heapEstimate=n/a budget=16.94GB (x2: processAot + bootRun)
+WITNESS A12b: [THREAD-CAP] requested=12 availableProcessors=12 heapEstimate=n/a budget=16.94GB (x1: processAot not re-run)
+WITNESS A8:   [THREAD-CAP] requested=8 availableProcessors=8 heapEstimate=n/a budget=16.94GB (x2)
+C2a (A12a vs A12b; d9b_compare labels A / A2, its "C2" pair): [C2] differing: 0 of 24 objects (21 files + the file set + 2 pool tables): none -> C2 HELD  => C2a HELD (exit 0)
+C2b (A12a vs A8;   d9b_compare labels A / B,  its "C1'" pair): [C1'] differing: 0 of 24 objects (21 files + the file set + 2 pool tables): none -> C1' HELD  => C2b HELD (exit 0)
+B3: -PjvmThreads=0 EXIT 1 "[THREAD-CAP] -PjvmThreads='0' is not a positive integer <= 24; refusing before any fork (absent -> no cap)" BUILD FAILED, 0 tasks executed
+B3: -PjvmThreads=25 EXIT 1 "[THREAD-CAP] -PjvmThreads='25' is not a positive integer <= 24; refusing before any fork (absent -> no cap)" BUILD FAILED, 0 tasks executed
+B3: -PjvmThreads=abc EXIT 1 "[THREAD-CAP] -PjvmThreads='abc' is not a positive integer <= 24; refusing before any fork (absent -> no cap)" BUILD FAILED, 0 tasks executed
+B3: absent EXIT 0 (threadCapProbeExec, the zero-DB JavaExec probe, as bootRun) "[THREAD-CAP] requested=none availableProcessors=24 heapEstimate=n/a budget=16.94GB"
+C3 HELD (3 of 3 refusals executed and printed before any task; absent branch prints requested=none; the [THREAD-CAP] line present on B1 (7eb4714) and on every B2 leg)
+P2: C2a HELD (prior 0.85) -> HELD; C2b HELD (prior 0.70) -> HELD. P3: C3 HELD (prior 0.95) -> HELD. F2 NOT FIRED (C2b HELD).
+P6-like DESCRIPTIVE (declared drops, no bar): TotalDasguptaCost A12a 2.244331611313258E8 / A12b 2.232594082456018E8 (0.522985% of A) / A8 2.2329726908051246E8 (0.506116% of A); DP |diff| <= 3.44e-15, SS <= 5.55e-17
+C4: NOT RUN (leg B4, waits its C7-2 witness; not in this brief).
+RULE 7: W1 FREE all 7 DB files, W2 no java/python/gradle process, W4 31.6 GB before / 31.7 GB after (wcheck_pre/post.txt); main DB per-table sha256 (60 table-views, immutable=1 and mode=ro) EQUAL before and after (pins_main_pre/post.txt); whole-file sha256 unchanged; pool_guard --pool p2dca21ab5f4ef3ae OK after. The worktree COPY of embeddings_cache.db had its queries table rewritten by the AG build (queries sha differs from main's, immutable != ro view: a WAL tail; pins_wt_copy_after_A8.txt): the known text-keyed rewrite, confined to the copy.
+DOES NOT SHOW: the Ollama cap (C4); anything at 22 threads; determinism of MAIN_taxonomy_quality.csv's declared-drop rows or of a MMLU-Pro-scale build.

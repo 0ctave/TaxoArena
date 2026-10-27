@@ -1,0 +1,104 @@
+{
+  "id": "SELECTIVE-ORDER",
+  "title": "SELECTIVE-ORDER: can the second order be skipped where the candidates' own answers already agree? (zero calls)",
+  "question": "Three policies replayed on the x12 MAIN cache, which stores both per-order votes for all 9,142 matches: always dual, always single, and selective (dual only on answer-disagreeing pairs); registered: rho within 0.005 of always-dual, violations no worse, strictly fewer calls.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "1fdceee",
+    "program_lines": "docs/judge_v2_program.md L1649-L1669 (registration) and L1700-L1733 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-14 (before looking at any result, ZERO calls) — SELECTIVE-ORDER: pay for the second order only where it can change anything",
+    "outcome_heading": [
+      "L1700: - **SELECTIVE-ORDER OUTCOME (2026-09-14, zero calls): REGISTERED FAIL, and the reason is that I had the"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "tools/analysis/selective_order.py",
+    "sha16": "24e797eaf2055b1b (at a03ae63)",
+    "commit": "a03ae63"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/selectiveorder_outcome.txt",
+    "outcome_commit": "a03ae63",
+    "calls": 0,
+    "cce": 0,
+    "pool": "x12 MAIN cache (9,142 matches, both per-order votes)",
+    "date": "2026-09-14"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/)",
+    "commit": "a03ae63",
+    "verdict": "FAIL; MECHANISM CORRECTED (the flip rate measures the absence of decisive evidence; the shipped matchFilter is better motivated)"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "rho within 0.005 of always-dual, violations no worse, strictly fewer calls",
+      "result": "FAILED",
+      "value": "SELECTIVE spends 58% more calls than always-single and buys exactly the same board (rho 0.9580, 3 violations, against dual's 0.9720 and 2): the dual rule's entire advantage lives in the matches the policy economised on; diagnostic: the two orders disagree on 0.192 of answer-AGREEING pairs against 0.105 of disagreeing ones; agreeing pairs are 10.4% key-decidable, so a single order invents a winner 78% of the time and gives it to the longer answer in 78% of those",
+      "denominator": "9,142 x12 MAIN matches"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "MY ERROR, recorded: POSITION-FULL's frontier / cross-tier split is a cut WITHIN answer-disagreeing pairs and was generalised across a boundary the data never crossed; closed line: single and selective order (CONTEXT.md section 5: ORDER-1, SELECTIVE-ORDER)"
+  },
+  "numbers_of_record": {
+    "boards": "selective rho 0.9580 / 3 violations = single; dual 0.9720 / 2",
+    "calls": "selective 58% more than single",
+    "flip_by_agreement": "0.192 agreeing vs 0.105 disagreeing; agreeing pairs 10.4% decidable; invented winner 78%, longer answer 78%"
+  },
+  "sentence_of_record": "SELECTIVE-ORDER (2026-09-14, zero calls): REGISTERED FAIL: selective spends 58% more calls than always-single and buys exactly the same board (rho 0.9580, 3 violations, against dual's 0.9720 and 2); the two orders disagree on 0.192 of answer-agreeing pairs against 0.105 of disagreeing ones, and agreeing pairs are 10.4% key-decidable, so a single order invents a winner 78% of the time and gives it to the longer answer in 78% of those. MY ERROR, recorded: POSITION-FULL's frontier / cross-tier split is a cut within answer-disagreeing pairs; corrected statement: the flip rate measures the ABSENCE OF DECISIVE EVIDENCE; there is no cheap subset to skip, and the shipped matchFilter is better motivated by this, not worse.",
+  "chips": [
+    "FAIL",
+    "MECHANISM CORRECTED"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a cheap subset to skip the second order on"
+  ],
+  "ledger": {
+    "row_id": "SELECTIVE-ORDER",
+    "version": "v70 (95228cd); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "ORDER-1",
+    "POSITION-FULL",
+    "MATCH-FILTER",
+    "ARENA-V2"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "single order and selective order (CONTEXT.md section 5: ORDER-1, SELECTIVE-ORDER)"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L1649-L1669 and L1700-L1733 (1fdceee / a03ae63)",
+    "experiment_results/x12_crossdomain/selectiveorder_outcome.txt (a03ae63)",
+    "docs/test_ledger.html row SELECTIVE-ORDER (v70): chips verbatim, observed cell, evidence",
+    "script sha16 = sha256 of tools/analysis/selective_order.py at a03ae63, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ4 Price",
+    "what": "Replays three judging policies on 9,142 cached matches that store both presentation orders: always judge in both orders, always one order, or both orders only when the two models' answers differ. No calls.",
+    "why": "Judging each pair in both orders doubles the cost. The test asks whether the second order can be skipped when the answers already agree.",
+    "information": "Same quality at fewer calls would be a cheap saving. Result: done, registered failure. The selective policy costs 58% more than single order and gives the same weaker leaderboard (0.958 vs 0.972). Orders disagree more often on agreeing answers (19% vs 11%). There, a single order invents a winner and usually favours the longer answer. There is no cheap subset to skip. Arena-pool data, later ruled history, not evidence.",
+    "written": "2026-10-07"
+  }
+}

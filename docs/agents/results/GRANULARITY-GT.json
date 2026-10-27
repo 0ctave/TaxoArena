@@ -1,0 +1,155 @@
+{
+ "id": "GRANULARITY-GT",
+ "title": "GRANULARITY-GT: best-cut AMI of the [LF] intent trees (M-AF, C-AF) vs an average-link hierarchy at the coarse gold level (GR1) and dendrogram purity vs 200 matched-shape random trees (GR2) (zero calls; REGISTERED 2026-10-04)",
+ "question": "Is the tree right at a different granularity, and is its hierarchy better than random arrangements of the same leaves?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "the commit that writes it (parent bd5ca001)",
+  "program_lines": "docs/judge_v2_program.md L24317-L24328",
+  "program_lines_as_of": "the commit that writes them, parent bd5ca001, re-grepped",
+  "date": "2026-10-04",
+  "provenance": "docs/literature/2026-10-04_testing_logic_review.md (bd5ca001) section 3; the author's Go (docs/agents/plans/2026-10-04_W1_W2_schedule.md (be8e54d3))"
+ },
+ "script": {
+  "path": "tools/analysis/granularity_gt.py",
+  "sha16": "bcb4240d (git blob, LF; sha256-lf16:3a9a38fc29c8012b; working tree CRLF sha256-crlf16:e54ade5498dbf140, D-4)",
+  "commit": "e2c082ef (merged)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_granularity_gt.md",
+  "commit": "e2c082ef",
+  "blob": "45b0be9b (LF)",
+  "verdict": "READY on blob bcb4240d, on conditions R-1 (B1-B5) and R-2"
+ },
+ "go": "the author's Go for zero-call windows (2026-10-04)",
+ "run": {
+  "outcome_file": "E:/TaxoArena_backup_2026-10-04_ggt/outcome/granularity_gt_outcome.txt (never committed; also E:/TaxoArena_backup_2026-10-04_granularity_gt/granularity_gt_outcome.txt)",
+  "outcome_sha256": "f338a3e6065433ee0ceaf38fd8b19e0d3cb95d6e9125d9da4ca55daaffecbfa2",
+  "outcome_commit": "run from main (blob bcb4240d; never committed)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "none (S1 intent build DBs, read-only; not a union-pool reader)",
+  "date": "2026-10-04",
+  "concurrency": "none affecting (RESP-PROFILE-INFO and the three routing readouts in the window; zero-call readers of other objects; no construction; pins OK)"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_granularity_gt.md",
+  "commit": "4572dbd4",
+  "blob": "b26bf856 (LF)",
+  "verdict": "VALID with disclosure C-1"
+ },
+ "criteria": [
+  {
+   "id": "GR1",
+   "text": "DECIDING (point and interval, per corpus; both corpora): TREE-BETTER iff D1 > spread_B AND 95% > 0; AVG-BETTER iff D1 < -spread_B AND 95% < 0; NEITHER otherwise. Verdict line: DESCRIPTIVE-ONLY at the prediction (DEFF 1.0093; SE 0.0050; MDE80 0.014)",
+   "result": "PARTIAL",
+   "value": "MIXED: MASSIVE TREE-BETTER (D1 +0.34038, 95% [+0.32256, +0.34974], spread_B 0.03154; C-1 chained average-link); CLINC NEITHER (D1 -0.02317, 95% [-0.03051, -0.01740], spread_B 0.03535); realised SE MASSIVE 0.0069, CLINC 0.0033",
+   "denominator": "MASSIVE 4,946 / 4,923 (Kish 1.0093); CLINC 6,672 / 6,672 (Kish 1.0000)"
+  },
+  {
+   "id": "GR2",
+   "text": "DECIDING (point vs percentile): HELD iff DP(tree) > random p97.5 on both corpora; FAILED iff on neither; MIXED otherwise. SCOREABLE as a classification",
+   "result": "HELD",
+   "value": "DP(tree, coarse) MASSIVE 0.67043 vs p97.5 0.30353; CLINC 0.47730 vs 0.19703; 0 of 200 >= on each",
+   "denominator": "200 matched-shape random trees per corpus"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "D1 MASSIVE -0.01 [-0.05, +0.03], CLINC -0.01 [-0.05, +0.03]; GR1 NEITHER 0.6 [B3: 'GR1 NEITHER' NOT SCORED (not an outcome of the overall rule); per-corpus words printed]",
+   "result": "PARTIAL",
+   "value": "MASSIVE FAILED (+0.34038); CLINC HELD (-0.02317); 'GR1 NEITHER 0.6' NOT SCORED (GG-1)",
+   "denominator": "EVAL"
+  },
+  {
+   "id": "P2",
+   "text": "GR2 HELD 0.75",
+   "result": "HELD",
+   "value": "GR2 HELD; Brier 0.0625",
+   "denominator": "2 corpora"
+  },
+  {
+   "id": "P3",
+   "text": "coarse best-cut depth shallower than the leaves on both corpora 0.9 (descriptive)",
+   "result": "HELD",
+   "value": "MASSIVE depth 4 of 8, CLINC 6 of 8; Brier 0.0100 (descriptive)",
+   "denominator": "2 corpora"
+  }
+ ],
+ "falsifier": {
+  "text": "F-GR fires iff GR2 FAILED: the hierarchy is no better than a random arrangement of the same leaves; P3 / D6 hierarchy wording falsified.",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "GR1_MASSIVE": "TREE-BETTER: AMI tree 0.65875 vs average-link 0.31837; D1 +0.34038, 95% [+0.32256, +0.34974] (reviewer [+0.32323, +0.34953]); spread_B 0.03154; SE 0.0069, MDE80 0.019; 4,946 / 4,923; C-1 chained comparator",
+  "GR1_CLINC": "NEITHER: AMI tree 0.60066 vs average-link 0.62383; D1 -0.02317, 95% [-0.03051, -0.01740]; spread_B 0.03535; SE 0.0033; 6,672 / 6,672",
+  "GR2": "DP MASSIVE 0.67043 vs p97.5 0.30353 (MC SE 0.00358); CLINC 0.47730 vs 0.19703 (MC SE 0.00129); 200 draws each",
+  "C1_comparator": "average-link largest leaf MASSIVE 8,455 of 9,870 TRAIN (85.7%), CLINC 3,207 of 13,487 (23.8%); bisecting MASSIVE coarse best-cut range 0.648-0.679 (tree 0.659 inside)",
+  "D3_dedup": "9,826 unique MASSIVE texts: D1 +0.35155 (+0.0112); no word moves"
+ },
+ "sentence_of_record": "GRANULARITY-GT (2026-10-04, 0 calls) — VALID; GR1 MIXED, GR2 HELD, F-GR not fired. On the [LF] intent trees (MASSIVE 4,946 EVAL items, 84 leaves; CLINC 6,672, 139 leaves), the tree's dendrogram purity against the coarse gold level lies above the 97.5th percentile of 200 matched-shape random trees on both corpora (0.670 vs 0.304; 0.477 vs 0.197). At the coarse level the tree's best cut beats average-link on MASSIVE (D1 +0.340 [+0.323, +0.350]) but not on CLINC (NEITHER, D1 -0.023); the MASSIVE comparator is a chained average-link (one leaf holds 85.7% of TRAIN), so this reads 'better than a chained average-link', not 'better than a competent hierarchy'. P1's 'GR1 NEITHER' NOT SCORED.",
+ "chips": [
+  "REGISTERED 2026-10-04, BEFORE ANY CODE; not built",
+  "VALID (POST-RUN 4572dbd4): GR1 MIXED (MASSIVE TREE-BETTER, CLINC NEITHER); GR2 HELD; F-GR NOT FIRED",
+  "C-1: MASSIVE TREE-BETTER = BETTER THAN A CHAINED AVERAGE-LINK (ONE LEAF 85.7% OF TRAIN), NOT A COMPETENT HIERARCHY; P1 &#x27;GR1 NEITHER&#x27; NOT SCORED"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-04",
+   "by": "registrar (pre-data; READY_granularity_gt)",
+   "text": "B1 GR1 comparator best cut at the tree's k_d only (all-k descriptive); B3 P1 'GR1 NEITHER' NOT SCORED; D2 44 duplicate MASSIVE TRAIN rows; D3 SD 0.35 a planning assumption; R-2 post-run recompute of spread_B and intervals. Programme L24321, L24323, L24324, L24325."
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (POSTRUN 4572dbd4)",
+   "text": "outcome recorded; duties applied: C-1 (D-2), D-3 dedup shift, D-4 hash kinds, realised Support, GG-1; concurrency none affecting. docs/judge_v2_program.md L24500-L24513 (section \"## GRANULARITY-GT (2026-10-04, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent c32ef885, re-grepped); OUTCOME brackets on the registration lines."
+  }
+ ],
+ "does_not_show": [
+  "'right at a different granularity' in general (GR1 MIXED)",
+  "superiority over a competent hierarchy (C-1)",
+  "routing value",
+  "MMLU-Pro",
+  "that the leaves are better (T-C1 governs)"
+ ],
+ "ledger": {
+  "row_id": "GRANULARITY-GT",
+  "version": "v386 (2026-10-04: OUTCOME bracket, OK + WARN chips) | v382 (2026-10-04: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "INTENT-TRANSFER-S1"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none (no judge, rubric, reference, frontier, temperature or LR)"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "< 1 h",
+  "agent_hours": "about 3 h",
+  "reads_pool": false
+ },
+ "outputs": "never committed: stored on E: with SHA256SUMS.txt; temp on E: via scratch_dir",
+ "sources": [
+  "docs/judge_v2_program.md L24317-L24328 (_as_of the commit that writes it, parent bd5ca001, re-grepped)",
+  "docs/literature/2026-10-04_testing_logic_review.md (bd5ca001)",
+  "docs/agents/plans/2026-10-04_W1_W2_schedule.md (be8e54d3)",
+  "docs/reviews/POSTRUN_granularity_gt.md (4572dbd4; blob b26bf856, LF)",
+  "docs/judge_v2_program.md L24500-L24513 (section \"## GRANULARITY-GT (2026-10-04, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent c32ef885, re-grepped)",
+  "E:/TaxoArena_backup_2026-10-04_ggt/SHA256SUMS.txt"
+ ],
+ "last_update": "2026-10-04",
+ "plain_description": {
+  "sq": "SQ3 Taxonomy",
+  "what": "On two intent datasets with gold labels (MASSIVE and CLINC), it compares the label-free discovered tree with an average-link clustering hierarchy at the coarse gold level. It also compares the tree's purity with 200 random trees of the same shape. No calls.",
+  "why": "It tests whether the discovered tree reflects real structure ('right at some granularity') rather than arbitrary splits.",
+  "information": "Beating random trees shows real structure. Beating a standard hierarchy would show it is better than an off-the-shelf method. Result: valid. The tree beats random trees of the same shape on both corpora. Against average-link the result is mixed: it wins on MASSIVE, but only against a badly chained comparator, and does not win on CLINC. This shows no routing value and no MMLU-Pro result.",
+  "written": "2026-10-07"
+ }
+}

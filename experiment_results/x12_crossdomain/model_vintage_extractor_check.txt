@@ -1,0 +1,49 @@
+=== MODEL-VINTAGE-CANARY | precheck (instrument step 0: extract-v1 on the cached rows, vintage v0) | script sha256(LF) bedbbdaefdfb8a954e6b6d944f98ed05b1cabf5b2a8137cdd16507e823581115 | extract-v1 b9782bef338e4815 | 2026-09-22 10:53:04 ===
+registration: docs/judge_v2_program.md 'Registered 2026-09-18 ... MODEL-VINTAGE-CANARY' (~L5984-6084); judge calls: 0
+[POOL] p2dca21ab5f4ef3ae (pool of record; verified by pool_guard.assert_pool_of_record)
+canary set: experiment_results\x12_crossdomain\canary_set.json hash 50af669ac6997f9f (= record 50af669ac6997f9f) | 300 matches | 279 distinct questions | roster 12 models | x12 match_history rows verified 300 (condition MAIN, 20260727_042523_Headless_Run_Auto_ge_MAIN)
+DBs (mode=ro&immutable=1): mmlu_pro_dataset_cache_v2.db | experiment_results\x12_crossdomain\ratings_x12.db ; Meta-Llama-3-70B-Instruct asserted absent
+OPTIONS-key audit (never question_text): questions with >1 options key across the roster files 0; with >1 gt letter 0; with no row 0; mmlu_pro rows by the key: unique 279 / ambiguous 0 / none 0
+extractor: extract-v1 (b9782bef338e4815) = TIGER-Lab MMLU-Pro three-tier: t1 'answer is \\(?([A-J])\\)?' ; t2 '.*[aA]nswer:\\s*([A-J])' ; t3 '\\b[A-J]\\b(?!.*\\b[A-J]\\b)' (DOTALL); blank when none matches
+metric: reproduction = share of the model's canary rows with extract-v1(model_output) == pred (both blank = agreement; blank on one side = disagreement); interval = Wilson 95%; NON_TERMINATED on v0: UNSTAMPED (eval_results carries no finish_reason)
+denominator: the model's rows on the 279 canary questions (registered 279 per model, 278 for iask_pro)
+
+model                            n  agree    repro          wilson95  pBlank  eBlank   commAgr  tiers
+Llama-2-13b-hf                 279    270   0.9677 [0.9398, 0.9829]      45      36  234/234   none=36 t1=234 t3=9
+Llama-2-7b-hf                  279    268   0.9606 [0.9308, 0.9778]      51      40  228/228   none=40 t1=228 t3=11
+Meta-Llama-3_1-70B-Instruct    279    273   0.9785 [0.9539, 0.9901]       0       6  273/273   none=6 t1=272 t3=1
+Meta-Llama-3_1-8B              279    264   0.9462 [0.9132, 0.9672]       0      15  264/264   none=15 t1=263 t3=1
+Qwen1.5-72B-Chat               279    242   0.8674 [0.8226, 0.9022]      59      22  220/220   none=22 t1=220 t2=1 t3=36
+Yi-6b-Chat                     279    258   0.9247 [0.8877, 0.9502]      49      28  230/230   none=28 t1=230 t3=21
+arx_0314                       279    277   0.9928 [0.9742, 0.9980]       0       0  277/279   t1=277 t3=2
+c4ai-command-r-v01             279    261   0.9355 [0.9003, 0.9588]      28      10  251/251   none=10 t1=251 t3=18
+deepseek-chat-v2_5             279    279   1.0000 [0.9864, 1.0000]       1       1  278/278   none=1 t1=275 t3=3
+gemini-3.1-pro_5-shots         279    279   1.0000 [0.9864, 1.0000]       0       0  279/279   t1=279
+gpt-4o-2024-08-06              279    279   1.0000 [0.9864, 1.0000]       1       1  278/278   none=1 t1=275 t3=3
+iask_pro                       278    278   1.0000 [0.9864, 1.0000]       2       2  276/276   none=2 t1=273 t3=3
+
+disagreement classes per model (description; what an amendment by insertion would have to name):
+  Llama-2-13b-hf               pred blank / extract t3=F x4; pred blank / extract t3=H x3; pred blank / extract t3=J x1; pred blank / extract t3=I x1
+  Llama-2-7b-hf                pred blank / extract t3=C x3; pred blank / extract t3=H x2; pred blank / extract t3=F x2; pred blank / extract t3=E x2; pred blank / extract t3=J x1; pred blank / extract t3=B x1
+  Meta-Llama-3_1-70B-Instruct  pred G / extract blank x6
+  Meta-Llama-3_1-8B            pred G / extract blank x15
+  Qwen1.5-72B-Chat             pred blank / extract t3=A x8; pred blank / extract t3=C x6; pred blank / extract t3=F x5; pred blank / extract t3=E x4; pred blank / extract t3=B x4; pred blank / extract t3=J x3; pred blank / extract t3=H x3; pred blank / extract t3=D x1; pred blank / extract t3=I x1; pred blank / extract t2=C x1; pred blank / extract t3=G x1
+  Yi-6b-Chat                   pred blank / extract t3=A x4; pred blank / extract t3=C x3; pred blank / extract t3=E x3; pred blank / extract t3=J x2; pred blank / extract t3=H x2; pred blank / extract t3=B x2; pred blank / extract t3=I x2; pred blank / extract t3=G x1; pred blank / extract t3=F x1; pred blank / extract t3=D x1
+  arx_0314                     pred B / extract I (t3) x1; pred B / extract H (t3) x1
+  c4ai-command-r-v01           pred blank / extract t3=E x4; pred blank / extract t3=C x3; pred blank / extract t3=J x3; pred blank / extract t3=A x3; pred blank / extract t3=F x3; pred blank / extract t3=D x1; pred blank / extract t3=I x1
+  deepseek-chat-v2_5           none
+  gemini-3.1-pro_5-shots       none
+  gpt-4o-2024-08-06            none
+  iask_pro                     none
+
+mean chars per cached answer (the registration's cost table): Llama-2-13b-hf 329; Llama-2-7b-hf 311; Meta-Llama-3_1-70B-Instruct 489; Meta-Llama-3_1-8B 635; Qwen1.5-72B-Chat 509; Yi-6b-Chat 420; arx_0314 888; c4ai-command-r-v01 371; deepseek-chat-v2_5 1020; gemini-3.1-pro_5-shots 870; gpt-4o-2024-08-06 1512; iask_pro 1257
+
+(C1) extract-v1 reproduces the cached pred at >= 0.99 per model on the 279: 5 of 12 models at or above the bar
+     models below: Llama-2-13b-hf 0.9677, Llama-2-7b-hf 0.9606, Meta-Llama-3_1-70B-Instruct 0.9785, Meta-Llama-3_1-8B 0.9462, Qwen1.5-72B-Chat 0.8674, Yi-6b-Chat 0.9247, c4ai-command-r-v01 0.9355
+     C1 as registered (12 of 12): FAILED
+     C1 registrar's blind addition (>= 10 of 12): FAILED
+     fixed checkpoints (the null's): Llama-2-7b-hf 0.9606, Llama-2-13b-hf 0.9677, Meta-Llama-3_1-8B 0.9462, Meta-Llama-3_1-70B-Instruct 0.9785, Qwen1.5-72B-Chat 0.8674, Yi-6b-Chat 0.9247, c4ai-command-r-v01 0.9355
+     API rows: arx_0314 0.9928, deepseek-chat-v2_5 1.0000, gemini-3.1-pro_5-shots 1.0000, gpt-4o-2024-08-06 1.0000, iask_pro 1.0000
+     consequence (registration): the extractor, not the model, is the object; amend extract-v1 by insertion BEFORE any generation, never after
+
+does not show: any model drift (no v1 exists); F_gen, F_cache, a_m, the alarm (C2-C4 need the author's generation pass); the frontier order.

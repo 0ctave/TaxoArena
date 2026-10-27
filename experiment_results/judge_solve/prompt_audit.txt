@@ -1,0 +1,42 @@
+=== (1) CATALOGUE by declared prompt configuration (pool p2dca21ab5f4ef3ae, 46 models) ===
+  5-shot (declared)    n= 1 | accuracy 0.913..0.913 | mean trace  882.. 882 chars | missing pred 0.1%..0.1%
+      gemini-3.1-pro_5-shots             0.913 | trace  882 | missing 0.1%
+  undeclared           n=41 | accuracy 0.178..0.834 | mean trace    0..1474 chars | missing pred 0.0%..24.3%
+      arx_0314                           0.834 | trace  860 | missing 0.0%
+      iask_pro                           0.817 | trace 1303 | missing 0.9%
+      arx_3                              0.790 | trace 1072 | missing 0.0%
+      claude-3-5-sonnet-20241022         0.779 | trace  820 | missing 0.0%
+      claude-3.5-sonnet                  0.771 | trace  943 | missing 0.0%
+      gpt-4o-2024-08-06                  0.750 | trace 1474 | missing 0.5%
+  0-shot (declared)    n= 3 | accuracy 0.549..0.733 | mean trace    0..   0 chars | missing pred 0.0%..0.0%
+      sonnet-3.5_0shots_09_34_29         0.733 | trace    0 | missing 0.0%
+      flash_0shots_00_35_03              0.594 | trace    0 | missing 0.0%
+      sonnet_0shots_12_01_18             0.549 | trace    0 | missing 0.0%
+  2-shot (declared)    n= 1 | accuracy 0.693..0.693 | mean trace    0..   0 chars | missing pred 0.0%..0.0%
+      opus_2shots_00_37_14               0.693 | trace    0 | missing 0.0%
+
+=== (2) WITHIN-FAMILY spread (version and configuration are partly confounded in these names) ===
+  arx            spread 0.044 | arx_0314 0.834, arx_3 0.790
+  claudesonnet   spread 0.009 | claude-3-5-sonnet-20241022 0.779, claude-3.5-sonnet 0.771
+  geminipro      spread 0.215 | gemini-3.1-pro_5-shots 0.913, gemini-1.5-pro-002 0.698
+  gpto           spread 0.026 | gpt-4o-2024-08-06 0.750, gpt4o(2024-05-13) 0.724
+  llamabhf       spread 0.180 | Llama-2-70b-hf 0.358, Llama-2-13b-hf 0.235, Llama-2-7b-hf 0.178
+  metallamab     spread 0.192 | Meta-Llama-3_1-70B 0.521, Meta-Llama-3-70B 0.512, Meta-Llama-3_1-8B 0.371, Meta-Llama-3-8B 0.329
+  metallamabinst spread 0.225 | Meta-Llama-3_1-70B-Instruct 0.630, Meta-Llama-3_1-8B-Instruct 0.442, Meta-Llama-3-8B-Instruct 0.405
+  mistralbinstru spread 0.047 | Mistral-7B-Instruct-v0.2 0.289, Mistral-7B-Instruct-v0.1 0.242
+  qwenbchat      spread 0.222 | Qwen1.5-72B-Chat 0.474, Qwen1.5-14B-Chat 0.355, Qwen1.5-7B-Chat 0.252
+  sonnet         spread 0.184 | sonnet-3.5_0shots_09_34_29 0.733, sonnet_0shots_12_01_18 0.549
+  yib            spread 0.165 | Yi-34B 0.415, Yi-6B 0.250
+
+=== (3) CONTROLLED paired estimate: the SAME model, SAME questions, two prompts (REGEN) ===
+  n=3430 paired questions (REGEN complete: 3434 of 3,445 answered)
+  answer-only prompt 0.860 | chain-of-thought prompt 0.850 | paired difference -0.010 +- 0.004
+  flips: answer-only right and CoT wrong 105 | CoT right and answer-only wrong 71
+
+=== (4) IMPACT: frontier gaps against the controlled prompt effect ===
+  gemini-3.1-pro_5-shots         over arx_0314                 gap 0.079  <- safe
+  arx_0314                       over iask_pro                 gap 0.017  <- comparable to the prompt effect: marginal
+  iask_pro                       over gpt-4o-2024-08-06        gap 0.067  <- safe
+
+  controlled prompt effect used as the yardstick: 0.010
+  NOTE: gemini-3.1-pro is the only one of these four whose name declares a shot count (5-shot).

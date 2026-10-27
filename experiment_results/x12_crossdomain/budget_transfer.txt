@@ -1,0 +1,34 @@
+=== BUDGET-TRANSFER (corrected 2026-09-15): does tau(A) = exp(-3.2326 + 3.3133*A) survive a change of roster? ===
+  x12 cache 9142 verdicts | x20 cache 12394 verdicts on 124 pairs, of which 0 involve two originals
+  new models: Mixtral-8x7B-Instruct-v0.1, Qwen1.5-110B, Qwen1.5-14B-Chat, arx_3, claude-3-5-haiku-20241022, claude-3-5-sonnet-20241022, gemma-7b, gpt-4o-mini
+  wrong counts are shown as all(McNemar-established) on the anchor's judged questions.
+
+=== A. THE SPARSE BOARD OF 2026-09-14 (x20 cache alone; the originals never compared directly) ===
+  prov        edges  rawcall    wrong   budcall    wrong  nominal   ratio
+  INTERNAL      374      293     0(0)       252     0(0)     0.32    0.0x | established only: 236 called, 0 wrong, 0.26 nom = 0.0x
+  CROSS        1265      953    23(9)       825     9(2)     1.30    6.9x | established only: 795 called, 2 wrong, 1.11 nom = 1.8x
+  SHARED        895      685    10(8)       611     0(0)     1.03    0.0x | established only: 598 called, 0 wrong, 0.96 nom = 0.0x
+  ALL          2534     1931    33(17)      1688     9(2)     2.65    3.4x | established only: 1629 called, 2 wrong, 2.32 nom = 0.9x
+  READ: on this board SHARED edges are inferred through the new models only; the strata do not mean
+  fitted / half-fitted / unfitted. Shown so the retracted 6.9x and the retraction's 1.7x have a home.
+
+=== B. THE MERGED BOARD OF RECORD (x12 + x20 = 21536 verdicts), cold parameters, NEW-verdict pairs only ===
+  prov        edges  rawcall    wrong   budcall    wrong  nominal   ratio
+  INTERNAL      377      295     1(0)       253     1(0)     0.38    2.6x | established only: 238 called, 0 wrong, 0.29 nom = 0.0x
+  CROSS        1270     1015    28(9)       851     9(2)     1.21    7.4x | established only: 815 called, 2 wrong, 0.93 nom = 2.1x
+  NEW (both)   1647     1310    29(9)      1104    10(2)     1.59    6.3x | established only: 1053 called, 2 wrong, 1.23 nom = 1.6x
+  SHARED*       891      769    13(8)       679     3(2)     1.10    2.7x | established only: 661 called, 2 wrong, 0.96 nom = 2.1x
+  SHARED* on the merged board IS the x12 fitting data plus indirect constraints - in-sample, sanity only.
+
+  (1) PRIMARY on the 1647 NEW-verdict edges: called 1104 | wrong 10, established 2 | nominal 1.59
+  -> UNDETERMINED: with a nominal of 1.59 expected wrong calls, 2 established against it cannot be
+     told from calibrated. The registration pre-committed exactly this reading: transfer is
+     UNTESTED, not demonstrated, and the parameter is published as roster-specific.
+  (2) UTILITY on the merged board: 70.3% of edges still called (bar 60%) -> PASS
+  (3) b1 refit on NEW-verdict edges: all labels +2.0821 | established labels +1.9918 | x12 +3.3133, CI [1.72, 7.87]
+      a refit on a stratum with few wrong calls is weakly identified; report, do not adjudicate on it.
+  (4) raw certificate on NEW-verdict edges: 1310 called, 29 wrong (9 established) = 2.21% (0.69% established)
+      budget: 1104 called, 10 wrong (2 est), 187 correct surrendered
+      gate A < 0.70: 1119 called, 12 wrong (4 est), 174 correct surrendered
+      gate A < 0.80: 1254 called, 22 wrong (5 est), 49 correct surrendered
+      gate A < 0.85: 1300 called, 27 wrong (8 est), 8 correct surrendered

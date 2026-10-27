@@ -1,0 +1,240 @@
+{
+  "id": "TIE-MECHANICS",
+  "title": "TIE-MECHANICS: is the canary's 'every retest disagreement sits at the tie boundary, and no decisive match reverses' a property of the judge, or the arithmetic that independent per-call vote changes force through the dual-order TIE-on-flip rule? (zero calls; a CONSISTENCY CHECK on the two CANARY-BASELINE caches)",
+  "question": "Given T = 59 changed order votes of 600 between the canary's two passes, is n2 (matches whose BOTH order votes changed) consistent with the exact conditional i.i.d. null (E0 2.856, SD0 1.52)? The record's own counts (26 + 23 = 49 matches with a change; 59 changed votes) imply n1 = 39 and n2 = 10, not the relayed 49 / 0.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "3c2fcab (the registration commit; it adds this record and the programme section, and precedes all code: no script exists for this test at 3c2fcab)",
+    "program_lines": "docs/judge_v2_program.md L12911-L13030 (heading at L12911)",
+    "program_lines_as_of": "3c2fcab (the registration commit); spans re-verified by sed at 88a95d8; resolve by the quoted heading, not by the line number",
+    "heading": "## Registered 2026-09-23 (before any code or call) — TIE-MECHANICS: is the canary's \"every retest disagreement sits at the tie boundary, and no decisive match reverses\" a property of the judge, or the arithmetic that independent per-call vote changes force through the dual-order TIE-on-flip rule? (zero calls; a CONSISTENCY CHECK on the two CANARY-BASELINE caches)",
+    "date": "2026-09-23"
+  },
+  "script": {
+    "path": "tools/analysis/tie_mechanics.py (MERGED on main at 8cd0f0e, from 5579eb7)",
+    "sha16": "blob:7f88d2ac581679aea33a2a25dc088883785fca86 / sha256-lf16:d6a1a0409a0fc06e",
+    "commit": "8cd0f0e"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_vote_frame_family_rr2.md",
+    "commit": "776a2dd",
+    "verdict": "READY",
+    "script": "tools/analysis/tie_mechanics.py at 5579eb7, merged to main 8cd0f0e, blob:7f88d2ac581679aea33a2a25dc088883785fca86 / sha256-lf16:d6a1a0409a0fc06e",
+    "conditions": "none open (T-C1 and T-C2 discharged at bc2ea7b)",
+    "supersession_chain": "14edeb4 (d237e56) -> bc2ea7b (84ab7e3) -> 776a2dd (5579eb7; merged 8cd0f0e)"
+  },
+  "go": "n/a: ZERO judge calls, far below the 4,000-match rule; no plan amendment is owed. The author's standing authorisation of 2026-09-23 to schedule and start further tests without waiting for approval (relayed by the orchestrator) is recorded as the DECISION TO SCHEDULE. Operational gates: an instrument written against this registration, a committed adversarial-reviewer READY, a zero-call --dry-run that writes nothing, and a run outside any construction window (rule 7).",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/tie_mechanics_outcome.txt (blob:a2df609de26fd8b0117b7bfa8fa12b483f83dfb4 / sha256-lf:2b28ee178c4664777a0b46d4c0553f0313f79089273fced1cffc8e769259a370 (LF, of record) / sha256-crlf:1a8d802e1aeb986ed1af360039615b85e68bd8d71d710f8cbbd0cc64f073d1c6 (the CRLF working tree, as the operator relayed it))",
+    "outcome_commit": "eb6fc9c",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (canary set 50af669ac6997f9f)",
+    "date": "2026-09-23",
+    "script": "tools/analysis/tie_mechanics.py at 8cd0f0e, blob:7f88d2ac581679aea33a2a25dc088883785fca86 / sha256-lf16:d6a1a0409a0fc06e"
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-23_tie_mechanics_post.md",
+    "commit": "64bdecb",
+    "verdict": "numbers CONFIRMED to the digit; C1 FAILED stands as registered; the reading PARTLY (D-1 HIGH); falsifier scope narrowed (D-2); no blocker"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "n2 = matches whose BOTH order votes changed between passes, against the EXACT CONDITIONAL NULL given T (uniform T-subsets of the 600 cells; 10^6 draws, seed 42). At T = 59 the two-sided alpha-0.05 rejection region is n2 >= 7 (P0 0.0146); NO lower region exists (P0(n2 = 0) = 0.042). HELD (i.i.d. per-call model consistent; the canary pattern is forced arithmetic) iff n2 outside the region; FAILED (within-match dependence) iff inside. The count is the statistic; no interval clause. SCOREABLE (MDE about 6.4 double changes above the null mean 2.86 at DEFF 1.09; prediction 10).",
+      "result": "FAILED",
+      "value": "n2 = 10 against E0 2.856, SD0 1.528, P0(n2 >= 10) = 0.0001 (region >= 7); [QUALIFIED 2026-09-23 by the registrar on the post-run review 64bdecb (D-1 HIGH)]: C1 rejects independent change at ONE COMMON per-call rate. It shows MATCH-LEVEL CO-CHANGE: change propensity is a match-level quantity. It does NOT separate dependence of the two calls GIVEN the match from HETEROGENEITY of change rates across matches: with 2 cells per match and one retest the two are observationally equivalent. Stratified by the pass-1 TIE / decisive state (per-cell change 0.307 vs 0.029), n2 = 10 lies OUTSIDE the stratified region (p 0.103); likewise by pass-1 configuration (p 0.145) and by pass-2 state (p 0.057); a two-class mixture reproduces the 251 / 39 / 10 distribution exactly. The outcome file's reading 'within-match dependence ... a property of the judge on these matches' claims more than C1 licenses and is superseded by this bracket. The 3-event excess in the pass-1-decisive stratum ((A,A) -> (TIE,TIE), P0 0.0003) is UNREGISTERED and DESCRIPTIVE: a lead, never a finding; so are the position-preference co-swaps (4 of 6).",
+      "denominator": "300 matches = 600 (match, order) cells on 279 questions (Kish 1.14)"
+    },
+    {
+      "id": "C2",
+      "text": "THE REVERSAL CELL, DESCRIPTIVE-ONLY: expected direct reversals among pass-1-decisive matches under i.i.d. change at the measured per-order transition matrix, with exp(-E) for the observed 0; the relayed unconditional 2.9 (exp(-2.9) = 0.055) beside as an upper bound. No expectation <= 2.9 can make 0 significant.",
+      "result": "DELIVERED",
+      "value": "DESCRIPTIVE: E_rev 0.2164 pooled (0.2018 per order; contestant-frame pooled 0.2518, D-6)",
+      "denominator": "the 215 matches decisive in both passes / the pass-1-decisive matches"
+    },
+    {
+      "id": "C3",
+      "text": "DESCRIPTIVE: the expected TIE <-> decisive share of verdict changes under the i.i.d. model vs the observed 26 of 26.",
+      "result": "DELIVERED",
+      "value": "DESCRIPTIVE: expected TIE <-> decisive share 0.9942 against 26 / 26; expected verdict changes 37.38",
+      "denominator": "26 verdict changes"
+    },
+    {
+      "id": "C4",
+      "text": "DESCRIPTIVE SENSITIVITY: C1 on one match per question (279 matches) with its own conditional null.",
+      "result": "DELIVERED",
+      "value": "DESCRIPTIVE: 279 matches, n2 10, T 57 / 558, E0 2.865, p 0.0001",
+      "denominator": "279 matches"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "n2 = 10, interval [8, 12] (implied by the record's counts)",
+      "result": "HELD",
+      "value": "n2 10 in [8, 12]",
+      "denominator": "300 matches"
+    },
+    {
+      "id": "P2",
+      "text": "n1 = 39 [35, 43]",
+      "result": "HELD",
+      "value": "n1 39 in [35, 43]",
+      "denominator": "300 matches"
+    },
+    {
+      "id": "P3",
+      "text": "C1 FAILED (exact conditional p <= 0.001)",
+      "result": "HELD",
+      "value": "C1 FAILED, exact p 1.05e-4",
+      "denominator": "300 matches"
+    },
+    {
+      "id": "P4",
+      "text": "E_rev in [0.02, 1.0], point 0.25, so P(0 | E_rev) >= 0.37",
+      "result": "HELD",
+      "value": "E_rev 0.20-0.25 in every frame; P(0) >= 0.777",
+      "denominator": "pass-1-decisive matches"
+    },
+    {
+      "id": "P5",
+      "text": "C3: expected TIE <-> decisive share >= 0.90 under i.i.d.",
+      "result": "HELD",
+      "value": "0.9934-0.9946 >= 0.90",
+      "denominator": "26 verdict changes"
+    }
+  ],
+  "falsifier": {
+    "text": "C1 FAILED overturns the reading (a relayed lead, never a recorded result) that the canary's tie-boundary pattern is forced arithmetic of independent per-call flips, and forbids deriving any match-level floor from a per-call rate (0.098, or DECOMP's per-call 0.057) by independence arithmetic anywhere in the record; TRACE-TRUNCATION's 're-price after TIE-MECHANICS' then resolves to NO RE-PRICE FROM THIS TEST. C1 HELD licenses that derivation on this set and TRACE-TRUNCATION's floor may be restated from p and re-priced or dropped at zero cost. EITHER WAY NO RECORDED NUMBER MOVES: canary floor 0.087 [0.056, 0.122], NO ALARM, 26 / 215 / 0, 0.098, DECOMP 5.7%, BFCL-FLIP-RESEED's anchor 0.913. [OUTCOME 2026-09-23: FIRED; scope NARROWED (D-2) to deriving a match-level floor from a SINGLE POOLED per-call rate (0.098, 0.057) by independence arithmetic; state-conditional rates not shown invalid; TRACE-TRUNCATION does not re-price.]",
+    "fired": true
+  },
+  "numbers_of_record": {
+    "premise_correction": "49 = 26 + 23 matches with AT LEAST one changed order vote; with 59 changed votes the record implies n1 = 39 and n2 = 10; '0 reversals' is a subset of n2; given T, n1 = T - 2 x n2 (one statistic). The relayed 53.2 (SD 6.6) and 2.90 are the unconditional expectations at p = 59/600",
+    "null": "E0 2.856, SD0 1.528, P0(n2 >= 10) = 0.0001; region >= 7; no lower region",
+    "n2": "10 (n1 39; 251 / 39 / 10); T 59 / 600",
+    "stratified": "pass-1 TIE / decisive (per-cell change 0.307 vs 0.029): E0 7.12, p 0.103 (OUTSIDE); pass-1 configuration p 0.145; pass-2 state p 0.057; two-class mixture reproduces 251 / 39 / 10",
+    "support": "MDE 6.22-6.70 by DEFF source, distance 7.14, break-even DEFF 1.319; DEFF 1.09 measured on the verdict-change indicator (the deciding indicator's is about 0.97-1.00; D-3); Kish 1.160 (D-5); n_eff 275.2 (D-7)",
+    "independence_arithmetic": "pooled-rate prediction ~37 verdict changes vs 26 observed; state-conditional 25.2 (in-sample)",
+    "outcome_pins": "blob:a2df609de26fd8b0117b7bfa8fa12b483f83dfb4 / sha256-lf:2b28ee178c4664777a0b46d4c0553f0313f79089273fced1cffc8e769259a370 (LF, of record) / sha256-crlf:1a8d802e1aeb986ed1af360039615b85e68bd8d71d710f8cbbd0cc64f073d1c6 (the CRLF working tree, as the operator relayed it)"
+  },
+  "sentence_of_record": "TIE-MECHANICS (zero calls; caches pass 1 5142795b / pass 2 9e2f4b7c, re-counted by the reviewer to the digit): of 300 canary matches, n2 = 10 changed BOTH order votes between passes, given T = 59 changed cells of 600. The exact conditional null under independent change at ONE common per-call rate gives E0 2.856, SD0 1.528, P0(n2 >= 10) = 0.0001 (region n2 >= 7), so C1 FAILED as registered; P1-P5 HELD; SCOREABLE (MDE 6.22-6.70 by DEFF source, distance 7.14). C1 shows that change propensity is a match-level quantity (the two orders co-change); it does not separate within-match dependence from heterogeneity of change rates across matches: stratified by pass-1 TIE/decisive state (per-cell change 0.307 vs 0.029), n2 = 10 lies outside the stratified region (p 0.10). Consequence: no match-level floor may be derived from a single pooled per-call rate (0.098, 0.057) by independence arithmetic (it predicts 37 verdict changes against the observed 26); TRACE-TRUNCATION does not re-price from this test.",
+  "chips": [
+    "C1 FAILED (AS REGISTERED)",
+    "QUALIFIED: CO-CHANGE, NOT SEPARABLE FROM HETEROGENEITY",
+    "FALSIFIER FIRED (NARROWED TO A SINGLE POOLED RATE)",
+    "P1-P5 HELD",
+    "NO RE-PRICE OF TRACE-TRUNCATION"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-23",
+      "by": "the registrar (ledger v134 commit; insertion only, zero calls)",
+      "text": "registration.commit resolved from PENDING to 3c2fcab and ledger.version from PENDING to v134; nothing else in this record moves."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the coordinator's relay of the build at e4b5911, before any real-data run (insertion only, zero calls)",
+      "text": "BUILT (e4b5911). Programme L13691-L13746, ruling (1): schema identity asserted on every column except exactly {provider1, provider2} (canary pass 1 predates them); any other difference refuses."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar (insertion only, zero calls)",
+      "text": "READY review 14edeb4: READY-WITH-CONDITIONS (conditions T-C1, T-C2). Script now at d237e56, tools/analysis/tie_mechanics.py LF b3df664f904849ab."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the re-review bc2ea7b (insertion only, zero calls)",
+      "text": "READY of record bc2ea7b: READY for tools/analysis/tie_mechanics.py at 84ab7e3 (blob:7f88d2ac581679aea33a2a25dc088883785fca86 / sha256-lf16:d6a1a0409a0fc06e). Conditions: 14edeb4's T-C1 and T-C2 discharged; the 84ab7e3 diff touches only the injectable guard, the [SCHEMA] message and the selftest. Rulings (programme L14201-L14246): D2 H3 extended to the call-site argument (option (a) for the instrument; option (b), the reviewer's data-flow reading, the record for the three writers of record); D4 duplicate-key LONG tables UNCERTIFIABLE; D7 pin rule kept, P4 printed by reason, rubric_contrast UNCERTIFIABLE by pin timing not frame. The builder is fixing D1, D3, D5 (new pins then need the READY's re-check)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar (insertion only, zero calls)",
+      "text": "Build efbf376 (D2(a) call-site check, D3, D4, D5, D7 implemented; D1 not, pending the H3(b) amendment): tools/analysis/tie_mechanics.py blob:7f88d2ac581679aea33a2a25dc088883785fca86 / sha256-lf16:d6a1a0409a0fc06e (UNCHANGED since 84ab7e3), verified by the registrar. H3(b) AMENDED (programme L14248-L14278): the 'AST-equivalent' arm is withdrawn; a combiner is verified only if AST-identical to rejudge_grok.combine_orders at the pinned blob, or a direct call to it; stated limits: a correct differently written combiner (C6), an unrelated combine_text helper, an aliased import 'co' all read UNCERTIFIABLE (false fails, never false passes)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the delta re-review 776a2dd and the merge 8cd0f0e (insertion only, zero calls)",
+      "text": "READY of record 776a2dd (READY); merged 8cd0f0e (blob:7f88d2ac581679aea33a2a25dc088883785fca86 / sha256-lf16:d6a1a0409a0fc06e, verified by the registrar). Conditions: none open (T-C1 and T-C2 discharged at bc2ea7b). Rulings (programme L14383-L14413): D-A clarified within 94731da; D-B the call-site check extended to order 1; D-C noted; x2 a stated limit. State: RUNNING (the run-operator)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the post-run review 64bdecb (insertion only, zero calls)",
+      "text": "OUTCOME recorded (programme L14415-L14453): C1 FAILED as registered, QUALIFIED (D-1): match-level co-change, not separable from heterogeneity; falsifier FIRED, narrowed (D-2); P1-P5 HELD; SCOREABLE. D-3 to D-10 recorded; D-5 bracketed at the registration (Kish 1.160); D-10 recorded as a lesson: a dependence test needs a heterogeneity fixture. Outcome pins with kinds (D-9)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (V-C4 delta check ae88d3a, relayed by the coordinator)",
+      "text": "READY (ae88d3a): tie_mechanics.py byte-identical to its running pin blob:7f88d2ac581679aea33a2a25dc088883785fca86 / sha256-lf16:d6a1a0409a0fc06e (unchanged 5579eb7 -> f6acf1b). No condition; the recorded run and its outcome stand. docs/judge_v2_program.md L14529-L14549."
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (VFC-FIXES-2 merge record; zero calls; insertion only)",
+      "text": "VFC-FIXES-2 MERGED at f76a93b: tie_mechanics.py unchanged (7f88d2ac / d6a1a0409a0fc06e); its imported vote_frame_cert.py is now 1a3d0bb5 / b45b75db7d98103e. The outcome of record (a2df609d) STANDS; its re-derivation (expected 0 differing lines) is VFC-FIXES-2 (iii), NOT SHOWN; no reuse until (ii)/(iii). docs/judge_v2_program.md L20127-L20162 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — VFC-FIXES-2 PART (i) READY (f387d58, build 930ccc7, after NOT READY a3da968); ...\"), _as_of the commit that writes it, parent f76a93b, re-grepped."
+    },
+    {
+      "date": "2026-09-26",
+      "by": "registrar (VFC-FIXES-2 (ii)/(iii); zero calls; insertion only)",
+      "text": "(iii) PASS for tie_mechanics.py (blob:7f88d2ac / sha256-lf16:d6a1a0409a0fc06e): score-tm rc 0, exactly L14 moved (4a18124878801487 -> d6a1a0409a0fc06e), the [POOL] line p2dca21ab5f4ef3ae unmoved, [FRAME] REFUSED 0; the outcome of record (a2df609d) STANDS (docs/reviews/POSTRUN_vfc_ii_iii.md (ef045a1; blob:f472aba63fecff11de867a8e154a20ea0ecd10d2), VALID). REUSE of vote_frame_cert.py blob:1a3d0bb5 / sha256-lf16:b45b75db7d98103e by this test is LICENSED on the pinned closure (any edit to the 15-module closure voids it); certificate c731836 not re-issued; VFC_PIN_LF 72ceddfe stands; V-C5 in force. docs/judge_v2_program.md L20558-L20593 (section \"## VFC-FIXES-2 (ii)/(iii) (2026-09-26, 0 calls) — VALID (post-run review ef045a1): (ii) PASS, (iii) PASS; P3 MET ...\"; _as_of the commit that writes it, parent c400c30, re-grepped). Ledger v297 (a bracket in the observed cell; no chip change)."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "That the two calls of a match are dependent GIVEN the match: this is not separable from match-level rate heterogeneity at 2 cells x 1 retest.",
+    "A mechanism: position preference, answer similarity or content. The 4-of-6 position-preference co-swaps among the pass-1-TIE double changes are a lead, not a result.",
+    "That '0 reversals' is a judge property: structurally undetectable (no lower region; C2 P(0) 0.78-0.82).",
+    "That state-conditional independence arithmetic is invalid (it fits in-sample: 25.2 against 26).",
+    "The within-decisive-stratum excess (3 against 0.17) as a finding: 3 events, unregistered.",
+    "Anything about another judge, corpus or set, or any fidelity or accuracy number."
+  ],
+  "ledger": {
+    "row_id": "TIE-MECHANICS",
+    "version": "v297 (2026-09-26: bracket in the observed cell: VFC-FIXES-2 (iii) PASS, reuse licensed; no chip change) | v289 (bracket in the observed cell: VFC-FIXES-2 part (i) READY and merged at f76a93b; reuse gated; no chip change); v134 (2026-09-23; a PLAN-chip registration row in section 7, newest first, inserted before GUARD-22-RENAME-PROOF; audit OK, 232 rows). The adjudicated observed cell is written with the outcome, not now. [UPDATED 2026-09-23 at ledger v162: adjudicated - PLAN chips replaced by outcome chips and an outcome bracket.]; [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "CANARY-BASELINE",
+    "DECOMP"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing and reopens nothing; ORDER-1 / SELECTIVE-ORDER (closed) are not touched - it reads dual-order caches as recorded and proposes no single or selective order; TEMP-0 not touched."
+  },
+  "queue_items": [
+    "TIE-MECHANICS"
+  ],
+  "support": {
+    "deciding_denominator": "300 matches = 600 (match, order) cells on 279 questions; Kish mean cluster size 342 / 300 = 1.14",
+    "deff_and_source": "1.09 MEASURED on this cache pair (CANARY-BASELINE pass-2 question-clustered floor)",
+    "n_eff": "300 / 1.09 = 275",
+    "se_arithmetic": "SD0(n2 | T = 59) = 1.52 (exact conditional null by simulation); x sqrt(1.09) = 1.59",
+    "mde_80": "alternative mean about 9.1 (Poisson P(X >= 7 | 9.1) = 0.802) = +6.2 over 2.86; about +6.4 with DEFF; a deficit has no MDE",
+    "verdict_lines": "C1 SCOREABLE (10 - 2.86 = 7.1 > 6.4; margin about 0.7 of a match); C2 DESCRIPTIVE-ONLY; C3, C4 DESCRIPTIVE-ONLY",
+    "structural": "n fixed at 300; only an EXCESS of double changes is detectable at T = 59; the deficit reading is unreachable at this n and reachable only with further retest passes (not bought)"
+  },
+  "sources": [
+    "docs/judge_v2_program.md, this registration section",
+    "docs/agents/results/CANARY-BASELINE.json numbers_of_record tie_boundary, per_order_raw_vote_disagreement, floor (DEFF 1.09), set",
+    "experiment_results/x12_crossdomain/canary_baseline_outcome.txt L23-L26",
+    "the registrar's combinatorics of 2026-09-23 (200,000 random 59-subsets of 600 cells; exact E0 = 300 x 59 x 58 / (600 x 599) = 2.856), stated in the section",
+    "docs/agents/queue.json items TIE-MECHANICS and TRACE-TRUNCATION",
+    "docs/reviews/READY_vote_frame_family_rr3.md (ae88d3a); docs/judge_v2_program.md L14529-L14549",
+    "docs/judge_v2_program.md L20127-L20162 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — VFC-FIXES-2 PART (i) READY (f387d58, build 930ccc7, after NOT READY a3da968); ...\"), _as_of the commit that writes it, parent f76a93b, re-grepped",
+    "docs/judge_v2_program.md L20558-L20593 (section \"## VFC-FIXES-2 (ii)/(iii) (2026-09-26, 0 calls) — VALID (post-run review ef045a1): (ii) PASS, (iii) PASS; P3 MET ...\"; _as_of the commit that writes it, parent c400c30, re-grepped)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "In a repeated judge run (300 matches, each judged in both answer orders, run twice), it counts how often both order votes of a match changed together. It compares this with what independent random vote changes would predict. No calls.",
+    "why": "Checks whether \"retest changes only happen at ties\" is just arithmetic from independent per-call noise, which would justify computing match-level noise floors from a single per-call rate.",
+    "information": "If independence held, noise floors could be derived cheaply. Result: it failed. Both votes changed together 10 times against about 3 expected, so changes cluster within matches. No match-level noise floor may be derived from one pooled per-call rate. It cannot tell real within-match dependence apart from some matches simply being shakier. No recorded number moves. Older judged question family, later ruled 'history, not evidence'.",
+    "written": "2026-10-07"
+  }
+}

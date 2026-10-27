@@ -1,0 +1,62 @@
+pool p2dca21ab5f4ef3ae (pool_guard.assert_pool_of_record)
+[THREADS] OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+[SCRIPT] tools/analysis/embedder_cross_flat.py blob:87811d3d / sha256-lf16:181581e3f454367a / sha256-crlf16:76c9a5311029462e
+[PIN] tools/analysis/embedder_arms.py blob:0546800f / sha256-lf16:4bfd77986e4bfb92 / sha256-crlf16:4dfc8dd59490dd15 (verified on import)
+[PIN] tools/analysis/flat_mix_mmlu.py blob:555ae3ac / sha256-lf16:b80cec50c2eef49d / sha256-crlf16:57413483afaf7aa1 (verified on import)
+EMBEDDER-CROSS-FLAT E0b part cpu (RP15a); spaces qwen3_raw, nomic_raw, tfidf; k [14, 82]; seeds [0, 1, 2, 3, 4]; slice 256; zero judge calls
+  [EMB-ARMS] registrar pin: arm nomic_raw sha256 53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95 == embedder_cross_arm_pins.json
+PINS: every non-qwen3 arm's copy equals the registrar's pin (checked before any read of the read set or the DB of record)
+M1' (D2; the orchestrator's ruling, bracketed by the registrar): purity on the 3,445 held-out with each cell's majority from the 8,125 FIT texts; FLAT-MIX-MMLU's M1 (majority from its 8,324 train texts) is NOT computed; the read set is not extended
+READ SET: fit 8125, held-out 3445, keyed 10925, read set 11687 distinct texts (registered 8,125 / 3,445 / 10,925 / 11,687 after the data-steward's 3,504 correction)
+HYGIENE: held-out texts in the fit 0; held-out stem_keys in the fit 0 (both must be 0: no held-out question enters any fit)
+  [EMB-ARMS] arm qwen3_raw (qwen3-embedding:latest, REFERENCE): 11687 of 11687 needed texts have a vector; raw dims {4096: 11687}; native 4096
+ARM qwen3_raw (qwen3-embedding:latest, REFERENCE): file embeddings_cache.db sha256 52229e1ebfdda76ebaed3e461eeee80ae654dfb35ac480eb9cb9868bb0269769; 11687 vectors, native dim [4096]; sliced to 256 and renormalised; model digest at the --go n/a (the DB of record)
+  [EMB-ARMS] registrar pin: arm nomic_raw sha256 53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95 == embedder_cross_arm_pins.json
+  [EMB-ARMS] reader: arm nomic_raw reads the --target-dir copy Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\embedder_cross\embeddings_cache_nomic-embed-text_latest.db sha256 53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95 (== provenance == the registrar's pin; source Z:\FAC\TUBerlin\THESIS\TaxoArena\embeddings_cache_nomic-embed-text_latest.db sha256 53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95)
+  [EMB-ARMS] arm nomic_raw (nomic-embed-text:latest, PRIMARY): 11687 of 11687 needed texts have a vector; raw dims {768: 11687}; native 768
+ARM nomic_raw (nomic-embed-text:latest, PRIMARY): file embeddings_cache_nomic-embed-text_latest.db sha256 53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95; 11687 vectors, native dim [768]; sliced to 256 and renormalised; model digest at the --go 0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f
+ARM tfidf (TF-IDF -> SVD-256, fitted on the 8125 fit texts only): vocabulary 11699; explained variance 0.2867
+CONFOUNDS (per arm; printed, not scored): prefix policy, layer_norm, context truncation (D5 proxy ceil(chars/4) > context), quantisation (registration: only qwen3 is Q4), Ollama tag digest now (D6)
+  qwen3_raw  prefix 'none'; layer_norm False; texts over context 0 of 11687 (context 32768 tokens, proxy); Q4; digest 64b933495768fbd3b87c20583d379728a07471e0c66733a9df87cd1901b3c44b
+  nomic_raw  prefix 'none'; layer_norm False; texts over context 0 of 11687 (context 2048 tokens, proxy); not Q4; digest 0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f
+  tfidf: no model (lexical floor)
+FITTED qwen3_raw: 20 partitions on 8125 fit texts (45.7 s); M2 n 10925 of 10925 keyed
+FITTED nomic_raw: 20 partitions on 8125 fit texts (45.0 s); M2 n 10925 of 10925 keyed
+FITTED tfidf: 20 partitions on 8125 fit texts (36.2 s); M2 n 10925 of 10925 keyed
+
+SUPPORT: denominators M1' 3445 held-out (3445 stem_key twin groups; Kish m-bar 1.0000 = DEFF measured; n_eff 3445), M2 10925 keyed; registered SE M1 0.00663 / M2 0.357e-3, MDE80 M1 0.0186 / M2 1.00e-3 (FLAT's, NOMINAL for M1'); wrong(established) and tie conventions N/A (no judge)
+(f) VERDICT LINE (registered): E0b nomic-vs-qwen3 at k 14 on M1 DESCRIPTIVE-ONLY (P1 -0.020 lies inside max(0.0186, spread) on the record's spread 0.0305); TF-IDF floor SCOREABLE (P2 -0.08 beyond 0.0305); every cross-arm contrast DESCRIPTIVE-ONLY. [registered, verbatim; its premise 0.0305 is FLAT-MIX-MMLU's spread, NOMINAL here: re-derived below with this instrument's spread (C-E0B-2)]
+
+ARMS (V seed 0 / mean over seeds 0-4; M1' purity on 3445, M2 F6 x1e-3 on 10925)
+  qwen3_raw  k 14  V0 M1' 0.6032 M2 +10.353 | V mean M1' 0.6016 M2 +10.881 | K0 M1' 0.5771 M2 +10.091
+  qwen3_raw  k 82  V0 M1' 0.7698 M2 +14.318 | V mean M1' 0.7630 M2 +13.962 | K0 M1' 0.7707 M2 +13.723
+  nomic_raw  k 14  V0 M1' 0.5852 M2 +10.703 | V mean M1' 0.5695 M2 +10.651 | K0 M1' 0.5808 M2 +10.015
+  nomic_raw  k 82  V0 M1' 0.7257 M2 +12.216 | V mean M1' 0.7131 M2 +12.490 | K0 M1' 0.7173 M2 +12.019
+  tfidf      k 14  V0 M1' 0.3483 M2 +7.567 | V mean M1' 0.3496 M2 +7.224 | K0 M1' 0.3837 M2 +7.340
+  tfidf      k 82  V0 M1' 0.4752 M2 +9.345 | V mean M1' 0.4655 M2 +9.353 | K0 M1' 0.5016 M2 +10.096
+
+CRITERION WORSE_S,k (registered): M(V_S) - M(V_qwen3) < -spread_qwen3(M) AND the paired 95% CI's upper end < 0; V = seed 0 (D1); M = M1' (D2) or M2; record spread M1 0.0305 NOMINAL, never used; each line carries its SUPPORT tag against the MEASURED bar max(MDE, spread_qwen3) and its realised SE / MDE80 (C-E0B-2, C-E0B-6)
+  WORSE nomic_raw k=14 M1': diff -0.0180, CI [-0.0293, -0.0064], spread_qwen3 +0.0316 -> not shown worse beyond max(MDE, spread) = 0.0316 [DESCRIPTIVE-ONLY (prior -0.0200 vs bar 0.0316 = max(registered MDE 0.0186, spread_qwen3 0.0316, realised MDE80 0.0164))] | realised SE 0.0058, MDE80 0.0164 | mean-over-seeds diff -0.0321, K0 diff +0.0038, spread_nomic_raw +0.0380 (descriptive)
+  WORSE nomic_raw k=14 M2: diff +0.350e-3, CI [-0.213e-3, +0.890e-3], spread_qwen3 +1.083e-3 -> not shown worse beyond max(MDE, spread) = 1.083e-3 [DESCRIPTIVE-ONLY (no registered prior)] | realised SE 0.281e-3, MDE80 0.788e-3 | mean-over-seeds diff -0.230e-3, K0 diff -0.077e-3, spread_nomic_raw +0.434e-3 (descriptive)
+  WORSE nomic_raw k=82 M1': diff -0.0441, CI [-0.0572, -0.0305], spread_qwen3 +0.0279 -> WORSE FIRES [DESCRIPTIVE-ONLY (no registered prior)] | realised SE 0.0068, MDE80 0.0191 | mean-over-seeds diff -0.0499, K0 diff -0.0534, spread_nomic_raw +0.0226 (descriptive)
+  WORSE nomic_raw k=82 M2: diff -2.102e-3, CI [-2.915e-3, -1.362e-3], spread_qwen3 +0.822e-3 -> WORSE FIRES [DESCRIPTIVE-ONLY (no registered prior)] | realised SE 0.396e-3, MDE80 1.109e-3 | mean-over-seeds diff -1.472e-3, K0 diff -1.704e-3, spread_nomic_raw +0.628e-3 (descriptive)
+  WORSE tfidf k=14 M1': diff -0.2549, CI [-0.2743, -0.2340], spread_qwen3 +0.0316 -> WORSE FIRES [SCOREABLE (prior -0.0800 vs bar 0.0316 = max(registered MDE 0.0186, spread_qwen3 0.0316, realised MDE80 0.0288))] | realised SE 0.0103, MDE80 0.0288 | mean-over-seeds diff -0.2521, K0 diff -0.1933, spread_tfidf +0.0392 (descriptive)
+  WORSE tfidf k=14 M2: diff -2.785e-3, CI [-3.536e-3, -1.961e-3], spread_qwen3 +1.083e-3 -> WORSE FIRES [DESCRIPTIVE-ONLY (no registered prior)] | realised SE 0.402e-3, MDE80 1.125e-3 | mean-over-seeds diff -3.657e-3, K0 diff -2.751e-3, spread_tfidf +1.027e-3 (descriptive)
+  WORSE tfidf k=82 M1': diff -0.2946, CI [-0.3135, -0.2752], spread_qwen3 +0.0279 -> WORSE FIRES [DESCRIPTIVE-ONLY (no registered prior)] | realised SE 0.0098, MDE80 0.0274 | mean-over-seeds diff -0.2975, K0 diff -0.2691, spread_tfidf +0.0247 (descriptive)
+  WORSE tfidf k=82 M2: diff -4.973e-3, CI [-5.914e-3, -4.008e-3], spread_qwen3 +0.822e-3 -> WORSE FIRES [DESCRIPTIVE-ONLY (no registered prior)] | realised SE 0.486e-3, MDE80 1.362e-3 | mean-over-seeds diff -4.609e-3, K0 diff -3.627e-3, spread_tfidf +0.847e-3 (descriptive)
+(f) RE-DERIVED with this instrument's spread (C-E0B-2): E0b nomic-vs-qwen3 at k 14 on M1' DESCRIPTIVE-ONLY (prior -0.0200 vs bar 0.0316 = max(registered MDE 0.0186, spread_qwen3 0.0316, realised MDE80 0.0164)); TF-IDF floor at k 14 on M1' SCOREABLE (prior -0.0800 vs bar 0.0316 = max(registered MDE 0.0186, spread_qwen3 0.0316, realised MDE80 0.0288)); every other WORSE line DESCRIPTIVE-ONLY (no registered prior)
+
+GEOMETRY (fit texts, 256-d; printed, NOT scored; EMB-03)
+  qwen3_raw  anisotropy 0.2702 (centred -0.0001); participation ratio 90.78
+  nomic_raw  anisotropy 0.4488 (centred -0.0001); participation ratio 86.44; vs qwen3: mutual kNN@10 0.3759, linear CKA 0.5857
+  tfidf      anisotropy 0.0914 (centred -0.0001); participation ratio 171.34; vs qwen3: mutual kNN@10 0.1999, linear CKA 0.3207
+
+PREDICTIONS (priors; scored HELD / FAILED, D7)
+P1 HELD: nomic_raw minus qwen3 at k 14, M1' = -0.0180 (prior -0.020, 80% [-0.050, +0.010]); WORSE fired: no (prior 0.40)
+P2 FAILED: tfidf minus qwen3 at k 14, M1' = -0.2549 (prior -0.080, 80% [-0.150, -0.030]); WORSE fired: yes (prior 0.85)
+P6 HELD: mutual kNN@10 qwen3-nomic_raw = 0.3759 (prior [0.25, 0.55], 0.70)
+P5 NOT SCORED in part cpu (F1 is read after E0b-EMBED)
+FALSIFIER F1 NOT SCORED: E0b-CPU alone reads the nomic family only (registration)
+
+E1 (RP09): out of scope of this script; P3 / P4 NOT SCORED here.
+[E0B] wrote Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\embedder_cross_flat\e0b_cpu_outcome.txt and Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\embedder_cross_flat\e0b_cpu_arms.csv (write-once)

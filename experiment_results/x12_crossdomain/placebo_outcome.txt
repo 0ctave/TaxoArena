@@ -1,0 +1,44 @@
+=== PLACEBO-ENTRY: gemini re-entered through the ARENA-13 protocol ===
+(2) ARM A, zero calls - does the disagreement filter inflate the theta scale?
+      all x12 matches      n= 9142 | theta spread (SD) 1.574 | range 4.308
+      disagreeing subset   n= 5276 | theta spread (SD) 1.785 | range 4.940
+      ratio of spreads 1.13 -> FILTERED EDGES ARE ON A WIDER SCALE: mixing them with unfiltered ones on one board inflates whoever is filtered
+      per model, distance from the board centre:
+        iask_pro                           all +2.157 | filtered +2.331 | +0.174
+        gemini-3.1-pro_5-shots             all +2.139 | filtered +2.464 | +0.325
+        arx_0314                           all +1.596 | filtered +1.961 | +0.365
+        gpt-4o-2024-08-06                  all +1.521 | filtered +1.528 | +0.007
+        deepseek-chat-v2_5                 all +0.593 | filtered +0.640 | +0.047
+        Meta-Llama-3_1-70B-Instruct        all -0.092 | filtered +0.082 | +0.174
+
+(1) ARM B, 599 dual-order matches judged
+      gemini win rate 0.589 | ties 0.120 | key-decidable accuracy 0.664 on 518 pairs (readout 3)
+      gemini theta, x12 edges vs ALL eleven opponents        +2.333
+      gemini theta, x12 edges vs THE SAME FOUR opponents     +2.389   <- the matched baseline
+      gemini theta, PROTOCOL edges (same four opponents)     +2.346
+      delta against the MATCHED baseline -0.043  95% CI [-0.196, +0.109]
+      (against the eleven-opponent baseline it would read +0.013 - a different quantity, and the
+       comparison the first version of this script made; boards centred on the other eleven)
+      POWER, stated because the registration did not: the CI half-width is 0.152 against a +0.045 bar,
+      so this arm could not have CONFIRMED the hypothesis even had it been true at the registered size.
+      Read it as uninformative about +0.045, not as evidence against it.
+
+  (1) PRIMARY, registered bar delta >= +0.045 with a CI excluding zero -> NOT CONFIRMED
+  RECONCILIATION of the two arms, which otherwise contradict each other inside this file: arm A
+      filters gemini's edges against ALL eleven opponents and reports +0.325; arm B replaces them
+      with edges against FOUR. Arm A also refits every other model on filtered evidence, so it
+      measures a global rescaling of the board, not a relative gain to the model being filtered.
+      The two are not the same quantity and arm B is the one that matches the ARENA-13 configuration.
+  AMENDMENT RULE fixed before the run: as written, 'gemini does not gain, so the residue belongs to the newcomer and trace style becomes
+      the leading candidate'. THAT READING IS NOT AVAILABLE and the rule is withdrawn rather than
+      applied: at a CI half-width of 0.152 against a 0.045 bar this arm could not have confirmed the
+      hypothesis, so a NOT CONFIRMED here is absence of evidence, not evidence of absence. Readout (4)
+      supersedes the question in any case - the residue the rule was written to attribute is itself
+      not distinguishable from zero. Both candidates stay open and unprioritised, and nothing about
+      trace style is claimed.
+
+  (4) FREE, unregistered - is the ARENA-13 residue distinguishable from zero at all?
+      the newcomer's dual-order theta gap to gemini +0.045 | bootstrap 95% CI [-0.068, +0.186] over 1800 matches
+      -> the gap INCLUDES zero. The newcomer and gemini are not separated by this arena at
+      this budget, so the +0.045 needs no mechanism: ARENA-13 (1) failed on a rank
+      ordering that the evidence never supported either way.

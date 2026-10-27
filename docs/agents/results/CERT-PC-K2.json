@@ -1,0 +1,146 @@
+{
+ "id": "CERT-PC-K2",
+ "title": "CERT-PC-K2: does the site-null certificate certify a declared 2-way source-family partition inside math, physics and economics at G12's depth-1 sizes (n 486, 441)? (zero calls; REGISTERED 2026-10-03)",
+ "question": "Is G12's 0 of 60 a k = 2 / within-category sensitivity limit?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "the commit that writes it (parent 2cb20cca)",
+  "program_lines": "docs/judge_v2_program.md L23901-L23913",
+  "program_lines_as_of": "the commit that writes them, parent 2cb20cca, re-grepped",
+  "date": "2026-10-03",
+  "heading": "## Registered 2026-10-03 (before any code or call) — CERT-PC-K2: does the site-null certificate certify a DECLARED 2-way partition inside a single MMLU-Pro cate ...",
+  "provenance": "docs/agents/plans/2026-10-03_15h_schedule.md (the orchestrator) under the autonomous-scheduling authorisation; criteria etc. the registrar's"
+ },
+ "script": {
+  "path": "TO BE BUILT",
+  "sha16": null,
+  "commit": null
+ },
+ "ready": {
+  "file": "docs/reviews/READY_cert_pc_k2.md",
+  "commit": "e5349928"
+ },
+ "go": "autonomous-scheduling authorisation (zero calls, cheap)",
+ "run": {
+  "outcome_file": "rp12-r2-run experiment_results/cert_pc_k2/outcome.txt (sha256 f13983bb...; never committed); backup E:\\TaxoArena_backup_2026-10-03_cert_pc_k2 (8/8 OK)",
+  "outcome_commit": "ops 346a6f7e (rp12-r2-run at 85fc338a)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "pv2_1575de61bb20e977 (B0-2)",
+  "date": "2026-10-03"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_cert_pc_k2.md",
+  "commit": "4d4e7dc3",
+  "verdict": "VALID; a failed positive control (W-1..W-6)"
+ },
+ "criteria": [
+  {
+   "id": "PK1",
+   "text": "n 486: K2-CERTIFIABLE iff >= 2 of 3 anchors CERTIFIED-AT-SIZE (>= 4 of 5 subsamples, k_d <= 14, C0 comparable; NOT EVALUABLE gate first); K2-NOT iff 0; MIXED otherwise. Verdict line: SCOREABLE as a classification (MDE80 0.0352 per subsample)",
+   "result": "FAILED",
+   "value": "K2-NOT: 0 of 15 subsamples certified at this size (k_d 300/300); statistic 0.014-0.019 below the null minimum 0.042-0.050 (a failed positive control, W-2)",
+   "denominator": "3 anchors x 2 sizes x 5 subsamples, 300 replicates each (DEFF 1.0 by construction)"
+  },
+  {
+   "id": "PK2",
+   "text": "n 441: the same rule",
+   "result": "FAILED",
+   "value": "K2-NOT: 0 of 15 subsamples certified at this size (k_d 300/300); statistic 0.014-0.019 below the null minimum 0.042-0.050 (a failed positive control, W-2)",
+   "denominator": "3 anchors x 2 sizes x 5 subsamples, 300 replicates each (DEFF 1.0 by construction)"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "PK1 K2-CERTIFIABLE 0.35, MIXED 0.30, K2-NOT 0.35",
+   "result": "n/a",
+   "value": "K2-NOT occurred (prior 0.35); 3-way Brier 0.6350",
+   "denominator": "3 anchors x 2 sizes x 5 subsamples, 300 replicates each (DEFF 1.0 by construction)"
+  },
+  {
+   "id": "P2",
+   "text": "physics 0.45, economics 0.40, math 0.35 CERTIFIED-AT-SIZE",
+   "result": "n/a",
+   "value": "all three events no: physics 0.2025, economics 0.1600, math 0.1225",
+   "denominator": "3 anchors x 2 sizes x 5 subsamples, 300 replicates each (DEFF 1.0 by construction)"
+  },
+  {
+   "id": "P3",
+   "text": "C0 comparable everywhere 0.85",
+   "result": "HELD",
+   "value": "C0 comparable 30/30; Brier 0.0225",
+   "denominator": "3 anchors x 2 sizes x 5 subsamples, 300 replicates each (DEFF 1.0 by construction)"
+  }
+ ],
+ "falsifier": {
+  "text": "F-PK fires iff PK1 K2-NOT: G12's 0 of 60 possibly a k = 2 / within-category sensitivity limit; CERT-PC-SIZE's 'not explained by n alone' narrows to 14-way structure. F-TAX N-1 and F2 stand.",
+  "fired": true,
+  "outcome": "FIRED; read as a failed positive control: it does not discriminate a sensitivity limit from weak structure (W-2, W-3)"
+ },
+ "numbers_of_record": {
+  "PK": "0 of 30 certified (n 486, 441); k_d 300/300",
+  "statistic": "declared split 0.014-0.019; null min 0.042-0.050; null p95 0.067-0.071; 3.5-11.5x the C0 maximum",
+  "G12_beside": "G12 TOP splits of the same anchors 0.037-0.040 (descriptive)"
+ },
+ "sentence_of_record": "On R2's B0 MMLU_PRO_LB member (draw 5a3e756 TRAIN; qwen3 512-slice; sepBar 0.0145; 300 reps), the declared 2-way source-family partition (MMLU-original vs added sources) inside math, physics and economics, subsampled to n 486 and n 441, is NOT certified on any of 30 subsamples (k_d 300 of 300 everywhere). Its statistic, 0.014-0.019, lies below the minimum of its own site null (0.042-0.050) and at 20-28% of the null p95 (0.067-0.071). C0 comparable 30/30. [a FAILED POSITIVE CONTROL: k = 2 within-category sensitivity neither shown nor refuted (W-2); CERT-PC-SIZE's W-2 stands; G12's 0 of 60, N-1 and F2 unchanged]",
+ "chips": [
+  "REGISTERED 2026-10-03, BEFORE ANY CODE; not built",
+  "VALID (POST-RUN 4d4e7dc3): PK1, PK2 K2-NOT (0/30); F-PK FIRED",
+  "FAILED POSITIVE CONTROL (SPLIT BELOW THE NULL MINIMUM); k=2 SENSITIVITY NEITHER SHOWN NOR REFUTED; G12 0/60, N-1, F2 UNCHANGED"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-03",
+   "by": "registrar (pre-data; READY_cert_pc_k2)",
+   "text": "Q-K1 builder's NOT EVALUABLE rule adopted (withholding only); PK-1 ids vs items (one math twin, 316); PK-7 P2 at n 486; D-1 chemistry eligible, not included, anchors unchanged, no amendment; D-3 economics subsamples about one draw (468-470 of 486 shared). Brackets L23904, L23908, L23910."
+  },
+  {
+   "date": "2026-10-03",
+   "by": "registrar (POSTRUN 4d4e7dc3)",
+   "text": "outcome recorded; F-PK sentence bracketed (L23911); draft lead CERT-PC-K2-KNOWN recorded. docs/judge_v2_program.md L23989-L23999 (section \"## CERT-PC-K2 (2026-10-03, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent 06f03005)"
+  }
+ ],
+ "does_not_show": [
+  "a certificate of any tree site",
+  "that source families are the right sub-taxonomy",
+  "other categories, members, draws or slices",
+  "a mode test"
+ ],
+ "ledger": {
+  "row_id": "CERT-PC-K2",
+  "version": "v367 (2026-10-03: OUTCOME bracket, OK + WARN chips) | v362 (2026-10-03: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "CERT-PC-SIZE",
+  "CERT-POSITIVE-CONTROL"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "about 20-35 min site nulls",
+  "agent_hours": "about 1.5 h",
+  "reads_pool": true
+ },
+ "outputs": "never committed: pinned by sha256, backed up to E:",
+ "sources": [
+  "docs/judge_v2_program.md L23901-L23913 (_as_of the commit that writes it, parent 2cb20cca, re-grepped)",
+  "docs/agents/plans/2026-10-03_15h_schedule.md"
+ ],
+ "last_update": "2026-10-03",
+ "plain_description": {
+  "sq": "SQ3 Taxonomy",
+  "what": "No calls. A positive control for the significance check: inside math, physics and economics, the questions were split two ways by known source (original MMLU questions vs added sources), resized to the earlier test's sizes, and run through the same certificate 30 times.",
+  "why": "An earlier test certified 0 of 60 splits. This one asks whether that is because the check is too weak to detect a simple two-way split inside one subject.",
+  "information": "If the known split were certified, the check would be shown sensitive enough and the earlier 0 of 60 would reflect weak structure. If not, the check might simply be blind at this size. Result: done. The known split was certified on none of the 30 runs; its separation was below every random baseline. This is read as a failed positive control: it cannot tell 'the check is not sensitive enough' apart from 'source families are only weakly separated'. The earlier conclusions are unchanged.",
+  "written": "2026-10-07"
+ }
+}

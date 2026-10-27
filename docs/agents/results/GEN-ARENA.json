@@ -1,0 +1,169 @@
+{
+  "id": "GEN-ARENA",
+  "title": "GEN-ARENA: does the deployed judge reproduce the router's decisions WITHOUT an answer key, on the union's generative corpora? (3,000 matches / 5,994 calls)",
+  "question": "MATH (1,800) and IFEval (1,200) matches on the reserved side of the per-(source, domain) 0.30 split at seed 42; 8 models spanning both key-based per-corpus winners; grok-4-1-fast-non-reasoning, v2 mechanics, dual order, no rubric; the VERIFIER as reference (MATH the corrected target, IFEval the constraint list): (1) key-decidable accuracy >= 0.75; (2) per-corpus board rho >= 0.85 on both; (3) the BRIDGE: judged per-corpus argmax == key argmax on both; (4) decidable ties <= 0.15.",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "a09b7ee",
+    "program_lines": "docs/multi_corpus_design.md L536-L563 (registration) and L564-L600 (result); no programme section (the multi-corpus line is recorded in multi_corpus_design.md)",
+    "program_lines_as_of": "docs/multi_corpus_design.md at 4ec8f18",
+    "heading": "## Registered 2026-09-13 (before any call) — GEN-ARENA: does the deployed judge reproduce the router WITHOUT keys?",
+    "outcome_heading": [
+      "docs/multi_corpus_design.md L564: ## GEN-ARENA result (2026-09-13) — REGISTERED FAIL: the judge ranks the field but cannot pick the winner"
+    ],
+    "date": "2026-09-13"
+  },
+  "script": {
+    "path": "tools/analysis/generative_arena.py",
+    "sha16": "ae0ce2bfdee9facf (at d0ec01d)",
+    "commit": "d0ec01d"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (3,000 matches, 6,000 calls registered; 5,994 posted); zero reasoning calls (verifier reference)",
+  "run": {
+    "outcome_file": "experiment_results/multicorpus/gen_arena_outcome.txt",
+    "outcome_commit": "9c0329c",
+    "calls": 5994,
+    "cce": "not stated",
+    "pool": "the reserved side of the per-(source, domain) 0.30 split at seed 42 recomputed in Python (a Random(42) re-derivation, NOT the union pool paeec37aa28063c75: CERT-CORPUS noted overlap 114/394 MATH, 55/162 IFEVAL)",
+    "date": "2026-09-13",
+    "other_files": [
+      "gen_arena_grok.db (cache; 3,000 valid verdicts)"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); CERT-CORPUS (FRAMEWORK item 8) re-read the cache for the widener; CHECKER-ANSWER-INGEST found 367 of the 1,800 judged MATH matches involve a cap-hit response (the 1,024-token harness cap)",
+    "commit": "9c0329c",
+    "verdict": "REGISTERED FAIL (the bridge breaks on both corpora); the verifier reference is the best judge yet (MATH 0.935)"
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "key-decidable accuracy >= 0.75 overall",
+      "result": "HELD",
+      "value": "0.819 (975 decidable of 3,000); MATH 0.935 (568 decidable), IFEval 0.658 (407)",
+      "denominator": "975 key-decidable matches"
+    },
+    {
+      "id": "(2)",
+      "text": "per-corpus judged BT board Spearman rho vs corrected key accuracy >= 0.85 on BOTH",
+      "result": "FAILED",
+      "value": "MATH 0.922 OK; IFEval 0.719 FAIL",
+      "denominator": "8-model boards"
+    },
+    {
+      "id": "(3)",
+      "text": "the BRIDGE: judged per-corpus argmax == key-based argmax on both corpora",
+      "result": "FAILED",
+      "value": "BREAKS on both: the judged top-two gap is 0.032 (MATH) / 0.040 (IFEval) logits, so the argmax a router consumes sits exactly where judges are least reliable (third appearance after ARENA-V2 and X20); on IFEval the key's winner (Llama-3.3-70B, 0.870) was ranked fourth",
+      "denominator": "two corpora"
+    },
+    {
+      "id": "(4)",
+      "text": "decidable tie rate <= 0.15",
+      "result": "HELD",
+      "value": "0.138 overall (MATH 0.055, IFEval 0.256); flips 0.294 (MATH 0.237, IFEval 0.380)",
+      "denominator": "975 decidable"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "accuracy 0.78-0.85",
+      "result": "HELD",
+      "value": "0.819",
+      "denominator": "975"
+    },
+    {
+      "id": "P2",
+      "text": "rho 0.88-0.95",
+      "result": "FAILED",
+      "value": "MATH 0.922 inside; IFEval 0.719 below",
+      "denominator": "boards"
+    },
+    {
+      "id": "P3",
+      "text": "the bridge HOLDS on MATH and is the coin-flip on IFEval",
+      "result": "FAILED",
+      "value": "breaks on both",
+      "denominator": "two corpora"
+    },
+    {
+      "id": "P4",
+      "text": "ties 8-12%",
+      "result": "FAILED",
+      "value": "13.8%",
+      "denominator": "975"
+    }
+  ],
+  "falsifier": {
+    "text": "the registered criteria (1)-(4); overall FAIL if any fails",
+    "fired": true,
+    "note": "REGISTERED FAIL on (2) and (3); conclusion for the paper: judged verdicts substitute for a key when the claim is a RANKING (rho 0.92 on MATH) and do NOT substitute when the claim is an ARGMAX, which is what routing needs; EXPLORATORY cost of judging instead of keys: MATH -6.3pp +- 3.6, IFEval -0.6pp +- 3.8, pooled -4.7pp (0.649 vs 0.696 over 556 reserved questions)"
+  },
+  "numbers_of_record": {
+    "table": "MATH 1,800 matches / 568 decidable / 0.935 / ties 0.055 / flip 0.237; IFEVAL 1,200 / 407 / 0.658 / 0.256 / 0.380; ALL 3,000 / 975 / 0.819 / 0.138 / 0.294; 0 errors, 0 invalid",
+    "rho": "MATH 0.922; IFEval 0.719",
+    "bridge": "judged top-two gap 0.032 / 0.040 logits; IFEval key winner ranked fourth",
+    "cost_of_judging": "MATH -6.3pp +- 3.6; IFEval -0.6pp +- 3.8; pooled -4.7pp",
+    "cap_note": "CHECKER-ANSWER-INGEST: 367 of the 1,800 judged MATH matches involve a cap-hit response; STAGE3-MATH-CAPFREE on the terminated population reads 0.958 / 0.993"
+  },
+  "sentence_of_record": "GEN-ARENA (2026-09-13, 3,000 matches / 5,994 calls): REGISTERED FAIL: the judge ranks the field but cannot pick the winner. MATH accuracy 0.935, rho 0.922, ties 5.5%: better than the MMLU-Pro judge's 0.852 on free-form answers, because an exact verifier reference removes the reference ceiling; IFEval 0.658, rho 0.719, ties 25.6%, flips 38%: a reference that LISTS constraints is not one that CHECKS them. (1) and (4) pass; (2) fails on IFEval; (3) the bridge fails on both: the judged top-two gap is 0.032 / 0.040 logits, so the argmax a router consumes sits exactly where judges are least reliable (third appearance, after ARENA-V2 and X20). Judged verdicts substitute for a key when the claim is a RANKING, not an ARGMAX.",
+  "chips": [
+    "FAIL (bridge breaks)",
+    "verifier reference is the best judge yet"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-15/16",
+      "by": "CHECKER-ANSWER-INGEST (FRAMEWORK item 7) and STAGE3-MATH-CAPFREE",
+      "text": "367 of GEN-ARENA's 1,800 judged MATH matches involve a cap-hit response (the 1,024-token harness cap); on the terminated population the cheap judge with the checker reference reads 0.958 / 0.993 (STAGE3-MATH-CAPFREE)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the IFEVAL RULING (docs/agents/leads/2026-09-23_ifeval_ruling.md, af116f8, judge-design-specialist, zero calls, zero execution), recorded by the registrar as brackets in docs/multi_corpus_design.md (the GEN-ARENA result's corpus table and finding 2), docs/design/FRAMEWORK.md (the stage-1 'Rests on' line and the traceability row) and docs/judge_v2_program.md (the three ladder statements)",
+      "text": "FINDING 2 IS UNREALISABLE ON IFEVAL, AND THE LADDER'S IFEVAL RUNG STAYS AT SPECIFICATION 0.658 PERMANENTLY. MATH's verifier emits a canonical answer string that exists before any response; IFEval's emits a PREDICATE ON A RESPONSE (prompt_level_strict_acc = all(inst_level_strict_acc), the identity asserted row by row at tools/analysis/checker_answer_ingest.py L513 / L528). IFEval's fields split into question-level (instruction_id_list + kwargs = exactly the SPECIFICATION reference already measured at 0.658) and response-level (inst_level_strict_acc and anything it follows from), and every response-level field determines the key; there is no middle term. A per-response pass vector is therefore an ORACLE-CLASS, RESPONSE-LEVEL object, stronger than ORACLE's question-level key, and its accuracy may never be quoted beside MATH's 0.958 (two independent reasons: the reference objects are not the same kind, and no IFEval cap-hit proxy exists - checker_answers_v2.db is MATH-only, v1's non_terminated is the unclosed-<think> proxy, IFEval's harness cap is 1,280, programme L3741). Structural claim about a corpus family whose verifier is a predicate over the response; REF-FORM-BY-CELL's closure does not cover it (its object was always a question with a canonical answer). No number of this record changes: 0.658 / 0.256 / 0.380 / rho 0.719 stand, and what changes is that they are now known to be UNIMPROVABLE BY A REFERENCE on this corpus. Zero calls; no new test; no ledger row on 2026-09-23."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "INCONSISTENCIES-PASS (registrar, zero calls; insertion only)",
+      "text": "CORRECTED 2026-09-16 by CERT-CORPUS, carried into THIS row on 2026-09-23 by INCONSISTENCIES-PASS (registrar, zero calls; insertion only): the reserved side scored here is a Random(42) re-derivation of the per-(source, domain) 0.30 split recomputed in Python, NOT the union pool paeec37aa28063c75; CERT-CORPUS records the overlap with the pool of record as 114/394 MATH and 55/162 IFEVAL. Every number above stands as a reading on that re-derived side, not on the pool of record. [ledger: observed cell of row GEN-ARENA, v132]"
+    }
+  ],
+  "does_not_show": [
+    "a judged router (the argmax is where judges are least reliable)",
+    "a checker that CHECKS on IFEval (the judge was given the constraint list, not the checker's output)"
+  ],
+  "ledger": {
+    "row_id": "GEN-ARENA",
+    "version": "v54 (9c0329c) [v132 2026-09-23: INCONSISTENCIES-PASS insertion in this row]"
+  },
+  "depends_on": [
+    "MC-E2E",
+    "MC-ROUTER",
+    "MATH-FIX",
+    "JUDGE-SWAP",
+    "STAGE3-MATH-CAPFREE",
+    "CERT-CORPUS"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/multi_corpus_design.md L536-L600 (registration a09b7ee, result 9c0329c)",
+    "experiment_results/multicorpus/gen_arena_outcome.txt (9c0329c)",
+    "docs/test_ledger.html row GEN-ARENA (v54): chips verbatim, evidence (generative_arena.py, gen_arena_outcome.txt, a09b7ee, d0ec01d)",
+    "script sha16 = sha256 of tools/analysis/generative_arena.py at d0ec01d, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/agents/leads/2026-09-23_ifeval_ruling.md (af116f8, judge-design-specialist, zero calls): sections 1, 2 and 5 - the field-by-field reading of the lm-eval record, the ORACLE-class argument, and the closed-lines check that names REF-FORM-BY-CELL's uncovered mechanism"
+  ],
+  "last_update": "2026-09-23",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "A judged arena of 3,000 matches (5,994 calls) on MATH and IFEval with 8 models. The judge is shown the checker's material as its reference: the correct answer for MATH, the list of constraints for IFEval. Judged results are compared with the answer key.",
+    "why": "Asks whether a judge can stand in for the answer key, both in ranking models and in picking the winner a router would choose.",
+    "information": "If the judge matches the key, judged arenas could replace keys where none exist. Result: registered FAIL. The judge ranks the field well on MATH (rank correlation 0.92) but poorly on IFEval (0.72, many ties), and it picks the wrong top model on both, because the top two are nearly tied. Judged verdicts can stand in for a key for a ranking, not for choosing the single best model, which is what routing needs. Later note: 367 of the MATH matches involve answers cut off by the 1,024-token limit.",
+    "written": "2026-10-07"
+  }
+}

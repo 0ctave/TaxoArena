@@ -1,0 +1,274 @@
+{
+  "id": "G13-BREAKDOWN",
+  "title": "G13-BREAKDOWN: per-corpus and per-depth decomposition of R2's G13 (D13 -0.0215), unsupervised k-means comparators at matched k, flatLeaf vs descent, wall-clock, selective filing (descriptive), KC label-ownership mechanism (zero calls; REGISTERED 2026-10-02)",
+  "question": "Where does R2's anchored tree lose filing precision to class-conditional k-means (per member corpus, per tree depth), does it beat UNSUPERVISED k-means at matched k, does the loss survive the filing rule, and what does each method cost in wall-clock?",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "the commit that writes this record (parent 3898a2ec)",
+    "program_lines": "docs/judge_v2_program.md L22887-L23048",
+    "program_lines_as_of": "the commit that writes them, parent 3898a2ec, re-grepped",
+    "date": "2026-10-02",
+    "heading": "## Registered 2026-10-02 (before any code or call) \u2014 G13-BREAKDOWN: where does R2's anchored tree lose filing precision to class-conditional k-means ...",
+    "provenance": "docs/agents/plans/2026-10-02_g13_breakdown.md \u00a71 (0b4b11a6, tree-construction specialist), registered as drafted with the registrar's pre-data insertions; the author's go \"yes register and run the G13 breakdown\" (plan Amendment 35); leg (e) included DESCRIPTIVE-ONLY (the orchestrator's choice)"
+  },
+  "script": {
+    "path": "tools/analysis/g13_breakdown.py",
+    "sha16": "blob:c29fa1c3d3b7837e (git blob, LF of record; working file = same blob, per the review)",
+    "commit": "6088e8d1 (merge of g13-breakdown 8f68476c)"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_g13_breakdown.md + delta",
+    "commit": "7e6858eb + ac7bb984",
+    "verdict": "delta ac7bb984: D-1 closed (B0-2 pool check), MERGEABLE; --run READY under C2-C5; merged 6088e8d1"
+  },
+  "go": "plan Amendment 35: the author's \"yes register and run the G13 breakdown\" (0 calls; the 4k-match rule not engaged)",
+  "run": {
+    "outcome_file": "experiment_results/archv2/rp12_r2/g13_breakdown_outcome.txt (148 lines, blob:3ca9629b89b6a4786a05f5df77f5bb8219380d7c, LF, 0 CR; sha256-lf16 9a9605c70cb6d384, per the review)",
+    "outcome_commit": "7f7b0fe3",
+    "calls": 0,
+    "cce": 0,
+    "pool": "pv2_1575de61bb20e977 (B0-2 pool check rc 0; engine pool file sha256-lf16 79d48f4b36434a55; -wal 0 bytes)",
+    "date": "2026-10-02",
+    "incident": "E-1 (LOW): attempt 1 wrote the complete outcome (blob 3ca9629b) and then crashed printing to a cp1252 console; attempt 2 refused write-once; POSTRUN_g13_breakdown re-ran the readout in-process: all non-timing lines identical. No number changed. Forward fix: UTF-8 stdout (PYTHONIOENCODING=utf-8)."
+  },
+  "review": {
+    "file": "docs/reviews/POSTRUN_g13_breakdown.md",
+    "commit": "ec557e60",
+    "verdict": "VALID with wording conditions W1-W7 (applied by the registrar); in-process re-run: all non-timing lines identical; C4 to the digit; E-1 LOW (record line), E-2 MEDIUM (C-M Support degenerate), E-3 LOW (timing ratio an order of magnitude)"
+  },
+  "criteria": [
+    {
+      "id": "I1-I4",
+      "text": "IDENTITY PRECONDITIONS (refuse before any new number): I1 P_fl 0.8119, P(KC_s) 0.8334/0.8394/0.8340/0.8446/0.8413, D13 -0.0215 [-0.0301, -0.0125], U-global seeds 0.7381/0.7381/0.7159/0.7252/0.7573, NCC 0.8065 reproduced to the printed digits; I2 P_descent 0.7182; I3 recomputed flatLeaf = CSV leaf_id on >= 99.9% of EVAL; I4 every leaf_id resolves and reaches a corpus root",
+      "result": "HELD",
+      "value": "I0-I5 PASSED (G13 reproduced to the printed digits; I3 misses 0 of 6,139; I4 133 leaves, depth <= 7)",
+      "denominator": "6,139 EVAL items / 5,628 CK-CLOSE components (union pool pv2_1575de61bb20e977, draw 5a3e756), item-paired; B 2,000 component bootstrap, seed 20260929"
+    },
+    {
+      "id": "C-a1",
+      "text": "SCOREABLE; MMLU_PRO_LB only; the INTERVAL decides: HELD (the tree loses there) iff D13_MMLU's 95% interval lies wholly below 0; FAILED iff wholly above 0; UNDETERMINED (draft: UNRESOLVED) otherwise. Other five sources DESCRIPTIVE-ONLY",
+      "result": "HELD",
+      "value": "D13_MMLU -0.0446, 95% [-0.0566, -0.0321] wholly below 0 (SE 0.00639, DEFF 1.046, n_eff 3,325, MDE80 0.0179); MMLU-Pro carries the loss (share 1.1742, descriptive); never 'the tree loses only on MMLU-Pro' (W7)",
+      "denominator": "MMLU_PRO_LB 3,478 EVAL items / 3,386 components"
+    },
+    {
+      "id": "C-a4",
+      "text": "SCOREABLE, POINT-INFORMED (Support (h)); the INTERVAL decides: HELD (the loss opens below the anchors) iff Delta = D(leaf) - D(2) = D13 - [P_tree(2) - P_NCC] has its interval wholly below 0; FAILED iff wholly above 0; UNDETERMINED otherwise. POINT SEEN BEFORE REGISTRATION (domain_ok 0.8042, NCC 0.8065 printed in G13's outcome)",
+      "result": "HELD",
+      "value": "the loss opens below the anchors: Delta -0.0192, 95% [-0.0292, -0.0089] (SE 0.00514, DEFF 1.147, MDE80 0.0144); point seen before registration; D(2) -0.0023 [-0.0108, +0.0064] UNDETERMINED, never parity (W3)",
+      "denominator": "6,139 EVAL items / 5,628 CK-CLOSE components (union pool pv2_1575de61bb20e977, draw 5a3e756), item-paired; B 2,000 component bootstrap, seed 20260929"
+    },
+    {
+      "id": "C-b2",
+      "text": "SCOREABLE; INTERVAL AND POINT jointly (G13's form): HELD iff D_Us = P_fl - P(US_0) has its interval wholly above 0 AND D_Us > spread_US; FAILED (REVERSED) iff wholly below 0 AND D_Us < -spread_US; UNDETERMINED otherwise (incl. by spread)",
+      "result": "HELD",
+      "value": "D_Us +0.0656, 95% [+0.0546, +0.0778] > spread_US 0.0233 (SE 0.00601, DEFF 1.449, MDE80 0.0168); a win over k-means reading TRAIN labels at naming only while the tree reads GT-seeded anchors (W2) [CORRECTED 2026-10-02 by G13-BREAKDOWN (the author's go \"yes do both\"): C-b1 (+0.0738) and C-b2 (+0.0656) compare the ANCHORED tree, which carries TRAIN label information (depth-2 frontier 52 nodes, one per declared class, k_c(2) = 1 for all 52; P_tree(2) 0.8042 about NCC 0.8065), with UNSUPERVISED k-means: the lead is attributable to the anchors' label information, NOT evidence that the tree's discovered structure beats k-means; the like-for-like comparison of the discovered part is G13 / C-a4 (the tree LOSES to class-conditioned k-means, D13 -0.0215 [-0.0301, -0.0125]; Delta -0.0192 [-0.0292, -0.0089], below depth 2); never quoted as 'the tree beats k-means' without the anchor qualifier; verdicts unchanged]",
+      "denominator": "6,139 EVAL items / 5,628 CK-CLOSE components (union pool pv2_1575de61bb20e977, draw 5a3e756), item-paired; B 2,000 component bootstrap, seed 20260929"
+    },
+    {
+      "id": "C-b1",
+      "text": "CONFIRMATORY OF A SEEN POINT; same form as C-b2 against U-global (k = 133): HELD iff D_U interval wholly above 0 AND D_U > spread_U; FAILED (REVERSED) iff wholly below 0 AND D_U < -spread_U. POINT SEEN BEFORE REGISTRATION (flatLeaf 0.8119 vs U-global 0.7159-0.7573)",
+      "result": "HELD",
+      "value": "point seen before registration: D_U +0.0738, 95% [+0.0625, +0.0855] > spread_U 0.0414 (SE 0.00587, DEFF 1.341; measured Support only) (W2, W5) [CORRECTED 2026-10-02 by G13-BREAKDOWN (the author's go \"yes do both\"): C-b1 (+0.0738) and C-b2 (+0.0656) compare the ANCHORED tree, which carries TRAIN label information (depth-2 frontier 52 nodes, one per declared class, k_c(2) = 1 for all 52; P_tree(2) 0.8042 about NCC 0.8065), with UNSUPERVISED k-means: the lead is attributable to the anchors' label information, NOT evidence that the tree's discovered structure beats k-means; the like-for-like comparison of the discovered part is G13 / C-a4 (the tree LOSES to class-conditioned k-means, D13 -0.0215 [-0.0301, -0.0125]; Delta -0.0192 [-0.0292, -0.0089], below depth 2); never quoted as 'the tree beats k-means' without the anchor qualifier; verdicts unchanged]",
+      "denominator": "6,139 EVAL items / 5,628 CK-CLOSE components (union pool pv2_1575de61bb20e977, draw 5a3e756), item-paired; B 2,000 component bootstrap, seed 20260929"
+    },
+    {
+      "id": "C-M",
+      "text": "SCOREABLE; the INTERVAL decides: HELD (KC's edge is label ownership) iff G_own = P(KC_0) - P(KC-relabel_0) has its interval wholly above 0; FAILED iff wholly below 0 (registrar's pre-data completion by the header's 'one clause each way'); UNDETERMINED otherwise",
+      "result": "UNDETERMINED",
+      "value": "UNDETERMINED (degenerate: KC-relabel_0 = KC_0 item-wise; 0 of 133 prototypes renamed) (E-2): G_own = 0 exactly, a real structural zero; |G_own| <= 0.0005 over seeds 0-4; printed [0, 0], SE 0, DEFF nan, MDE80 0 are not precision; never 'ruled out by a test', never parity (W4); no re-test in this form informative at any n",
+      "denominator": "6,139 EVAL items / 5,628 CK-CLOSE components (union pool pv2_1575de61bb20e977, draw 5a3e756), item-paired; B 2,000 component bootstrap, seed 20260929"
+    },
+    {
+      "id": "DESCRIPTIVE",
+      "text": "DESCRIPTIVE-ONLY: A1 for BBH, MATH, MUSR, IFEVAL, GPQA; A2 (D_src, D_within); A3 depth curve d = 2..7 and leaf-depth strata; (c) filing rule (D13_desc, D_U,desc, KC-desc); (d) wall-clock; (e) selective filing P@80 (included, never paired, never deciding); the label ladder",
+      "result": "n/a",
+      "value": "DESCRIPTIVE-ONLY: IFEval +0.0494 [+0.0123, +0.0864], BBH +0.0140 are not tree wins of record (W5); wall-clock about three orders of magnitude (~10^3; 2,163x in the run, 2,462x on a re-run) on this machine, 1-thread Python k-means vs the 12-thread JVM build, never a general cost ratio (W6, E-3)",
+      "denominator": "6,139 EVAL items / 5,628 CK-CLOSE components (union pool pv2_1575de61bb20e977, draw 5a3e756), item-paired; B 2,000 component bootstrap, seed 20260929"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P-A1",
+      "text": "D13_MMLU -0.030 [-0.050, -0.010]; C-a1 HELD 0.75; MMLU share of the net deficit 0.75 [0.45, 1.10]; MATH -0.04 [-0.12, +0.04]; GPQA -0.02 [-0.10, +0.06]; IFEVAL -0.03 [-0.10, +0.04]; BBH 0.000 [-0.010, +0.010]; MUSR 0.000 [-0.010, 0.000]",
+      "result": "FAILED",
+      "value": "D13_MMLU -0.0446 HELD; share 1.1742 FAILED; MATH -0.0205 HELD; GPQA -0.0062 HELD; IFEVAL +0.0494 FAILED; BBH +0.0140 FAILED; MUSR 0.0000 HELD; C-a1 HELD 0.75: observed HELD",
+      "denominator": "per source"
+    },
+    {
+      "id": "P-A2",
+      "text": "D_src -0.005 [-0.015, +0.005]; D_within -0.018 [-0.030, -0.006]",
+      "result": "HELD",
+      "value": "D_src +0.0049 HELD; D_within -0.0269 HELD",
+      "denominator": "6,139 EVAL items / 5,628 CK-CLOSE components (union pool pv2_1575de61bb20e977, draw 5a3e756), item-paired; B 2,000 component bootstrap, seed 20260929"
+    },
+    {
+      "id": "P-A3",
+      "text": "D(2) -0.002 [-0.008, +0.004]; D(3) -0.010 [-0.020, 0.000]; D(4) -0.016 [-0.026, -0.006]; D(>= 5) within 0.005 of D13",
+      "result": "HELD",
+      "value": "D(2) -0.0023 HELD (never parity); D(3) -0.0098 HELD; D(4) -0.0186 HELD; D(>= 5) one prediction (C5): -0.0005 / -0.0016 / -0.0007 HELD",
+      "denominator": "6,139 EVAL items / 5,628 CK-CLOSE components (union pool pv2_1575de61bb20e977, draw 5a3e756), item-paired; B 2,000 component bootstrap, seed 20260929"
+    },
+    {
+      "id": "P-A4",
+      "text": "Delta -0.019 [-0.030, -0.008]; C-a4 HELD 0.85 (point-informed)",
+      "result": "HELD",
+      "value": "Delta -0.0192 HELD; C-a4 HELD 0.85: observed HELD",
+      "denominator": "6,139 EVAL items / 5,628 CK-CLOSE components (union pool pv2_1575de61bb20e977, draw 5a3e756), item-paired; B 2,000 component bootstrap, seed 20260929"
+    },
+    {
+      "id": "P-B1",
+      "text": "D_U +0.074 [+0.060, +0.090]; C-b1 HELD 0.80",
+      "result": "HELD",
+      "value": "D_U +0.0738 HELD; C-b1 HELD 0.80: observed HELD",
+      "denominator": "6,139 EVAL items / 5,628 CK-CLOSE components (union pool pv2_1575de61bb20e977, draw 5a3e756), item-paired; B 2,000 component bootstrap, seed 20260929"
+    },
+    {
+      "id": "P-B2",
+      "text": "P(US_0) 0.77 [0.74, 0.80]; D_Us +0.040 [+0.015, +0.070]; spread_US 0.020 [0.010, 0.040]; C-b2 HELD 0.60, REVERSED 0.05",
+      "result": "HELD",
+      "value": "P(US_0) 0.7462 HELD; D_Us +0.0656 HELD; spread_US 0.0233 HELD; C-b2 HELD 0.60: observed HELD",
+      "denominator": "6,139 EVAL items / 5,628 CK-CLOSE components (union pool pv2_1575de61bb20e977, draw 5a3e756), item-paired; B 2,000 component bootstrap, seed 20260929"
+    },
+    {
+      "id": "P-C",
+      "text": "D13_desc -0.115 [-0.130, -0.100] (seen arithmetic); D_U,desc -0.017 [-0.040, +0.010]; P(KC-desc) - P(KC_0) -0.010 [-0.025, 0.000]",
+      "result": "FAILED",
+      "value": "D13_desc -0.1152 HELD; D_U,desc -0.0199 HELD; P(KC-desc) - P(KC_0) -0.0974 FAILED",
+      "denominator": "6,139 EVAL items / 5,628 CK-CLOSE components (union pool pv2_1575de61bb20e977, draw 5a3e756), item-paired; B 2,000 component bootstrap, seed 20260929"
+    },
+    {
+      "id": "P-D",
+      "text": "tree members' manifest sum 155.0 s, loop sum 112.5 s, grafts 77.7 s / 113.6 s (seen); KC 5-seed median 1-10 s single thread; U-global median 20-120 s; tree end-to-end at 12 threads 10-100x KC's fit at 1 thread",
+      "result": "FAILED",
+      "value": "seen points not scored; KC median 0.108 s FAILED; U-global median 1.736 s FAILED; end-to-end / KC (~10^3) FAILED",
+      "denominator": "this machine"
+    },
+    {
+      "id": "P-E",
+      "text": "P@80 tree 0.87 [0.84, 0.90], KC_0 0.89 [0.86, 0.92], U-global 0.80 [0.76, 0.84]; tree - KC gap at 80% within 0.01 of D13 (DESCRIPTIVE)",
+      "result": "HELD",
+      "value": "P@80 tree 0.8917, KC_0 0.9126, U-global 0.8078 HELD; gap - D13 +0.0005 HELD (descriptive)",
+      "denominator": "4,911 kept items per method"
+    },
+    {
+      "id": "P-M",
+      "text": "G_own +0.012 [+0.004, +0.022]; C-M HELD 0.70; P_fl - P(KC-relabel_0) -0.010 [-0.020, 0.000]",
+      "result": "FAILED",
+      "value": "G_own +0.0000 FAILED; P_fl - P(KC-relabel_0) -0.0215 FAILED; C-M HELD 0.70: observed UNDETERMINED",
+      "denominator": "6,139 EVAL items / 5,628 CK-CLOSE components (union pool pv2_1575de61bb20e977, draw 5a3e756), item-paired; B 2,000 component bootstrap, seed 20260929"
+    }
+  ],
+  "falsifier": {
+    "text": "F-GB fires iff C-b2 REVERSED: the anchored tree files worse than source-aware label-free k-means at matched counts (its data-driven partition adds nothing over unsupervised clustering given the source). F-GB2 fires iff C-a4 FAILED: the loss sits at the anchors, not below them (points follow-ups to the anchor geometry, away from the split criterion). Neither revises G13, G11 or F-TAX L-2. [CORRECTED 2026-10-02 by G13-BREAKDOWN: C-b2 compares the ANCHORED tree with unsupervised k-means, so F-GB not firing does not show that the data-driven partition adds anything over unsupervised clustering; the like-for-like test is UNION-AF-ROUTE F-AK (added pre-data 2026-10-02)]",
+    "fired": false,
+    "result": "F-GB NOT FIRED (C-b2 HELD); F-GB2 NOT FIRED (C-a4 HELD); G13, G11, F-TAX L-2 not revised"
+  },
+  "numbers_of_record": {
+    "support_denominators": "EVAL 6,139 / 5,628 components; MMLU_PRO_LB 3,478 / 3,386; BBH 1,718 / 1,408; MATH 390 / 382; MUSR 229 / 129; IFEVAL 162 / 162; GPQA 162 / 161; TRAIN 12,334",
+    "deff": "1.214 MEASURED (G13, overall); per source transported as max(1.214, n_s/G_s): MMLU 1.214, BBH 1.220, MATH 1.214 (re-measured in-run)",
+    "se": "sqrt(disc/n x DEFF): C-a1 sqrt(0.15/3,478 x 1.214) = 0.00724; C-a4 sqrt(0.11/6,139 x 1.214) = 0.00466; C-b2 sqrt(0.20/6,139 x 1.214) = 0.00629; C-M sqrt(0.02/6,139 x 1.214) = 0.00199 (programme, registrar insertion at Support (d))",
+    "mde80": "2.80 SE: C-a1 0.0203 (draft 0.0202 from the rounded SE); C-a4 0.0131; C-b2 0.0176, bar max(MDE80, spread_US), spread_US planning 0.020 [0.010, 0.040]; C-M 0.0056",
+    "verdict_line": "C-a1 SCOREABLE thin (0.030 vs 0.0203); C-a4 SCOREABLE (0.019 vs 0.0131; point-informed); C-b2 SCOREABLE thin (0.040 vs 0.020-0.040; UNDETERMINED by spread if spread_US > 0.040); C-b1 SCOREABLE (seen 0.074 vs seen spread 0.041); C-M SCOREABLE (0.012 vs 0.0056); every other line DESCRIPTIVE-ONLY",
+    "structural_leg": "C-b2's and C-b1's spread clauses do not shrink with n; C-a1, C-a4, C-M reachable at this n iff the true effects exceed their MDE80",
+    "seen_before_registration": "C-b1: flatLeaf 0.8119 vs U-global k = 133 seeds 0.7381 / 0.7381 / 0.7159 / 0.7252 / 0.7573; C-a4: domain_ok P_fl 0.8042, NCC 0.8065 (g13_outcome.txt blob:ff8fa439; POSTRUN_rp12_r2 78a30da1 W-1)",
+    "D13_MMLU": "-0.0446, 95% [-0.0566, -0.0321] (MMLU_PRO_LB 3,478 items / 3,386 components)",
+    "Delta": "-0.0192, 95% [-0.0292, -0.0089] (6,139 EVAL items / 5,628 CK-CLOSE components (pv2_1575de61bb20e977, draw 5a3e756), item-paired; B 2,000 component bootstrap, seed 20260929)",
+    "D_U": "+0.0738, 95% [+0.0625, +0.0855], spread_U 0.0414 (6,139 EVAL items / 5,628 CK-CLOSE components (pv2_1575de61bb20e977, draw 5a3e756), item-paired; B 2,000 component bootstrap, seed 20260929; point seen before registration) [anchored tree vs unsupervised k-means: the lead is the anchors' label information, not discovered structure (CORRECTED 2026-10-02)]",
+    "D_Us": "+0.0656, 95% [+0.0546, +0.0778], spread_US 0.0233 (6,139 EVAL items / 5,628 CK-CLOSE components (pv2_1575de61bb20e977, draw 5a3e756), item-paired; B 2,000 component bootstrap, seed 20260929) [anchored tree vs unsupervised k-means: the lead is the anchors' label information, not discovered structure (CORRECTED 2026-10-02)]",
+    "G_own": "0 exactly (degenerate: 0 of 133 prototypes renamed at seed 0; |G_own| <= 0.0005 over seeds 0-4); printed interval and Support not precision",
+    "D2": "-0.0023, 95% [-0.0108, +0.0064] (UNDETERMINED; never parity)",
+    "wall_clock": "about three orders of magnitude (~10^3; 2,163x run, 2,462x re-run), this machine, 1-thread Python vs 12-thread JVM; descriptive only"
+  },
+  "sentence_of_record": "G13-BREAKDOWN (2026-10-02, 0 calls; run 7f7b0fe3, post-run review ec557e60 VALID): on 6,139 EVAL items / 5,628 components the anchored tree (no LLM labelling; GT-seeded declared-class anchors) loses filing precision to class-conditional k-means on MMLU-Pro (D13_MMLU -0.0446 [-0.0566, -0.0321]; C-a1 HELD), the loss opens below the anchors (Delta -0.0192 [-0.0292, -0.0089]; C-a4 HELD, point seen before registration), and it beats unsupervised k-means (D_U +0.0738 [+0.0625, +0.0855], point seen before registration; C-b1 HELD) and per-source unsupervised k-means (D_Us +0.0656 [+0.0546, +0.0778]; C-b2 HELD); C-M UNDETERMINED (degenerate: 0 of 133 prototypes renamed). [G13 FAILED stands; never 'label-free'; the k-means comparators read labels at naming only while the tree reads GT-seeded anchors; D(2) is not parity; IFEval and BBH descriptive only; wall-clock ~10^3 on this machine only, no general cost ratio.] [CORRECTED 2026-10-02 by G13-BREAKDOWN (the author's go \"yes do both\"): C-b1 (+0.0738) and C-b2 (+0.0656) compare the ANCHORED tree, which carries TRAIN label information (depth-2 frontier 52 nodes, one per declared class, k_c(2) = 1 for all 52; P_tree(2) 0.8042 about NCC 0.8065), with UNSUPERVISED k-means: the lead is attributable to the anchors' label information, NOT evidence that the tree's discovered structure beats k-means; the like-for-like comparison of the discovered part is G13 / C-a4 (the tree LOSES to class-conditioned k-means, D13 -0.0215 [-0.0301, -0.0125]; Delta -0.0192 [-0.0292, -0.0089], below depth 2); never quoted as 'the tree beats k-means' without the anchor qualifier; verdicts unchanged]",
+  "chips": [
+    "REGISTERED 2026-10-02, BEFORE ANY CODE; not built [plan]",
+    "VALID (POST-RUN ec557e60); RUN 7f7b0fe3: C-a1, C-a4, C-b1, C-b2 HELD (C-a4, C-b1 POINT SEEN BEFORE REGISTRATION); F-GB, F-GB2 NOT FIRED; G13 FAILED STANDS [ok]",
+    "C-M UNDETERMINED (DEGENERATE: 0 OF 133 PROTOTYPES RENAMED); ANCHORED TREE, NEVER &ldquo;LABEL-FREE&rdquo;; NO PARITY (D(2)); WALL-CLOCK ~10&sup3; THIS MACHINE ONLY [warn]",
+    "C-b1, C-b2: THE LEAD IS THE ANCHORS&rsquo; LABEL INFORMATION, NOT DISCOVERED STRUCTURE (CORRECTED 2026-10-02; VERDICTS UNCHANGED) [warn]"
+  ],
+  "brackets": [
+    {
+      "date": "2026-10-02",
+      "by": "registrar (READY_g13_breakdown.md, 7e6858eb)",
+      "text": "HYGIENE bracketed onto the B0-2 pool check (v2_union_pool.py --dry-run; engine_pool_pv2_1575de61bb20e977.json sha256-lf16 79d48f4b36434a55; 0-byte -wal/-journal), replacing pool_guard.py --pool (D-1). Accepted readings: end-to-end = six member manifests + flatLeaf graft (R1); D(>= 5) checked at d = 5, 6, 7 and scored as ONE prediction (C5, bracket on A3); C-b1 with measured support only (R3); rp12_pairing.py blob 35214b3f recorded as an ADDITION to the pins (C6). D-5 strata counts 1,167 / 1,839 / 1,325 / 1,596 / 212. C4: post-run review recomputes D_Us, D_U, Delta, G_own from the printed means and checks C-b2 against spread_US. docs/judge_v2_program.md L23062-L23068 (section \"## Registrar's record 2026-10-02 (insertion only; zero calls; nothing run; pre-data) \u2014 G13-BREAKDOWN READY review ...\"; _as_of the commit that writes it, parent 7e6858eb, re-grepped)"
+    },
+    {
+      "date": "2026-10-02",
+      "by": "registrar (POSTRUN_g13_breakdown.md ec557e60, E-1, E-2, W1-W7)",
+      "text": "Outcome recorded VALID. E-1: attempt 1 wrote the complete outcome (blob 3ca9629b) and then crashed printing to a cp1252 console; attempt 2 refused write-once; POSTRUN_g13_breakdown re-ran the readout in-process: all non-timing lines identical; forward fix UTF-8 stdout. E-2: C-M recorded 'UNDETERMINED (degenerate: KC-relabel_0 = KC_0 item-wise; 0 of 133 prototypes renamed)'. docs/judge_v2_program.md L23070-L23085 (section \"## G13-BREAKDOWN (2026-10-02, 0 calls) \u2014 VALID (post-run review docs/reviews/POSTRUN_g13_breakdown.md, ec557e60): C-a1, C-a4, C-b1, C-b2 HELD; C-M UNDETERMINED (degenerate) ...\"; _as_of the commit that writes it, parent ec557e60, re-grepped)"
+    },
+    {
+      "date": "2026-10-02",
+      "by": "registrar (orchestrator's brief; THE AUTHOR's go \"yes do both\")",
+      "text": "CORRECTED 2026-10-02 by G13-BREAKDOWN (the author's go \"yes do both\"): C-b1 (+0.0738) and C-b2 (+0.0656) compare the ANCHORED tree, which carries TRAIN label information (depth-2 frontier 52 nodes, one per declared class, k_c(2) = 1 for all 52; P_tree(2) 0.8042 about NCC 0.8065), with UNSUPERVISED k-means: the lead is attributable to the anchors' label information, NOT evidence that the tree's discovered structure beats k-means; the like-for-like comparison of the discovered part is G13 / C-a4 (the tree LOSES to class-conditioned k-means, D13 -0.0215 [-0.0301, -0.0125]; Delta -0.0192 [-0.0292, -0.0089], below depth 2); never quoted as 'the tree beats k-means' without the anchor qualifier; verdicts unchanged. Brackets at the outcome's C-b2 line and the registration's F-GB sentence; sentence of record bracketed (words kept); ledger v340 (OUTCOME-CORRECTION bracket, WARN chip). docs/judge_v2_program.md L23087-L23091 (section \"## Registrar's record 2026-10-02 (insertion only; zero calls; nothing run; pre-data for UNION-AF-ROUTE) \u2014 the author's \"yes do both\": G13-BREAKDOWN C-b1 / C-b2 corrected ...\"; _as_of the commit that writes it, parent aaf12c77, re-grepped); docs/judge_v2_program.md L23079 (C-b2 line of section \"## G13-BREAKDOWN (2026-10-02, 0 calls) \u2014 VALID (post-run review docs/reviews/POSTRUN_g13_breakdown.md, ec557e60): C-a1, C-a4, C-b1, C-b2 HELD; C-M UNDETERMINED (degenerate) ...\"; _as_of the commit that writes it, parent aaf12c77, re-grepped)"
+    },
+    {
+      "date": "2026-10-02",
+      "by": "registrar (DEEP-SPLIT-COMPARE post-run W2, bcd4a88f)",
+      "text": "C-a4 'the loss opens below the anchors' is the LOCATION of the loss; DEEP-SPLIT-COMPARE's B-gt bridge (P(B-gt_0) - P(D_0) +0.0028 [-0.0015, +0.0069]) attributes its cause to depth-2 fit-set membership, not to splitting or label ownership below depth 2; verdict unchanged. section \"## DEEP-SPLIT-COMPARE (2026-10-02, 0 calls) \u2014 VALID (post-run review docs/reviews/POSTRUN_deep_split.md, bcd4a88f): ...\" (L23515-L23529, _as_of the commit that writes it, parent a96c7ae6)"
+    }
+  ],
+  "does_not_show": [
+    "that the tree is needed for filing: G13 FAILED stands; never 'competitive with / matches KC' (W1)",
+    "parity anywhere (no TOST): D(2), MUSR, C-M (W3, W4)",
+    "that the tree's data-driven partition alone beats unsupervised clustering; anything 'label-free' (W2)",
+    "whether KC's edge is label ownership (C-M degenerate, E-2)",
+    "a general cost ratio (W6, E-3)",
+    "other draws, recipes, embedders, slices; any certificate or routing value; capability text",
+    "that the tree's discovered structure beats unsupervised k-means: C-b1 / C-b2's lead is the anchors' label information (52 depth-2 cells = the declared classes); the like-for-like test is UNION-AF-ROUTE AK1 / AK2 / F-AK (CORRECTED 2026-10-02)"
+  ],
+  "ledger": {
+    "row_id": "G13-BREAKDOWN",
+    "version": "v340 (2026-10-02: OUTCOME-CORRECTION bracket, WARN chip: C-b1 / C-b2 lead = anchors' label information) | v339 (2026-10-02: OUTCOME bracket, two chips) | v337 (2026-10-02: new row, PLAN chip)"
+  },
+  "depends_on": [
+    "ARCH-V2-E-T-R2 (done; G13, G11 objects at commit M 2703f2c2)"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "value": false,
+    "text": "closes nothing; CONTEXT \u00a75 lines not touched"
+  },
+  "cost": {
+    "calls": 0,
+    "cce": 0,
+    "builds": 0,
+    "cpu": "about 35 spherical k-means fits + about 25 bootstraps B 2,000: about 20-40 min single thread (estimate; the cost-estimator re-prices)",
+    "agent": "engine-coder about 3-4 h; reviewer READY; run-operator; reviewer post-run"
+  },
+  "run_conditions": "after the current Ollama work ends; no construction or site null beside it; CPU lane single-threaded (OMP/OPENBLAS/MKL = 1); pool_guard.py --pool pv2_1575de61bb20e977 in the dry-run",
+  "sources": [
+    "docs/judge_v2_program.md L22887-L23048 (section \"## Registered 2026-10-02 (before any code or call) \u2014 G13-BREAKDOWN: where does R2's anchored tree lose filing precision to class-conditional k-means ...\"; _as_of the commit that writes them, parent 3898a2ec, re-grepped)",
+    "docs/agents/plans/2026-10-02_g13_breakdown.md \u00a71 (0b4b11a6)",
+    "docs/plan_2026-09-15.md Amendment 35",
+    "experiment_results/archv2/rp12_r2/g13_outcome.txt blob:ff8fa439 (G13 numbers, printed-beside comparators)",
+    "docs/reviews/POSTRUN_rp12_r2.md (78a30da1; W-1, W-2, W-4)",
+    "docs/reviews/READY_g13_breakdown.md (7e6858eb)",
+    "docs/judge_v2_program.md L23070-L23085 (section \"## G13-BREAKDOWN (2026-10-02, 0 calls) \u2014 VALID (post-run review docs/reviews/POSTRUN_g13_breakdown.md, ec557e60): C-a1, C-a4, C-b1, C-b2 HELD; C-M UNDETERMINED (degenerate) ...\"; _as_of the commit that writes it, parent ec557e60, re-grepped)",
+    "experiment_results/archv2/rp12_r2/g13_breakdown_outcome.txt blob:3ca9629b (7f7b0fe3)",
+    "docs/reviews/POSTRUN_g13_breakdown.md (ec557e60)",
+    "docs/reviews/READY_g13_breakdown.md delta (ac7bb984); merge 6088e8d1",
+    "docs/judge_v2_program.md L23087-L23091 (section \"## Registrar's record 2026-10-02 (insertion only; zero calls; nothing run; pre-data for UNION-AF-ROUTE) \u2014 the author's \"yes do both\": G13-BREAKDOWN C-b1 / C-b2 corrected ...\"; _as_of the commit that writes it, parent aaf12c77, re-grepped)",
+    "docs/judge_v2_program.md L23079 (C-b2 line of section \"## G13-BREAKDOWN (2026-10-02, 0 calls) \u2014 VALID (post-run review docs/reviews/POSTRUN_g13_breakdown.md, ec557e60): C-a1, C-a4, C-b1, C-b2 HELD; C-M UNDETERMINED (degenerate) ...\"; _as_of the commit that writes it, parent aaf12c77, re-grepped)",
+    "experiment_results/archv2/rp12_r2/g13_breakdown_outcome.txt blob:3ca9629b (A3 line d = 2: |F(2)| 52, sum k_c(2) 52, P_tree(2) 0.8042, NCC 0.8065)"
+  ],
+  "last_update": "2026-10-02",
+  "review_conditions": [
+    "C1 D-1 fixed, delta-checked, merged",
+    "C2 run from main; 8 TOTAL TIME blocks, no INCOMPLETE",
+    "C3 after the Ollama pass; THREADS 1; nothing beside",
+    "C4 post-run recomputation of D_Us, D_U, Delta, G_own; C-b2 vs spread_US",
+    "C5 D(>= 5) one prediction",
+    "C6 registrar brackets (MET 2026-10-02); operator pins the run blob LF"
+  ],
+  "plain_description": {
+    "sq": "SQ3 Taxonomy",
+    "what": "Breaks down an earlier result where the union tree filed questions less accurately than k-means given the class labels. It splits the result by source corpus and tree depth, and adds plain unsupervised k-means with the same number of clusters. No calls.",
+    "why": "It locates where the tree loses and checks whether it beats clustering that uses no labels.",
+    "information": "It shows whether the loss is local (one corpus, one depth) and whether the tree adds value over unsupervised clustering. Result: the loss sits mainly in MMLU-Pro (-4.5 points) and opens below the category layer. The tree beats unsupervised k-means by about 7 points, but that lead comes from the tree's declared category anchors (label information), not from discovered structure. The earlier failure stands, and this is not a label-free win.",
+    "written": "2026-10-07"
+  }
+}

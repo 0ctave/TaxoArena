@@ -1,0 +1,29 @@
+=== SELECTIVE-ORDER: spend the second call only where the candidates disagree (zero calls) ===
+  x12 MAIN, 9142 valid matches | 5276 of them (57.7%) have candidates whose own answers DISAGREE
+
+  policy          calls  calls/m      rho top-4 viol     ties   dec.acc
+  ALWAYS DUAL     18284     2.00   0.9720          2    0.209     0.852
+  ALWAYS SINGLE    9142     1.00   0.9580          3    0.000     0.890
+  SELECTIVE       14418     1.58   0.9580          3    0.075     0.856
+
+  REGISTERED BAR for SELECTIVE: rho within 0.005 of ALWAYS DUAL, violations no worse, strictly fewer calls
+      rho 0.9580 vs 0.9720 (delta -0.0140) | violations 3 vs 2 | calls 14418 vs 18284 (21% saved) -> FAIL
+
+  DIAGNOSTIC - flip rate between the two orders, split by whether the candidates' own answers agree:
+      candidates DISAGREE  n= 5276 | FLIP RATE 0.105 | key-decidable 0.778 | single order names a winner on 0.967, the LONGER answer 69% of the time
+      candidates AGREE     n= 3866 | FLIP RATE 0.192 | key-decidable 0.104 | single order names a winner on 0.784, the LONGER answer 78% of the time
+      READING: the policy was built on the assumption that answer-agreeing pairs are where the second
+      call is wasted. They are where it is most NEEDED. Those pairs are almost never key-decidable, so
+      there is no right answer for a single order to find - it invents one, with a length preference,
+      and only the dual rule's abstention suppresses it. POSITION-FULL's cross-tier finding does not
+      transfer: cross-tier pairs mostly DISAGREE on their answers, so 'cross-tier' and 'answer-agreeing'
+      are different cuts and I conflated them when designing this policy.
+
+  TOP-4 PAIRS ONLY (1872 matches, 55.9% disagreeing - the regime the frontier line cares about):
+      ALWAYS DUAL    calls  3744 (2.00/match) | gemini-3.1-p > iask_pro > arx_0314 > gpt-4o-2024- | 1 violations | decidable accuracy 0.660
+      ALWAYS SINGLE  calls  1872 (1.00/match) | iask_pro > gemini-3.1-p > arx_0314 > gpt-4o-2024- | 2 violations | decidable accuracy 0.719
+      SELECTIVE      calls  2919 (1.56/match) | iask_pro > gemini-3.1-p > arx_0314 > gpt-4o-2024- | 2 violations | decidable accuracy 0.660
+
+  SCOPE, as registered: this is the matchFilter signal used a second way and the two do not multiply.
+  An arena that can DROP answer-agreeing matches should drop them - a six-fold saving on frontier
+  pairs. Selective dual order is for arenas that must judge every pair they schedule.

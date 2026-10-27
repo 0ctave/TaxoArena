@@ -1,0 +1,8 @@
+== G12 dry-run 2026-10-01T10:11:24+02:00: cwd main (tools/src identical to M), python tools/analysis/g12_site_null.py --dry-run --lane r2 --config experiment_configs/rp12_r2/B0/g12_site_null.sitenull --snapshot-db .claude/worktrees/rp12-r2-run/snapshots.db
+POOL pv2_1575de61bb20e977 (G12 site null, dry-run: counts only, NO statistic, nothing launched)
+[G12] P1-P2 member B0/mmlu_pro_lb = snapshot 20261001_094311_Headless_Run_Auto_ge; stamp pool pv2_1575de61bb20e977, engine pool sha256(LF) 79d48f4b36434a55, namespaces ['MMLU_PRO']: equal to the pointer entry
+[G12] P3 sites 60 (by depth: d1 14 (n 264-778), d2 22 (n 150-438), d3 21 (n 123-320), d4 2 (n 189-239), d5 1 (n 144-144)); families 33; TOP family m = 14, depths [1]
+[G12] P3 m = 14 <= 15 (declared MMLU-Pro domains 14): the top family is reachable at 300 reps
+[G12] P4 heap: largest site n 778, live replicates 12, peak 0.28 GB -> fits the 6g default
+[G12] COMMAND: .\gradlew.bat siteNull --console=plain --offline -PjvmThreads=12 -PnullReps=300 "-DsnapshotId=20261001_094311_Headless_Run_Auto_ge" "-DsliceDim=512" "-DsepBar=0.0145" "-DdropTop=0" "-Dwhiten=false" "-DoutCsv=experiment_results/archv2/rp12_r2/g12/site_null_B0_mmlu_pro_lb.csv"
+rc=0

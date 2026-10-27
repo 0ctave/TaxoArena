@@ -1,0 +1,120 @@
+{
+  "id": "ARXIASK",
+  "title": "ARXIASK: given ONLY the questions that discriminate the inverted frontier pair, can either format recover the true order? (1,196 calls)",
+  "question": "The 302 pool questions where arx_0314 and iask_pro differ by the key (arx 179 : iask 123, rate 0.593); every match decidable by construction; both formats, same judge / reference / rubric / mechanics; plus a length-matched control; per format, the arx win rate tested against 0.5 by two-sided binomial; accuracy vs key; share of verdicts going to the longer answer; the same on length-matched questions.",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "b8f994d",
+    "program_lines": "docs/judge_v2_program.md L875-L931 (registration) and L932-L985 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-13 (before any call) — ARXIASK: the clean capability test on the discriminating evidence",
+    "outcome_heading": [
+      "L932: - **ARXIASK (2026-09-13): the frontier does not resolve because the REFERENCE fails on exactly the questions"
+    ],
+    "date": "2026-09-13"
+  },
+  "script": {
+    "path": "tools/analysis/arxiask_probe.py",
+    "sha16": "c0d43dfd7991fa0c (at ccd516a)",
+    "commit": "ccd516a"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (1,196 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/arxiask_outcome.txt",
+    "outcome_commit": "6ff359c",
+    "calls": 1196,
+    "cce": "not stated",
+    "pool": "the 302 discriminating pool questions (arx 179 : iask 123)",
+    "date": "2026-09-13"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); ORACLE (2026-09-14) followed with the answer key as reference on the same 302",
+    "commit": "6ff359c",
+    "verdict": "NEITHER format recovers the order; cause identified: the reference (0.726 on these questions vs 0.860 on the pool)"
+  },
+  "criteria": [
+    {
+      "id": "win_rate",
+      "text": "per format, the arx win rate vs 0.5 (two-sided binomial)",
+      "result": "DELIVERED",
+      "value": "pairwise 0.496 (p = 0.95); pointwise 0.561 (p = 0.060), closer to the true 0.593 but not significant",
+      "denominator": "302 discriminating questions"
+    },
+    {
+      "id": "accuracy",
+      "text": "accuracy vs key",
+      "result": "DELIVERED",
+      "value": "pairwise 0.612; pointwise 0.667; when the reference is right 0.788 / 0.856, when wrong 0.146 / 0.160 (below chance: the judge picks the model matching a wrong reference)",
+      "denominator": "302"
+    },
+    {
+      "id": "length",
+      "text": "share of verdicts to the longer answer; length-matched control",
+      "result": "DELIVERED",
+      "value": "length is NOT the cause: length-matched subsets give 0.490 and 0.562 despite iask averaging 1,590 chars vs arx's 911",
+      "denominator": "length-matched subsets"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "the reference scores 0.860 on the pool but 0.726 on the discriminating questions and the judge follows it; a reference-based arena's power to order two models is bounded by the reference's accuracy on the subset where they differ"
+  },
+  "numbers_of_record": {
+    "arx_win_rate": "pairwise 0.496 (p 0.95); pointwise 0.561 (p 0.060); true 0.593",
+    "accuracy": "0.612 / 0.667; ref-right 0.788 / 0.856; ref-wrong 0.146 / 0.160",
+    "reference": "0.860 pool vs 0.726 discriminating",
+    "length_matched": "0.490 / 0.562"
+  },
+  "sentence_of_record": "ARXIASK (2026-09-13, 1,196 calls): on the 302 questions where arx and iask differ by the key, pairwise gives arx 0.496 (p = 0.95, accuracy 0.612) and pointwise 0.561 (p = 0.060, accuracy 0.667); neither recovers the true 0.593; length is not the cause (length-matched 0.490 / 0.562); THE CAUSE: the reference scores 0.860 on the pool but 0.726 on these questions and the judge follows it (accuracy 0.788 / 0.856 when the reference is right, 0.146 / 0.160 when wrong). A reference-based arena's power to order two models is bounded by the reference's accuracy on the subset where they differ.",
+  "chips": [
+    "NEITHER recovers",
+    "cause identified: the reference"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "the frontier order (closed by rule)",
+    "a length mechanism on this subset"
+  ],
+  "ledger": {
+    "row_id": "ARXIASK",
+    "version": "v61 (6ff359c); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "FRONTIER",
+    "POINTWISE",
+    "ORACLE",
+    "AGGREGATE"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "the frontier order (CONTEXT.md section 5: FRONTIER, ARXIASK, ORACLE, AGGREGATE)"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L875-L985 (b8f994d / 6ff359c)",
+    "experiment_results/x12_crossdomain/arxiask_outcome.txt (6ff359c)",
+    "docs/test_ledger.html row ARXIASK (v61): chips verbatim, observed cell, evidence",
+    "script sha16 = sha256 of tools/analysis/arxiask_probe.py at ccd516a (first commit), first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Uses only the 302 questions where two top models (arx and iask) differ by the answer key, so that every match has a known winner. Both are judged in pairwise and pointwise format, plus a version matched for answer length (1,196 calls).",
+    "why": "Asks why the judged arena puts these two frontier models in the wrong order: is it answer length or something else?",
+    "information": "Shows whether a judge can recover the true order when given only the questions that matter, and what blocks it. Result: neither format recovered the true order. Length was not the cause. The cause was that the reference answer shown to the judge is much worse on these questions (0.73 correct, against 0.86 overall), and the judge follows it. A judge that relies on a reference cannot order two models better than the reference is accurate on the questions where they differ. This was measured on an older judged set that is now classed as history, not evidence.",
+    "written": "2026-10-07"
+  }
+}

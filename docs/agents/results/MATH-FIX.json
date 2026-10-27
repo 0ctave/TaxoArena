@@ -1,0 +1,135 @@
+{
+  "id": "MATH-FIX",
+  "title": "MATH-FIX: is the MATH corpus's near-zero accuracy a capability result or an answer-extraction artefact, and what does correcting it do to the router? (zero calls)",
+  "question": "Tolerant extractor (last \\boxed / 'final answer is' / last number, any candidate may match), normalisation with numeric tolerance 1e-6; correction only ever RAISES; corrected column written to a new table, ingested rows untouched; then MC-E2E re-run on the overlay. (1) per-model corrected accuracy + count of responses with no extractable answer; (2) do the six 0.000 models rise above 0.10; (3) the deployed router gain on corrected data, three seeds. Predictions: zeros rise to 0.3-0.7; gain shrinks to +2 to +3.5pp.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "d29f445",
+    "program_lines": "docs/multi_corpus_design.md L489-L509 (registration) and L510-L535 (result); no programme section",
+    "program_lines_as_of": "docs/multi_corpus_design.md at 4ec8f18",
+    "heading": "## Registered 2026-09-13 (before recomputing) — MATH-FIX: a tolerant answer extractor for the MATH corpus",
+    "outcome_heading": [
+      "docs/multi_corpus_design.md L510: ## MATH-FIX result (2026-09-13, zero calls) — the artefact was large, and the corrected router gain is +2.7pp"
+    ],
+    "date": "2026-09-13"
+  },
+  "script": {
+    "path": "tools/analysis/math_fix.py",
+    "sha16": "4758c8e2f2bb7272 (at 10a3413)",
+    "commit": "10a3413"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/multicorpus/math_fix.txt",
+    "outcome_commit": "10a3413",
+    "calls": 0,
+    "cce": 0,
+    "pool": "the MC-E2E reserved sides (three seeds; see MC-E2E's 2026-09-14 correction on that split)",
+    "date": "2026-09-13",
+    "other_files": [
+      "experiment_results/multicorpus/router_e2e_mathfix.txt (10a3413)",
+      "eval_results_mathfix (the overlay table)"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); MC-E2E's 2026-09-14 correction (the reserved side was not the tree's held-out pool) applies to (3)",
+    "commit": "10a3413",
+    "verdict": "ARTEFACT CONFIRMED; (2) (3) PASS; new router headline +2.7pp superseding +5.0"
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "per-model corrected accuracy + count with no extractable answer",
+      "result": "DELIVERED",
+      "value": "5,181 of 23,832 cells corrected (21.7%); the leaderboard's own answers store '\\iny' for '\\infty' (its unit stripper eats 'ft'); the R1 distills are truncated by the generation limit so their 0.198 / 0.144 are floors; 60 rows (0.25%) keep a credit the extractor misses (symbolic equivalence): only-raise protects them",
+      "denominator": "23,832 (model, question) cells"
+    },
+    {
+      "id": "(2)",
+      "text": "the six 0.000 models rise above 0.10",
+      "result": "HELD",
+      "value": "Qwen2.5-32B 0.000 -> 0.598, Qwen2.5-72B 0.012 -> 0.584, Llama-3.3-70B 0.002 -> 0.473, internlm 0.000 -> 0.397",
+      "denominator": "the six models"
+    },
+    {
+      "id": "(3)",
+      "text": "the deployed router gain on corrected data, three seeds",
+      "result": "HELD",
+      "value": "+3.4 / +2.1 / +2.8pp, mean +2.7, still REAL in every seed; metadata cost collapses to ~0",
+      "denominator": "three seeds"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "zeros rise to 0.3-0.7",
+      "result": "HELD",
+      "value": "0.397-0.598",
+      "denominator": "six models"
+    },
+    {
+      "id": "P2",
+      "text": "gain shrinks to +2 to +3.5pp",
+      "result": "HELD",
+      "value": "+2.7 (range +2.1 to +3.4)",
+      "denominator": "three seeds"
+    }
+  ],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "new headline superseding +5.0; MC-E2E's clean-pool correction (2026-09-14) later read the deployed gain at +3.38 mean on the tree's own active pool [ID-ONLY 2026-09-23 (CLAIMS-SWEEP-BRACKETS, registrar): pool union paeec37aa28063c75; verified by id only, not by content; reviewed twins on this pool (reviews 1df2cf1, 8ebfa7a): 471 ids / 427 texts exact, 478 / 432 norm-v1 (GPQA 288, MMLU-Pro 185, MATH 3, BBH 2); see docs/judge_v2_program.md L14280-L14340 (CONTENT-DISJOINT-SPLIT-AUDIT) and L14455-L14487 (SPLIT-FOLLOWUPS).]"
+  },
+  "numbers_of_record": {
+    "corrected": "5,181 / 23,832 (21.7%)",
+    "zeros": "0.598 / 0.584 / 0.473 / 0.397",
+    "router_gain": "+3.4 / +2.1 / +2.8, mean +2.7",
+    "protected": "60 rows (0.25%) symbolic equivalence"
+  },
+  "sentence_of_record": "MATH-FIX (2026-09-13, zero calls): ARTEFACT CONFIRMED: 5,181 of 23,832 cells corrected (21.7%); Qwen2.5-32B 0.000 -> 0.598, Qwen2.5-72B 0.012 -> 0.584, Llama-3.3-70B 0.002 -> 0.473, internlm 0.000 -> 0.397; two upstream facts (the leaderboard stores '\\iny' for '\\infty'; the R1 distills are truncated by the generation limit so 0.198 / 0.144 are floors); 60 rows keep a credit the extractor misses, protected by only-raise; the deployed router gain falls to +3.4 / +2.1 / +2.8pp, mean +2.7, still REAL in every seed; metadata cost collapses to ~0. New headline, superseding +5.0.",
+  "chips": [
+    "ARTEFACT CONFIRMED",
+    "(2)(3) PASS"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-14",
+      "by": "MC-E2E's CORRECTION (multi_corpus_design.md L602)",
+      "text": "the reserved side used for (3) was a Random(seed) re-derivation, ~70% training data for the taxonomy; on the tree's own active pool the deployed gain reads +4.37 / +2.43 / +3.34 (mean +3.38) and the metadata cost is 3x larger (mean +0.71pp)."
+    }
+  ],
+  "does_not_show": [
+    "symbolic-equivalence credit (60 rows) beyond the extractor",
+    "a clean-pool router gain (MC-E2E's correction supplies it) [ID-ONLY 2026-09-23 (CLAIMS-SWEEP-BRACKETS, registrar): pool union paeec37aa28063c75; verified by id only, not by content; reviewed twins on this pool (reviews 1df2cf1, 8ebfa7a): 471 ids / 427 texts exact, 478 / 432 norm-v1 (GPQA 288, MMLU-Pro 185, MATH 3, BBH 2); see docs/judge_v2_program.md L14280-L14340 (CONTENT-DISJOINT-SPLIT-AUDIT) and L14455-L14487 (SPLIT-FOLLOWUPS).]"
+  ],
+  "ledger": {
+    "row_id": "MATH-FIX",
+    "version": "v53 (10a3413)"
+  },
+  "depends_on": [
+    "MC-ROUTER",
+    "MC-E2E",
+    "GEN-ARENA",
+    "CHECKER-ANSWER-INGEST"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/multi_corpus_design.md L489-L535 (d29f445 / 10a3413)",
+    "experiment_results/multicorpus/math_fix.txt and router_e2e_mathfix.txt (10a3413)",
+    "docs/test_ledger.html row MATH-FIX (v53): chips verbatim, observed cell, evidence",
+    "script sha16 = sha256 of tools/analysis/math_fix.py at 10a3413 (first commit), first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)"
+  ],
+  "last_update": "2026-09-22",
+  "plain_description": {
+    "sq": "Data hygiene",
+    "what": "Re-scores MATH answers with a more tolerant answer extractor. It accepts the last boxed answer, 'final answer is' or the last number, with numeric tolerance, and it only ever raises scores. Then it re-runs the routing evaluation on the corrected data. No calls.",
+    "why": "Six models scored near 0 on MATH. That looked like an answer-extraction artefact rather than real inability, and it could inflate the measured routing gain.",
+    "information": "If zeros jump, the old numbers were artefacts and the routing gain must be re-estimated. Result: done, artefact confirmed. 21.7% of cells were corrected, and several models went from about 0 to 0.40-0.60. Routing per cell still helps in every seed, but less: +2.7 points on average instead of +5.0. A later re-read on the tree's own held-out pool gave about +3.4. That figure was itself replaced by a clean re-measurement of about +2.9, with policies fitted on training questions only. Pool separation was checked by question id only, not by content.",
+    "written": "2026-10-07"
+  }
+}

@@ -1,0 +1,84 @@
+{
+ "id": "BZ-GRANULARITY-WORK",
+ "title": "BZ-GRANULARITY-WORK: node attribution, depth curve, topic-vs-difficulty controls and nested pruning of the axis_v1 leaves on the WORK split (D-2026-10-20-3; exploratory, zero calls, no vault read)",
+ "question": "Where in the axis_v1 tree does the meter's gain sit (splits, depth), and how much survives difficulty and length controls, on WORK only?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "none (exploratory, not registered)",
+  "program_lines": "docs/judge_v2_program.md L25494-L25501 (_as_of the commit that writes it, parent 4759e014, re-grepped)",
+  "date": "2026-10-20"
+ },
+ "script": {
+  "path": "benchzoom examples/granularity_work.py",
+  "sha16": "blob:b5874a2c (run of record at 19250ae; 0aba06e docstring only, blob:7afb0a8a; LF, per POSTRUN)",
+  "commit": "benchzoom ca361d9..0aba06e"
+ },
+ "ready": null,
+ "go": "D-2026-10-20-3 (the author, verbatim: \"See how you can improve that\"; 1da14759)",
+ "run": {
+  "outcome_file": "E:/benchzoom_demo/granularity_work/{math,mmlu_pro} (SHA256SUMS 10/10 each; backup 22/22)",
+  "outcome_commit": "outputs not committed",
+  "calls": 0,
+  "cce": 0,
+  "pool": "WORK split only (MATH 2,949, MMLU-Pro 7,197 items); vault never read",
+  "date": "2026-10-20"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_BZ-GRANULARITY-WORK.md",
+  "commit": "4759e014",
+  "verdict": "VALID as exploratory output; allowed sentences A1-A6; SOLID vs CONTINUUM REFUTED as a contrast (D1 HIGH); single-split sum not quotable (D2)"
+ },
+ "criteria": [],
+ "predictions": [],
+ "falsifier": {
+  "text": "none (exploratory)",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "A1 MATH G(L3a|L2) WORK": "+0.124 SE 0.035 (2,949 items, DEFF 1.001, n_eff 2,947, MDE80 0.098)",
+  "A2 depth curve": "peak depth 4 +0.15 SE 0.036; finest level gives back +0.030 SE 0.009",
+  "A3 controls": "after difficulty + length +0.109 SE 0.032; after leaf-mean difficulty +0.090 SE 0.028",
+  "SOLID - CONTINUUM": "REFUTED as a contrast: split-level jackknife SE 0.028; permutation P 0.32 (3,654 relabelings)",
+  "A5 pruning": "collapsed - full -0.013 SE 0.024",
+  "A6 MMLU-Pro": "L3a|L2 -0.010 SE 0.021 (MDE80 0.059); L3a|L1 +0.168 SE 0.055; L2|L1 +1.043 SE 0.120"
+ },
+ "sentence_of_record": "On the work split only (5 content-grouped folds x 5 seeds; leaves built on all items' text), the MATH axis leaves add +0.12 (SE 0.035) over subject x level, peaking at depth 4 and +0.11 (SE 0.032) after difficulty and length controls; SOLID vs CONTINUUM is refuted as a contrast (split-level P 0.32) [EXPLORATORY, adjudicates nothing; POSTRUN 4759e014 allowed sentences A1-A6]",
+ "chips": [
+  "EXPLORATORY (WORK only)",
+  "SOLID vs CONTINUUM REFUTED AS A CONTRAST"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-20",
+   "by": "registrar",
+   "text": "NOT allowed: SOLID - CONTINUUM -0.043 (SE 0.009); single-split gains sum +0.060; 19 of 36 leaves survive the controls"
+  }
+ ],
+ "does_not_show": [
+  "a registered or held-out result",
+  "that SOLID splits carry less gain than continuum regions",
+  "a topic effect on MMLU-Pro (the control removes only 57% there)",
+  "anything about the vault"
+ ],
+ "ledger": {
+  "row_id": "BZ-GRANULARITY-WORK",
+  "version": "v427"
+ },
+ "depends_on": [
+  "BZ-METER-AXIS",
+  "BZ-AXIS-A"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "nothing"
+ },
+ "sources": [
+  "docs/reviews/POSTRUN_BZ-GRANULARITY-WORK.md (4759e014)",
+  "docs/agents/author_decisions/2026-10-20.md",
+  "docs/judge_v2_program.md L25494-L25501 (_as_of the commit that writes it, parent 4759e014, re-grepped)"
+ ],
+ "last_update": "2026-10-20"
+}

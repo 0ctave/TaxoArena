@@ -1,0 +1,174 @@
+{
+ "id": "CELL-DIFFICULTY",
+ "title": "CELL-DIFFICULTY: out-of-sample difficulty variance explained by AF-U cells vs random within-source cells plus composition share (CD1); 3PL bootstrap check of the 7 CELL-FLIPS cells (CD2); exploratory union-DB look disclosed (zero calls; REGISTERED 2026-10-04)",
+ "question": "Are cells difficulty strata, and are the 7 flip cells multidimensional?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "the commit that writes it (parent b7fb6bc8)",
+  "program_lines": "docs/judge_v2_program.md L24402-L24414",
+  "program_lines_as_of": "the commit that writes them, parent b7fb6bc8, re-grepped",
+  "date": "2026-10-04",
+  "provenance": "docs/literature/2026-10-04_response_structure.md (a8fb1be4; blob 0230843b); docs/agents/plans/2026-10-04_literature_shortlist.md (68a3d731); the author's Go (docs/agents/plans/2026-10-04_W1_W2_schedule.md (be8e54d3))"
+ },
+ "script": {
+  "path": "tools/analysis/cell_difficulty.py",
+  "sha16": "8bc20761c54e2b4a (sha256-lf16)",
+  "blob": "20f0d98d (LF); resp_structure_common blob ba67f78f",
+  "commit": "14ab172d (merge of resp-structure-fix1 b2d05f34)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_resp_structure.md",
+  "commit": "fdfe0543",
+  "blob": "19acccf1 (LF)",
+  "verdict": "READY (CD1 decides alone; C-CD1, T-CD2, R-3)"
+ },
+ "go": "the author's Go for zero-call windows (2026-10-04)",
+ "run": {
+  "outcome_file": "experiment_results/archv2/cell_difficulty/cell_difficulty_outcome.txt (sha256 11aed1ee35c609ff561898b076978cc861cd11b1ecdba19968c2a67530656ebc; write-once, never committed); backup E:/TaxoArena_backup_2026-10-04_cell_pair (SHA256SUMS.txt, 12 OK)",
+  "outcome_commit": "run from main (code merged 14ab172d); outcome not committed",
+  "calls": 0,
+  "cce": 0,
+  "pool": "reader: pv2_1575de61bb20e977 (B0-2 rc 0; views sha256 before = after; IDENTITY REPRODUCED)",
+  "date": "2026-10-04",
+  "concurrency": "sequential zero-call readers after RESP-PROFILE-INFO (N-CONC; rule 7 not engaged): NOT AFFECTING"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_cell_pair.md",
+  "commit": "a6daf4a9",
+  "blob": "461e4515 (LF)",
+  "verdict": "VALID with word condition R-CD-K (MEDIUM); C-CD1 and R-3 recorded; T-CD2 and R-IRT discharged; N-SUP LOW"
+ },
+ "criteria": [
+  {
+   "id": "CD1",
+   "text": "DECIDING: DIFFICULTY-STRATA iff eta2_b(AF-U) > RWS p97.5 AND median composition share > 0.5; NOT-DIFFICULTY-STRATA otherwise. SCOREABLE as a classification",
+   "result": "HELD",
+   "value": "DIFFICULTY-STRATA: eta2_b(AF-U) +0.2299 > RWS p97.5 +0.0803; median composition share 0.6985 > 0.5; QUALIFIED R-CD-K (AF-U below all five K_0 seeds +0.2332..+0.2450 and declared +0.2365)",
+   "denominator": "EVAL 5,907 / 5,404 x 18; 200 RWS draws"
+  },
+  {
+   "id": "CD2",
+   "text": "scored count: flip cells MULTIDIM (1-D 3PL parametric bootstrap p < 0.05 after BH over 7); carries the falsifier [DEMOTED TO DESCRIPTIVE 2026-10-04 (B-CD2, orchestrator's ruling): selection-confounded; a consistency check of CF1]",
+   "result": "HELD",
+   "value": "7 of 7 MULTIDIM (BH q 0.05); DESCRIPTIVE (B-CD2: a consistency check of CF1 under a 3PL null, not a dimension claim)",
+   "denominator": "the 7 BH-surviving CELL-FLIPS cells"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "CD1 DIFFICULTY-STRATA 0.60",
+   "result": "HELD",
+   "value": "DIFFICULTY-STRATA occurred; Brier 0.1600",
+   "denominator": "EVAL"
+  },
+  {
+   "id": "P2",
+   "text": "CD2 point 5 [2, 7]; >= 4 of 7 MULTIDIM",
+   "result": "HELD",
+   "value": "7 (point 5 [2, 7]; >= 4 of 7), scored with the B-CD2 qualifier",
+   "denominator": "7 cells"
+  },
+  {
+   "id": "P3",
+   "text": "median composition share 0.6 [0.4, 0.8]",
+   "result": "HELD",
+   "value": "0.6985 in [0.4, 0.8] (constrained fit 0.7389)",
+   "denominator": "18 models"
+  }
+ ],
+ "falsifier": {
+  "text": "F-CD fires iff CD2 = 0: the flips are reproducible under one dimension. [B-CD2: the CD2 leg is descriptive; F-CD of record fires iff CD1 NOT-DIFFICULTY-STRATA (registrar's completion, flagged for the author)]",
+  "fired": false,
+  "outcome": "F-CD of record NOT FIRED, read from the CD1 line (R-3); CD2 = 7, not 0 (descriptive leg)"
+ },
+ "numbers_of_record": {
+  "CD1": "eta2_b(AF-U) +0.2299 vs RWS p97.5 +0.0803 (median +0.0746; 200 draws; MC SE 0.0004); median composition share 0.6985 (18 models); EVAL 5,907 / 5,404",
+  "CD1_arms": "K0..K4 +0.2422/+0.2389/+0.2450/+0.2380/+0.2332 (mean 0.2394); declared +0.2365; SRC +0.0874 (R-CD-K)",
+  "CD1_margin": "15.1 component-bootstrap SE (SE 0.0099, B 400; reviewer)",
+  "R-IRT": "constrained-ML 3PL: AF-U +0.2394 vs RWS p97.5 +0.0935; share 0.7389: DIFFICULTY-STRATA unchanged",
+  "CD2": "7 of 7 MULTIDIM (descriptive; constrained fit 7/7)",
+  "own_source": "5,716 own-source items: eta2 +0.2360, share 0.6957 vs own-source RWS p97.5 +0.0947; K0 +0.2445 (unregistered, descriptive); 191 cross-source: eta2 -0.1019 (K0 +0.0505)",
+  "DEFF": "declared 1.6; Kish m 1.3115; measured (reviewer, N-SUP) 0.95 for eta2_b, n_eff about 6,200"
+ },
+ "sentence_of_record": "CELL-DIFFICULTY (2026-10-04, 0 calls) \u2014 VALID; CD1 DIFFICULTY-STRATA (R-CD-K), F-CD not fired. On the content-closed v2 union EVAL (5,907 items / 5,404 components x 18 models), AF-U cells are difficulty strata beyond random within-source cells of the same sizes (eta2_b 0.230 vs RWS p97.5 0.080; composition share 0.70); per-source k-means cells stratify difficulty at least as well (0.239, descriptive). Unchanged under the constrained-ML 3PL (R-IRT). CD2 7 of 7 is a consistency check of CF1 under a 3PL null, not evidence of more than one dimension; TASKFLOOR lines NOT REPORTABLE (C-CD1). [POSTRUN docs/reviews/POSTRUN_cell_pair.md, a6daf4a9; outcome not committed, sha256 11aed1ee...]",
+ "chips": [
+  "REGISTERED 2026-10-04, BEFORE ANY CODE; not built",
+  "VALID (POST-RUN a6daf4a9): CD1 DIFFICULTY-STRATA (eta2_b +0.2299 &gt; RWS p97.5 +0.0803; share 0.6985); F-CD NOT FIRED (FROM CD1, R-3)",
+  "R-CD-K: BEYOND RANDOM WITHIN-SOURCE CELLS ONLY; AF-U BELOW ALL FIVE K_0 SEEDS AND DECLARED; CD2 7/7 DESCRIPTIVE; TASKFLOOR NOT REPORTABLE (C-CD1)"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-04",
+   "by": "registrar (pre-data; READY_resp_structure)",
+   "text": "B-CD2 (orchestrator's ruling, flagged for the author): CD2 selection-confounded (33 of 33 simulated selected cells MULTIDIM), demoted to DESCRIPTIVE with F-CD's CD2 leg; CD1 decides alone; F-CD of record completed on CD1 (registrar, flagged); BBH floor 0 disclosed; BBH / MUSR per-task floors descriptive sensitivity; B-CD7 CD-R7 descriptive (18 / 101 vs 7 / 101). L24409, L24411, L24412."
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (pre-data; READY_resp_structure.md)",
+   "text": "B-CD9: CD-R8 (CD2 and F-CD's CD2 leg DESCRIPTIVE) and CD-R9 (per-task floors DESCRIPTIVE, stream 20261004 + 2) readings of record. C-CD1 (orchestrator's choice under the autonomous go, FLAGGED FOR THE AUTHOR): no code change; the BBH / MUSR per-task-floor lines are NOT REPORTABLE (TASK_OPTIONS wrong for movie_recommendation, 4 options on 232 / 250, flip cells n00000066 / n00000067; and reasoning_about_colored_objects, variable). Post-run T-CD2: CD1's number unchanged when the CD2 inputs are permuted or dropped. Post-run R-3: F-CD of record read from the CD1 line (fires iff NOT-DIFFICULTY-STRATA). L24409, L24412."
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (post-run duty; POSTRUN 6cb817b6)",
+   "text": "R-IRT carried from POSTRUN_resp_profile_info.md (6cb817b6): shares resp_structure_common.fit_train (alternating JML, not the penalised optimum); the post-run review re-fits the deciding numbers under the constrained optimum and flags any verdict change; the IRT is quoted as 'a 3PL fitted by alternating JML with standardised theta (not the penalised optimum; verdicts robust to the constrained optimum, POSTRUN_resp_profile_info.md)'. INSTRUMENT L24407."
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (outcome; POSTRUN a6daf4a9)",
+   "text": "OUTCOME: CD1 DIFFICULTY-STRATA quoted only with R-CD-K; F-CD of record not fired (R-3); CD2 descriptive; C-CD1 TASKFLOOR not reportable; T-CD2 and R-IRT discharged. Brackets L24407, L24409, L24412; section L24573-L24586 (_as_of 0d76dc87)."
+  }
+ ],
+ "does_not_show": [
+  "that AF-U stratifies difficulty better than per-source k-means (below all five seeds)",
+  "evidence of more than one ability dimension or a dimension count (CD2 descriptive)",
+  "roster-independent difficulty (18 models)",
+  "routing value",
+  "any per-task-floor number (C-CD1)",
+  "that the 3PL is the penalised optimum (R-IRT)"
+ ],
+ "ledger": {
+  "row_id": "CELL-DIFFICULTY",
+  "version": "v389 (2026-10-04: OUTCOME bracket, OK + WARN chips) | v383 (2026-10-04: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "CELL-FLIPS",
+  "UNION-AF-ROUTE",
+  "ROUTE-SOURCE-NULL (RWS arm)"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; no Gaussian-mixture LR / BIC, MDL or Bayesian evidence (MIX-LRT-SITE untouched); no judge, rubric, reference, frontier, temperature"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "CPU minutes-1 h (pool reader)",
+  "agent_hours": "about 3 h",
+  "reads_pool": true
+ },
+ "outputs": "never committed: stored on E: with SHA256SUMS.txt; temp under E:/TaxoArena_tmp via scratch_dir",
+ "sources": [
+  "docs/judge_v2_program.md L24402-L24414 (_as_of the commit that writes it, parent b7fb6bc8, re-grepped)",
+  "docs/literature/2026-10-04_response_structure.md (a8fb1be4; blob 0230843b)",
+  "docs/agents/plans/2026-10-04_literature_shortlist.md (68a3d731)",
+  "docs/reviews/READY_resp_structure.md delta (fdfe0543; blob 19acccf1, LF)",
+  "docs/judge_v2_program.md section \"## Registrar's record 2026-10-04 (insertion only; zero calls; nothing run; pre-data) \u2014 CELL-STRATA-EVAL and CELL-DIFFICULTY READY ...\" (L24530-L24534, _as_of 14ab172d, re-grepped)",
+  "docs/reviews/POSTRUN_cell_pair.md (a6daf4a9; blob 461e4515, LF); the outcome file (sha256 11aed1ee...); docs/judge_v2_program.md section '## CELL-DIFFICULTY (2026-10-04, 0 calls) ...' L24573-L24586 (_as_of 0d76dc87)"
+ ],
+ "last_update": "2026-10-04",
+ "disclosure": "exploratory read-only look at the union DB (TRAIN + EVAL; no cell or label quantity) during the response-structure pass (docs/literature/2026-10-04_response_structure.md (a8fb1be4; blob 0230843b) section 0)",
+ "label_status": "AF-U [SC] where used",
+ "author_review": "B-CD2 ruling and the F-CD completion on CD1: the author may overrule",
+ "plain_description": {
+  "sq": "SQ3 Taxonomy",
+  "what": "On the clean version-2 evaluation set (5,907 questions x 18 models), it measures how much of the variation in question difficulty is explained by the anchor-free tree's cells, compared with random cells of the same size drawn within each source benchmark. A secondary check looked at 7 cells where model rankings flip.",
+  "why": "If cells are only topics, they might not matter for evaluation. If they also group questions by difficulty, that helps explain why per-cell rankings differ.",
+  "information": "A clear excess over random cells shows the cells capture real difficulty structure. No excess would mean cells are difficulty-neutral labels. Result: done, valid. The cells are difficulty strata: they explain 23% of difficulty variation against at most about 8% for random cells. Per-source k-means cells do at least as well (24%, descriptive), so this does not show the tree beats k-means. The 7-flip-cell check is only a consistency check, not evidence of more than one ability dimension.",
+  "written": "2026-10-07"
+ }
+}

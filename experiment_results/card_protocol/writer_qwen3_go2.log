@@ -1,0 +1,30 @@
+[CARD-W] pacing: pause 0.25 s after each batch; TIME_WAIT drain threshold 20000 (poll 10 s, cap 600 s)
+[CARD-W] T0 prompts file card_protocol_prompts.json sha256 (LF rendering) 19c3d1f888ba3a99cd4f91f917f3ce47dee41f8f2f8fe7177fe851e71e6e7e76 (CRLF working-tree sha256 8a86fed11ca698ea6ed354815ea8c5b216cb45d06c0f0edc54935087e9d3e751) [PIN OK]
+[CARD-W] T0 prompt qwen3 [DECIDING (CP1, CP2)]: "Instruct: Given a user utterance to a virtual assistant, identify the user's intent\nQuery:" sha256 e92a9484a87ad9d2d767f6a3b4a89f8b05301af78946d55886c1d69671c10e24 (90 UTF-8 bytes)
+[CARD-W] T0 prompt gemma [DECIDING (CP1)]: 'task: clustering | query: ' sha256 11ab9b678a16b2580a8b9379ee78f68307df0eac9cfca376e5b536928d16c2cf (26 UTF-8 bytes)
+[CARD-W] T0 prompt nomic [DESCRIPTIVE (CP4)]: 'clustering: ' sha256 1885ff312b2a4250dfe559ed4e00d931d14e3163d02638e25063d5e3f84b01c6 (12 UTF-8 bytes)
+[INTENT-S0] pin intent_transfer_corpora_v1.db: sha256 487e0093719c184c98bca53bc9bc61c193559690abb206d77010fd77f81c09a2 [PIN OK]
+[INTENT-S0] raw provenance amazon-massive-dataset-1.1.tar.gz: sha256 4cba5faa11c71437928e17cb1b9b3d8b8e727e7ea363a3a9a8045e19c0491577 [PIN OK]
+[INTENT-S0] raw provenance banking77_test.csv: sha256 d12d6e3bc4c3103966ae786dc435913c0c563dfa328f5a3646d0e62cfeeb474d [PIN OK]
+[INTENT-S0] raw provenance banking77_train.csv: sha256 b06e26ac675513959a63135f11b94ea7786ed02da65db93a5650d8838cbc664b [PIN OK]
+[INTENT-S0] raw provenance clinc_data_oos_plus.json: sha256 bfcca9ae515623541dc1983c94c4ed7cae9d26b42ae47d74b972e51bb6f7a21f [PIN OK]
+[INTENT-S0] raw provenance clinc_domains.json: sha256 b947b579d3b8e74b06f93b01083d8efaff2888b43a3e362533bd88a6e1211b3a [PIN OK]
+[INTENT-S0] pin intent_emb_qwen3.db: sha256 9e100e04fc91b137a075b8abedbc87d2b29a6dc2244c5f242b1c587004a4ee74 [PIN OK]
+[CARD-W] embed qwen3 (qwen3-embedding:latest, CARD prompt sha256 e92a9484a87ad9d2) -> Z:\FAC\TUBerlin\THESIS\TaxoArena\intent_emb_qwen3_card.db (exists: RESUME): text set 57350 (sha256 0ba7eb3c805127d5), present 51008, missing 6342, this launch 6342
+[CARD-W] heavy foreign processes: none
+[CARD-W] DISK before: 194.65 GB free on the volume of Z:\FAC\TUBerlin\THESIS\TaxoArena
+[CARD-W] shared caches per-table before: {"embeddings_cache.db": {"agent_ratings": "e3b0c44298fc1c14/0", "embeddings": "641ff6fad35bd1af/39631", "gmm_vectors": "e3b0c44298fc1c14/0", "match_history": "e3b0c44298fc1c14/0", "queries": "cdeca05e573e2578/31986"}, "embeddings_cache_embeddinggemma_latest.db": {"embeddings": "041a4dd1e4afb8fe/8249", "gmm_vectors": "e3b0c44298fc1c14/0", "queries": "e3b0c44298fc1c14/0"}, "embeddings_cache_nomic-embed-text_latest.db": {"embeddings": "826d5d6a8fb87a38/11769", "gmm_vectors": "e3b0c44298fc1c14/0", "queries": "9fea09b43d8397aa/8299"}}
+[CARD-W] Ollama endpoint http://127.0.0.1:11434/api/embed (resolved from OLLAMA_HOST='http://127.0.0.1:11434' by embedder_arms.client_base)
+[CARD-W] T1 /api/tags: qwen3-embedding:latest digest 64b933495768fbd3b87c20583d379728a07471e0c66733a9df87cd1901b3c44b; S0's RAW file intent_emb_qwen3.db stored digest 64b933495768fbd3b87c20583d379728a07471e0c66733a9df87cd1901b3c44b
+[CARD-W] T2 RAW route parity qwen3-embedding:latest: 20 texts posted without a prefix vs S0's stored RAW vectors, cos after slice-256 + renormalise min 0.999498 median 1.000000 (S0's bar >= 0.9980): PASS
+[CARD-W] T2b cos(CARD, RAW) qwen3 on 20 texts (S0 text set, first 20 by sha256), slice 256 + renormalise: min 0.669991 median 0.804583 (the prompt is the treatment: PRINTED, NO BAR)
+[CARD-W] T2b cos(CARD, RAW) qwen3 on 20 texts (S0 text set, first 20 by sha256), slice 1024 + renormalise: min 0.654376 median 0.778641 (the prompt is the treatment: PRINTED, NO BAR)
+[CARD-W] T2b cos(CARD, RAW) qwen3 on 20 texts (S0 text set, first 20 by sha256), slice 4096 + renormalise: min 0.637377 median 0.778908 (the prompt is the treatment: PRINTED, NO BAR)
+[CARD-W] T3 repeatability qwen3 CARD: 20 inputs posted twice, cos after slice-256 + renormalise min 0.999492 median 1.000000 (bar >= 0.9980): PASS
+[CARD-W] T4 resume parity intent_emb_qwen3_card.db: 20 stored rows re-embedded with the prefix, cos after slice-256 + renormalise min 0.999147 median 1.000000 (bar >= 0.9980): PASS
+[EMB-ARMS] target Z:\FAC\TUBerlin\THESIS\TaxoArena\intent_emb_qwen3_card.db (exists) sha256 before b2c3d1597e37c3d4938ec0c9ee9ff9c2fc2d55331ae7dc2f84cbafc988585d3b
+[EMB-ARMS] wrote 6342 vectors; sha256 after e8dd85afc2afc0752fce019d7fb4ad127a7d06e094cf604401b82efb1f22a1ac
+[CARD-W] shared caches per-table after: unchanged
+[CARD-W] S0's pins re-checked after: unchanged {'ingest_db': '487e0093719c184c', 'qwen3': '9e100e04fc91b137'}
+[CARD-W] DISK after: 194.54 GB free on the volume of Z:\FAC\TUBerlin\THESIS\TaxoArena
+[CARD-W] embed qwen3 CARD: wrote 6342; 0 of the set still missing (COMPLETE)

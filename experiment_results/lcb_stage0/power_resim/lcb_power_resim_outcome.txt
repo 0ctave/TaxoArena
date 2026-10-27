@@ -1,0 +1,27 @@
+[LCB-RESIM] LCB-STAGE0-POWER-RESIM | registration docs/judge_v2_program.md L22208-L22228 (7ea9ec1) | zero calls
+  B: 2000
+  W: 400
+  blobs: {'analysis.py': 'e3144692177ce48b3adf95a112c210c667f25538', 'fixture.py': '10437edbef903068f1842e36ccfbdb5feedd8176', 'stats.py': '813d2d6dd1581883c41d10e0ebb7869a7be21122'}
+  design_sha256: 4891b89c0dafd34e94795ab7112db26449e68cca4b964c97e2269f4167fe9d6e
+  script_blob: 8622ff95661f35214791752b9469088aca090432
+  tag: lcb-stage0-outcome-of-record
+  tag_commit: 3bcc9ab34937ea6ea4991d514b04b8c2870d91a2
+  taus: ['0.00', '0.15', '0.20', '0.25', '0.30']
+GRID (W 400 per tau, B 2000, bar p_T <= 0.01):
+  tau 0.00: 3 of 400 reject -> power 0.0075, Wilson 95% [0.0026, 0.0218]; fit refusals 0; mean true 10pp-reversal pairs 0.00
+  tau 0.15: 24 of 400 reject -> power 0.0600, Wilson 95% [0.0406, 0.0877]; fit refusals 0; mean true 10pp-reversal pairs 0.00
+  tau 0.20: 89 of 400 reject -> power 0.2225, Wilson 95% [0.1845, 0.2658]; fit refusals 0; mean true 10pp-reversal pairs 0.00
+  tau 0.25: 152 of 400 reject -> power 0.3800, Wilson 95% [0.3338, 0.4285]; fit refusals 0; mean true 10pp-reversal pairs 0.00
+  tau 0.30: 264 of 400 reject -> power 0.6600, Wilson 95% [0.6123, 0.7047]; fit refusals 0; mean true 10pp-reversal pairs 0.01
+C0 VALIDITY: identity REPRODUCED; size at tau 0 = 3 of 400 (bar <= 12); fit refusals per tau {'0.00': 0, '0.15': 0, '0.20': 0, '0.25': 0, '0.30': 0} (> 20 VOIDS that tau) -> PASS
+C1 THE POWER WORDS (the INTERVAL decides; the point decides nothing): power(0.20) = 0.2225 (89 of 400), Wilson 95% [0.1845, 0.2658] against 0.80 -> FAILED
+  the clause is replaced by C2's tau80
+C2 tau80 (DESCRIPTIVE, no bar): > 0.30; mean true 10pp-reversal pairs at tau80: n/a (no grid tau reaches 0.80)
+P1 power(0.20) = 0.70 [0.50, 0.88]: observed 0.2225 -> FAILED
+P2 power(0.15) = 0.42 [0.22, 0.62]: observed 0.0600 -> FAILED
+P3 power(0.25) = 0.88 [0.72, 0.97]: observed 0.3800 -> FAILED
+P4 size at tau 0 = 0.010 [0.003, 0.025]: observed 0.0075 -> HELD
+P5 C1 (HELD 0.25, FAILED 0.45, UNDETERMINED 0.30): observed FAILED
+P6 tau80 = 0.25 (0.45; 0.20: 0.25; 0.30: 0.20; > 0.30: 0.10): observed > 0.30
+F1: FIRES: the STOP sentence's power clause is re-bracketed with tau80 (the STOP, G1's FAIL, LCB's F1 and the closed line stand)
+WORDS: power UNDER THE PLUG-IN NULL (a_m, s_m, delta_p fitted on the same TRAIN data) with iid interactions on the FIXED real regions; the two-group structure is not run (C1 conservative for it)

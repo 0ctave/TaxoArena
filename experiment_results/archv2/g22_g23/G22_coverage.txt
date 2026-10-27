@@ -1,0 +1,62 @@
+[POOL] p2dca21ab5f4ef3ae: pool_guard.assert_pool_of_record PASSED (the id file and the reserved_pool rows both hash to it; the guard's own read-only open of the eval DB is not in the DB-open log below)
+=== ARCH-V2 G22 SIMULATOR, leg coverage: RUN UNDER THE REGISTRATION ARCH-V2-G22 at d6129cf (programme L15208-L15265), master ARCHV2-G22-REC-1, R 1000 ===
+  argv: tools/analysis/archv2_g22_sim.py --leg coverage --out experiment_results/archv2/g22_g23/G22_coverage.txt
+  master 'ARCHV2-G22-REC-1' | data root Z:\FAC\TUBerlin\THESIS\TaxoArena | started 2026-09-24 11:08:05
+  instrument identity (git blob / sha256-lf16 of the LF rendering; working tree state):
+    archv2_g22_sim.py                  blob:522cefe751fcbf53d8e898f043218b697c254db2 sha256-lf16:eff3435a973c1cfd (CRLF sha256-crlf16:9023845e49799760)
+    archv2_arena/__init__.py           blob:210bd76eaff44916ea9d85b0d6dcccd711d85154 sha256-lf16:ae6a0736954a8674 (CRLF sha256-crlf16:2f57cabe6c394809)
+    archv2_arena/streams.py            blob:30c23f9700a1309cda059c76bfe6fcbc6c41d64b sha256-lf16:315a30993d340650 (CRLF sha256-crlf16:bd52a16174d485b7)
+    archv2_arena/ro.py                 blob:98cfb84a58e7844e24b73ba301c2792cddc61b7c sha256-lf16:23d4f38710e3007f (CRLF sha256-crlf16:297117b2176e7cd7)
+    archv2_arena/bt.py                 blob:8ee2e28b4fe9097f68b462562adaedea92f54813 sha256-lf16:138bd034706eb2e1 (CRLF sha256-crlf16:b9c25ce1f79d1875)
+    archv2_arena/cert.py               blob:d150ec9c3084352354bd83c4b106f7936f11d036 sha256-lf16:11e2ec7e76e0b495 (CRLF sha256-crlf16:1a5f2a861058b6d1)
+    archv2_arena/verdict_model.py      blob:2d6d0e2c9f494f33bfc40fab18a30d31b2d433ad sha256-lf16:10b9a030c3f09e47 (CRLF sha256-crlf16:5ba1fa98b405f8a1)
+    archv2_arena/data.py               blob:7de0b135028ba96eab24b2ba998a62dd74e03247 sha256-lf16:78d3947f51dc8596 (CRLF sha256-crlf16:769163d4f95b4437)
+    archv2_arena/design.py             blob:4959cb525c8d07a26d19358c3f98342d5b28b3d2 sha256-lf16:becd63768eedb8fc (CRLF sha256-crlf16:c0e5c5ffd6dcd994)
+    archv2_arena/g22.py                blob:257d14ca64328f1d48d52fc57b0386dc71690b3b sha256-lf16:a8e7026c0d7e8c7a (CRLF sha256-crlf16:407a72846563346f)
+    archv2_arena/report.py             blob:51639563bdd47d48e0ec8b1673eee0e7b865653a sha256-lf16:da954a3c4d1b833f (CRLF sha256-crlf16:50e5e1884a1eb849)
+    archv2_arena/synth.py              blob:02db84ba5d3ee2c819bddc1be4455ec0e186b5ca sha256-lf16:b64657775ffa4422 (CRLF sha256-crlf16:3633804b08d6b3f1)
+    archv2_arena/selftest_g22.py       blob:88adb8247e51f9231282fc421fe9b6d82ac18aff sha256-lf16:e12bf469e0071db9 (CRLF sha256-crlf16:50145f9087cd36d5)
+    archv2_arena/selftest_g22_v2.py    blob:bd1e73f96db66ae31cb360a28be466c925e6c86c sha256-lf16:b3f4d8bffa636c41 (CRLF sha256-crlf16:d478cfe70a36b9d1)
+  inputs (size, mtime; -wal / -journal sizes):
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\mmlu_pro_dataset_cache_v2.db | 974917632 B | mtime 2026-09-19 16:30:10 | -wal 0 B
+  roster: 47 models in the eval DB, 46 after the quarantine of Meta-Llama-3-70B-Instruct
+  category data check: 6624 question ids carry more than one normalised category; the anchor is the modal value
+
+=== (h) EXTRACTION COVERAGE D_c per anchor for the 46-model roster ===
+  D_c = share of (question, pair) with two non-blank extracted answers (FRAMEWORK L39); a missing row counts blank; the valid-letter variant (ABCDEFGHIJ) beside; questions: ALL questions of the category (the DEV split's EVAL ids are not read here)
+  biology                      q   719 | D_c 0.8881 | valid-letter 0.8881 | BELOW the 0.95 bar
+  business                     q   793 | D_c 0.8793 | valid-letter 0.8793 | BELOW the 0.95 bar
+  chemistry                    q  1144 | D_c 0.6830 | valid-letter 0.6830 | BELOW the 0.95 bar
+  computer science             q   414 | D_c 0.8300 | valid-letter 0.8300 | BELOW the 0.95 bar
+  economics                    q   851 | D_c 0.9370 | valid-letter 0.9370 | BELOW the 0.95 bar
+  engineering                  q   974 | D_c 0.8071 | valid-letter 0.8071 | BELOW the 0.95 bar
+  health                       q   822 | D_c 0.9496 | valid-letter 0.9496 | BELOW the 0.95 bar
+  history                      q   385 | D_c 0.9250 | valid-letter 0.9250 | BELOW the 0.95 bar
+  law                          q  1108 | D_c 0.9443 | valid-letter 0.9443 | BELOW the 0.95 bar
+  math                         q  1361 | D_c 0.7407 | valid-letter 0.7407 | BELOW the 0.95 bar
+  other                        q   932 | D_c 0.9597 | valid-letter 0.9597 | PASS the 0.95 bar
+  philosophy                   q   506 | D_c 0.9217 | valid-letter 0.9217 | BELOW the 0.95 bar
+  physics                      q  1309 | D_c 0.8286 | valid-letter 0.8286 | BELOW the 0.95 bar
+  psychology                   q   800 | D_c 0.9802 | valid-letter 0.9802 | PASS the 0.95 bar
+  per-model blank rate, worst eight: Qwen1.5-7B-Chat 0.239, deepseek 0.209, Yi-6b-Chat 0.195, Mistral-7B-Instruct-v0.2 0.192, Qwen1.5-72B-Chat 0.190, Llama-2-7b-hf 0.177, Qwen1.5-14B-Chat 0.174, Llama-2-13b-hf 0.174
+  anchors at or above the bar: 2 of 14
+  frontier band from KEY TIERS (0.017 adjacency rule) per anchor, 46-model roster:
+    biology                      top tier (1): gemini-3.1-pro_5-shots
+    business                     top tier (1): gemini-3.1-pro_5-shots
+    chemistry                    top tier (1): gemini-3.1-pro_5-shots
+    computer science             top tier (1): gemini-3.1-pro_5-shots
+    economics                    top tier (1): gemini-3.1-pro_5-shots
+    engineering                  top tier (1): gemini-3.1-pro_5-shots
+    health                       top tier (1): gemini-3.1-pro_5-shots
+    history                      top tier (1): gemini-3.1-pro_5-shots
+    law                          top tier (1): gemini-3.1-pro_5-shots
+    math                         top tier (1): gemini-3.1-pro_5-shots
+    other                        top tier (1): gemini-3.1-pro_5-shots
+    philosophy                   top tier (1): gemini-3.1-pro_5-shots
+    physics                      top tier (1): gemini-3.1-pro_5-shots
+    psychology                   top tier (1): gemini-3.1-pro_5-shots
+
+  EXECUTION WITNESS (new code paths): {}
+  DB OPENS (all through pool_guard.open_ro: -wal/-journal refused, then mode=ro&immutable=1): 1
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\mmlu_pro_dataset_cache_v2.db
+  RANDOM STREAMS (master 'ARCHV2-G22-REC-1'): 0 named streams, log sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 (full list in the .streams.tsv beside this file); seed = sha256(master|name)[:8] big-endian unless 'of record'

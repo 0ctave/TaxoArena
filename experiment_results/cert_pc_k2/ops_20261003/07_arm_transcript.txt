@@ -1,0 +1,73 @@
+﻿To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.10/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+Configuration on demand is an incubating feature.
+Calculating task graph as no cached configuration is available for tasks: certPcK2
+> Task :checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :processTestResources UP-TO-DATE
+> Task :processResources UP-TO-DATE
+> Task :compileKotlin FROM-CACHE
+> Task :compileJava NO-SOURCE
+> Task :classes UP-TO-DATE
+> Task :jar
+> Task :compileTestKotlin FROM-CACHE
+> Task :compileTestJava NO-SOURCE
+> Task :testClasses UP-TO-DATE
+
+> Task :processTestAot
+17:57:54.028 [main] INFO org.springframework.test.context.aot.TestClassScanner -- Scanning for Spring test classes in all packages in classpath roots [Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\build\classes\kotlin\test, Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\build\resources\test]
+
+> Task :compileAotTestKotlin NO-SOURCE
+> Task :processAotTestResources UP-TO-DATE
+> Task :compileAotTestJava FROM-CACHE
+> Task :aotTestClasses UP-TO-DATE
+
+> Task :certPcK2
+
+SeparationNullBySizeTest > certPcK2 - declared two-family sites inside one category scored against their own site nulls() STANDARD_OUT
+    [THREAD-CAP] requested=12 availableProcessors=12 heapEstimate=n/a budget=5.80GB
+    [PK2] reads embeddings_cache.db (the qwen3 cache of record; -DembeddingCacheFile / -DembeddingModel refused)
+    [PK2] snapshot 20261001_094311_Headless_Run_Auto_ge root n00000001 'MMLU_PRO_LB' n=6993; site file experiment_results\cert_pc_k2\site_labels.tsv sha256 efcc4e99cf5eed50d04249a28e7aa896b1518f39088102e25055e6a3f65393bb; sites 31 (IDENTITY:6993/14g, K2_economics_n486_d1:486/2g, K2_economics_n486_d2:486/2g, K2_economics_n486_d3:486/2g, K2_economics_n486_d4:486/2g, K2_economics_n486_d5:486/2g, K2_economics_n441_d1:441/2g, K2_economics_n441_d2:441/2g, K2_economics_n441_d3:441/2g, K2_economics_n441_d4:441/2g, K2_economics_n441_d5:441/2g, K2_math_n486_d1:486/2g, K2_math_n486_d2:486/2g, K2_math_n486_d3:486/2g, K2_math_n486_d4:486/2g, K2_math_n486_d5:486/2g, K2_math_n441_d1:441/2g, K2_math_n441_d2:441/2g, K2_math_n441_d3:441/2g, K2_math_n441_d4:441/2g, K2_math_n441_d5:441/2g, K2_physics_n486_d1:486/2g, K2_physics_n486_d2:486/2g, K2_physics_n486_d3:486/2g, K2_physics_n486_d4:486/2g, K2_physics_n486_d5:486/2g, K2_physics_n441_d1:441/2g, K2_physics_n441_d2:441/2g, K2_physics_n441_d3:441/2g, K2_physics_n441_d4:441/2g, K2_physics_n441_d5:441/2g)
+    [SEPBAR] proposalSeparationBar=0.0145 (-DsepBar '0.0145'); sliceDim=512 dropTop=0 whiten=false reps=300 minClusterSize=55
+    [THREAD-CAP] requested=12 availableProcessors=12 heapEstimate=2.15GB budget=5.80GB
+    [SITENULL-HEAP] sliceDim=512 largest site n=6993 live=12 -> peak live 2.15 GB; budget 5.80 GB
+    [EMB-GUARD] model=qwen3-embedding:latest (default (no -DembeddingCacheFile, no -DembeddingModel, no manifest reachable: the DB of record's canonical model)); cache=embeddings_cache.db; native dim expected 4096; vectors read 6993 of 6993 ids, raw dims {4096=6993}; slice width 512
+    [EMB-GUARD] vmfMu cosine over 60 sites: min 0.9976 (site n00000014 'MMLU_PRO_LB/philosophy' n=322), median 0.9996; budget 0.99 -> ADMIT
+    [EMB-GUARD]   site n00000014  n=322   found=322   cos=0.9976  MMLU_PRO_LB/philosophy
+    [EMB-GUARD]   site n00000047  n=286   found=286   cos=0.9980  Emergent Concept #32
+    [EMB-GUARD]   site n00000018  n=426   found=426   cos=0.9982  Emergent Concept #3
+    [PK2] IDENTITY n=6993 declared=0.107803 k=0 (registered 0.107803, k 0) plain p95=0.041626 max=0.042414
+    [PK2] site K2_economics_n486_d1 n=486 groups=[230, 256] declared=0.014634 k=300 plain p95=0.068953 reached=300 deflated dims=1 k=300 C0 p95=0.000761 (seed -5455714868461722583)
+    [PK2] site K2_economics_n486_d2 n=486 groups=[230, 256] declared=0.014258 k=300 plain p95=0.068539 reached=300 deflated dims=1 k=300 C0 p95=0.000915 (seed -5455714865807286822)
+    [PK2] site K2_economics_n486_d3 n=486 groups=[230, 256] declared=0.014867 k=300 plain p95=0.068361 reached=300 deflated dims=1 k=300 C0 p95=0.000834 (seed -5455714863152851061)
+    [PK2] site K2_economics_n486_d4 n=486 groups=[230, 256] declared=0.014458 k=300 plain p95=0.068709 reached=300 deflated dims=1 k=300 C0 p95=0.000789 (seed -5455714860498415300)
+    [PK2] site K2_economics_n486_d5 n=486 groups=[230, 256] declared=0.014934 k=300 plain p95=0.068960 reached=300 deflated dims=1 k=300 C0 p95=0.000846 (seed -5455714857843979539)
+    [PK2] site K2_economics_n441_d1 n=441 groups=[208, 233] declared=0.014551 k=300 plain p95=0.069366 reached=300 deflated dims=1 k=300 C0 p95=0.000685 (seed -5465915968614240262)
+    [PK2] site K2_economics_n441_d2 n=441 groups=[208, 233] declared=0.014166 k=300 plain p95=0.069217 reached=300 deflated dims=1 k=300 C0 p95=0.001017 (seed -5465915965959804501)
+    [PK2] site K2_economics_n441_d3 n=441 groups=[208, 233] declared=0.014997 k=300 plain p95=0.069809 reached=300 deflated dims=1 k=300 C0 p95=0.000955 (seed -5465915963305368740)
+    [PK2] site K2_economics_n441_d4 n=441 groups=[208, 233] declared=0.014191 k=300 plain p95=0.071182 reached=300 deflated dims=1 k=300 C0 p95=0.000887 (seed -5465915960650932979)
+    [PK2] site K2_economics_n441_d5 n=441 groups=[208, 233] declared=0.016125 k=300 plain p95=0.069955 reached=300 deflated dims=1 k=300 C0 p95=0.000867 (seed -5465915957996497218)
+    [PK2] site K2_math_n486_d1      n=486 groups=[191, 295] declared=0.015878 k=300 plain p95=0.069132 reached=300 deflated dims=1 k=300 C0 p95=0.001497 (seed 2360419182743224035)
+    [PK2] site K2_math_n486_d2      n=486 groups=[191, 295] declared=0.014934 k=300 plain p95=0.066707 reached=300 deflated dims=1 k=300 C0 p95=0.001594 (seed 2360419185397659796)
+    [PK2] site K2_math_n486_d3      n=486 groups=[191, 295] declared=0.014413 k=300 plain p95=0.068710 reached=300 deflated dims=1 k=300 C0 p95=0.001411 (seed 2360419188052095557)
+    [PK2] site K2_math_n486_d4      n=486 groups=[191, 295] declared=0.016542 k=300 plain p95=0.069803 reached=300 deflated dims=1 k=300 C0 p95=0.001718 (seed 2360419190706531318)
+    [PK2] site K2_math_n486_d5      n=486 groups=[191, 295] declared=0.014397 k=300 plain p95=0.069653 reached=300 deflated dims=1 k=300 C0 p95=0.001498 (seed 2360419193360967079)
+    [PK2] site K2_math_n441_d1      n=441 groups=[173, 268] declared=0.016557 k=300 plain p95=0.069067 reached=300 deflated dims=1 k=300 C0 p95=0.001732 (seed 2350218082590706356)
+    [PK2] site K2_math_n441_d2      n=441 groups=[173, 268] declared=0.014956 k=300 plain p95=0.068039 reached=300 deflated dims=1 k=300 C0 p95=0.001647 (seed 2350218085245142117)
+    [PK2] site K2_math_n441_d3      n=441 groups=[173, 268] declared=0.015077 k=300 plain p95=0.069559 reached=300 deflated dims=1 k=300 C0 p95=0.001625 (seed 2350218087899577878)
+    [PK2] site K2_math_n441_d4      n=441 groups=[173, 268] declared=0.016743 k=300 plain p95=0.070156 reached=300 deflated dims=1 k=300 C0 p95=0.001684 (seed 2350218090554013639)
+    [PK2] site K2_math_n441_d5      n=441 groups=[173, 268] declared=0.013884 k=300 plain p95=0.067977 reached=300 deflated dims=1 k=300 C0 p95=0.001626 (seed 2350218093208449400)
+    [PK2] site K2_physics_n486_d1   n=486 groups=[331, 155] declared=0.017687 k=300 plain p95=0.066967 reached=300 deflated dims=1 k=300 C0 p95=0.002084 (seed 1078883969151709570)
+    [PK2] site K2_physics_n486_d2   n=486 groups=[331, 155] declared=0.016026 k=300 plain p95=0.068035 reached=300 deflated dims=1 k=300 C0 p95=0.002194 (seed 1078883971806145331)
+    [PK2] site K2_physics_n486_d3   n=486 groups=[331, 155] declared=0.016746 k=300 plain p95=0.067314 reached=300 deflated dims=1 k=300 C0 p95=0.001952 (seed 1078883974460581092)
+    [PK2] site K2_physics_n486_d4   n=486 groups=[331, 155] declared=0.018195 k=300 plain p95=0.067343 reached=300 deflated dims=1 k=300 C0 p95=0.001927 (seed 1078883977115016853)
+    [PK2] site K2_physics_n486_d5   n=486 groups=[331, 155] declared=0.017495 k=300 plain p95=0.066679 reached=300 deflated dims=1 k=300 C0 p95=0.002213 (seed 1078883979769452614)
+    [PK2] site K2_physics_n441_d1   n=441 groups=[300, 141] declared=0.015966 k=300 plain p95=0.067888 reached=300 deflated dims=1 k=300 C0 p95=0.002298 (seed 1068682868999191891)
+    [PK2] site K2_physics_n441_d2   n=441 groups=[300, 141] declared=0.018984 k=300 plain p95=0.067917 reached=300 deflated dims=1 k=300 C0 p95=0.002035 (seed 1068682871653627652)
+    [PK2] site K2_physics_n441_d3   n=441 groups=[300, 141] declared=0.016568 k=300 plain p95=0.067598 reached=300 deflated dims=1 k=300 C0 p95=0.002330 (seed 1068682874308063413)
+    [PK2] site K2_physics_n441_d4   n=441 groups=[300, 141] declared=0.018182 k=300 plain p95=0.067028 reached=300 deflated dims=1 k=300 C0 p95=0.002171 (seed 1068682876962499174)
+    [PK2] site K2_physics_n441_d5   n=441 groups=[300, 141] declared=0.016928 k=300 plain p95=0.068314 reached=300 deflated dims=1 k=300 C0 p95=0.002267 (seed 1068682879616934935)
+    [PK2] wrote experiment_results\cert_pc_k2\arm: sites.csv, replicates.csv, status.txt (COMPLETE); verdicts are the readout's
+
+BUILD SUCCESSFUL in 24m 42s
+9 actionable tasks: 3 executed, 3 from cache, 3 up-to-date
+Configuration cache entry stored.

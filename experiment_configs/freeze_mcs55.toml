@@ -1,0 +1,118 @@
+# ══════════════════════════════════════════════════════════════════════════
+#  outputDir: experiment_results/freeze_mcs55
+#  freeze_mcs55.toml — THE FROZEN ARTIFACT
+#
+#  Snapshot: 20260727_042523_Headless_Run_Auto_ge
+#  154 nodes / 87 leaves / maxDepth 6 / mass 8299.00 / J = 0.253129
+#  87/87 labelled, 87/87 rubrics. CERTIFIED true on all four terms at
+#  iteration 10 (editsDelta 0, trickleDelta -3.33e-16, maxMuDelta 1.11e-16,
+#  maxKappaRel 4.25e-13 against tol 1e-6). Iterations 8, 9, 10 identical on
+#  every column of iteration_metrics.csv. Mass conserved, no [MASS] warnings.
+#  Built from commit c381211 with no production source dirty.
+#
+#  ── Why each parameter has the value it has ───────────────────────────────
+#  minClusterSize = 55. NOT a statistical requirement. Chosen so the cell count
+#  (87) matches what the judge budget can identify; per-cell reliability
+#  (r = n/(n+7.66), median 0.833) is a CONSEQUENCE, not a target. This is
+#  licensed by a measured result: discriminative power is flat from 14 to 152
+#  cells (observed rho 0.929 / 0.922 / 0.905), so cell count is free to choose
+#  on budget grounds at no evaluative cost. See
+#  docs/prereg_discriminative_power.md — the prediction was registered before
+#  the numbers existed.
+#
+#  acceptanceZ = 2.0. SE(dJ) spans 13.1x p10-p90 on this corpus, and the
+#  uncalibrated rule accepted 4 of 52 edits below z=1, worst at z=0.156
+#  (dJ 9.4e-06 against SE 6.0e-05). Defended on COHERENCE alone: two empirical
+#  corroborations were tested and both refuted — the gate is stability-neutral
+#  (additive ~4.4-leaf offset, no dispersion change) and J-neutral (higher on
+#  2 of 5 seeds, sign test p = 0.812).
+#
+#  proposalSeparationBar = 0.025. Sits between two nulls measured by driving
+#  the production splitter: isotropic p95 0.0055-0.0093, within-node p50 ~0.04.
+#  See docs/separation_null_by_size.md.
+#
+#  maxK = 4 (default). A cost bound, not a structural determinant — but only
+#  since the k-fallback (e3c4b2c). Before it, maxK=6 collapsed the tree to 36
+#  leaves. Plateau at 6->8 was measured pre-router-fix and needs re-deriving.
+#
+#  ── The router correction this artifact depends on ────────────────────────
+#  Built AFTER c381211, which fixed routeToVmfs to score with shared kappa
+#  (matching the trickler) instead of the per-child density form. At matched
+#  granularity that correction is worth +10.3% J: 87 leaves at 0.253129 here
+#  against the previous frozen 88 leaves at 0.229418. Every result predating
+#  c381211 is void.
+#
+#  ── Known properties, stated rather than fixed ────────────────────────────
+#  * One leaf sits marginally below minClusterSize. The floor is enforced on
+#    the routed partition at SPLIT time and populations drift afterward, so
+#    ~1% of leaves end below it (1/87 here, 1/152 at mcs=30, 1/104 earlier).
+#    The floor is a birth constraint, not an invariant.
+#  * wall_ms is 0 in every iteration_metrics row — column declared, never
+#    populated.
+#  * The manifest's `dirty` flag is true from report/*.tex and one test file.
+#    No production source was dirty; the flag cannot currently distinguish
+#    those cases.
+#
+#  DO NOT EDIT THIS HEADER WHEN DERIVING A NEW CONFIG FROM THIS FILE.
+#  Rewrite it. Four configs in this directory have carried a stale header
+#  through sed-derivation; the outputDir: line above is what
+#  ExperimentConfigHeaderTest checks.
+# ══════════════════════════════════════════════════════════════════════════
+
+datasetType   = "MMLU_PRO"
+
+models        = [
+    "gpt-4o-2024-08-06",
+    "claude-3-5-sonnet-20241022",
+    "gemini-1.5-pro-002",
+    "deepseek-chat-v2_5",
+    "Meta-Llama-3_1-70B-Instruct",
+    "Qwen1.5-72B-Chat",
+    "gpt-4o-mini",
+    "claude-3-5-haiku-20241022",
+    "Mixtral-8x7B-Instruct-v0.1",
+    "c4ai-command-r-v01",
+    "Qwen1.5-14B-Chat",
+    "Meta-Llama-3_1-8B-Instruct",
+    "gemini-1.5-flash-002",
+    "Llama-2-70b-hf",
+    "Llama-2-13b-hf"
+]
+
+category      = ""
+queryLimit    = 0
+outputDir     = "experiment_results/freeze_mcs55"
+testRatio     = 0.3
+seed          = 42
+
+runPipeline        = true
+runBenchmark       = false
+runTrickle         = true
+runBaselines       = false
+enableFinalMetrics = true
+enableLabeling     = true
+judgeInduction     = true
+
+dagMode = "DAG_MAX"
+
+maxDepth              = 8
+minClusterSize        = 55
+proposalSeparationBar = 0.025
+tau                   = 1e-6
+acceptanceZ           = 2.0
+enableRefitGate       = false
+
+membershipFloor       = 0.25
+routingBeamGamma      = 0.2
+descentMargin         = 0.12
+
+effectiveSupportFloor = 2.0
+defaultKappaPrior     = 10.0
+
+numIterations         = 50
+maxLeafAssignments    = 5
+
+fusionSimilarityThreshold = 0.90
+enableGtWarmStart         = false
+
+enableProfiling           = true

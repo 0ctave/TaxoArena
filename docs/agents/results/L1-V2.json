@@ -1,0 +1,124 @@
+{
+  "id": "L1-V2",
+  "title": "L1-V2: truncation under the reference AND the v2 mechanics (~2k Mistral calls)",
+  "question": "L1's matches, three arms (original / truncate / pad), Mistral, the reasoning reference as in L1-V, SYSTEM template = v2 (verify the final answer first; a wrong final answer cannot win; no depth criteria); PRIMARY: truncate-arm correct-verdict rate > L1-V's 0.350, paired McNemar p < 0.05 on the common matches; SECONDARY original >= 0.772 - 0.02, pad within +-0.03 of original; prediction truncate 0.45-0.55; >= 0.55 -> v2 enters STACK as a second arm.",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "2034c9f",
+    "program_lines": "docs/judge_v2_program.md L108-L117 (registration, 2026-09-10 01:00) and L134-L147 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "### L1-V2 — truncation under the reference AND the v2 mechanics (~2k Mistral calls; registered 2026-09-10 01:00)",
+    "outcome_heading": [
+      "L134: - **L1-V2 (2026-09-10 01:58): PRIMARY PASS — the first causal evidence that a prompt change moves ..."
+    ],
+    "date": "2026-09-10"
+  },
+  "script": {
+    "path": "tools/analysis/causal_length.py --reference grok-reasoning --prompt v2",
+    "sha16": "544fc300f6d5aebe (at cc8b42c, the script's first commit; the --prompt v2 path at 2034c9f)",
+    "commit": "2034c9f"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (~2k Mistral calls; a first launch at 00:58 stopped after 40 s by a queue-marker bug; rerun 01:25-01:58)",
+  "run": {
+    "outcome_file": "experiment_results/causal_length/l1v2_outcome.txt",
+    "outcome_commit": "d8df3d6",
+    "calls": "~2,000 (337 matches x 3 arms, dual order)",
+    "cce": "not stated",
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-10",
+    "other_files": [
+      "experiment_results/causal_length/mistral_refgrok_v2.db (cache)",
+      "judge_v2_queue.log"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/)",
+    "commit": "d8df3d6",
+    "verdict": "PRIMARY PASS; secondary original -2.1pp missed the -2.0 floor by 0.001; pad n.s.; auto-trigger not reached; the STACK-v2 arm recommended as the author's call (taken: STACK-v2)"
+  },
+  "criteria": [
+    {
+      "id": "PRIMARY",
+      "text": "truncate-arm correct-verdict rate > L1-V's 0.350, paired McNemar p < 0.05 on the common matches",
+      "result": "HELD",
+      "value": "337 matches, 0 errors: truncate arm 0.433 vs L1-V 0.350 (+8.3pp; 42:14; p 0.0002); the v2 verify-first mechanics measurably reduce the elaboration damage (drop 0.507 -> 0.421 -> 0.318 across L1, L1-V, L1-V2)",
+      "denominator": "337 common matches"
+    },
+    {
+      "id": "SECONDARY",
+      "text": "original >= 0.772 - 0.02; pad within +-0.03 of original",
+      "result": "FAILED",
+      "value": "original 0.751 vs 0.772 (-2.1pp, n.s.; the -2.0 floor missed by 0.001); pad n.s.",
+      "denominator": "337 matches"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "truncate 0.45-0.55; >= 0.55 -> v2 enters STACK as a second arm",
+      "result": "FAILED",
+      "value": "0.433 (below the band); the auto-trigger not reached; the STACK-v2 arm recommended as the author's call, then registered and run (STACK-v2 0.865, the recipe of record)",
+      "denominator": "337"
+    }
+  ],
+  "falsifier": {
+    "text": "none beyond the criteria",
+    "fired": false,
+    "note": "the first causal evidence that a prompt change moves the elaboration vulnerability; v2 mechanics became part of STACK-v2"
+  },
+  "numbers_of_record": {
+    "truncate": "0.433 vs L1-V 0.350 (+8.3pp; 42:14; p 0.0002); drop 0.507 -> 0.421 -> 0.318 across L1 / L1-V / L1-V2",
+    "original": "0.751 vs 0.772 (-2.1pp, n.s.)",
+    "pad": "n.s."
+  },
+  "sentence_of_record": "L1-V2 (2026-09-10, ~2k calls): PRIMARY PASS: the truncate arm reads 0.433 vs L1-V's 0.350 (+8.3pp; 42:14; p = 0.0002): the v2 verify-first mechanics measurably reduce the elaboration damage (drop 0.507 -> 0.421 -> 0.318 across L1, L1-V, L1-V2), the first causal evidence that a prompt change moves the vulnerability; the original arm 0.751 vs 0.772 (-2.1pp, n.s.; the -2.0 floor missed by 0.001); pad n.s.; the auto-trigger (>= 0.55) not reached; the STACK-v2 arm recommended as the author's call.",
+  "chips": [
+    "PRIMARY PASS · secondary −0.001"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-23",
+      "by": "CORRECTIONS_2026-09-23 (registrar)",
+      "text": "[CORRECTED 2026-09-23 by the registrar: the script block named commit 2034c9f but carried 544fc300f6d5aebe, which is the sha of tools/analysis/causal_length.py at cc8b42c, the FIRST commit. The run-time sha of record is 7a1241ddc3e55067 = git show 2034c9f:tools/analysis/causal_length.py | sha256sum, first 16 hex. This one is determinate, not an identity: 2034c9f (2026-09-10 00:58:48) carries the --prompt v2 path and is the file's LAST commit, and the run is 01:25-01:58 the same night, so no other version can have posted.]"
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "the v2 mechanics as a recipe on their own (STACK-v2 assembled them with the reference and the rubric)"
+  ],
+  "ledger": {
+    "row_id": "L1-V2",
+    "version": "v22 (849fb17); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "L1",
+    "L1-V",
+    "STACK",
+    "STACK-v2"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L108-L117 and L134-L147 (2034c9f / d8df3d6)",
+    "experiment_results/causal_length/l1v2_outcome.txt (d8df3d6)",
+    "docs/test_ledger.html row L1-V2 (v22): chips verbatim, evidence (causal_length.py --reference grok-reasoning --prompt v2, mistral_refgrok_v2.db, judge_v2_queue.log, 2034c9f)",
+    "script sha16 = sha256 of tools/analysis/causal_length.py at cc8b42c (first commit), first 16 hex (identity, computed by the registrar 2026-09-22; the run version 2034c9f is the last edit)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Re-judges a set of matches where one answer was artificially cut short, padded, or left as is. This time the judge prompt says to check the final answer first and never let a wrong final answer win (about 2,000 calls).",
+    "why": "Earlier tests showed that judges reward longer, more elaborate answers. This test checks whether a prompt change can reduce that.",
+    "information": "It tells whether judge bias toward elaboration can be fixed by changing the instructions. Result: done; the main test passed. The judge picked the correct answer in the cut-short case 43% of the time instead of 35% (+8.3 points, p=0.0002). This is the first causal evidence that a prompt change reduces the bias. Normal accuracy dipped slightly, which is not significant. The automatic adoption threshold was not reached, so adoption is the author's call. This belongs to the older question pool, which is now ruled history, not evidence.",
+    "written": "2026-10-07"
+  }
+}

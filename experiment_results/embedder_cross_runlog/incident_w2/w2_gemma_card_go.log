@@ -1,0 +1,41 @@
+[THREADS] OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+[EMB-ARMS] --target-dir: source Z:\FAC\TUBerlin\THESIS\TaxoArena\embeddings_cache_embeddinggemma_latest.db sha256 3e9ce57772160749e0b5ea0267713286ca4109444d5a6b676e877a5b0501df29 -> NEW card file Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\embedder_cross\embeddings_cache_embeddinggemma_latest__card.db (absent; written only with --go)
+[EMB-ARMS] arm gemma_card: 11687 needed texts -> Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\embedder_cross\embeddings_cache_embeddinggemma_latest__card.db (queries rows copied from Z:\FAC\TUBerlin\THESIS\TaxoArena\embeddings_cache_embeddinggemma_latest.db)
+[EMB-ARMS] target Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\embedder_cross\embeddings_cache_embeddinggemma_latest__card.db (exists) sha256 before e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+Traceback (most recent call last):
+  File "Z:\FAC\TUBerlin\THESIS\TaxoArena\tools\analysis\embedder_arms.py", line 1382, in <module>
+    sys.exit(main(sys.argv[1:]))
+             ^^^^^^^^^^^^^^^^^^
+  File "Z:\FAC\TUBerlin\THESIS\TaxoArena\tools\analysis\embedder_arms.py", line 1378, in main
+    return run_embed(a)
+           ^^^^^^^^^^^^
+  File "Z:\FAC\TUBerlin\THESIS\TaxoArena\tools\analysis\embedder_arms.py", line 1145, in run_embed
+    embed_card(a.embed_card, a.go, target_dir=a.target_dir)
+  File "Z:\FAC\TUBerlin\THESIS\TaxoArena\tools\analysis\embedder_arms.py", line 1113, in embed_card
+    n = write_vectors(path, arm, texts, embed_fn, queries_src=raw)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "Z:\FAC\TUBerlin\THESIS\TaxoArena\tools\analysis\embedder_arms.py", line 467, in write_vectors
+    embs = embed_fn(arm.model, [arm.prefix + t for t in ch])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "Z:\FAC\TUBerlin\THESIS\TaxoArena\tools\analysis\embedder_arms.py", line 207, in ollama_embed
+    with urllib.request.urlopen(req, timeout=600) as r:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\octav\AppData\Local\Programs\Python\Python311\Lib\urllib\request.py", line 216, in urlopen
+    return opener.open(url, data, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\octav\AppData\Local\Programs\Python\Python311\Lib\urllib\request.py", line 525, in open
+    response = meth(req, response)
+               ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\octav\AppData\Local\Programs\Python\Python311\Lib\urllib\request.py", line 634, in http_response
+    response = self.parent.error(
+               ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\octav\AppData\Local\Programs\Python\Python311\Lib\urllib\request.py", line 563, in error
+    return self._call_chain(*args)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\octav\AppData\Local\Programs\Python\Python311\Lib\urllib\request.py", line 496, in _call_chain
+    result = func(*args)
+             ^^^^^^^^^^^
+  File "C:\Users\octav\AppData\Local\Programs\Python\Python311\Lib\urllib\request.py", line 643, in http_error_default
+    raise HTTPError(req.full_url, code, msg, hdrs, fp)
+urllib.error.HTTPError: HTTP Error 400: Bad Request
+rc=1

@@ -1,0 +1,146 @@
+{
+ "id": "E1-REPLICATES",
+ "title": "E1-REPLICATES: is E1's nomic-vs-qwen3 anchor-free tree-filing gap (-0.0456) larger than the construction-seed spread at 4 seeds per embedder (af_clean_s42 TRAIN and recipe fixed)? (zero calls; 6 builds; REGISTERED 2026-10-03)",
+ "question": "Is the E1 filing loss the embedder's or the build draw's?",
+ "kind": "zero-call",
+ "state": "withdrawn",
+ "registration": {
+  "commit": "the commit that writes it (parent 8841518b)",
+  "program_lines": "docs/judge_v2_program.md L23694-L23720",
+  "program_lines_as_of": "the commit that writes them, parent 8841518b, re-grepped",
+  "date": "2026-10-03",
+  "heading": "## Registered 2026-10-03 (before any code or call) — E1-REPLICATES: with af_clean_s42's content-closed TRAIN and recipe fixed, is the nomic-vs-qwen3 tree-filing gap of E1 (-0.0456) larger than the construction-seed spread when each embedder's anchor-free MMLU-Pro tree is rebuilt at 3 more construction seeds? (zero calls; 6 builds; CPU readout)",
+  "provenance": "the orchestrator's 5-hour schedule (8841518b) under the author's \"be autonomous\" and the autonomous-scheduling authorisation; criteria, Support, predictions, falsifier the registrar's"
+ },
+ "script": {
+  "path": "TO BE BUILT (see the registration's INSTRUMENT)",
+  "sha16": null,
+  "commit": null
+ },
+ "ready": null,
+ "go": "autonomous-scheduling authorisation; the author's \"schedule the continuation of testing for the next 5 hours, and be autonomous\"",
+ "run": null,
+ "review": {
+  "file": "docs/reviews/READY_e1_replicates.md",
+  "commit": "061a2418",
+  "verdict": "NOT READY (B-1: order shuffle rebuilds the same tree; S-1: order SD 0.00104 measured)"
+ },
+ "criteria": [
+  {
+   "id": "IDENTITY",
+   "text": "precondition: s = 42 arms reproduce 0.6813 / 0.7269 and b 327 / c 484",
+   "result": "n/a",
+   "value": "WITHDRAWN pre-data (no build ran)",
+   "denominator": "3,445 held-out items (DEFF 1.0, E1-measured tree-vs-tree; n_eff 3,445); 4 construction seeds per embedder"
+  },
+  {
+   "id": "ER1",
+   "text": "G = mean_s top1(N_s) - mean_s top1(Q_s); POINT AND INTERVAL jointly: WORSE iff 95% interval wholly < 0 AND G < -max(spread_N, spread_Q); BETTER symmetric; NEITHER otherwise. Verdict line: DESCRIPTIVE-ONLY at prediction (SE_total 0.0123, MDE80 0.0345, bar 0.0345) [2026-10-03 re-bracket: over 4 order-shuffled arms per embedder (o 1-4); SE_total 0.0100, MDE80 0.0280; SCOREABLE thin at prediction]",
+   "result": "n/a",
+   "value": "WITHDRAWN pre-data (no build ran)",
+   "denominator": "3,445 held-out items (DEFF 1.0, E1-measured tree-vs-tree; n_eff 3,445); 4 construction seeds per embedder"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "G -0.030 [-0.060, 0.000] [2026-10-03 re-bracket: P1 G -0.035 [-0.065, -0.005]; P2 spread_Q 0.015 [0.004, 0.040], spread_N 0.018 [0.005, 0.045]; P3 WORSE 0.45, NEITHER 0.53, BETTER 0.02; P4 F-ER 0.35]",
+   "result": "n/a",
+   "value": "WITHDRAWN pre-data (no build ran)",
+   "denominator": "3,445 held-out items (DEFF 1.0, E1-measured tree-vs-tree; n_eff 3,445); 4 construction seeds per embedder"
+  },
+  {
+   "id": "P2",
+   "text": "spread_Q 0.020 [0.008, 0.045]; spread_N 0.025 [0.010, 0.050]",
+   "result": "n/a",
+   "value": "WITHDRAWN pre-data (no build ran)",
+   "denominator": "3,445 held-out items (DEFF 1.0, E1-measured tree-vs-tree; n_eff 3,445); 4 construction seeds per embedder"
+  },
+  {
+   "id": "P3",
+   "text": "ER1 WORSE 0.30, NEITHER 0.68, BETTER 0.02",
+   "result": "n/a",
+   "value": "WITHDRAWN pre-data (no build ran)",
+   "denominator": "3,445 held-out items (DEFF 1.0, E1-measured tree-vs-tree; n_eff 3,445); 4 construction seeds per embedder"
+  },
+  {
+   "id": "P4",
+   "text": "F-ER fires 0.40",
+   "result": "n/a",
+   "value": "WITHDRAWN pre-data (no build ran)",
+   "denominator": "3,445 held-out items (DEFF 1.0, E1-measured tree-vs-tree; n_eff 3,445); 4 construction seeds per embedder"
+  }
+ ],
+ "falsifier": {
+  "text": "F-ER fires iff |G| <= max(spread_N, spread_Q): E1's F-E1 fire is not separable from build variation at 4 seeds; F-E1's overturn of 'the method's' is bracketed accordingly. No recorded number revised.",
+  "fired": null
+ },
+ "numbers_of_record": {},
+ "sentence_of_record": "E1-REPLICATES WITHDRAWN pre-data (2026-10-03; no build ran): at a fixed split construction is effectively deterministic (H9-REM order SD 0.00104; R4 af_s42_o1 equals af/seed_42 up to relabelling; the construction seed inert at a fixed reservedPoolFile), so the test would measure a known ~0 spread [READY_e1_replicates 061a2418 B-1, S-1]",
+ "chips": [
+  "REGISTERED 2026-10-03, BEFORE ANY CODE; not built",
+  "WITHDRAWN PRE-DATA: CONSTRUCTION EFFECTIVELY DETERMINISTIC AT A FIXED SPLIT (H9-REM, R4)"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-03",
+   "by": "registrar (pre-data; the builder's finding, the orchestrator's re-bracket)",
+   "text": "construction seed inert with reservedPoolFile fixed (L4676-L4680, L3819): instrument -> constructionOrderShuffleSeed o = 1..4, 4 shuffled arms per embedder (8 builds); G and spreads over the shuffled arms; unshuffled s=42 trees descriptive; Support re-stated with a declared order-shuffle pilot SD 0.008: SE_total 0.0100, MDE80 0.0280; ER1 SCOREABLE thin at G -0.035. section \"## Registrar's record 2026-10-03 (insertion only; zero calls; nothing run; pre-data) — E1-REPLICATES re-bracketed: ...\" (L23760-L23765, _as_of the commit that writes it, parent e45474b8)"
+  },
+  {
+   "date": "2026-10-03",
+   "by": "registrar (the orchestrator, on READY_e1_replicates 061a2418)",
+   "text": "WITHDRAWN pre-data. section \"## Registrar's record 2026-10-03 (insertion only; zero calls; nothing run; pre-data) — E1-REPLICATES WITHDRAWN pre-data ...\" (L23774-L23780, _as_of the commit that writes it, parent 061a2418)"
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (consistency check 2026-10-04; zero calls)",
+   "text": "the 'chips' list had drifted from the ledger row's chips (wording or replaced chips); the chips of record are the ledger's, copied verbatim into 'chips_ledger_verbatim' (ledger v379); 'chips' is kept as history."
+  }
+ ],
+ "does_not_show": [
+  "another corpus, embedder, recipe or TRAIN draw",
+  "prompts (nomic RAW); anchored trees",
+  "routing or judging value; parity (no TOST); the mechanism"
+ ],
+ "ledger": {
+  "row_id": "E1-REPLICATES",
+  "version": "v357 (2026-10-03: WITHDRAWN chip) | v356 (2026-10-03: re-bracket) | v355 (2026-10-03: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "EMBEDDER-CROSS-FLAT",
+  "E1-ROUTE"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 8,
+  "cpu": "6 constructions about 5 min each at 12 threads (estimate) + readout minutes",
+  "agent_hours": "engine-coder about 2 h",
+  "reads_pool": false
+ },
+ "outputs": "never committed: pinned by sha256, backed up to E: (memory bulky-outputs-not-in-git)",
+ "sources": [
+  "docs/judge_v2_program.md L23694-L23720 (section \"## Registered 2026-10-03 (before any code or call) — E1-REPLICATES: with af_clean_s42's content-closed TRAIN and recipe  ...\"; _as_of the commit that writes it, parent 8841518b, re-grepped)",
+  "docs/agents/results/EMBEDDER-CROSS-FLAT.json (E1, D-PR-3)",
+  "docs/agents/plans/2026-10-03_5h_schedule.md (8841518b)"
+ ],
+ "last_update": "2026-10-04",
+ "chips_ledger_verbatim": [
+  "plan: REGISTERED 2026-10-03, BEFORE ANY CODE; not built",
+  "null: WITHDRAWN PRE-DATA: CONSTRUCTION EFFECTIVELY DETERMINISTIC AT A FIXED SPLIT"
+ ],
+ "plain_description": {
+  "sq": "SQ5 Invariance",
+  "what": "Planned to rebuild the anchor-free tree 4 times for each of two embedders to see whether the filing gap between nomic and qwen3 (-0.046) is bigger than the variation between build runs.",
+  "why": "It asks whether the earlier filing loss belongs to the embedder or is just build-to-build noise.",
+  "information": "It would have separated a real embedder effect from build randomness. Result: WITHDRAWN before any data was collected. With a fixed data split, the build is effectively deterministic, so the test would only have measured a spread already known to be close to zero.",
+  "written": "2026-10-07"
+ }
+}

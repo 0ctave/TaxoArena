@@ -1,0 +1,1415 @@
+[BOOT] TaxoAdapt starting � pid=59728, java=21.0.6, jar=file:/Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/rp13-afu-run2/build/classes/kotlin/main/
+[THREAD-CAP] requested=12 availableProcessors=12 heapEstimate=n/a budget=16.94GB
+[BOOT] corpusDbPath from TOML: taxoadapt.eval.db-path=multicorpus_cache_v1.db
+Page de codes active�: 65001
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+15:28:43.092 [INFO ] EmbeddingCache - SQLite Embedding, GMM & Query Cache initialized successfully.
+15:28:43.104 [INFO ] ModelEvalStore - ModelEvalStore schema ready.
+15:28:43.108 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+15:28:43.130 [WARN ] ArcConfig - LLM provider is AZURE but AZURE_AI_ENDPOINT/AZURE_AI_API_KEY are blank. Create a root-level .env (see .env.example) or export these variables. Falling back to the Ollama chat model at http://localhost:11434 so the application can still start.
+15:28:43.164 [INFO ] LLMClient - [ARENA-PACING] request pacing at 4.0 req/s, semaphore capacity 4
+15:28:43.176 [INFO ] RankingService - SQLite Agent Ratings V2, Match History, and Bradley-Terry schema initialized.
+15:28:43.202 [INFO ] HeadlessRunner - Starting Headless Benchmark Mode with config: experiment_configs/union_af_route/AF-U/bbh.toml
+15:28:43.234 [INFO ] RatingsDbGuard - [DB-GUARD] ratings database 'ratings.db' is not tracked; safe to write
+15:28:43.259 [INFO ] HeadlessRunner - Loaded CLI Configuration: HeadlessCliConfig(snapshotId=unsaved, models=[DeepSeek-R1-Distill-Llama-8B, DeepSeek-R1-Distill-Qwen-32B, Falcon3-10B-Instruct, Llama-3.1-70B-Instruct, Llama-3.2-3B-Instruct, Llama-3.3-70B-Instruct, Mistral-Small-Instruct-2409, Mixtral-8x7B-Instruct-v0.1, OLMo-2-1124-7B-Instruct, Phi-3.5-mini-instruct, Qwen2.5-32B-Instruct, Qwen2.5-72B-Instruct, Qwen2.5-7B-Instruct, Qwen2.5-Coder-7B-Instruct, Qwen2.5-Math-7B-Instruct, Yi-1.5-34B-Chat-16K, c4ai-command-r-plus-08-2024, internlm2_5-20b-chat], queryLimit=0, category=null, confidenceGate=0.65, parallelism=6, questionsPerRound=12, reservedOnly=true, resumeBenchmark=false, profileMode=false, profileSeTarget=0.15, profileStrataFile=null, maxQueryReuse=2147483647, matchFilter=none, tau=1.0E-6, enableFinalMetrics=true, adaptiveBarFile=null, embeddingSliceDim=256, splitDropTopPcs=0, splitWhiten=false, proposalMemo=null, conditions=[MAIN, ORACLE, GENERIC_JUDGE, RANDOM_SCHEDULER], outputDir=experiment_results/archv2/union_af_route/AF-U/bbh, testRatio=0.3, seed=42, seeds=[], splitSeed=null, constructionOrderShuffleSeed=null, anchorFree=true, proposalAcceptMultiplier=null, reservedPoolFile=null, v2PoolFile=experiment_configs/engine_pool_pv2_1575de61bb20e977.json, unionRoutingItemKey=false, v2ForeignMembers=[], pool=pv2_1575de61bb20e977, acknowledgedEvalMembers=[], regenerateSplit=false, runPipeline=true, maxDepth=8, minClusterSize=55, proposalSeparationBar=0.025, membershipFloor=0.25, routingBeamGamma=0.2, descentMargin=0.12, acceptanceZ=2.0, marginalEps=null, maxK=null, excludeFromAnchoring=[], expectedWithheldQueries=null, enableRefitGate=false, defaultKappaPrior=10.0, enableLabeling=false, judgeInduction=false, datasetType=null, corpora=[BBH], corpusDbPath=multicorpus_cache_v1.db, unionSnapshots=[], unionRootRouting=descent, runBenchmark=false, runTrickle=true, domains=[], enableStableQuestionIds=null, enableResidualRouting=null, enableResidualSplitGate=null, fusionSimilarityThreshold=0.9, effectiveSupportFloor=2.0, numIterations=50, runBaselines=false, enableGtWarmStart=false, maxLeafAssignments=5, dagMode=DAG_MAX, enableProfiling=true, judgeSeesOptions=null, judgeOptionMode=null, judgeRecipe=null, judgeRecipeKit=null, judgeRecipeModel=null, judgeRecipeMaxTokens=null, judgeRecipeTemperature=null)
+15:28:43.260 [WARN ] HeadlessRunner - [ANCHOR-FREE] anchor-free construction ACTIVE: no category anchors, every train query starts at the root (the DAG is NOT the production path)
+15:28:43.260 [INFO ] HeadlessRunner - [SLICE] embedding slice width = 256, split PCA dropTop=0 whiten=false
+15:28:43.261 [INFO ] HeadlessRunner - [CORPUS] corpora=[BBH] corpusDbPath=multicorpus_cache_v1.db
+15:28:43.261 [INFO ] HeadlessRunner - [JUDGE-RECIPE] disabled: judge = Mistral-Large-3 on the langchain4j path (byte-identical to the board of record)
+15:28:43.363 [INFO ] Diagnostics - [DIAG] diagnostics bundle open at Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp13-afu-run2\experiment_results\archv2\union_af_route\AF-U\bbh\seed_42\diagnostics
+15:28:43.363 [INFO ] HeadlessRunner - ==================================================
+15:28:43.363 [INFO ] HeadlessRunner - STARTING PIPELINE AND EVALUATION WITH SEED: 42
+15:28:43.363 [INFO ] HeadlessRunner - ==================================================
+15:28:43.363 [INFO ] HeadlessRunner - Headless pipeline execution enabled. Starting DAG generation pipeline...
+15:28:43.365 [INFO ] HeadlessRunner - Loading dataset for domains: []
+15:28:43.409 [INFO ] LeaderboardCorpus - Loaded 5761 BBH queries across 24 domain(s) from multicorpus_cache_v1.db
+15:28:43.417 [INFO ] DatasetFetcher - [CORPUS] merged 1 source(s): BBH=24 domain(s)/5761 queries -> 24 domain key(s), 5761 queries
+15:28:43.535 [WARN ] HeadlessRunner - [SPLIT-V2] the split is taken AS GIVEN from experiment_configs/engine_pool_pv2_1575de61bb20e977.json (pv2_1575de61bb20e977, CK-CLOSE-v2); seed, testRatio and reservedPoolFile are not used for the split
+15:28:43.785 [WARN ] DatasetFetcher - [SPLIT-V2] namespaced pool file: this build loaded [BBH] of [BBH, GPQA, IFEVAL, MATH, MMLU_PRO, MUSR]; one-to-one checked on those
+15:28:43.818 [INFO ] DatasetFetcher - [POOL] recorded pc6bf56283b637368 (v2 pool pv2_1575de61bb20e977, 2286 judgeable ids; sentinels excluded); nothing activated
+15:28:43.820 [WARN ] DatasetFetcher - [SPLIT-V2] split taken as given from pv2_1575de61bb20e977 (CK-CLOSE-v2, engine pool file sha256(LF) 79d48f4b36434a55): 3475 train / 2286 reserved (eval 6466, gate 566, sentinels 0); one-to-one TRAIN and RESERVED hold; 0 TRAIN rows share a stem key with the 8186 global reserved keys; legacy id-list pool pc6bf56283b637368 (READY_rp12_et D-1: it holds EVAL + GATE ids, never an EVAL pool)
+15:28:43.824 [WARN ] HeadlessRunner - [TRAIN-ONLY] global reserved keys installed: 8186 (pv2_1575de61bb20e977, all corpora, sentinels included); build stamp recorded
+15:28:43.844 [INFO ] HeadlessRunner - [POOL] recorded pc6bf56283b637368 (seed=42, gate=566, closedByContent=0); nothing activated
+15:28:43.845 [INFO ] HeadlessRunner - Running GMM splitting and trickle routing pipeline...
+15:28:43.848 [INFO ] Engine - Starting Taxonomy Adaptation: BBH
+15:28:43.850 [INFO ] Engine - 
+┌── TAXONOMY CONFIGURATION PARAMETERS ─────────────────────
+│ Execution Settings:
+│   - Dataset Type:         AG_NEWS
+│   - Corpora:              [BBH]
+│   - Num Iterations:       50
+│   - Early Stopping:       true
+│   - Labeling:             false
+│   - Selected Domains:     [All]
+│   - Split Dataset:        true
+│   - Test Split Ratio:     0.3
+├── LLM & Embedding Models:
+│   - LLM Provider:         AZURE
+│   - Embedding Provider:   OLLAMA
+│   - Embedding Model:      qwen3-embedding:latest
+│   - Judge Model:          Mistral-Large-3
+│   - Labeling Model:       Mistral-Large-3
+│   - Max Judge Generality: 1
+├── Advanced Mathematical Formalism Controls:
+│   - DAG Mode:             DAG_MAX
+│   - Max Depth:            8
+│   - Min Cluster Size:     55
+│   - Separation Bar:       0.025
+│   - Slice Dim / PCA:      256 / dropTop=0 whiten=false
+│   - Lexicographic Tau:    1.0E-6
+│   - Anchor-Free:          true (ANCHOR-FREE arm; no category anchors)
+│   - Membership Floor:     0.25
+│   - Routing Beam Gamma:   0.2
+│   - Descent Margin:       0.12
+│   - Fusion Sim Threshold: 0.9
+│   - Eff Support Floor:    2.0
+│   - Default Kappa Prior:  10.0
+└──────────────────────────────────────────────────────────
+15:28:43.850 [WARN ] Engine - [ANCHOR-FREE] anchor-free construction ACTIVE: no category anchors, every train query starts at the root and the root is a split site (ANCHOR-FREE arm; this DAG is NOT the production path)
+15:28:43.850 [INFO ] Engine - Phase 1: Precomputing Embeddings...
+15:28:43.968 [INFO ] EmbeddingCache - All 3474 requested embeddings are already cached on disk.
+15:28:43.969 [INFO ] Engine - Dimension check passed: model=4096 dims, minRequired=256 (maxDepth=8)
+15:28:43.973 [WARN ] Engine - [ANCHOR-FREE] 3474 train queries placed at the root (no anchors); the root is the only split site at iteration 1
+15:28:43.976 [INFO ] Engine - Bootstrap: Seeding GMMs with 100% ground-truth data...
+15:28:43.976 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+15:28:44.032 [INFO ] Fitter - [FITTER] Fitting complete (1 depths, 1 nodes)
+15:28:44.034 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 228.0250     | 10.0000      | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+15:28:44.036 [INFO ] Engine - Initial DAG Structure (Before Statistical Fitting)
+15:28:44.041 [INFO ] Operations - 
+┌── TAXONOMY DAG HIERARCHY ───────────────────────────────
+│ BBH [q_dir=3474, q_rec=3474, mass=3474.0 - Leaf] (vMF kappa: 228.025)
+└─────────────────────────────────────────────────────────
+15:28:44.042 [INFO ] Engine - STARTING EVOLUTION ITERATION 1
+15:28:47.147 [INFO ] Splitter - Split 'BBH' (q=3474, k=2, sep=0.040, routed=[1249, 2225], converged=true) -> Spawning 2 children
+15:28:47.614 [INFO ] Splitter - Split 'BBH' (q=3474, k=2, sep=0.040, routed=[1249, 2225], converged=true) -> Spawning 2 children
+15:28:48.285 [INFO ] Operations - [DJ-SE] GROW 'BBH' dJ=4.033e-02 SE_dJ=2.235e-03 z=18.04 dV=2
+15:28:48.288 [INFO ] Operations - [GROW ACCEPTED] 'BBH' Delta J = 0.040326, Delta V = 2
+15:28:48.319 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+15:28:48.354 [INFO ] Fitter - [FIT-μ]  iter=1: mean_MLE_drift=1.000, oscillating_nodes=0/3, earlyout_rate=1.00
+15:28:48.356 [INFO ] Fitter - [FIT-κ]  iter=1: prior_dominated=0/3 (0.0%), median_kfinal=228.02, median_alpha=0.00
+15:28:48.356 [INFO ] Fitter - [FITTER] Fitting complete (2 depths, 3 nodes)
+15:28:48.359 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 228.0250     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 261.5770     | 228.0250     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+15:28:48.363 [INFO ] Engine - [REFIT-DELTA] Iteration 1 | 0.000e+00 (M-step inert, as expected)
+15:28:48.364 [INFO ] Engine - [J-TRACK] Iteration 1 | J_after_trickle: 0.000000 (Trickle Delta: 0.000000) | J_after_edits: 0.040326 (Edits Delta: 0.040326)
+15:28:48.365 [INFO ] Engine - [MU-GAP] Iteration 1 | internal nodes=1 cos(mu_v, resultant) min=0.9978 p10=0.9978 median=0.9978 max=0.9978
+15:28:48.747 [INFO ] Engine - [J-RESOLUTION] Iteration 1 | J=0.040326 SE_boot=2.081e-03 (B=200) | tau=1.000e-06 SE/tau=2081.0 | 2*SE=4.162e-03
+15:28:48.748 [INFO ] Engine - Iteration 1 completed in 4705ms.
+15:28:48.749 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 3 (2 leaves, 1 internal) | Total Mass: 3474.00 ===
+15:28:48.762 [INFO ] Engine - === DAG after iteration 1 ===
+15:28:48.770 [INFO ] Operations - 
+┌── TAXONOMY HIERARCHY ───────────────────────────────────
+│ BBH [q_dir=0, q_rec=3474, mass=3474.0, Parent] (kappa: 228.0)
+│ ├── Emergent Concept #3 [q_dir=1265, q_rec=1265, mass=1258.3, Leaf] (kappa: 311.9)
+│ └── Emergent Concept #4 [q_dir=2223, q_rec=2223, mass=2215.7, Leaf] (kappa: 211.3)
+└─────────────────────────────────────────────────────────
+15:28:48.770 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 1) ===
+15:28:48.771 [INFO ] Engine - GROW: 1 attempted (1 accepted, 0 rejected, 0 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+15:28:48.774 [INFO ] Engine - [CONVERGENCE] Iteration 1 | GED converged=false | J stationary=false (streak 0/5, editsDelta=4.033e-02, trickleDelta=0.000e+00)
+15:28:48.777 [INFO ] Engine - STARTING EVOLUTION ITERATION 2
+15:28:49.909 [INFO ] Splitter - Split 'Emergent Concept #3' (q=1265, k=2, sep=0.173, routed=[467, 798], converged=true) -> Spawning 2 children
+15:28:50.016 [INFO ] Splitter - Split 'Emergent Concept #3' (q=1265, k=2, sep=0.173, routed=[467, 798], converged=true) -> Spawning 2 children
+15:28:50.209 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #3' dJ=-4.504e-03 SE_dJ=4.205e-04 z=-10.71 dV=2
+15:28:50.210 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #3' Delta J = -0.004504, Delta V = 2. Reverting.
+15:28:50.241 [INFO ] Splitter - Split 'Emergent Concept #3' (q=1265, k=3, sep=0.290, routed=[467, 289, 509], converged=true) -> Spawning 3 children
+15:28:50.394 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #3' dJ=-1.281e-02 SE_dJ=8.142e-04 z=-15.73 dV=3
+15:28:50.395 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #3' Delta J = -0.012809, Delta V = 3. Reverting.
+15:28:50.463 [INFO ] Splitter - Split 'Emergent Concept #3' (q=1265, k=4, sep=0.362, routed=[467, 88, 240, 470], converged=true) -> Spawning 4 children
+15:28:50.604 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #3' dJ=-1.202e-02 SE_dJ=6.167e-04 z=-19.49 dV=4
+15:28:50.605 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #3' Delta J = -0.012017, Delta V = 4. Reverting.
+15:28:52.364 [INFO ] Splitter - Split 'Emergent Concept #4' (q=2223, k=2, sep=0.086, routed=[1280, 943], converged=true) -> Spawning 2 children
+15:28:52.542 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #4' dJ=8.962e-02 SE_dJ=6.102e-04 z=146.87 dV=2
+15:28:52.542 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #4' Delta J = 0.089622, Delta V = 2
+15:28:52.563 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+15:28:52.623 [INFO ] Fitter - [FIT-μ]  iter=2: mean_MLE_drift=1.000, oscillating_nodes=0/5, earlyout_rate=1.00
+15:28:52.623 [INFO ] Fitter - [FIT-κ]  iter=2: prior_dominated=0/5 (0.0%), median_kfinal=228.02, median_alpha=0.00
+15:28:52.624 [INFO ] Fitter - [FITTER] Fitting complete (3 depths, 5 nodes)
+15:28:52.626 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 228.0250     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 261.5577     | 228.0250     | 0               | 0.0000             | 0.0000            
+│ 2     | 219.6689     | 211.2889     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+15:28:52.629 [INFO ] Engine - [REFIT-DELTA] Iteration 2 | 0.000e+00 (M-step inert, as expected)
+15:28:52.629 [INFO ] Engine - [J-TRACK] Iteration 2 | J_after_trickle: 0.040326 (Trickle Delta: -0.000000) | J_after_edits: 0.129948 (Edits Delta: 0.089622)
+15:28:52.629 [INFO ] Engine - [MU-GAP] Iteration 2 | internal nodes=2 cos(mu_v, resultant) min=0.9973 p10=0.9973 median=0.9978 max=0.9978
+15:28:52.667 [INFO ] Engine - [J-RESOLUTION] Iteration 2 | J=0.129948 SE_boot=1.913e-03 (B=200) | tau=1.000e-06 SE/tau=1913.5 | 2*SE=3.827e-03
+15:28:52.667 [INFO ] Engine - Iteration 2 completed in 3890ms.
+15:28:52.668 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 5 (3 leaves, 2 internal) | Total Mass: 3474.00 ===
+15:28:52.681 [INFO ] Engine - === DAG Changes in iteration 2 ===
+15:28:52.684 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│ "BBH" (Parent, q=0/3474)
+│ └── [MUTATED] "Emergent Concept #4" (Parent, kappa: 211.3, q=0/2223) -> type changed: Leaf -> Parent
+│     ├── [ADDED] "Emergent Concept #16" (Leaf, kappa: 248.1, q=1285/1285)
+│     └── [ADDED] "Emergent Concept #17" (Leaf, kappa: 191.3, q=942/942)
+└──────────────────────────────────────────────────────────
+15:28:52.685 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 2) ===
+15:28:52.685 [INFO ] Engine - GROW: 7 attempted (1 accepted, 3 rejected, 3 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+15:28:52.686 [INFO ] Stabilizer - GED Analysis (Iter 2): +2/-0 nodes, +2/-0 relations.
+15:28:52.686 [INFO ] Engine - [CONVERGENCE] Iteration 2 | GED converged=false | J stationary=false (streak 0/5, editsDelta=8.962e-02, trickleDelta=-2.608e-08)
+15:28:52.686 [INFO ] Engine - STARTING EVOLUTION ITERATION 3
+15:28:53.764 [INFO ] Splitter - Split 'Emergent Concept #16' (q=1285, k=2, sep=0.050, routed=[454, 831], converged=true) -> Spawning 2 children
+15:28:53.815 [INFO ] Splitter - Split 'Emergent Concept #16' (q=1285, k=2, sep=0.050, routed=[454, 831], converged=true) -> Spawning 2 children
+15:28:53.922 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #16' dJ=1.752e-02 SE_dJ=7.215e-04 z=24.29 dV=2
+15:28:53.922 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #16' Delta J = 0.017524, Delta V = 2
+15:28:54.709 [INFO ] Splitter - Split 'Emergent Concept #17' (q=942, k=2, sep=0.161, routed=[501, 441], converged=true) -> Spawning 2 children
+15:28:54.778 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #17' dJ=4.731e-02 SE_dJ=5.297e-04 z=89.31 dV=2
+15:28:54.778 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #17' Delta J = 0.047306, Delta V = 2
+15:28:55.816 [INFO ] Splitter - Split 'Emergent Concept #3' (q=1265, k=2, sep=0.173, routed=[467, 798], converged=true) -> Spawning 2 children
+15:28:55.900 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #3' dJ=4.076e-02 SE_dJ=1.360e-03 z=29.96 dV=2
+15:28:55.904 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #3' Delta J = 0.040763, Delta V = 2
+15:28:55.926 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+15:28:55.937 [INFO ] Fitter - [FIT-μ]  iter=3: mean_MLE_drift=1.000, oscillating_nodes=0/11, earlyout_rate=1.00
+15:28:55.937 [INFO ] Fitter - [FIT-κ]  iter=3: prior_dominated=0/11 (0.0%), median_kfinal=248.07, median_alpha=0.00
+15:28:55.937 [INFO ] Fitter - [FITTER] Fitting complete (4 depths, 11 nodes)
+15:28:55.940 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 228.0250     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 261.5525     | 228.0250     | 0               | 0.0000             | 0.0000            
+│ 2     | 321.0704     | 261.5525     | 0               | 0.0000             | 0.0000            
+│ 3     | 235.6900     | 219.6785     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+15:28:55.942 [INFO ] Engine - [REFIT-DELTA] Iteration 3 | 0.000e+00 (M-step inert, as expected)
+15:28:55.942 [INFO ] Engine - [J-TRACK] Iteration 3 | J_after_trickle: 0.129948 (Trickle Delta: 0.000000) | J_after_edits: 0.235541 (Edits Delta: 0.105593)
+15:28:55.942 [INFO ] Engine - [MU-GAP] Iteration 3 | internal nodes=5 cos(mu_v, resultant) min=0.9963 p10=0.9963 median=0.9973 max=0.9981
+15:28:55.975 [INFO ] Engine - [J-RESOLUTION] Iteration 3 | J=0.235541 SE_boot=4.023e-03 (B=200) | tau=1.000e-06 SE/tau=4022.7 | 2*SE=8.045e-03
+15:28:55.975 [INFO ] Engine - Iteration 3 completed in 3289ms.
+15:28:55.975 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 11 (6 leaves, 5 internal) | Total Mass: 3474.00 ===
+15:28:55.990 [INFO ] Engine - === DAG Changes in iteration 3 ===
+15:28:55.990 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│ "BBH" (Parent, q=0/3474)
+│ ├── [MUTATED] "Emergent Concept #3" (Parent, kappa: 311.8, q=0/1265) -> type changed: Leaf -> Parent
+│ │   ├── [ADDED] "Emergent Concept #25" (Leaf, kappa: 319.9, q=798/798)
+│ │   └── [ADDED] "Emergent Concept #24" (Leaf, kappa: 525.1, q=467/467)
+│ └── "Emergent Concept #4" (Parent, q=0/2223)
+│     ├── [MUTATED] "Emergent Concept #16" (Parent, kappa: 248.1, q=0/1284) -> type changed: Leaf -> Parent
+│     │   ├── [ADDED] "Emergent Concept #21" (Leaf, kappa: 223.3, q=830/830)
+│     │   └── [ADDED] "Emergent Concept #20" (Leaf, kappa: 294.8, q=456/456)
+│     └── [MUTATED] "Emergent Concept #17" (Parent, kappa: 191.3, q=0/942) -> type changed: Leaf -> Parent
+│         ├── [ADDED] "Emergent Concept #22" (Leaf, kappa: 248.3, q=501/501)
+│         └── [ADDED] "Emergent Concept #23" (Leaf, kappa: 176.4, q=441/441)
+└──────────────────────────────────────────────────────────
+15:28:55.991 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 3) ===
+15:28:55.991 [INFO ] Engine - GROW: 9 attempted (3 accepted, 0 rejected, 6 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+15:28:55.991 [INFO ] Stabilizer - GED Analysis (Iter 3): +6/-0 nodes, +6/-0 relations.
+15:28:55.992 [INFO ] Engine - [CONVERGENCE] Iteration 3 | GED converged=false | J stationary=false (streak 0/5, editsDelta=1.056e-01, trickleDelta=4.562e-09)
+15:28:55.992 [INFO ] Engine - STARTING EVOLUTION ITERATION 4
+15:28:56.692 [INFO ] Splitter - Split 'Emergent Concept #21' (q=830, k=2, sep=0.105, routed=[408, 422], converged=true) -> Spawning 2 children
+15:28:56.718 [INFO ] Splitter - Split 'Emergent Concept #21' (q=830, k=2, sep=0.105, routed=[408, 422], converged=true) -> Spawning 2 children
+15:28:56.770 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #21' dJ=4.379e-02 SE_dJ=5.813e-04 z=75.33 dV=2
+15:28:56.770 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #21' Delta J = 0.043787, Delta V = 2
+15:28:56.950 [INFO ] Splitter - Split 'Emergent Concept #20' (q=456, k=2, sep=0.187, routed=[150, 306], converged=true) -> Spawning 2 children
+15:28:56.991 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #20' dJ=5.553e-03 SE_dJ=2.986e-04 z=18.59 dV=2
+15:28:56.991 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #20' Delta J = 0.005553, Delta V = 2
+15:28:57.427 [INFO ] Splitter - Split 'Emergent Concept #22' (q=501, k=2, sep=0.284, routed=[300, 201], converged=true) -> Spawning 2 children
+15:28:57.470 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #22' dJ=2.137e-02 SE_dJ=4.902e-04 z=43.58 dV=2
+15:28:57.470 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #22' Delta J = 0.021365, Delta V = 2
+15:28:57.650 [INFO ] Splitter - Split 'Emergent Concept #23' (q=441, k=2, sep=0.284, routed=[292, 149], converged=true) -> Spawning 2 children
+15:28:57.698 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #23' dJ=3.197e-02 SE_dJ=1.139e-03 z=28.07 dV=2
+15:28:57.698 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #23' Delta J = 0.031968, Delta V = 2
+15:28:58.370 [INFO ] Splitter - Split 'Emergent Concept #25' (q=798, k=2, sep=0.156, routed=[470, 328], converged=true) -> Spawning 2 children
+15:28:58.424 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #25' dJ=4.091e-02 SE_dJ=8.099e-04 z=50.52 dV=2
+15:28:58.424 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #25' Delta J = 0.040914, Delta V = 2
+15:28:58.621 [INFO ] Splitter - Split 'Emergent Concept #24' (q=467, k=2, sep=0.158, routed=[372, 95], converged=true) -> Spawning 2 children
+15:28:58.657 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #24' dJ=-3.421e-03 SE_dJ=3.476e-04 z=-9.84 dV=2
+15:28:58.657 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #24' Delta J = -0.003421, Delta V = 2. Reverting.
+15:28:58.662 [INFO ] Splitter - Split 'Emergent Concept #24' (q=467, k=3, sep=0.418, routed=[175, 95, 197], converged=true) -> Spawning 3 children
+15:28:58.737 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #24' dJ=-1.231e-02 SE_dJ=4.057e-04 z=-30.35 dV=3
+15:28:58.737 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #24' Delta J = -0.012314, Delta V = 3. Reverting.
+15:28:58.742 [INFO ] Splitter - Split 'Emergent Concept #24' (q=467, k=4, sep=0.616, routed=[175, 95, 93, 104], converged=true) -> Spawning 4 children
+15:28:58.810 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #24' dJ=-1.468e-02 SE_dJ=4.224e-04 z=-34.77 dV=4
+15:28:58.811 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #24' Delta J = -0.014685, Delta V = 4. Reverting.
+15:28:58.829 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+15:28:58.842 [INFO ] Fitter - [FIT-μ]  iter=4: mean_MLE_drift=1.000, oscillating_nodes=0/21, earlyout_rate=1.00
+15:28:58.842 [INFO ] Fitter - [FIT-κ]  iter=4: prior_dominated=0/21 (0.0%), median_kfinal=245.45, median_alpha=0.00
+15:28:58.842 [INFO ] Fitter - [FITTER] Fitting complete (5 depths, 21 nodes)
+15:28:58.844 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 228.0250     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 261.5477     | 228.0250     | 0               | 0.0000             | 0.0000            
+│ 2     | 321.0794     | 261.5477     | 0               | 0.0000             | 0.0000            
+│ 3     | 261.3358     | 253.0882     | 0               | 0.0000             | 0.0000            
+│ 4     | 361.7159     | 235.6745     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+15:28:58.846 [INFO ] Engine - [REFIT-DELTA] Iteration 4 | 0.000e+00 (M-step inert, as expected)
+15:28:58.846 [INFO ] Engine - [J-TRACK] Iteration 4 | J_after_trickle: 0.235541 (Trickle Delta: 0.000000) | J_after_edits: 0.379128 (Edits Delta: 0.143587)
+15:28:58.846 [INFO ] Engine - [MU-GAP] Iteration 4 | internal nodes=10 cos(mu_v, resultant) min=0.9815 p10=0.9927 median=0.9973 max=1.0000
+15:28:58.875 [INFO ] Engine - [J-RESOLUTION] Iteration 4 | J=0.379128 SE_boot=4.780e-03 (B=200) | tau=1.000e-06 SE/tau=4779.9 | 2*SE=9.560e-03
+15:28:58.876 [INFO ] Engine - Iteration 4 completed in 2884ms.
+15:28:58.876 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 21 (11 leaves, 10 internal) | Total Mass: 3474.00 ===
+15:28:58.893 [INFO ] Engine - === DAG Changes in iteration 4 ===
+15:28:58.894 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│ "BBH" (Parent, q=0/3474)
+│ ├── "Emergent Concept #3" (Parent, q=0/1265)
+│ │   └── [MUTATED] "Emergent Concept #25" (Parent, kappa: 319.9, q=0/798) -> type changed: Leaf -> Parent
+│ │       ├── [ADDED] "Emergent Concept #36" (Leaf, kappa: 381.0, q=470/470)
+│ │       └── [ADDED] "Emergent Concept #37" (Leaf, kappa: 244.3, q=328/328)
+│ └── "Emergent Concept #4" (Parent, q=0/2221)
+│     ├── "Emergent Concept #16" (Parent, q=0/1282)
+│     │   ├── [MUTATED] "Emergent Concept #21" (Parent, kappa: 223.2, q=0/828) -> type changed: Leaf -> Parent
+│     │   │   ├── [ADDED] "Emergent Concept #29" (Leaf, kappa: 200.4, q=420/420)
+│     │   │   └── [ADDED] "Emergent Concept #28" (Leaf, kappa: 234.0, q=408/408)
+│     │   └── [MUTATED] "Emergent Concept #20" (Parent, kappa: 294.8, q=0/456) -> type changed: Leaf -> Parent
+│     │       ├── [ADDED] "Emergent Concept #30" (Leaf, kappa: 1161.4, q=150/150)
+│     │       └── [ADDED] "Emergent Concept #31" (Leaf, kappa: 264.0, q=306/306)
+│     └── "Emergent Concept #17" (Parent, q=0/942)
+│         ├── [MUTATED] "Emergent Concept #22" (Parent, kappa: 248.3, q=0/501) -> type changed: Leaf -> Parent
+│         │   ├── [ADDED] "Emergent Concept #32" (Leaf, kappa: 354.9, q=300/300)
+│         │   └── [ADDED] "Emergent Concept #33" (Leaf, kappa: 207.8, q=201/201)
+│         └── [MUTATED] "Emergent Concept #23" (Parent, kappa: 176.4, q=0/441) -> type changed: Leaf -> Parent
+│             ├── [ADDED] "Emergent Concept #34" (Leaf, kappa: 225.8, q=292/292)
+│             └── [ADDED] "Emergent Concept #35" (Leaf, kappa: 245.5, q=149/149)
+└──────────────────────────────────────────────────────────
+15:28:58.894 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 4) ===
+15:28:58.894 [INFO ] Engine - GROW: 23 attempted (5 accepted, 3 rejected, 15 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+15:28:58.894 [INFO ] Stabilizer - GED Analysis (Iter 4): +10/-0 nodes, +10/-0 relations.
+15:28:58.894 [INFO ] Engine - [CONVERGENCE] Iteration 4 | GED converged=false | J stationary=false (streak 0/5, editsDelta=1.436e-01, trickleDelta=2.211e-08)
+15:28:58.895 [INFO ] Engine - STARTING EVOLUTION ITERATION 5
+15:28:59.084 [INFO ] Splitter - Split 'Emergent Concept #29' (q=420, k=2, sep=0.206, routed=[151, 269], converged=true) -> Spawning 2 children
+15:28:59.110 [INFO ] Splitter - Split 'Emergent Concept #29' (q=420, k=2, sep=0.206, routed=[151, 269], converged=true) -> Spawning 2 children
+15:28:59.157 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #29' dJ=3.037e-02 SE_dJ=1.024e-03 z=29.66 dV=2
+15:28:59.157 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #29' Delta J = 0.030366, Delta V = 2
+15:28:59.324 [INFO ] Splitter - Split 'Emergent Concept #28' (q=408, k=2, sep=0.167, routed=[258, 150], converged=true) -> Spawning 2 children
+15:28:59.368 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #28' dJ=2.307e-02 SE_dJ=8.381e-04 z=27.53 dV=2
+15:28:59.368 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #28' Delta J = 0.023073, Delta V = 2
+15:28:59.437 [INFO ] Splitter - Split 'Emergent Concept #30' (q=150, k=2, sep=0.121, routed=[76, 74], converged=true) -> Spawning 2 children
+15:28:59.466 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #30' dJ=-4.547e-03 SE_dJ=5.667e-05 z=-80.24 dV=2
+15:28:59.466 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #30' Delta J = -0.004547, Delta V = 2. Reverting.
+15:28:59.468 [INFO ] Splitter - Split 'Emergent Concept #30' (q=150, k=2, sep=0.121, routed=[76, 74], converged=true) -> Spawning 2 children
+15:28:59.493 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #30' dJ=-4.547e-03 SE_dJ=5.667e-05 z=-80.24 dV=2
+15:28:59.494 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #30' Delta J = -0.004547, Delta V = 2. Reverting.
+15:28:59.496 [INFO ] Splitter - Split 'Emergent Concept #30' (q=150, k=2, sep=0.121, routed=[76, 74], converged=true) -> Spawning 2 children
+15:28:59.521 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #30' dJ=-4.547e-03 SE_dJ=5.667e-05 z=-80.24 dV=2
+15:28:59.521 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #30' Delta J = -0.004547, Delta V = 2. Reverting.
+15:28:59.657 [INFO ] Splitter - Split 'Emergent Concept #31' (q=306, k=2, sep=0.247, routed=[152, 154], converged=true) -> Spawning 2 children
+15:28:59.705 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #31' dJ=1.062e-02 SE_dJ=3.038e-04 z=34.95 dV=2
+15:28:59.705 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #31' Delta J = 0.010619, Delta V = 2
+15:28:59.833 [INFO ] Splitter - Split 'Emergent Concept #32' (q=300, k=2, sep=0.700, routed=[150, 150], converged=true) -> Spawning 2 children
+15:28:59.910 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #32' dJ=1.393e-02 SE_dJ=2.013e-04 z=69.19 dV=2
+15:28:59.911 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #32' Delta J = 0.013926, Delta V = 2
+15:29:00.146 [INFO ] Splitter - Split 'Emergent Concept #34' (q=292, k=2, sep=0.390, routed=[150, 142], converged=true) -> Spawning 2 children
+15:29:00.181 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #34' dJ=2.009e-02 SE_dJ=2.745e-04 z=73.19 dV=2
+15:29:00.181 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #34' Delta J = 0.020094, Delta V = 2
+15:29:00.250 [INFO ] Splitter - Split 'Emergent Concept #35' (q=149, k=2, sep=0.087, routed=[69, 80], converged=true) -> Spawning 2 children
+15:29:00.281 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #35' dJ=2.770e-04 SE_dJ=1.077e-04 z=2.57 dV=2
+15:29:00.281 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #35' Delta J = 0.000277, Delta V = 2
+15:29:00.475 [INFO ] Splitter - Split 'Emergent Concept #36' (q=470, k=2, sep=0.180, routed=[186, 284], converged=true) -> Spawning 2 children
+15:29:00.519 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #36' dJ=1.797e-02 SE_dJ=5.706e-04 z=31.49 dV=2
+15:29:00.519 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #36' Delta J = 0.017968, Delta V = 2
+15:29:00.660 [INFO ] Splitter - Split 'Emergent Concept #37' (q=328, k=2, sep=0.266, routed=[240, 88], converged=true) -> Spawning 2 children
+15:29:00.695 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #37' dJ=2.508e-02 SE_dJ=1.515e-03 z=16.55 dV=2
+15:29:00.696 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #37' Delta J = 0.025078, Delta V = 2
+15:29:00.893 [INFO ] Splitter - Split 'Emergent Concept #24' (q=467, k=2, sep=0.158, routed=[372, 95], converged=true) -> Spawning 2 children
+15:29:00.932 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #24' dJ=8.498e-03 SE_dJ=7.376e-04 z=11.52 dV=2
+15:29:00.932 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #24' Delta J = 0.008498, Delta V = 2
+15:29:00.954 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+15:29:00.966 [INFO ] Fitter - [FIT-μ]  iter=5: mean_MLE_drift=1.000, oscillating_nodes=0/39, earlyout_rate=1.00
+15:29:00.966 [INFO ] Fitter - [FIT-κ]  iter=5: prior_dominated=0/39 (0.0%), median_kfinal=248.30, median_alpha=0.00
+15:29:00.966 [INFO ] Fitter - [FITTER] Fitting complete (6 depths, 39 nodes)
+15:29:00.969 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 228.0250     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 261.5448     | 228.0250     | 0               | 0.0000             | 0.0000            
+│ 2     | 321.0779     | 261.5448     | 0               | 0.0000             | 0.0000            
+│ 3     | 377.5980     | 321.0779     | 0               | 0.0000             | 0.0000            
+│ 4     | 359.5339     | 261.3389     | 0               | 0.0000             | 0.0000            
+│ 5     | 366.6503     | 254.0902     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+15:29:00.971 [INFO ] Engine - [REFIT-DELTA] Iteration 5 | 0.000e+00 (M-step inert, as expected)
+15:29:00.971 [INFO ] Engine - [J-TRACK] Iteration 5 | J_after_trickle: 0.379129 (Trickle Delta: 0.000000) | J_after_edits: 0.529027 (Edits Delta: 0.149899)
+15:29:00.971 [INFO ] Engine - [MU-GAP] Iteration 5 | internal nodes=19 cos(mu_v, resultant) min=0.9733 p10=0.9795 median=0.9973 max=1.0000
+15:29:00.999 [INFO ] Engine - [J-RESOLUTION] Iteration 5 | J=0.529027 SE_boot=5.344e-03 (B=200) | tau=1.000e-06 SE/tau=5344.1 | 2*SE=1.069e-02
+15:29:00.999 [INFO ] Engine - Iteration 5 completed in 2104ms.
+15:29:01.000 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 39 (20 leaves, 19 internal) | Total Mass: 3474.00 ===
+15:29:01.027 [INFO ] Engine - === DAG Changes in iteration 5 ===
+15:29:01.028 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│ "BBH" (Parent, q=0/3474)
+│ ├── "Emergent Concept #3" (Parent, q=0/1265)
+│ │   ├── "Emergent Concept #25" (Parent, q=0/798)
+│ │   │   ├── [MUTATED] "Emergent Concept #36" (Parent, kappa: 381.0, q=0/470) -> type changed: Leaf -> Parent
+│ │   │   │   ├── [ADDED] "Emergent Concept #67" (Leaf, kappa: 442.3, q=186/186)
+│ │   │   │   └── [ADDED] "Emergent Concept #68" (Leaf, kappa: 349.8, q=284/284)
+│ │   │   └── [MUTATED] "Emergent Concept #37" (Parent, kappa: 244.3, q=0/328) -> type changed: Leaf -> Parent
+│ │   │       ├── [ADDED] "Emergent Concept #70" (Leaf, kappa: 334.7, q=88/88)
+│ │   │       └── [ADDED] "Emergent Concept #69" (Leaf, kappa: 293.7, q=240/240)
+│ │   └── [MUTATED] "Emergent Concept #24" (Parent, kappa: 525.1, q=0/467) -> type changed: Leaf -> Parent
+│ │       ├── [ADDED] "Emergent Concept #72" (Leaf, kappa: 893.1, q=95/95)
+│ │       └── [ADDED] "Emergent Concept #71" (Leaf, kappa: 559.7, q=372/372)
+│ └── "Emergent Concept #4" (Parent, q=0/2221)
+│     ├── "Emergent Concept #16" (Parent, q=0/1282)
+│     │   ├── "Emergent Concept #21" (Parent, q=0/828)
+│     │   │   ├── [MUTATED] "Emergent Concept #29" (Parent, kappa: 200.4, q=0/420) -> type changed: Leaf -> Parent
+│     │   │   │   ├── [ADDED] "Emergent Concept #50" (Leaf, kappa: 202.6, q=268/268)
+│     │   │   │   └── [ADDED] "Emergent Concept #49" (Leaf, kappa: 282.6, q=153/153)
+│     │   │   └── [MUTATED] "Emergent Concept #28" (Parent, kappa: 234.0, q=0/408) -> type changed: Leaf -> Parent
+│     │   │       ├── [ADDED] "Emergent Concept #52" (Leaf, kappa: 208.8, q=150/150)
+│     │   │       └── [ADDED] "Emergent Concept #51" (Leaf, kappa: 235.8, q=259/259)
+│     │   └── "Emergent Concept #20" (Parent, q=0/456)
+│     │       └── [MUTATED] "Emergent Concept #31" (Parent, kappa: 264.0, q=0/306) -> type changed: Leaf -> Parent
+│     │           ├── [ADDED] "Emergent Concept #59" (Leaf, kappa: 352.1, q=153/153)
+│     │           └── [ADDED] "Emergent Concept #60" (Leaf, kappa: 204.0, q=154/154)
+│     └── "Emergent Concept #17" (Parent, q=0/942)
+│         ├── "Emergent Concept #22" (Parent, q=0/501)
+│         │   └── [MUTATED] "Emergent Concept #32" (Parent, kappa: 354.9, q=0/300) -> type changed: Leaf -> Parent
+│         │       ├── [ADDED] "Emergent Concept #61" (Leaf, kappa: 1191.2, q=150/150)
+│         │       └── [ADDED] "Emergent Concept #62" (Leaf, kappa: 767.0, q=150/150)
+│         └── "Emergent Concept #23" (Parent, q=0/441)
+│             ├── [MUTATED] "Emergent Concept #34" (Parent, kappa: 225.8, q=0/292) -> type changed: Leaf -> Parent
+│             │   ├── [ADDED] "Emergent Concept #63" (Leaf, kappa: 346.1, q=150/150)
+│             │   └── [ADDED] "Emergent Concept #64" (Leaf, kappa: 242.5, q=142/142)
+│             └── [MUTATED] "Emergent Concept #35" (Parent, kappa: 245.5, q=0/149) -> type changed: Leaf -> Parent
+│                 ├── [ADDED] "Emergent Concept #65" (Leaf, kappa: 190.6, q=69/69)
+│                 └── [ADDED] "Emergent Concept #66" (Leaf, kappa: 176.6, q=81/81)
+└──────────────────────────────────────────────────────────
+15:29:01.028 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 5) ===
+15:29:01.028 [INFO ] Engine - GROW: 45 attempted (9 accepted, 3 rejected, 33 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+15:29:01.029 [INFO ] Stabilizer - GED Analysis (Iter 5): +18/-0 nodes, +18/-0 relations.
+15:29:01.029 [INFO ] Engine - [CONVERGENCE] Iteration 5 | GED converged=false | J stationary=false (streak 0/5, editsDelta=1.499e-01, trickleDelta=1.229e-08)
+15:29:01.029 [INFO ] Engine - STARTING EVOLUTION ITERATION 6
+15:29:01.163 [INFO ] Splitter - Split 'Emergent Concept #50' (q=268, k=2, sep=0.235, routed=[165, 103], converged=true) -> Spawning 2 children
+15:29:01.184 [INFO ] Splitter - Split 'Emergent Concept #50' (q=268, k=2, sep=0.235, routed=[165, 103], converged=true) -> Spawning 2 children
+15:29:01.219 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #50' dJ=2.288e-02 SE_dJ=7.253e-04 z=31.55 dV=2
+15:29:01.220 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #50' Delta J = 0.022882, Delta V = 2
+15:29:01.287 [INFO ] Splitter - Split 'Emergent Concept #49' (q=153, k=2, sep=0.046, routed=[71, 82], converged=true) -> Spawning 2 children
+15:29:01.318 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #49' dJ=4.195e-04 SE_dJ=1.276e-04 z=3.29 dV=2
+15:29:01.318 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #49' Delta J = 0.000419, Delta V = 2
+15:29:01.390 [INFO ] Splitter - Split 'Emergent Concept #52' (q=150, k=2, sep=0.050, routed=[69, 81], converged=true) -> Spawning 2 children
+15:29:01.420 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #52' dJ=2.599e-03 SE_dJ=1.516e-04 z=17.15 dV=2
+15:29:01.421 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #52' Delta J = 0.002599, Delta V = 2
+15:29:01.532 [INFO ] Splitter - Split 'Emergent Concept #51' (q=259, k=2, sep=0.258, routed=[151, 108], converged=true) -> Spawning 2 children
+15:29:01.567 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #51' dJ=2.046e-02 SE_dJ=5.911e-04 z=34.61 dV=2
+15:29:01.568 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #51' Delta J = 0.020459, Delta V = 2
+15:29:01.641 [INFO ] Splitter - Split 'Emergent Concept #59' (q=153, k=2, sep=0.030, routed=[67, 86], converged=true) -> Spawning 2 children
+15:29:01.673 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #59' dJ=-7.107e-04 SE_dJ=1.667e-04 z=-4.26 dV=2
+15:29:01.674 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #59' Delta J = -0.000711, Delta V = 2. Reverting.
+15:29:01.677 [INFO ] Splitter - Split 'Emergent Concept #59' (q=153, k=2, sep=0.030, routed=[67, 86], converged=true) -> Spawning 2 children
+15:29:01.707 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #59' dJ=-7.107e-04 SE_dJ=1.667e-04 z=-4.26 dV=2
+15:29:01.708 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #59' Delta J = -0.000711, Delta V = 2. Reverting.
+15:29:01.710 [INFO ] Splitter - Split 'Emergent Concept #59' (q=153, k=2, sep=0.030, routed=[67, 86], converged=true) -> Spawning 2 children
+15:29:01.742 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #59' dJ=-7.107e-04 SE_dJ=1.667e-04 z=-4.26 dV=2
+15:29:01.742 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #59' Delta J = -0.000711, Delta V = 2. Reverting.
+15:29:01.815 [INFO ] Splitter - Split 'Emergent Concept #60' (q=154, k=2, sep=0.167, routed=[91, 63], converged=true) -> Spawning 2 children
+15:29:01.847 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #60' dJ=4.923e-03 SE_dJ=2.534e-04 z=19.43 dV=2
+15:29:01.847 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #60' Delta J = 0.004923, Delta V = 2
+15:29:01.983 [INFO ] Splitter - Split 'Emergent Concept #62' (q=150, k=2, sep=0.188, routed=[75, 75], converged=true) -> Spawning 2 children
+15:29:02.012 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #62' dJ=-3.795e-03 SE_dJ=8.015e-05 z=-47.35 dV=2
+15:29:02.012 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #62' Delta J = -0.003795, Delta V = 2. Reverting.
+15:29:02.014 [INFO ] Splitter - Split 'Emergent Concept #62' (q=150, k=2, sep=0.188, routed=[75, 75], converged=true) -> Spawning 2 children
+15:29:02.044 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #62' dJ=-3.795e-03 SE_dJ=8.015e-05 z=-47.35 dV=2
+15:29:02.045 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #62' Delta J = -0.003795, Delta V = 2. Reverting.
+15:29:02.047 [INFO ] Splitter - Split 'Emergent Concept #62' (q=150, k=2, sep=0.188, routed=[75, 75], converged=true) -> Spawning 2 children
+15:29:02.080 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #62' dJ=-3.795e-03 SE_dJ=8.015e-05 z=-47.35 dV=2
+15:29:02.080 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #62' Delta J = -0.003795, Delta V = 2. Reverting.
+15:29:02.151 [INFO ] Splitter - Split 'Emergent Concept #63' (q=150, k=2, sep=0.053, routed=[82, 68], converged=true) -> Spawning 2 children
+15:29:02.183 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #63' dJ=-4.046e-04 SE_dJ=8.607e-05 z=-4.70 dV=2
+15:29:02.183 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #63' Delta J = -0.000405, Delta V = 2. Reverting.
+15:29:02.185 [INFO ] Splitter - Split 'Emergent Concept #63' (q=150, k=2, sep=0.053, routed=[82, 68], converged=true) -> Spawning 2 children
+15:29:02.212 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #63' dJ=-4.046e-04 SE_dJ=8.607e-05 z=-4.70 dV=2
+15:29:02.212 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #63' Delta J = -0.000405, Delta V = 2. Reverting.
+15:29:02.213 [INFO ] Splitter - Split 'Emergent Concept #63' (q=150, k=2, sep=0.053, routed=[82, 68], converged=true) -> Spawning 2 children
+15:29:02.242 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #63' dJ=-4.046e-04 SE_dJ=8.607e-05 z=-4.70 dV=2
+15:29:02.243 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #63' Delta J = -0.000405, Delta V = 2. Reverting.
+15:29:02.308 [INFO ] Splitter - Split 'Emergent Concept #64' (q=142, k=2, sep=0.079, routed=[78, 64], converged=true) -> Spawning 2 children
+15:29:02.340 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #64' dJ=1.909e-03 SE_dJ=1.517e-04 z=12.59 dV=2
+15:29:02.341 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #64' Delta J = 0.001909, Delta V = 2
+15:29:02.428 [INFO ] Splitter - Split 'Emergent Concept #67' (q=186, k=2, sep=0.448, routed=[98, 88], converged=true) -> Spawning 2 children
+15:29:02.461 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #67' dJ=2.245e-03 SE_dJ=1.391e-04 z=16.14 dV=2
+15:29:02.462 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #67' Delta J = 0.002245, Delta V = 2
+15:29:02.583 [INFO ] Splitter - Split 'Emergent Concept #68' (q=284, k=2, sep=0.285, routed=[190, 94], converged=true) -> Spawning 2 children
+15:29:02.624 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #68' dJ=1.740e-02 SE_dJ=8.404e-04 z=20.70 dV=2
+15:29:02.624 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #68' Delta J = 0.017397, Delta V = 2
+15:29:02.729 [INFO ] Splitter - Split 'Emergent Concept #69' (q=240, k=2, sep=0.336, routed=[149, 91], converged=true) -> Spawning 2 children
+15:29:02.764 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #69' dJ=1.680e-02 SE_dJ=8.085e-04 z=20.78 dV=2
+15:29:02.764 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #69' Delta J = 0.016803, Delta V = 2
+15:29:02.839 [INFO ] Splitter - Split 'Emergent Concept #30' (q=150, k=2, sep=0.121, routed=[76, 74], converged=true) -> Spawning 2 children
+15:29:02.870 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #30' dJ=-5.350e-03 SE_dJ=9.545e-05 z=-56.05 dV=2
+15:29:02.870 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #30' Delta J = -0.005350, Delta V = 2. Reverting.
+15:29:02.872 [INFO ] Splitter - Split 'Emergent Concept #30' (q=150, k=2, sep=0.121, routed=[76, 74], converged=true) -> Spawning 2 children
+15:29:02.902 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #30' dJ=-5.350e-03 SE_dJ=9.545e-05 z=-56.05 dV=2
+15:29:02.902 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #30' Delta J = -0.005350, Delta V = 2. Reverting.
+15:29:02.904 [INFO ] Splitter - Split 'Emergent Concept #30' (q=150, k=2, sep=0.121, routed=[76, 74], converged=true) -> Spawning 2 children
+15:29:02.937 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #30' dJ=-5.350e-03 SE_dJ=9.545e-05 z=-56.05 dV=2
+15:29:02.937 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #30' Delta J = -0.005350, Delta V = 2. Reverting.
+15:29:03.181 [INFO ] Splitter - Split 'Emergent Concept #71' (q=372, k=2, sep=0.292, routed=[175, 197], converged=true) -> Spawning 2 children
+15:29:03.225 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #71' dJ=1.560e-02 SE_dJ=5.823e-04 z=26.78 dV=2
+15:29:03.225 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #71' Delta J = 0.015595, Delta V = 2
+15:29:03.250 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+15:29:03.261 [INFO ] Fitter - [FIT-μ]  iter=6: mean_MLE_drift=1.000, oscillating_nodes=0/59, earlyout_rate=1.00
+15:29:03.261 [INFO ] Fitter - [FIT-κ]  iter=6: prior_dominated=0/59 (0.0%), median_kfinal=245.45, median_alpha=0.00
+15:29:03.261 [INFO ] Fitter - [FITTER] Fitting complete (7 depths, 59 nodes)
+15:29:03.264 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 228.0250     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 261.5448     | 228.0250     | 0               | 0.0000             | 0.0000            
+│ 2     | 321.0779     | 261.5448     | 0               | 0.0000             | 0.0000            
+│ 3     | 377.5981     | 321.0779     | 0               | 0.0000             | 0.0000            
+│ 4     | 398.2697     | 303.9557     | 0               | 0.0000             | 0.0000            
+│ 5     | 392.2377     | 290.0520     | 0               | 0.0000             | 0.0000            
+│ 6     | 189.8617     | 229.3783     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+15:29:03.266 [INFO ] Engine - [REFIT-DELTA] Iteration 6 | 0.000e+00 (M-step inert, as expected)
+15:29:03.266 [INFO ] Engine - [J-TRACK] Iteration 6 | J_after_trickle: 0.529027 (Trickle Delta: 0.000000) | J_after_edits: 0.634260 (Edits Delta: 0.105233)
+15:29:03.267 [INFO ] Engine - [MU-GAP] Iteration 6 | internal nodes=29 cos(mu_v, resultant) min=0.9733 p10=0.9815 median=0.9974 max=1.0000
+15:29:03.297 [INFO ] Engine - [J-RESOLUTION] Iteration 6 | J=0.634260 SE_boot=5.276e-03 (B=200) | tau=1.000e-06 SE/tau=5275.8 | 2*SE=1.055e-02
+15:29:03.297 [INFO ] Engine - Iteration 6 completed in 2268ms.
+15:29:03.297 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 59 (30 leaves, 29 internal) | Total Mass: 3474.00 ===
+15:29:03.318 [INFO ] Engine - === DAG Changes in iteration 6 ===
+15:29:03.318 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│ "BBH" (Parent, q=0/3474)
+│ ├── "Emergent Concept #3" (Parent, q=0/1265)
+│ │   ├── "Emergent Concept #25" (Parent, q=0/798)
+│ │   │   ├── "Emergent Concept #36" (Parent, q=0/470)
+│ │   │   │   ├── [MUTATED] "Emergent Concept #67" (Parent, kappa: 442.3, q=0/186) -> type changed: Leaf -> Parent
+│ │   │   │   │   ├── [ADDED] "Emergent Concept #106" (Leaf, kappa: 491.9, q=88/88)
+│ │   │   │   │   └── [ADDED] "Emergent Concept #105" (Leaf, kappa: 566.9, q=98/98)
+│ │   │   │   └── [MUTATED] "Emergent Concept #68" (Parent, kappa: 349.8, q=0/284) -> type changed: Leaf -> Parent
+│ │   │   │       ├── [ADDED] "Emergent Concept #108" (Leaf, kappa: 623.2, q=94/94)
+│ │   │   │       └── [ADDED] "Emergent Concept #107" (Leaf, kappa: 364.3, q=190/190)
+│ │   │   └── "Emergent Concept #37" (Parent, q=0/328)
+│ │   │       └── [MUTATED] "Emergent Concept #69" (Parent, kappa: 293.7, q=0/240) -> type changed: Leaf -> Parent
+│ │   │           ├── [ADDED] "Emergent Concept #109" (Leaf, kappa: 384.3, q=149/149)
+│ │   │           └── [ADDED] "Emergent Concept #110" (Leaf, kappa: 229.9, q=91/91)
+│ │   └── "Emergent Concept #24" (Parent, q=0/467)
+│ │       └── [MUTATED] "Emergent Concept #71" (Parent, kappa: 559.7, q=0/372) -> type changed: Leaf -> Parent
+│ │           ├── [ADDED] "Emergent Concept #117" (Leaf, kappa: 758.9, q=175/175)
+│ │           └── [ADDED] "Emergent Concept #118" (Leaf, kappa: 502.5, q=197/197)
+│ └── "Emergent Concept #4" (Parent, q=0/2221)
+│     ├── "Emergent Concept #16" (Parent, q=0/1282)
+│     │   ├── "Emergent Concept #21" (Parent, q=0/828)
+│     │   │   ├── "Emergent Concept #29" (Parent, q=0/420)
+│     │   │   │   ├── [MUTATED] "Emergent Concept #50" (Parent, kappa: 202.6, q=0/268) -> type changed: Leaf -> Parent
+│     │   │   │   │   ├── [ADDED] "Emergent Concept #76" (Leaf, kappa: 202.1, q=103/103)
+│     │   │   │   │   └── [ADDED] "Emergent Concept #75" (Leaf, kappa: 209.8, q=165/165)
+│     │   │   │   └── [MUTATED] "Emergent Concept #49" (Parent, kappa: 282.6, q=0/153) -> type changed: Leaf -> Parent
+│     │   │   │       ├── [ADDED] "Emergent Concept #77" (Leaf, kappa: 215.7, q=73/73)
+│     │   │   │       └── [ADDED] "Emergent Concept #78" (Leaf, kappa: 190.8, q=82/82)
+│     │   │   └── "Emergent Concept #28" (Parent, q=0/408)
+│     │   │       ├── [MUTATED] "Emergent Concept #52" (Parent, kappa: 208.8, q=0/150) -> type changed: Leaf -> Parent
+│     │   │       │   ├── [ADDED] "Emergent Concept #79" (Leaf, kappa: 146.2, q=71/71)
+│     │   │       │   └── [ADDED] "Emergent Concept #80" (Leaf, kappa: 154.3, q=83/83)
+│     │   │       └── [MUTATED] "Emergent Concept #51" (Parent, kappa: 235.8, q=0/259) -> type changed: Leaf -> Parent
+│     │   │           ├── [ADDED] "Emergent Concept #81" (Leaf, kappa: 249.5, q=151/151)
+│     │   │           └── [ADDED] "Emergent Concept #82" (Leaf, kappa: 214.5, q=108/108)
+│     │   └── "Emergent Concept #20" (Parent, q=0/456)
+│     │       └── "Emergent Concept #31" (Parent, q=0/306)
+│     │           └── [MUTATED] "Emergent Concept #60" (Parent, kappa: 204.0, q=0/154) -> type changed: Leaf -> Parent
+│     │               ├── [ADDED] "Emergent Concept #90" (Leaf, kappa: 156.4, q=63/63)
+│     │               └── [ADDED] "Emergent Concept #89" (Leaf, kappa: 180.6, q=91/91)
+│     └── "Emergent Concept #17" (Parent, q=0/942)
+│         └── "Emergent Concept #23" (Parent, q=0/441)
+│             └── "Emergent Concept #34" (Parent, q=0/292)
+│                 └── [MUTATED] "Emergent Concept #64" (Parent, kappa: 242.5, q=0/142) -> type changed: Leaf -> Parent
+│                     ├── [ADDED] "Emergent Concept #104" (Leaf, kappa: 165.5, q=65/65)
+│                     └── [ADDED] "Emergent Concept #103" (Leaf, kappa: 193.1, q=80/80)
+└──────────────────────────────────────────────────────────
+15:29:03.318 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 6) ===
+15:29:03.318 [INFO ] Engine - GROW: 97 attempted (10 accepted, 12 rejected, 75 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+15:29:03.319 [INFO ] Stabilizer - GED Analysis (Iter 6): +20/-0 nodes, +20/-0 relations.
+15:29:03.319 [INFO ] Engine - [CONVERGENCE] Iteration 6 | GED converged=false | J stationary=false (streak 0/5, editsDelta=1.052e-01, trickleDelta=3.190e-08)
+15:29:03.319 [INFO ] Engine - STARTING EVOLUTION ITERATION 7
+15:29:03.498 [INFO ] Splitter - Split 'Emergent Concept #81' (q=151, k=2, sep=0.026, routed=[70, 81], converged=true) -> Spawning 2 children
+15:29:03.521 [INFO ] Splitter - Split 'Emergent Concept #81' (q=151, k=2, sep=0.026, routed=[70, 81], converged=true) -> Spawning 2 children
+15:29:03.552 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #81' dJ=3.764e-03 SE_dJ=2.062e-04 z=18.26 dV=2
+15:29:03.552 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #81' Delta J = 0.003764, Delta V = 2
+15:29:03.648 [INFO ] Splitter - Split 'Emergent Concept #107' (q=190, k=2, sep=0.524, routed=[101, 89], converged=true) -> Spawning 2 children
+15:29:03.686 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #107' dJ=1.103e-02 SE_dJ=2.110e-04 z=52.26 dV=2
+15:29:03.686 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #107' Delta J = 0.011026, Delta V = 2
+15:29:03.757 [INFO ] Splitter - Split 'Emergent Concept #109' (q=149, k=2, sep=0.033, routed=[71, 78], converged=true) -> Spawning 2 children
+15:29:03.791 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #109' dJ=2.562e-05 SE_dJ=1.160e-04 z=0.22 dV=2
+15:29:03.791 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #109' Delta J = 0.000026, Delta V = 2. Reverting.
+15:29:03.794 [INFO ] Splitter - Split 'Emergent Concept #109' (q=149, k=2, sep=0.033, routed=[71, 78], converged=true) -> Spawning 2 children
+15:29:03.824 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #109' dJ=2.562e-05 SE_dJ=1.160e-04 z=0.22 dV=2
+15:29:03.824 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #109' Delta J = 0.000026, Delta V = 2. Reverting.
+15:29:03.825 [INFO ] Splitter - Split 'Emergent Concept #109' (q=149, k=2, sep=0.033, routed=[71, 78], converged=true) -> Spawning 2 children
+15:29:03.859 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #109' dJ=2.562e-05 SE_dJ=1.160e-04 z=0.22 dV=2
+15:29:03.860 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #109' Delta J = 0.000026, Delta V = 2. Reverting.
+15:29:03.936 [INFO ] Splitter - Split 'Emergent Concept #59' (q=153, k=2, sep=0.030, routed=[67, 86], converged=true) -> Spawning 2 children
+15:29:03.970 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #59' dJ=9.905e-04 SE_dJ=2.372e-04 z=4.18 dV=2
+15:29:03.970 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #59' Delta J = 0.000990, Delta V = 2
+15:29:04.113 [INFO ] Splitter - Split 'Emergent Concept #62' (q=150, k=2, sep=0.188, routed=[75, 75], converged=true) -> Spawning 2 children
+15:29:04.147 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #62' dJ=-3.715e-03 SE_dJ=1.091e-04 z=-34.05 dV=2
+15:29:04.147 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #62' Delta J = -0.003715, Delta V = 2. Reverting.
+15:29:04.149 [INFO ] Splitter - Split 'Emergent Concept #62' (q=150, k=2, sep=0.188, routed=[75, 75], converged=true) -> Spawning 2 children
+15:29:04.182 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #62' dJ=-3.715e-03 SE_dJ=1.091e-04 z=-34.05 dV=2
+15:29:04.182 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #62' Delta J = -0.003715, Delta V = 2. Reverting.
+15:29:04.184 [INFO ] Splitter - Split 'Emergent Concept #62' (q=150, k=2, sep=0.188, routed=[75, 75], converged=true) -> Spawning 2 children
+15:29:04.218 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #62' dJ=-3.715e-03 SE_dJ=1.091e-04 z=-34.05 dV=2
+15:29:04.219 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #62' Delta J = -0.003715, Delta V = 2. Reverting.
+15:29:04.291 [INFO ] Splitter - Split 'Emergent Concept #63' (q=150, k=2, sep=0.053, routed=[82, 68], converged=true) -> Spawning 2 children
+15:29:04.328 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #63' dJ=1.332e-03 SE_dJ=1.306e-04 z=10.20 dV=2
+15:29:04.328 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #63' Delta J = 0.001332, Delta V = 2
+15:29:04.416 [INFO ] Splitter - Split 'Emergent Concept #117' (q=175, k=2, sep=0.388, routed=[101, 74], converged=true) -> Spawning 2 children
+15:29:04.450 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #117' dJ=-2.510e-03 SE_dJ=1.514e-04 z=-16.58 dV=2
+15:29:04.450 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #117' Delta J = -0.002510, Delta V = 2. Reverting.
+15:29:04.453 [INFO ] Splitter - Split 'Emergent Concept #117' (q=175, k=2, sep=0.388, routed=[101, 74], converged=true) -> Spawning 2 children
+15:29:04.489 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #117' dJ=-2.510e-03 SE_dJ=1.514e-04 z=-16.58 dV=2
+15:29:04.489 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #117' Delta J = -0.002510, Delta V = 2. Reverting.
+15:29:04.490 [INFO ] Splitter - Split 'Emergent Concept #117' (q=175, k=2, sep=0.388, routed=[101, 74], converged=true) -> Spawning 2 children
+15:29:04.525 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #117' dJ=-2.510e-03 SE_dJ=1.514e-04 z=-16.58 dV=2
+15:29:04.526 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #117' Delta J = -0.002510, Delta V = 2. Reverting.
+15:29:04.610 [INFO ] Splitter - Split 'Emergent Concept #118' (q=197, k=2, sep=0.602, routed=[104, 93], converged=true) -> Spawning 2 children
+15:29:04.643 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #118' dJ=7.775e-03 SE_dJ=2.020e-04 z=38.48 dV=2
+15:29:04.643 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #118' Delta J = 0.007775, Delta V = 2
+15:29:04.709 [INFO ] Splitter - Split 'Emergent Concept #30' (q=150, k=2, sep=0.121, routed=[76, 74], converged=true) -> Spawning 2 children
+15:29:04.739 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #30' dJ=-6.146e-03 SE_dJ=1.261e-04 z=-48.74 dV=2
+15:29:04.740 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #30' Delta J = -0.006146, Delta V = 2. Reverting.
+15:29:04.741 [INFO ] Splitter - Split 'Emergent Concept #30' (q=150, k=2, sep=0.121, routed=[76, 74], converged=true) -> Spawning 2 children
+15:29:04.772 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #30' dJ=-6.146e-03 SE_dJ=1.261e-04 z=-48.74 dV=2
+15:29:04.772 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #30' Delta J = -0.006146, Delta V = 2. Reverting.
+15:29:04.774 [INFO ] Splitter - Split 'Emergent Concept #30' (q=150, k=2, sep=0.121, routed=[76, 74], converged=true) -> Spawning 2 children
+15:29:04.809 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #30' dJ=-6.146e-03 SE_dJ=1.261e-04 z=-48.74 dV=2
+15:29:04.809 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #30' Delta J = -0.006146, Delta V = 2. Reverting.
+15:29:04.910 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #122' w=0.0 res=0 ch=0 par=0
+15:29:05.045 [INFO ] Operations - [DJ-SE] SHRINK 'Emergent Concept #81' dJ=-4.947e-03 SE_dJ=1.885e-04 z=-26.25 dV=-1
+15:29:05.045 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #81' Delta J = -0.004947, Delta V = -1. Reverting.
+15:29:05.057 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #122' w=0.0 res=0 ch=0 par=0
+15:29:05.084 [INFO ] Operations - [DJ-SE] SHRINK 'BBH' dJ=-4.947e-03 SE_dJ=1.885e-04 z=-26.25 dV=-1
+15:29:05.085 [INFO ] Operations - [SHRINK REJECTED] 'BBH' Delta J = -0.004947, Delta V = -1. Reverting.
+15:29:05.089 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+15:29:05.102 [INFO ] Fitter - [FIT-μ]  iter=7: mean_MLE_drift=1.000, oscillating_nodes=0/69, earlyout_rate=1.00
+15:29:05.102 [INFO ] Fitter - [FIT-κ]  iter=7: prior_dominated=0/69 (0.0%), median_kfinal=248.05, median_alpha=0.00
+15:29:05.102 [INFO ] Fitter - [FITTER] Fitting complete (8 depths, 69 nodes)
+15:29:05.104 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 228.0250     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 261.5448     | 228.0250     | 0               | 0.0000             | 0.0000            
+│ 2     | 321.0779     | 261.5448     | 0               | 0.0000             | 0.0000            
+│ 3     | 377.5981     | 321.0779     | 0               | 0.0000             | 0.0000            
+│ 4     | 398.2697     | 303.9557     | 0               | 0.0000             | 0.0000            
+│ 5     | 436.8226     | 311.2966     | 0               | 0.0000             | 0.0000            
+│ 6     | 239.1845     | 270.9775     | 0               | 0.0000             | 0.0000            
+│ 7     | 175.0524     | 249.4801     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+15:29:05.107 [INFO ] Engine - [REFIT-DELTA] Iteration 7 | 0.000e+00 (M-step inert, as expected)
+15:29:05.107 [INFO ] Engine - [J-TRACK] Iteration 7 | J_after_trickle: 0.634260 (Trickle Delta: 0.000000) | J_after_edits: 0.659147 (Edits Delta: 0.024887)
+15:29:05.107 [INFO ] Engine - [MU-GAP] Iteration 7 | internal nodes=34 cos(mu_v, resultant) min=0.9733 p10=0.9923 median=0.9981 max=1.0000
+15:29:05.141 [INFO ] Engine - [J-RESOLUTION] Iteration 7 | J=0.659147 SE_boot=6.472e-03 (B=200) | tau=1.000e-06 SE/tau=6471.7 | 2*SE=1.294e-02
+15:29:05.141 [INFO ] Engine - Iteration 7 completed in 1822ms.
+15:29:05.142 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 69 (35 leaves, 34 internal) | Total Mass: 3474.00 ===
+15:29:05.164 [INFO ] Engine - === DAG Changes in iteration 7 ===
+15:29:05.165 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│ "BBH" (Parent, q=0/3474)
+│ ├── "Emergent Concept #3" (Parent, q=0/1265)
+│ │   ├── "Emergent Concept #25" (Parent, q=0/798)
+│ │   │   └── "Emergent Concept #36" (Parent, q=0/470)
+│ │   │       └── "Emergent Concept #68" (Parent, q=0/284)
+│ │   │           └── [MUTATED] "Emergent Concept #107" (Parent, kappa: 364.3, q=0/190) -> type changed: Leaf -> Parent
+│ │   │               ├── [ADDED] "Emergent Concept #124" (Leaf, kappa: 474.8, q=89/89)
+│ │   │               └── [ADDED] "Emergent Concept #123" (Leaf, kappa: 554.4, q=101/101)
+│ │   └── "Emergent Concept #24" (Parent, q=0/467)
+│ │       └── "Emergent Concept #71" (Parent, q=0/372)
+│ │           └── [MUTATED] "Emergent Concept #118" (Parent, kappa: 502.5, q=0/197) -> type changed: Leaf -> Parent
+│ │               ├── [ADDED] "Emergent Concept #148" (Leaf, kappa: 741.6, q=93/93)
+│ │               └── [ADDED] "Emergent Concept #147" (Leaf, kappa: 934.6, q=104/104)
+│ └── "Emergent Concept #4" (Parent, q=0/2221)
+│     ├── "Emergent Concept #16" (Parent, q=0/1282)
+│     │   ├── "Emergent Concept #21" (Parent, q=0/828)
+│     │   │   └── "Emergent Concept #28" (Parent, q=0/408)
+│     │   │       └── "Emergent Concept #51" (Parent, q=0/259)
+│     │   │           └── [MUTATED] "Emergent Concept #81" (Parent, kappa: 249.5, q=0/151) -> type changed: Leaf -> Parent
+│     │   │               ├── [ADDED] "Emergent Concept #121" (Leaf, kappa: 179.1, q=74/74)
+│     │   │               └── [ADDED] "Emergent Concept #122" (Leaf, kappa: 171.0, q=85/85)
+│     │   └── "Emergent Concept #20" (Parent, q=0/456)
+│     │       └── "Emergent Concept #31" (Parent, q=0/306)
+│     │           └── [MUTATED] "Emergent Concept #59" (Parent, kappa: 352.1, q=0/153) -> type changed: Leaf -> Parent
+│     │               ├── [ADDED] "Emergent Concept #131" (Leaf, kappa: 263.6, q=68/68)
+│     │               └── [ADDED] "Emergent Concept #132" (Leaf, kappa: 239.6, q=88/88)
+│     └── "Emergent Concept #17" (Parent, q=0/942)
+│         └── "Emergent Concept #23" (Parent, q=0/441)
+│             └── "Emergent Concept #34" (Parent, q=0/292)
+│                 └── [MUTATED] "Emergent Concept #63" (Parent, kappa: 346.1, q=0/150) -> type changed: Leaf -> Parent
+│                     ├── [ADDED] "Emergent Concept #140" (Leaf, kappa: 230.8, q=70/70)
+│                     └── [ADDED] "Emergent Concept #139" (Leaf, kappa: 263.8, q=85/85)
+└──────────────────────────────────────────────────────────
+15:29:05.165 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 7) ===
+15:29:05.165 [INFO ] Engine - GROW: 167 attempted (5 accepted, 12 rejected, 150 no-proposal) | SHRINK: 2 attempted (0 accepted, 2 rejected, 0 no-proposal) | [MEMO] hits=0 boundary-exempt=0
+15:29:05.165 [INFO ] Stabilizer - GED Analysis (Iter 7): +10/-0 nodes, +10/-0 relations.
+15:29:05.166 [INFO ] Engine - [CONVERGENCE] Iteration 7 | GED converged=false | J stationary=false (streak 0/5, editsDelta=2.489e-02, trickleDelta=2.164e-08)
+15:29:05.169 [INFO ] Engine - STARTING EVOLUTION ITERATION 8
+15:29:05.328 [INFO ] Splitter - Split 'Emergent Concept #109' (q=149, k=2, sep=0.033, routed=[71, 78], converged=true) -> Spawning 2 children
+15:29:05.350 [INFO ] Splitter - Split 'Emergent Concept #109' (q=149, k=2, sep=0.033, routed=[71, 78], converged=true) -> Spawning 2 children
+15:29:05.380 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #109' dJ=3.250e-04 SE_dJ=1.282e-04 z=2.54 dV=2
+15:29:05.381 [INFO ] Operations - [GROW ACCEPTED] 'Emergent Concept #109' Delta J = 0.000325, Delta V = 2
+15:29:05.509 [INFO ] Splitter - Split 'Emergent Concept #62' (q=150, k=2, sep=0.188, routed=[75, 75], converged=true) -> Spawning 2 children
+15:29:05.540 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #62' dJ=-3.848e-03 SE_dJ=1.200e-04 z=-32.06 dV=2
+15:29:05.540 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #62' Delta J = -0.003848, Delta V = 2. Reverting.
+15:29:05.542 [INFO ] Splitter - Split 'Emergent Concept #62' (q=150, k=2, sep=0.188, routed=[75, 75], converged=true) -> Spawning 2 children
+15:29:05.573 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #62' dJ=-3.848e-03 SE_dJ=1.200e-04 z=-32.06 dV=2
+15:29:05.573 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #62' Delta J = -0.003848, Delta V = 2. Reverting.
+15:29:05.574 [INFO ] Splitter - Split 'Emergent Concept #62' (q=150, k=2, sep=0.188, routed=[75, 75], converged=true) -> Spawning 2 children
+15:29:05.604 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #62' dJ=-3.848e-03 SE_dJ=1.200e-04 z=-32.06 dV=2
+15:29:05.605 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #62' Delta J = -0.003848, Delta V = 2. Reverting.
+15:29:05.680 [INFO ] Splitter - Split 'Emergent Concept #117' (q=175, k=2, sep=0.388, routed=[101, 74], converged=true) -> Spawning 2 children
+15:29:05.711 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #117' dJ=-2.383e-03 SE_dJ=1.597e-04 z=-14.92 dV=2
+15:29:05.712 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #117' Delta J = -0.002383, Delta V = 2. Reverting.
+15:29:05.713 [INFO ] Splitter - Split 'Emergent Concept #117' (q=175, k=2, sep=0.388, routed=[101, 74], converged=true) -> Spawning 2 children
+15:29:05.744 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #117' dJ=-2.383e-03 SE_dJ=1.597e-04 z=-14.92 dV=2
+15:29:05.745 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #117' Delta J = -0.002383, Delta V = 2. Reverting.
+15:29:05.747 [INFO ] Splitter - Split 'Emergent Concept #117' (q=175, k=2, sep=0.388, routed=[101, 74], converged=true) -> Spawning 2 children
+15:29:05.778 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #117' dJ=-2.383e-03 SE_dJ=1.597e-04 z=-14.92 dV=2
+15:29:05.778 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #117' Delta J = -0.002383, Delta V = 2. Reverting.
+15:29:05.842 [INFO ] Splitter - Split 'Emergent Concept #30' (q=150, k=2, sep=0.121, routed=[76, 74], converged=true) -> Spawning 2 children
+15:29:05.872 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #30' dJ=-6.322e-03 SE_dJ=1.298e-04 z=-48.72 dV=2
+15:29:05.873 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #30' Delta J = -0.006322, Delta V = 2. Reverting.
+15:29:05.873 [INFO ] Splitter - Split 'Emergent Concept #30' (q=150, k=2, sep=0.121, routed=[76, 74], converged=true) -> Spawning 2 children
+15:29:05.904 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #30' dJ=-6.322e-03 SE_dJ=1.298e-04 z=-48.72 dV=2
+15:29:05.904 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #30' Delta J = -0.006322, Delta V = 2. Reverting.
+15:29:05.905 [INFO ] Splitter - Split 'Emergent Concept #30' (q=150, k=2, sep=0.121, routed=[76, 74], converged=true) -> Spawning 2 children
+15:29:05.936 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #30' dJ=-6.322e-03 SE_dJ=1.298e-04 z=-48.72 dV=2
+15:29:05.936 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #30' Delta J = -0.006322, Delta V = 2. Reverting.
+15:29:06.032 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #122' w=0.0 res=0 ch=0 par=0
+15:29:06.058 [INFO ] Operations - [DJ-SE] SHRINK 'Emergent Concept #81' dJ=-5.098e-03 SE_dJ=2.270e-04 z=-22.45 dV=-1
+15:29:06.058 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #81' Delta J = -0.005098, Delta V = -1. Reverting.
+15:29:06.070 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #122' w=0.0 res=0 ch=0 par=0
+15:29:06.097 [INFO ] Operations - [DJ-SE] SHRINK 'BBH' dJ=-5.098e-03 SE_dJ=2.270e-04 z=-22.45 dV=-1
+15:29:06.097 [INFO ] Operations - [SHRINK REJECTED] 'BBH' Delta J = -0.005098, Delta V = -1. Reverting.
+15:29:06.101 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+15:29:06.114 [INFO ] Fitter - [FIT-μ]  iter=8: mean_MLE_drift=1.000, oscillating_nodes=0/71, earlyout_rate=1.00
+15:29:06.115 [INFO ] Fitter - [FIT-κ]  iter=8: prior_dominated=0/71 (0.0%), median_kfinal=248.30, median_alpha=0.00
+15:29:06.115 [INFO ] Fitter - [FITTER] Fitting complete (8 depths, 71 nodes)
+15:29:06.117 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 228.0250     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 261.5456     | 228.0250     | 0               | 0.0000             | 0.0000            
+│ 2     | 321.0783     | 261.5456     | 0               | 0.0000             | 0.0000            
+│ 3     | 377.5976     | 321.0783     | 0               | 0.0000             | 0.0000            
+│ 4     | 398.2692     | 303.9552     | 0               | 0.0000             | 0.0000            
+│ 5     | 436.8192     | 311.2960     | 0               | 0.0000             | 0.0000            
+│ 6     | 242.3462     | 282.3006     | 0               | 0.0000             | 0.0000            
+│ 7     | 175.0522     | 249.4801     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+15:29:06.120 [INFO ] Engine - [REFIT-DELTA] Iteration 8 | 0.000e+00 (M-step inert, as expected)
+15:29:06.120 [INFO ] Engine - [J-TRACK] Iteration 8 | J_after_trickle: 0.659147 (Trickle Delta: -0.000000) | J_after_edits: 0.659472 (Edits Delta: 0.000325)
+15:29:06.120 [INFO ] Engine - [MU-GAP] Iteration 8 | internal nodes=35 cos(mu_v, resultant) min=0.9733 p10=0.9923 median=0.9981 max=1.0000
+15:29:06.146 [INFO ] Engine - [J-RESOLUTION] Iteration 8 | J=0.659472 SE_boot=6.645e-03 (B=200) | tau=1.000e-06 SE/tau=6644.9 | 2*SE=1.329e-02
+15:29:06.146 [INFO ] Engine - Iteration 8 completed in 977ms.
+15:29:06.147 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 71 (36 leaves, 35 internal) | Total Mass: 3474.00 ===
+15:29:06.159 [INFO ] Engine - === DAG Changes in iteration 8 ===
+15:29:06.160 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│ "BBH" (Parent, q=0/3474)
+│ └── "Emergent Concept #3" (Parent, q=0/1265)
+│     └── "Emergent Concept #25" (Parent, q=0/798)
+│         └── "Emergent Concept #37" (Parent, q=0/328)
+│             └── "Emergent Concept #69" (Parent, q=0/240)
+│                 └── [MUTATED] "Emergent Concept #109" (Parent, kappa: 384.3, q=0/149) -> type changed: Leaf -> Parent
+│                     ├── [ADDED] "Emergent Concept #157" (Leaf, kappa: 275.5, q=75/75)
+│                     └── [ADDED] "Emergent Concept #158" (Leaf, kappa: 266.2, q=82/82)
+└──────────────────────────────────────────────────────────
+15:29:06.160 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 8) ===
+15:29:06.160 [INFO ] Engine - GROW: 205 attempted (1 accepted, 9 rejected, 195 no-proposal) | SHRINK: 2 attempted (0 accepted, 2 rejected, 0 no-proposal) | [MEMO] hits=0 boundary-exempt=6
+15:29:06.160 [INFO ] Stabilizer - GED Analysis (Iter 8): +2/-0 nodes, +2/-0 relations.
+15:29:06.160 [INFO ] Engine - [CONVERGENCE] Iteration 8 | GED converged=false | J stationary=false (streak 0/5, editsDelta=3.250e-04, trickleDelta=-7.588e-09)
+15:29:06.161 [INFO ] Engine - STARTING EVOLUTION ITERATION 9
+15:29:06.384 [INFO ] Splitter - Split 'Emergent Concept #62' (q=150, k=2, sep=0.188, routed=[75, 75], converged=true) -> Spawning 2 children
+15:29:06.404 [INFO ] Splitter - Split 'Emergent Concept #62' (q=150, k=2, sep=0.188, routed=[75, 75], converged=true) -> Spawning 2 children
+15:29:06.434 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #62' dJ=-3.848e-03 SE_dJ=1.200e-04 z=-32.06 dV=2
+15:29:06.434 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #62' Delta J = -0.003848, Delta V = 2. Reverting.
+15:29:06.435 [INFO ] Splitter - Split 'Emergent Concept #62' (q=150, k=2, sep=0.188, routed=[75, 75], converged=true) -> Spawning 2 children
+15:29:06.466 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #62' dJ=-3.848e-03 SE_dJ=1.200e-04 z=-32.06 dV=2
+15:29:06.467 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #62' Delta J = -0.003848, Delta V = 2. Reverting.
+15:29:06.468 [INFO ] Splitter - Split 'Emergent Concept #62' (q=150, k=2, sep=0.188, routed=[75, 75], converged=true) -> Spawning 2 children
+15:29:06.498 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #62' dJ=-3.848e-03 SE_dJ=1.200e-04 z=-32.06 dV=2
+15:29:06.498 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #62' Delta J = -0.003848, Delta V = 2. Reverting.
+15:29:06.575 [INFO ] Splitter - Split 'Emergent Concept #117' (q=175, k=2, sep=0.388, routed=[101, 74], converged=true) -> Spawning 2 children
+15:29:06.605 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #117' dJ=-2.383e-03 SE_dJ=1.597e-04 z=-14.92 dV=2
+15:29:06.605 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #117' Delta J = -0.002383, Delta V = 2. Reverting.
+15:29:06.607 [INFO ] Splitter - Split 'Emergent Concept #117' (q=175, k=2, sep=0.388, routed=[101, 74], converged=true) -> Spawning 2 children
+15:29:06.637 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #117' dJ=-2.383e-03 SE_dJ=1.597e-04 z=-14.92 dV=2
+15:29:06.637 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #117' Delta J = -0.002383, Delta V = 2. Reverting.
+15:29:06.639 [INFO ] Splitter - Split 'Emergent Concept #117' (q=175, k=2, sep=0.388, routed=[101, 74], converged=true) -> Spawning 2 children
+15:29:06.669 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #117' dJ=-2.383e-03 SE_dJ=1.597e-04 z=-14.92 dV=2
+15:29:06.669 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #117' Delta J = -0.002383, Delta V = 2. Reverting.
+15:29:06.734 [INFO ] Splitter - Split 'Emergent Concept #30' (q=150, k=2, sep=0.121, routed=[76, 74], converged=true) -> Spawning 2 children
+15:29:06.765 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #30' dJ=-6.322e-03 SE_dJ=1.298e-04 z=-48.72 dV=2
+15:29:06.765 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #30' Delta J = -0.006322, Delta V = 2. Reverting.
+15:29:06.766 [INFO ] Splitter - Split 'Emergent Concept #30' (q=150, k=2, sep=0.121, routed=[76, 74], converged=true) -> Spawning 2 children
+15:29:06.798 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #30' dJ=-6.322e-03 SE_dJ=1.298e-04 z=-48.72 dV=2
+15:29:06.798 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #30' Delta J = -0.006322, Delta V = 2. Reverting.
+15:29:06.800 [INFO ] Splitter - Split 'Emergent Concept #30' (q=150, k=2, sep=0.121, routed=[76, 74], converged=true) -> Spawning 2 children
+15:29:06.831 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #30' dJ=-6.322e-03 SE_dJ=1.298e-04 z=-48.72 dV=2
+15:29:06.831 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #30' Delta J = -0.006322, Delta V = 2. Reverting.
+15:29:06.922 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #122' w=0.0 res=0 ch=0 par=0
+15:29:06.953 [INFO ] Operations - [DJ-SE] SHRINK 'Emergent Concept #81' dJ=-5.098e-03 SE_dJ=1.937e-04 z=-26.32 dV=-1
+15:29:06.953 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #81' Delta J = -0.005098, Delta V = -1. Reverting.
+15:29:06.960 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #122' w=0.0 res=0 ch=0 par=0
+15:29:06.991 [INFO ] Operations - [DJ-SE] SHRINK 'BBH' dJ=-5.098e-03 SE_dJ=1.937e-04 z=-26.32 dV=-1
+15:29:06.991 [INFO ] Operations - [SHRINK REJECTED] 'BBH' Delta J = -0.005098, Delta V = -1. Reverting.
+15:29:06.995 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+15:29:07.008 [INFO ] Fitter - [FIT-μ]  iter=9: mean_MLE_drift=1.000, oscillating_nodes=0/71, earlyout_rate=1.00
+15:29:07.008 [INFO ] Fitter - [FIT-κ]  iter=9: prior_dominated=0/71 (0.0%), median_kfinal=248.30, median_alpha=0.00
+15:29:07.008 [INFO ] Fitter - [FITTER] Fitting complete (8 depths, 71 nodes)
+15:29:07.009 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 228.0250     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 261.5456     | 228.0250     | 0               | 0.0000             | 0.0000            
+│ 2     | 321.0783     | 261.5456     | 0               | 0.0000             | 0.0000            
+│ 3     | 377.5976     | 321.0783     | 0               | 0.0000             | 0.0000            
+│ 4     | 398.2692     | 303.9552     | 0               | 0.0000             | 0.0000            
+│ 5     | 436.8192     | 311.2960     | 0               | 0.0000             | 0.0000            
+│ 6     | 242.3462     | 282.3006     | 0               | 0.0000             | 0.0000            
+│ 7     | 175.0522     | 249.4801     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+15:29:07.012 [INFO ] Engine - [REFIT-DELTA] Iteration 9 | 0.000e+00 (M-step inert, as expected)
+15:29:07.012 [INFO ] Engine - [J-TRACK] Iteration 9 | J_after_trickle: 0.659472 (Trickle Delta: 0.000000) | J_after_edits: 0.659472 (Edits Delta: 0.000000)
+15:29:07.012 [INFO ] Engine - [MU-GAP] Iteration 9 | internal nodes=35 cos(mu_v, resultant) min=0.9733 p10=0.9923 median=0.9981 max=1.0000
+15:29:07.039 [INFO ] Engine - [J-RESOLUTION] Iteration 9 | J=0.659472 SE_boot=6.645e-03 (B=200) | tau=1.000e-06 SE/tau=6644.9 | 2*SE=1.329e-02
+15:29:07.039 [INFO ] Engine - Iteration 9 completed in 878ms.
+15:29:07.039 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 71 (36 leaves, 35 internal) | Total Mass: 3474.00 ===
+15:29:07.050 [INFO ] Engine - === DAG Changes in iteration 9 ===
+15:29:07.050 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│   (No structural changes in this iteration)
+└──────────────────────────────────────────────────────────
+15:29:07.050 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 9) ===
+15:29:07.050 [INFO ] Engine - GROW: 213 attempted (0 accepted, 9 rejected, 204 no-proposal) | SHRINK: 2 attempted (0 accepted, 2 rejected, 0 no-proposal) | [MEMO] hits=0 boundary-exempt=6
+15:29:07.051 [INFO ] Stabilizer - GED Analysis (Iter 9): +0/-0 nodes, +0/-0 relations.
+15:29:07.051 [INFO ] Stabilizer - Convergence streak: 1/5
+15:29:07.051 [INFO ] Engine - [CONVERGENCE] Iteration 9 | GED converged=false | J stationary=true (streak 1/5, editsDelta=0.000e+00, trickleDelta=6.652e-09)
+15:29:07.052 [INFO ] Engine - STARTING EVOLUTION ITERATION 10
+15:29:07.272 [INFO ] Splitter - Split 'Emergent Concept #62' (q=150, k=2, sep=0.188, routed=[75, 75], converged=true) -> Spawning 2 children
+15:29:07.291 [INFO ] Splitter - Split 'Emergent Concept #62' (q=150, k=2, sep=0.188, routed=[75, 75], converged=true) -> Spawning 2 children
+15:29:07.321 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #62' dJ=-3.848e-03 SE_dJ=1.200e-04 z=-32.06 dV=2
+15:29:07.321 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #62' Delta J = -0.003848, Delta V = 2. Reverting.
+15:29:07.323 [INFO ] Splitter - Split 'Emergent Concept #62' (q=150, k=2, sep=0.188, routed=[75, 75], converged=true) -> Spawning 2 children
+15:29:07.352 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #62' dJ=-3.848e-03 SE_dJ=1.200e-04 z=-32.06 dV=2
+15:29:07.352 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #62' Delta J = -0.003848, Delta V = 2. Reverting.
+15:29:07.354 [INFO ] Splitter - Split 'Emergent Concept #62' (q=150, k=2, sep=0.188, routed=[75, 75], converged=true) -> Spawning 2 children
+15:29:07.383 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #62' dJ=-3.848e-03 SE_dJ=1.200e-04 z=-32.06 dV=2
+15:29:07.383 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #62' Delta J = -0.003848, Delta V = 2. Reverting.
+15:29:07.459 [INFO ] Splitter - Split 'Emergent Concept #117' (q=175, k=2, sep=0.388, routed=[101, 74], converged=true) -> Spawning 2 children
+15:29:07.489 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #117' dJ=-2.383e-03 SE_dJ=1.597e-04 z=-14.92 dV=2
+15:29:07.489 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #117' Delta J = -0.002383, Delta V = 2. Reverting.
+15:29:07.491 [INFO ] Splitter - Split 'Emergent Concept #117' (q=175, k=2, sep=0.388, routed=[101, 74], converged=true) -> Spawning 2 children
+15:29:07.520 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #117' dJ=-2.383e-03 SE_dJ=1.597e-04 z=-14.92 dV=2
+15:29:07.520 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #117' Delta J = -0.002383, Delta V = 2. Reverting.
+15:29:07.522 [INFO ] Splitter - Split 'Emergent Concept #117' (q=175, k=2, sep=0.388, routed=[101, 74], converged=true) -> Spawning 2 children
+15:29:07.553 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #117' dJ=-2.383e-03 SE_dJ=1.597e-04 z=-14.92 dV=2
+15:29:07.553 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #117' Delta J = -0.002383, Delta V = 2. Reverting.
+15:29:07.617 [INFO ] Splitter - Split 'Emergent Concept #30' (q=150, k=2, sep=0.121, routed=[76, 74], converged=true) -> Spawning 2 children
+15:29:07.646 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #30' dJ=-6.322e-03 SE_dJ=1.298e-04 z=-48.72 dV=2
+15:29:07.646 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #30' Delta J = -0.006322, Delta V = 2. Reverting.
+15:29:07.648 [INFO ] Splitter - Split 'Emergent Concept #30' (q=150, k=2, sep=0.121, routed=[76, 74], converged=true) -> Spawning 2 children
+15:29:07.679 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #30' dJ=-6.322e-03 SE_dJ=1.298e-04 z=-48.72 dV=2
+15:29:07.679 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #30' Delta J = -0.006322, Delta V = 2. Reverting.
+15:29:07.680 [INFO ] Splitter - Split 'Emergent Concept #30' (q=150, k=2, sep=0.121, routed=[76, 74], converged=true) -> Spawning 2 children
+15:29:07.710 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #30' dJ=-6.322e-03 SE_dJ=1.298e-04 z=-48.72 dV=2
+15:29:07.710 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #30' Delta J = -0.006322, Delta V = 2. Reverting.
+15:29:07.803 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #122' w=0.0 res=0 ch=0 par=0
+15:29:07.833 [INFO ] Operations - [DJ-SE] SHRINK 'Emergent Concept #81' dJ=-5.098e-03 SE_dJ=1.937e-04 z=-26.32 dV=-1
+15:29:07.833 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #81' Delta J = -0.005098, Delta V = -1. Reverting.
+15:29:07.839 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #122' w=0.0 res=0 ch=0 par=0
+15:29:07.868 [INFO ] Operations - [DJ-SE] SHRINK 'BBH' dJ=-5.098e-03 SE_dJ=1.937e-04 z=-26.32 dV=-1
+15:29:07.868 [INFO ] Operations - [SHRINK REJECTED] 'BBH' Delta J = -0.005098, Delta V = -1. Reverting.
+15:29:07.872 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+15:29:07.882 [INFO ] Fitter - [FIT-μ]  iter=10: mean_MLE_drift=1.000, oscillating_nodes=0/71, earlyout_rate=1.00
+15:29:07.882 [INFO ] Fitter - [FIT-κ]  iter=10: prior_dominated=0/71 (0.0%), median_kfinal=248.30, median_alpha=0.00
+15:29:07.882 [INFO ] Fitter - [FITTER] Fitting complete (8 depths, 71 nodes)
+15:29:07.883 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 228.0250     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 261.5456     | 228.0250     | 0               | 0.0000             | 0.0000            
+│ 2     | 321.0783     | 261.5456     | 0               | 0.0000             | 0.0000            
+│ 3     | 377.5976     | 321.0783     | 0               | 0.0000             | 0.0000            
+│ 4     | 398.2692     | 303.9552     | 0               | 0.0000             | 0.0000            
+│ 5     | 436.8192     | 311.2960     | 0               | 0.0000             | 0.0000            
+│ 6     | 242.3462     | 282.3006     | 0               | 0.0000             | 0.0000            
+│ 7     | 175.0522     | 249.4801     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+15:29:07.886 [INFO ] Engine - [REFIT-DELTA] Iteration 10 | 0.000e+00 (M-step inert, as expected)
+15:29:07.886 [INFO ] Engine - [J-TRACK] Iteration 10 | J_after_trickle: 0.659472 (Trickle Delta: 0.000000) | J_after_edits: 0.659472 (Edits Delta: 0.000000)
+15:29:07.886 [INFO ] Engine - [MU-GAP] Iteration 10 | internal nodes=35 cos(mu_v, resultant) min=0.9733 p10=0.9923 median=0.9981 max=1.0000
+15:29:07.913 [INFO ] Engine - [J-RESOLUTION] Iteration 10 | J=0.659472 SE_boot=6.645e-03 (B=200) | tau=1.000e-06 SE/tau=6644.9 | 2*SE=1.329e-02
+15:29:07.913 [INFO ] Engine - Iteration 10 completed in 861ms.
+15:29:07.913 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 71 (36 leaves, 35 internal) | Total Mass: 3474.00 ===
+15:29:07.925 [INFO ] Engine - === DAG Changes in iteration 10 ===
+15:29:07.926 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│   (No structural changes in this iteration)
+└──────────────────────────────────────────────────────────
+15:29:07.926 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 10) ===
+15:29:07.926 [INFO ] Engine - GROW: 213 attempted (0 accepted, 9 rejected, 204 no-proposal) | SHRINK: 2 attempted (0 accepted, 2 rejected, 0 no-proposal) | [MEMO] hits=0 boundary-exempt=6
+15:29:07.927 [INFO ] Stabilizer - GED Analysis (Iter 10): +0/-0 nodes, +0/-0 relations.
+15:29:07.927 [INFO ] Stabilizer - Convergence streak: 2/5
+15:29:07.927 [INFO ] Engine - [CONVERGENCE] Iteration 10 | GED converged=false | J stationary=true (streak 2/5, editsDelta=0.000e+00, trickleDelta=3.358e-12)
+15:29:07.928 [INFO ] Engine - STARTING EVOLUTION ITERATION 11
+15:29:08.148 [INFO ] Splitter - Split 'Emergent Concept #62' (q=150, k=2, sep=0.188, routed=[75, 75], converged=true) -> Spawning 2 children
+15:29:08.168 [INFO ] Splitter - Split 'Emergent Concept #62' (q=150, k=2, sep=0.188, routed=[75, 75], converged=true) -> Spawning 2 children
+15:29:08.198 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #62' dJ=-3.848e-03 SE_dJ=1.200e-04 z=-32.06 dV=2
+15:29:08.198 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #62' Delta J = -0.003848, Delta V = 2. Reverting.
+15:29:08.199 [INFO ] Splitter - Split 'Emergent Concept #62' (q=150, k=2, sep=0.188, routed=[75, 75], converged=true) -> Spawning 2 children
+15:29:08.229 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #62' dJ=-3.848e-03 SE_dJ=1.200e-04 z=-32.06 dV=2
+15:29:08.229 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #62' Delta J = -0.003848, Delta V = 2. Reverting.
+15:29:08.230 [INFO ] Splitter - Split 'Emergent Concept #62' (q=150, k=2, sep=0.188, routed=[75, 75], converged=true) -> Spawning 2 children
+15:29:08.259 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #62' dJ=-3.848e-03 SE_dJ=1.200e-04 z=-32.06 dV=2
+15:29:08.260 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #62' Delta J = -0.003848, Delta V = 2. Reverting.
+15:29:08.334 [INFO ] Splitter - Split 'Emergent Concept #117' (q=175, k=2, sep=0.388, routed=[101, 74], converged=true) -> Spawning 2 children
+15:29:08.364 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #117' dJ=-2.383e-03 SE_dJ=1.597e-04 z=-14.92 dV=2
+15:29:08.364 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #117' Delta J = -0.002383, Delta V = 2. Reverting.
+15:29:08.365 [INFO ] Splitter - Split 'Emergent Concept #117' (q=175, k=2, sep=0.388, routed=[101, 74], converged=true) -> Spawning 2 children
+15:29:08.397 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #117' dJ=-2.383e-03 SE_dJ=1.597e-04 z=-14.92 dV=2
+15:29:08.398 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #117' Delta J = -0.002383, Delta V = 2. Reverting.
+15:29:08.399 [INFO ] Splitter - Split 'Emergent Concept #117' (q=175, k=2, sep=0.388, routed=[101, 74], converged=true) -> Spawning 2 children
+15:29:08.431 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #117' dJ=-2.383e-03 SE_dJ=1.597e-04 z=-14.92 dV=2
+15:29:08.432 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #117' Delta J = -0.002383, Delta V = 2. Reverting.
+15:29:08.495 [INFO ] Splitter - Split 'Emergent Concept #30' (q=150, k=2, sep=0.121, routed=[76, 74], converged=true) -> Spawning 2 children
+15:29:08.526 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #30' dJ=-6.322e-03 SE_dJ=1.298e-04 z=-48.72 dV=2
+15:29:08.526 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #30' Delta J = -0.006322, Delta V = 2. Reverting.
+15:29:08.528 [INFO ] Splitter - Split 'Emergent Concept #30' (q=150, k=2, sep=0.121, routed=[76, 74], converged=true) -> Spawning 2 children
+15:29:08.558 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #30' dJ=-6.322e-03 SE_dJ=1.298e-04 z=-48.72 dV=2
+15:29:08.558 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #30' Delta J = -0.006322, Delta V = 2. Reverting.
+15:29:08.560 [INFO ] Splitter - Split 'Emergent Concept #30' (q=150, k=2, sep=0.121, routed=[76, 74], converged=true) -> Spawning 2 children
+15:29:08.590 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #30' dJ=-6.322e-03 SE_dJ=1.298e-04 z=-48.72 dV=2
+15:29:08.590 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #30' Delta J = -0.006322, Delta V = 2. Reverting.
+15:29:08.683 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #122' w=0.0 res=0 ch=0 par=0
+15:29:08.711 [INFO ] Operations - [DJ-SE] SHRINK 'Emergent Concept #81' dJ=-5.098e-03 SE_dJ=1.937e-04 z=-26.32 dV=-1
+15:29:08.711 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #81' Delta J = -0.005098, Delta V = -1. Reverting.
+15:29:08.717 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #122' w=0.0 res=0 ch=0 par=0
+15:29:08.744 [INFO ] Operations - [DJ-SE] SHRINK 'BBH' dJ=-5.098e-03 SE_dJ=1.937e-04 z=-26.32 dV=-1
+15:29:08.744 [INFO ] Operations - [SHRINK REJECTED] 'BBH' Delta J = -0.005098, Delta V = -1. Reverting.
+15:29:08.748 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+15:29:08.758 [INFO ] Fitter - [FIT-μ]  iter=11: mean_MLE_drift=1.000, oscillating_nodes=0/71, earlyout_rate=1.00
+15:29:08.758 [INFO ] Fitter - [FIT-κ]  iter=11: prior_dominated=0/71 (0.0%), median_kfinal=248.30, median_alpha=0.00
+15:29:08.758 [INFO ] Fitter - [FITTER] Fitting complete (8 depths, 71 nodes)
+15:29:08.759 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 228.0250     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 261.5456     | 228.0250     | 0               | 0.0000             | 0.0000            
+│ 2     | 321.0783     | 261.5456     | 0               | 0.0000             | 0.0000            
+│ 3     | 377.5976     | 321.0783     | 0               | 0.0000             | 0.0000            
+│ 4     | 398.2692     | 303.9552     | 0               | 0.0000             | 0.0000            
+│ 5     | 436.8192     | 311.2960     | 0               | 0.0000             | 0.0000            
+│ 6     | 242.3462     | 282.3006     | 0               | 0.0000             | 0.0000            
+│ 7     | 175.0522     | 249.4801     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+15:29:08.762 [INFO ] Engine - [REFIT-DELTA] Iteration 11 | 0.000e+00 (M-step inert, as expected)
+15:29:08.762 [INFO ] Engine - [J-TRACK] Iteration 11 | J_after_trickle: 0.659472 (Trickle Delta: 0.000000) | J_after_edits: 0.659472 (Edits Delta: 0.000000)
+15:29:08.762 [INFO ] Engine - [MU-GAP] Iteration 11 | internal nodes=35 cos(mu_v, resultant) min=0.9733 p10=0.9923 median=0.9981 max=1.0000
+15:29:08.790 [INFO ] Engine - [J-RESOLUTION] Iteration 11 | J=0.659472 SE_boot=6.645e-03 (B=200) | tau=1.000e-06 SE/tau=6644.9 | 2*SE=1.329e-02
+15:29:08.790 [INFO ] Engine - Iteration 11 completed in 862ms.
+15:29:08.790 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 71 (36 leaves, 35 internal) | Total Mass: 3474.00 ===
+15:29:08.799 [INFO ] Engine - === DAG Changes in iteration 11 ===
+15:29:08.799 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│   (No structural changes in this iteration)
+└──────────────────────────────────────────────────────────
+15:29:08.800 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 11) ===
+15:29:08.800 [INFO ] Engine - GROW: 213 attempted (0 accepted, 9 rejected, 204 no-proposal) | SHRINK: 2 attempted (0 accepted, 2 rejected, 0 no-proposal) | [MEMO] hits=0 boundary-exempt=6
+15:29:08.800 [INFO ] Stabilizer - GED Analysis (Iter 11): +0/-0 nodes, +0/-0 relations.
+15:29:08.800 [INFO ] Stabilizer - Convergence streak: 3/5
+15:29:08.800 [INFO ] Engine - [CONVERGENCE] Iteration 11 | GED converged=false | J stationary=true (streak 3/5, editsDelta=0.000e+00, trickleDelta=1.554e-15)
+15:29:08.800 [INFO ] Engine - STARTING EVOLUTION ITERATION 12
+15:29:09.027 [INFO ] Splitter - Split 'Emergent Concept #62' (q=150, k=2, sep=0.188, routed=[75, 75], converged=true) -> Spawning 2 children
+15:29:09.046 [INFO ] Splitter - Split 'Emergent Concept #62' (q=150, k=2, sep=0.188, routed=[75, 75], converged=true) -> Spawning 2 children
+15:29:09.075 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #62' dJ=-3.848e-03 SE_dJ=1.200e-04 z=-32.06 dV=2
+15:29:09.075 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #62' Delta J = -0.003848, Delta V = 2. Reverting.
+15:29:09.076 [INFO ] Splitter - Split 'Emergent Concept #62' (q=150, k=2, sep=0.188, routed=[75, 75], converged=true) -> Spawning 2 children
+15:29:09.105 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #62' dJ=-3.848e-03 SE_dJ=1.200e-04 z=-32.06 dV=2
+15:29:09.105 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #62' Delta J = -0.003848, Delta V = 2. Reverting.
+15:29:09.107 [INFO ] Splitter - Split 'Emergent Concept #62' (q=150, k=2, sep=0.188, routed=[75, 75], converged=true) -> Spawning 2 children
+15:29:09.136 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #62' dJ=-3.848e-03 SE_dJ=1.200e-04 z=-32.06 dV=2
+15:29:09.136 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #62' Delta J = -0.003848, Delta V = 2. Reverting.
+15:29:09.209 [INFO ] Splitter - Split 'Emergent Concept #117' (q=175, k=2, sep=0.388, routed=[101, 74], converged=true) -> Spawning 2 children
+15:29:09.239 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #117' dJ=-2.383e-03 SE_dJ=1.597e-04 z=-14.92 dV=2
+15:29:09.239 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #117' Delta J = -0.002383, Delta V = 2. Reverting.
+15:29:09.240 [INFO ] Splitter - Split 'Emergent Concept #117' (q=175, k=2, sep=0.388, routed=[101, 74], converged=true) -> Spawning 2 children
+15:29:09.269 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #117' dJ=-2.383e-03 SE_dJ=1.597e-04 z=-14.92 dV=2
+15:29:09.269 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #117' Delta J = -0.002383, Delta V = 2. Reverting.
+15:29:09.270 [INFO ] Splitter - Split 'Emergent Concept #117' (q=175, k=2, sep=0.388, routed=[101, 74], converged=true) -> Spawning 2 children
+15:29:09.302 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #117' dJ=-2.383e-03 SE_dJ=1.597e-04 z=-14.92 dV=2
+15:29:09.303 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #117' Delta J = -0.002383, Delta V = 2. Reverting.
+15:29:09.366 [INFO ] Splitter - Split 'Emergent Concept #30' (q=150, k=2, sep=0.121, routed=[76, 74], converged=true) -> Spawning 2 children
+15:29:09.396 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #30' dJ=-6.322e-03 SE_dJ=1.298e-04 z=-48.72 dV=2
+15:29:09.396 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #30' Delta J = -0.006322, Delta V = 2. Reverting.
+15:29:09.398 [INFO ] Splitter - Split 'Emergent Concept #30' (q=150, k=2, sep=0.121, routed=[76, 74], converged=true) -> Spawning 2 children
+15:29:09.427 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #30' dJ=-6.322e-03 SE_dJ=1.298e-04 z=-48.72 dV=2
+15:29:09.427 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #30' Delta J = -0.006322, Delta V = 2. Reverting.
+15:29:09.428 [INFO ] Splitter - Split 'Emergent Concept #30' (q=150, k=2, sep=0.121, routed=[76, 74], converged=true) -> Spawning 2 children
+15:29:09.459 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #30' dJ=-6.322e-03 SE_dJ=1.298e-04 z=-48.72 dV=2
+15:29:09.459 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #30' Delta J = -0.006322, Delta V = 2. Reverting.
+15:29:09.550 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #122' w=0.0 res=0 ch=0 par=0
+15:29:09.575 [INFO ] Operations - [DJ-SE] SHRINK 'Emergent Concept #81' dJ=-5.098e-03 SE_dJ=2.394e-04 z=-21.29 dV=-1
+15:29:09.575 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #81' Delta J = -0.005098, Delta V = -1. Reverting.
+15:29:09.580 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #122' w=0.0 res=0 ch=0 par=0
+15:29:09.606 [INFO ] Operations - [DJ-SE] SHRINK 'BBH' dJ=-5.098e-03 SE_dJ=2.394e-04 z=-21.29 dV=-1
+15:29:09.606 [INFO ] Operations - [SHRINK REJECTED] 'BBH' Delta J = -0.005098, Delta V = -1. Reverting.
+15:29:09.611 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+15:29:09.619 [INFO ] Fitter - [FIT-μ]  iter=12: mean_MLE_drift=1.000, oscillating_nodes=0/71, earlyout_rate=1.00
+15:29:09.619 [INFO ] Fitter - [FIT-κ]  iter=12: prior_dominated=0/71 (0.0%), median_kfinal=248.30, median_alpha=0.00
+15:29:09.619 [INFO ] Fitter - [FITTER] Fitting complete (8 depths, 71 nodes)
+15:29:09.622 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 228.0250     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 261.5456     | 228.0250     | 0               | 0.0000             | 0.0000            
+│ 2     | 321.0783     | 261.5456     | 0               | 0.0000             | 0.0000            
+│ 3     | 377.5976     | 321.0783     | 0               | 0.0000             | 0.0000            
+│ 4     | 398.2692     | 303.9552     | 0               | 0.0000             | 0.0000            
+│ 5     | 436.8192     | 311.2960     | 0               | 0.0000             | 0.0000            
+│ 6     | 242.3462     | 282.3006     | 0               | 0.0000             | 0.0000            
+│ 7     | 175.0522     | 249.4801     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+15:29:09.624 [INFO ] Engine - [REFIT-DELTA] Iteration 12 | 0.000e+00 (M-step inert, as expected)
+15:29:09.624 [INFO ] Engine - [J-TRACK] Iteration 12 | J_after_trickle: 0.659472 (Trickle Delta: 0.000000) | J_after_edits: 0.659472 (Edits Delta: 0.000000)
+15:29:09.624 [INFO ] Engine - [MU-GAP] Iteration 12 | internal nodes=35 cos(mu_v, resultant) min=0.9733 p10=0.9923 median=0.9981 max=1.0000
+15:29:09.652 [INFO ] Engine - [J-RESOLUTION] Iteration 12 | J=0.659472 SE_boot=6.645e-03 (B=200) | tau=1.000e-06 SE/tau=6644.9 | 2*SE=1.329e-02
+15:29:09.652 [INFO ] Engine - Iteration 12 completed in 852ms.
+15:29:09.652 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 71 (36 leaves, 35 internal) | Total Mass: 3474.00 ===
+15:29:09.662 [INFO ] Engine - === DAG Changes in iteration 12 ===
+15:29:09.663 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│   (No structural changes in this iteration)
+└──────────────────────────────────────────────────────────
+15:29:09.663 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 12) ===
+15:29:09.663 [INFO ] Engine - GROW: 213 attempted (0 accepted, 9 rejected, 204 no-proposal) | SHRINK: 2 attempted (0 accepted, 2 rejected, 0 no-proposal) | [MEMO] hits=0 boundary-exempt=6
+15:29:09.663 [INFO ] Stabilizer - GED Analysis (Iter 12): +0/-0 nodes, +0/-0 relations.
+15:29:09.663 [INFO ] Stabilizer - Convergence streak: 4/5
+15:29:09.663 [INFO ] Engine - [CONVERGENCE] Iteration 12 | GED converged=false | J stationary=true (streak 4/5, editsDelta=0.000e+00, trickleDelta=2.220e-16)
+15:29:09.664 [INFO ] Engine - STARTING EVOLUTION ITERATION 13
+15:29:09.890 [INFO ] Splitter - Split 'Emergent Concept #62' (q=150, k=2, sep=0.188, routed=[75, 75], converged=true) -> Spawning 2 children
+15:29:09.909 [INFO ] Splitter - Split 'Emergent Concept #62' (q=150, k=2, sep=0.188, routed=[75, 75], converged=true) -> Spawning 2 children
+15:29:09.940 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #62' dJ=-3.848e-03 SE_dJ=1.200e-04 z=-32.06 dV=2
+15:29:09.940 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #62' Delta J = -0.003848, Delta V = 2. Reverting.
+15:29:09.940 [INFO ] Splitter - Split 'Emergent Concept #62' (q=150, k=2, sep=0.188, routed=[75, 75], converged=true) -> Spawning 2 children
+15:29:09.972 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #62' dJ=-3.848e-03 SE_dJ=1.200e-04 z=-32.06 dV=2
+15:29:09.972 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #62' Delta J = -0.003848, Delta V = 2. Reverting.
+15:29:09.973 [INFO ] Splitter - Split 'Emergent Concept #62' (q=150, k=2, sep=0.188, routed=[75, 75], converged=true) -> Spawning 2 children
+15:29:10.003 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #62' dJ=-3.848e-03 SE_dJ=1.200e-04 z=-32.06 dV=2
+15:29:10.003 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #62' Delta J = -0.003848, Delta V = 2. Reverting.
+15:29:10.081 [INFO ] Splitter - Split 'Emergent Concept #117' (q=175, k=2, sep=0.388, routed=[101, 74], converged=true) -> Spawning 2 children
+15:29:10.111 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #117' dJ=-2.383e-03 SE_dJ=1.597e-04 z=-14.92 dV=2
+15:29:10.111 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #117' Delta J = -0.002383, Delta V = 2. Reverting.
+15:29:10.112 [INFO ] Splitter - Split 'Emergent Concept #117' (q=175, k=2, sep=0.388, routed=[101, 74], converged=true) -> Spawning 2 children
+15:29:10.143 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #117' dJ=-2.383e-03 SE_dJ=1.597e-04 z=-14.92 dV=2
+15:29:10.143 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #117' Delta J = -0.002383, Delta V = 2. Reverting.
+15:29:10.144 [INFO ] Splitter - Split 'Emergent Concept #117' (q=175, k=2, sep=0.388, routed=[101, 74], converged=true) -> Spawning 2 children
+15:29:10.175 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #117' dJ=-2.383e-03 SE_dJ=1.597e-04 z=-14.92 dV=2
+15:29:10.175 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #117' Delta J = -0.002383, Delta V = 2. Reverting.
+15:29:10.240 [INFO ] Splitter - Split 'Emergent Concept #30' (q=150, k=2, sep=0.121, routed=[76, 74], converged=true) -> Spawning 2 children
+15:29:10.269 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #30' dJ=-6.322e-03 SE_dJ=1.298e-04 z=-48.72 dV=2
+15:29:10.269 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #30' Delta J = -0.006322, Delta V = 2. Reverting.
+15:29:10.270 [INFO ] Splitter - Split 'Emergent Concept #30' (q=150, k=2, sep=0.121, routed=[76, 74], converged=true) -> Spawning 2 children
+15:29:10.300 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #30' dJ=-6.322e-03 SE_dJ=1.298e-04 z=-48.72 dV=2
+15:29:10.300 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #30' Delta J = -0.006322, Delta V = 2. Reverting.
+15:29:10.302 [INFO ] Splitter - Split 'Emergent Concept #30' (q=150, k=2, sep=0.121, routed=[76, 74], converged=true) -> Spawning 2 children
+15:29:10.336 [INFO ] Operations - [DJ-SE] GROW 'Emergent Concept #30' dJ=-6.322e-03 SE_dJ=1.298e-04 z=-48.72 dV=2
+15:29:10.337 [INFO ] Operations - [GROW REJECTED] 'Emergent Concept #30' Delta J = -0.006322, Delta V = 2. Reverting.
+15:29:10.425 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #122' w=0.0 res=0 ch=0 par=0
+15:29:10.452 [INFO ] Operations - [DJ-SE] SHRINK 'Emergent Concept #81' dJ=-5.098e-03 SE_dJ=1.937e-04 z=-26.32 dV=-1
+15:29:10.452 [INFO ] Operations - [SHRINK REJECTED] 'Emergent Concept #81' Delta J = -0.005098, Delta V = -1. Reverting.
+15:29:10.456 [INFO ] Operations - [PROPOSAL DIAG] 1 node(s) unreachable after action: 'Emergent Concept #122' w=0.0 res=0 ch=0 par=0
+15:29:10.482 [INFO ] Operations - [DJ-SE] SHRINK 'BBH' dJ=-5.098e-03 SE_dJ=1.937e-04 z=-26.32 dV=-1
+15:29:10.482 [INFO ] Operations - [SHRINK REJECTED] 'BBH' Delta J = -0.005098, Delta V = -1. Reverting.
+15:29:10.485 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+15:29:10.494 [INFO ] Fitter - [FIT-μ]  iter=13: mean_MLE_drift=1.000, oscillating_nodes=0/71, earlyout_rate=1.00
+15:29:10.494 [INFO ] Fitter - [FIT-κ]  iter=13: prior_dominated=0/71 (0.0%), median_kfinal=248.30, median_alpha=0.00
+15:29:10.494 [INFO ] Fitter - [FITTER] Fitting complete (8 depths, 71 nodes)
+15:29:10.495 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 228.0250     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 261.5456     | 228.0250     | 0               | 0.0000             | 0.0000            
+│ 2     | 321.0783     | 261.5456     | 0               | 0.0000             | 0.0000            
+│ 3     | 377.5976     | 321.0783     | 0               | 0.0000             | 0.0000            
+│ 4     | 398.2692     | 303.9552     | 0               | 0.0000             | 0.0000            
+│ 5     | 436.8192     | 311.2960     | 0               | 0.0000             | 0.0000            
+│ 6     | 242.3462     | 282.3006     | 0               | 0.0000             | 0.0000            
+│ 7     | 175.0522     | 249.4801     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+15:29:10.498 [INFO ] Engine - [REFIT-DELTA] Iteration 13 | 0.000e+00 (M-step inert, as expected)
+15:29:10.498 [INFO ] Engine - [J-TRACK] Iteration 13 | J_after_trickle: 0.659472 (Trickle Delta: -0.000000) | J_after_edits: 0.659472 (Edits Delta: 0.000000)
+15:29:10.498 [INFO ] Engine - [MU-GAP] Iteration 13 | internal nodes=35 cos(mu_v, resultant) min=0.9733 p10=0.9923 median=0.9981 max=1.0000
+15:29:10.525 [INFO ] Engine - [J-RESOLUTION] Iteration 13 | J=0.659472 SE_boot=6.645e-03 (B=200) | tau=1.000e-06 SE/tau=6644.9 | 2*SE=1.329e-02
+15:29:10.525 [INFO ] Engine - Iteration 13 completed in 861ms.
+15:29:10.525 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 71 (36 leaves, 35 internal) | Total Mass: 3474.00 ===
+15:29:10.536 [INFO ] Engine - === DAG Changes in iteration 13 ===
+15:29:10.536 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│   (No structural changes in this iteration)
+└──────────────────────────────────────────────────────────
+15:29:10.536 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 13) ===
+15:29:10.536 [INFO ] Engine - GROW: 213 attempted (0 accepted, 9 rejected, 204 no-proposal) | SHRINK: 2 attempted (0 accepted, 2 rejected, 0 no-proposal) | [MEMO] hits=0 boundary-exempt=6
+15:29:10.537 [INFO ] Stabilizer - GED Analysis (Iter 13): +0/-0 nodes, +0/-0 relations.
+15:29:10.537 [INFO ] Stabilizer - Convergence streak: 5/5
+15:29:10.537 [INFO ] Stabilizer - Convergence Met: Taxonomy mixture has stabilized for 5 consecutive iterations.
+15:29:10.537 [INFO ] Engine - [CONVERGENCE] Iteration 13 | GED converged=true | J stationary=true (streak 5/5, editsDelta=0.000e+00, trickleDelta=-2.220e-16)
+15:29:10.537 [INFO ] Engine - Early stopping triggered in iteration 13 due to convergence (GED quiescence).
+15:29:10.537 [WARN ] Engine - [ANCHOR-FREE] construction ended with 2 emergent depth-1 nodes under the root (no category anchors)
+15:29:10.538 [INFO ] Engine - [FIXED-POINT] iteration=13 editsDelta=0.000e+00 trickleDelta=-2.220e-16 maxMuDelta=1.110e-16 maxKappaRel=2.020e-12 tol=1.000e-06 certified=true
+15:29:10.538 [INFO ] Engine - === STARTING FINALIZATION PHASE ===
+15:29:10.539 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+15:29:10.547 [INFO ] Fitter - [FITTER] Fitting complete (8 depths, 71 nodes)
+15:29:10.549 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 228.0250     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 261.5456     | 228.0250     | 0               | 0.0000             | 0.0000            
+│ 2     | 321.0783     | 261.5456     | 0               | 0.0000             | 0.0000            
+│ 3     | 377.5976     | 321.0783     | 0               | 0.0000             | 0.0000            
+│ 4     | 398.2692     | 303.9552     | 0               | 0.0000             | 0.0000            
+│ 5     | 436.8192     | 311.2960     | 0               | 0.0000             | 0.0000            
+│ 6     | 242.3462     | 282.3006     | 0               | 0.0000             | 0.0000            
+│ 7     | 175.0522     | 249.4801     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+15:29:10.549 [INFO ] Engine - Finalization phase completed in 10ms.
+15:29:10.550 [INFO ] Engine - --- 50-Iteration Evolution Completed ---
+15:29:10.555 [INFO ] Operations - 
+┌── TAXONOMY DAG HIERARCHY ───────────────────────────────
+│ BBH [q_dir=0, q_rec=3474, mass=3474.0 - Parent/Residual] (vMF kappa: 228.025)
+│ ├── Emergent Concept #3 [q_dir=0, q_rec=1265, mass=1259.4 - Parent/Residual] (vMF kappa: 311.830)
+│ │   ├── Emergent Concept #25 [q_dir=0, q_rec=798, mass=792.4 - Parent/Residual] (vMF kappa: 319.928)
+│ │   │   ├── Emergent Concept #36 [q_dir=0, q_rec=470, mass=470.0 - Parent/Residual] (vMF kappa: 381.037)
+│ │   │   │   ├── Emergent Concept #67 [q_dir=0, q_rec=186, mass=186.0 - Parent/Residual] (vMF kappa: 442.336)
+│ │   │   │   │   ├── Emergent Concept #106 [q_dir=88, q_rec=88, mass=88.0 - Leaf] (vMF kappa: 491.890)
+│ │   │   │   │   └── Emergent Concept #105 [q_dir=98, q_rec=98, mass=98.0 - Leaf] (vMF kappa: 566.913)
+│ │   │   │   └── Emergent Concept #68 [q_dir=0, q_rec=284, mass=284.0 - Parent/Residual] (vMF kappa: 349.847)
+│ │   │   │       ├── Emergent Concept #108 [q_dir=94, q_rec=94, mass=94.0 - Leaf] (vMF kappa: 623.176)
+│ │   │   │       └── Emergent Concept #107 [q_dir=0, q_rec=190, mass=190.0 - Parent/Residual] (vMF kappa: 364.319)
+│ │   │   │           ├── Emergent Concept #124 [q_dir=89, q_rec=89, mass=89.0 - Leaf] (vMF kappa: 474.775)
+│ │   │   │           └── Emergent Concept #123 [q_dir=101, q_rec=101, mass=101.0 - Leaf] (vMF kappa: 554.446)
+│ │   │   └── Emergent Concept #37 [q_dir=0, q_rec=328, mass=322.4 - Parent/Residual] (vMF kappa: 244.287)
+│ │   │       ├── Emergent Concept #70 [q_dir=88, q_rec=88, mass=88.0 - Leaf] (vMF kappa: 334.736)
+│ │   │       └── Emergent Concept #69 [q_dir=0, q_rec=240, mass=234.4 - Parent/Residual] (vMF kappa: 293.739)
+│ │   │           ├── Emergent Concept #109 [q_dir=0, q_rec=149, mass=147.6 - Parent/Residual] (vMF kappa: 384.286)
+│ │   │           │   ├── Emergent Concept #157 [q_dir=75, q_rec=75, mass=71.1 - Leaf] (vMF kappa: 275.493)
+│ │   │           │   └── Emergent Concept #158 [q_dir=82, q_rec=82, mass=76.5 - Leaf] (vMF kappa: 266.219)
+│ │   │           └── Emergent Concept #110 [q_dir=91, q_rec=91, mass=86.8 - Leaf] (vMF kappa: 229.899)
+│ │   └── Emergent Concept #24 [q_dir=0, q_rec=467, mass=467.0 - Parent/Residual] (vMF kappa: 525.053)
+│ │       ├── Emergent Concept #72 [q_dir=95, q_rec=95, mass=95.0 - Leaf] (vMF kappa: 893.095)
+│ │       └── Emergent Concept #71 [q_dir=0, q_rec=372, mass=372.0 - Parent/Residual] (vMF kappa: 559.656)
+│ │           ├── Emergent Concept #117 [q_dir=175, q_rec=175, mass=175.0 - Leaf] (vMF kappa: 758.870)
+│ │           └── Emergent Concept #118 [q_dir=0, q_rec=197, mass=197.0 - Parent/Residual] (vMF kappa: 502.498)
+│ │               ├── Emergent Concept #148 [q_dir=93, q_rec=93, mass=93.0 - Leaf] (vMF kappa: 741.592)
+│ │               └── Emergent Concept #147 [q_dir=104, q_rec=104, mass=104.0 - Leaf] (vMF kappa: 934.580)
+│ └── Emergent Concept #4 [q_dir=0, q_rec=2221, mass=2214.6 - Parent/Residual] (vMF kappa: 211.261)
+│     ├── Emergent Concept #16 [q_dir=0, q_rec=1282, mass=1277.7 - Parent/Residual] (vMF kappa: 248.047)
+│     │   ├── Emergent Concept #21 [q_dir=0, q_rec=828, mass=822.7 - Parent/Residual] (vMF kappa: 223.210)
+│     │   │   ├── Emergent Concept #29 [q_dir=0, q_rec=420, mass=414.7 - Parent/Residual] (vMF kappa: 200.380)
+│     │   │   │   ├── Emergent Concept #50 [q_dir=0, q_rec=268, mass=263.7 - Parent/Residual] (vMF kappa: 202.620)
+│     │   │   │   │   ├── Emergent Concept #76 [q_dir=103, q_rec=103, mass=103.0 - Leaf] (vMF kappa: 202.100)
+│     │   │   │   │   └── Emergent Concept #75 [q_dir=165, q_rec=165, mass=160.7 - Leaf] (vMF kappa: 209.774)
+│     │   │   │   └── Emergent Concept #49 [q_dir=0, q_rec=153, mass=151.1 - Parent/Residual] (vMF kappa: 282.500)
+│     │   │   │       ├── Emergent Concept #77 [q_dir=73, q_rec=73, mass=71.6 - Leaf] (vMF kappa: 215.645)
+│     │   │   │       └── Emergent Concept #78 [q_dir=82, q_rec=82, mass=79.4 - Leaf] (vMF kappa: 190.666)
+│     │   │   └── Emergent Concept #28 [q_dir=0, q_rec=408, mass=408.0 - Parent/Residual] (vMF kappa: 234.003)
+│     │   │       ├── Emergent Concept #52 [q_dir=0, q_rec=150, mass=149.6 - Parent/Residual] (vMF kappa: 208.791)
+│     │   │       │   ├── Emergent Concept #79 [q_dir=71, q_rec=71, mass=68.5 - Leaf] (vMF kappa: 146.166)
+│     │   │       │   └── Emergent Concept #80 [q_dir=83, q_rec=83, mass=81.1 - Leaf] (vMF kappa: 154.317)
+│     │   │       └── Emergent Concept #51 [q_dir=0, q_rec=259, mass=258.4 - Parent/Residual] (vMF kappa: 235.805)
+│     │   │           ├── Emergent Concept #81 [q_dir=0, q_rec=151, mass=151.0 - Parent/Residual] (vMF kappa: 249.480)
+│     │   │           │   ├── Emergent Concept #121 [q_dir=74, q_rec=74, mass=70.0 - Leaf] (vMF kappa: 179.062)
+│     │   │           │   └── Emergent Concept #122 [q_dir=85, q_rec=85, mass=81.0 - Leaf] (vMF kappa: 171.042)
+│     │   │           └── Emergent Concept #82 [q_dir=108, q_rec=108, mass=107.4 - Leaf] (vMF kappa: 214.536)
+│     │   └── Emergent Concept #20 [q_dir=0, q_rec=456, mass=454.9 - Parent/Residual] (vMF kappa: 294.761)
+│     │       ├── Emergent Concept #30 [q_dir=150, q_rec=150, mass=150.0 - Leaf] (vMF kappa: 1161.363)
+│     │       └── Emergent Concept #31 [q_dir=0, q_rec=306, mass=304.9 - Parent/Residual] (vMF kappa: 264.011)
+│     │           ├── Emergent Concept #59 [q_dir=0, q_rec=153, mass=152.4 - Parent/Residual] (vMF kappa: 352.123)
+│     │           │   ├── Emergent Concept #131 [q_dir=68, q_rec=68, mass=66.6 - Leaf] (vMF kappa: 263.558)
+│     │           │   └── Emergent Concept #132 [q_dir=88, q_rec=88, mass=85.7 - Leaf] (vMF kappa: 239.584)
+│     │           └── Emergent Concept #60 [q_dir=0, q_rec=154, mass=152.5 - Parent/Residual] (vMF kappa: 203.996)
+│     │               ├── Emergent Concept #90 [q_dir=63, q_rec=63, mass=61.5 - Leaf] (vMF kappa: 156.386)
+│     │               └── Emergent Concept #89 [q_dir=91, q_rec=91, mass=91.0 - Leaf] (vMF kappa: 180.583)
+│     └── Emergent Concept #17 [q_dir=0, q_rec=942, mass=936.9 - Parent/Residual] (vMF kappa: 191.285)
+│         ├── Emergent Concept #22 [q_dir=0, q_rec=501, mass=495.9 - Parent/Residual] (vMF kappa: 248.304)
+│         │   ├── Emergent Concept #32 [q_dir=0, q_rec=300, mass=300.0 - Parent/Residual] (vMF kappa: 354.881)
+│         │   │   ├── Emergent Concept #61 [q_dir=150, q_rec=150, mass=150.0 - Leaf] (vMF kappa: 1191.169)
+│         │   │   └── Emergent Concept #62 [q_dir=150, q_rec=150, mass=150.0 - Leaf] (vMF kappa: 766.996)
+│         │   └── Emergent Concept #33 [q_dir=201, q_rec=201, mass=195.9 - Leaf] (vMF kappa: 207.839)
+│         └── Emergent Concept #23 [q_dir=0, q_rec=441, mass=441.0 - Parent/Residual] (vMF kappa: 176.432)
+│             ├── Emergent Concept #34 [q_dir=0, q_rec=292, mass=292.0 - Parent/Residual] (vMF kappa: 225.814)
+│             │   ├── Emergent Concept #63 [q_dir=0, q_rec=150, mass=150.0 - Parent/Residual] (vMF kappa: 346.086)
+│             │   │   ├── Emergent Concept #140 [q_dir=70, q_rec=70, mass=67.5 - Leaf] (vMF kappa: 230.820)
+│             │   │   └── Emergent Concept #139 [q_dir=85, q_rec=85, mass=82.5 - Leaf] (vMF kappa: 263.799)
+│             │   └── Emergent Concept #64 [q_dir=0, q_rec=142, mass=142.0 - Parent/Residual] (vMF kappa: 242.480)
+│             │       ├── Emergent Concept #104 [q_dir=65, q_rec=65, mass=63.6 - Leaf] (vMF kappa: 165.498)
+│             │       └── Emergent Concept #103 [q_dir=80, q_rec=80, mass=78.4 - Leaf] (vMF kappa: 193.077)
+│             └── Emergent Concept #35 [q_dir=0, q_rec=149, mass=149.0 - Parent/Residual] (vMF kappa: 245.450)
+│                 ├── Emergent Concept #65 [q_dir=69, q_rec=69, mass=68.7 - Leaf] (vMF kappa: 190.610)
+│                 └── Emergent Concept #66 [q_dir=81, q_rec=81, mass=80.3 - Leaf] (vMF kappa: 176.553)
+└─────────────────────────────────────────────────────────
+15:29:10.558 [INFO ] Engine - 
+========================================================================================================
+                               DAG PERFORMANCE REPORT & INSTRUMENTATION                                 
+========================================================================================================
+Top-Level Roll-Up:
+  Construction     :     25 576 ms (100,0%)
+  Arena/Bench      :          0 ms (  0,0%)
+  Persistence      :          0 ms (  0,0%)
+  Other            :          0 ms (  0,0%)
+  TOTAL TIME       :     25 576 ms (100.0%)
+========================================================================================================
+
+Section: CONSTRUCTION DETAILS
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| Phase / Operation                           | Calls | Total(ms) | Avg(ms) | p50(ms) | p95(ms) |     Count |    Unit/s |  Shr |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| phase4_split                                |    13 |     24331 |  1871,6 |    1568 |    4245 |        13 |       0,5 | 95,1% |
+| phase5_optimize                             |    13 |       648 |    49,8 |      59 |     183 |        13 |      20,1 | 2,5% |
+| phase2_refit                                |    13 |       253 |    19,5 |      15 |      63 |        13 |      51,4 | 1,0% |
+| phase3_trickle                              |    13 |       161 |    12,4 |      14 |      23 |    45 162 | 280 509,3 | 0,6% |
+| phase1_precompute                           |     1 |       118 |   118,0 |     118 |     118 |     3 474 |  29 440,7 | 0,5% |
+| phase2_bootstrap                            |     1 |        65 |    65,0 |      65 |      65 |         1 |      15,4 | 0,3% |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+
+Construction Per-Iteration Step Times:
+  Iter  1:  4 302 ms  [phase5_optimize=17ms, phase2_refit=40ms, phase3_trickle=0ms, phase4_split=4245ms]
+  Iter  2:  3 835 ms  [phase5_optimize=9ms, phase2_refit=63ms, phase3_trickle=23ms, phase4_split=3740ms]
+  Iter  3:  3 246 ms  [phase5_optimize=12ms, phase2_refit=15ms, phase3_trickle=10ms, phase4_split=3209ms]
+  Iter  4:  2 846 ms  [phase5_optimize=6ms, phase3_trickle=7ms, phase2_refit=15ms, phase4_split=2818ms]
+  Iter  5:  2 066 ms  [phase5_optimize=9ms, phase3_trickle=13ms, phase2_refit=15ms, phase4_split=2029ms]
+  Iter  6:  2 232 ms  [phase5_optimize=10ms, phase3_trickle=9ms, phase2_refit=15ms, phase4_split=2198ms]
+  Iter  7:  1 780 ms  [phase5_optimize=183ms, phase3_trickle=14ms, phase2_refit=15ms, phase4_split=1568ms]
+  Iter  8:    944 ms  [phase5_optimize=72ms, phase3_trickle=14ms, phase2_refit=16ms, phase4_split=842ms]
+  Iter  9:    845 ms  [phase5_optimize=74ms, phase3_trickle=14ms, phase2_refit=14ms, phase4_split=743ms]
+  Iter 10:    826 ms  [phase5_optimize=71ms, phase2_refit=11ms, phase4_split=730ms, phase3_trickle=14ms]
+  Iter 11:    827 ms  [phase5_optimize=66ms, phase2_refit=11ms, phase4_split=734ms, phase3_trickle=16ms]
+  Iter 12:    817 ms  [phase5_optimize=60ms, phase2_refit=12ms, phase4_split=731ms, phase3_trickle=14ms]
+  Iter 13:    827 ms  [phase5_optimize=59ms, phase2_refit=11ms, phase4_split=744ms, phase3_trickle=13ms]
+========================================================================================================
+
+15:29:10.734 [INFO ] AdditionalMetrics - [CALIB]  ECE=0.9987, reliability_bins={[0.9,1.0]:1.00/0.00, [0.7,0.8]:0.71/0.00, [0.6,0.7]:0.64/0.00, [0.5,0.6]:0.57/0.00}
+15:29:10.736 [INFO ] Metrics - 
+┌── TAXONOMY CONFIGURATION PARAMETERS ─────────────────────
+│ Execution Settings:
+│   - Dataset Type:         AG_NEWS
+│   - Corpora:              [BBH]
+│   - Num Iterations:       50
+│   - Early Stopping:       true
+│   - Labeling:             false
+│   - Selected Domains:     [All]
+│   - Split Dataset:        true
+│   - Test Split Ratio:     0.3
+├── LLM & Embedding Models:
+│   - LLM Provider:         AZURE
+│   - Embedding Provider:   OLLAMA
+│   - Embedding Model:      qwen3-embedding:latest
+│   - Judge Model:          Mistral-Large-3
+│   - Labeling Model:       Mistral-Large-3
+│   - Max Judge Generality: 1
+├── Advanced Mathematical Formalism Controls:
+│   - DAG Mode:             DAG_MAX
+│   - Max Depth:            8
+│   - Min Cluster Size:     55
+│   - Separation Bar:       0.025
+│   - Slice Dim / PCA:      256 / dropTop=0 whiten=false
+│   - Lexicographic Tau:    1.0E-6
+│   - Anchor-Free:          true (ANCHOR-FREE arm; no category anchors)
+│   - Membership Floor:     0.25
+│   - Routing Beam Gamma:   0.2
+│   - Descent Margin:       0.12
+│   - Fusion Sim Threshold: 0.9
+│   - Eff Support Floor:    2.0
+│   - Default Kappa Prior:  10.0
+└──────────────────────────────────────────────────────────
+| TAXONOMY ARCHITECTURAL METRICS
++----------------------------------------------------------
+| Topology Stats:
+|   Total Nodes:         71
+|   Leaf Nodes:          36
+|   Cross-Domain Nodes:  0
+|   Bridge Node Ratio:   0.00%
+|   Max Depth:           7
+|   Avg Leaf Depth:      5.47
++----------------------------------------------------------
+| Assignment Stats:
+|   Unique Queries:      3474
+|   Median Nodes/Query:  1.00
+|   Residual Queries:    0
+|   Avg Match Count:     1.02 leaves/query
++----------------------------------------------------------
+| Structural & Semantic Diagnostics:
+|   Residual Ratio:      0.00%
+|   Max Concentration:   5.79%
+|   Tree Equilibrium:    83.47%
+|   Contamination:       100.00%
+|   vMF κ by depth:
+|     Depth 3: 893.095
+|     Depth 4: 615.702
+|     Depth 5: 591.338
+|     Depth 6: 241.971
+|     Depth 7: 175.052
++----------------------------------------------------------
+| External Validation & Geometric Metrics:
+|   NMI:                 0.4300
+|   ARI:                 0.0690
+|   Dendrogram Purity:   0.7628
+|   Weighted Leaf Purity:0.8115
+|   Edge F1 vs Gold:     0.0000
+|   Spherical Silhouette:0.3933
+|   Ancestor Correct:    0.0000
+|   Leaf Entropy:        3.5340 nats
++----------------------------------------------------------
+
+15:29:10.851 [INFO ] HeadlessRunner - [TRAIN-ONLY] after construction: 0 EVAL texts among the tree's members (2283 keys checked)
+15:29:10.851 [INFO ] HeadlessRunner - Saving generated DAG snapshot to database...
+15:29:10.852 [INFO ] Persistence - Saving taxonomy DAG with Vector-Offloading to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp13-afu-run2\temp_graph_save.tmp...
+15:29:11.898 [INFO ] Persistence - Saved 71 nodes successfully (offloaded structure to SQL).
+15:29:12.010 [WARN ] AdditionalMetrics - computeRoutingECE: empty ground truth — returning 0.0 (GT plumbing absent)
+15:29:12.023 [INFO ] SnapshotManager - [POOL-PIN] snapshot stores this run's own reserved pool pc6bf56283b637368
+15:29:12.126 [INFO ] SnapshotManager - [TRAIN-ONLY] saveSnapshot: 0 EVAL texts among the tree's members (2283 pool texts checked)
+15:29:12.161 [INFO ] SnapshotManager - Successfully created and saved snapshot to DB: 20261002_152910_Headless_Run_Auto_ge
+15:29:12.161 [INFO ] HeadlessRunner - Successfully generated and saved snapshot. Snapshot ID: 20261002_152910_Headless_Run_Auto_ge
+15:29:12.161 [INFO ] HeadlessRunner - Active graph node set: n00000001
+15:29:12.162 [INFO ] HeadlessRunner - Bridge Nodes CSV written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp13-afu-run2\experiment_results\archv2\union_af_route\AF-U\bbh\seed_42\validation\bridge_nodes.csv
+15:29:12.163 [INFO ] HeadlessRunner - Bridge Residuals CSV written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp13-afu-run2\experiment_results\archv2\union_af_route\AF-U\bbh\seed_42\validation\bridge_residuals.csv
+15:29:12.204 [INFO ] LeaderboardCorpus - Loaded 5761 BBH queries across 24 domain(s) from multicorpus_cache_v1.db
+15:29:12.206 [INFO ] DatasetFetcher - [CORPUS] merged 1 source(s): BBH=24 domain(s)/5761 queries -> 24 domain key(s), 5761 queries
+15:29:12.210 [INFO ] HeadlessRunner - ========================================
+15:29:12.210 [INFO ] HeadlessRunner - RUNNING TRICKLE VALIDATION: MAIN
+15:29:12.210 [INFO ] HeadlessRunner - ========================================
+15:29:12.211 [INFO ] HeadlessRunner - Starting Headless Batch Trickle Validation for MAIN...
+15:29:12.213 [INFO ] HeadlessRunner - Graph validity CSV for MAIN written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp13-afu-run2\experiment_results\archv2\union_af_route\AF-U\bbh\seed_42\validation\MAIN_graph_validity.csv
+15:29:12.302 [INFO ] AdditionalMetrics - [CALIB]  ECE=0.9987, reliability_bins={[0.9,1.0]:1.00/0.00, [0.7,0.8]:0.71/0.00, [0.6,0.7]:0.64/0.00, [0.5,0.6]:0.57/0.00}
+15:29:12.302 [INFO ] HeadlessRunner - Taxonomy quality CSV for MAIN written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp13-afu-run2\experiment_results\archv2\union_af_route\AF-U\bbh\seed_42\validation\MAIN_taxonomy_quality.csv
+15:29:12.303 [INFO ] HeadlessRunner - Bridge quality CSV for MAIN written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp13-afu-run2\experiment_results\archv2\union_af_route\AF-U\bbh\seed_42\validation\MAIN_bridge_quality.csv
+15:29:12.306 [INFO ] HeadlessRunner - Loaded 3528 ground-truth categories directly from DAG queries.
+15:29:12.310 [INFO ] HeadlessRunner - Backfilled 0 categories from local cache. Total mapping keys: 3474
+15:29:12.318 [INFO ] HeadlessRunner - Indexed leaves: 36 / 36 leaves tagged with a domain.
+15:29:12.319 [INFO ] HeadlessRunner - Routing 2286 test queries...
+15:29:13.684 [INFO ] AdditionalMetrics - [CALIB]  ECE=0.2088, reliability_bins={[0.9,1.0]:1.00/0.80, [0.7,0.8]:0.73/0.94, [0.6,0.7]:0.65/0.95, [0.5,0.6]:0.54/0.96}
+15:29:13.685 [INFO ] BatchTrickleEvaluator - [ROUTE]  posterior_sum≈1.0000, membership_depth_corr=-0.1993, multi_leaf_rate=0.0363, dist={1:0.96, 2:0.04}
+15:29:13.685 [INFO ] BatchTrickleEvaluator - Held-out residual rate: 0.00%
+15:29:13.686 [INFO ] HeadlessRunner - Batch Trickle Results (MAIN):
+15:29:13.686 [INFO ] HeadlessRunner -   - Total Queries: 2286
+15:29:13.686 [INFO ] HeadlessRunner -   - Top-1 Accuracy: 80,14% (95% Wilson CI: [78,45%, 81,72%])
+15:29:13.686 [INFO ] HeadlessRunner -   - Any-Match Accuracy: 80,23%
+15:29:13.686 [INFO ] HeadlessRunner -   - Mean Leaf Purity: 82,88%
+15:29:13.686 [INFO ] HeadlessRunner -   - Expected Calibration Error (ECE): 0,2088
+15:29:13.686 [INFO ] HeadlessRunner -   - Macro F1: 79,08%
+15:29:13.686 [INFO ] HeadlessRunner -   - Avg Match Count (Eval): 1,04 leaves/query
+15:29:13.686 [INFO ] HeadlessRunner -   - Median Nodes/Query (Eval): 1,00
+15:29:13.686 [INFO ] HeadlessRunner - Held-out residual rate: 0.00%
+15:29:13.687 [INFO ] HeadlessRunner - 
+Per-Domain Trickle Results (MAIN):
+----------------------------------------------------------------------
+Domain                    | Support | Precision |   Recall |       F1
+----------------------------------------------------------------------
+BBH/date_understanding    |     108 |    100,0% |   100,0% |   100,0%
+BBH/logical_deduction_thr |     105 |      0,0% |     0,0% |     0,0%
+BBH/disambiguation_qa     |     102 |     93,6% |   100,0% |    96,7%
+BBH/temporal_sequences    |     100 |    100,0% |   100,0% |   100,0%
+BBH/hyperbaton            |     100 |    100,0% |   100,0% |   100,0%
+BBH/reasoning_about_color |     100 |     98,3% |    58,0% |    73,0%
+BBH/object_counting       |     100 |     75,4% |    95,0% |    84,1%
+BBH/boolean_expressions   |     100 |    100,0% |   100,0% |   100,0%
+BBH/geometric_shapes      |     100 |    100,0% |   100,0% |   100,0%
+BBH/formal_fallacies      |     100 |     99,0% |   100,0% |    99,5%
+BBH/web_of_lies           |     100 |     98,0% |   100,0% |    99,0%
+BBH/movie_recommendation  |     100 |    100,0% |   100,0% |   100,0%
+BBH/sports_understanding  |     100 |    100,0% |   100,0% |   100,0%
+BBH/navigate              |     100 |    100,0% |   100,0% |   100,0%
+BBH/salient_translation_e |     100 |    100,0% |   100,0% |   100,0%
+BBH/ruin_names            |     100 |    100,0% |   100,0% |   100,0%
+BBH/tracking_shuffled_obj |      99 |     29,7% |    19,2% |    23,3%
+BBH/logical_deduction_sev |      95 |     29,1% |    35,8% |    32,1%
+BBH/tracking_shuffled_obj |      94 |     23,3% |    39,4% |    29,2%
+BBH/tracking_shuffled_obj |      90 |     35,0% |    23,3% |    28,0%
+BBH/causal_judgement      |      84 |    100,0% |   100,0% |   100,0%
+BBH/logical_deduction_fiv |      80 |     27,6% |    56,3% |    37,0%
+BBH/snarks                |      71 |     98,6% |   100,0% |    99,3%
+BBH/penguins_in_a_table   |      58 |     93,5% |   100,0% |    96,7%
+======================================================================
+
+15:29:13.691 [INFO ] HeadlessRunner - Trickle validation results written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp13-afu-run2\experiment_results\archv2\union_af_route\AF-U\bbh\seed_42\validation\MAIN_trickle_validation_results.csv
+15:29:13.743 [INFO ] HeadlessRunner - Nearest-Centroid Routing Results (MAIN):
+15:29:13.743 [INFO ] HeadlessRunner -   - Total Evaluated: 2286
+15:29:13.743 [INFO ] HeadlessRunner -   - Top-1 Accuracy: 82,11%
+15:29:13.743 [INFO ] HeadlessRunner -   - Top-3 Accuracy: 93,48%
+15:29:13.743 [INFO ] HeadlessRunner -   - Top-5 Accuracy: 94,84%
+15:29:13.743 [INFO ] HeadlessRunner -   - Top-10 Accuracy: 95,41%
+15:29:13.744 [INFO ] HeadlessRunner - Centroid routing results written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp13-afu-run2\experiment_results\archv2\union_af_route\AF-U\bbh\seed_42\validation\MAIN_centroid_routing_results.csv
+15:29:14.904 [INFO ] HeadlessRunner - Migration flow matrix written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp13-afu-run2\experiment_results\archv2\union_af_route\AF-U\bbh\seed_42\validation\MAIN_migration_flow_matrix.csv
+15:29:16.246 [INFO ] HeadlessRunner - Held-out leaf support CSV written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp13-afu-run2\experiment_results\archv2\union_af_route\AF-U\bbh\seed_42\validation\MAIN_heldout_leaf_support.csv
+15:29:16.247 [INFO ] HeadlessRunner - Held-out leaf support (MAIN): leaves=36, top1 min=38 median=57.0 max=126, leaves with <12 held-out top-1 queries: 0
+15:29:16.253 [INFO ] HeadlessRunner - Routing calibration CSV written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp13-afu-run2\experiment_results\archv2\union_af_route\AF-U\bbh\seed_42\validation\MAIN_routing_calibration.csv
+15:29:16.392 [INFO ] AdditionalMetrics - [CALIB]  ECE=0.9987, reliability_bins={[0.9,1.0]:1.00/0.00, [0.7,0.8]:0.71/0.00, [0.6,0.7]:0.64/0.00, [0.5,0.6]:0.57/0.00}
+15:29:19.338 [INFO ] HeadlessRunner - Appended condition MAIN results to ledger at Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp13-afu-run2\experiment_results\archv2\union_af_route\AF-U\bbh\tuning_ledger.csv
+15:29:19.340 [INFO ] HeadlessRunner - Performance report JSON written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp13-afu-run2\experiment_results\archv2\union_af_route\AF-U\bbh\seed_42\performance_report.json
+15:29:19.342 [INFO ] HeadlessRunner - 
+========================================================================================================
+                               DAG PERFORMANCE REPORT & INSTRUMENTATION                                 
+========================================================================================================
+Top-Level Roll-Up:
+  Construction     :     25 799 ms ( 75,4%)
+  Arena/Bench      :      7 128 ms ( 20,8%)
+  Persistence      :      1 310 ms (  3,8%)
+  Other            :          0 ms (  0,0%)
+  TOTAL TIME       :     34 237 ms (100.0%)
+========================================================================================================
+
+Section: CONSTRUCTION DETAILS
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| Phase / Operation                           | Calls | Total(ms) | Avg(ms) | p50(ms) | p95(ms) |     Count |    Unit/s |  Shr |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| phase4_split                                |    13 |     24331 |  1871,6 |    1568 |    4245 |        13 |       0,5 | 71,1% |
+| phase5_optimize                             |    13 |       648 |    49,8 |      59 |     183 |        13 |      20,1 | 1,9% |
+| phase2_refit                                |    13 |       253 |    19,5 |      15 |      63 |        13 |      51,4 | 0,7% |
+| finalization.generate_report                |     2 |       223 |   111,5 |     137 |     137 |         2 |       9,0 | 0,7% |
+| phase3_trickle                              |    13 |       161 |    12,4 |      14 |      23 |    45 162 | 280 509,3 | 0,5% |
+| phase1_precompute                           |     1 |       118 |   118,0 |     118 |     118 |     3 474 |  29 440,7 | 0,3% |
+| phase2_bootstrap                            |     1 |        65 |    65,0 |      65 |      65 |         1 |      15,4 | 0,2% |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+
+Section: ARENA/BENCHMARK DETAILS
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| Phase / Operation                           | Calls | Total(ms) | Avg(ms) | p50(ms) | p95(ms) |     Count |    Unit/s |  Shr |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| validation.MAIN                             |     1 |      7128 |  7128,0 |    7128 |    7128 |     2 286 |     320,7 | 20,8% |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+
+Section: PERSISTENCE DETAILS
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| Phase / Operation                           | Calls | Total(ms) | Avg(ms) | p50(ms) | p95(ms) |     Count |    Unit/s |  Shr |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| snapshot_save                               |     1 |      1310 |  1310,0 |    1310 |    1310 |         1 |       0,8 | 3,8% |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+
+Construction Per-Iteration Step Times:
+  Iter  1:  4 302 ms  [phase5_optimize=17ms, phase2_refit=40ms, phase3_trickle=0ms, phase4_split=4245ms]
+  Iter  2:  3 835 ms  [phase5_optimize=9ms, phase2_refit=63ms, phase3_trickle=23ms, phase4_split=3740ms]
+  Iter  3:  3 246 ms  [phase5_optimize=12ms, phase2_refit=15ms, phase3_trickle=10ms, phase4_split=3209ms]
+  Iter  4:  2 846 ms  [phase5_optimize=6ms, phase3_trickle=7ms, phase2_refit=15ms, phase4_split=2818ms]
+  Iter  5:  2 066 ms  [phase5_optimize=9ms, phase3_trickle=13ms, phase2_refit=15ms, phase4_split=2029ms]
+  Iter  6:  2 232 ms  [phase5_optimize=10ms, phase3_trickle=9ms, phase2_refit=15ms, phase4_split=2198ms]
+  Iter  7:  1 780 ms  [phase5_optimize=183ms, phase3_trickle=14ms, phase2_refit=15ms, phase4_split=1568ms]
+  Iter  8:    944 ms  [phase5_optimize=72ms, phase3_trickle=14ms, phase2_refit=16ms, phase4_split=842ms]
+  Iter  9:    845 ms  [phase5_optimize=74ms, phase3_trickle=14ms, phase2_refit=14ms, phase4_split=743ms]
+  Iter 10:    826 ms  [phase5_optimize=71ms, phase2_refit=11ms, phase4_split=730ms, phase3_trickle=14ms]
+  Iter 11:    827 ms  [phase5_optimize=66ms, phase2_refit=11ms, phase4_split=734ms, phase3_trickle=16ms]
+  Iter 12:    817 ms  [phase5_optimize=60ms, phase2_refit=12ms, phase4_split=731ms, phase3_trickle=14ms]
+  Iter 13:    827 ms  [phase5_optimize=59ms, phase2_refit=11ms, phase4_split=744ms, phase3_trickle=13ms]
+========================================================================================================
+
+15:29:19.351 [INFO ] Diagnostics - [DIAG] diagnostics bundle closed (completed) at Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp13-afu-run2\experiment_results\archv2\union_af_route\AF-U\bbh\seed_42\diagnostics
+15:29:19.352 [INFO ] HeadlessRunner - Headless Benchmark finished successfully.
+15:29:19.352 [INFO ] ModelEvalStore - SQLite evaluation store database connection closed cleanly via shutdown hook.
+15:29:19.356 [INFO ] RankingService - SQLite database connection closed cleanly via shutdown hook.
+15:29:19.373 [INFO ] DatasetFetcher - SQLite dataset fetcher database connection closed cleanly via shutdown hook.
+15:29:19.387 [INFO ] SnapshotManager - SQLite snapshot database connection closed cleanly via shutdown hook.

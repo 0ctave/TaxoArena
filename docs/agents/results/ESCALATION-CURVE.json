@@ -1,0 +1,174 @@
+{
+ "id": "ESCALATION-CURVE",
+ "title": "ESCALATION-CURVE: full accuracy-coverage curve as the lowest-margin / OOS items escalate to the best single model (combined GATE-normalised ordering); deciding area vs random escalation (AURC difference); AF-U [SC] beside K_0 and KM-U (zero calls; REGISTERED 2026-10-05)",
+ "question": "Across the whole coverage range, is escalating low-margin / OOS items first better than escalating at random?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "8e681387",
+  "program_lines": "docs/judge_v2_program.md L24653-L24665",
+  "program_lines_as_of": "the commit that writes them, parent 07bc237f, re-grepped",
+  "date": "2026-10-05",
+  "heading": "## Registered 2026-10-05 (before any code or call) — ESCALATION-CURVE: on the union routing data, what is the full curve of routed accuracy against coverage ...",
+  "provenance": "the author's \"Start them\" (relayed in the orchestrator's brief of 2026-10-05); registrar's record docs/judge_v2_program.md L24618-L24623"
+ },
+ "script": {
+  "path": "tools/analysis/escalation_curve.py",
+  "sha16": "blob:0acfb0cc (LF; sha256-lf16 b3b17943e1e51b23, sha256-crlf16 b3690bceb8666241)",
+  "commit": "823f6148 (branch drift-escalation); merged by path 4636f50d"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_drift_escalation.md",
+  "commit": "ec880315",
+  "verdict": "READY with conditions C-EC1..C-EC3 (registrar brackets; no code change)"
+ },
+ "go": "the author's \"Start them\" (2026-10-05; zero calls, no 4k-match go needed)",
+ "run": {
+  "outcome_file": "experiment_results/archv2/escalation_curve/outcome.txt (sha256 0573ff5d3f9da048cfa098cc0ab3f7885a06866fb5a50bb77dd4f781a8d87114; write-once, never committed; 124 lines); backup E:/TaxoArena_backup_2026-10-05_escalation_curve (SHA256SUMS.txt 8/8 OK)",
+  "outcome_commit": "outcome not committed (run from main after merge 4636f50d)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "pv2_1575de61bb20e977 (content-closed, CK-CLOSE-v2, residual disclosed); union EVAL 5,907 key-complete items / 5,404 components; TRAIN 11,841; GATE 2,033 (1,944 key-complete for c*); key-scored, no judge",
+  "date": "2026-10-05; 0 REFUSED / VOID / Traceback in ec_dry.log, ec_run.log (review)"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_escalation_curve.md",
+  "commit": "f44b2f17",
+  "verdict": "VALID; EC1 reproduced to the digit (byte-identical re-execution; own curve / ECDF / SE); words W-1..W-4 (MEDIUM); D-1 Kish label, D-2 c* GATE fixed (LOW)"
+ },
+ "criteria": [
+  {
+   "id": "EC1",
+   "text": "DECIDING (interval decides): A_E = mean over c = 0.00..1.00 of D_E(c) = acc_u(c) - [c acc(AF-U policy) + (1 - c) acc(best single)]; ORDERING-INFORMATIVE iff 95% lower > 0; ORDERING-HARMFUL iff upper < 0; UNDETERMINED otherwise. DEFF 1.302 measured (ESCALATION-RC); SE <= 0.0036; MDE80 0.0100; DESCRIPTIVE-ONLY at the prediction [OUTCOME 2026-10-05: words 'on average over the coverage grid', not 'across the coverage range' (W-1)]",
+   "result": "HELD",
+   "value": "ORDERING-INFORMATIVE: A_E(AF-U) +0.00659, two-stage 95% [+0.00310, +0.01007] (SE 0.00178); percentile [+0.00254, +0.00937]; reviewer one-stage [+0.00349, +0.00939]; pointwise D_E intervals include 0 at c >= 0.80",
+   "denominator": "5,907 EVAL items / 5,404 components (Kish 1.311); 101 grid points; B 2,000"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "A_E(AF-U) +0.008 [+0.003, +0.013] (informed by the seen component curves)",
+   "result": "HELD",
+   "value": "+0.00659",
+   "denominator": "5,907 items / 5,404 components"
+  },
+  {
+   "id": "P1-prob",
+   "text": "EC1 ORDERING-INFORMATIVE 0.45, UNDETERMINED 0.55, HARMFUL 0.00 (informed by the seen component curves; Brier printed, not credited)",
+   "result": "n/a",
+   "value": "NOT CREDITED as registered: ORDERING-INFORMATIVE occurred, modal UNDETERMINED 0.55 did not; Brier 0.6050",
+   "denominator": "5,907 items / 5,404 components"
+  },
+  {
+   "id": "P2",
+   "text": "(descriptive) A_E(AF-U) - A_E(K_0) 0.000 [-0.006, +0.006] (informed by the seen component curves; W-4)",
+   "result": "HELD",
+   "value": "+0.00212 [-0.00159, +0.00582]",
+   "denominator": "5,907 items / 5,404 components"
+  },
+  {
+   "id": "P3",
+   "text": "(descriptive) max_c D_E(c) +0.013 [+0.008, +0.020] (informed by the seen component curves)",
+   "result": "HELD",
+   "value": "+0.01249",
+   "denominator": "5,907 items / 5,404 components"
+  },
+  {
+   "id": "P3-cov",
+   "text": "(descriptive) coverage of the max 0.55 [0.35, 0.75] (informed by the seen component curves)",
+   "result": "HELD",
+   "value": "0.38",
+   "denominator": "5,907 items / 5,404 components"
+  },
+  {
+   "id": "P4",
+   "text": "(descriptive) GATE-chosen c* EVAL gain over no escalation +0.004 [-0.004, +0.012] (informed by the seen component curves; W-4)",
+   "result": "HELD",
+   "value": "+0.00237 [-0.00435, +0.00909] at c* 0.69",
+   "denominator": "5,907 items / 5,404 components"
+  }
+ ],
+ "falsifier": {
+  "text": "F-EC fires iff EC1 ORDERING-HARMFUL: overturns ESCALATION-RC's words 'the rule avoids the cost of random escalation' and closes margin / OOS ordering as a route safety valve on these cells.",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "EC1_A_E_AF-U": "+0.00659, two-stage 95% [+0.00310, +0.01007] (SE_2stage 0.00178); 5,907 items / 5,404 components; mean over 101 grid points",
+  "A_E_KM-U": "+0.00603 [+0.00343, +0.00862] (mean over seeds 0-4; per seed +0.00366 / +0.00635 / +0.00637 / +0.00692 / +0.00683); descriptive",
+  "AF-U_minus_KM-U": "+0.00056, one-stage percentile [-0.00185, +0.00280] (SE 0.00120; the review's readout, not printed by the outcome; descriptive)",
+  "A_E_K_0": "+0.00447 [+0.00090, +0.00804]; AF-U - K_0 +0.00212 [-0.00159, +0.00582]; descriptive",
+  "max_D_E": "+0.01249 at coverage 0.38 (0.01 grid); descriptive",
+  "c_star": "0.69 (GATE, 1,944 key-complete); EVAL gain over no escalation +0.00237 [-0.00435, +0.00909]; EVAL-chosen best +0.00491 at 0.58 (post hoc, no interval)",
+  "no_escalation_baseline": "gain over no escalation negative for c < 0.30 (best single 0.6049 < AF-U policy 0.6201)",
+  "seen_component_areas": "AF-U margin +0.00761, OOS +0.00853, fragility +0.01018 (seen in ESCALATION-RC; no interval; each larger than the combined ordering's)",
+  "without_IFEVAL": "5,745 items: A_E +0.00738 [+0.00383, +0.01092]; c* 0.71, EVAL gain +0.00366 [-0.00299, +0.01030]",
+  "support_realised": "SE_2stage 0.00178 (i.i.d. 0.00162), DEFF 1.202 (registered 1.302), n_eff 4,915 (registered 4,537), MDE80 0.0050 (registered 0.0100); Kish 1.311 (registered label 1.09 = plain mean, D-1)",
+  "P1_brier": "0.6050 (not credited)"
+ },
+ "sentence_of_record": "ESCALATION-CURVE (2026-10-05, 0 calls) — VALID; EC1 ORDERING-INFORMATIVE, F-EC NOT FIRED. On the union EVAL items (5,907 / 5,404 components), escalating the lowest-u items (combined margin/OOS ordering) to the best single model beats random escalation on average over the coverage grid by +0.66pp of accuracy (two-stage 95% [+0.31, +1.01]pp; EC1 ORDERING-INFORMATIVE, predictions informed by the seen component curves). The size is small, and it equals a label-free k-means partition's (+0.60pp; difference +0.06pp [-0.19, +0.28]pp), so it is a property of the margin/OOS ordering on any centroid partition, not of the tree. It yields no usable operating point: the GATE-chosen coverage 0.69 gains +0.24pp [-0.44, +0.91]pp over no escalation, and below coverage 0.30 escalation loses accuracy. [POSTRUN docs/reviews/POSTRUN_escalation_curve.md, f44b2f17, W-1..W-4; not 'across the coverage range' (pointwise intervals include 0 at c >= 0.80); AF-U - KM-U is the review's one-stage readout, descriptive; all six prediction lines informed, not blind; outcome not committed, sha256 0573ff5d...]",
+ "chips": [
+  "VALID (POST-RUN f44b2f17): ORDERING-INFORMATIVE, small; = k-means; no operating-point gain",
+  "W-1..W-4: ON AVERAGE OVER THE COVERAGE GRID, NOT ACROSS THE RANGE (c ≥ 0.80 INCLUDES 0); A MARGIN/OOS PROPERTY, NOT A TREE PROPERTY; ALL SIX PREDICTIONS INFORMED BY THE SEEN COMPONENT CURVES"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-05",
+   "by": "registrar (pre-data; docs/reviews/READY_drift_escalation.md (ec880315))",
+   "text": "READY on escalation_curve.py blob:0acfb0cc (LF). C-EC1: P1 (band and EC1 probabilities) and P3 carry the qualifier 'informed by the seen component curves' (the script's P1 band and P3 lines print none; no code change). C-EC2 / EC-R12: escalation_rc a17f6821 -> 8f99db7d, selftest lines only (2 lines below the SELFTEST marker; called code byte-identical). C-EC3: per the review it concerns DRIFT-REPLAY's seed 20261008 (descriptive only); nothing in ESCALATION-CURVE's deciding path. Selftest 6/6, mutants 50/50, own E1-E4 killed (review)."
+  },
+  {
+   "date": "2026-10-05",
+   "by": "registrar (POSTRUN f44b2f17, VALID)",
+   "text": "W-1: EC1's words are 'on average over the coverage grid', not 'across the coverage range' (outcome file stays write-once). W-2/W-3: small (+0.66pp), equal to KM-U (+0.60pp; AF-U - KM-U +0.06pp [-0.19, +0.28]), a margin/OOS property, not a tree property; no usable operating point (c* +0.24pp [-0.44, +0.91]). W-4: 'informed by the seen component curves' on all six prediction lines (extends C-EC1). D-1: Support (a) 1.09 is the plain mean; Kish 1.311. Brackets in the registration's READOUTS AND CRITERIA, SUPPORT, PREDICTIONS lines (L24659-L24661)."
+  }
+ ],
+ "does_not_show": [
+  "a tree property (AF-U = KM-U within +0.0006)",
+  "a usable operating point (c* interval straddles 0; below c 0.30 escalation loses accuracy)",
+  "an ordering gain at every coverage (pointwise intervals include 0 at c >= 0.80)",
+  "that the combined ordering is the best ordering (each seen component area is larger)",
+  "a fresh test of the seen component curves or the fragility peak",
+  "escalation to a judge (ESCALATE-LLAMA-LAW untouched); judged decisions, real traffic, other rosters or draws"
+ ],
+ "ledger": {
+  "row_id": "ESCALATION-CURVE",
+  "version": "v398 (2026-10-05: OUTCOME bracket, OK + WARN chips) | v397 (2026-10-05: READY bracket, chip READY) | v392 (2026-10-05: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "ESCALATION-RC",
+  "UNION-AF-ROUTE (frozen TRAIN policy)"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; no judge, rubric, reference, frontier, temperature, LR / BIC (MIX-LRT-SITE untouched); route escalation, not judge escalation (ESCALATE-LLAMA-LAW untouched)"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "CPU minutes",
+  "agent_hours": "about 2 h",
+  "reads_pool": false
+ },
+ "outputs": "never committed: stored on E: with SHA256SUMS.txt; temp under E:/TaxoArena_tmp via scratch_dir",
+ "sources": [
+  "docs/judge_v2_program.md L24653-L24665 (_as_of the commit that writes them, parent 07bc237f, re-grepped)",
+  "docs/judge_v2_program.md L24618-L24623 (registrar's record; _as_of the commit that writes them, parent 07bc237f, re-grepped)",
+  "the orchestrator's brief of 2026-10-05 (the author's \"Start them\")",
+  "docs/reviews/READY_drift_escalation.md (ec880315); programme brackets in the ESCALATION-CURVE registration L24657, L24661 (_as_of ec880315 + this commit, re-grepped)",
+  "docs/judge_v2_program.md L24714-L24719 (registrar's record '## Registrar's record 2026-10-05 (insertion only; zero calls; nothing run; pre-data) — READY_drift_escalation ec880315: ...'; _as_of ec880315 + this commit, re-grepped)",
+  "docs/reviews/POSTRUN_escalation_curve.md (f44b2f17); outcome sha256 0573ff5d...; docs/judge_v2_program.md '## ESCALATION-CURVE (2026-10-05, 0 calls) — VALID (POSTRUN f44b2f17): ...' L24721-L24733 and brackets L24659-L24661 (_as_of the commit that writes them, parent f44b2f17, re-grepped)"
+ ],
+ "last_update": "2026-10-05",
+ "label_status": "AF-U [SC]; K_0 [SC] (files by declared source, D-2); KM-U [LF] (descriptive); policies and best single fitted on TRAIN correctness",
+ "plain_description": {
+  "sq": "SQ1 Use",
+  "what": "Draws the full accuracy curve for routing the least certain questions to the best single model instead of the per-cell choice, at every coverage level. It compares this with sending a random set of questions of the same size. Uses about 5,900 evaluation questions. No judge calls.",
+  "why": "Checks whether the routing's uncertainty signal is a useful safety valve: does escalating uncertain items first beat escalating at random?",
+  "information": "A positive area means the uncertainty ordering helps. A negative area would remove it as a safety valve. Result: averaged over the coverage levels tested, escalating uncertain items first beats escalating at random by about +0.66 accuracy points, which is small. It is not a gain at every level: at high coverage the interval at each level includes zero. A plain k-means partition does the same (+0.60), so this is not a property of the tree. There is no usable operating point: the chosen coverage's gain includes zero, and escalating at very low coverage lowers accuracy.",
+  "written": "2026-10-07"
+ }
+}

@@ -1,0 +1,167 @@
+{
+ "id": "COVERAGE-AUDIT",
+ "title": "COVERAGE-AUDIT: per union member, the share of its EVAL items filed into cells dominated by other members (X_m) under AF-U, K_0 nearest-of-all and declared-centroid cells; CV1 = tree minus k-means TOST +/-0.020 (zero calls; REGISTERED 2026-10-04)",
+ "question": "Do the anchor-free tree's cells mix union members more or less than k-means?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "the commit that writes it (parent ed52c912)",
+  "program_lines": "docs/judge_v2_program.md L24156-L24167",
+  "program_lines_as_of": "the commit that writes them, parent ed52c912, re-grepped",
+  "date": "2026-10-04",
+  "provenance": "docs/agents/plans/2026-10-04_10h_schedule.md (ed52c912); docs/literature/2026-10-03_tree_uses.md (7812c100); the orchestrator's brief; autonomous scheduling"
+ },
+ "script": {
+  "path": "tools/analysis/coverage_audit.py",
+  "sha16": "75f65a27 (git blob, LF)",
+  "commit": "0708354a (merged)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_coverage_audit_delta.md (with READY_cell_flips_coverage.md)",
+  "commit": "see review",
+  "verdict": "READY after delta"
+ },
+ "go": "autonomous-scheduling authorisation (zero calls); the author's 10-hour instruction",
+ "run": {
+  "outcome_file": "experiment_results/archv2/coverage_audit/coverage_audit_outcome.txt (sha256 93d17e98...); never committed; backup E:/TaxoArena_backup_2026-10-04_coverage_audit (SHA256SUMS OK)",
+  "outcome_commit": "run from main at 0708354a after the author's 'run it'",
+  "calls": 0,
+  "cce": 0,
+  "pool": "union EVAL 5,907 / 5,404 (draw 5a3e756)",
+  "date": "2026-10-04"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_coverage_audit.md",
+  "commit": "1a9f0eab",
+  "verdict": "VALID (Q1-Q3)"
+ },
+ "criteria": [
+  {
+   "id": "CV1",
+   "text": "DECIDING (interval): D_X = X(AF-U) - X(K_0 nearest of all), item-paired; EQUIVALENT iff 90% inside +/-0.020; DIFFERENT iff |D_X| > 0.020 AND 95% excludes 0; NEITHER otherwise. Verdict line: SCOREABLE (DEFF 1.102 measured, AK1; SE 0.00432; TOST reach 0.0093) [B-4 2026-10-04: decided by MIRRORED K_0 filing (IFEVAL by source, others nearest of 122 non-IFEVAL centroids); dominance by each arm's own filing (CV-R2)]",
+   "result": "HELD",
+   "value": "EQUIVALENT within +/-0.020: D_X +0.00322, 90% [-0.00017, +0.00690], 95% [-0.00085, +0.00746]; DEFF 0.992, SE 0.00211",
+   "denominator": "union EVAL 5,907 items / 5,404 components"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "D_X +0.005 [-0.015, +0.025]; CV1 EQUIVALENT 0.50, NEITHER 0.30, DIFFERENT 0.20",
+   "result": "HELD",
+   "value": "+0.00322 in [-0.015, +0.025]; EQUIVALENT occurred; Brier 0.3800",
+   "denominator": "union EVAL 5,907 items / 5,404 components"
+  },
+  {
+   "id": "P2",
+   "text": "X(AF-U) pooled 0.12 [0.05, 0.25]; GPQA 0.45 [0.20, 0.75]; MATH 0.25 [0.10, 0.45]",
+   "result": "FAILED",
+   "value": "pooled X(AF-U) 0.032 outside [0.05, 0.25] FAILED; GPQA 0.353 (n 34), MATH 0.131 and the order HELD",
+   "denominator": "union EVAL 5,907 items / 5,404 components"
+  },
+  {
+   "id": "P3",
+   "text": "X(declared-centroid) 0.08 [0.03, 0.18] (descriptive)",
+   "result": "HELD",
+   "value": "declared-centroid X 0.057 in [0.03, 0.18]",
+   "denominator": "union EVAL 5,907 items / 5,404 components"
+  }
+ ],
+ "falsifier": {
+  "text": "F-CV fires iff CV1 DIFFERENT (TREE-MORE-MIXED): the tree is the worse index for coverage audits.",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "CV1": "D_X +0.00322, 90% [-0.00017, +0.00690] (5,907 / 5,404; DEFF 0.992, SE 0.00211)",
+  "pooled_X": "AF-U 0.03233; K_0 mirrored 0.02912; K_0 nearest-of-all 0.03741; declared-centroid 0.05739",
+  "nearest_of_all_D_X": "-0.00508 [-0.00981, -0.00017] (IFEVAL asymmetry); without IFEVAL +0.00331 / +0.00279 (descriptive)",
+  "per_member_AFU_K0": "BBH 0/0, MUSR 0/0, IFEVAL 0/0 (by source, not measured), MATH 0.131/0.131, MMLU-Pro 0.038/0.031, GPQA 0.353/0.471 (n 34)"
+ },
+ "sentence_of_record": "COVERAGE-AUDIT, content-closed v2 union split, 0 calls: filing each union member's EVAL items into cells and scoring the share that land in a cell whose TRAIN-dominant member is another member, the anchor-free tree (AF-U) and per-source k-means (K_0, mirrored one-cell filing per B-4) mix members EQUIVALENTLY within ±0.020: D_X = X(AF-U) − X(K_0) = +0.0032, 90% [−0.0002, +0.0069] (TOST; 5,907 items / 5,404 components; DEFF 0.99); F-CV not fired. Pooled X: AF-U 0.032, K_0 0.029 (registered nearest-of-all K_0 0.037, descriptive; its D_X −0.0051 [−0.0098, −0.0002] carries the IFEVAL one-cell asymmetry; without IFEVAL both filings give +0.003). Per member (AF-U / K_0): BBH 0 / 0, MUSR 0 / 0, IFEVAL 0 / 0 (filed by source, not measured), MATH 0.131 / 0.131, MMLU-Pro 0.038 / 0.031, GPQA 0.353 / 0.471 (n 34). Predictions: P1, P2 GPQA, P2 MATH, P2 order and P3 HELD; P2 pooled FAILED (0.032 < 0.05); Brier 0.38. [Not licensed: 'equal' or 'no difference'; the tree separating benchmarks better / worse than k-means; any GPQA contrast; foreign filing as error; any OOS claim. B-5 (CV-R2) confirmed by the author; it changes no AF-U or K_0 number.]",
+ "chips": [
+  "REGISTERED 2026-10-04, BEFORE ANY CODE; not built",
+  "VALID (POST-RUN 1a9f0eab): CV1 EQUIVALENT (&plusmn;0.020); F-CV NOT FIRED",
+  "NEVER &#x27;EQUAL&#x27;; NEAREST-OF-ALL D_X &minus;0.0051 FROM THE IFEVAL ASYMMETRY; GPQA n 34; BBH / MUSR / IFEVAL 0"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-04",
+   "by": "registrar (pre-data; READY_cell_flips_coverage)",
+   "text": "B-1 seeds 20261004 / 20261005, Kish; B-3 GPQA n 34; B-4 CV1 decided by MIRRORED K_0 filing (C-S1 precedent; restores like with like; nearest-of-all and non-IFEVAL D_X descriptive); B-5 CV-R2 dominance by each arm's own filing, CV-R3 ties / empty cells. Programme L24160, L24162, L24163, L24164."
+  },
+  {
+   "date": "2026-10-04",
+   "by": "orchestrator's ruling (recorded by the registrar; pre-data)",
+   "text": "CV-R2 decides CV1 (a reading, not a criterion move: the term defined the same way for every arm; construction-membership X descriptive). Flagged for the author's checkpoint-H review; the author may overrule before the run. Programme L24160."
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (POSTRUN 1a9f0eab; the author's 'run it')",
+   "text": "outcome recorded; the author confirmed the B-5 CV-R2 ruling. docs/judge_v2_program.md L24226-L24236 (section \"## COVERAGE-AUDIT (2026-10-04, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent 1a9f0eab)"
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (consistency check 2026-10-04; zero calls)",
+   "text": "READY pointer completed: docs/reviews/READY_coverage_audit_delta.md committed in 0708354a (blob 60511689, LF); with docs/reviews/READY_cell_flips_coverage.md (d16892fa); 'ready' kept as written."
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (status correction; zero calls)",
+   "text": "status correction (testing-logic review, docs/literature/2026-10-04_testing_logic_review.md (bd5ca001)): AF-U is federated per source (prog L22633), so it is SOURCE-CONDITIONED [SC], not label-free; 'label-free' / [LF] on AF-U reads [SC]; K_0 is [SC] too (like with like); no number or verdict moves; docs/judge_v2_program.md L24259-L24263 (registrar's record; _as_of the commit that writes it, parent bd5ca001)"
+  }
+ ],
+ "does_not_show": [
+  "'equal' or 'no difference' (equivalence within +/-0.020)",
+  "tree vs k-means benchmark separation",
+  "any GPQA contrast (n 34)",
+  "foreign filing as error",
+  "any OOS claim"
+ ],
+ "ledger": {
+  "row_id": "COVERAGE-AUDIT",
+  "version": "v379 (2026-10-04: OUTCOME bracket, OK + WARN chips) | v375 (2026-10-04: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "UNION-AF-ROUTE",
+  "OOS-TREE-CELLS"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "minutes",
+  "agent_hours": "about 1.5 h",
+  "reads_pool": true
+ },
+ "outputs": "never committed: pinned by sha256, stored / backed up on E: with SHA256SUMS.txt (the author prefers E:)",
+ "sources": [
+  "docs/judge_v2_program.md L24156-L24167 (_as_of the commit that writes it, parent ed52c912, re-grepped)",
+  "docs/agents/plans/2026-10-04_10h_schedule.md (ed52c912)",
+  "docs/reviews/READY_cell_flips_coverage.md (blob 59070b52, LF; branch cell-flips-coverage aa5ddf04: cell_flips.py 998d39a7 READY, coverage_audit.py 69c55268 NOT READY as of that blob; the review file was untracked when this bracket was written)",
+  "docs/reviews/POSTRUN_coverage_audit.md (1a9f0eab; blob e237b34d, LF)",
+  "docs/judge_v2_program.md L24226-L24236 (section \"## COVERAGE-AUDIT (2026-10-04, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent 1a9f0eab)"
+ ],
+ "last_update": "2026-10-04",
+ "review_pending": "READY_cell_flips_coverage: NOT READY as of 69c55268; delta review of D-1's prints owed",
+ "author_review": "resolved 2026-10-04: the author's 'run it' confirmed the CV-R2 ruling",
+ "ready_of_record": {
+  "file": "docs/reviews/READY_coverage_audit_delta.md",
+  "commit": "0708354a",
+  "blob": "60511689 (LF)",
+  "note": "with docs/reviews/READY_cell_flips_coverage.md (d16892fa)"
+ },
+ "label_status": "AF-U [SC] (source-conditioned; federated per source), not [LF]; K_0 [SC]",
+ "plain_description": {
+  "sq": "SQ3 Taxonomy",
+  "what": "No calls. For each benchmark in the combined dataset, the test measured the share of its held-out questions that land in a cell dominated by a different benchmark. It compared the tree built without topic labels but separately within each source benchmark (source-conditioned, not label-free) with per-source k-means clustering.",
+  "why": "It asks whether the tree mixes benchmarks more than plain k-means does, which would make it a worse index for checking coverage.",
+  "information": "If the tree mixed more, it would be the worse tool for coverage audits. Equivalence means neither is worse on this measure. Result: done. The two are equivalent within a 2-point margin (about 3% of items land in a foreign-dominated cell under both). This is equivalence within a margin, not 'no difference'. It is not a claim that foreign filing is an error, and it does not compare how well the two separate benchmarks.",
+  "written": "2026-10-07"
+ }
+}

@@ -1,0 +1,98 @@
+[BUILD] data_v2 E-D; label REG_ARCHV2-SPLIT-1_c03031568a0a9d827d834b075512b8e4dd095642; registered seed (ARCH-V2-SPLIT-DRAW-1); seed 'ARCHV2-SPLIT-1:c03031568a0a9d827d834b075512b8e4dd095642'; data root Z:\FAC\TUBerlin\THESIS\TaxoArena (read-only); out-dir Z:\FAC\TUBerlin\THESIS\TaxoArena\data_v2\REG_ARCHV2-SPLIT-1_c03031568a0a9d827d834b075512b8e4dd095642
+[BUILD] git HEAD beb8bc150c914fe07f01b5416a33ca97d0930b45; dirty paths: none
+[M1] mmlu-pro-v2: source Z:\FAC\TUBerlin\THESIS\TaxoArena\mmlu_pro_dataset_cache_v2.db (read-only), output Z:\FAC\TUBerlin\THESIS\TaxoArena\data_v2\REG_ARCHV2-SPLIT-1_c03031568a0a9d827d834b075512b8e4dd095642\corpus_v2_mmlu_pro_v2.db
+[M1] mmlu-pro-v2: 12000 source rows read
+[M1] mmlu-pro-v2: 560379 response rows, 47 models
+[M1] mmlu-pro-v2: legacy references grok-reasoning-v0 (experiment_results/judge_solve/grok-reasoning.db, sha256-bytes 536e3f463ced750b): 3432 rows -> {"solver_row": 3432}
+[M1] mmlu-pro-v2: legacy references grok-reasoning-v1 (experiment_results/judge_solve/grok-reasoning-v1.db, sha256-bytes e6e5b783db6c3c2a): 200 rows -> {"solver_row": 200}
+[M1] mmlu-pro-v2: items 12490 (corpus 11609, response-only 881), variants 13192 (response-only 1350, answer conflict 45)
+[M1] mmlu-pro-v2: label conflicts by scheme {"eval_results.category": 4, "mmlu_pro.category": 4}; answer classes {"conflict": 0, "formatting_only": 0, "punctuation_only": 7, "option_sets_differ": 77}; GPQA items None
+[M1] mmlu-pro-v2: QUARANTINED Meta-Llama-3-70B-Instruct: 7510 rows; 7424 of the 7424 with an active row of their qid carry another stem than the active modal stem; 86 rows have no active row; record 7424 of 7510: MATCH
+[M1] mmlu-pro-v2: SEALED corpus_v2_mmlu_pro_v2.db sha256-bytes c8afeaa615bd962da70b1dcf81ed3c8838ffeb73f752e7e0d41a7d730f9f8834
+[M1] mc6-2026-09-11: source Z:\FAC\TUBerlin\THESIS\TaxoArena\multicorpus_cache_v1.db (read-only), output Z:\FAC\TUBerlin\THESIS\TaxoArena\data_v2\REG_ARCHV2-SPLIT-1_c03031568a0a9d827d834b075512b8e4dd095642\corpus_v2_union_mc6.db
+[M1] mc6-2026-09-11: 21606 source rows read
+[M1] mc6-2026-09-11: 388908 response rows, 18 models
+[M1] mc6-2026-09-11: items 20537 (corpus 20535, response-only 2), variants 20804 (response-only 6, answer conflict 31)
+[M1] mc6-2026-09-11: label conflicts by scheme {"eval_results.category": 34, "union.domain": 34, "union.source": 30, "union.task": 478}; answer classes {"conflict": 2, "formatting_only": 4, "punctuation_only": 7, "option_sets_differ": 76}; GPQA items 546
+[M1] mc6-2026-09-11: SEALED corpus_v2_union_mc6.db sha256-bytes 21d79e8cd53cd7ac9330d88822d7e9255b1d103d78262fa44150e3b153ddd246
+[M2] seed 'ARCHV2-SPLIT-1:c03031568a0a9d827d834b075512b8e4dd095642' -> registered seed (ARCH-V2-SPLIT-DRAW-1); rule CK-CLOSE-v1; eval ratio 0.30, gate ratio 0.10
+[M2] read corpus_v2_mmlu_pro_v2.db (mmlu-pro-v2) sha256-bytes c8afeaa615bd962da70b1dcf81ed3c8838ffeb73f752e7e0d41a7d730f9f8834
+[M2] read corpus_v2_union_mc6.db (mc6-2026-09-11) sha256-bytes 21d79e8cd53cd7ac9330d88822d7e9255b1d103d78262fa44150e3b153ddd246
+[M2] items 21384 (global over 2 corpora), components 21374 (10 merged by a family edge, 20 items in them), 34 components voting in more than one stratum
+[M2] CK-CLOSE-v1 condition 2 (global): one build_closure over 2 corpora, 34962 units: gen 24461, reserved 10143, sentinel 358 -> moved 0 (must be 0)
+[M2] [CK-CLOSE] content-disjoint v2 split (condition 1: sentinels explicit): PASS, 24461 train / 10143 reserved / 358 sentinel ids; 0 twins under split_side.stem_key (norm-v1, ck-v1, options-free); 0 shared families (no families given)
+[M2] CK-CLOSE-v1 condition 3 (family): 33638 families (declared + legacy-qid), 0 crossing the EVAL boundary (must be 0)
+[M2] CK-CLOSE-v1 condition 4 (cluster, never drop): 10501 EVAL units (10143 judgeable + 358 routing-only sentinels), 0 dropped; clusters by key 6419 (ids in twin groups 7730, max 14), Kish sum(n^2)/n 1.9079 -> n_eff(rho=1) 5503.9; by component 6415 clusters, Kish 1.9094 -> n_eff(rho=1) 5499.5 [DEFF at rho = 1 (upper bound), not a measured DEFF]
+[M2]   (the pooled figure counts an MMLU-Pro item once per corpus that carries it; the per-corpus figures are the ones a per-corpus board uses)
+[M2]   mc6-2026-09-11   EVAL units  6503 (judgeable  6503, sentinels    0); clusters by key  6187, Kish 1.1224 -> n_eff(rho=1) 5793.8; by component  6187, Kish 1.1224 -> n_eff(rho=1) 5793.8
+[M2]   mmlu-pro-v2      EVAL units  3998 (judgeable  3640, sentinels  358); clusters by key  3749, Kish 1.1461 -> n_eff(rho=1) 3488.4; by component  3745, Kish 1.1481 -> n_eff(rho=1) 3482.4
+[M2] per stratum (source, domain): 52 strata
+    BBH          boolean_expressions                    components   250  EVAL    75  GATE   25  TRAIN   150  (items   250, EVAL items    75)
+    BBH          causal_judgement                       components   185  EVAL    56  GATE   19  TRAIN   110  (items   185, EVAL items    56)
+    BBH          date_understanding                     components   250  EVAL    75  GATE   25  TRAIN   150  (items   250, EVAL items    75)
+    BBH          disambiguation_qa                      components   250  EVAL    75  GATE   25  TRAIN   150  (items   250, EVAL items    75)
+    BBH          formal_fallacies                       components   250  EVAL    75  GATE   25  TRAIN   150  (items   250, EVAL items    75)
+    BBH          geometric_shapes                       components   250  EVAL    75  GATE   25  TRAIN   150  (items   250, EVAL items    75)
+    BBH          hyperbaton                             components   250  EVAL    75  GATE   25  TRAIN   150  (items   250, EVAL items    75)
+    BBH          logical_deduction_five_objects         components   250  EVAL    75  GATE   25  TRAIN   150  (items   250, EVAL items    75)
+    BBH          logical_deduction_seven_objects        components   250  EVAL    75  GATE   25  TRAIN   150  (items   250, EVAL items    75)
+    BBH          logical_deduction_three_objects        components   250  EVAL    75  GATE   25  TRAIN   150  (items   250, EVAL items    75)
+    BBH          movie_recommendation                   components   250  EVAL    75  GATE   25  TRAIN   150  (items   250, EVAL items    75)
+    BBH          navigate                               components   250  EVAL    75  GATE   25  TRAIN   150  (items   250, EVAL items    75)
+    BBH          object_counting                        components   250  EVAL    75  GATE   25  TRAIN   150  (items   250, EVAL items    75)
+    BBH          penguins_in_a_table                    components   146  EVAL    44  GATE   15  TRAIN    87  (items   146, EVAL items    44)
+    BBH          reasoning_about_colored_objects        components   250  EVAL    75  GATE   25  TRAIN   150  (items   250, EVAL items    75)
+    BBH          ruin_names                             components   250  EVAL    75  GATE   25  TRAIN   150  (items   250, EVAL items    75)
+    BBH          salient_translation_error_detection    components   250  EVAL    75  GATE   25  TRAIN   150  (items   250, EVAL items    75)
+    BBH          snarks                                 components   178  EVAL    53  GATE   18  TRAIN   107  (items   178, EVAL items    53)
+    BBH          sports_understanding                   components   248  EVAL    74  GATE   25  TRAIN   149  (items   248, EVAL items    74)
+    BBH          temporal_sequences                     components   250  EVAL    75  GATE   25  TRAIN   150  (items   250, EVAL items    75)
+    BBH          tracking_shuffled_objects_five_objects components   250  EVAL    75  GATE   25  TRAIN   150  (items   250, EVAL items    75)
+    BBH          tracking_shuffled_objects_seven_object components   250  EVAL    75  GATE   25  TRAIN   150  (items   250, EVAL items    75)
+    BBH          tracking_shuffled_objects_three_object components   250  EVAL    75  GATE   25  TRAIN   150  (items   250, EVAL items    75)
+    BBH          web_of_lies                            components   250  EVAL    75  GATE   25  TRAIN   150  (items   250, EVAL items    75)
+    GPQA         Biology                                components   105  EVAL    32  GATE   11  TRAIN    62  (items   105, EVAL items    32)
+    GPQA         Chemistry                              components   214  EVAL    64  GATE   21  TRAIN   129  (items   214, EVAL items    64)
+    GPQA         Physics                                components   227  EVAL    68  GATE   23  TRAIN   136  (items   227, EVAL items    68)
+    IFEVAL       ifeval                                 components   541  EVAL   162  GATE   54  TRAIN   325  (items   541, EVAL items   162)
+    MATH         Algebra                                components   295  EVAL    89  GATE   30  TRAIN   176  (items   295, EVAL items    89)
+    MATH         Counting & Probability                 components   118  EVAL    35  GATE   12  TRAIN    71  (items   118, EVAL items    35)
+    MATH         Geometry                               components   132  EVAL    40  GATE   13  TRAIN    79  (items   132, EVAL items    40)
+    MATH         Intermediate Algebra                   components   280  EVAL    84  GATE   28  TRAIN   168  (items   280, EVAL items    84)
+    MATH         Number Theory                          components   152  EVAL    46  GATE   15  TRAIN    91  (items   152, EVAL items    46)
+    MATH         Prealgebra                             components   182  EVAL    55  GATE   18  TRAIN   109  (items   182, EVAL items    55)
+    MATH         Precalculus                            components   135  EVAL    41  GATE   14  TRAIN    80  (items   135, EVAL items    41)
+    MMLU_PRO     biology                                components   637  EVAL   191  GATE   64  TRAIN   382  (items   637, EVAL items   191)
+    MMLU_PRO     business                               components   785  EVAL   236  GATE   79  TRAIN   470  (items   790, EVAL items   238)
+    MMLU_PRO     chemistry                              components  1413  EVAL   424  GATE  141  TRAIN   848  (items  1415, EVAL items   425)
+    MMLU_PRO     computer science                       components   417  EVAL   125  GATE   42  TRAIN   250  (items   417, EVAL items   125)
+    MMLU_PRO     economics                              components   856  EVAL   257  GATE   86  TRAIN   513  (items   856, EVAL items   257)
+    MMLU_PRO     engineering                            components  1300  EVAL   390  GATE  130  TRAIN   780  (items  1301, EVAL items   391)
+    MMLU_PRO     health                                 components   687  EVAL   206  GATE   69  TRAIN   412  (items   688, EVAL items   206)
+    MMLU_PRO     history                                components   390  EVAL   117  GATE   39  TRAIN   234  (items   390, EVAL items   117)
+    MMLU_PRO     law                                    components   973  EVAL   292  GATE   97  TRAIN   584  (items   973, EVAL items   292)
+    MMLU_PRO     math                                   components  1351  EVAL   405  GATE  135  TRAIN   811  (items  1352, EVAL items   405)
+    MMLU_PRO     other                                  components   941  EVAL   282  GATE   94  TRAIN   565  (items   941, EVAL items   282)
+    MMLU_PRO     philosophy                             components   510  EVAL   153  GATE   51  TRAIN   306  (items   510, EVAL items   153)
+    MMLU_PRO     physics                                components  1405  EVAL   422  GATE  141  TRAIN   842  (items  1405, EVAL items   422)
+    MMLU_PRO     psychology                             components   815  EVAL   245  GATE   82  TRAIN   488  (items   815, EVAL items   245)
+    MUSR         murder_mysteries                       components   250  EVAL    75  GATE   25  TRAIN   150  (items   250, EVAL items    75)
+    MUSR         object_placements                      components   256  EVAL    77  GATE   26  TRAIN   153  (items   256, EVAL items    77)
+    MUSR         team_allocation                        components   250  EVAL    75  GATE   25  TRAIN   150  (items   250, EVAL items    75)
+[M2] totals: components EVAL 6415 / GATE 2142 / TRAIN 12817; items EVAL 6419 / GATE 2143 / TRAIN 12822 (EVAL share of items 0.3002)
+[M2] new pool id pv2_4cce62591eb5a2cb  scope mc6-2026-09-11   EVAL components  6187, EVAL items  6187  [registered seed (ARCH-V2-SPLIT-DRAW-1)]
+[M2] new pool id pv2_6f78aece2bf9a612  scope mmlu-pro-v2      EVAL components  3745, EVAL items  3749  [registered seed (ARCH-V2-SPLIT-DRAW-1)]
+[M2] new pool id pv2_ffa5eea85c29112c  scope all corpora      EVAL components  6415, EVAL items  6419  [registered seed (ARCH-V2-SPLIT-DRAW-1)]
+[M2] SEALED split_v2_REG_ARCHV2-SPLIT-1_c03031568a0a9d827d834b075512b8e4dd095642.db sha256-bytes 69c8dfa2ebceb9349c00cfd1a02349049ad3af3b745dbb0804ecaff939a5688b
+[BUILD] side-table export data_v2\manifests\REG_ARCHV2-SPLIT-1_c03031568a0a9d827d834b075512b8e4dd095642_side.tsv: 21384 rows, table_sha 1b5f6395cac8f46fdef00fea3389e6f69779d57b64e3602a4d9300f6559d03db (equal to the sealed split's; verified from the text)
+[M3] building gen_view_REG.db (registered seed (ARCH-V2-SPLIT-DRAW-1); sides TRAIN+GATE) from split split_v2_REG_ARCHV2-SPLIT-1_c03031568a0a9d827d834b075512b8e4dd095642.db
+[M3]   mmlu-pro-v2: item 8741, variant 9236, source_row 8377, alias 24810, label 16234, label_conflict 4, answer_class 60, item_subset 0, model_registry 47, response_lite 391277, quarantine_check 1, options_ordered 9330, reference 2559
+[M3]   mc6-2026-09-11: item 14350, variant 14532, source_row 15106, alias 30216, label 57940, label_conflict 406, answer_class 62, item_subset 840, model_registry 18, response_lite 271908, quarantine_check 0, options_ordered 54894, reference 0
+[M3]   content check: 70342 texts / keys re-keyed, 0 EVAL content in the generation view (must be 0)
+[M3] SEALED gen_view_REG.db sha256-bytes 690d06b8fc108ccf99f01f1b460e18a2e4847f6ecbd6ab51d242050a96d86fc2
+[M3] building eval_view_REG.db (registered seed (ARCH-V2-SPLIT-DRAW-1); sides EVAL) from split split_v2_REG_ARCHV2-SPLIT-1_c03031568a0a9d827d834b075512b8e4dd095642.db
+[M3]   mmlu-pro-v2: item 3749, variant 3956, source_row 3623, alias 10746, label 7037, label_conflict 4, answer_class 24, item_subset 0, model_registry 47, response 169102, quarantine_check 1, options_ordered 4106, reference 1073
+[M3]   mc6-2026-09-11: item 6187, variant 6272, source_row 6500, alias 13003, label 24980, label_conflict 170, answer_class 27, item_subset 352, model_registry 18, response 117000, quarantine_check 0, options_ordered 23601, reference 0
+[M3]   content check: 30287 texts / keys re-keyed, 0 non-EVAL content in the eval view (must be 0)
+[M3] SEALED eval_view_REG.db sha256-bytes 7c284b15c45aa381654b5d175549fbac49269e0f4eed00c24e26990220650fb1
+[BUILD] done in 168 s; manifest data_v2\manifests\REG_ARCHV2-SPLIT-1_c03031568a0a9d827d834b075512b8e4dd095642.json

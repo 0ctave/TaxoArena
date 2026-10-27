@@ -1,0 +1,47 @@
+=== ARENA-V2-X20: 20-model board from 21536 verdicts (9142 ARENA-V2 + 12394 new) ===
+  iask_pro                       theta +2.027 | key acc 0.817 
+  gemini-3.1-pro_5-shots         theta +1.981 | key acc 0.913 
+  claude-3-5-sonnet-20241022     theta +1.745 | key acc 0.779 NEW
+  arx_3                          theta +1.549 | key acc 0.790 NEW
+  gpt-4o-2024-08-06              theta +1.466 | key acc 0.750 
+  arx_0314                       theta +1.464 | key acc 0.834 
+  gpt-4o-mini                    theta +0.869 | key acc 0.633 NEW
+  claude-3-5-haiku-20241022      theta +0.814 | key acc 0.630 NEW
+  deepseek-chat-v2_5             theta +0.526 | key acc 0.657 
+  Meta-Llama-3_1-70B-Instruct    theta -0.186 | key acc 0.630 
+  Qwen1.5-72B-Chat               theta -0.302 | key acc 0.474 
+  Qwen1.5-110B                   theta -0.783 | key acc 0.487 NEW
+  Qwen1.5-14B-Chat               theta -0.829 | key acc 0.355 NEW
+  Mixtral-8x7B-Instruct-v0.1     theta -0.914 | key acc 0.412 NEW
+  c4ai-command-r-v01             theta -1.009 | key acc 0.363 
+  Meta-Llama-3_1-8B              theta -1.297 | key acc 0.371 
+  gemma-7b                       theta -1.449 | key acc 0.312 NEW
+  Yi-6b-Chat                     theta -1.585 | key acc 0.271 
+  Llama-2-13b-hf                 theta -1.916 | key acc 0.235 
+  Llama-2-7b-hf                  theta -2.172 | key acc 0.178 
+
+  per new pair (judge right on key-decidable):
+    arx_3                          vs gpt-4o-2024-08-06                2/  5 = 0.40
+    arx_3                          vs claude-3-5-sonnet-20241022       7/ 12 = 0.58
+    claude-3-5-sonnet-20241022     vs gemini-3.1-pro_5-shots           9/ 15 = 0.60
+    arx_0314                       vs arx_3                            5/  8 = 0.62
+    arx_0314                       vs gpt-4o-mini                     11/ 17 = 0.65
+    Mixtral-8x7B-Instruct-v0.1     vs claude-3-5-haiku-20241022       21/ 32 = 0.66
+    arx_3                          vs iask_pro                         6/  9 = 0.67
+    claude-3-5-sonnet-20241022     vs gpt-4o-mini                     13/ 19 = 0.68
+    claude-3-5-sonnet-20241022     vs iask_pro                        11/ 16 = 0.69
+    arx_0314                       vs claude-3-5-sonnet-20241022      10/ 14 = 0.71
+  (1) rho >= 0.95: 0.9628                                                                    OK
+  (2) 12-model order kept in the 20-model board, tau >= 0.90: 0.970                          OK
+  (3) key-decidable accuracy on new pairs >= 0.85: 0.884 (n=4310)                            OK
+  (4) top-6 violations <= 3: 4 [iask_pro > gemini-3.1-pro_5-shots > claude-3-5-sonnet-20241022 > arx_0314 > arx_3 > gpt-4o-2024-08-06 vs key gemini-3.1-pro_5-shots > arx_0314 > iask_pro > arx_3 > claude-3-5-sonnet-20241022 > gpt-4o-2024-08-06] FAIL
+  (5) anchor LRT p_perm < 0.05: LRT 208.27 null p95 -119.04 p=0.001                          OK
+  ARENA-V2-X20 REGISTERED: FAIL
+
+DESCRIPTIVE: mean trace length (chars) on the pool, top-6 (board rank vs key rank):
+  iask_pro                     board 1 key 3  over-ranked by +2 | mean len  1303
+  gemini-3.1-pro_5-shots       board 2 key 1  over-ranked by -1 | mean len   882
+  claude-3-5-sonnet-20241022   board 3 key 5  over-ranked by +2 | mean len   820
+  arx_0314                     board 4 key 2  over-ranked by -2 | mean len   860
+  arx_3                        board 5 key 4  over-ranked by -1 | mean len  1072
+  gpt-4o-2024-08-06            board 6 key 6  over-ranked by +0 | mean len  1474

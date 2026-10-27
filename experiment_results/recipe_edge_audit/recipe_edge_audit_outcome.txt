@@ -1,0 +1,56 @@
+pool: none (no DB opened)
+script tools/analysis/recipe_edge_audit.py blob:09369edb / sha256-lf16:2a73dedca0eb9749 / sha256-crlf16:d21a7696e46c3b77
+RECORD-RECIPE-EDGE-AUDIT outcome (Part 2; registration docs/judge_v2_program.md L20817-L20844, 6402b0a). Zero calls.
+k in this outcome and in recipe_edge_audit_sites.csv = the site's number of (non-bridge) children, the site-null CSV's own k; NOT CERT-RESOLUTION's k (a null exceedance count)
+SPLIT ITERATION of record = STABLE-FROM (ruling A6, 23f9f00); FIRST-EQUAL printed beside it, descriptive.
+INPUTS AND PRECONDITIONS
+  csv       Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results/promoted/site_null_bareq512_s42.csv  blob:16aaf5a4 / sha256-lf16:ea0cb19865f63036 / sha256-crlf16:8b3d32ffd88f4a3c (working file CRLF)
+  jsonl     Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results/promoted/bareq512_s42/seed_42/dag_snapshots.jsonl  blob:ffbbb321 / sha256-lf16:0bf29bbc8c9b10b2 / sha256-crlf16:1aad19328b8a8513 (working file LF)
+  metrics   Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results/promoted/bareq512_s42/seed_42/diagnostics/iteration_metrics.csv  blob:035b3fc1 / sha256-lf16:5f6c376a9aa2dd70 / sha256-crlf16:dc85ae06e49eb02a (working file LF)
+  proposals Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results/promoted/bareq512_s42/seed_42/diagnostics/proposals.csv  blob:25b5381e / sha256-lf16:b59070cdf7ea1ca5 / sha256-crlf16:59220780c18cc304 (working file LF)
+  buildout  Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results/promoted/bareq512_s42.build.out  blob:b35b1148 / sha256-lf16:7617b28829d0fa16 / sha256-crlf16:06f4750f8d6c1302 (working file CRLF)
+  records: 18 (iterations 1..18 in order); last record 158 nodes / 87 leaves = iteration_metrics.csv; first quiet iteration (editsDelta 0) = 8, LATE-BORN = split iteration >= 9
+  build.out: proposalSeparationBar=0.0145 on every occurrence (1) and on line 15
+  proposals.csv header: iter,type,site_id,site_label,dJ,SE_dJ,z,dV,decision,reason,n_site (the registered one; no k column)
+  identity check: PASS (70 sites in the iteration-18 record, non-leaf, depth and k children match); certified: 10
+
+NODES BORN AT ITERATION >= 9 (birth = first record containing the id), with their parents (site?):
+  iteration 9  n00000523  parents ['n00000191']  parent is a site [True]
+  iteration 9  n00000524  parents ['n00000191']  parent is a site [True]
+  iteration 13  n00000693  parents ['n00000154']  parent is a site [True]
+  iteration 13  n00000694  parents ['n00000154']  parent is a site [True]
+
+C1 (the criterion; denominator: the 10 cert_site_p95 sites of bareq512_s42, of 70; a census)
+C1 HELD: none of the 10 certified sites is late-born (split iteration >= 9).
+  (DESCRIPTIVE, ruling A6; does not decide) certified sites late-born under the FIRST-EQUAL reading: 0
+  SPLIT-ITERATION READINGS DISAGREE on 0 of 70 sites (stable-from = first-equal everywhere).
+
+D1 (DESCRIPTIVE) BAR RATIO = observed_sep / 0.0145 (bar-edge iff < 1.05); P95 RATIO = observed_sep / site_null_p95
+  certified n00000054 Normative Ethical and Legal Theory Analysis depth 2 n 279 k 3  bar ratio 2.3726  p95 ratio 1.1359
+  certified n00000078 Discrete Fact Verification and Trivia Discrimination depth 3 n 165 k 2  bar ratio 2.7069  p95 ratio 1.0183
+  certified n00000002 Business                     depth 1 n 580 k 2  bar ratio 2.7377  p95 ratio 1.0402
+  certified n00000020 Applied Classical and Quantum Physics Problems depth 2 n 532 k 2  bar ratio 2.8365  p95 ratio 1.0370
+  certified n00000007 History                      depth 1 n 314 k 2  bar ratio 3.7662  p95 ratio 1.0436
+  certified n00000003 Law                          depth 1 n 706 k 2  bar ratio 3.7840  p95 ratio 1.0776
+  certified n00000015 Engineering                  depth 1 n 513 k 2  bar ratio 5.1624  p95 ratio 1.1909
+  certified n00000060 Applied Probability and Statistical Inference depth 3 n 150 k 2  bar ratio 5.3600  p95 ratio 1.0309
+  certified n00000127 Contract and Property Dispute Scenarios depth 3 n 241 k 2  bar ratio 6.0060  p95 ratio 1.0251
+  certified n00000006 Chemistry                    depth 1 n 905 k 3  bar ratio 6.1908  p95 ratio 1.9765
+  certified (10): bar ratio < 1.05: 0; < 1.10: 0; min 2.3726
+  all (70): bar ratio < 1.05: 0; < 1.10: 0; min 1.2256
+  STRUCTURAL NOTE (registered): a certified site is bar-edge only if its null p95 lies below 1.05 x 0.0145 = 0.01523; near-vacuous by construction, hence a readout.
+
+D2 (DESCRIPTIVE) late-born sites, certified or not:
+  n00000191 Macroeconomic Policy and Aggregate Dynamics n 135 k 2 q_site 0.6200 cert_site_p95 false birth 3 split iteration 9
+  n00000154 Electromagnetic Field and Charge Interaction Analysis n 135 k 2 q_site 0.5400 cert_site_p95 false birth 3 split iteration 13
+
+D3 THE K-EDGE HALF: UNDETERMINED BY INSTRUMENT. proposals.csv carries only "iter,type,site_id,site_label,dJ,SE_dJ,z,dV,decision,reason,n_site" (no k, no per-k separation); build.out's Splitter lines carry k and sep per candidate keyed by LABEL (repeated "Emergent Concept #n" labels), not by node id; which k competed at which site is not identifiable without a new engine log line; no criterion (KSEL-ANCHORED-512, a proposal, is the route).
+
+PREDICTIONS
+P1 HELD: C1 HELD (registered probability 0.80 of HELD).
+P2 HELD: 2 of the 70 sites are late-born (point 2, 80% interval [2, 4]).
+P3 HELD: 0 of 10 certified sites bar-edge (ratio < 1.05); registered 0 (probability 0.95).
+P4 HELD: the smallest bar ratio among the certified sites is 2.3726 (point 2.5, 80% interval [2.0, 3.2]).
+
+FALSIFIER
+F1 does not fire (C1 HELD). Part 1's facts stand on their own either way.

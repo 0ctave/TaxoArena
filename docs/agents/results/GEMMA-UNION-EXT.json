@@ -1,0 +1,87 @@
+{
+ "id": "GEMMA-UNION-EXT",
+ "title": "GEMMA-UNION-EXT: extend the embeddinggemma embeddings to all union items on the RAW arm (D-2026-10-08-4; engineering; zero judge calls; local Ollama)",
+ "question": "Engineering go, no criterion: does the gemma RAW cache cover every distinct union text, keyed as qwen3 keys the union, with the base unchanged?",
+ "kind": "engineering",
+ "state": "done",
+ "registration": {
+  "commit": "da1ef992 (registrar's record; not a registration: an engineering go of the author, no criterion)",
+  "program_lines": "docs/judge_v2_program.md L25363-L25372 (section \"## Registrar's record 2026-10-09 (insertion only; zero calls; nothing run; pre-data) — HARNESS-EXTRACTOR rulings HX-R4, HX-R1, HX-R2 ...\"; _as_of the commit that writes it, parent 40cd6d41, re-grepped) [CORRECTED 2026-10-09 by the registrar: the parent of da1ef992 is 980c3982, not 40cd6d41; 980c3982 touched only tools/analysis/adaptive_profile.py, so the span and its line numbers stand; docs/judge_v2_program.md L25394-L25401 (section \"## Author's decision 2026-10-09 (recorded by the registrar; zero calls; insertion only) — D-2026-10-09-1 ...\"; _as_of the commit that writes it, parent defab40c, re-grepped).]",
+  "date": "2026-10-09"
+ },
+ "script": {
+  "path": "gemma_union_ext.py (NOT in the repository: backup E:/TaxoArena_backup_20261009_gemma_union and E:/TaxoArena_tmp/op_20261009 only)",
+  "sha16": "sha256-bytes 5ba08f3e4832f0e1 (file as backed up; no blob until committed, G-1)",
+  "commit": null
+ },
+ "ready": null,
+ "go": "D-2026-10-08-4 (the author, verbatim: \"Yes, run it locally\"; docs/agents/author_decisions/2026-10-08.md, 5211616a); RAW arm the main session's technical choice (relayed)",
+ "run": {
+  "outcome_file": "experiment_results/embedder_cross/gemma_union/embeddings_cache_embeddinggemma_latest.db (sha256 1360a7ed19604177c898877c50be83ab412f2e434fac410143649013c20c8be2, bytes of the binary DB per the backup SHA256SUMS) + .provenance.json (sha256 e3b4f7f8506ebe0f...); never committed; backups E:/TaxoArena_backup_20261009_gemma_union (7/7 OK) and E:/TaxoArena_backup_20261009_gemma_union_base (2/2 OK)",
+  "outcome_commit": "not committed (data artefact)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "no pool read; local Ollama embedding of 8,937 texts; Ollama affinity mask 0xFFF (12 threads, log)",
+  "date": "2026-10-09"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_GEMMA-UNION-EXT.md",
+  "commit": "b453cedd",
+  "verdict": "VALID (engineering build); G-1 MEDIUM (driver unreviewed before its run and uncommitted), G-2 MEDIUM (staged, not live), L-1 LOW (7,624 bracketed to 8,937), L-2 LOW (base DB 0-byte -wal/-shm from 02:13, before the op; sha unchanged)"
+ },
+ "criteria": [],
+ "predictions": [],
+ "falsifier": {
+  "text": "none (engineering, no criterion)",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "new_db": "sha256 1360a7ed19604177c898877c50be83ab412f2e434fac410143649013c20c8be2; 20,690 rows = base 11,753 + 8,937 added (exactly the distinct union texts missing from the base; all base rows byte-equal)",
+  "coverage": "20,546 of 20,546 distinct corpus_questions.text (21,606 rows) carry a 768-d (3,072-byte) vector; 0 non-finite; norms 1.0000; 8,937 distinct new vectors",
+  "missing_by_source": "8,937 by distinct text: BBH 5,757, GPQA 546, IFEVAL 541, MUSR 756, MATH 1,303, MMLU_PRO 34 (the 7,624 copied earlier is unexplained)",
+  "key": "raw text, the key qwen3 embeddings_cache.db uses for the union (all 20,546 present verbatim)",
+  "base_db": "experiment_results/embedder_cross/embeddings_cache_embeddinggemma_latest.db sha256 28f2e3a41e77312f... unchanged",
+  "model_parity": "digest 85462619 equal; route parity min cos 0.999995 / median 1.000000 over 20 texts (bar 0.9999; log, not re-embedded)"
+ },
+ "sentence_of_record": "GEMMA-UNION-EXT (2026-10-09, 0 judge calls; local Ollama) — VALID engineering build: the embeddinggemma RAW-arm cache now covers all 20,546 distinct union texts (8,937 vectors added to the base's 11,753; DB sha256 1360a7ed19604177...). [POSTRUN docs/reviews/POSTRUN_GEMMA-UNION-EXT.md, b453cedd: STAGED, NOT LIVE: no reader takes it before the EMBEDDER-PLUMBING gate and a registrar's record naming this sha; qwen3 stays of record; the driver is uncommitted (G-1); no criterion is decided.]",
+ "chips": [],
+ "brackets": [
+  {
+   "date": "2026-10-09",
+   "by": "registrar (docs/judge_v2_program.md L25386-L25392 (section \"## Registrar's record 2026-10-09 (insertion only; zero calls; nothing run) — ADAPTIVE-PROFILE refused at [AP-DENOM] ...\"; _as_of the commit that writes it, parent b453cedd, re-grepped))",
+   "text": "Built and VALID (engineering). G-1: commit the driver by path under tools/analysis/ (owed; its blob then bracketed into the record). G-2: STAGED, NOT LIVE until the EMBEDDER-PLUMBING gate and a registrar's record naming 1360a7ed... as the gemma RAW union object; qwen3 stays of record. L-1: the 7,624 at L25370 bracketed to 8,937. L-2: the data-steward identifies the opener of the base DB (0-byte -wal/-shm, 02:13)."
+  },
+  {
+   "date": "2026-10-09",
+   "by": "registrar (docs/judge_v2_program.md L25394-L25401 (section \"## Author's decision 2026-10-09 (recorded by the registrar; zero calls; insertion only) — D-2026-10-09-1 ...\"; _as_of the commit that writes it, parent defab40c, re-grepped))",
+   "text": "Parent slip: pointers to the section written by da1ef992 (HARNESS-EXTRACTOR rulings, L25363-L25372) printed 'parent 40cd6d41'; the parent is 980c3982 (git log -1 --format=%P da1ef992); span and line numbers stand; bracketed inline."
+  }
+ ],
+ "does_not_show": [
+  "any criterion or embedder comparison (engineering only)",
+  "that the gemma union cache may be read (gated: EMBEDDER-PLUMBING + registrar's record)",
+  "the card-conformant arm (the __card DB is not extended)"
+ ],
+ "ledger": {
+  "row_id": null,
+  "version": "no ledger row (engineering artefact); noted in the v422 stamp"
+ },
+ "depends_on": [
+  "D-2026-10-08-4",
+  "embeddings_cache_embeddinggemma_latest.db (base, RAW arm, PRIMARY)"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none"
+ },
+ "sources": [
+  "docs/judge_v2_program.md L25386-L25392 (section \"## Registrar's record 2026-10-09 (insertion only; zero calls; nothing run) — ADAPTIVE-PROFILE refused at [AP-DENOM] ...\"; _as_of the commit that writes it, parent b453cedd, re-grepped)",
+  "docs/reviews/POSTRUN_GEMMA-UNION-EXT.md (b453cedd)",
+  "E:/TaxoArena_backup_20261009_gemma_union/SHA256SUMS.txt",
+  "docs/judge_v2_program.md L25363-L25372 (_as_of the commit that writes it, parent 40cd6d41, re-grepped) [CORRECTED 2026-10-09 by the registrar: the parent of da1ef992 is 980c3982, not 40cd6d41; 980c3982 touched only tools/analysis/adaptive_profile.py, so the span and its line numbers stand; docs/judge_v2_program.md L25394-L25401 (section \"## Author's decision 2026-10-09 (recorded by the registrar; zero calls; insertion only) — D-2026-10-09-1 ...\"; _as_of the commit that writes it, parent defab40c, re-grepped).]",
+  "docs/judge_v2_program.md L25394-L25401 (section \"## Author's decision 2026-10-09 (recorded by the registrar; zero calls; insertion only) — D-2026-10-09-1 ...\"; _as_of the commit that writes it, parent defab40c, re-grepped)"
+ ],
+ "last_update": "2026-10-09"
+}

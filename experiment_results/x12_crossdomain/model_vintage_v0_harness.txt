@@ -1,0 +1,91 @@
+=== MODEL-VINTAGE-CANARY | stamp-harness (instrument step 0b: per-model harness_id on vintage v0; amendment (a)) | script sha256(LF) 599d6e07aaf478f2a6e2232208544b9b4521bd4a99db5be1d27c967f712e4e78 | extract-v1 b9782bef338e4815 | 2026-09-22 12:27:00 ===
+registration: docs/judge_v2_program.md 'Registered 2026-09-22 ... MODEL-VINTAGE-CANARY amendment (a)' (L9687-L9799, bec7402) over 'Registered 2026-09-18 ... MODEL-VINTAGE-CANARY' (~L5984-6084); judge calls: 0; generation: none
+[POOL] p2dca21ab5f4ef3ae (pool of record; verified by pool_guard.assert_pool_of_record)
+canary set: experiment_results\x12_crossdomain\canary_set.json hash 50af669ac6997f9f (= record 50af669ac6997f9f) | 300 matches | 279 distinct questions | roster 12 models | x12 match_history rows verified 300 (condition MAIN, 20260727_042523_Headless_Run_Auto_ge_MAIN)
+DBs (mode=ro&immutable=1): mmlu_pro_dataset_cache_v2.db | experiment_results\x12_crossdomain\ratings_x12.db ; Meta-Llama-3-70B-Instruct asserted absent; nothing of record modified (the stamp lives in experiment_results\x12_crossdomain\model_vintage_v0_harness.json)
+variants (versioned functions; source sha beside extract-v1 b9782bef338e4815):
+  tier1-blank   tier1-blank-v1   cbed6f92deece096  tier 1 'answer is \\(?([A-J])\\)?', else blank  [H-tier1-blank]
+  three-tier    three-tier-v1    b9782bef338e4815  = extract-v1: t1 'answer is \\(?([A-J])\\)?' ; t2 '.*[aA]nswer:\\s*([A-J])' ; t3 '\\b[A-J]\\b(?!.*\\b[A-J]\\b)' (DOTALL); else blank  [H-threetier]
+  three-tier-G  three-tier-G-v1  14f7b3bce20bcdfd  extract-v1's three tiers, else the constant 'G'  [H-constantG]
+assignment (FIXED IN CODE before the run, amendment (a) (1); defined by the disagreement signature in experiment_results\x12_crossdomain\model_vintage_extractor_check.txt; never re-made from this output):
+  H-tier1-blank  variant tier1-blank   5 members: Llama-2-13b-hf, Llama-2-7b-hf, Qwen1.5-72B-Chat, Yi-6b-Chat, c4ai-command-r-v01
+  H-constantG    variant three-tier-G  2 members: Meta-Llama-3_1-70B-Instruct, Meta-Llama-3_1-8B
+  H-threetier    variant three-tier    5 members: arx_0314, deepseek-chat-v2_5, gemini-3.1-pro_5-shots, gpt-4o-2024-08-06, iask_pro
+  stated exception: arx_0314 ties on the canary between tier1-blank/three-tier; the full table breaks it toward three-tier -> H-threetier
+assignment rule (a CHECK printed beside the fixed membership; never used to assign): a model is assigned to the variant in {tier1-blank, three-tier, three-tier-G} that best reproduces its pred column on the canary, ties to the simplest (tier1-blank < three-tier < three-tier-G); applied to the precheck's classes it gives the three memberships, with ONE stated exception: arx_0314 ties at 0.9928 between tier1-blank and three-tier on the canary and the tie is broken by the full-table reading (three-tier 0.9933), so H-threetier. The rule is printed as a CHECK beside the fixed membership and is never used to assign or re-assign.
+falsifier (4): a model < 0.99 under its ASSIGNED variant is stamped harness_id = UNASSIGNED, refused, excluded from the null and the alarm, NEVER re-assigned; >= 3 exclusions overturn the premise (the choice returns to the author)
+metric: reproduction = share of the model's canary rows with variant(model_output) == pred (both blank = agreement; blank on one side = disagreement); interval = Wilson 95%; C1-H reads each model under ITS ASSIGNED family's variant
+denominator: the model's rows on the 279 canary questions (registered 279 per model, 278 for iask_pro); the full-table column is every eval_results row of the model (DESCRIPTIVE, not a criterion)
+
+canary table (3 variants x 12 models; the criterion's; * = the assigned variant):
+model                        family          tier1-blank   three-tier three-tier-G  rule best     check
+Llama-2-13b-hf               H-tier1-blank       *1.0000       0.9677       0.8387  tier1-blank   AGREES
+Llama-2-7b-hf                H-tier1-blank       *1.0000       0.9606       0.8172  tier1-blank   AGREES
+Meta-Llama-3_1-70B-Instruct  H-constantG          0.9749       0.9785      *1.0000  three-tier-G  AGREES
+Meta-Llama-3_1-8B            H-constantG          0.9427       0.9462      *1.0000  three-tier-G  AGREES
+Qwen1.5-72B-Chat             H-tier1-blank       *1.0000       0.8674       0.7885  tier1-blank   AGREES
+Yi-6b-Chat                   H-tier1-blank       *1.0000       0.9247       0.8244  tier1-blank   AGREES
+arx_0314                     H-threetier          0.9928      *0.9928       0.9928  tier1-blank   AGREES-BY-EXCEPTION (the stated exception: canary tie tier1-blank/three-tier/three-tier-G at 0.9928, broken by the full table toward three-tier (tier1-blank 0.9918 vs three-tier 0.9933 vs three-tier-G 0.9933))
+c4ai-command-r-v01           H-tier1-blank       *1.0000       0.9355       0.8996  tier1-blank   AGREES
+deepseek-chat-v2_5           H-threetier          0.9892      *1.0000       0.9964  three-tier    AGREES
+gemini-3.1-pro_5-shots       H-threetier          1.0000      *1.0000       1.0000  tier1-blank   CONTRADICTION-TIE (canary tie tier1-blank/three-tier/three-tier-G at 1.0000 does not distinguish; the tie-break (simplest) picks tier1-blank != assigned three-tier; membership NOT changed)
+gpt-4o-2024-08-06            H-threetier          0.9892      *1.0000       0.9964  three-tier    AGREES
+iask_pro                     H-threetier          0.9892      *1.0000       0.9928  three-tier    AGREES
+
+full-table column (DESCRIPTIVE; 3 variants x 12 models over every eval_results row of the model; * = the assigned variant):
+model                          rows  tier1-blank   three-tier three-tier-G  rule best     check
+Llama-2-13b-hf                12032      *1.0000       0.9613       0.8322  tier1-blank   FULLTABLE-AGREES
+Llama-2-7b-hf                 12032      *1.0000       0.9611       0.8287  tier1-blank   FULLTABLE-AGREES
+Meta-Llama-3_1-70B-Instruct   12032       0.9790       0.9844      *1.0000  three-tier-G  FULLTABLE-AGREES
+Meta-Llama-3_1-8B             12032       0.9356       0.9490      *1.0000  three-tier-G  FULLTABLE-AGREES
+Qwen1.5-72B-Chat              12032      *1.0000       0.8980       0.8162  tier1-blank   FULLTABLE-AGREES
+Yi-6b-Chat                    12032      *1.0000       0.9183       0.8108  tier1-blank   FULLTABLE-AGREES
+arx_0314                      12005       0.9918      *0.9933       0.9933  three-tier    FULLTABLE-AGREES
+c4ai-command-r-v01            12032      *1.0000       0.9229       0.8757  tier1-blank   FULLTABLE-AGREES
+deepseek-chat-v2_5            12032       0.9929      *1.0000       0.9943  three-tier    FULLTABLE-AGREES
+gemini-3.1-pro_5-shots        12020       0.9980      *1.0000       0.9986  three-tier    FULLTABLE-AGREES
+gpt-4o-2024-08-06             12032       0.9931      *1.0000       0.9945  three-tier    FULLTABLE-AGREES
+iask_pro                      11939       0.9941      *1.0000       0.9909  three-tier    FULLTABLE-AGREES
+
+the stamp (per model, under the ASSIGNED variant; the sidecar's row):
+model                        harness_id     variant           n  agree    repro          wilson95 residual refused
+Llama-2-13b-hf               H-tier1-blank  tier1-blank     279    279   1.0000 [0.9864, 1.0000]        0 False
+Llama-2-7b-hf                H-tier1-blank  tier1-blank     279    279   1.0000 [0.9864, 1.0000]        0 False
+Meta-Llama-3_1-70B-Instruct  H-constantG    three-tier-G    279    279   1.0000 [0.9864, 1.0000]        0 False
+Meta-Llama-3_1-8B            H-constantG    three-tier-G    279    279   1.0000 [0.9864, 1.0000]        0 False
+Qwen1.5-72B-Chat             H-tier1-blank  tier1-blank     279    279   1.0000 [0.9864, 1.0000]        0 False
+Yi-6b-Chat                   H-tier1-blank  tier1-blank     279    279   1.0000 [0.9864, 1.0000]        0 False
+arx_0314                     H-threetier    three-tier      279    277   0.9928 [0.9742, 0.9980]        2 False
+c4ai-command-r-v01           H-tier1-blank  tier1-blank     279    279   1.0000 [0.9864, 1.0000]        0 False
+deepseek-chat-v2_5           H-threetier    three-tier      279    279   1.0000 [0.9864, 1.0000]        0 False
+gemini-3.1-pro_5-shots       H-threetier    three-tier      279    279   1.0000 [0.9864, 1.0000]        0 False
+gpt-4o-2024-08-06            H-threetier    three-tier      279    279   1.0000 [0.9864, 1.0000]        0 False
+iask_pro                     H-threetier    three-tier      278    278   1.0000 [0.9864, 1.0000]        0 False
+
+residual rows per model (A3; the canary rows that still disagree under the assigned variant, by qid with pred and extract):
+  Llama-2-13b-hf               none
+  Llama-2-7b-hf                none
+  Meta-Llama-3_1-70B-Instruct  none
+  Meta-Llama-3_1-8B            none
+  Qwen1.5-72B-Chat             none
+  Yi-6b-Chat                   none
+  arx_0314                     q4941 pred B / extract I (t3); q7433 pred B / extract H (t3)
+  c4ai-command-r-v01           none
+  deepseek-chat-v2_5           none
+  gemini-3.1-pro_5-shots       none
+  gpt-4o-2024-08-06            none
+  iask_pro                     none
+
+(A1) the sidecar carries 12 models with the memberships of (1) exactly (assigned_family and variant per model = FAMILY_ASSIGNMENT): HELD
+(C1-H) every model reproduces its pred column at >= 0.99 under ITS OWN family's variant: 12 of 12 -> HELD (C1 as registered, one extractor: FAILED of record, experiment_results\x12_crossdomain\model_vintage_extractor_check.txt)
+     models below under their assigned variant (stamped UNASSIGNED, EXCLUDED from the null and the alarm, never re-assigned): none
+(A2) REFUSED (UNASSIGNED) models: 0 (0 expected)
+(A3) residual rows: Llama-2-13b-hf 0; Llama-2-7b-hf 0; Meta-Llama-3_1-70B-Instruct 0; Meta-Llama-3_1-8B 0; Qwen1.5-72B-Chat 0; Yi-6b-Chat 0; arx_0314 2; c4ai-command-r-v01 0; deepseek-chat-v2_5 0; gemini-3.1-pro_5-shots 0; gpt-4o-2024-08-06 0; iask_pro 0
+assignment-rule check (beside, never re-assigning): 1 CONTRADICTION(S) printed and recorded, membership NOT changed: gemini-3.1-pro_5-shots: CONTRADICTION-TIE (canary tie tier1-blank/three-tier/three-tier-G at 1.0000 does not distinguish; the tie-break (simplest) picks tier1-blank != assigned three-tier; membership NOT changed)
+
+P-A1 (C1-H HELD 12 of 12; 11 at 1.0000; arx_0314 at 0.9928 [0.9742, 0.9980]; A2 = 0): HELD
+P-A2 (residual rows 0 for eleven models; 2 for arx_0314, q4941 and q7433): HELD
+P-A3 (descriptive, the full-table column: H-tier1-blank 1.0000 under tier1-blank; the four API models 1.0000 under three-tier; the Llama-3.1 pair >= 0.99 under three-tier-G; arx_0314 0.9933 under three-tier): HELD
+P-A4 (the generation pass): not scorable here (no v1 exists).
+
+does not show: any model drift (no v1 exists); F_gen, F_cache, a_m, the alarm (C2-H, C3-H, C4 need the author's generation pass); a fourth extractor (no regex was added to extract-v1); any change to pred, is_correct or a verdict; the frontier order.

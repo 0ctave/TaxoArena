@@ -1,0 +1,203 @@
+{
+ "id": "GOLD-LEVEL-EMB",
+ "title": "GOLD-LEVEL-EMB: is the gold COARSE-level k-means readout invariant within 0.025 NMI across slice, quantisation, prompt and embedder on MASSIVE and CLINC (TOST, 9 arms, 8 contrasts), while the fine level is not (descriptive)? (zero calls; REGISTERED 2026-10-02)",
+ "question": "Does the literature's 'clustering survives truncation and instruction changes' hold at the gold coarse level of the intent corpora while the fine level depends on the embedder (the granularity reconciliation)?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "the commit that writes it (parent 487ac3bd)",
+  "program_lines": "docs/judge_v2_program.md L23377-L23422",
+  "program_lines_as_of": "the commit that writes them, parent 487ac3bd, re-grepped",
+  "date": "2026-10-02",
+  "heading": "## Registered 2026-10-02 (before any code or call) — GOLD-LEVEL-EMB: on the pinned S0 embeddings, is the GOLD COARSE-level k-means readout invariant ...",
+  "provenance": "the orchestrator's brief of 2026-10-02 (arms, levels, coarse TOST deciding, fine descriptive); margin 0.025 NMI, 30 coarse seeds, Support, predictions, falsifiers and reading table the registrar's, pre-data; the author's go (plan Amendment 37)"
+ },
+ "script": {
+  "path": "tools/analysis/gold_level_emb.py",
+  "sha16": "blob:867657643886b5efff37bd7dec0a813bdace6e33 (LF, of record)",
+  "commit": "9b86d32d (merge of oos-gold-readouts a625a957)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_oos_gold.md",
+  "commit": "9b86d32d",
+  "verdict": "READY for --run (conditions C-1..C-6)"
+ },
+ "go": "plan Amendment 37: the author's \"register the out-of-scope baselines and gold-level embedder readout\" (0 calls; the 4k-match rule not engaged)",
+ "run": {
+  "outcome_file": "experiment_results/gold_level_emb/outcome.txt (sha256 7e00d7d9...; blob:6cff1108; write-once; UNTRACKED) + nmi_gold.csv, h_gold.csv, nomic_selection.json",
+  "outcome_commit": "run from main at 9b86d32d (brackets d1abedce); outcome untracked; two java-guard refusals wrote nothing",
+  "calls": 0,
+  "cce": 0,
+  "pool": "none (pinned intent DBs read-only; pins unchanged)",
+  "date": "2026-10-02"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_gold_level_emb.md",
+  "commit": "dad630f2",
+  "verdict": "VALID (W-1..W-6)"
+ },
+ "criteria": [
+  {
+   "id": "IDENTITY",
+   "text": "precondition (refuse): seeds 0-4 coarse / fine NMI reproduce nmi_matrix.csv (EMBED-DIM-SLICE arms), nmi_q.csv (q8 fine), nmi_card.csv (CARD fine), s0_c1.csv (nomic 256/512); H reproduces h_table.csv",
+   "result": "HELD",
+   "value": "REPRODUCED: q4 130 + 32 H, q8 15, qcard 15, g 40 + 8 H, gcard 15, nomic 50; max dev <= 4.98e-7",
+   "denominator": "coarse: MASSIVE 4,946 EVAL in-scope items / 4,923 components (Kish 1.0093), CLINC 6,672 / 6,672 (Kish 1.0000); 30 k-means seeds per arm; paired component bootstrap B 2,000"
+  },
+  {
+   "id": "GL1-DIM",
+   "text": "coarse TOST family, q256 / q512 / q4096 vs q1024 on MASSIVE and CLINC (6 statuses). Per status: D = 30-seed mean NMI difference at K_c; SE_total = sqrt(SE_boot^2 + var_seed/30); EQUIVALENT iff D +/- 1.645 SE_total inside (-0.025, +0.025) (INTERVAL decides); DIFFERENT iff |D| > 0.025 AND D +/- 1.96 SE_total excludes 0 (POINT AND INTERVAL); NEITHER otherwise. Family INVARIANT iff all EQUIVALENT; NOT-INVARIANT iff any DIFFERENT; UNDETERMINED otherwise. Verdict line: NOT-INVARIANT SCOREABLE (MASSIVE q256 predicted -0.045 >= DIFFERENT reach 0.0303)",
+   "result": "UNDETERMINED",
+   "value": "4 of 6 EQUIVALENT; q256 MASSIVE D -0.0217 and q4096 CLINC D +0.0244 NEITHER; all 6 seen-carried (R-2, G-4); never 'slice-invariant'; MASSIVE q256 shrank -0.049 (5 seeds) -> -0.022 (30)",
+   "denominator": "coarse: MASSIVE 4,946 EVAL in-scope items / 4,923 components (Kish 1.0093), CLINC 6,672 / 6,672 (Kish 1.0000); 30 k-means seeds per arm; paired component bootstrap B 2,000"
+  },
+  {
+   "id": "GL1-QUANT",
+   "text": "same form, q8 (Q8_0 at 1024) vs q1024 (2 statuses). Verdict line: INVARIANT SCOREABLE (+0.003 <= EQUIVALENT reach 0.0091 / 0.0076)",
+   "result": "HELD",
+   "value": "INVARIANT: MASSIVE D -0.0054, 90% [-0.0135, +0.0027]; CLINC D -0.0058, 90% [-0.0138, +0.0023]",
+   "denominator": "coarse: MASSIVE 4,946 EVAL in-scope items / 4,923 components (Kish 1.0093), CLINC 6,672 / 6,672 (Kish 1.0000); 30 k-means seeds per arm; paired component bootstrap B 2,000"
+  },
+  {
+   "id": "GL1-PROMPT",
+   "text": "same form, qcard vs q1024 and gcard vs g768 (4 statuses). Verdict line: NOT-INVARIANT SCOREABLE (MASSIVE qcard predicted +0.040 >= 0.0304)",
+   "result": "FAILED",
+   "value": "NOT-INVARIANT: qcard CLINC -0.034, gcard MASSIVE -0.041, gcard CLINC +0.032 DIFFERENT (no consistent direction); qcard MASSIVE NEITHER +0.025; 0.05 sensitivity INVARIANT by 0.0003, never a finding",
+   "denominator": "coarse: MASSIVE 4,946 EVAL in-scope items / 4,923 components (Kish 1.0093), CLINC 6,672 / 6,672 (Kish 1.0000); 30 k-means seeds per arm; paired component bootstrap B 2,000"
+  },
+  {
+   "id": "GL1-EMBEDDER",
+   "text": "same form, g768 vs q1024 and n* (nomic at its GATE-selected slice) vs q1024 (4 statuses). Verdict line: NOT-INVARIANT SCOREABLE (three predicted DIFFERENT lines)",
+   "result": "FAILED",
+   "value": "NOT-INVARIANT: nomic@256 -0.047 / -0.069 (new data); gemma 768 MASSIVE +0.106 (seen; 5-seed +0.086); gemma CLINC NEITHER -0.022",
+   "denominator": "coarse: MASSIVE 4,946 EVAL in-scope items / 4,923 components (Kish 1.0093), CLINC 6,672 / 6,672 (Kish 1.0000); 30 k-means seeds per arm; paired component bootstrap B 2,000"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "coarse D (30 seeds), MASSIVE: q256 -0.045 [-0.065, -0.025] SEEN; q512 -0.030 [-0.050, -0.010] SEEN; q4096 -0.015 [-0.035, +0.005] SEEN; q8 +0.003 [-0.007, +0.010]; qcard +0.040 [0.000, +0.080]; gcard -0.020 [-0.050, +0.010]; g768 +0.085 [+0.065, +0.105] SEEN; n* -0.055 [-0.080, -0.030]. CLINC: q256 +0.010 [-0.015, +0.035] SEEN; q512 -0.005 [-0.025, +0.015] SEEN; q4096 +0.030 [+0.005, +0.055] SEEN; q8 +0.003 [-0.007, +0.010]; qcard 0.000 [-0.030, +0.030]; gcard -0.030 [-0.070, +0.010]; g768 -0.005 [-0.030, +0.020] SEEN; n* -0.065 [-0.100, -0.030]",
+   "result": "PARTIAL",
+   "value": "new contrasts 6 HELD / 2 FAILED (qcard CLINC, gcard CLINC); seen contrasts 5 HELD / 3 FAILED, none a confirmation",
+   "denominator": "coarse: MASSIVE 4,946 EVAL in-scope items / 4,923 components (Kish 1.0093), CLINC 6,672 / 6,672 (Kish 1.0000); 30 k-means seeds per arm; paired component bootstrap B 2,000"
+  },
+  {
+   "id": "P2",
+   "text": "families: DIM NOT-INVARIANT 0.65 / UNDETERMINED 0.30 / INVARIANT 0.05; QUANT INVARIANT 0.75; PROMPT NOT-INVARIANT 0.55; EMBEDDER NOT-INVARIANT 0.90",
+   "result": "n/a",
+   "value": "DIM UNDETERMINED (p 0.30, Brier 0.4900); QUANT INVARIANT 0.0625; PROMPT NOT-INVARIANT 0.2025; EMBEDDER NOT-INVARIANT 0.0100",
+   "denominator": "coarse: MASSIVE 4,946 EVAL in-scope items / 4,923 components (Kish 1.0093), CLINC 6,672 / 6,672 (Kish 1.0000); 30 k-means seeds per arm; paired component bootstrap B 2,000"
+  },
+  {
+   "id": "P3",
+   "text": "reading: LEVEL 0.03, TRANSFORMATION 0.15, NO-LEVEL-ADVANTAGE 0.65, MIXED 0.17; F-GL fires 0.95",
+   "result": "n/a",
+   "value": "reading MIXED (p 0.17, Brier sum 1.1348); F-GL fired (p 0.95, Brier 0.0025)",
+   "denominator": "coarse: MASSIVE 4,946 EVAL in-scope items / 4,923 components (Kish 1.0093), CLINC 6,672 / 6,672 (Kish 1.0000); 30 k-means seeds per arm; paired component bootstrap B 2,000"
+  },
+  {
+   "id": "P4",
+   "text": "GL2 (descriptive, at the point): fine DIM statuses all EQUIVALENT 0.60 (SEEN DS2); fine g768 - q1024 DIFFERENT on MASSIVE and Banking77 0.85 (SEEN DS1)",
+   "result": "HELD",
+   "value": "fine DIM all EQUIVALENT true (0.1600); fine g768 DIFFERENT MASSIVE and Banking77 true (0.0225, SEEN)",
+   "denominator": "coarse: MASSIVE 4,946 EVAL in-scope items / 4,923 components (Kish 1.0093), CLINC 6,672 / 6,672 (Kish 1.0000); 30 k-means seeds per arm; paired component bootstrap B 2,000"
+  },
+  {
+   "id": "P5",
+   "text": "GL3 (at the point): H(g768) > H(q) at every qwen3 slice on MASSIVE 0.95 (SEEN); |H(q8) - H(q1024)| <= 0.02 on both corpora 0.80",
+   "result": "PARTIAL",
+   "value": "H(g768) > H(q) MASSIVE true (SEEN); |H(q8) - H(q1024)| <= 0.02 false (CLINC -0.0359)",
+   "denominator": "coarse: MASSIVE 4,946 EVAL in-scope items / 4,923 components (Kish 1.0093), CLINC 6,672 / 6,672 (Kish 1.0000); 30 k-means seeds per arm; paired component bootstrap B 2,000"
+  }
+ ],
+ "falsifier": {
+  "text": "F-GL fires iff any coarse family reads NOT-INVARIANT: overturns the literature scan's granularity reconciliation ('coarse invariant, fine not') as a thesis sentence; SQ5 must name the family that moved. F-GL' fires iff EMBEDDER reads INVARIANT: overturns the seen coarse gemma lead (MASSIVE +0.086 at 5 seeds; S0 +0.135 at 256) as an embedder property. No recorded number revised; S0 C1b 'not fired, never parity' stands. [OUTCOME: F-GL FIRED (PROMPT, EMBEDDER); F-GL' NOT FIRED]",
+  "fired": true
+ },
+ "numbers_of_record": {
+  "families": "DIM UNDETERMINED / QUANT INVARIANT / PROMPT NOT-INVARIANT / EMBEDDER NOT-INVARIANT; reading MIXED",
+  "QUANT": "MASSIVE D -0.0054, 90% [-0.0135, +0.0027]; CLINC D -0.0058, 90% [-0.0138, +0.0023] (margin 0.025)",
+  "PROMPT": "qcard CLINC -0.034, gcard MASSIVE -0.041, gcard CLINC +0.032 (DIFFERENT); qcard MASSIVE +0.025 (NEITHER)",
+  "EMBEDDER": "n*@256 -0.047 (MASSIVE) / -0.069 (CLINC); g768 MASSIVE +0.106 (seen); g768 CLINC -0.022 (NEITHER)",
+  "DIM": "q256 MASSIVE -0.0217 (5-seed seen -0.049), q4096 CLINC +0.0244 NEITHER; 4 of 6 EQUIVALENT; seen-carried",
+  "support": "SE_total 0.0045-0.0074 (measured); seed term > SE_boot in 16 of 16; 30-seed coarse spreads up to 0.13 NMI",
+  "denominators": "MASSIVE 4,946 / 4,923 (Kish 1.0093), CLINC 6,672 / 6,672; 30 seeds; d_n* = 256"
+ },
+ "sentence_of_record": "GOLD-LEVEL-EMB (2026-10-02, 0 calls; post-run review dad630f2 VALID): F-GL FIRED through PROMPT and EMBEDDER: the gold coarse level is not invariant to prompt or embedder here; the literature's reconciliation must name those two families, not the level [k-means (K = gold coarse count) against the gold coarse labels of MASSIVE and CLINC (EVAL in-scope), 30 seeds; families DIM UNDETERMINED (seen-carried) / QUANT INVARIANT (within 0.025 NMI) / PROMPT NOT-INVARIANT (no consistent direction) / EMBEDDER NOT-INVARIANT (nomic new data; gemma MASSIVE seen); reading MIXED; k-means seed noise dominates every coarse SE; nothing about trees or MMLU-Pro]",
+ "chips": [
+  "REGISTERED 2026-10-02, BEFORE ANY CODE; not built",
+  "VALID (POST-RUN dad630f2): QUANT INVARIANT; PROMPT, EMBEDDER NOT-INVARIANT; F-GL FIRED; F-GL&#x27; NOT FIRED",
+  "DIM UNDETERMINED (SEEN-CARRIED; q256 MASSIVE &minus;0.049 &rarr; &minus;0.022 AT 30 SEEDS); READING MIXED; PROMPT NO CONSISTENT DIRECTION; SEED NOISE DOMINATES COARSE SE; NEVER &ldquo;COARSE STRUCTURE ROBUST&rdquo;"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-02",
+   "by": "registrar (PRE-DATA, READY_oos_gold)",
+   "text": "R-2: a family verdict carried only by SEEN statuses (DIM all 6; EMBEDDER g768 x 2) is quoted 'carried by contrasts seen at 5 seeds (G-4)', never a confirmation. R-3 reviewer-CONFIRMED readings: OB1 (c2 called unchanged; nomic / gemma slots hold qwen3 fits, discarded), GB1 (5 dp = |value - CSV| <= 5e-6), GB2 (nomic_selection.json written before any nomic EVAL read). section \"## Registrar's record 2026-10-02 (insertion only; zero calls; nothing run; pre-data) — READY_oos_gold.md: ...\" (L23561-L23565, _as_of the commit that writes it, parent 9b86d32d)"
+  },
+  {
+   "date": "2026-10-03",
+   "by": "registrar (POSTRUN dad630f2 W-1..W-6)",
+   "text": "outcome recorded; 'coarse holds' bracketed at S0 L22095 and in the reframing memo C3. docs/judge_v2_program.md L23622-L23636 (section \"## GOLD-LEVEL-EMB (2026-10-02, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent aac3f7fc)"
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (consistency check 2026-10-04; zero calls)",
+   "text": "the 'chips' list had drifted from the ledger row's chips (wording or replaced chips); the chips of record are the ledger's, copied verbatim into 'chips_ledger_verbatim' (ledger v379); 'chips' is kept as history."
+  }
+ ],
+ "does_not_show": [
+  "anything about trees, leaves or the construction (k-means against gold only)",
+  "MTEB-style averages or corpora beyond MASSIVE / CLINC / Banking77; capability text or MMLU-Pro",
+  "which embedder is better (D3 the author's); precision above Q8_0; other prompts; nomic CARD",
+  "that the gold coarse level is the right taxonomy",
+  "parity outside +/-0.025 NMI or at the fine level (GL2 descriptive)",
+  "a second split draw"
+ ],
+ "ledger": {
+  "row_id": "GOLD-LEVEL-EMB",
+  "version": "v351 (2026-10-03: OUTCOME bracket, OK + WARN chips) | v344 (2026-10-02: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "INTENT-TRANSFER-S0",
+  "EMBED-DIM-SLICE",
+  "EMBED-QUANT",
+  "INTENT-S0-CARD-PROTOCOL"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "about 1-3 h single-threaded (registrar's ESTIMATE, unsourced; the dry-run prices it)",
+  "agent_hours": "engine-coder about 3 h",
+  "reads_pool": false
+ },
+ "sources": [
+  "docs/judge_v2_program.md L23377-L23422 (section \"## Registered 2026-10-02 (before any code or call) — GOLD-LEVEL-EMB: ...\"; _as_of the commit that writes it, parent 487ac3bd, re-grepped)",
+  "experiment_results/embed_dim_slice/nmi_matrix.csv (blob:1056bad9) and h_table.csv (seen coarse NMI, H, seed SDs)",
+  "experiment_results/intent_transfer/s0_c1.csv and s0_outcome.txt Support (coarse bootstrap SE(D), Kish)",
+  "docs/literature/2026-10-02_related_work.md (00dea46b) ranked item 7",
+  "docs/plan_2026-09-15.md Amendment 37",
+  "docs/judge_v2_program.md L23622-L23636 (section \"## GOLD-LEVEL-EMB (2026-10-02, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent aac3f7fc)",
+  "docs/reviews/POSTRUN_gold_level_emb.md (dad630f2)"
+ ],
+ "last_update": "2026-10-04",
+ "chips_ledger_verbatim": [
+  "plan: REGISTERED 2026-10-02, BEFORE ANY CODE; not built",
+  "ok: VALID (POST-RUN dad630f2): QUANT INVARIANT; PROMPT, EMBEDDER NOT-INVARIANT; F-GL FIRED; F-GL' NOT FIRED",
+  "warn: DIM UNDETERMINED (SEEN-CARRIED); READING MIXED; PROMPT NO CONSISTENT DIRECTION; SEED NOISE DOMINATES COARSE SE; NEVER “COARSE STRUCTURE ROBUST”"
+ ],
+ "plain_description": {
+  "sq": "SQ5 Invariance",
+  "what": "Runs k-means at the coarse, human-labelled level of MASSIVE and CLINC and checks whether agreement with those coarse labels stays within 0.025 across vector length, compression, prompt wording and embedder choice (9 settings).",
+  "why": "The literature says clustering survives such changes; the thesis wanted to know if that holds at the coarse level while only the fine level depends on the embedder.",
+  "information": "Invariance would let the thesis say the coarse level is robust; non-invariance limits the claim. Result: done; compression is invariant, vector length undetermined, but prompt wording and embedder choice DO change the coarse readout (no consistent direction), so the robustness claim must name those two factors. k-means only; nothing about trees or MMLU-Pro.",
+  "written": "2026-10-07"
+ }
+}

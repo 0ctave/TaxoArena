@@ -1,0 +1,20 @@
+pool questions 3445 | grok-reasoning reference acc 0.860 (conf<100 stratum 0.743, n=1361)
+top-6 majority   acc 0.875 (coverage 0.96) | conf<100 stratum acc 0.772 (coverage 0.94)
+top-8 majority   acc 0.860 (coverage 0.97) | conf<100 stratum acc 0.747 (coverage 0.96)
+leave-two-out (reference for a match between the two excluded models), top-8 pool:
+  gemini-3.1-pro_5-shots     vs arx_0314                   ref acc 0.837 (cov 0.95) | conf<100 0.724
+  gemini-3.1-pro_5-shots     vs iask_pro                   ref acc 0.833 (cov 0.95) | conf<100 0.720
+  gemini-3.1-pro_5-shots     vs arx_3                      ref acc 0.853 (cov 0.95) | conf<100 0.743
+  gemini-3.1-pro_5-shots     vs claude-3-5-sonnet-20241022 ref acc 0.845 (cov 0.95) | conf<100 0.728
+  gemini-3.1-pro_5-shots     vs gpt-4o-2024-08-06          ref acc 0.852 (cov 0.95) | conf<100 0.744
+  arx_0314                   vs iask_pro                   ref acc 0.844 (cov 0.95) | conf<100 0.739
+  arx_0314                   vs arx_3                      ref acc 0.863 (cov 0.95) | conf<100 0.761
+  arx_0314                   vs claude-3-5-sonnet-20241022 ref acc 0.857 (cov 0.95) | conf<100 0.750
+  arx_0314                   vs gpt-4o-2024-08-06          ref acc 0.860 (cov 0.95) | conf<100 0.755
+  iask_pro                   vs arx_3                      ref acc 0.863 (cov 0.95) | conf<100 0.760
+  iask_pro                   vs claude-3-5-sonnet-20241022 ref acc 0.854 (cov 0.96) | conf<100 0.744
+  iask_pro                   vs gpt-4o-2024-08-06          ref acc 0.856 (cov 0.95) | conf<100 0.752
+  arx_3                      vs claude-3-5-sonnet-20241022 ref acc 0.874 (cov 0.95) | conf<100 0.770
+  arx_3                      vs gpt-4o-2024-08-06          ref acc 0.880 (cov 0.95) | conf<100 0.782
+  claude-3-5-sonnet-20241022 vs gpt-4o-2024-08-06          ref acc 0.872 (cov 0.96) | conf<100 0.766
+grok-reasoning + leave-out ensemble (iask vs gemini excluded) on conf<100: acc 0.734, coverage 0.95

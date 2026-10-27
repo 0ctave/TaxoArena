@@ -1,0 +1,185 @@
+== RUN LOG embedder_cross writes (card + nomic_raw), run-operator, main aa9c2d7, Tue Sep 29 16:26:21     2026
+blob embedder_arms: 0546800f76437a537bff45e5d9590240bec87fae (worktree hash-object: 0546800f76437a537bff45e5d9590240bec87fae)
+-- processes
+ollama app.exe               41712 Console                    1    78ÿ232 Ko
+ollama.exe                   41912 Console                    1    99ÿ624 Ko
+java.exe                     50188 Console                    1 1ÿ043ÿ748 Ko
+java.exe                     20756 Console                    1 2ÿ532ÿ512 Ko
+java.exe                     44496 Console                    1   774ÿ016 Ko
+-- TIME_WAIT: 12
+-- source -wal/-journal count: 0
+-- source sha256 BEFORE
+3e9ce57772160749e0b5ea0267713286ca4109444d5a6b676e877a5b0501df29 *embeddings_cache_embeddinggemma_latest.db
+53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95 *embeddings_cache_nomic-embed-text_latest.db
+-- DIR before
+total 52797
+drwxr-xr-x 1 octav 197609        0 Sep 29 15:45 ./
+drwxr-xr-x 1 octav 197609        0 Sep 29 15:40 ../
+-rw-r--r-- 1 octav 197609 54022144 Sep 29 15:42 embeddings_cache_embeddinggemma_latest.db
+-rw-r--r-- 1 octav 197609      743 Sep 29 15:42 embeddings_cache_embeddinggemma_latest.db.provenance.json
+-rw-r--r-- 1 octav 197609      281 Sep 29 12:30 gemma_raw_embed_missing.log
+-- DIR copy gemma_raw sha256
+28f2e3a41e77312ff5c92d798b95e6ea2acdb8b6591b2eab1c677fa1d5367867 *experiment_results/embedder_cross/embeddings_cache_embeddinggemma_latest.db
+-- pool guard
+pool p2dca21ab5f4ef3ae OK: experiment_configs/reserved_pool_frozen_p2dca.json hashes to it; reserved_pool rows in mmlu_pro_dataset_cache_v2.db agree
+  keys=14 ids=3599 judgeable=3445 sentinels=154 corpus_set=MMLU_PRO (mmlu-pro-v2) origin=20260727_042523_Headless_Run_Auto_ge
+rc=0
+-- ollama version
+{"version":"0.34.4"}
+-- env OLLAMA_HOST(user)=0.0.0.0
+50188 C:\Users\octav\.jdks\graalvm-jdk-21.0.6\bin\java.exe --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-op
+20756 C:\Users\octav\.jdks\graalvm-jdk-21.0.6\bin\java -cp C:\Users\octav\.gradle\caches\modules-2\files-2.1\org.jetbrains.kotlin\kotlin-compiler-embeddable\2.1.10\ee3e5c806617c52ce167bdf96933efef9593853e\k
+44496 "C:\Program Files\Java\jdk-23\bin\java.exe" --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.
+
+== W2 DRY (OLLAMA_HOST=http://127.0.0.1:11434): embedder_arms.py --embed-card gemma_card --target-dir experiment_results/embedder_cross
+[THREADS] OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+[EMB-ARMS] --target-dir: source Z:\FAC\TUBerlin\THESIS\TaxoArena\embeddings_cache_embeddinggemma_latest.db sha256 3e9ce57772160749e0b5ea0267713286ca4109444d5a6b676e877a5b0501df29 -> NEW card file Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\embedder_cross\embeddings_cache_embeddinggemma_latest__card.db (absent; written only with --go)
+[EMB-ARMS] arm gemma_card: 11687 needed texts -> Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\embedder_cross\embeddings_cache_embeddinggemma_latest__card.db (queries rows copied from Z:\FAC\TUBerlin\THESIS\TaxoArena\embeddings_cache_embeddinggemma_latest.db)
+[EMB-ARMS] dry: nothing posted, nothing written (add --go)
+rc=0
+total 52797
+drwxr-xr-x 1 octav 197609        0 Sep 29 15:45 ./
+drwxr-xr-x 1 octav 197609        0 Sep 29 15:40 ../
+-rw-r--r-- 1 octav 197609 54022144 Sep 29 15:42 embeddings_cache_embeddinggemma_latest.db
+-rw-r--r-- 1 octav 197609      743 Sep 29 15:42 embeddings_cache_embeddinggemma_latest.db.provenance.json
+-rw-r--r-- 1 octav 197609      281 Sep 29 12:30 gemma_raw_embed_missing.log
+
+== W2 GO gemma_card: TIME_WAIT before = 15; start 16:26:45
+rc=0 end 16:29:50
+-- retry lines: 9; TIME_WAIT after: 19490
+-- source sha256 AFTER
+3e9ce57772160749e0b5ea0267713286ca4109444d5a6b676e877a5b0501df29 *embeddings_cache_embeddinggemma_latest.db
+53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95 *embeddings_cache_nomic-embed-text_latest.db
+-- DIR after
+total 104993
+drwxr-xr-x 1 octav 197609        0 Sep 29 16:29 ./
+drwxr-xr-x 1 octav 197609        0 Sep 29 15:40 ../
+-rw-r--r-- 1 octav 197609 54022144 Sep 29 15:42 embeddings_cache_embeddinggemma_latest.db
+-rw-r--r-- 1 octav 197609      743 Sep 29 15:42 embeddings_cache_embeddinggemma_latest.db.provenance.json
+-rw-r--r-- 1 octav 197609 53444608 Sep 29 16:29 embeddings_cache_embeddinggemma_latest__card.db
+-rw-r--r-- 1 octav 197609      830 Sep 29 16:29 embeddings_cache_embeddinggemma_latest__card.db.provenance.json
+-rw-r--r-- 1 octav 197609      281 Sep 29 12:30 gemma_raw_embed_missing.log
+-- card sha256
+24820836f7266c08958438c1d4a0116d38416113c7602499420f7e0ca65b4e93 *experiment_results/embedder_cross/embeddings_cache_embeddinggemma_latest__card.db
+-- provenance
+{
+ "arm": "gemma_card",
+ "copy": "Z:\\FAC\\TUBerlin\\THESIS\\TaxoArena\\experiment_results\\embedder_cross\\embeddings_cache_embeddinggemma_latest__card.db",
+ "copy_basename": "embeddings_cache_embeddinggemma_latest__card.db",
+ "model": "embeddinggemma:latest",
+ "model_digest": "85462619ee721b466c5927d109d4cb765861907d5417b9109caebc4e614679f1",
+ "role": "SECONDARY",
+ "script": "tools/analysis/embedder_arms.py blob:0546800f76437a537bff45e5d9590240bec87fae (LF)",
+ "sha256_after": "24820836f7266c08958438c1d4a0116d38416113c7602499420f7e0ca65b4e93",
+ "source": "Z:\\FAC\\TUBerlin\\THESIS\\TaxoArena\\embeddings_cache_embeddinggemma_latest.db",
+ "source_sha256": "3e9ce57772160749e0b5ea0267713286ca4109444d5a6b676e877a5b0501df29",
+ "source_use": "queries rows copied into a NEW card file",
+ "vectors_written": 11687
+}
+
+== W3 DRY: --embed-card nomic_card
+[THREADS] OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+[EMB-ARMS] --target-dir: source Z:\FAC\TUBerlin\THESIS\TaxoArena\embeddings_cache_nomic-embed-text_latest.db sha256 53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95 -> NEW card file Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\embedder_cross\embeddings_cache_nomic-embed-text_latest__card.db (absent; written only with --go)
+[EMB-ARMS] arm nomic_card: 11687 needed texts -> Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\embedder_cross\embeddings_cache_nomic-embed-text_latest__card.db (queries rows copied from Z:\FAC\TUBerlin\THESIS\TaxoArena\embeddings_cache_nomic-embed-text_latest.db)
+[EMB-ARMS] dry: nothing posted, nothing written (add --go)
+rc=0
+total 104993
+drwxr-xr-x 1 octav 197609        0 Sep 29 16:29 ./
+drwxr-xr-x 1 octav 197609        0 Sep 29 15:40 ../
+-rw-r--r-- 1 octav 197609 54022144 Sep 29 15:42 embeddings_cache_embeddinggemma_latest.db
+-rw-r--r-- 1 octav 197609      743 Sep 29 15:42 embeddings_cache_embeddinggemma_latest.db.provenance.json
+-rw-r--r-- 1 octav 197609 53444608 Sep 29 16:29 embeddings_cache_embeddinggemma_latest__card.db
+-rw-r--r-- 1 octav 197609      830 Sep 29 16:29 embeddings_cache_embeddinggemma_latest__card.db.provenance.json
+-rw-r--r-- 1 octav 197609      281 Sep 29 12:30 gemma_raw_embed_missing.log
+== W3 GO nomic_card: TIME_WAIT before = 14; start 16:32:00
+rc=0 end 16:35:01
+-- retry lines: 4; TIME_WAIT after: 14818
+-- source sha256 AFTER
+3e9ce57772160749e0b5ea0267713286ca4109444d5a6b676e877a5b0501df29 *embeddings_cache_embeddinggemma_latest.db
+53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95 *embeddings_cache_nomic-embed-text_latest.db
+-- DIR after
+total 162765
+drwxr-xr-x 1 octav 197609        0 Sep 29 16:35 ./
+drwxr-xr-x 1 octav 197609        0 Sep 29 15:40 ../
+-rw-r--r-- 1 octav 197609 54022144 Sep 29 15:42 embeddings_cache_embeddinggemma_latest.db
+-rw-r--r-- 1 octav 197609      743 Sep 29 15:42 embeddings_cache_embeddinggemma_latest.db.provenance.json
+-rw-r--r-- 1 octav 197609 53444608 Sep 29 16:29 embeddings_cache_embeddinggemma_latest__card.db
+-rw-r--r-- 1 octav 197609      830 Sep 29 16:29 embeddings_cache_embeddinggemma_latest__card.db.provenance.json
+-rw-r--r-- 1 octav 197609 59154432 Sep 29 16:35 embeddings_cache_nomic-embed-text_latest__card.db
+-rw-r--r-- 1 octav 197609      838 Sep 29 16:35 embeddings_cache_nomic-embed-text_latest__card.db.provenance.json
+-rw-r--r-- 1 octav 197609      281 Sep 29 12:30 gemma_raw_embed_missing.log
+-- card sha256
+90754dfd95849cf23ee3698a8523a17ea6e3ec3d32fc7516c78534c36301e414 *experiment_results/embedder_cross/embeddings_cache_nomic-embed-text_latest__card.db
+-- provenance
+{
+ "arm": "nomic_card",
+ "copy": "Z:\\FAC\\TUBerlin\\THESIS\\TaxoArena\\experiment_results\\embedder_cross\\embeddings_cache_nomic-embed-text_latest__card.db",
+ "copy_basename": "embeddings_cache_nomic-embed-text_latest__card.db",
+ "model": "nomic-embed-text:latest",
+ "model_digest": "0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f",
+ "role": "SECONDARY",
+ "script": "tools/analysis/embedder_arms.py blob:0546800f76437a537bff45e5d9590240bec87fae (LF)",
+ "sha256_after": "90754dfd95849cf23ee3698a8523a17ea6e3ec3d32fc7516c78534c36301e414",
+ "source": "Z:\\FAC\\TUBerlin\\THESIS\\TaxoArena\\embeddings_cache_nomic-embed-text_latest.db",
+ "source_sha256": "53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95",
+ "source_use": "queries rows copied into a NEW card file",
+ "vectors_written": 11687
+}
+
+== W4 DRY: --embed-missing nomic_raw --expect-missing 0
+[THREADS] OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+[EMB-ARMS] --target-dir: source Z:\FAC\TUBerlin\THESIS\TaxoArena\embeddings_cache_nomic-embed-text_latest.db sha256 53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95 -> copy Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\embedder_cross\embeddings_cache_nomic-embed-text_latest.db (absent; written only with --go)
+[EMB-ARMS] arm nomic_raw: 11687 needed texts, 0 missing from Z:\FAC\TUBerlin\THESIS\TaxoArena\embeddings_cache_nomic-embed-text_latest.db (expected 0)
+[EMB-ARMS] dry: nothing posted, nothing written (add --go)
+rc=0
+-- DIR before W4
+total 162765
+drwxr-xr-x 1 octav 197609        0 Sep 29 16:35 ./
+drwxr-xr-x 1 octav 197609        0 Sep 29 15:40 ../
+-rw-r--r-- 1 octav 197609 54022144 Sep 29 15:42 embeddings_cache_embeddinggemma_latest.db
+-rw-r--r-- 1 octav 197609      743 Sep 29 15:42 embeddings_cache_embeddinggemma_latest.db.provenance.json
+-rw-r--r-- 1 octav 197609 53444608 Sep 29 16:29 embeddings_cache_embeddinggemma_latest__card.db
+-rw-r--r-- 1 octav 197609      830 Sep 29 16:29 embeddings_cache_embeddinggemma_latest__card.db.provenance.json
+-rw-r--r-- 1 octav 197609 59154432 Sep 29 16:35 embeddings_cache_nomic-embed-text_latest__card.db
+-rw-r--r-- 1 octav 197609      838 Sep 29 16:35 embeddings_cache_nomic-embed-text_latest__card.db.provenance.json
+-rw-r--r-- 1 octav 197609      281 Sep 29 12:30 gemma_raw_embed_missing.log
+
+== W4 GO nomic_raw copy: TIME_WAIT before = 18; start 16:37:19
+rc=0 end 16:37:22
+-- retry lines: 0; TIME_WAIT after: 91
+-- source sha256 AFTER
+3e9ce57772160749e0b5ea0267713286ca4109444d5a6b676e877a5b0501df29 *embeddings_cache_embeddinggemma_latest.db
+53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95 *embeddings_cache_nomic-embed-text_latest.db
+-- DIR after
+total 221265
+drwxr-xr-x 1 octav 197609        0 Sep 29 16:37 ./
+drwxr-xr-x 1 octav 197609        0 Sep 29 15:40 ../
+-rw-r--r-- 1 octav 197609 54022144 Sep 29 15:42 embeddings_cache_embeddinggemma_latest.db
+-rw-r--r-- 1 octav 197609      743 Sep 29 15:42 embeddings_cache_embeddinggemma_latest.db.provenance.json
+-rw-r--r-- 1 octav 197609 53444608 Sep 29 16:29 embeddings_cache_embeddinggemma_latest__card.db
+-rw-r--r-- 1 octav 197609      830 Sep 29 16:29 embeddings_cache_embeddinggemma_latest__card.db.provenance.json
+-rw-r--r-- 1 octav 197609 59899904 Sep 29 16:37 embeddings_cache_nomic-embed-text_latest.db
+-rw-r--r-- 1 octav 197609      834 Sep 29 16:37 embeddings_cache_nomic-embed-text_latest.db.provenance.json
+-rw-r--r-- 1 octav 197609 59154432 Sep 29 16:35 embeddings_cache_nomic-embed-text_latest__card.db
+-rw-r--r-- 1 octav 197609      838 Sep 29 16:35 embeddings_cache_nomic-embed-text_latest__card.db.provenance.json
+-rw-r--r-- 1 octav 197609      281 Sep 29 12:30 gemma_raw_embed_missing.log
+-- copy sha256
+28f2e3a41e77312ff5c92d798b95e6ea2acdb8b6591b2eab1c677fa1d5367867 *experiment_results/embedder_cross/embeddings_cache_embeddinggemma_latest.db
+24820836f7266c08958438c1d4a0116d38416113c7602499420f7e0ca65b4e93 *experiment_results/embedder_cross/embeddings_cache_embeddinggemma_latest__card.db
+53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95 *experiment_results/embedder_cross/embeddings_cache_nomic-embed-text_latest.db
+90754dfd95849cf23ee3698a8523a17ea6e3ec3d32fc7516c78534c36301e414 *experiment_results/embedder_cross/embeddings_cache_nomic-embed-text_latest__card.db
+-- provenance
+{
+ "arm": "nomic_raw",
+ "copy": "Z:\\FAC\\TUBerlin\\THESIS\\TaxoArena\\experiment_results\\embedder_cross\\embeddings_cache_nomic-embed-text_latest.db",
+ "copy_basename": "embeddings_cache_nomic-embed-text_latest.db",
+ "model": "nomic-embed-text:latest",
+ "model_digest": "0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f",
+ "role": "PRIMARY",
+ "script": "tools/analysis/embedder_arms.py blob:0546800f76437a537bff45e5d9590240bec87fae (LF)",
+ "sha256_after": "53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95",
+ "source": "Z:\\FAC\\TUBerlin\\THESIS\\TaxoArena\\embeddings_cache_nomic-embed-text_latest.db",
+ "source_sha256": "53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95",
+ "source_use": "copied byte-for-byte, then the missing vectors inserted",
+ "vectors_written": 0
+}

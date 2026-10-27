@@ -1,0 +1,277 @@
+{
+  "id": "BFCL-FLIP-RESEED",
+  "title": "BFCL-FLIP-RESEED: do the BFCL pilot's 100 ORDER-FLIP TIES reproduce when the SAME 100 matches are posted a second time, or are they resampling noise at the tie boundary? (judged; 200 calls, 100 matches; separator 1 of the three hypotheses BFCL-JUDGED-PILOT left unseparated; an INDEPENDENT test, not an arm of BFCL-FINAL-STATE-SWAP)",
+  "question": "On the 100 matches of the BFCL-JUDGED-PILOT deciding subset (458 matches, 49 tasks, pool p2035adddedd1becb) whose dual-order aggregation was TIE, does a SECOND POSTING of the same 100 matches in BOTH orders, under a BYTE-IDENTICAL prompt, reproduce the ties? R = (the number of the 100 that are a dual-order TIE again) / 100, read against two anchors fixed before the run: the STABLE anchor 0.913 = 1 - CANARY-BASELINE pass 2's frozen-set retest floor 0.087, and the NOISE anchor 0.2183, the corpus's own marginal tie rate. A retest of decisiveness stability; never a fidelity number, never a rung, never a ranking.",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "ca3a7cc (the registration commit; it carries exactly seven docs/ paths and precedes all code: no script exists for this test at ca3a7cc). The registration section was appended at the END of docs/judge_v2_program.md so that no line number above it moves.",
+    "program_lines": "docs/judge_v2_program.md L12048-L12314 (heading at L12049; the section ends with the 2026-09-23 POSITION-INDEX-ALL stated-dependency bracket, added in the same commit)",
+    "program_lines_as_of": "ca3a7cc (the registration commit); resolve by the quoted heading, not by the line number",
+    "heading": "## Registered 2026-09-23 (before any code or call) — BFCL-FLIP-RESEED: do the BFCL pilot's 100 ORDER-FLIP TIES reproduce when the SAME 100 matches are posted a second time, or are they resampling noise at the tie boundary? (judged; 200 calls, 100 matches; separator 1 of the three hypotheses the BFCL-JUDGED-PILOT outcome left unseparated; an INDEPENDENT test, not an arm of BFCL-FINAL-STATE-SWAP)",
+    "date": "2026-09-23",
+    "depends_on_registration": "docs/judge_v2_program.md L10965-L11237 (BFCL-JUDGED-PILOT, 22c5d5f + 6ccf2f7), its outcome section L11772-L11988 and its registration-defect section L11990-L12024",
+    "plan_amendment": "none owed: 100 arena matches is far below the standing 4,000-match rule (CONTEXT.md section 4 rule 5). Plan Amendment 9's 14,000-call hard ceiling for the night of 2026-09-23 governs the launch and is read from experiment_results/night_calls_2026-09-23.json (2,944 of 14,000 at registration)."
+  },
+  "script": {
+    "path": "tools/analysis/bfcl_flip_reseed.py (branch bfcl-separators @ 26ffb1d, NOT MERGED)",
+    "sha16": "d4e08a891a85b4cd (LF, as named by the READY; not re-hashed by the registrar)",
+    "commit": "26ffb1d"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_bfcl_flip_reseed.md",
+    "commit": "e3592dc",
+    "verdict": "READY-WITH-CONDITIONS",
+    "script": "tools/analysis/bfcl_flip_reseed.py LF sha16 d4e08a891a85b4cd on bfcl-separators @ 26ffb1d; parent bfcl_judged_pilot.py LF 5e9db53b894eeccb",
+    "conditions": "READY-WITH-CONDITIONS e3592dc (docs/reviews/READY_bfcl_flip_reseed.md; conditions 1, 3, 4 and 5 of 29c1e8c stand, 2 and 4 replaced): (1) the dry-run is run from the checkout that will post and prints script LF d4e08a891a85b4cd and parent 5e9db53b894eeccb; [BYTE-GATE] (A) 951ec3a0a063b5a8 -> MATCH, (B) 200 of 200, (C) 058faa54f0697ad9 -> MATCH, (E) True; 100 mids with partition 57/0/24/14/3/2 and nothing outside the six classes; REFUSALS: none; a last [DBGUARD] line listing only mode=ro&immutable=1 URIs. (2, replaced) the gate requires the sha on the verdict line: the [READY] ... OPEN printout at --pilot must show the parsed verdict line naming d4e08a891a85b4cd. (3) the dry-run's CLUSTERS line is quoted in the pilot report. (4, replaced) the instrument prints the usable-only interval; the post-run reviewer checks it against an external recomputation. (5) FLIP WAITS FOR POSITION-INDEX-ALL: the coordinator's standing sequencing decision (2896b1d). [ADDED 2026-09-23: POST-RUN CONDITION (from BFCL-FINAL-STATE-SWAP's post-run review 80caf70, D1): this instrument's assert_no_per_side_verdict inspects the TASK STATEMENT only; its numbers review MUST perform a FULL-PAYLOAD scan of all 200 re-assembled payloads before any leakage claim stands. DBGUARD: READY condition 1's clause is read as 'a last [DBGUARD] line naming only the corpus and the pilot cache, each of which _guarded_connect admits only as mode=ro&immutable=1'. THIS TEST NOW ALONE bears on position bias versus boundary noise; the swap cache's 71 of the pilot's 100 ties tied again UNDER A DIFFERENT PROMPT and, the swap not being a control for this test (L12136), 71/100 is never quoted as R, never used against 0.566, never pooled.]",
+    "supersession_chain": "fdd6a99 (READY-WITH-CONDITIONS; 3d659e15030cf025 @ 5f459b2) -> 29c1e8c (READY-WITH-CONDITIONS; af5bfca08ddccccb @ e15d2a9) -> e3592dc (READY-WITH-CONDITIONS; d4e08a891a85b4cd @ 26ffb1d, targeted re-review of D-G1 / D-G2 / D-G3 and the usable-only interval)"
+  },
+  "go": "n/a as a budget-rule exception (100 matches, 200 calls; far below the 4,000-match rule, so no author go is owed and no plan amendment is written). THE AUTHOR'S AUTHORISATION TO SCHEDULE BOTH SEPARATORS was relayed by the orchestrator on 2026-09-23 and is recorded in the registration's opening paragraph as the DECISION TO SCHEDULE, not as a rule exception. The operational gates before any call: an instrument written against this registration, a committed adversarial-reviewer READY, a zero-call --dry-run that passes the byte-identity gate 200 of 200, and a 12-match pilot read by the truncation guard. The author's authorisation of 2026-09-23 (\"Go ahead and authorize the judged runs, start what you can\") is recorded as plan Amendment 11 (docs/plan_2026-09-15.md, appended 2026-09-23), which authorises the BUDGET ONLY: it does NOT grant the judge-design-specialist's closed-line ruling still owed on the trace-template line, does NOT grant the design ruling on BFCL-DEGRADED-CONTROL's corruption rule, does NOT authorise TRACE-TRUNCATION, and does NOT suspend the standard flow, rule 7, the reserved/generation split or the per-launch call-ledger row. The itemisation it was given against totals ~2,640 calls / ~1,320 matches, BELOW the 4,000-match rule. [2026-09-23: LAUNCHED ON THE AUTHOR'S EXPLICIT GO, relayed by the coordinator, given after the author read both of-record statements in this record's launch_note. 200 calls, far below the 4,000-match rule; no plan amendment owed.]",
+  "run": {
+    "outcome_file": "experiment_results/agent/bfcl_flip_reseed_outcome.txt blob:5bee2f278162654a1f5a30e1ce94a8a65de13988 / sha256-lf16:7bb4bd659ffb4084 / sha256-crlf16:577f8fc4f119ec0f (working tree CRLF)",
+    "outcome_commit": "6dca538",
+    "calls": 200,
+    "cce": "n/a",
+    "pool": "p2035adddedd1becb (check of record compute_pool_id over 228 ids PASSED; pool_guard refuses p2035: POOL-REGISTRY-BFCL drafted)",
+    "date": "2026-09-23",
+    "errors": 0,
+    "unusable": 0,
+    "night_total": "4,060 of 14,000",
+    "cache": "experiment_results/agent/bfcl_flip_reseed.db blob:2bd30896b0807122165fbf91400827d532e0b7a7"
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-23_bfcl_flip_reseed_post.md",
+    "commit": "7ddf59f",
+    "verdict": "every number reproduces; C1 HELD CONFIRMED (robust: CR1 [0.590, 0.790], 20 seeds); full-payload leakage scan 0/200 (post-run condition MET); P1 / P2 / P6 FAILED as band defects (D1, D2); D7 launch decision; D3-D6, D8 LOW; no BLOCKER / HIGH"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "THE REPRODUCTION RATE R, the primary and ONLY barred endpoint. R = (the number of the 100 whose pass-2 dual-order aggregation is again TIE) / 100. THE DECIDING STATISTIC IS THE TASK-CLUSTERED INTERVAL OF R AND NOTHING ELSE (point +- 1.96 x the task-clustered bootstrap SE, clusters = the distinct tasks of the 100, B = 2000, seed 137); the percentile and Wilson intervals and the point are printed beside and decide nothing. BAR B* = 0.566, the midpoint of the two registered anchors 0.913 (stable) and 0.2183 (noise). HELD iff the clustered interval lies WHOLLY ABOVE 0.566; FAILED iff it lies WHOLLY BELOW 0.566; UNDETERMINED iff it CONTAINS 0.566, or fewer than 90 of the 100 yield a usable dual-order outcome, or the byte-identity gate did not pass 200 of 200. Three disjoint outcomes over ONE statistic, as the 2026-09-23 registration-defect ruling requires. [CORRECTED 2026-09-23 by the registrar (D2): the validity triggers are NOT disjoint from the interval outcomes; RULING: they are evaluated FIRST and PRE-EMPT the verdict expression (UNDETERMINED BY TRIGGER, interval printed not scored, falsifier not evaluated); otherwise the interval's three disjoint outcomes apply. See the programme section '## Registration defects recorded 2026-09-23 (insertion only; zero calls; no recorded number moves) — BFCL-FLIP-RESEED and BFCL-FINAL-STATE-SWAP: ...' (docs/judge_v2_program.md L13362-L13443 _as_of the commit that adds it).]",
+      "result": "HELD",
+      "value": "R = 69 / 100 = 0.690; task-clustered [0.5924, 0.7876] wholly above 0.566 (L14); CR1 [0.590, 0.790]; 20 seeds; usable-only identical",
+      "denominator": "the 100 dual-order-TIE matches of the BFCL-JUDGED-PILOT deciding subset (458 matches, 49 tasks), over the distinct tasks they occupy (the cluster unit, printed by the dry-run)"
+    },
+    {
+      "id": "C2",
+      "text": "THE POSITION SIGNATURE, DESCRIPTIVE, NO BAR, and the registration states why (n = 57 at the pilot's measured DEFF 3.60 gives n_eff ~16 and an MDE of ~+-0.35: a bar the design cannot reach manufactures a result). Printed with intervals: (a) the share of the 57 (Model A, Model A) matches that are (Model A, Model A) again; (b) the share of the 57 that are a dual-order TIE again by any route; (c) the pass-2 first-position rate over the pass-2 non-tie votes of the 200 cells, beside the pilot's marginal 0.5862 of 870 (z = 5.09), with the note that on this SELECTED subset the pass-1 value is 1.0 for 57 of the 100 BY CONSTRUCTION; (d) the 3 (TIE, TIE) and 2 (Model B, TIE) sub-classes counted separately. HELD iff (a)-(d) are computed and printed with their denominators and intervals; FAILED if any is omitted or printed without its denominator.",
+      "result": "HELD",
+      "value": "descriptive: (a) 32 / 57 = 0.561 [0.398, 0.725]; (b) 40 / 57 = 0.702; (c) 133 / 167 = 0.796 (L29)",
+      "denominator": "57 (Model A, Model A) matches; 200 (mid, arm) cells for the first-position rate; the pilot's 870 non-tie votes for the comparison figure"
+    },
+    {
+      "id": "C3",
+      "text": "THE PAIRED PER-ORDER STATISTIC, computed and printed, NO BAR. The paired test of record is the EXACT TWO-SIDED McNEMAR on the 200 (mid, arm) cells for the binary outcome 'named the FIRST-SHOWN side', with its discordant counts b and c and its exact p. WHY McNEMAR: the same cells are observed twice, so the between-match and between-task variance is common and cancels, only the discordant cells carry information, and the exact binomial form is the record's convention for a paired judged comparison (wrong(established); IFEVAL-RESPONSE-ORACLE). WHY NO BAR: the 100 were SELECTED on being ties, so a match-level McNemar against pass 1 is degenerate by construction and any McNemar on this set measures regression to the mean as well as instability; the per-ORDER form escapes the degeneracy but not the selection. HELD iff b, c and the exact p are printed with the 200-cell denominator and the words 'selected set, direction not verdict'.",
+      "result": "HELD",
+      "value": "exact McNemar b 32, c 13, p 0.0066 on 200 cells (L33)",
+      "denominator": "200 (mid, arm) cells observed in both passes"
+    },
+    {
+      "id": "C4",
+      "text": "INSTRUMENT COUNTS AND THE BYTE-IDENTITY GATE, printed, no bar except where a refusal is named. (a) THE BYTE-IDENTITY GATE: 200 of 200 payload sha256_16 equal to the pilot's for the same (mid, arm), and the system prompt hash equal to 951ec3a0a063b5a8 - ANY SHORTFALL REFUSES THE RUN; (b) unusable rows (content_filter + length + unparsed) over the posted calls; (c) finish_reason and provider fingerprint on every posted call; (d) max completion tokens against the 8,192 cap; (e) truncated sides and state-over-cap; (f) the MEASURED DEFF and n_eff for R, printed beside every C1 interval; (g) the cumulative night call count at each launch against 14,000, read from and appended to experiment_results/night_calls_2026-09-23.json. HELD iff (a)-(g) are printed. [CORRECTED 2026-09-23 by the registrar (D1, transcription defect): 951ec3a0a063b5a8 is the SCHEDULE-WIDE PAYLOAD ANCHOR over the 1,216 payloads plus the system prompt (programme L11933, L11975), re-assembled through the parent module and required to equal it; the system prompt ALONE hashes to 058faa54f0697ad9 (re-derived by the registrar from code, no DB) and the system-prompt check is byte-identity to the parent's with that sha; the pilot cache stores no per-cell payload hash. See the programme section '## Registration defects recorded 2026-09-23 (insertion only; zero calls; no recorded number moves) — BFCL-FLIP-RESEED and BFCL-FINAL-STATE-SWAP: ...' (docs/judge_v2_program.md L13362-L13443 _as_of the commit that adds it).]",
+      "result": "HELD",
+      "value": "counts and byte gate printed (L47); gate (B) tautological, pass-1 identity rests on (A) (D3)",
+      "denominator": "200 (mid, arm) payloads; the posted calls; the night ledger"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "R in [0.75, 0.95], POINT 0.88 (below the stable anchor 0.913 because the 100 are a selected extreme and some regression is expected even under a fully stable effect)",
+      "result": "FAILED",
+      "value": "0.690 outside [0.75, 0.95] (L50); REGISTRATION BAND DEFECT (D1: anchored on 0.913 match-level, not 0.787 / 0.636 tie-conditional)",
+      "denominator": "the 100 re-posted matches"
+    },
+    {
+      "id": "P2",
+      "text": "the 57-subclass (Model A, Model A) reproduction rate, criterion C2(a), in [0.60, 0.90], POINT 0.75",
+      "result": "FAILED",
+      "value": "0.561 outside [0.60, 0.90] (L51); REGISTRATION BAND DEFECT (D2: band narrower than the registration's MDE)",
+      "denominator": "the 57 (Model A, Model A) matches of the pilot's flip table"
+    },
+    {
+      "id": "P3",
+      "text": "the pass-2 convention-B agreement with the checker on those of the 100 that DO commit a dual-order verdict in pass 2, in [0.55, 0.90], POINT 0.72 - below the pilot's 0.9469 on the full 458, because these are the matches the recipe found hardest to decide; DESCRIPTIVE, on whatever denominator pass 2 produces",
+      "result": "HELD",
+      "value": "25 / 31 = 0.806 (L52)",
+      "denominator": "whatever subset of the 100 commits in pass 2, printed"
+    },
+    {
+      "id": "P4",
+      "text": "unusable rows (content_filter + length + unparsed) <= 1% of the 200 posted calls (the pilot read 0 of 1,216)",
+      "result": "HELD",
+      "value": "0 of 200 (L53)",
+      "denominator": "200 posted calls"
+    },
+    {
+      "id": "P5",
+      "text": "the byte-identity gate passes 200 of 200 and the system prompt hashes to 951ec3a0a063b5a8 (a 0-mismatch prediction) [CORRECTED 2026-09-23 by the registrar (D1, transcription defect): 951ec3a0a063b5a8 is the SCHEDULE-WIDE PAYLOAD ANCHOR over the 1,216 payloads plus the system prompt (programme L11933, L11975), re-assembled through the parent module and required to equal it; the system prompt ALONE hashes to 058faa54f0697ad9 (re-derived by the registrar from code, no DB) and the system-prompt check is byte-identity to the parent's with that sha; the pilot cache stores no per-cell payload hash. See the programme section '## Registration defects recorded 2026-09-23 (insertion only; zero calls; no recorded number moves) — BFCL-FLIP-RESEED and BFCL-FINAL-STATE-SWAP: ...' (docs/judge_v2_program.md L13362-L13443 _as_of the commit that adds it).]",
+      "result": "HELD",
+      "value": "200 of 200; anchor 951ec3a0a063b5a8 (L54); rests on gate (A)",
+      "denominator": "200 (mid, arm) payloads"
+    },
+    {
+      "id": "P6",
+      "text": "the MEASURED task-clustered DEFF for R on the 100, in [2.5, 6.0], POINT 3.8 - at or above the pilot's measured 3.60, because ties CLUSTER (11 of 49 tasks at or above 50% ties; 5 tasks carrying 32 of the 100) and selecting on ties concentrates the set further",
+      "result": "FAILED",
+      "value": "1.160 outside [2.5, 6.0] (L55); REGISTRATION BAND DEFECT (D2: built on A's DEFF at Kish 9.92)",
+      "denominator": "the 100 matches over their distinct tasks"
+    }
+  ],
+  "falsifier": {
+    "text": "IF R'S TASK-CLUSTERED INTERVAL LIES WHOLLY BELOW 0.566, the reading that the pilot's 100 order-flip ties and their one-sided (57 / 0) signature are a STABLE PER-MATCH PROPERTY of the deployed recipe on this corpus IS OVERTURNED: the 0.2183 is then a MARGINAL rate generated at a noisy decision boundary, the flip SET is not a stable object, and a standing consequence is adopted by insertion - NO LATER TEST ON THIS CORPUS MAY RE-POST A SELECTED MATCH SET AND READ THE RESULT AS A PER-MATCH MEASUREMENT. IT OVERTURNS NO NUMBER OF BFCL-JUDGED-PILOT: A = 0.7402, A = 0.9469, 19 wrong-committed (0.0415), the tie rate 0.2183 and the MARGINAL first-position rate 0.5862 of 870 (z = 5.09) are all marginal quantities and stand whatever R is; it overturns no board, no profile, no tier, no rung and no MMLU-Pro result; it does not overturn CANARY-BASELINE pass 2's 0.087 floor or DECOMP's 5.7%, which were measured on other corpora and unselected sets and are used here only as anchors. SYMMETRICALLY, C1 HELD overturns nothing: a stable effect is consistent with BOTH position bias and template mis-fit, and separating those is BFCL-FINAL-STATE-SWAP's job. UNDETERMINED is a registered outcome.",
+    "fired": false,
+    "reading": "NOT FIRED; C1 HELD establishes reproducibility, not cause (docs/judge_v2_program.md L14899-L14929)"
+  },
+  "numbers_of_record": {
+    "the_100": "the mids of the DECIDING SUBSET (stratum base; both agents on the 7-agent headline roster; nj / nj_a / nj_b clear; 458 mids over 49 tasks) whose dual-order aggregation over the cached fwd and rev rows is TIE. Cardinality of record 100 (BFCL-JUDGED-PILOT outcome, C4 and the falsifier paragraph: 'order-flip TIE share 100/458 = 0.2183'). The dry-run re-derives the set and REFUSES the run if it is not exactly 100.",
+    "identifier_of_record": "schedule.mid, the INTEGER PRIMARY KEY of the schedule table of experiment_results/agent/bfcl_judged_pilot.db (mode=ro&immutable=1), 608 rows pinned by run_meta.schedule_hash = bcf9d1654e68e4ca; the 100 mids with their task_id / agent_a / agent_b and their cached pass-1 votes are printed by the dry-run and pinned in the new cache's run_meta as a sorted list and as its sha256_16",
+    "flip_table_of_record": "of the 100: 57 (Model A, Model A), 0 (Model B, Model B), 24 (TIE, Model A), 14 (Model A, TIE), 3 (TIE, TIE), 2 (Model B, TIE); 97 genuine order disagreements and 3 double-TIEs, all 100 kept in the set (source: BFCL-JUDGED-PILOT outcome section, D2 bracket)",
+    "seed": "137, registered as the instrument RNG seed and the bootstrap seed of record; IT IS NOT A JUDGE SEED - the judge call carries no seed and no temperature, so pass 2 is a retest because it is POSTED AGAIN IN A NEW SESSION, exactly as CANARY-BASELINE pass 2 and DECOMP were constructed (pass 1 was seed 42)",
+    "anchors": "STABLE 0.913 = 1 - 0.087, CANARY-BASELINE pass 2's frozen-set retest floor (26/300 = 0.087 [0.056, 0.122], SE 0.0170, DEFF 1.09; all 26 disagreements TIE <-> decisive, the 215 decisive-in-both never reversing). NOISE 0.2183, the corpus's own marginal tie rate on the 458. BAR B* = 0.566 (their midpoint 0.5655, rounded to three decimals), fixed at registration and never after. DECOMP's 5.7% is quoted as BACKGROUND (MMLU-Pro, different roster) and is NOT this test's floor. [CORRECTED 2026-09-23: the unrounded midpoint is 0.56565; B* = 0.566 unchanged.]",
+    "support_and_MDE": "100 matches over the distinct tasks the dry-run prints (at most 49, concentrated: 11 of 49 tasks at or above 50% ties, 5 tasks carrying 32 of the 100). PLANNING DEFF = the pilot's MEASURED 3.60, with a pessimistic 5.0 carried beside. At DEFF 3.60, n_eff 27.8: SE(R) 0.095 at R = 0.5, 0.053 at 0.913, 0.078 at 0.218; MDE +-0.265 at 80% power, +-0.186 at 50%. At DEFF 5.0, n_eff 20.0: SE(R) 0.112 at R = 0.5, MDE +-0.313. The two anchors are 0.695 apart = 2.6x the MDE at the planning DEFF and 2.2x at the pessimistic one; at R = 0.913 the interval reads about [0.808, 1.000] and at R = 0.218 about [0.065, 0.371], both far from 0.566. THE DESIGN CANNOT resolve 0.913 from 0.75, nor 0.30 from 0.218, nor any pair closer than about 0.27, and licenses NO tight point claim about R.",
+    "bill": "CEILING 200 CALLS, EXPECTED 200 (100 matches x 2 orders; the 24-call pilot is INSIDE the 200; no cached row is ever re-posted, so the ceiling equals the expected count and there is no retry budget). cce 200. Machine ~8 min. Night ledger at registration: 2,944 of 14,000.",
+    "instrument_constants_inherited": "judge grok-4-1-fast-non-reasoning (azure); cap 8192; temperature OMITTED; dual order, TIE on flip; reference = the PER-TASK EXPECTED OUTCOME with a 1,200-char CHECKER_TEXT_CUT (BFCL-REF-ORACLE, programme L11001); artefact = the decoded call sequence + final state_info at 2,500 ESTIMATED tokens (chars / 4), symmetric; prompt = the frozen v2 verify-first template with SYSTEM_BFCL / RUBRIC_BFCL, system prompt sha 951ec3a0a063b5a8; corpus DB experiment_results/agent/bfcl_result_2025-12-16.db mode=ro&immutable=1 [CORRECTED 2026-09-23 by the registrar (D1, transcription defect): 951ec3a0a063b5a8 is the SCHEDULE-WIDE PAYLOAD ANCHOR over the 1,216 payloads plus the system prompt (programme L11933, L11975), re-assembled through the parent module and required to equal it; the system prompt ALONE hashes to 058faa54f0697ad9 (re-derived by the registrar from code, no DB) and the system-prompt check is byte-identity to the parent's with that sha; the pilot cache stores no per-cell payload hash. See the programme section '## Registration defects recorded 2026-09-23 (insertion only; zero calls; no recorded number moves) — BFCL-FLIP-RESEED and BFCL-FINAL-STATE-SWAP: ...' (docs/judge_v2_program.md L13362-L13443 _as_of the commit that adds it).]",
+    "split_and_guard": "pool p2035adddedd1becb, 228 EVAL ids over 57 EVAL families, side by split_side.tier_b norm-v1 (0 mismatches of 800, 0 straddling families). NO TAXONOMY WAS EVER BUILT ON BFCL AND NO RUBRIC WAS EVER INDUCED ON BFCL; SYSTEM_BFCL / RUBRIC_BFCL are hand-written corpus-level constants pinned in the pilot's run_meta. Guard: the pool id is the first printed line; every scheduled task_id is asserted EVAL-side and a single TRAIN-side id refuses the run; `python tools/analysis/pool_guard.py --pool p2035adddedd1becb` is quoted in the READY; the 100 are drawn only from the pilot's frozen schedule, so the split is settled by inheritance and re-verified. [CORRECTED 2026-09-23: that command REFUSES (the pool is not in pool_guard's registry); the check of record is compute_pool_id(judgeable(ids)) = p2035adddedd1becb over 228 ids, re-derived by the READY reviewer; queue item POOL-REGISTRY-BFCL.]",
+    "R": "69 / 100 = 0.690, task-clustered [0.5924, 0.7876] (35 tasks), CR1 [0.590, 0.790]; flip-origin 66 / 97 = 0.680",
+    "leakage": "full-payload scan 0 / 200 (review 7ddf59f); the instrument's assert covers the task statement only and is not leakage evidence",
+    "canary_tie_retest": "59 / 75 = 0.787 all ties; 35 / 55 = 0.636 flip-origin (the correct comparators; the registration's 0.913 was match-level)",
+    "position_form": "pass-2 both-decisive flips first-shown 42 : 1 (p 1.0e-11); (A,A) again 32 / 57",
+    "deff": "1.160 printed (one seed); stable 1.19-1.22; n_eff about 84-86"
+  },
+  "sentence_of_record": "BFCL-FLIP-RESEED (200 calls, 0 errors, 0 unusable): the pilot's 100 order-flip ties, re-posted under a byte-identical prompt in a new session, tie again in 69 of 100 (task-clustered interval [0.592, 0.788], 35 tasks, measured DEFF 1.16-1.22, n_eff ~84), wholly above the 0.566 bar, so C1 HELD: the BFCL flip set is a stable per-match property, not boundary noise. The rate matches the MMLU-Pro canary's own tie-conditional retest rate (0.636 for flip-origin ties, 0.787 for all ties), not the 0.913 match-level floor the registration used as its stable anchor. P1, P2 and P6 FAILED on bands that the registration mis-derived. Among pass-2 both-decisive flips the first-shown side is named 42 : 1. With BFCL-FINAL-STATE-SWAP (template mis-fit at the four strings refuted) and POSITION-INDEX-ALL (a first/second imbalance general across families, BFCL's degree not), the flips are stable and positional in form. Whether position preference causes them or only breaks ties on matches the judge cannot decide (corpus difficulty) is not separated. [run 6dca538; review <this commit>; full-payload leakage scan 0/200; denominators: 100 matches over 35 tasks, selected from 458 deciding matches over 49 tasks, pool p2035adddedd1becb] [<this commit> in the reviewer's bracket = 7ddf59f. Recorded by the registrar: C1 decided by the task-clustered INTERVAL against the bar of record 0.566 (unchanged); P1, P2, P6 FAILED as scored, REGISTRATION BAND DEFECTS (D1, D2); leakage evidence of record = the review's full-payload scan 0/200, NOT the instrument's assert_no_per_side_verdict]",
+  "chips": [
+    "REGISTERED 2026-09-23, BEFORE ANY CODE OR CALL",
+    "C1 HELD (R 0.69 [0.59, 0.79] > 0.566)",
+    "LEAKAGE 0/200 (FULL-PAYLOAD SCAN)",
+    "P1 / P2 / P6 FAILED: REGISTRATION BAND DEFECTS",
+    "P3-P5 HELD",
+    "UNDETERMINED IS A REGISTERED OUTCOME"
+  ],
+  "does_not_show": [
+    "it does not observe 'a different 100 flipping': no match that was DECISIVE in pass 1 is re-posted, a control arm over the 358 committed matches is NOT bought at this budget, and the 'different 100' leg is answered only INDIRECTLY through the noise anchor 0.2183 - an inference that RESTS ON A STATED ASSUMPTION, that the corpus's marginal tie rate is itself stable across sessions, which this run cannot check and which the outcome must name beside every reading of C1",
+    "it says nothing about WHY a flip happens: position bias, template mis-fit and corpus difficulty all predict reproduction, so C1 HELD does not choose among them",
+    "it says nothing about fidelity: no rung, no ladder position, no 0.75 bar, no 'for Agents' bridge",
+    "it gives no profile cell, no agent ranking, no per-trajectory and no process claim - 57 EVAL tasks against the 120-question support rule",
+    "it is not a calibration of the judge: 100 selected matches on one corpus, at an MDE of about +-0.27",
+    "it does not extend CANARY-BASELINE's 0.087 floor or DECOMP's 5.7% to this corpus; both are used only as pre-set anchors",
+    "it reopens no closed line: both orders are posted (ORDER-1, SELECTIVE-ORDER untouched), temperature is omitted (TEMP-0 untouched), and the prompt is byte-identical including RUBRIC_BFCL (the rubric line untouched, and the byte-identity gate refuses the run if it is not)",
+    "it may not SEPARATE at all if POSITION-INDEX-ALL (zero calls, proposed, not registered) shows that one-sided flip composition is GENERAL across corpora: C1 HELD would then be CONFIRMATORY rather than separating - a stated dependency recorded at registration, not a gate",
+    "[post-run review 7ddf59f] Why a flip happens. Position preference as a cause vs as the tie-breaker of an undecided judge (difficulty) is not separated by this or any registered test.",
+    "[post-run review 7ddf59f] A \"different 100\": no match decisive in pass 1 was re-posted. The noise-anchor inference assumes a session-stable marginal tie rate.",
+    "[post-run review 7ddf59f] R to better than about ±0.10, or any \"flips reproduce at X%\" with a tight interval.",
+    "[post-run review 7ddf59f] Any fidelity, rung, ladder, 0.75 bar, profile cell, agent ranking or \"for Agents\" bridge.",
+    "[post-run review 7ddf59f] That BFCL's 57/0 (or pass-2 42/1) degree of one-sidedness generalises. POSITION-INDEX-ALL says it does not.",
+    "[post-run review 7ddf59f] Any comparison with SWAP's re-tie count. That count was taken under a different prompt, and it is not R, not a control and not poolable.",
+    "[post-run review 7ddf59f] That the posted bodies equal the scanned re-assembly other than through byte gate (A) and the pinned shas. The cache stores no body.",
+    "[post-run review 7ddf59f] A calibration of the judge."
+  ],
+  "ledger": {
+    "row_id": "BFCL-FLIP-RESEED",
+    "version": "v180 (adjudicated: chips replaced, observed cell carries the outcome; audit OK)"
+  },
+  "depends_on": [
+    "BFCL-JUDGED-PILOT",
+    "AGENT-CORPUS-ADMISSION",
+    "CANARY-BASELINE-PASS2",
+    "DECOMP"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing and reopens nothing. Closed lines checked at registration (CONTEXT.md section 5) and NOT touched: ORDER-1 / SELECTIVE-ORDER (both orders posted on every match), TEMP-0 (temperature omitted), the rubric line at every granularity and rubric-shaped references (the prompt is byte-identical, including RUBRIC_BFCL, and the byte-identity gate refuses the run otherwise), ENSEMBLE-REF / J2-D / REF-CONF / ABSTAIN (one reference, one judge, no gate, no confidence threshold, no abstention), the frontier order, sub-anchor profiles, ESCALATE-LLAMA-LAW, PERF-8. The design class it belongs to - same-set retest - is open and is carried by CANARY-BASELINE and DECOMP."
+  },
+  "queue_items": [
+    "docs/agents/queue.json item BFCL-FLIP-RESEED (state registered, lane LLM, cce 200/200)"
+  ],
+  "sources": [
+    "docs/judge_v2_program.md L10965-L11237 (BFCL-JUDGED-PILOT registration, 22c5d5f + 6ccf2f7; heading at HEAD L10969): the pool, the split, the roster, the artefact cap, the reference form, the prompt slots, the guards",
+    "docs/judge_v2_program.md L11772-L11988 (BFCL-JUDGED-PILOT outcome section of record, with the D1-D4 brackets): the 458 / 49 tasks, A 0.7402, convention B 0.9469, 19 wrong-committed 0.0415, the 100 order-flip ties 0.2183, the flip table 57/0/24/14/3/2, the first-position rate 0.5862 of 870 (z = 5.09), the tie clustering (11 of 49 tasks, 5 tasks carrying 32), DEFF 3.60 / n_eff 127 / MDE +-0.109, and the THIRD HYPOTHESIS paragraph naming the FINAL ANSWER furniture",
+    "docs/judge_v2_program.md L11990-L12024 (BFCL-JUDGED-PILOT registration-defect section): the ruling that a registration carrying a point clause and an interval clause over the same bar is scored on both, and that a criterion with a bar must state IN ONE PLACE which decides it",
+    "docs/agents/results/BFCL-JUDGED-PILOT.json (registrar, 2026-09-23): every number copied above, the pool id p2035adddedd1becb, the split sentence, the two separators as recorded in the review bracket of 2026-09-23",
+    "docs/judge_v2_program.md, CANARY-BASELINE pass 2 outcome section (2026-09-22, 600 calls): the frozen-set retest floor 26/300 = 0.087 [0.056, 0.122], SE 0.0170, DEFF 1.09, all 26 disagreements TIE <-> decisive, the 215 decisive-in-both never reversing",
+    "memory note judge-program-2026-09 and the DECOMP ledger row: the 5.7% judge test-retest floor, measured on MMLU-Pro (quoted as background, not as this corpus's floor)",
+    "docs/judge_v2_program.md L4427-L4432 (REF-CHECKLIST table, n = 826, same conventions): PAIR-NOREF 0.734 / 0.887 / 0.173 / 0.0930, CHECKLIST 0.749 / 0.893 / 0.161 / 0.0900, REF 0.845 / 0.921 / 0.080 / 0.0750, RECIPE-GROK 0.857 / 0.925 / 0.074 / 0.0690",
+    "experiment_results/agent/bfcl_judged_pilot.db run_meta (read mode=ro on 2026-09-23 by the registrar, no write): schedule_hash bcf9d1654e68e4ca, seed 42, n_matches 608, arms fwd / rev, the identifier of record schedule.mid, judge grok-4-1-fast-non-reasoning, max_tokens 8192, temperature omitted, artefact_cap_tokens 2500, reference_text_cap 1200, dataset_sha256 1a21a995..., possible_answer_sha256 1fee6782..., script shas fa38c1dbe2776314 / 5e9db53b894eeccb",
+    "tools/analysis/prompt_v2.py v2_system_template() (read-only, rendered by the registrar on 2026-09-23 at zero calls): the four 'final answer' occurrences and their exact surrounding strings",
+    "docs/plan_2026-09-15.md Amendment 9 (ebd462d, L316-L363): the night's 14,000-call hard ceiling and the night ledger experiment_results/night_calls_2026-09-23.json (5 rows, 2,944 posted at registration)",
+    "docs/agents/CONTEXT.md sections 3, 4 and 5 (read 2026-09-23): the denominators and object-naming rules, the standing rules, and the closed-lines list against which both registrations were checked",
+    "docs/judge_v2_program.md L12048-L12314 (ca3a7cc): the registration itself - question, the 100 by their identifier of record, the seed statement, hygiene and the split guard, the instrument, the byte-identity gate, C1-C4, P1-P6, the support/MDE paragraph, the falsifier, the closed-lines check, the prior results, cost and consequence and the registered flow",
+    "docs/plan_2026-09-15.md Amendment 11 (2026-09-23, appended in this commit): the author's authorisation of the judged separator programme, BUDGET ONLY, with its five explicit non-grants and the itemisation it was given against",
+    "experiment_results/_backup/bfcl_2026-09-23/ (backup of bfcl_result_2025-12-16.db and bfcl_raw_2025-12-16/, verified 2026-09-23)",
+    "docs/judge_v2_program.md L14794-L14827",
+    "docs/judge_v2_program.md L14883-L14897",
+    "docs/reviews/2026-09-23_bfcl_flip_reseed_post.md (7ddf59f)",
+    "experiment_results/agent/bfcl_flip_reseed_outcome.txt (6dca538)",
+    "docs/judge_v2_program.md L14899-L14929",
+    "docs/judge_v2_program.md L15027-L15037"
+  ],
+  "last_update": "2026-09-23 (registrar: docs/judge_v2_program.md L15027-L15037)",
+  "brackets": [
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, in the SAME COMMIT as the registration, on the coordinator's relay of a judge-lane review (insertion only, zero calls); programme bracket at the END of the registration section",
+      "text": "STATED DEPENDENCY: POSITION-INDEX-ALL, a proposed ZERO-CALL flip-composition index over EVERY dual-order cache in the record, may make this test CONFIRMATORY rather than separating. BFCL's 57-of-100 one-sided flips (0 the other way; first-position rate 0.5862 of 870 non-tie votes, z = 5.09) are NOT producible by i.i.d. per-call noise, so a systematic mechanism is already established AT THE MARGIN before this test posts a call; if one-sidedness proves GENERAL across corpora, C1 HELD would confirm on 100 BFCL matches what a zero-call index had already shown across the record, and the author may prefer not to buy the 200 calls. THE ZERO-CALL INDEX SHOULD BE READ BEFORE THIS TEST IS LAUNCHED, and the launch decision is the author's and the experiment-manager's. NO CRITERION, PREDICTION, BAR, ANCHOR, MDE OR FALSIFIER OF THIS REGISTRATION IS CHANGED, and this is NOT a gate: if the author launches first, the test is scored exactly as registered; if the index lands first, its result is quoted in this test's outcome as CONTEXT and never folded into R, into C1's bar or into any interval here. AND WHAT THE INDEX CANNOT DO, which is why this test is not withdrawn: a marginal index over caches is a MARGINAL object, while this is the only registered instrument that asks whether the flip SET is stable AT THE MATCH LEVEL."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (recording the coordinator's relay; zero calls, no DB opened)",
+      "text": "BACKUP OF THE BFCL INPUTS OF RECORD: experiment_results/_backup/bfcl_2026-09-23/ holds bfcl_result_2025-12-16.db (sha256 c5eddd267623f0ff652dad1f912e3473829a8adf7c2bcae8960f229c8303399e, identical to experiment_results/agent/bfcl_result_2025-12-16.db, 18,767,872 bytes) and the full raw tree bfcl_raw_2025-12-16/ (72 of 72 files match the committed experiment_results/agent/bfcl_raw/2025-12-16/MANIFEST.txt on sha256 AND byte size, 371.2 MB; the backup's MANIFEST.txt is the CRLF working-tree rendering of the committed LF blob, identical modulo line endings). Verified by the registrar at zero calls with sha256sum and a manifest re-hash (no DB opened). Neither had a backup before; BFCL-DEGRADED-CONTROL's DC3 depends on the raw tree. No number of this record moves."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the coordinator's relay of the engine-coder's build at efb0f6b (insertion only, zero calls, no DB opened)",
+      "text": "REGISTRATION DEFECTS D1 / D2 recorded by insertion (programme section at the END of the file plus in-line brackets at L12129, L12143, L12168, L12194, L12210 and a POINTER at L12314; no line moved): D1 951ec3a0a063b5a8 is the schedule-wide payload anchor, not a system-prompt hash (the system prompt alone is 058faa54f0697ad9, re-derived); D2 validity triggers pre-empt the verdict expression (UNDETERMINED BY TRIGGER; falsifier not evaluated). Builder readings recorded for the READY: literal denominators CONFIRMED, DEFF definition CONFIRMED, go gate BFCL_FLIP_GO=11 + committed READY ADMISSIBLE (not an authorisation). POSITION-INDEX-ALL is now REGISTERED (b25bde0), still a stated dependency and not a gate. No bar, band, MDE, prediction value or falsifier moves; READY may proceed on these rulings."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar (insertion only, zero calls)",
+      "text": "CORRECTED: the ledger row BFCL-FLIP-RESEED is in SECTION 7 ('7 · Adjudicated outcomes since 2026-09-11'), not section 8 as this field says: at HEAD it stands in section 7 (docs/test_ledger.html L162, section 8's heading is at L311, _as_of 55e1c5d), where the registration rows of 2026-09-23 are placed by the registrar's own precedent (GUARD-22-RENAME-PROOF and the five rows of v134 likewise). Nothing else in the record moves."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the READY-WITH-CONDITIONS review docs/reviews/READY_bfcl_flip_reseed.md (fdd6a99) and the coordinator's relay (insertion only, zero calls)",
+      "text": "READY-WITH-CONDITIONS recorded (fdd6a99; script LF 3d659e15030cf025): state registered -> READY, the five section-C conditions copied into ready.conditions; condition 5 is the coordinator's standing sequencing decision: FLIP waits for POSITION-INDEX-ALL. Registrar LOW items corrected by in-line brackets (no line moved): C3 '194 of the 200' -> 154 (46 TIE votes; 870 = 916 - 46); the midpoint 0.56565, not 0.5655 (B* 0.566 unchanged); hygiene step (3)'s pool_guard command REFUSES (pool not in the registry), the check of record is compute_pool_id(judgeable(ids)) = p2035adddedd1becb over 228 ids; queue item POOL-REGISTRY-BFCL. Review findings applying to both instruments: (a) the go gate checks that the READY file EXISTS, not its verdict nor its named script sha (a NOT READY filed under the READY name would open it); until the engine-coder's fix the run-operator reads the verdict word and the sha before --pilot; (b) unusable-as-not-TIE: the usable-only R is printed beside the literal R (condition 4)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar (insertion only, zero calls)",
+      "text": "READY of record is now e3592dc for script LF d4e08a891a85b4cd. SUPERSESSION CHAIN, kept readable: fdd6a99 (READY-WITH-CONDITIONS; 3d659e15030cf025 @ 5f459b2) -> 29c1e8c (READY-WITH-CONDITIONS; af5bfca08ddccccb @ e15d2a9) -> e3592dc (READY-WITH-CONDITIONS; d4e08a891a85b4cd @ 26ffb1d, targeted re-review of D-G1 / D-G2 / D-G3 and the usable-only interval). The earlier ready values in this record's brackets stay as history; the last bracket wins. Review findings (both instruments): D-G6 (LOW, fail-closed): VERDICT_RE opens with ^\\s*, which spans newlines, so a verdict line preceded by a blank line is falsely REFUSED; until fixed (^[ \\t]*) a READY's verdict must be its first line (or follow a non-blank line). D-G7 (LOW): surviving mutants (SWAP N5 / N6; FLIP N11 / N12) covered by the review's execution checks instead of the selftest. D-G4 (the live-fire launch test) carried forward. State: READY, WAITING on POSITION-INDEX-ALL (the coordinator's standing sequencing decision)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar (insertion only, zero calls)",
+      "text": "POST-RUN CONDITION (from BFCL-FINAL-STATE-SWAP's post-run review 80caf70, D1): this instrument's assert_no_per_side_verdict inspects the TASK STATEMENT only; its numbers review MUST perform a FULL-PAYLOAD scan of all 200 re-assembled payloads before any leakage claim stands. DBGUARD: READY condition 1's clause is read as 'a last [DBGUARD] line naming only the corpus and the pilot cache, each of which _guarded_connect admits only as mode=ro&immutable=1'. THIS TEST NOW ALONE bears on position bias versus boundary noise; the swap cache's 71 of the pilot's 100 ties tied again UNDER A DIFFERENT PROMPT and, the swap not being a control for this test (L12136), 71/100 is never quoted as R, never used against 0.566, never pooled."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (POSITION-INDEX-ALL outcome; coordinator's relay)",
+      "text": "FOR THE AUTHOR'S LAUNCH DECISION, SIDE BY SIDE (POSITION-INDEX-ALL outcome, docs/judge_v2_program.md L14794-L14827): (1) the registration's own statement (L13126-L13129, verbatim): \"if one-sided composition proves GENERAL (C2 HELD), BFCL-FLIP-RESEED's C1 HELD would be CONFIRMATORY rather than separating and the author may prefer not to buy its 200 calls; the launch decision is the author's and the experiment-manager's; nothing in either registration's criteria changes.\" POSITION-INDEX-ALL's C2 HELD (as registered, decided by MATH at a margin of 0.024 on one cache; the imbalance generalises, BFCL's 57 / 0 degree does not). (2) BFCL-FLIP-RESEED's own dependency bracket (L12310-L12313, verbatim): \"NOTE ALSO WHAT THE INDEX CANNOT DO, which is why this test is not withdrawn by the bracket: a marginal index over caches is a MARGINAL object, and this test is the only registered instrument that asks whether the flip SET is stable AT THE MATCH LEVEL - the two questions are different, and the pilot's own record already separates them (the marginal first-position rate 0.5862 is marginal; R is not).\" LAUNCH STATE: the coordinator launched this test and STOPPED IT BEFORE ANY CALL (0 posted; the night's total stays 3,860), pending the author."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (the coordinator's relay)",
+      "text": "RAN at 6dca538 on the author's explicit go (after reading both statements in the launch_note): 200 calls, 0 errors, 0 unusable; night total 4,060 / 14,000. C1 printed HELD (R = 69 / 100, [0.5924, 0.7876] above 0.566). The outcome is NOT recorded until its post-run review (with the full-payload leakage scan) lands. docs/judge_v2_program.md L14883-L14897."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (run 6dca538; post-run review 7ddf59f)",
+      "text": "OUTCOME: C1 HELD CONFIRMED; full-payload leakage scan 0/200 (condition MET; the instrument's task-statement assert is not leakage evidence); C2-C4 HELD; P1 / P2 / P6 FAILED as registration band defects (brackets at the registration); P3-P5 HELD; D7 launch decision recorded; D8 stale 'SWAP's job' line bracketed; the joint BFCL reading recorded. docs/judge_v2_program.md L14899-L14929."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (ruling (b))",
+      "text": "The pool check of record for p2035adddedd1becb (a table-less corpus) is compute_pool_id(judgeable(ids)) over the 228-id file, printed by the instrument; pool_guard's 'not in the registry' refusal is expected and is not a failed precondition. POOL-REGISTRY-BFCL declined as queued; POOL-GUARD-IDFILE-ENTRY queued. docs/judge_v2_program.md L15027-L15037."
+    }
+  ],
+  "launch_note": "FOR THE AUTHOR'S LAUNCH DECISION, SIDE BY SIDE (POSITION-INDEX-ALL outcome, docs/judge_v2_program.md L14794-L14827): (1) the registration's own statement (L13126-L13129, verbatim): \"if one-sided composition proves GENERAL (C2 HELD), BFCL-FLIP-RESEED's C1 HELD would be CONFIRMATORY rather than separating and the author may prefer not to buy its 200 calls; the launch decision is the author's and the experiment-manager's; nothing in either registration's criteria changes.\" POSITION-INDEX-ALL's C2 HELD (as registered, decided by MATH at a margin of 0.024 on one cache; the imbalance generalises, BFCL's 57 / 0 degree does not). (2) BFCL-FLIP-RESEED's own dependency bracket (L12310-L12313, verbatim): \"NOTE ALSO WHAT THE INDEX CANNOT DO, which is why this test is not withdrawn by the bracket: a marginal index over caches is a MARGINAL object, and this test is the only registered instrument that asks whether the flip SET is stable AT THE MATCH LEVEL - the two questions are different, and the pilot's own record already separates them (the marginal first-position rate 0.5862 is marginal; R is not).\" LAUNCH STATE: the coordinator launched this test and STOPPED IT BEFORE ANY CALL (0 posted; the night's total stays 3,860), pending the author. [SUPERSEDED 2026-09-23 by insertion (review 7ddf59f, D7): the AUTHOR EXPLICITLY AUTHORISED THE LAUNCH (relayed by the coordinator) after reading both statements above; the run posted 200 calls at 6dca538 (19:14-19:22). docs/judge_v2_program.md L14899-L14929.]",
+  "joint_reading": "THE BFCL LINE OF RECORD (joint reading of BFCL-FLIP-RESEED, BFCL-FINAL-STATE-SWAP and POSITION-INDEX-ALL): (1) the BFCL order-flip TIE set is a STABLE PER-MATCH PROPERTY of the deployed recipe under a byte-identical prompt (R 0.69 [0.59, 0.79], wholly above 0.566, far above the noise anchor 0.2183); (2) template mis-fit at the four 'final answer' strings is REFUTED (BFCL-FINAL-STATE-SWAP C1 FAILED, tie rate 0.2140 vs 0.2183, delta -0.0044 [-0.0387, +0.0300], outcome L14071); (3) the flips are POSITIONAL IN FORM and that form reproduces at the match level (pass-2 both-decisive flips name the first-shown side 42 : 1, exact p 1.0e-11; 32 of the 57 (A,A) are (A,A) again; DESCRIPTIVE figures on a selected set, not a bar); (4) the first / second IMBALANCE is general across supported families but BFCL's DEGREE (1.000) is not, and the direction differs by judge (POSITION-INDEX-ALL, L14794; its C2 HELD rests on MATH at 0.024 on one cache). NOT LICENSED: that position preference CAUSES the ties rather than breaking ties on hard matches the judge cannot decide (corpus difficulty predicts a stable, positionally resolved flip set equally well); NO REGISTERED TEST SEPARATES THE TWO; nor any fidelity number, that BFCL's 57/0 degree generalises, or any per-match claim off BFCL. SWAP's 71/100 is NEVER R, never compared with R and never pooled.",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "The test re-sent the same 100 matches from a function-calling benchmark (BFCL), in both orders and with an identical prompt. In the pilot, these were the matches where the judge's verdict flipped with answer order. It counted how many flipped again.",
+    "why": "It separates two explanations: are these flips a stable property of certain matches, or random noise at the edge of a decision?",
+    "information": "If they flip again often, the flips are systematic, and position bias or task difficulty should be handled. If they rarely flip again, they are just noise. Result: done. 69 of 100 tied again, clearly above the noise level, so the flips are a stable property of each match. When both orders gave a decision, the judge picked the answer shown first 42 to 1. The test cannot tell whether position preference causes the flips or only breaks ties on matches the judge cannot decide.",
+    "written": "2026-10-07"
+  }
+}

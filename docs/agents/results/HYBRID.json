@@ -1,0 +1,108 @@
+{
+  "id": "HYBRID",
+  "title": "HYBRID: grade to rank, compare only where grades are close: does routing between the two formats beat either? (zero calls)",
+  "question": "Both formats already judged the same 1,971 matches, so every routing rule is a re-read of the caches; pointwise verdict when the grade gap exceeds tau, pairwise otherwise; tau swept 0 to 100; tau* = smallest pairwise budget reaching accuracy >= 0.864 AND 0 top-4 violations; prediction tau* ~ 10-20, 25-40% budget, ~half the calls.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "0912c69",
+    "program_lines": "docs/judge_v2_program.md L708-L721 (registration) and L722-L750 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-13 (before running, ZERO calls) — HYBRID: grade to rank, compare only where grades are close",
+    "outcome_heading": [
+      "L722: - **HYBRID (2026-09-13, zero calls): REGISTERED FAIL on two of three clauses, and it dominates pure pairwise.**"
+    ],
+    "date": "2026-09-13"
+  },
+  "script": {
+    "path": "tools/analysis/hybrid_judge.py",
+    "sha16": "16ea825509d03fb3 (at 995e932)",
+    "commit": "995e932"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/hybrid_outcome.txt",
+    "outcome_commit": "995e932",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-13"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/)",
+    "commit": "995e932",
+    "verdict": "FAIL (2 of 3 clauses); pure pairwise is dominated"
+  },
+  "criteria": [
+    {
+      "id": "tau*",
+      "text": "smallest pairwise budget reaching accuracy >= 0.864 AND 0 top-4 violations",
+      "result": "FAILED",
+      "value": "accuracy peaks 0.883 at tau = 30, above BOTH parents (pairwise 0.864, pointwise 0.808); no tau reaches 0 top-4 violations (the inversion returns as soon as any pairwise verdict enters, because close-grade pairs ARE the frontier pairs); cost 1.86 + 2 x budget with a floor of 36% budget (that many pairs have exactly equal grades), never cheaper than either parent",
+      "denominator": "1,971 matches judged by both formats"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "tau* ~ 10-20, 25-40% budget, ~half the calls",
+      "result": "FAILED",
+      "value": "no tau meets the clauses; floor 36% budget",
+      "denominator": "tau sweep 0-100"
+    }
+  ],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "pairwise is beaten on accuracy by the hybrid, on the board by pointwise (0.9930 vs 0.9790, 0 vs 1 violations) and on cost by pointwise (1.86 vs 2.00): rank with pointwise; use the hybrid only when the product is an individual verdict"
+  },
+  "numbers_of_record": {
+    "peak": "0.883 at tau = 30 (parents 0.864 / 0.808)",
+    "violations": "no tau reaches 0",
+    "cost": "1.86 + 2 x budget; floor 36%"
+  },
+  "sentence_of_record": "HYBRID (2026-09-13, zero calls): REGISTERED FAIL on two of three clauses: accuracy peaks 0.883 at tau = 30, above both parents (pairwise 0.864, pointwise 0.808), but no tau reaches 0 top-4 violations (close-grade pairs ARE the frontier pairs) and the cost floor is 36% budget (equal grades), so the hybrid is never cheaper than either parent; pairwise is dominated on accuracy by the hybrid, on the board and on cost by pointwise. Rank with pointwise; use the hybrid only when the product is an individual verdict.",
+  "chips": [
+    "FAIL (2 of 3 clauses)",
+    "pure pairwise is dominated"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a cheaper hybrid",
+    "a hybrid that recovers the frontier order"
+  ],
+  "ledger": {
+    "row_id": "HYBRID",
+    "version": "v56 (995e932); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "POINTWISE",
+    "FRONTIER"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L708-L750 (0912c69 / 995e932)",
+    "experiment_results/x12_crossdomain/hybrid_outcome.txt (995e932)",
+    "docs/test_ledger.html row HYBRID (v56): chips verbatim, observed cell, evidence",
+    "script sha16 = sha256 of tools/analysis/hybrid_judge.py at 995e932 (first commit), first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ4 Price",
+    "what": "Using cached verdicts from both judging formats on the same 1,971 matches, it uses the grade-only verdict when two answers' grades are far apart and the head-to-head comparison when they are close. It sweeps the threshold. No calls.",
+    "why": "It tests whether mixing the two formats gives better accuracy at lower cost than either one.",
+    "information": "Success would give a cheaper, more accurate judging recipe. Result: failed on two of three requirements. Accuracy peaks at 0.883, above both formats. But no setting fixes the order of the top models, because close-grade pairs are exactly the top pairs, and the mix is never cheaper. Advice: rank with grades only, and use the mix only for individual verdicts. Later ruled 'history, not evidence'.",
+    "written": "2026-10-07"
+  }
+}

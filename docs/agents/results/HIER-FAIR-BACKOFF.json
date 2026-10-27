@@ -1,0 +1,197 @@
+{
+ "id": "HIER-FAIR-BACKOFF",
+ "title": "HIER-FAIR-BACKOFF: AF-U back-off vs back-off over a SHAPE-MATCHED spherical k-means hierarchy (identical per-level node counts, same flatLeaf filing), TRAIN-CV by CK-CLOSE component (10 folds), tau on GATE, 5 seeds; decision on the intervals of D_final and of the back-off-gain difference; EVAL leg descriptive (zero calls; REGISTERED 2026-10-08)",
+ "question": "Is TREE-BACKOFF's hierarchy gain a property of the tree's content or of having a hierarchy of that shape?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "e83b59d5",
+  "program_lines": "docs/judge_v2_program.md L24974-L24987",
+  "program_lines_as_of": "e83b59d5 (parent d8ab39fa), re-grepped",
+  "date": "2026-10-08",
+  "heading": "## Registered 2026-10-08 (before any code or call) — HIER-FAIR-BACKOFF: under TRAIN cross-validation by CK-CLOSE component ...",
+  "provenance": "the orchestrator's brief of 2026-10-08 (design); criteria, Support, predictions, falsifier the registrar's; docs/judge_v2_program.md L24950-L24956 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — six zero-call tests registered ...\"; _as_of the commit that writes it, parent d8ab39fa, re-grepped)"
+ },
+ "script": {
+  "path": "tools/analysis/hier_fair_backoff.py",
+  "blob": "blob:6d3e86b5dc04e5dfcd73e5844218983f898ca653",
+  "sha16": "sha256-lf16:83e642947d8bd5b4",
+  "commit": "db44a46a (built, branch worktree-wf_fa0ebf63-18c-3)",
+  "merged": "c5f23e7a (registrar's batch, by path; parent 17c34de9)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_hier-fair-backoff_tree-cut-granularity.md",
+  "commit": "17c34de9",
+  "verdict": "READY (C1-C3)"
+ },
+ "go": "the author's 2026-10-08 authorisation (relayed in the orchestrator's brief, words not supplied): register and run the zero-call batch a-f; no judged calls",
+ "run": {
+  "outcome_file": "experiment_results/archv2/hier_fair_backoff/outcome.txt (sha256 0214a5025bc933e569751a04a012367291e172510e0dcac27d7983b597791404, 127 lines; write-once, never committed); backup E:/TaxoArena_backup_20261008_hier_fair_backoff (SHA256SUMS 4/4 OK, review)",
+  "outcome_commit": "outcome not committed (run from main after merge c5f23e7a)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "pv2_1575de61bb20e977 (content-closed under CK-CLOSE-v2, residual disclosed); gen_view c2930c60 / eval_view e35b7518 sha before = after; TRAIN-CV computed before the eval view opened; only the known -shm mtime moved (D-shm)",
+  "date": "2026-10-08"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_hier-fair-backoff_tree-cut-granularity.md",
+  "commit": "37672103",
+  "verdict": "VALID; HB1 KMEANS-BETTER (DESCRIPTIVE-ONLY by Support, W-1), HB2 NEITHER, PARITY refuted, F-HB fires; every deciding number reproduced to the digit by own code; C1-C3 confirmed"
+ },
+ "criteria": [
+  {
+   "id": "HB1",
+   "text": "DECIDING (first clause that holds): TREE-BETTER iff 95% LB(D_final) > 0; KMEANS-BETTER iff 95% UB < 0; else PARITY iff the 90% interval lies inside [-0.60, +0.60]pp; else NEITHER. Sign words DESCRIPTIVE-ONLY (MDE80 0.55pp); PARITY SCOREABLE (TOST need 0.485 <= 0.55)",
+   "result": "HELD",
+   "value": "KMEANS-BETTER [DESCRIPTIVE-ONLY by Support (f); 0.53pp < measured MDE80 0.61pp; W-1]: D_final -0.00530, 95% [-0.00944, -0.00106], 90% [-0.00901, -0.00180]; PARITY REFUTED (the SCOREABLE finding); TREE-BETTER refuted. HELD = the registered clause reached a word at the planned n (the predicted PARITY did not hold: P2)",
+   "denominator": "11,841 TRAIN-CV items / 10,781 CK-CLOSE components (Kish 1.3336); 5 seeds; realised SE 0.00217, DEFF 1.762, n_eff 6,119"
+  },
+  {
+   "id": "HB2",
+   "text": "DECIDING: D_gain = [TB - TF] - mean_s [BCB_s - BCF_s]: DIVIDEND-TREE iff 95% LB > 0; DIVIDEND-KMEANS iff 95% UB < 0; NEITHER otherwise. DESCRIPTIVE-ONLY (predicted +0.50 < MDE80 0.62pp)",
+   "result": "HELD",
+   "value": "NEITHER: D_gain +0.00125, 95% [-0.00283, +0.00541]; DIVIDEND-TREE refuted",
+   "denominator": "as HB1; realised SE 0.00210, DEFF 1.290, n_eff 8,356, MDE80 0.59pp"
+  },
+  {
+   "id": "HB3",
+   "text": "SCORED SECONDARY, DESCRIPTIVE-ONLY: HB1 sign words and HB2 on EVAL (unseen for this contrast); MDE80 1.23pp",
+   "result": "HELD",
+   "value": "DESCRIPTIVE: D_final +0.29pp [-0.42, +0.99] NEITHER; D_gain +0.54pp [-0.27, +1.35] NEITHER; NO_XSRC (191 removed) +0.32pp [-0.40, +1.03]; realised SE 0.00360, DEFF 2.501, MDE80 1.01pp",
+   "denominator": "EVAL 5,907 items / 5,404 components"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "D_final -0.05pp [-0.40, +0.30]",
+   "result": "FAILED",
+   "value": "-0.530pp outside [-0.40, +0.30]",
+   "denominator": "TRAIN-CV"
+  },
+  {
+   "id": "P2",
+   "text": "HB1 PARITY 0.70 / NEITHER 0.20 / KMEANS-BETTER 0.07 / TREE-BETTER 0.03",
+   "result": "FAILED",
+   "value": "observed KMEANS-BETTER (forecast 0.07; modal PARITY 0.70); Brier 1.3958 (multi-class sum, as printed)",
+   "denominator": "TRAIN-CV"
+  },
+  {
+   "id": "P3",
+   "text": "D_gain +0.50pp [+0.10, +0.90]",
+   "result": "HELD",
+   "value": "+0.125pp in [+0.10, +0.90]",
+   "denominator": "TRAIN-CV"
+  },
+  {
+   "id": "P4",
+   "text": "HB2 DIVIDEND-TREE 0.80 / NEITHER 0.20 / DIVIDEND-KMEANS 0.00",
+   "result": "FAILED",
+   "value": "observed NEITHER (forecast 0.20; modal DIVIDEND-TREE 0.80); Brier 1.2800",
+   "denominator": "TRAIN-CV"
+  },
+  {
+   "id": "P5",
+   "text": "HB3 EVAL D_final -0.30pp [-1.30, +0.70]",
+   "result": "HELD",
+   "value": "+0.29pp in [-1.30, +0.70]",
+   "denominator": "EVAL"
+  },
+  {
+   "id": "P6",
+   "text": "median over folds of tau*(AF-U) in [50, 200]",
+   "result": "HELD",
+   "value": "median tau*(AF-U) 100 (per fold 500 200 20 100 100 200 100 200 100 100)",
+   "denominator": "10 folds"
+  }
+ ],
+ "falsifier": {
+  "text": "F-HB fires iff HB1 reads KMEANS-BETTER; overturns the reading that TREE-BACKOFF's HIERARCHY-HELPS is a property of the TREE's hierarchy",
+  "fired": true
+ },
+ "numbers_of_record": {
+  "HB1": "KMEANS-BETTER [DESCRIPTIVE-ONLY by Support (f), W-1]; PARITY REFUTED (SCOREABLE)",
+  "D_final": "-0.530pp (-0.00530), 95% [-0.944, -0.106]pp, 90% [-0.901, -0.180]pp; TRAIN-CV 11,841 items / 10,781 components; per seed 5/5 negative; holds under 3 bootstrap streams (review)",
+  "HB2": "NEITHER",
+  "D_gain": "+0.125pp (+0.00125), 95% [-0.283, +0.541]pp",
+  "support_realised": "D_final SE 0.00217 (registered 0.00195), component-only 0.00164, DEFF 1.762 (registered 1.61), n_eff 6,119 (6,696), MDE80 0.61pp (0.55); D_gain SE 0.00210, DEFF 1.290, n_eff 8,356, MDE80 0.59pp; TOST need at measured SE 0.540 <= 0.55",
+  "arms_TRAIN_CV": "TF 0.63145, TB 0.63618, BCB_s mean of 0.63838 / 0.64327 / 0.64513 / 0.63787 / 0.64277; BEST 0.60806",
+  "by_source": "MMLU_PRO -0.755pp [-1.284, -0.231] (n 6,759); BBH -0.489pp [-1.124, +0.127] (n 3,473); IFEVAL +2.708pp [+0.606, +5.000] (n 325); NON_BBH -0.547pp [-1.024, -0.055]",
+  "W-3_symmetric_xsrc": "both arms' cross-source filings removed (n 11,122): D_final -0.602pp [-1.042, -0.158], KMEANS-BETTER; D_gain NEITHER (review, own code)",
+  "HB3_EVAL": "D_final +0.29pp [-0.42, +0.99] NEITHER; D_gain +0.54pp [-0.27, +1.35] NEITHER; 5,907 / 5,404 (descriptive)",
+  "tau_star": "median AF-U 100 over 10 folds (GATE 1,944)"
+ },
+ "sentence_of_record": "HIER-FAIR-BACKOFF (2026-10-08, 0 calls) — VALID; HB1 KMEANS-BETTER [DESCRIPTIVE-ONLY by Support (f): 0.53pp < measured MDE80 0.61pp; robust to 3 bootstrap streams, 5/5 seeds, TAU200, NO-XSRC and the symmetric cross-source removal (W-3)]; PARITY REFUTED (SCOREABLE). Under TRAIN cross-validation, back-off over AF-U routes 0.53pp worse than back-off over a shape-matched spherical k-means hierarchy (D_final -0.530pp, 95% [-0.944, -0.106]); the back-off-gain difference is NEITHER (D_gain +0.125pp [-0.283, +0.541]). F-HB FIRES: 'the tree's hierarchy routes better' is withdrawn. [POSTRUN docs/reviews/POSTRUN_hier-fair-backoff_tree-cut-granularity.md, 37672103, W-1, W-5: 11,841 TRAIN-CV items / 10,781 components re-read from the pilot (not an independent replication); EVAL (HB3, descriptive) +0.29pp [-0.42, +0.99], NEITHER; every arm [SC]; one tree, one draw, one roster, qwen3.]",
+ "chips": [
+  "REGISTERED 2026-10-08, BEFORE ANY CODE",
+  "VALID (POST-RUN 37672103): PARITY REFUTED (SCOREABLE); HB2 NEITHER",
+  "HB1 KMEANS-BETTER, DESCRIPTIVE-ONLY BY SUPPORT (W-1: 0.53pp < MDE80 0.61pp); F-HB FIRES: 'THE TREE'S HIERARCHY ROUTES BETTER' WITHDRAWN; TRAIN-CV, NOT AN INDEPENDENT REPLICATION; EVAL NEITHER"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-08",
+   "by": "registrar (docs/judge_v2_program.md L25147-L25157 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — rulings GAP-FIX-CC C-1 (B-3), SI-NULL-TRIAD B1 and SIN-2; ...\"; _as_of the commit that writes it, parent 17c34de9, re-grepped))",
+   "text": "READY; tool merged to main by path, blob verified. Condition C2: an [HFB-CV-DENOM] refusal is a failed precondition (before the EVAL view), not an outcome: no re-pin, returned to the registrar."
+  },
+  {
+   "date": "2026-10-08",
+   "by": "registrar (POSTRUN 37672103, VALID; docs/judge_v2_program.md L25159-L25169 (section \"## HIER-FAIR-BACKOFF (2026-10-08, 0 calls) — VALID (POSTRUN 37672103): ...\"; _as_of the commit that writes it, parent f4dd6292, re-grepped))",
+   "text": "OUTCOME bracket appended to READOUTS AND CRITERIA of the registration (L24981): HB1 KMEANS-BETTER [DESCRIPTIVE-ONLY by Support (f), W-1]; PARITY REFUTED (SCOREABLE); HB2 NEITHER; F-HB FIRES; HB3 NEITHER (descriptive)."
+  },
+  {
+   "date": "2026-10-08",
+   "by": "registrar (D-2026-10-08)",
+   "text": "D-2026-10-08-1 (the author's words, now supplied verbatim): \"a. Certificates (recommended), b+c. Hierarchy tests (recommended), d. SCPB gate, e+f. GAP-FIX-CC and SuperGPQA\"; judged spend \"None for now (Recommended)\". The go of record is unchanged in substance. Source: docs/judge_v2_program.md L25317-L25327 (section \"## Author's decision 2026-10-08 (recorded by the registrar; zero calls; insertion only) — D-2026-10-08-1..6 ...\"; _as_of the commit that writes it, parent 5211616a, re-grepped); authority docs/agents/author_decisions/2026-10-08.md (5211616a); plan Amendment 40"
+  }
+ ],
+ "does_not_show": [
+  "a SCOREABLE sign word (KMEANS-BETTER is DESCRIPTIVE-ONLY by Support, W-1)",
+  "an independent replication (the deciding leg re-reads the pilot's 11,841 TRAIN items, W-5)",
+  "an EVAL effect (HB3 NEITHER, +0.29pp [-0.42, +0.99])",
+  "a label-free result (every arm [SC])",
+  "that k-means is a better taxonomy; other rosters, draws, embedders or splits"
+ ],
+ "ledger": {
+  "row_id": "HIER-FAIR-BACKOFF",
+  "version": "v417 (2026-10-08: OUTCOME bracket; VALID ok + W-1 warn chips beside REGISTERED) | v414 (2026-10-08: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "TREE-BACKOFF (instrument tree_backoff.py blob da80c57e; D-1 shape confound)",
+  "UNION-AF-ROUTE (AF-U, D-4)",
+  "STABILITY-VS-KMEANS",
+  "CONSTRUCTION-ARMS"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; per-leaf accuracies are policy inputs scored by aggregate routed accuracy (not a sub-anchor profile); no judge, rubric, reference, frontier, temperature"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "about 10-30 min",
+  "agent_hours": "about 3 h",
+  "reads_pool": true
+ },
+ "outputs": "never committed: pinned by sha256, stored on E: with SHA256SUMS.txt; temp under E:/TaxoArena_tmp via scratch_dir",
+ "sources": [
+  "docs/judge_v2_program.md L24974-L24987 (_as_of the commit that writes it, parent d8ab39fa, re-grepped)",
+  "docs/judge_v2_program.md L24950-L24956 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — six zero-call tests registered ...\"; _as_of the commit that writes it, parent d8ab39fa, re-grepped)",
+  "E:/TaxoArena_tmp/hier_tests/test3_fair_backoff/review/verify.out (pilot; seen)",
+  "docs/judge_v2_program.md L25147-L25157 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — rulings GAP-FIX-CC C-1 (B-3), SI-NULL-TRIAD B1 and SIN-2; ...\"; _as_of the commit that writes it, parent 17c34de9, re-grepped)",
+  "docs/judge_v2_program.md L25159-L25169 (section \"## HIER-FAIR-BACKOFF (2026-10-08, 0 calls) — VALID (POSTRUN 37672103): ...\"; _as_of the commit that writes it, parent f4dd6292, re-grepped)",
+  "docs/judge_v2_program.md L25317-L25327 (section \"## Author's decision 2026-10-08 (recorded by the registrar; zero calls; insertion only) — D-2026-10-08-1..6 ...\"; _as_of the commit that writes it, parent 5211616a, re-grepped); authority docs/agents/author_decisions/2026-10-08.md (5211616a); plan Amendment 40"
+ ],
+ "last_update": "2026-10-08",
+ "label_status": "AF-U [SC]; every arm [SC]",
+ "pilot_disclosure": "SEEN before registration, pilot role only (never evidence): E:/TaxoArena_tmp/cert_split (results.json sha256 32fcf7cd8baa1367..., VERIFIED_HEADLINE.txt 98b32054b56bde7b...), E:/TaxoArena_tmp/hier_tests (granularity_free/results.json 2fc8ba3a99b8dc54..., nesting/results.json cb5a74cf0d870081..., test3_fair_backoff/results.json 866284ca1bb5cf98..., + review dirs), E:/TaxoArena_tmp/scpb/review_v3_synthesis.md d341748f5265229d...; 2026-10-07, zero calls, TRAIN only, not committed",
+ "plain_description": {
+  "sq": "SQ1 Use",
+  "what": "Compares routing that borrows strength from the tree's parent cells against the same borrowing over a k-means hierarchy with exactly the same shape, using cross-validation on TRAIN. No judge calls.",
+  "why": "TREE-BACKOFF found a small gain from using the tree's hierarchy; a k-means hierarchy of the same shape tells whether the gain comes from the tree's content or just from having a hierarchy.",
+  "information": "Shows whether the tree's hierarchy is better for routing than a same-shaped k-means one. Result: done. The k-means hierarchy routed slightly better (0.53 points, range 0.11 to 0.94), so 'the tree and k-means are on par' is refuted and 'the tree's hierarchy routes better' is withdrawn. The size of the difference is below what the test was powered to call, it was measured on the training items the pilot had already seen, and on the unseen evaluation items there was no difference.",
+  "written": "2026-10-08"
+ }
+}

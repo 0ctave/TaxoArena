@@ -1,0 +1,11 @@
+[INTENT-S0] pacing: pause 0.25 s after each batch; TIME_WAIT drain threshold 20000 (poll 10 s, cap 600 s)
+[INTENT-S0] pin intent_transfer_corpora_v1.db: sha256 487e0093719c184c98bca53bc9bc61c193559690abb206d77010fd77f81c09a2 [PIN OK]
+[INTENT-S0] embed qwen3 (qwen3-embedding:latest, RAW) -> Z:\FAC\TUBerlin\THESIS\TaxoArena\intent_emb_qwen3.db (exists: RESUME): text set 57350 (sha256 0ba7eb3c805127d5), present 31296, missing 26054, this launch 26054
+[INTENT-S0] Ollama endpoint http://127.0.0.1:11434/api/embed (resolved from OLLAMA_HOST='http://127.0.0.1:11434' by embedder_arms.client_base)
+[INTENT-S0] shared caches per-table before: {"embeddings_cache.db": {"agent_ratings": "e3b0c44298fc1c14/0", "embeddings": "641ff6fad35bd1af/39631", "gmm_vectors": "e3b0c44298fc1c14/0", "match_history": "e3b0c44298fc1c14/0", "queries": "cdeca05e573e2578/31986"}, "embeddings_cache_embeddinggemma_latest.db": {"embeddings": "041a4dd1e4afb8fe/8249", "gmm_vectors": "e3b0c44298fc1c14/0", "queries": "e3b0c44298fc1c14/0"}, "embeddings_cache_nomic-embed-text_latest.db": {"embeddings": "826d5d6a8fb87a38/11769", "gmm_vectors": "e3b0c44298fc1c14/0", "queries": "9fea09b43d8397aa/8299"}}
+[INTENT-S0] TRANSPORT parity bar qwen3: min cos >= 0.9980 (source: orchestrator's ruling 2026-09-30 on experiment_results/intent_transfer_s0/qwen3_parity_diagnosis_2026-09-30.txt (9699d7d): drift >= 0.99915, smallest route error 0.9846)
+[INTENT-S0] TRANSPORT route parity qwen3: 20 texts of embeddings_cache.db re-embedded via /api/embed, cos after slice-256 + renormalise min 0.998761 median 1.000000 (bar >= 0.9980): PASS
+[EMB-ARMS] target Z:\FAC\TUBerlin\THESIS\TaxoArena\intent_emb_qwen3.db (exists) sha256 before b0ae8329d375ff9cd2e426b4884fa0beae136d7878bedc302fcddfb167056260
+[EMB-ARMS] wrote 26054 vectors; sha256 after 9e100e04fc91b137a075b8abedbc87d2b29a6dc2244c5f242b1c587004a4ee74
+[INTENT-S0] shared caches per-table after: unchanged
+[INTENT-S0] embed qwen3: wrote 26054; 0 of the set still missing (COMPLETE)

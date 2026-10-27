@@ -1,0 +1,41 @@
+MC-E2E: 21606 questions routed over 143 federated leaves (dim 512) | predicted source 0.962 | predicted source+domain 0.813
+arms: best single | TRUE source | TRUE source/domain | PRED source | PRED source/domain | PRED leaf | oracle
+
+seed 42 (reserved n=6481)
+  best single          0.5535 ± 0.0060
+  TRUE source          0.5931 ± 0.0060
+  TRUE source/domain   0.6039 ± 0.0058
+  PRED source          0.5888 ± 0.0060
+  PRED source/domain   0.6027 ± 0.0059
+  PRED leaf            0.5982 ± 0.0055
+  oracle               0.9067 ± 0.0036
+  DEPLOYED gain (PRED source/domain - best single): +0.0492 ± 0.0055 -> REAL
+  oracle-metadata gain +0.0505 ± 0.0053 | METADATA COST +0.0012
+
+seed 137 (reserved n=6481)
+  best single          0.5629 ± 0.0055
+  TRUE source          0.5869 ± 0.0056
+  TRUE source/domain   0.6056 ± 0.0056
+  PRED source          0.5829 ± 0.0055
+  PRED source/domain   0.5965 ± 0.0054
+  PRED leaf            0.5894 ± 0.0056
+  oracle               0.9065 ± 0.0034
+  DEPLOYED gain (PRED source/domain - best single): +0.0336 ± 0.0054 -> REAL
+  oracle-metadata gain +0.0427 ± 0.0054 | METADATA COST +0.0091
+
+seed 2048 (reserved n=6481)
+  best single          0.5626 ± 0.0063
+  TRUE source          0.5922 ± 0.0065
+  TRUE source/domain   0.6101 ± 0.0062
+  PRED source          0.5885 ± 0.0065
+  PRED source/domain   0.6033 ± 0.0063
+  PRED leaf            0.5994 ± 0.0060
+  oracle               0.9056 ± 0.0039
+  DEPLOYED gain (PRED source/domain - best single): +0.0407 ± 0.0052 -> REAL
+  oracle-metadata gain +0.0475 ± 0.0054 | METADATA COST +0.0068
+
+== MC-SEEDS ==
+  deployed gain per seed: +0.0492, +0.0336, +0.0407 | mean +0.0412 | across-seed spread 0.0156 vs mean within-seed SE 0.0053 -> seed-sensitive
+  REGISTERED (1) deployed > best single by > 2 SE in all seeds: PASS
+  REGISTERED (3) spread < within-seed SE: FAIL
+  metadata cost per seed: +0.0012, +0.0091, +0.0068

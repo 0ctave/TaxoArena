@@ -1,0 +1,67 @@
+pool: none (no DB opened)
+script tools/analysis/cert_redraw_r512.py blob:9258bc8f / sha256-lf16:e88199b2ebf14215 / sha256-crlf16:4dad6a002356f71c
+base tools/analysis/cert_resolution.py blob:dbe9425d / sha256-lf16:3e3fb1b91aa3d361 / sha256-crlf16:b0982ba75521b7d4 (imported unchanged; working file CRLF)
+CERT-REDRAW-R512 outcome (registration docs/judge_v2_program.md L21680-L21703, a357ef0). Zero calls. DESCRIPTIVE, POST-HOC-SEEN.
+k = the null exceedance count round(q_site x reps); the input CSV's k (the site's children) is used only by the identity check
+INPUTS
+  bareq512_s42   csv    Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results/promoted/site_null_bareq512_s42.csv  blob:16aaf5a4 / sha256-lf16:ea0cb19865f63036 / sha256-crlf16:8b3d32ffd88f4a3c (working file CRLF)
+  bareq512_s42   dag    Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results/promoted/bareq512_s42/seed_42/dag_snapshots.jsonl  blob:ffbbb321 / sha256-lf16:0bf29bbc8c9b10b2 / sha256-crlf16:1aad19328b8a8513 (working file LF)
+  bareq512_s137  csv    Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results/dimsweep2/site_null_bareq512_s137.csv  blob:a90e2e12 / sha256-lf16:8bd6c8de94a6de28 / sha256-crlf16:e06934538b969eff (working file CRLF)
+  bareq512_s137  dag    Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results/dimsweep2/bareq512_s137/seed_137/dag_snapshots.jsonl  blob:b10da23d / sha256-lf16:8da4e1ef92f72de1 / sha256-crlf16:0e7571633a4011ec (working file LF)
+  bareq512_s2048 csv    Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results/dimsweep2/site_null_bareq512_s2048.csv  blob:08739297 / sha256-lf16:a88d75edc5be5d5b / sha256-crlf16:dfe3f856e0e613d5 (working file CRLF)
+  bareq512_s2048 dag    Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results/dimsweep2/bareq512_s2048/seed_2048/dag_snapshots.jsonl  blob:12ac3105 / sha256-lf16:ab36d2fcc255a35a / sha256-crlf16:16d10cd4b3f41172 (working file LF)
+SUPPORT (registered)
+ (a) denominators: sites per tree 70 / 67 / 71 (bareq512_s42 / s137 / s2048); 300 null reps per site
+ (b) DEFF 1, BY CONSTRUCTION (independent Monte-Carlo reps; declared, not measured)
+ (c) n_eff = 300 per site
+ (d) SE at the per-site bar: sqrt(0.05 x 0.95 / 300) = sqrt(0.00015833) = 0.01258
+ (e) MDE80: 2.80 x 0.01258 = 0.0352 on q_site
+ (f) VERDICT LINE: DESCRIPTIVE-ONLY (the outcome is largely seen; no prediction is scoreable)
+ (g) STRUCTURAL LEG: p floor 1/301 = 0.00332; a rank-1 BH rejection in a family of m_f needs 0.05 / m_f >= p: k = 1 (p = 2/301 = 0.00664) needs m_f <= 7, k = 0 needs m_f <= 15; R2 reaches a site at k = 0 only if n_s / N >= (1/301) / 0.05 = 0.0664; smaller sites are UNREACHABLE at 300 reps by construction (per site, per tree)
+R512 ONLY: never set against R256 counts. The re-draws are on their own pre-closure splits (id-disjoint only) and pre-P7-FIX, like s42.
+
+== bareq512_s42 (R512): m = 70 sites  [record; R1 printed as an instrument check]
+  identity check: PASS (70 sites; multi-parent sites: 0)
+  R1 flat BH at q = 0.05: 0 of 70; BY (descriptive): 0 of 70
+  R1 hierarchical BH (per-family q = 0.05; tree-wide FDR NOT claimed): 2: n00000006 Chemistry, n00000015 Engineering; top family 14 sites
+  R2 (FWER 0.05 against the Gaussian site null, arbitrary dependence across sites): N = 8547; tested 16; reachable at k = 0 7; rejected 1: n00000006 Chemistry (alpha_s 0.005294)
+  R2 structural leg (g): reachable at k = 0 (n_s / N >= 0.0664): n00000002 Business (n/N 0.0679), n00000003 Law (n/N 0.0826), n00000004 Psychology (n/N 0.0735), n00000005 Biology (n/N 0.0665), n00000006 Chemistry (n/N 0.1059), n00000011 Math (n/N 0.1061), n00000012 Physics (n/N 0.1021); every other site UNREACHABLE at 300 reps
+  R2 at 300 reps reduces to weighted Bonferroni over the 14 top-family sites (no deeper site reachable)
+
+== bareq512_s137 (R512): m = 67 sites
+  identity check: PASS (67 sites; multi-parent sites: 0)
+  R1 flat BH at q = 0.05: 0 of 67; BY (descriptive): 0 of 67
+  R1 hierarchical BH (per-family q = 0.05; tree-wide FDR NOT claimed): 3: n00000006 Chemistry, n00000008 Other, n00000015 Engineering; top family 14 sites
+  R2 (FWER 0.05 against the Gaussian site null, arbitrary dependence across sites): N = 8547; tested 16; reachable at k = 0 7; rejected 1: n00000006 Chemistry (alpha_s 0.005376)
+  R2 structural leg (g): reachable at k = 0 (n_s / N >= 0.0664): n00000002 Business (n/N 0.0667), n00000003 Law (n/N 0.0825), n00000004 Psychology (n/N 0.0736), n00000005 Biology (n/N 0.0666), n00000006 Chemistry (n/N 0.1075), n00000011 Math (n/N 0.1047), n00000012 Physics (n/N 0.1031); every other site UNREACHABLE at 300 reps
+  R2 at 300 reps reduces to weighted Bonferroni over the 14 top-family sites (no deeper site reachable)
+
+== bareq512_s2048 (R512): m = 71 sites
+  identity check: PASS (71 sites; multi-parent sites: 0)
+  R1 flat BH at q = 0.05: 0 of 71; BY (descriptive): 0 of 71
+  R1 hierarchical BH (per-family q = 0.05; tree-wide FDR NOT claimed): 0: (empty); top family 14 sites
+  R2 (FWER 0.05 against the Gaussian site null, arbitrary dependence across sites): N = 8566; tested 14; reachable at k = 0 6; rejected 0: (empty)
+  R2 structural leg (g): reachable at k = 0 (n_s / N >= 0.0664): n00000003 Law (n/N 0.0836), n00000004 Psychology (n/N 0.0727), n00000006 Chemistry (n/N 0.1075), n00000008 Other (n/N 0.0671), n00000011 Math (n/N 0.1057), n00000012 Physics (n/N 0.1014); every other site UNREACHABLE at 300 reps
+  R2 at 300 reps reduces to weighted Bonferroni over the 14 top-family sites (no deeper site reachable)
+
+INSTRUMENT CHECK: bareq512_s42's hierarchical BH set reproduces CERT-RESOLUTION's recorded {n00000006, n00000015}.
+
+R3 QUALIFIERS (the words of record for each exhibit)
+  Engineering: "certified at per-family FDR q = 0.05 on bareq512_s42 and on 1 of 2 R512 re-draws (bareq512_s137)". R2: bareq512_s42 UNREACHABLE at 300 reps (n/N 0.0600 < 0.0664); bareq512_s137 UNREACHABLE at 300 reps (n/N 0.0607 < 0.0664); bareq512_s2048 UNREACHABLE at 300 reps (n/N 0.0613 < 0.0664)
+  Chemistry: "certified at per-family FDR q = 0.05 on bareq512_s42 and on 1 of 2 R512 re-draws (bareq512_s137)". R2: bareq512_s42 also FWER 0.05; bareq512_s137 also FWER 0.05; bareq512_s2048 not FWER 0.05
+
+CRITERIA (scored as readouts, POST-HOC-SEEN; the POINT decides; the CP never decides)
+C1 FAILED POST-HOC-SEEN: Engineering is absent from a re-draw's hierarchical BH set (bareq512_s137 in, bareq512_s2048 absent).
+C2 FAILED POST-HOC-SEEN: Chemistry is absent from a re-draw's hierarchical BH set (bareq512_s137 in, bareq512_s2048 absent).
+
+PREDICTIONS (DESCRIPTIVE; scored HELD / FAILED, not a test)
+P1 FAILED: Engineering in R1's set on both re-draws: no (registered probability 0.70).
+P2 HELD: Chemistry in R1's set on s137 (in) and not on s2048 (absent) (registered probability 0.65).
+P3 FAILED: each re-draw's R1 set has 1-4 sites: bareq512_s137 3, bareq512_s2048 0 (registered probability 0.70).
+P4 HELD (reading A, ruled): R2 on bareq512_s42 rejects ['n00000006'] (registered probability 0.55).
+  DISCLOSED (R1): Engineering UNREACHABLE at 300 reps (n/N 0.0600 < 0.0664) on bareq512_s42, so under reading A P4 reads the other exhibit alone; the prior 0.55 was set without this.
+
+FALSIFIER
+F1 does not fire (an exhibit is in R1's set on at least one re-draw).
+
+NOT COMPUTED: fringe-site identity (Jaccard >= 0.5 on shared train texts) -- ruling O1; no readout above uses it.

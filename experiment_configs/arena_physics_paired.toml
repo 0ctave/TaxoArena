@@ -1,0 +1,71 @@
+# physics, PAIRED: MAIN vs C5. 2026-07-31.
+#
+# WHY PHYSICS. History is the smallest domain in the batch -- 131 routed questions over 4
+# cells, ~33 questions per cell -- and that is the regime where per-cell profiles were
+# shown to be unresolvable at ANY budget: even judging every question in a cell for every
+# adjacent pair leaves 2.5*sigma above the median adjacent gap. An exact null on history
+# is what that predicts, and an exact null is what it returned.
+#
+# Physics has ~10 cells over a larger pool, so questions-per-cell is higher. If the
+# granularity/resolution account is right, Delta rho should favour MAIN more here than on
+# history. If physics also returns a null, the account is wrong and the partition buys
+# nothing at any cell size available in this corpus.
+#
+# FIRST RUN WITH [ARENA-LAT]. The client now reports, per call, how much wall-clock went
+# to the rate pacer, to waiting for a semaphore permit, and to the request itself, plus
+# http p50/p95/p99 and peak in-flight. On history this had to be reconstructed via
+# Little's Law after the fact and the first conclusion was wrong: target-rps was raised
+# 3 -> 4 and bought nothing, because the pacer sat at 60% utilisation and the system was
+# permit-bound. Watch the BOTTLENECK field in the first two rounds.
+#
+# HISTORY REFERENCE (option-visible, ratings_history_paired_v2.db.SECURED):
+#     MAIN 1,042 verdicts / C5 1,044, 131 questions, 4 cells, 25m46s
+#     half-weighted  d rho  0.000000 ( 0.00 steps)
+#     ties-dropped   d rho -0.006993 (-2.00 steps, exactly on the seam)
+#
+# NOT REGISTERED.
+
+datasetType   = "MMLU_PRO"
+models        = [
+    "gemini-3.1-pro_5-shots",
+    "iask_pro",
+    "arx_3",
+    "claude-3.5-sonnet",
+    "gpt-4o-2024-08-06",
+    "deepseek-chat-v2_5",
+    "gpt-4o-mini",
+    "claude-3-5-sonnet-20241022",
+    "Qwen1.5-72B-Chat",
+    "Meta-Llama-3-8B-Instruct",
+    "Qwen1.5-14B-Chat",
+    "Meta-Llama-3-8B"
+]
+snapshotId    = "20260727_042523_Headless_Run_Auto_ge"
+category      = "Physics"
+queryLimit    = 0            # all in-domain reserved questions
+outputDir     = "experiment_results/arena_physics_paired"
+testRatio     = 0.3
+seed          = 42
+
+runPipeline        = false
+regenerateSplit    = false   # load-bearing: use the canonical reserved pool as-is
+runBenchmark       = true
+runTrickle         = false
+runBaselines       = false
+enableFinalMetrics = false
+enableLabeling     = false   # rubrics already in the snapshot
+judgeInduction     = false
+
+conditions         = ["MAIN", "C5"]
+questionsPerRound  = 1
+confidenceGate     = 0.0     # DISABLED for both arms: C5 emits a flat 0.85 and
+                             # MAIN emits real values, so a live gate would filter one
+                             # arm and not the other - the paired design would break at
+                             # the verdict level while looking intact at the question level.
+parallelism        = 4
+reservedOnly       = true
+
+dagMode = "DAG_MAX"
+maxDepth              = 8
+minClusterSize        = 55
+proposalSeparationBar = 0.025

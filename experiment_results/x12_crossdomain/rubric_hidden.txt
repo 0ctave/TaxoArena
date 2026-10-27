@@ -1,0 +1,28 @@
+
+RK-1b: STACK-v2 with and without the DATA CARD (Mistral) — 1974 matches judged by both arms
+  stackv2_datacard       decidable  944 acc 0.858 | NON-decidable 1030: invents a winner  62.2% | of those 81.9% are the LONGER answer | top-4 non-dec 333, invented 51.1%
+  datacard               decidable  944 acc 0.875 | NON-decidable 1030: invents a winner  63.6% | of those 80.9% are the LONGER answer | top-4 non-dec 333, invented 53.8%
+
+RK-1b-GROK: same, grok judge — 1974 matches judged by both arms
+  stackv2_datacard       decidable  944 acc 0.858 | NON-decidable 1030: invents a winner  62.1% | of those 80.3% are the LONGER answer | top-4 non-dec 333, invented 52.0%
+  datacard               decidable  944 acc 0.871 | NON-decidable 1030: invents a winner  59.5% | of those 80.3% are the LONGER answer | top-4 non-dec 333, invented 48.6%
+
+RK-1c: STACK-v2 with and without card+worked neighbours — 1973 matches judged by both arms
+  stackv2_reasoned       decidable  944 acc 0.859 | NON-decidable 1029: invents a winner  62.3% | of those 82.7% are the LONGER answer | top-4 non-dec 333, invented 52.3%
+  reasoned               decidable  944 acc 0.868 | NON-decidable 1029: invents a winner  61.0% | of those 80.6% are the LONGER answer | top-4 non-dec 333, invented 50.8%
+
+=== POWER: what the rubric tests could actually detect ===
+paired McNemar, discordant rate d, effect delta -> pairs needed for 80% power at alpha 0.05:
+  delta +0.01, discordant 0.05 -> n ~  3917 decidable pairs
+  delta +0.02, discordant 0.06 -> n ~  1173 decidable pairs
+  delta +0.03, discordant 0.07 -> n ~   607 decidable pairs
+  delta +0.06, discordant 0.10 -> n ~   215 decidable pairs
+
+what the tests actually had:
+  RUBRIC-512 pooled      946 decidable pairs, 42:25 discordant -> powered for roughly 3pp, observed +1.8 (p=0.0498)
+  RK-1b pooled           944 decidable pairs, 32:16 discordant -> powered for roughly 3pp, observed +1.7 (p=0.029)
+  per ANCHOR              30-144 decidable pairs each -> powered for roughly 10-20pp only
+
+observed per-anchor gains that were NOT individually testable:
+  RUBRIC-512: Philosophy +16.7, Biology +7.4 | Physics -1.6, Engineering -4.7
+  RK-1b:      Business +9.1, Chemistry +6.0, History +4.8, Engineering +4.7 | Economics -6.2

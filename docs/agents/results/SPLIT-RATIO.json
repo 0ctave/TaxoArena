@@ -1,0 +1,118 @@
+{
+  "id": "SPLIT-RATIO",
+  "title": "SPLIT-RATIO: reserved-pool ratio study: how much of the query set can the arena take without losing construction certification? (builds + synthetic arena, zero calls)",
+  "question": "Promoted config, testRatio 0.001 / 0.10 / 0.20 / 0.30 / 0.40, own seed-42 splits, label-free, site nulls serialised; structural evidence only, pool re-pinned after; then LEAF-POWER's synthetic arena at each ratio's arena questions per leaf; registered readout: the ratio at which anchor-level profile SE at R2's budget stays <= 0.15 while certification is within 2 of the 0.30 build; prediction 0.30 is the knee.",
+  "kind": "build",
+  "state": "done",
+  "registration": {
+    "commit": "218df92 (bullet); the r00 / r10 extension registered at L367",
+    "program_lines": "docs/judge_v2_program.md L324-L332 (registration bullet), L351-L366 (outcome), L367-L389 (extension registration) and L416-L430 (extension outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "- **SPLIT-RATIO — reserved-pool ratio study** (3 label-free builds, ~8 min, plus a synthetic arena,",
+    "outcome_heading": [
+      "L351: - **SPLIT-RATIO (2026-09-10 14:45): registered readout = 0.20; prediction (\"0.30 is the knee\") NOT supported.**",
+      "L367: ## Registered 2026-09-10 15:05 (before any build) — SPLIT-RATIO extension, asked as \"what if you generate the tree with all the queries?\"",
+      "L416: - **SPLIT-RATIO extension r00/r10 (2026-09-10 15:50): leaves keep growing with the train set; certification"
+    ],
+    "date": "2026-09-10"
+  },
+  "script": {
+    "path": "experiment_configs/splitratio/*.toml (builds) + the synthetic-arena readout (LEAF-POWER's instrument)",
+    "sha16": "n/a (construction chain)",
+    "commit": "218df92 / ef3801d"
+  },
+  "ready": null,
+  "go": "n/a (0 LLM calls)",
+  "run": {
+    "outcome_file": "experiment_results/splitratio/readout.txt (98b0e0e) and readout_extended.txt (e8a1942); chain.log untracked",
+    "outcome_commit": "e8a1942",
+    "calls": 0,
+    "cce": 0,
+    "pool": "own seed-42 splits per ratio (structural only); 0.30 reproduces pool p8a29 exactly; pool re-pinned after",
+    "date": "2026-09-10"
+  },
+  "review": {
+    "file": "the ledger audit of 2026-09-14 (disambiguation bracket in the observed cell: readout.txt says 0.20, readout_extended.txt says 0.10; 0.30 stays deployed either way)",
+    "commit": "3535d56",
+    "verdict": "DESCRIPTIVE; PREDICTION NOT SUPPORTED (0.30 is not the knee); 0.30 stays the defensible middle"
+  },
+  "criteria": [
+    {
+      "id": "readout",
+      "text": "the ratio at which anchor-level SE at R2's budget stays <= 0.15 while certification is within 2 of the 0.30 build",
+      "result": "DELIVERED",
+      "value": "0.20 (readout.txt) [the extended sweep says the smallest ratio meeting both is 0.10; disambiguated 2026-09-14]: leaves 100 / 85 / 76 and certified 12/84 / 8/68 / 6/60 at 0.20 / 0.30 / 0.40; Top-1 0.760 / 0.757 / 0.757 (CIs overlap); synthetic anchor SE worst 0.111 / 0.104 / 0.101; caveat: under the empirical floor sqrt(3/q) from R2's real scheduler, 0.20 misses History / CS / Philosophy, 0.30 misses History only, 0.40 clears; arena questions per leaf 20 / 33 / 49: leaf profiles unsupported everywhere",
+      "denominator": "five ratios; 14 anchors; R2's budget"
+    },
+    {
+      "id": "extension",
+      "text": "r00 (0.001) and r10",
+      "result": "DELIVERED",
+      "value": "leaves 121 / 109 / 100 / 85 / 76 for 0.0 / 0.1 / 0.2 / 0.3 / 0.4; certified 12 / 16 / 12 / 8 / 6 (seed spread +-3): leaves grow linearly with the train set (train per leaf ~85), certification plateaus at ~12-16 below 0.20: minClusterSize, not data volume, binds",
+      "denominator": "five ratios"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "0.30 is the knee",
+      "result": "FAILED",
+      "value": "0.20 (or 0.10 on the extended grid); 0.30 stays deployed",
+      "denominator": "five ratios"
+    }
+  ],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "SPLIT-RATIO-SEEDS replicated the plateau across seeds; 0.30 stays"
+  },
+  "numbers_of_record": {
+    "leaves": "121 / 109 / 100 / 85 / 76 (0.0 / 0.1 / 0.2 / 0.3 / 0.4)",
+    "certified": "12 / 16 / 12 / 8 / 6",
+    "top1": "0.760 / 0.757 / 0.757 (0.20 / 0.30 / 0.40)",
+    "synthetic_SE": "worst 0.111 / 0.104 / 0.101; empirical floor: 0.20 misses 3 anchors, 0.30 misses History, 0.40 clears",
+    "readout": "0.20 (readout.txt) / 0.10 (readout_extended.txt); disambiguated 2026-09-14"
+  },
+  "sentence_of_record": "SPLIT-RATIO (2026-09-10, zero calls): registered readout 0.20; prediction ('0.30 is the knee') NOT supported: leaves 100 / 85 / 76 and certified 12/84 / 8/68 / 6/60 at 0.20 / 0.30 / 0.40, Top-1 CIs overlap, synthetic anchor-level SE <= 0.15 at every ratio [the row cites two outputs that disagree: readout.txt says 0.20, readout_extended.txt says 0.10; 0.30 remains the deployed split either way; disambiguated 2026-09-14]; under the empirical floor 0.20 misses three anchors, 0.30 misses History only; leaf-level profiles are unsupported everywhere; 0.30 stays the defensible middle. EXTENSION: leaves grow linearly with the train set (train per leaf ~85) while certification plateaus at ~12-16 below 0.20: minClusterSize, not data volume, binds.",
+  "chips": [
+    "DESCRIPTIVE",
+    "PREDICTION NOT SUPPORTED"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-14",
+      "by": "the ledger audit (observed cell)",
+      "text": "the row cites two outputs that disagree: readout.txt says 0.20, readout_extended.txt says 'smallest ratio meeting both: 0.10'; the extended sweep added smaller ratios and 0.10 also clears both clauses; 0.20 is the value from the original grid, and 0.30 remains the deployed split either way."
+    }
+  ],
+  "does_not_show": [
+    "a change to the deployed split (0.30 stays)",
+    "leaf-level profile support at any ratio"
+  ],
+  "ledger": {
+    "row_id": "SPLIT-RATIO",
+    "version": "v33 (1b9312f); disambiguation bracket 2026-09-14"
+  },
+  "depends_on": [
+    "D1",
+    "LEAF-POWER",
+    "SPLIT-RATIO-SEEDS"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L324-L332, L351-L366, L367-L389, L416-L430",
+    "experiment_results/splitratio/readout.txt (98b0e0e), readout_extended.txt (e8a1942)",
+    "docs/test_ledger.html row SPLIT-RATIO (v33): chips verbatim, observed cell, evidence",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)"
+  ],
+  "last_update": "2026-09-22",
+  "plain_description": {
+    "sq": "SQ4 Price",
+    "what": "Trees were built while reserving different shares of the questions (0.1% to 40%) for the arena. It checks how many leaves and certified splits survive, and whether simulated per-anchor rankings stay precise enough.",
+    "why": "It looks for how much data can go to evaluation without weakening tree construction, a cost trade-off.",
+    "information": "It tells which split ratio balances evaluation precision and tree quality. Result: done (zero calls). The prediction that 30% is the sweet spot was not supported; the readout pointed to 20% (an extended run said 10%). 30% stays the deployed, defensible middle. Leaves grow with training size, but certified splits plateau, limited by the minimum cluster size, not data volume. Leaf-level rankings are not supported at any ratio.",
+    "written": "2026-10-07"
+  }
+}

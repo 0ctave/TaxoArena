@@ -1,0 +1,107 @@
+{
+  "id": "RUBRIC-HIDDEN",
+  "title": "RUBRIC-HIDDEN: did the rubric tests hide a real per-leaf effect, through the pairs they discarded or through pooling? (zero calls)",
+  "question": "(1) On the NON-decidable pairs every rubric test excluded (1,030 of 1,974 on R3), does a rubric make the judge abstain instead of inventing a winner? (2) A power analysis of the pooled tests against the per-anchor effects observed.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "4480845",
+    "program_lines": "docs/rubric_v2_design.md L181-L212; no programme section (the rubric line is recorded in rubric_v2_design.md)",
+    "program_lines_as_of": "docs/rubric_v2_design.md at 53f5fd4",
+    "heading": "### RUBRIC-HIDDEN (2026-09-14, zero calls) — was the rubric effect hidden by how we sampled and measured?",
+    "outcome_heading": [
+      "docs/rubric_v2_design.md L181: the same section"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "n/a (free check; scratch script, no script of record; the output file is the record) (the cached paired arms of stack_v2_kit2.db / stack_v2_kit2_grok.db are the inputs)",
+    "sha16": "n/a",
+    "commit": "4480845"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/rubric_hidden.txt",
+    "outcome_commit": "4480845",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-14"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); descriptive",
+    "commit": "4480845",
+    "verdict": "mechanism 1 REFUTED (rubrics buy no abstention); mechanism 2 LIVE (pooling averaged away per-anchor effects that were never individually testable) -> LEAF-POWERED"
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "the unmeasured pairs: does a rubric make the judge abstain on non-decidable pairs?",
+      "result": "FAILED",
+      "value": "REFUTED: invented-winner rate on non-decidable pairs 62.2% without the card and 63.6% with it on Mistral (grok 62.1 -> 59.5; card + worked neighbours 61.0); the longer answer wins 80-82% in every arm: the rubric buys no abstention, so nothing hid there",
+      "denominator": "1,030 non-decidable pairs of 1,974 on R3"
+    },
+    {
+      "id": "(2)",
+      "text": "pooling across heterogeneous anchors",
+      "result": "HELD",
+      "value": "LIVE: pooled tests had 944-946 decidable pairs at a discordant rate near 0.05, powering them for ~3pp (1pp would need ~3,900); per anchor only 30-144 pairs, powering each for 10-20pp; the observed per-anchor gains (RUBRIC-512 Philosophy +16.7, Biology +7.4; RK-1b Business +9.1, Chemistry +6.0, History +4.8, Engineering +4.7; Economics -6.2) were never individually testable; leaf-level rubrics were tested ONCE (RUBRIC-512 +1.8pp, p 0.0498) and the clean follow-up LEAF-SS was cancelled by a gate",
+      "denominator": "R3 pooled tests"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none (descriptive)",
+    "fired": false,
+    "note": "what would settle it: ~215 decidable pairs per anchor to detect 6pp; the cheap version on the four anchors where the observed gain exceeded 6pp (~4k calls) was registered as LEAF-POWERED"
+  },
+  "numbers_of_record": {
+    "invented_winner_rates": "Mistral no card 62.2% / + card 63.6%; grok 62.1% / 59.5%; + worked neighbours 61.0%; longer answer 80.3-81.9%",
+    "power": "pooled 944-946 pairs at ~0.05 discordance: ~3pp; per anchor 30-144 pairs: 10-20pp; 1pp pooled needs ~3,900 pairs",
+    "observed_per_anchor": "Philosophy +16.7, Biology +7.4 (RUBRIC-512); Business +9.1, Chemistry +6.0, History +4.8, Engineering +4.7, Economics -6.2 (RK-1b)"
+  },
+  "sentence_of_record": "RUBRIC-HIDDEN (2026-09-14, zero calls): mechanism 1 REFUTED: the invented-winner rate on non-decidable pairs is 62.2% without the card and 63.6% with it on Mistral (62.1 -> 59.5 on grok), and the length preference stays near 81% in every arm, so the rubric buys no abstention and nothing hid in the discarded pairs; mechanism 2 LIVE: pooled tests were powered for ~3pp and per anchor only for 10-20pp, so the observed per-anchor gains (Philosophy +16.7, Business +9.1, Chemistry +6.0, against Economics -6.2) were never individually testable; leaf-level rubrics were tested ONCE (+1.8pp, p 0.0498) and the clean follow-up was cancelled by a gate, so that conclusion was weaker than the rest of the line (settled by LEAF-POWERED).",
+  "chips": [
+    "mechanism 1 REFUTED",
+    "mechanism 2 LIVE"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a per-anchor rubric effect (never individually testable here; LEAF-POWERED found +-2pp ceiling)"
+  ],
+  "ledger": {
+    "row_id": "RUBRIC-HIDDEN",
+    "version": "v66 (4480845); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "RUBRIC-512",
+    "RK-1b",
+    "FRONTIER",
+    "LEAF-SS"
+  ],
+  "supersedes": null,
+  "superseded_by": "LEAF-POWERED (the powered follow-up mechanism 2 called for)",
+  "closed_line": false,
+  "sources": [
+    "docs/rubric_v2_design.md L181-L212 (4480845)",
+    "experiment_results/x12_crossdomain/rubric_hidden.txt (4480845)",
+    "docs/test_ledger.html row RUBRIC-HIDDEN (v66): chips verbatim, evidence (rubric_hidden.txt, rubric_v2_design.md)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (rubric_v2_design.md / multi_corpus_design.md lines as of their last commits named in sources)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Using no new calls, the test re-read earlier rubric experiments. It checked whether a rubric makes the judge abstain on the undecidable pairs those tests had discarded. It also checked whether pooling across subjects hid real effects in individual subjects.",
+    "why": "Earlier tests found little value in rubrics, and the question was whether that verdict was an artefact of how they were analysed.",
+    "information": "It tells whether the negative rubric result can be trusted or needs a cleaner test. Result: done. The first explanation was refuted: with or without the rubric, the judge still invents a winner on about 60% of undecidable pairs and still prefers longer answers. The second stayed open: each subject had too few pairs to test effects of the size observed, so per-subject effects could not be tested one by one. This led to LEAF-POWERED, which settled it. Later ruled history rather than evidence, because it ran on the older question pool.",
+    "written": "2026-10-07"
+  }
+}

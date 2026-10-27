@@ -1,0 +1,47 @@
+=== TEST 3: the clean 2x2 — judge ability vs reference correctness, separated ===
+  pairwise:
+    judge solved reference right  n= 82 | verdict accuracy 0.780
+    judge solved reference wrong  n= 12 | verdict accuracy 0.250
+    judge failed reference right  n= 93 | verdict accuracy 0.796
+    judge failed reference wrong  n= 55 | verdict accuracy 0.145
+  pointwise:
+    judge solved reference right  n= 82 | verdict accuracy 0.854
+    judge solved reference wrong  n= 12 | verdict accuracy 0.417
+    judge failed reference right  n= 92 | verdict accuracy 0.837
+    judge failed reference wrong  n= 54 | verdict accuracy 0.130
+
+=== TEST 5: GPQA headroom — does a harder corpus restore discriminative power? ===
+  MMLU_PRO  n=12032 | best 0.567 (Qwen2.5-32B-Instruct) | top-4 all-correct 36.7% all-wrong 26.6% | mean pairwise differ 20.4%
+  GPQA      n= 1192 | best 0.375 (Qwen2.5-72B-Instruct) | top-4 all-correct 7.2% all-wrong 28.4% | mean pairwise differ 36.1%
+
+=== TEST (new): does the pointwise board advantage replicate ACROSS ANCHORS? (14 quasi-independent samples) ===
+  Biology            n= 130 | pointwise rho 0.9510 | pairwise rho 0.9441 | pointwise
+  Chemistry          n= 162 | pointwise rho 0.9441 | pairwise rho 0.9510 | pairwise
+  Computer science   n= 128 | pointwise rho 0.9371 | pairwise rho 0.9790 | pairwise
+  Economics          n= 132 | pointwise rho 0.8462 | pairwise rho 0.9650 | pairwise
+  Engineering        n= 106 | pointwise rho 0.9580 | pairwise rho 0.9021 | pointwise
+  Health             n= 141 | pointwise rho 0.9161 | pairwise rho 0.9371 | pairwise
+  History            n=  86 | pointwise rho 0.8322 | pairwise rho 0.8531 | pairwise
+  Law                n= 123 | pointwise rho 0.9161 | pairwise rho 0.9371 | pairwise
+  Math               n= 274 | pointwise rho 0.9860 | pairwise rho 0.9510 | pointwise
+  Other              n= 158 | pointwise rho 0.7902 | pairwise rho 0.8531 | pairwise
+  Philosophy         n=  64 | pointwise rho 0.4476 | pairwise rho 0.7902 | pairwise
+  Physics            n= 224 | pointwise rho 0.9650 | pairwise rho 0.9650 | tie
+  Psychology         n= 191 | pointwise rho 0.7343 | pairwise rho 0.9510 | pairwise
+  pointwise wins 3 of 13 anchors, pairwise 9
+
+=== CORRECTED: each anchor's board scored against THAT ANCHOR's own key accuracy ===
+  Biology            n= 130 | pointwise 0.9510 | pairwise 0.9441 | pointwise
+  Chemistry          n= 162 | pointwise 0.9790 | pairwise 0.9650 | pointwise
+  Computer science   n= 128 | pointwise 0.9580 | pairwise 0.9860 | pairwise
+  Economics          n= 132 | pointwise 0.7916 | pairwise 0.9037 | pairwise
+  Engineering        n= 106 | pointwise 0.9510 | pairwise 0.8811 | pointwise
+  Health             n= 141 | pointwise 0.9212 | pairwise 0.9422 | pairwise
+  History            n=  86 | pointwise 0.8462 | pairwise 0.8671 | pairwise
+  Law                n= 123 | pointwise 0.9231 | pairwise 0.9510 | pairwise
+  Math               n= 274 | pointwise 0.9860 | pairwise 0.9510 | pointwise
+  Other              n= 158 | pointwise 0.7263 | pairwise 0.8351 | pairwise
+  Philosophy         n=  64 | pointwise 0.4912 | pairwise 0.8070 | pairwise
+  Physics            n= 224 | pointwise 0.9650 | pairwise 0.9650 | tie
+  Psychology         n= 191 | pointwise 0.8112 | pairwise 0.9510 | pairwise
+  pointwise wins 4 of 13 anchors, pairwise 8

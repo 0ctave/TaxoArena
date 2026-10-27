@@ -1,0 +1,145 @@
+{
+  "id": "K-RECONCILE",
+  "title": "K-RECONCILE: FRAMEWORK item 10: reconcile the per-cell k of 4.84 (STRESS) with 2.06 (RESOLVE-CALIB) and declare the framework's k (zero calls)",
+  "question": "The STRESS procedure (x12 verdicts, category anchors, np120, B400, seed 137) vs the RESOLVE-CALIB procedure (STACK-v2, tree anchors, rj.mm_fit, B300, seed 42); four configs on ratings_x12.db (168 cells); clustering DEFF = SE_q^2 / SE_match^2; the production fitter BtMmFitter DEFAULT_PRIOR_STRENGTH = 0.5 (Jeffreys).",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "eaf1dbf",
+    "program_lines": "docs/judge_v2_program.md L3603-L3611 (by reference; docs/design/FRAMEWORK.md L363 item 10); the Block 1 record bullet at L3766",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-15 (before any run) — BY REFERENCE: the 26 tests in docs/design/FRAMEWORK.md \"Tests to register before shipping\" (commit 8d77f7b), with the criteria, predictions and call counts stated there, scheduled in docs/plan_2026-09-15.md",
+    "outcome_heading": [
+      "L3662: ## Block 1 record (2026-09-15/16, zero calls) — FRAMEWORK items 1-12, 14-16: fourteen zero-call tests built, each adversarially checked; verdicts of record below (checker's number wins where it refutes the builder)",
+      "L3766: - **K-RECONCILE (2026-09-15, zero calls): reconciled, and the prediction as registered is REFUTED in both clauses: 4.84 and 2.06 are the same per-cell quantity under two fits, and the whole gap is the Jeffreys prior in rj.mm_fit / BtMmFitter, not cross-model correlation.**"
+    ],
+    "date": "2026-09-15"
+  },
+  "script": {
+    "path": "tools/analysis/k_reconcile.py",
+    "sha16": "79291e298b102c4f",
+    "commit": "7076615"
+  },
+  "ready": null,
+  "go": "n/a (0 calls; Block 1)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/k_reconcile.txt",
+    "outcome_commit": "7076615",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (pool_guard.assert_pool_of_record() first; union pool paeec37aa28063c75 by explicit id where used)",
+    "date": "2026-09-15/16"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); each Block 1 test was 'adversarially checked' at build time and the checker's number wins where it refutes the builder (Block 1 record header L3662-L3663); the checker-confirmed defects are listed in the bullet",
+    "commit": "7076615",
+    "verdict": ""
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "reproduction of both records",
+      "result": "HELD",
+      "value": "STRESS median 4.835 = the stress pass's own cells.pkl cell-for-cell; RESOLVE-CALIB 2.06 [1.33, 3.02], all 14 per-anchor rows match (CONFIRMED)",
+      "denominator": "168 cells; 14 anchors"
+    },
+    {
+      "id": "C2",
+      "text": "per-cell 2.06-class values under the framework's estimator on ratings_x12.db",
+      "result": "HELD",
+      "value": "config 4 (mm_fit, x12 verdicts, tree anchors) median 2.04 [p10 1.42, p90 3.06], 21/168 cells above 3, max 4.43; category anchors 2.04 [1.35, 3.16]; but the stress estimator on the same DB gives per-cell 4.87 (category) / 5.03 (tree): checker PASS conditional on the fit; the item's literal 'per-cell ... under both estimators' refutes the first clause",
+      "denominator": "168 (anchor, model) cells on ratings_x12.db"
+    },
+    {
+      "id": "C3",
+      "text": "the 4.84 reflects cross-model correlation",
+      "result": "FAILED",
+      "value": "same-data gap log(4.87/2.04) = 0.871; clustering DEFF median 1.12 (13% of the gap); fit step 99%; off-diagonal draw correlation -0.083 vs the -1/11 centring baseline; theta SD 1.943 vs 1.337 (ratio 1.45; SD^2 accounts for 87% of the fit gap); without the four diverged unpenalised cells the stress median is 4.80 (CONFIRMED)",
+      "denominator": "168 cells"
+    },
+    {
+      "id": "C4",
+      "text": "the framework's k declared",
+      "result": "DELIVERED",
+      "value": "DECLARED, incomplete: k = q*SE^2 under jf.board_from -> rj.mm_fit (PRIOR 0.5 pseudo-match per observed pair) + question-clustered bootstrap: 2.04 [1.42, 3.06] on ratings_x12.db, 2.06 [1.33, 3.02] on STACK-v2; kstd 1.44 vs 1.21; FRAMEWORK L207's [2.06, 4.84] mixes two theta scales; the declaration omits the prior's magnitude and provenance (66 pseudo-matches per anchor = 5.2% (Math) to 23.0% (Philosophy) of real matches; per-anchor theta SD shrunk 1.23-1.82x)",
+      "denominator": "ratings_x12.db / STACK-v2"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "per-cell 2.06-class values; the per-anchor clustered 4.84 reflects cross-model correlation",
+      "result": "FAILED",
+      "value": "REFUTED in both clauses: per-cell values are 2.06-class only under the prior fit (the stress estimator gives 4.87 / 5.03 per cell on the same DB); the premise that 4.84 is a 'per-anchor clustered' figure is false (scratchpad/cellse.py is per-cell, as resolve_calibration.py is); the whole gap is the Jeffreys prior, not cross-model correlation",
+      "denominator": "168 cells"
+    }
+  ],
+  "falsifier": {
+    "text": "none beyond the criteria (registered by reference)",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "reproduction": "STRESS 4.835; RESOLVE-CALIB 2.06 [1.33, 3.02]",
+    "per_cell_under_mm_fit": "2.04 [1.42, 3.06] (tree anchors), 2.04 [1.35, 3.16] (category); 21/168 above 3, max 4.43; stress estimator on the same DB 4.87 / 5.03",
+    "gap_decomposition": "log(4.87/2.04) = 0.871; DEFF 1.12 (13%); fit step 99%; theta SD 1.943 vs 1.337 (SD^2 87% of the fit gap); off-diagonal draw correlation -0.083 vs -1/11",
+    "declared_k": "2.04 [1.42, 3.06] on ratings_x12.db, 2.06 [1.33, 3.02] on STACK-v2, under rj.mm_fit prior 0.5 + question-clustered bootstrap; kstd 1.44 vs 1.21",
+    "prior": "66 pseudo-matches per anchor = 5.2% (Math) to 23.0% (Philosophy) of real matches; per-anchor theta SD shrunk 1.23-1.82x (BtMmFitter DEFAULT_PRIOR_STRENGTH = 0.5); RESOLVE amendment 3's SD_cell 0.937-1.630 prior-dependent too",
+    "allocator": "at [1.42, 3.06] SE 0.20 needs 36-77 distinct questions per cell (L207: 51-121), SE 0.15 needs 63-136 (L207: 92-215)",
+    "diverged_cells": "CS Llama-2-7b k 425 / SE 3.77, CS Llama-2-13b 111, Engineering Llama-2-7b 83, Philosophy Llama-2-7b 34 (separation artefacts)"
+  },
+  "sentence_of_record": "K-RECONCILE (2026-09-15, zero calls): reconciled, and the prediction as registered is REFUTED in both clauses: 4.84 and 2.06 are the same per-cell quantity under two fits, and the whole gap is the Jeffreys prior in rj.mm_fit / BtMmFitter (theta SD 1.943 vs 1.337; SD^2 accounts for 87% of the fit gap; clustering DEFF 1.12 is 13%), not cross-model correlation; the framework's k is DECLARED (2.04 [1.42, 3.06] on ratings_x12.db, 2.06 [1.33, 3.02] on STACK-v2, under the prior-0.5 fit and the question-clustered bootstrap) but incomplete until the prior's magnitude and provenance are carried wherever k or SD_cell appears (FRAMEWORK L85 / L207 / L312, RESOLVE amendment 3).",
+  "chips": [
+    "C1 PASS",
+    "C2 PASS CONDITIONAL ON THE FIT (checker)",
+    "C3 FAIL",
+    "C4 DECLARED, INCOMPLETE",
+    "PREDICTION REFUTED IN BOTH CLAUSES"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-16",
+      "by": "Block 1 record corrections for LEDGER-CONSISTENCY (programme L3839; FRAMEWORK L85 / L207 / L312 bracketed at a75df45)",
+      "text": "declare the 0.5 Jeffreys prior wherever k or SD_cell appears; allocator ranges 36-77 / 63-136 distinct questions per cell for SE 0.20 / 0.15."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a k that is fit-independent (2.06-class only under the prior fit)",
+    "a re-derived L207 allocator (the ranges above are the checker's)",
+    "reconciled quartile conventions (np.percentile vs ordinal)"
+  ],
+  "ledger": {
+    "row_id": "K-RECONCILE",
+    "version": "v103 (684be03); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "RESOLVE-CALIB",
+    "STRESS",
+    "PROFILE-DEVIATION-CERT",
+    "ANCHOR-PROFILE-INTERVAL"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L3603-L3611 (by-reference registration eaf1dbf) and docs/design/FRAMEWORK.md L363 item 10: criterion, prediction, call count",
+    "docs/judge_v2_program.md L3766 ff. (Block 1 record bullet, 7076615): the criterion table, predictions scored, checker-confirmed defects, script and output",
+    "experiment_results/x12_crossdomain/k_reconcile.txt (7076615)",
+    "docs/test_ledger.html row K-RECONCILE (v103 684be03): chips verbatim, design / criteria / observed cells, evidence",
+    "script sha16 = sha256 of tools/analysis/k_reconcile.py at 7076615 (its first commit), first 16 hex (identity, computed by the registrar 2026-09-22; later edited at 13f2142 for the pool_guard change)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' heading and the '- **ID (...)**' bullet line inside the Block 1 record, to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ4 Price",
+    "what": "Two earlier analyses gave different values (4.84 and 2.06) for a factor that sets how many questions each cell needs. Using no new calls, the test reran both on the same data to find where the gap comes from.",
+    "why": "The budget of questions per cell depends on this factor, so the framework needs one declared value and an explanation.",
+    "information": "It tells the framework which number to use for budgeting and what that number depends on. Result: done. The prediction that the gap came from correlation between models was refuted. Both numbers are the same quantity under two fitting methods, and almost the whole gap comes from a statistical smoothing setting in one fit. The declared value is about 2.05, valid only under that setting, which must be stated wherever the value is used. Later ruled history rather than evidence, because it ran on the older question pool.",
+    "written": "2026-10-07"
+  }
+}

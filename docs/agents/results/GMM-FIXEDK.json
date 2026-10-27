@@ -1,0 +1,189 @@
+{
+ "id": "GMM-FIXEDK",
+ "title": "GMM-FIXEDK: CONSTRUCTION-ARMS extended with bisecting diagonal GMM and bisecting full-covariance GMM (PCA-32, reg_covar 1e-4) split rules against the engine-like spherical arm 1, MASSIVE / CLINC / MMLU-Pro C, matched L, 5 seeds (zero calls; REGISTERED 2026-10-06)",
+ "question": "Would a GMM split rule do better than the engine-like spherical k-means once k is fixed at 2 (no BIC to the cap)?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "9bff7e39",
+  "program_lines": "docs/judge_v2_program.md L24856-L24868",
+  "program_lines_as_of": "9bff7e39 (as registered); brackets appended to L24860, L24862, L24863, L24864 in the commit that writes this update (parent 215b551f), re-grepped",
+  "date": "2026-10-06",
+  "heading": "## Registered 2026-10-06 (before any code or call) — GMM-FIXEDK: ...",
+  "provenance": "the author's \"start 1 to 4\" (2026-10-06, in the chat; the four tests of the orchestrator's brief of 2026-10-06); registrar's record docs/judge_v2_program.md L24808-L24812; deciding clause, Support and predictions the registrar's, pre-data"
+ },
+ "script": {
+  "path": "tools/analysis/gmm_fixedk.py (imports construction_arms.py blob:5d08a5df, LF, unchanged)",
+  "sha16": "sha256-lf16:99cc418f47758921 (blob:fdca150f71caa49542a7389b2647eceab0a4bc39, LF of record; sha256-crlf16:86cc8a57a34d67c5 beside; copied from READY_gmm-fixedk 215b551f)",
+  "commit": "ea19a8b7 (branch gmm-fixedk, parent 9bff7e39); merged by path 0ebc0fe1"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_gmm-fixedk.md (section '## VERDICT: READY (no blocker)')",
+  "commit": "215b551f"
+ },
+ "go": "n/a (0 calls; the 4k-match rule not engaged); the author's \"start 1 to 4\" (2026-10-06, in the chat; the four tests of the orchestrator's brief of 2026-10-06)",
+ "run": {
+  "outcome_file": "E:/TaxoArena_backup_2026-10-06_gmm_fixedk/gmm_fixedk_outcome.txt (sha256 a89fb861cd8153898fc4d0b9b453ce8d598e6890a00c7eabd536c0e2f92803cf; write-once, never committed; 173 lines); folder of record E:/TaxoArena_backup_2026-10-06_gmm_fixedk (the script's own, SHA256SUMS.txt 1/1 OK); copy E:/TaxoArena_backup_2026-10-06_gmm-fixedk (same sha256, plus run.log; SHA256SUMS 2/2 OK); both re-checked by the registrar (P-1)",
+  "outcome_commit": "outcome not committed (run from main after merge 0ebc0fe1)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "intent corpora MASSIVE / CLINC (S1 builds; EVAL by CK-CLOSE components); MMLU-Pro C |C| 2,772 (pool reader; p2dca21ab5f4ef3ae and the three re-draw pools, id-disjoint scope); R-C1 busy.ps1 rc 1 before --run (P-2: the pre-dry-run check not in run.log)",
+  "date": "2026-10-06"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_gmm-fixedk.md",
+  "commit": "0910e947",
+  "verdict": "VALID; C-GK NO-GMM-WINS as registered (not parity; no TOST); all 40 per-seed deciding values re-fitted independently to the 5th digit; C-GK decided by the points alone; words W-1, W-2 (MEDIUM), W-3, W-4 (LOW); defects P-1..P-3 (LOW)"
+ },
+ "criteria": [
+  {
+   "id": "C-GK",
+   "text": "DECIDING, the POINT AND the INTERVAL jointly, one clause, mirroring C-CA: GMM-WINS iff for at least one (j, r), j in {BISECT-GMM-DIAG, BISECT-GMM-FULL}, r in {(a) DP_coarse on the common Ward-on-centroids hierarchy, (c) fine leaf filing accuracy}, on BOTH MASSIVE and CLINC D_jr > spread_1r (arm 1's realised seed range, known: (a) 0.04305 / 0.06048, (c) 0.10797 / 0.02323) AND the 95% lower bound of D_jr > 0; NO-GMM-WINS otherwise. Verdict line DESCRIPTIVE-ONLY at the prediction (0.02 < MDE80 0.076); (c) on MASSIVE structurally unreachable below 0.108",
+   "result": "FAILED",
+   "value": "NO-GMM-WINS (GMM-WINS refuted by the POINT alone: D <= spread_1r in all 8 cells, so no bound can change the word). D vs arm 1, 95%, MASSIVE / CLINC: DIAG (a) -0.00884 [-0.03491, +0.01642] / -0.00593 [-0.02673, +0.01400]; DIAG (c) -0.00364 [-0.03267, +0.04073] / -0.04550 [-0.06046, -0.03198]; FULL (a) +0.01564 [-0.00355, +0.03397] / +0.00910 [-0.01800, +0.03369]; FULL (c) +0.02450 [-0.00291, +0.06863] / +0.02080 [+0.00713, +0.03363]; spread_1r (a) 0.04305 / 0.06048, (c) 0.10797 / 0.02323; smallest margin FULL (c) CLINC -0.0024; every pair fails on MASSIVE by >= 0.027",
+   "denominator": "MASSIVE 4,946 EVAL items / 4,923 components (Kish 1.0093); CLINC 6,672 / 6,672 (Kish 1.0000); x 5 seeds per arm, crossed"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "BISECT-GMM-DIAG D_a -0.02 [-0.08, +0.04], D_c -0.01 [-0.06, +0.04], each corpus",
+   "result": "HELD",
+   "value": "HELD 4/4: D_a -0.00884 / -0.00593, D_c -0.00364 / -0.04550 (MASSIVE / CLINC), all in band",
+   "denominator": "MASSIVE 4,946 / CLINC 6,672 EVAL; 5 seeds"
+  },
+  {
+   "id": "P2",
+   "text": "BISECT-GMM-FULL D_a -0.01 [-0.07, +0.05], D_c 0.00 [-0.05, +0.05], each corpus",
+   "result": "HELD",
+   "value": "HELD 4/4: D_a +0.01564 / +0.00910, D_c +0.02450 / +0.02080 (MASSIVE / CLINC), all in band",
+   "denominator": "MASSIVE 4,946 / CLINC 6,672 EVAL; 5 seeds"
+  },
+  {
+   "id": "P3",
+   "text": "C-GK: GMM-WINS 0.05, NO-GMM-WINS 0.95 (Brier)",
+   "result": "HELD",
+   "value": "outcome NO-GMM-WINS; Brier 0.0025",
+   "denominator": "MASSIVE 4,946 / CLINC 6,672 EVAL; 5 seeds"
+  },
+  {
+   "id": "P4",
+   "text": "descriptive: forced-split share <= 0.10 for both new arms on MASSIVE and CLINC, probability 0.75",
+   "result": "HELD",
+   "value": "TRUE: forced share 0.0000 for both new arms on MASSIVE and CLINC (C 0.0000, printed); Brier 0.0625",
+   "denominator": "TRAIN fits, 5 seeds"
+  },
+  {
+   "id": "P5",
+   "text": "descriptive: GMM-BIC's CLINC (c) loss not reproduced: D_c CLINC > -0.06 for both new arms, probability 0.80",
+   "result": "HELD",
+   "value": "TRUE: D_c CLINC DIAG -0.04550, FULL +0.02080 (> -0.06); Brier 0.0400",
+   "denominator": "CLINC 6,672 EVAL; 5 seeds"
+  },
+  {
+   "id": "P6",
+   "text": "descriptive: BISECT-GMM-FULL minus BISECT-SKM on (c) within [-0.03, +0.03] on both corpora, probability 0.60",
+   "result": "FAILED",
+   "value": "FALSE: FULL minus BISECT-SKM (c) +0.01161 MASSIVE (in band), +0.04200 CLINC (outside [-0.03, +0.03]); Brier 0.3600",
+   "denominator": "MASSIVE 4,946 / CLINC 6,672 EVAL; 5 seeds"
+  }
+ ],
+ "falsifier": {
+  "text": "F-GK fires iff C-GK is GMM-WINS: a fixed-k mixture split beats the engine-like spherical control at matched leaves on both intent corpora by more than its seed spread; overturns CONSTRUCTION-ARMS' working reading extended to mixtures (the split rule matters once k = 2); consequence: a faithful engine GMM arm becomes a candidate for a NEW registration with its own go, never an engine change",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "support": "SE(D) transported from CONSTRUCTION-ARMS' realised BISECT-SKM intervals (width / 3.92): (a) 0.0160 / 0.0124, (c) 0.0173 / 0.0056; DEFF_total (a) 5.38 / 14.1, (c) 20.2 / 1.78; n_eff (a) 919 / 473, (c) 245 / 3,748; MDE80 joint = spread_1r + 1.25 x SE: (a) 0.0631 / 0.0760, (c) 0.1296 / 0.0302; deciding 0.076 (via (a)); realised CONSTRUCTION-ARMS joint MDE80 0.132 disclosed (W-2); DESCRIPTIVE-ONLY at the prediction (MASSIVE / CLINC)",
+  "c_gk": "NO-GMM-WINS (GMM-WINS refuted by the POINT alone: D <= spread_1r in all 8 cells, so no bound can change the word). D vs arm 1, 95%, MASSIVE / CLINC: DIAG (a) -0.00884 [-0.03491, +0.01642] / -0.00593 [-0.02673, +0.01400]; DIAG (c) -0.00364 [-0.03267, +0.04073] / -0.04550 [-0.06046, -0.03198]; FULL (a) +0.01564 [-0.00355, +0.03397] / +0.00910 [-0.01800, +0.03369]; FULL (c) +0.02450 [-0.00291, +0.06863] / +0.02080 [+0.00713, +0.03363]; spread_1r (a) 0.04305 / 0.06048, (c) 0.10797 / 0.02323; smallest margin FULL (c) CLINC -0.0024; every pair fails on MASSIVE by >= 0.027",
+  "nearest_cell_W1": "BISECT-GMM-FULL (c) CLINC D +0.0208 [+0.0071, +0.0336] vs spread_1r 0.0232: misses by 0.0024 (interval conjunct cleared, spread conjunct not); MASSIVE (c) +0.0245 vs 0.108 (structurally unreachable); 6,672 / 4,946 EVAL, 5 seeds",
+  "full_minus_bisect_skm_W2": "DESCRIPTIVE: (c) +0.012 [+0.003, +0.020] MASSIVE, +0.042 [+0.030, +0.054] CLINC; (a) MASSIVE +0.054; not in C-GK; no multiplicity control; interval anti-conservative on the seed axis (D-4)",
+  "support_realised_W3": "realised joint MDE80 per pair (SE as registered / seed-corrected): (a) DIAG 0.0734 / 0.0748, FULL 0.0770 / 0.0789 vs 0.076 registered (CLINC binds); (c) DIAG 0.1325 / 0.1353, FULL 0.1323 / 0.1350 vs 0.130 (MASSIVE binds); DEFF_total 3.68-40.47, max FULL (c) MASSIVE 40.47 (n_eff 122) seed-driven (Kish 1.0093); largest positive D 0.0245 below every MDE; DESCRIPTIVE-ONLY stands",
+  "descriptive_W4": "DIAG ARM-1-AHEAD CLINC (c) D -0.046 [-0.060, -0.032]; OOS AUROC FULL +0.004; C leg FULL DP 0.43-0.44 vs arm 1 0.39-0.40 (in-sample; id-disjoint scope)",
+  "post_run_checks": "PR-1 confirmed (DEFF / n_eff / MDE recomputed); PR-2 HELD (item-only SD > 0 in 8/8 cells, 0.00220-0.00504); PR-3 HELD (8/8 re-print points equal CONSTRUCTION-ARMS); identity I1-I3 and GK-I0 REPRODUCED"
+ },
+ "sentence_of_record": "GMM-FIXEDK (2026-10-06, 0 calls) — VALID; C-GK NO-GMM-WINS, DESCRIPTIVE-ONLY; F-GK NOT FIRED. No fixed-k = 2 GMM split rule beat the engine-like spherical k-means at matched leaves (not parity; no TOST): BISECT-GMM-FULL (c) on CLINC led arm 1 by +0.021 [+0.007, +0.034] and cleared the interval conjunct, but fell 0.002 short of arm 1's seed range 0.023; on MASSIVE (c) it was +0.025 against a 0.108 bar that one arm-1 seed carries (structurally unreachable, Support (g)). Its leads over spherical bisection are descriptive only. Arm 1 is a stand-in, not the engine (differences (i)-(vi)). [POSTRUN docs/reviews/POSTRUN_gmm-fixedk.md, 0910e947, W-1..W-4: 40 per-seed values re-fitted to the digit; the word is fixed by the points; realised joint MDE80 (a) 0.073 / 0.077 (0.075 / 0.079 seed-corrected), (c) 0.132 / 0.135, vs 0.076 / 0.130 registered; DEFF up to 40.5 seed-driven; [LF].]",
+ "chips": [
+  "REGISTERED 2026-10-06, BEFORE ANY CODE",
+  "VALID (POST-RUN 0910e947): NO-GMM-WINS; NOT PARITY; DESCRIPTIVE-ONLY; F-GK NOT FIRED",
+  "W-1..W-4: FULL (c) CLINC A NEAR MISS ON THE SPREAD BAR (0.002 SHORT); LEADS OVER BISECT-SKM DESCRIPTIVE, SEED-AXIS INTERVAL ANTI-CONSERVATIVE; REALISED MDE80 (a) 0.073 / 0.077, (c) 0.132; P6 FALSE"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-06",
+   "by": "registrar (READY_gmm-fixedk 215b551f, READY, no blocker)",
+   "text": "pre-data brackets in the registration: INSTRUMENT L24860 (GK-R1 per-replicate seed-draw order components -> ENGINE-SKM, BISECT-GMM-DIAG, BISECT-GMM-FULL, BISECT-SKM, GMM-BIC, re-print intervals differ by stream, only points checked; GK-R2 node_seed(s, c, 2), forced slot 9; GK-R3 PCA svd_solver 'full', centred, unwhitened; GK-R4 ValueError / LinAlgError -> forced split, counted as fit error; GK-R5 P4 forced share = (best-first forced + replaced) / all splits, mean of 5 seeds, MASSIVE and CLINC, C printed; GK-R6 leaf balance = W-3's count; GK-R7 p = min(p, slice dimension), 8-d fixtures only, D-3), READOUTS AND CRITERIA L24862 (GK-R1 re-prints, PR-3; D-4 words), SUPPORT L24863 (D-2: DEFF_total printed Kish x (SE/SE_item)^2, 0.93% MASSIVE, 0 CLINC, descriptive), PREDICTIONS L24864 (GK-R5 for P4); registrar's record L24870-L24876 (_as_of the commit that writes them, parent 215b551f, re-grepped)"
+  },
+  {
+   "date": "2026-10-06",
+   "by": "registrar (POSTRUN 0910e947, VALID)",
+   "text": "OUTCOME brackets in the registration: READOUTS AND CRITERIA L24862 (C-GK NO-GMM-WINS by the point, F-GK NOT FIRED; W-1, W-2, W-4), SUPPORT L24863 (W-3 realised table), PREDICTIONS L24864 (P1-P6 scored); outcome section docs/judge_v2_program.md L24877-L24889 (_as_of the commit that writes them, parent 0910e947, re-grepped); P-1 folder of record named; P-2, P-3 recorded"
+  }
+ ],
+ "does_not_show": [
+  "that any GMM rule beats or equals arm 1 (no TOST; NO-GMM-WINS is not parity; W-1 a near miss on the spread bar only)",
+  "that the full-covariance boundary is better than spherical bisection (W-2: descriptive, anti-conservative interval)",
+  "anything about the engine's own split rule (arm 1 a stand-in, differences (i)-(vi))",
+  "GMM with BIC or any other k-selection, or a modality / certificate property of any split",
+  "a (c) win on MASSIVE below the 0.108 bar (structural)",
+  "MMLU-Pro EVAL, routing, judged value, other embedders, slices, draws or leaf counts"
+ ],
+ "ledger": {
+  "row_id": "GMM-FIXEDK",
+  "version": "v407 (2026-10-06: OUTCOME bracket; READY chip replaced by VALID null + W warn chips) | v406 (READY chip, pre-data bracket)"
+ },
+ "depends_on": [
+  "CONSTRUCTION-ARMS (instrument, arm 1, spreads, identity)",
+  "INTENT-TRANSFER-S1 (corpora, L)",
+  "STABILITY-VS-KMEANS (triplet instrument)"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; MIX-LRT-SITE (GMM LR / BIC half of L6, CLOSED NEGATIVE) checked and not touched: fixed k = 2 partition rule only, no LR, no BIC, no modality claim, no certificate"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "cpu": "CPU about 1-3 h (detached if > 100 min); C leg a pool reader (rule 7 slot); engine-coder about 3 h"
+ },
+ "outputs": "never committed; sha256-pinned on E:/TaxoArena_backup_<date>_<tag> with SHA256SUMS.txt; temp via scratch_dir.py",
+ "label_status": "[LF] (MASSIVE / CLINC fine and coarse gold labels); single-corpus; gold and OOS rows read by the scorer only",
+ "sources": [
+  "docs/judge_v2_program.md L24856-L24868 (_as_of the commit that writes them, parent 4c764a1e, re-grepped)",
+  "docs/judge_v2_program.md L24808-L24812 (registrar's record)",
+  "the orchestrator's brief of 2026-10-06; the author's \"start 1 to 4\" (2026-10-06, in the chat; the four tests of the orchestrator's brief of 2026-10-06)",
+  "docs/agents/results/CONSTRUCTION-ARMS.json, INTENT-TRANSFER-S1.json, STABILITY-VS-KMEANS.json (transported SEs, identity digits, prior results)",
+  "docs/reviews/READY_gmm-fixedk.md (commit 215b551f): pins, verdict, conditions, defects, brackets owed",
+  "docs/judge_v2_program.md L24870-L24876 (registrar's record, _as_of the commit that writes it, parent 215b551f, re-grepped)",
+  "docs/reviews/POSTRUN_gmm-fixedk.md (commit 0910e947): verdict, words W-1..W-4, realised Support table, prediction scoring, defects P-1..P-3",
+  "E:/TaxoArena_backup_2026-10-06_gmm_fixedk/gmm_fixedk_outcome.txt (sha256 a89fb861...): D lines, SUPPORT / MDE80 PAIR lines, P1-P6 lines",
+  "docs/judge_v2_program.md L24877-L24889 (outcome section, _as_of the commit that writes it, parent 0910e947, re-grepped)"
+ ],
+ "last_update": "2026-10-06",
+ "conditions": {
+  "run": [
+   "R-C1 busy.ps1 exit 1 immediately before --run (C leg a pool reader, rule 7); nothing else heavy",
+   "R-C2 --workers <= 22 (about 24 min at 20; detach if anything else runs)",
+   "R-C3 accepted only if GK-I0 reads REPRODUCED (else refusal, no file: a failed precondition)"
+  ],
+  "post_run": [
+   "PR-1 DEFF / n_eff / MDE re-measured from the outcome SUPPORT lines beside the registered 0.076",
+   "PR-2 (a) item-only SD > 0 on both corpora (D-1)",
+   "PR-3 BISECT-SKM / GMM-BIC re-print POINTS read point REPRODUCED (8 cells)"
+  ],
+  "defects": [
+   "D-1 MEDIUM test gap (own mutant R1 survives: (a) bootstrap weights untested); code right; not required before the run; PR-2 covers",
+   "D-2 LOW DEFF_total printed Kish x (SE/SE_item)^2; bracketed",
+   "D-3 LOW readings line says GK-R1..R6; GK-R7 bracketed",
+   "D-4 LOW percentile interval anti-conservative on the seed axis; disclosed, seed-corrected SE printed beside"
+  ]
+ },
+ "plain_description": {
+  "sq": "SQ3 Taxonomy",
+  "what": "Comparing split rules for building the tree, always splitting each node in two. Gaussian-mixture splits (diagonal or full covariance) are compared with a spherical k-means split that mimics the engine. Done on MASSIVE, CLINC and MMLU-Pro with the same number of leaves and 5 seeds.",
+  "why": "It asks whether a more flexible split rule would give better partitions than what the engine uses.",
+  "information": "A clear win would make a mixture-based split a candidate for a new, separately approved test (never a direct engine change). Result (no new calls): no mixture rule clearly beat the k-means stand-in. The full-covariance rule led on CLINC but fell just short of the seed-to-seed spread. On MASSIVE the bar was out of reach. Its leads are descriptive only, and 'no win' is not proof of a tie.",
+  "written": "2026-10-07"
+ }
+}

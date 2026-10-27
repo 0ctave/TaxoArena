@@ -1,0 +1,344 @@
+package taxonomy.dataset
+
+import kotlinx.coroutines.*
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.*
+import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Service
+import java.io.File
+import java.sql.DriverManager
+import java.util.zip.ZipFile
+
+/**
+ * Raw shape of one item in a TIGER-AI-Lab eval result JSON file.
+ * Fields follow the exact keys present in the upstream zips.
+ */
+@Serializable
+private data class RawEvalItem(
+    val question_id: Int = -1,
+    val question: String = "",
+    val options: List<String> = emptyList(),
+    val answer: String = "",              // GT answer letter e.g. "A"
+    val answer_index: Int = -1,
+    val category: String = "",
+    val pred: String? = null,             // model's extracted answer
+    val model_outputs: String = "",       // full CoT trace
+    // Some older eval files use cot_content instead of model_outputs
+    val cot_content: String? = null,
+    // ...and 28 of the 47 upstream archives (the Llama / Qwen / Mistral / Mixtral / Yi /
+    // Phi-3 / gemma / mathstral families) use `generated_text` instead, with `cot_content`
+    // present but blank. Omitting this key meant `trace` resolved to "" for every one of
+    // those models: the ingest silently stored an empty `model_output` for 34 of 47 models,
+    // and `getRobustTrace` then synthesised a one-line stub in place of the real trace.
+    // That drove the 99.4% format preference measured in archive/docs/arena-math-findings.md.
+    val generated_text: String? = null
+)
+
+@Service
+class ModelEvalLoader(
+    /** Public so components that receive the loader can reach the pool reads by id (snapshot manager). */
+    val store: ModelEvalStore,
+    private val datasetFetcher: MMLUDatasetFetcher,   // for cross-referencing questions
+    // Injectable so integration tests can point at throwaway DB/files. Defaults match prod.
+    @Value("\${taxoadapt.eval.db-path:mmlu_pro_dataset_cache_v2.db}")
+    private val datasetDbPath: String = "mmlu_pro_dataset_cache_v2.db",
+    @Value("\${taxoadapt.eval.embedding-db-path:embeddings_cache.db}")
+    private val embeddingDbPath: String = "embeddings_cache.db",
+    @Value("\${taxoadapt.eval.reserved-file:reserved_test_queries.json}")
+    private val reservedFilePath: String = "reserved_test_queries.json",
+    private val corpusRegistry: CorpusRegistry = CorpusRegistry()
+) {
+    private val log = LoggerFactory.getLogger("taxonomy.ModelEvalLoader")
+    private val json = Json { ignoreUnknownKeys = true; isLenient = true; coerceInputValues = true }
+    private val datasetDbUrl = "jdbc:sqlite:$datasetDbPath?journal_mode=WAL&synchronous=NORMAL&busy_timeout=10000"
+    private val embeddingDbUrl = "jdbc:sqlite:$embeddingDbPath?journal_mode=WAL&synchronous=NORMAL&busy_timeout=10000"
+
+    // ─── Public API ───────────────────────────────────────────────────────────
+
+    /**
+     * Unified entry point: ingest a `.zip` (single inner json), a raw `.json`, or a
+     * directory of per-category json files. Model name is derived from the filename
+     * (`model_outputs_<MODEL>_<N>shots`) when not supplied.
+     */
+    suspend fun loadFromPath(
+        path: String,
+        modelName: String? = null,
+        onProgress: ((current: Int, total: Int) -> Unit)? = null
+    ): EvalLoadStats = withContext(Dispatchers.IO) {
+        val resolved = modelName?.takeIf { it.isNotBlank() }
+            ?: PrecomputedModelOutputLoader.deriveModelName(path)
+        val file = File(path)
+        val raw = when {
+            file.isDirectory -> parseDirectory(path)
+            path.endsWith(".zip") -> parseZip(path)
+            path.endsWith(".json") -> parseJsonBytes(file.readBytes(), file.name)
+            else -> {
+                log.warn("Unsupported eval source: $path")
+                emptyList()
+            }
+        }
+        log.info("Loading eval results for '$resolved' from $path (${raw.size} raw items)")
+        ingestRaw(raw, resolved, onProgress)
+    }
+
+    /**
+     * Ingest only the explicitly-selected catalog entries, one model at a time. Reports
+     * per-model lifecycle ([onModelStart]) and per-item progress ([onItemProgress]) so the TUI
+     * can show "Ingesting <model> (i/N) · rows X/Y". Returns the per-model load stats in order.
+     */
+    suspend fun loadEntries(
+        entries: List<EvalCatalogEntry>,
+        onModelStart: ((modelIdx: Int, modelCount: Int, modelName: String) -> Unit)? = null,
+        onItemProgress: ((modelIdx: Int, modelCount: Int, modelName: String, current: Int, total: Int) -> Unit)? = null
+    ): List<EvalLoadStats> = withContext(Dispatchers.IO) {
+        val count = entries.size
+        entries.mapIndexed { idx, entry ->
+            onModelStart?.invoke(idx, count, entry.modelName)
+            loadFromPath(entry.sourcePath, entry.modelName) { cur, total ->
+                onItemProgress?.invoke(idx, count, entry.modelName, cur, total)
+            }
+        }
+    }
+
+    /**
+     * Load all model results from a zip file produced by TIGER-AI-Lab eval scripts.
+     * Resolves cross-links to mmlu_pro and embeddings_cache tables.
+     * Idempotent — safe to call multiple times.
+     */
+    suspend fun loadFromZip(
+        zipPath: String,
+        modelName: String,
+        onProgress: ((current: Int, total: Int) -> Unit)? = null
+    ): EvalLoadStats = withContext(Dispatchers.IO) {
+        log.info("Loading eval results for '$modelName' from $zipPath")
+        val raw = parseZip(zipPath)
+        ingestRaw(raw, modelName, onProgress)
+    }
+
+    /**
+     * Load from an already-extracted directory of per-category JSON files.
+     */
+    suspend fun loadFromDirectory(
+        dirPath: String,
+        modelName: String,
+        onProgress: ((current: Int, total: Int) -> Unit)? = null
+    ): EvalLoadStats = withContext(Dispatchers.IO) {
+        log.info("Loading eval results for '$modelName' from directory $dirPath")
+        val raw = parseDirectory(dirPath)
+        ingestRaw(raw, modelName, onProgress)
+    }
+
+    // No reserved-pool sync: a pool is recorded at split time (MMLUDatasetFetcher) or from an id
+    // file (ReservedPoolRegistry); nothing activates anything and no row carries a side flag
+    // (FRAMEWORK item 18). `reservedFilePath` is kept only as the injected property name.
+
+    internal fun resolveTextsToIds(textMap: Map<String, List<String>>): Set<Int> {
+        val allTexts = textMap.values.flatten().toSet()
+        val ids = mutableSetOf<Int>()
+        DriverManager.getConnection(datasetDbUrl).use { c ->
+            allTexts.chunked(900).forEach { chunk ->
+                val ph = chunk.joinToString(",") { "?" }
+                c.prepareStatement(
+                    "SELECT DISTINCT question_id FROM eval_results WHERE question_text IN ($ph)"
+                ).use { ps ->
+                    chunk.forEachIndexed { i, t -> ps.setString(i + 1, t) }
+                    val rs = ps.executeQuery()
+                    while (rs.next()) ids.add(rs.getInt(1))
+                }
+            }
+        }
+        return ids
+    }
+
+    // ─── Parsing ──────────────────────────────────────────────────────────────
+
+    private fun parseZip(zipPath: String): List<RawEvalItem> {
+        val items = mutableListOf<RawEvalItem>()
+        ZipFile(zipPath).use { zip ->
+            zip.entries().asSequence()
+                .filter { !it.isDirectory && it.name.endsWith(".json") }
+                .forEach { entry ->
+                    zip.getInputStream(entry).use { stream ->
+                        items += parseJsonBytes(stream.readBytes(), entry.name)
+                    }
+                }
+        }
+        log.info("Parsed ${items.size} raw items from zip $zipPath")
+        return items
+    }
+
+    private fun parseDirectory(dirPath: String): List<RawEvalItem> {
+        val items = mutableListOf<RawEvalItem>()
+        File(dirPath).walkTopDown()
+            .filter { it.isFile && it.extension == "json" }
+            .forEach { file ->
+                runCatching {
+                    items += parseJsonBytes(file.readBytes(), file.name)
+                }.onFailure { log.warn("Skipping ${file.name}: ${it.message}") }
+            }
+        log.info("Parsed ${items.size} raw items from directory $dirPath")
+        return items
+    }
+
+    private fun parseJsonBytes(bytes: ByteArray, sourceName: String): List<RawEvalItem> {
+        val text = bytes.toString(Charsets.UTF_8)
+        return try {
+            // Files are a top-level JSON array
+            json.decodeFromString<List<RawEvalItem>>(text)
+        } catch (e: Exception) {
+            log.warn("Failed to parse $sourceName as array: ${e.message}")
+            emptyList()
+        }
+    }
+
+    // ─── Ingestion ────────────────────────────────────────────────────────────
+
+    private fun ingestRaw(
+        raw: List<RawEvalItem>,
+        modelName: String,
+        onProgress: ((Int, Int) -> Unit)?
+    ): EvalLoadStats {
+        val total = raw.size
+        if (total == 0) return EvalLoadStats(modelName, 0, 0, 0, 0, 0)
+
+        // Build lookup maps for cross-referencing
+        val questionTexts = raw.map { it.question }
+        val (mmlProRowIds, _) = fetchMmlProRowIdsAndSet(questionTexts)   // question_text → mmlu_pro.id
+        val embeddingHits = fetchEmbeddingHits(questionTexts)  // question_text → exists?
+
+        val results = mutableListOf<ModelEvalResult>()
+        val links   = mutableListOf<EvalQuestionLink>()
+        var errors  = 0
+
+        raw.forEachIndexed { idx, item ->
+            runCatching {
+                if (item.question_id < 0 || item.question.isBlank()) return@runCatching
+
+                // Unwrapped at ingest so the stored column is clean, AND again at read time in
+                // TaxonomyBenchmarkService.getRobustTrace, which covers rows ingested before
+                // this fix existed. Belt and braces: the leak is asymmetric and silent.
+                val trace = unwrapTraceEnvelope(
+                    item.model_outputs
+                        .ifBlank { item.cot_content ?: "" }
+                        .ifBlank { item.generated_text ?: "" }
+                )
+                // TIGER-AI-Lab zips are multiple-choice, so the MC-letter verifier decides
+                // correctness (docs/multi_corpus_design.md §3.3): `pred != null && pred == answer`,
+                // the invariant EvalIngestValidator asserts in SQL.
+                val isCorrect = McLetter.isCorrect(item.pred, item.answer, item.options)
+
+                results += ModelEvalResult(
+                    questionId   = item.question_id,
+                    modelName    = modelName,
+                    category     = MMLUCategories.normaliseCategory(item.category),
+                    questionText = item.question,
+                    options      = item.options,
+                    gtAnswer     = item.answer,
+                    pred         = item.pred,
+                    modelOutput  = trace,
+                    isCorrect    = isCorrect
+                )
+
+                // Resolve the link by question TEXT only. `item.question_id` is the upstream
+                // MMLU-Pro id (observed range 70..12256) while `mmlu_pro.id` is a local
+                // AUTOINCREMENT rowid (1..12000): the two spaces overlap numerically but are
+                // unrelated, so the old `dbIdSet.contains(item.question_id)` shortcut tested
+                // nothing and linked a row to whichever local row happened to share the number.
+                // It stayed harmless only while mmlu_pro was sparsely populated; the cache now
+                // holds ids 1..12000, so the shortcut would fire for nearly every row and
+                // fabricate wrong links wholesale. Text resolution is exact-or-normalised and
+                // covers 11999 of the 12000 cached questions.
+                val resolvedMmlProId = mmlProRowIds[item.question]
+
+                links += EvalQuestionLink(
+                    questionId    = item.question_id,
+                    mmlProRowId   = resolvedMmlProId,
+                    questionText  = item.question,
+                    hasEmbedding  = embeddingHits.contains(item.question)
+                )
+            }.onFailure {
+                errors++
+                log.warn("Error processing item ${item.question_id}: ${it.message}")
+            }
+            if (idx % 500 == 0) onProgress?.invoke(idx, total)
+        }
+
+        // Batch write
+        val (inserted, skipped) = store.saveBatch(results)
+        store.saveLinks(links.distinctBy { it.questionId })
+
+        onProgress?.invoke(total, total)
+
+        val stats = EvalLoadStats(
+            modelName       = modelName,
+            inserted        = inserted,
+            skipped         = skipped,
+            linkedToDataset = links.count { it.mmlProRowId != null },
+            linkedToEmbedding = links.count { it.hasEmbedding },
+            errors          = errors
+        )
+        log.info("Loaded '$modelName': $stats")
+        return stats
+    }
+
+    // ─── Cross-reference helpers ──────────────────────────────────────────────
+
+    private fun fetchMmlProRowIdsAndSet(questions: List<String>): Pair<Map<String, Int>, Set<Int>> {
+        val result = mutableMapOf<String, Int>()
+        val normalizedDbMap = mutableMapOf<String, Int>()
+        val dbIdSet = mutableSetOf<Int>()
+        DriverManager.getConnection(datasetDbUrl).use { c ->
+            c.createStatement().use { stmt ->
+                stmt.executeQuery("SELECT id, question FROM ${corpusRegistry.tableFor(CorpusRegistry.DEFAULT_SOURCE)}").use { rs ->
+                    while (rs.next()) {
+                        val qText = rs.getString("question") ?: ""
+                        val qId = rs.getInt("id")
+                        dbIdSet.add(qId)
+                        normalizedDbMap[qText] = qId
+                        normalizedDbMap[taxonomy.model.TextNormalizer.cleanText(qText)] = qId
+                    }
+                }
+            }
+        }
+        for (q in questions) {
+            val exact = normalizedDbMap[q]
+            if (exact != null) {
+                result[q] = exact
+            } else {
+                val cleaned = taxonomy.model.TextNormalizer.cleanText(q)
+                val fallback = normalizedDbMap[cleaned]
+                if (fallback != null) {
+                    result[q] = fallback
+                }
+            }
+        }
+        return Pair(result, dbIdSet)
+    }
+
+    private fun fetchEmbeddingHits(questions: List<String>): Set<String> {
+        val result = mutableSetOf<String>()
+        val normalizedCacheMap = mutableSetOf<String>()
+        try {
+            DriverManager.getConnection(embeddingDbUrl).use { c ->
+                c.createStatement().use { stmt ->
+                    stmt.executeQuery("SELECT query FROM embeddings").use { rs ->
+                        while (rs.next()) {
+                            val qText = rs.getString("query") ?: ""
+                            normalizedCacheMap.add(qText)
+                            normalizedCacheMap.add(taxonomy.model.TextNormalizer.cleanText(qText))
+                        }
+                    }
+                }
+            }
+            for (q in questions) {
+                if (normalizedCacheMap.contains(q) || normalizedCacheMap.contains(taxonomy.model.TextNormalizer.cleanText(q))) {
+                    result.add(q)
+                }
+            }
+        } catch (e: Exception) {
+            log.warn("Could not check embeddings cache: ${e.message}")
+        }
+        return result
+    }
+}

@@ -1,0 +1,170 @@
+{
+ "id": "ONLINE-STAGE2",
+ "title": "ONLINE-STAGE2: frozen leaf means, an OOS-only buffer with a GATE-calibrated threshold (target catch rate 0.80, nested leave-one-out on GATE) and periodic buffer-only rebuilds: prequential filing of a left-out union member vs batch AF-U (OS1) and the catch rate per held-out member (OS2), k-means arm beside; certified-split leg NOT included (zero calls; REGISTERED 2026-10-03)",
+ "question": "With frozen means and a catch-rate-calibrated buffer, does online filing of a new domain match a rebuild?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "the commit that writes it (parent e18fe595)",
+  "program_lines": "docs/judge_v2_program.md L24054-L24068",
+  "program_lines_as_of": "the commit that writes them, parent e18fe595, re-grepped",
+  "date": "2026-10-03",
+  "provenance": "docs/agents/plans/2026-10-03_reframing_memo_v3.md (6db5a3dd); the orchestrator's brief; autonomous scheduling"
+ },
+ "script": {
+  "path": "tools/analysis/online_stage2.py",
+  "sha16": "6bbc40dde71447f0 (git blob, LF)",
+  "commit": "4c2a6118"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_online_stage2.md",
+  "commit": "4c2a6118",
+  "blob": "fc323c1b (LF)",
+  "verdict": "READY; conditions B-1..B-7 (registrar, pre-data)"
+ },
+ "go": "autonomous-scheduling authorisation (zero calls)",
+ "run": {
+  "outcome_file": "experiment_results/online_stage2/outcome.txt (sha256 19e8a87a...) + online_stage2_items.csv (4ddd6587...); never committed; backup E:/TaxoArena_backup_2026-10-03_online_stage2 (SHA256SUMS 3/3 OK)",
+  "outcome_commit": "run from main after 08fe2870",
+  "calls": 0,
+  "cce": 0,
+  "pool": "pv2_1575de61bb20e977 (B0-2)",
+  "date": "2026-10-03"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_online_stage2.md",
+  "commit": "6f064b3b",
+  "verdict": "VALID (W-1..W-7)"
+ },
+ "criteria": [
+  {
+   "id": "OS1",
+   "text": "DECIDING (interval): D = P_fl(ONLINE-S2 tree, prequential) - P_fl(BATCH AF-U) on held-out members' EVAL, pooled over 6 replays; EQUIVALENT iff 90% inside +/-0.020; DIFFERENT iff |D| > 0.020 AND 95% excludes 0; NEITHER otherwise. Verdict line: DESCRIPTIVE-ONLY at the prediction (SE 0.00641; LOSS reach 0.0254, EQUIVALENT reach 0.0041)",
+   "result": "FAILED",
+   "value": "DIFFERENT (LOSS): D -0.0326, SE 0.00614, 95% [-0.0446, -0.0205] (online 0.6939 vs batch 0.7265)",
+   "denominator": "6,139 held-out EVAL items pooled over 6 replays (5,628 components); DEFF 1.263 measured (ONLINE-REPLAY-LOMO OL1)"
+  },
+  {
+   "id": "OS2",
+   "text": "DECIDING (point): CALIBRATED iff the median over six members' catch rates (share of m's streamed items buffered at tau_m) >= 0.70; UNDER-CATCH iff < 0.70. Verdict line: SCOREABLE [B-1: SCOREABLE but THIN; MDE80 up to 0.055]",
+   "result": "FAILED",
+   "value": "UNDER-CATCH: median catch 0.5508 (tree 0.5387 MMLU_PRO_LB, 0.5630 BBH, 0.3422 MATH, 1.0000 MUSR, 0.9261 IFEVAL, 0.5355 GPQA); k-means median 0.5043",
+   "denominator": "6 held-out members; 487-10,455 streamed items each (B-1)"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "D -0.015 [-0.035, +0.005]; OS1 NEITHER 0.45, LOSS 0.35, EQUIVALENT 0.20, GAIN 0.00",
+   "result": "HELD",
+   "value": "-0.0326 in [-0.035, +0.005]; LOSS (p 0.35) occurred",
+   "denominator": "6,139 held-out EVAL items pooled over 6 replays (5,628 components); DEFF 1.263 measured (ONLINE-REPLAY-LOMO OL1)"
+  },
+  {
+   "id": "P2",
+   "text": "OS2 median catch rate 0.75 [0.55, 0.88]; CALIBRATED 0.60",
+   "result": "HELD",
+   "value": "0.5508 in [0.55, 0.88] (band edge, 0.0008 inside); CALIBRATED 0.60 did not occur, Brier 0.7200",
+   "denominator": "6 held-out members"
+  },
+  {
+   "id": "P3",
+   "text": "in-members' false-buffer share at tau_m, median over replays, 0.30 [0.15, 0.50] (descriptive)",
+   "result": "FAILED",
+   "value": "false-buffer median 0.1030 outside [0.15, 0.50] (low)",
+   "denominator": "in-members' EVAL per replay"
+  },
+  {
+   "id": "P4",
+   "text": "k-means arm D -0.020 [-0.045, +0.005] (descriptive)",
+   "result": "FAILED",
+   "value": "k-means D -0.0686 outside [-0.045, +0.005]",
+   "denominator": "6,139 held-out EVAL items pooled over 6 replays (5,628 components); DEFF 1.263 measured (ONLINE-REPLAY-LOMO OL1)"
+  }
+ ],
+ "falsifier": {
+  "text": "F-OS fires iff OS1 reads DIFFERENT (LOSS): with frozen means and a calibrated buffer, online filing still falls > 2pp below a rebuild; overturns memo v3's online-evolution design (L84-L87) as filing-neutral.",
+  "fired": true
+ },
+ "numbers_of_record": {
+  "OS1": "D -0.0326, 95% [-0.0446, -0.0205] (6,139 / 5,628, 6 replays, one draw)",
+  "OS2": "median catch 0.5508 (tree per member 0.54 / 0.56 / 0.34 / 1.00 / 0.93 / 0.54; k-means median 0.50); six sources, no SE for the median",
+  "per_member_D_tree": "MMLU_PRO_LB +0.0115, BBH -0.0873, MATH -0.1128, MUSR -0.1223, IFEVAL 0.0000, GPQA -0.1111",
+  "kmeans_arm": "D -0.0686 [-0.0819, -0.0553]; tree minus k-means +0.0360 [+0.0211, +0.0514] (descriptive)",
+  "end_of_stream": "D tree -0.0528 / k-means -0.0741 (transductive, descriptive)",
+  "false_buffer": "median 0.1030 (tree)",
+  "support_remeasured": "DEFF 1.080 (reviewer 1.164) vs 1.263 registered; SE 0.00614"
+ },
+ "sentence_of_record": "Even with frozen leaf means, a GATE-calibrated OOS buffer and buffer rebuilds every 100 items, prequential online filing of a left-out member falls 3.3pp below a batch rebuild: OS1 DIFFERENT (LOSS), D -0.0326, 95% [-0.0446, -0.0205] (6,139 / 5,628, 6 replays, one draw); F-OS FIRES: memo v3's online-evolution design is not filing-neutral; the online claim narrows to 'stable ids at a filing cost; rebuild periodically'. [Stable ids hold by construction, not as a measured result; 3.9 -> 3.3pp is descriptive only, nothing credited to freezing; OS2 UNDER-CATCH (median catch 0.55); MUSR caught fully still lost 12.2pp: not only a catch problem; prequential filing; tree vs k-means descriptive.]",
+ "chips": [
+  "REGISTERED 2026-10-03, BEFORE ANY CODE; not built",
+  "VALID (POST-RUN 6f064b3b): OS1 LOSS &minus;3.3pp; OS2 UNDER-CATCH 0.55; F-OS FIRES",
+  "IDS STABLE BY CONSTRUCTION, NOT MEASURED; NOTHING CREDITED TO FREEZING; MUSR CAUGHT FULLY STILL &minus;12pp; TREE VS k-MEANS DESCRIPTIVE"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-03",
+   "by": "registrar (pre-data; READY B-1..B-7)",
+   "text": "B-1 OS2 Support: per-member n 487-10,455, SE 0.004-0.020, MDE80 up to 0.055; OS2 point-decided, SCOREABLE but THIN; no SE for the median (L24064). B-2 tau_m smallest observed score with unweighted median catch >= 0.80 (strict); B-3 buffering strict, non-buffered TRAIN absorbed over frozen cells; B-4 rebuild at multiples of 100 after append, tail < 100 in no prequential cell; B-5 order: file at arrival, then buffer decision, then append / rebuild (L24058). B-6 median = mean of 3rd and 4th (L24062). B-7 OS2 Brier over two outcomes (L24065). S-2 DEFF 1.263 is the reviewer's own-stream readout (SE 0.00648); GB.stat 1.245 / 0.00644."
+  },
+  {
+   "date": "2026-10-03",
+   "by": "registrar (POSTRUN 6f064b3b)",
+   "text": "outcome recorded; memo v3 item 8 bracketed (periodic batch rebuild stays necessary). docs/judge_v2_program.md L24076-L24085 (section \"## ONLINE-STAGE2 (2026-10-03, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent 6f064b3b)"
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (status correction; zero calls)",
+   "text": "status correction (testing-logic review, docs/literature/2026-10-04_testing_logic_review.md (bd5ca001)): AF-U is federated per source (prog L22633), so it is SOURCE-CONDITIONED [SC], not label-free; 'label-free' / [LF] on AF-U reads [SC]; K_0 is [SC] too (like with like); no number or verdict moves; docs/judge_v2_program.md L24259-L24263 (registrar's record; _as_of the commit that writes it, parent bd5ca001)"
+  }
+ ],
+ "does_not_show": [
+  "that freezing reduced the loss (two changes at once; descriptive)",
+  "stable ids as a measured effect (by construction)",
+  "stable buffer-cell ids",
+  "any certified split (leg excluded)",
+  "tree-over-k-means superiority",
+  "beyond six sources and one draw"
+ ],
+ "ledger": {
+  "row_id": "ONLINE-STAGE2",
+  "version": "v372 (2026-10-03: OUTCOME bracket, OK + WARN chips) | v371 (2026-10-03: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "ONLINE-REPLAY-LOMO",
+  "UNION-AF-ROUTE",
+  "OOS-TREE-CELLS"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; the frozen-means design F-OL pointed to, not a reopening"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "minutes to an hour",
+  "agent_hours": "about 2 h",
+  "reads_pool": true
+ },
+ "outputs": "never committed: pinned by sha256, backed up to E: with SHA256SUMS.txt",
+ "sources": [
+  "docs/judge_v2_program.md L24054-L24068 (_as_of the commit that writes it, parent e18fe595, re-grepped)",
+  "docs/agents/plans/2026-10-03_reframing_memo_v3.md (6db5a3dd)",
+  "docs/reviews/READY_online_stage2.md (merged 4c2a6118; blob fc323c1b, LF)",
+  "docs/reviews/POSTRUN_online_stage2.md (6f064b3b; blob 8ea07967, LF)",
+  "docs/judge_v2_program.md L24076-L24085 (section \"## ONLINE-STAGE2 (2026-10-03, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent 6f064b3b)"
+ ],
+ "last_update": "2026-10-04",
+ "transduction": "prequential filing: each EVAL item filed before it can enter the buffer; earlier EVAL items shape later buffer cells; oracle k = L_m; end-of-stream filing descriptive and transductive",
+ "label_status": "AF-U [SC] (source-conditioned; federated per source), not [LF]; K_0 [SC]",
+ "plain_description": {
+  "sq": "SQ1 Use",
+  "what": "Simulates a new corpus arriving one question at a time. The tree files each question online (fixed leaf centres, a buffer for odd questions, periodic small rebuilds), and the result is compared with a full rebuild on the same six held-out corpora. No calls.",
+  "why": "It tests whether the tree can grow online without losing filing accuracy compared with rebuilding.",
+  "information": "Matching a rebuild would back the 'evolving tree' design. A loss would mean rebuilding is needed. Result: online filing is 3.3 points worse than a rebuild, so the warning test fired. The online design is not filing-neutral, and the claim narrows to 'stable ids at a filing cost; rebuild periodically'. The buffer also catches too few new questions (55%). One draw only.",
+  "written": "2026-10-07"
+ }
+}

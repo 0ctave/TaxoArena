@@ -1,0 +1,49 @@
+=== PROFILE-RELIABILITY: is the ANCHOR-level capability profile reliable? ===
+  tree bareq512_s42 | pool 2811 questions | 87 leaves | 14 anchors | 12 models
+  instrument identical to PROFILE-TREE-ROBUST (5): disjoint half-splits of each cell's QUESTIONS,
+  profiles built on each half, correlated model-demeaned, Spearman-Brown to full length.
+  Averaged over 40 independent halvings instead of the single split used there.
+  NOTE ON COMPARABILITY: PROFILE-TREE-ROBUST reported leaf R=0.158 at a 25-question floor; this uses a
+  50-question floor, so its leaf row covers fewer, larger cells and reads higher. The two are
+  consistent with the size trend in (3), and the size sweep below is the instrument that settles it.
+
+  level        cells    q/cell      judge r  judge R(SB)    key R(SB)
+  leaf             8        71       0.1467       0.2559       0.8135
+             (judge split-half SD 0.0907 over 40 halvings, so R is stable to about +-0.042)
+  anchor          14       201       0.5069       0.6728       0.9135
+             (judge split-half SD 0.0443 over 40 halvings, so R is stable to about +-0.012)
+  whole pool       1      2811          n/a          n/a          n/a
+             (undefined by construction: with one cell, demeaning by model leaves every
+              value at zero, so there is nothing left to correlate. Not a failure.)
+
+=== (1) PRIMARY, registered bar 0.70 at the ANCHOR level ===
+  anchor-level judge Spearman-Brown reliability: 0.6728
+  spread over 40 independent halvings: split-half SD 0.0443, so the estimate is stable to about
+  +-0.012 on R. The shortfall against the bar is 0.0272, which is larger than that spread.
+  -> FAIL: the anchor profile does NOT clear 0.70
+  CONSEQUENCE, as registered in advance: RESOLVE may not publish per-anchor capability claims as
+  measured quantities. It publishes the board and the routing layer, and the granular capability
+  profile becomes a stated aspiration carrying its questions-per-cell requirement.
+
+=== (2) THE COMPARATOR: is any shortfall the JUDGE's or the CELL's? ===
+  leaf       judge R 0.2559 | key R 0.8135 | ratio 0.31  (8 cells, 71 q/cell)
+  anchor     judge R 0.6728 | key R 0.9135 | ratio 0.74  (14 cells, 201 q/cell)
+  A key R far above the judge's at the same granularity means the cells are fine and the JUDGE is the
+  limiting instrument. A key R that is also low would mean the cells themselves carry no stable signal.
+
+=== (3) THE DESIGN NUMBER: at what cell size does judge reliability cross 0.70? ===
+  Subsample every ANCHOR down to a common size and measure reliability at that size, so the sweep
+  varies cell size with the cell definition held fixed.
+      q/cell      cells    judge R(SB)      key R(SB)
+          50         14         0.1919         0.7143
+          75         14         0.1665         0.8285
+         100         14         0.3616         0.8513
+         150         11         0.4356         0.9164
+         200          6         0.6891         0.9283
+
+  JUDGE reliability does NOT reach 0.70 at any cell size this pool can supply (max 304 q/cell).
+  Extrapolating by Spearman-Brown from the largest measured point is the only available estimate
+  and is reported as an extrapolation, not a measurement:
+    at 200 q/cell R=0.6891 -> reaching 0.70 needs 1.1x, i.e. about 210 questions per cell
+    and it must come from NEW questions: TEMP-0 showed the 5.7% test-retest floor is
+    intrinsic, so re-judging the same matches adds no independent evidence.

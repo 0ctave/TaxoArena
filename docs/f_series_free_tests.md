@@ -1,0 +1,170 @@
+# F-series — free tests on existing data (registered 2026-09-08, before running)
+
+Motivated by the D1 / ladder / J-series results. Zero judge calls; every input is a
+committed artifact or a local cache. Harness: tools/analysis/free_tests_f.py.
+
+## F1 — certified-vs-uncertified split of the rubric ladder
+Data: leaf-rubric verdicts = x12 MAIN (Mistral, cell rubric) and anchor-rubric verdicts =
+rubric_ladder.db arm 'anchor', paired on the same matches (the ladder's own pairing);
+key-decidable matches only (eval_results.is_correct differs between the two contestants);
+ties count as wrong (ladder convention). Certification = docs/data/site_null_frozen.csv
+(6 certified sites: Chemistry, Math, Business, Engineering, Biology depth-1; one depth-4
+Math site).
+Strata: CERTIFIED-STRICT = the leaf's whole anchor->leaf path consists of certified splits
+(i.e. depth-2 leaves under the five certified anchors); CERTIFIED-IMMEDIATE = the leaf's
+own parent split is certified (adds the depth-4 site's leaves); UNCERTIFIED = the rest.
+REGISTERED PRIMARY: leaf-over-anchor gain (correct-verdict rate difference) is POSITIVE in
+CERTIFIED-STRICT with McNemar p < 0.05, AND exceeds the gain in UNCERTIFIED (difference
+of paired gains, 2,000-fold question bootstrap CI excluding 0). Immediate definition is
+the secondary. Power is limited (certified questions are a minority of the 2,000 ladder
+matches); a null with a wide CI is reported as underpowered, not as "no effect".
+Prediction: the ladder's leaf ~ anchor null was driven by uncertified leaves; certified
+leaves show a positive gain.
+
+## F2 — keyed capability profile: embedding cells vs MMLU-Pro categories
+Data: eval_results.is_correct for every model with >= 95% coverage of the 12,118 keyed
+questions; partitions: (a) MMLU-Pro category (14); (b) frozen-tree depth-1 anchor
+(14; train side from the snapshot's leaf queryIds joined by TEXT via embeddings_cache
+queries.raw_text -> eval_results.question_text, reserved side from
+reserved_leaf_assignments.csv primary leaf); (c) frozen-tree leaf (87); (d) the 20
+strata (strata_profile_v1.json). Statistic per (model, partition): leave-one-question-out
+Brier score of predicting the model's correctness from its cell accuracy, relative to
+the model's marginal accuracy (improvement > 0 = the partition carries information;
+LOO penalises many-cell partitions automatically, so k need not be matched).
+REGISTERED PRIMARY: mean improvement over models is larger for ANCHORS than for
+CATEGORIES (paired over questions, 2,000-fold bootstrap CI excluding 0), on ALL
+questions AND on the DISAGREEMENT subset (questions whose anchor != category).
+SECONDARY: leaves (c) and strata (d) vs categories, same statistic. Prediction: anchors
+~= categories overall (they share ~72% of assignments) but anchors win on the
+disagreement subset; leaves beat categories only if sub-anchor cells are informative —
+given the ladder and P2, I predict leaves do NOT beat categories on LOO Brier.
+
+## F3 — judge confidence calibration
+Data: R2 live verdicts (27,657) with per-verdict confidence (mean of the two orders);
+key-decidable decisive verdicts; correctness = verdict matches the key.
+Statistics: reliability table (10 bins), ECE, and AUC of confidence for verdict
+correctness with a 2,000-fold bootstrap CI.
+REGISTERED: confidence is INFORMATIVE iff AUC's CI excludes 0.5 and ECE < 0.10.
+Descriptive: a confidence-weighted BT board (weight = confidence) vs the raw board —
+rho vs GT and top-4 violations. Prediction: weakly informative (AUC 0.55-0.60),
+over-confident (ECE > 0.10 given the prompt's "default to 0.7-0.85" instruction), and
+the weighted board changes nothing in the top cluster.
+
+## F4 — sibling test on certified splits (registered 2026-09-08, after F1-F3, before running)
+Data: H7's `swap_sibling` arm (rubric_swap.db, 1,000 matches judged under the SIBLING
+leaf's rubric) paired with the x12 MAIN cell-rubric verdict on the same match;
+key-decidable only; ties wrong. Strata by the match's leaf as in F1 (CERT-STRICT /
+CERT-IMMEDIATE / UNCERTIFIED). REGISTERED PRIMARY: cell-over-sibling gain positive in
+CERT-STRICT (McNemar p < 0.05) AND larger than in UNCERTIFIED (question bootstrap CI
+excluding 0); F1's underpowered rule applies. Prediction: positive direction, underpowered.
+
+## F5 — where the leaf-level capability information lives
+F2's per-question leaf-over-category LOO improvement grouped by the leaf's certification
+(F1 definitions). REGISTERED PRIMARY: the improvement is positive (bootstrap CI excluding
+0) WITHIN UNCERTIFIED leaves — i.e. capability structure exists below the certified
+geometry. SECONDARY: certified minus uncertified difference. Prediction: primary holds;
+the certified/uncertified difference is not resolvable.
+
+## F6 — functional (key-only) validation of construction variants
+Trees: frozen (mcs55 seed 42), d256_s137, d512_s137, d512_s2048, abt2_s137, abt2_s2048,
+nomic (h9_embed_nomic). All keyed questions mapped by the options key (F2 rule), same
+model set and question set for every tree. Assignment = nearest-leaf-centroid on the
+tree's own slice and embedder for ALL questions (uniform across trees; each tree's cells
+were fit on ~70% of these questions, an in-sample optimism that is equal across trees
+and disclosed). Statistic = mean LOO Brier improvement over the marginal at LEAF and at
+ANCHOR level; paired 2,000-fold question bootstrap of each tree minus the frozen tree.
+REGISTERED PRIMARY: d512 and abt2 (both seeds) each lose NO leaf-level capability
+information vs the frozen tree — difference >= -0.5 (x1000) with the CI's upper bound
+> 0. Descriptive: the full ranking. Prediction: d512 >= frozen >= abt2 > nomic.
+
+## F7 — is the within-cluster length bias confidence-dependent?
+R2 live top-4 matches (n = 6,094), verdict confidence bands < 0.85 / 0.85-0.95 / >= 0.95;
+within-cluster LC-BT beta_len per band with SE. REGISTERED PRIMARY: beta(< 0.85) >
+beta(>= 0.95) with non-overlapping 95% CIs. Descriptive: confidence-gated board
+(verdicts >= 0.95 only) top-4 vs GT. Prediction: beta falls with confidence but the
+gated board still puts iask first (the bias is confident).
+
+## OUTCOMES (2026-09-08; harness tools/analysis/free_tests_f.py; output experiment_results/free_tests_f_output.txt)
+
+- **F1 — direction as predicted, UNDERPOWERED as registered.** CERT-STRICT n = 48:
+  leaf 0.792 vs anchor 0.750 (gain +0.042; discordant 2:0, McNemar p = 0.50);
+  CERT-IMMEDIATE n = 20: +0.150 (3:0, p = 0.25); UNCERTIFIED n = 899: −0.009 (30:38,
+  p = 0.40). Certified-minus-uncertified gain +0.051, question-bootstrap 95%
+  [+0.001, +0.120] (strict); +0.159 [+0.009, +0.330] (immediate). Both CIs exclude 0 at
+  the edge but the McNemar clause fails on 2:0 / 3:0 discordant pairs — the frozen tree
+  simply has too few certified leaves (6 certified sites) for the ladder's 2,000 matches
+  to say more. Reported as UNDERPOWERED, not as a null: the hypothesis that the ladder's
+  leaf ~ anchor result was driven by uncertified leaves is alive and is exactly what the
+  certified-leaf ladder (test 5, on a D2 tree with 17-18 certified sites) is for.
+
+- **F2 — PRIMARY FAILS; secondaries WIN; prediction reversed.** Corrected run (see data
+  note): 7,754 keyed questions (6,734 train-side, 1,020 reserved after the 46-model
+  coverage intersection), anchor != category on 25.8%. Mean LOO Brier improvement over
+  the marginal (x1000): category +10.53, anchor +10.67, stratum +11.59, leaf +13.68.
+  anchor − category +0.14 [−0.53, +0.83] TIE on all questions and +0.44 [−2.14, +2.89]
+  TIE on the disagreement subset → the registered "anchors beat categories" claim FAILS:
+  at the same coarse granularity the embedding axis carries no more information about
+  model correctness than the hand labels. But stratum − category +1.06 [+0.30, +1.81] and
+  leaf − category +3.15 [+2.07, +4.20] WIN on all questions (ties on the 1,998-question
+  disagreement subset, underpowered). I predicted leaves would NOT beat categories;
+  they do, by ~30% of the labels' own improvement. Reading: sub-anchor cells DO resolve
+  capability structure the 14 labels miss — the profile claim survives at stratum/leaf
+  granularity, not at anchor granularity — even though the ladder found no rubric value
+  below anchors. Capability structure and rubric-relevant structure are different things.
+
+- **F3 — confidence INFORMATIVE; prediction wrong.** n = 12,782 key-decidable decisive
+  verdicts: accuracy 0.881, mean confidence 0.909; ECE 0.039 (well calibrated, monotone
+  reliability table: bin 0.80–0.85 → 0.727 correct, bin 0.95–1.00 → 0.960); AUC 0.752
+  [0.738, 0.764]. Predicted weakly informative/over-confident; it is neither.
+  Confidence-weighted board: rho 0.951 → 0.958, top-4 unchanged (3 violations) — the
+  confidence field is a usable per-verdict weight but does not touch the frontier cluster.
+
+- **F4 — UNDERPOWERED (direction as predicted).** Harness tools/analysis/free_tests_f4_f7.py,
+  output experiment_results/free_tests_f4_f7_output.txt. CERT-STRICT n = 24: cell 0.792
+  vs sibling 0.708 (+0.083; 3:1, p = 0.63); UNCERTIFIED n = 439: +0.014 (15:9, p = 0.31);
+  difference +0.070 [−0.087, +0.236]. Same conclusion as F1: the frozen tree cannot
+  power a certified-leaf question; the D2-tree certified ladder can.
+
+- **F5 — PRIMARY PASS; prediction correct.** Leaf-over-category LOO improvement (x1000):
+  UNCERTIFIED leaves (n = 6,616) +2.18 [+1.01, +3.28] — capability structure exists
+  below the certified geometry; CERT-STRICT (n = 1,086) +2.49 [+0.09, +4.87], not
+  distinguishable from uncertified (+0.31 [−2.34, +2.89]); CERT-IMMEDIATE — the leaves
+  of the one certified depth-4 Math site (n = 204) — +31.45 [+19.26, +43.24], by far the
+  most capability-informative cells in the tree. Reading: certification (geometric
+  reality) and capability relevance are different criteria; P2's 6/66 is a floor on
+  rubric-relevant structure, not on profile-relevant structure.
+
+- **F6 — d512 PASS, abt2 FAIL; ranking as predicted except frozen >= d512.** n = 10,925
+  keyed questions, nearest-centroid cells, leaf-level LOO improvement (x1000): frozen
+  +14.25, d256_s137 +14.11, d512_s2048 +13.98, d512_s137 +13.80, abt2_s137 +12.76,
+  abt2_s2048 +12.59, nomic +12.36; category +10.79; every tree's anchors ~= category
+  (+10.3 to +10.8). Paired vs frozen: d512 −0.45 [−1.12, +0.21] and −0.27 [−0.90,
+  +0.31] (no loss, PASS); abt2 −1.49 [−2.22, −0.81] and −1.66 [−2.37, −0.95] (FAIL);
+  nomic −1.89. Reading: abt2's 61-63 certifiable cells resolve LESS capability structure
+  than the frozen tree's 87 mostly-uncertified ones — certification buys rubric-grade
+  cells at the price of profile resolution; d512 keeps both. D2 should therefore centre
+  on 512 dims (and abt2 x 512 to see whether the loss is the leaf count or the PCs).
+
+- **F7 — letter FAILS by 0.011; substance is the batch's most useful result.** Within
+  top-4 matches, beta_len by confidence band: < 0.85 (n = 4,044, 50% ties) +1.02 [+0.89,
+  +1.15]; 0.85–0.95 (n = 1,530) +2.61 [+2.34, +2.88]; >= 0.95 (n = 520) +0.68 [+0.46,
+  +0.90]. Non-monotone: the verbosity effect PEAKS in the 0.85–0.95 band — exactly the
+  "default to 0.7–0.85 for clear wins" band the prompt instructs — and is smallest where
+  the judge is most sure. The confidence-gated (>= 0.95) top-4 board is
+  gemini > iask > arx > gpt-4o (1 violation): the frontier divergence disappears on the
+  judge's own high-confidence verdicts, with no length model at all. Consequences: a
+  confidence-gated or confidence-weighted board is a legitimate corrected board (F3
+  showed confidence is calibrated); J3's prompt v2 has a specific target — the
+  mid-confidence "both correct, pick by depth" verdicts.
+
+DATA NOTE (found by F2's first run, which is VOID and superseded): `eval_results.
+question_text` is stored PER ROW, and the ingested file of Meta-Llama-3-70B-Instruct
+carries wrong question texts on 8.4% of its rows (every other model: 0.1%). A text→id
+join over eval_results therefore maps ~half of train questions to a wrong id (the first
+F2 run showed 49.5% anchor/category disagreement and an inflated advantage for embedding
+cells). Verified consequences: NONE for the campaign — that model is excluded by the
+standing rule; matching every eval row to its true MMLU-Pro row by its OPTIONS (5
+duplicate option-sets in 11,995 rows) shows the question text wrong for 18/11,580 ids
+(4 in the reserved pool), and the R2 judge saw the true question in 2,755/2,884 cases
+(3 wrong, 126 unmatched by option formatting). Rule added to memory: cross the
+mmlu_pro↔eval id spaces by the options key, never by eval_results.question_text.

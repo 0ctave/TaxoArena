@@ -1,0 +1,96 @@
+{
+ "artefact_sha256": "2177d046d96aeacd925f5e76551bd863cfe55f425c69276cf4ced05d473ebdb0",
+ "corpus_type": "mcq",
+ "manifest": {
+  "artefact_label": "MCQ rubric, population mmlu-pro-v2 TRAIN",
+  "content_key_check": {
+   "eval_hits": 0,
+   "n_option_texts": 392,
+   "n_texts": 40,
+   "not_gen_side": 0,
+   "sides": [
+    "TRAIN"
+   ]
+  },
+  "gen_view": "gen_view_REG.db",
+  "gen_view_meta": {
+   "content_check": "69353 checked, 0 hits",
+   "eval_key_count": "6153",
+   "of_record": "registered seed (ARCH-V2-SPLIT-DRAW-2)",
+   "seed": "ARCHV2-SPLIT-2:2929bd46aa271d883050bfe735f96e621ed55fd2",
+   "sides": "TRAIN,GATE",
+   "split_sha256_bytes": "a4e8a1362818c424d2fa5fd8b290726a80eb82d3ee5cdec354212c81da61a37d",
+   "view_kind": "gen",
+   "views_blob": "7a0f0ab31a09e02fcc54db6b8ce26d99284b1603"
+  },
+  "gen_view_sha256_bytes": "c2930c609c67d6c7e1f8b8fbcd8f6f1970478a28f844d086d0b0db169d10c0ec",
+  "induction_blob": "blob:f4d65f59156f8f3f28d3257989d8baab1953d83e",
+  "induction_version": "jv2-induce-3",
+  "input_variant_ids_ordered_sha256": "89bed2562c1f8575ed0dbfd5b9980216aa346ef26d5837fbe574b7b775ef132a",
+  "input_variant_ids_sha256": "99484486d75774b379bd35713063022a8c05b8949b7b2d61045f95670d9abe50",
+  "inputs_selected_by": "select_inputs",
+  "model": {
+   "attempt_of_record": 1,
+   "finish_reason": "stop",
+   "max_tokens": 8192,
+   "model": "grok-4-1-fast-non-reasoning",
+   "of_record": "REGISTERED ARCH-V2-INDUCE-RUBRIC-1 (attempt 1 of record)",
+   "payload_sha256": "cce432e1353e7c27e913862da0215322c279fe71aca9d9b174d3ab178963c7c4",
+   "provider": "azure:grok-4-1-fast-non-reasoning",
+   "reply_sha256": "22965043689274be4628c61bb2a58d440bcf2769e46cd4a17b07abe3c4193f4b",
+   "response_id": "51a49549-9e24-47dc-ab3e-b842bcba59b9",
+   "temperature_label": "omitted"
+  },
+  "n_inputs": 40,
+  "overlap_exclusion": {
+   "file": "overlap_exclusions_split2.json",
+   "list_sha256": "68c0b960a4a7bedc76db079cdc2e0f01d5ef0b2fc4304f5486706cb27b71418a",
+   "n_excluded": 679,
+   "threshold": 8
+  },
+  "population": {
+   "contracts": [
+    "MC_LETTER"
+   ],
+   "corpus_version": "mmlu-pro-v2"
+  },
+  "prompt_system_sha256": "4c4bf36f61f43f37f0057ce31e96b086528735aae338a60c1e19432a009823e7",
+  "prompt_user_sha256": "98259677b45c2939aaed1fc39ab9546b4cebeac662d7d19f80970cb0d3cbb53e",
+  "seed": "ARCHV2-INDUCE-1:5abb79f55c3719d122b5310151f975493609f37b",
+  "seed_label": "REGISTERED ARCH-V2-INDUCE-SELECT-1",
+  "seed_registration": "ARCH-V2-INDUCE-SELECT-1",
+  "sides_admitted": [
+   "TRAIN"
+  ],
+  "train_only_witness": {
+   "candidate_rows": 7441,
+   "distinct_variants": 7441,
+   "duplicates_collapsed": 0,
+   "excluded_by_population": {
+    "mc6-2026-09-11 IMPORTED:acc_norm": 4259,
+    "mc6-2026-09-11 MC_LETTER": 7143
+   },
+   "excluded_skipped_in_order": 7,
+   "exclusion_list_size": 679,
+   "gate_excluded": 1929,
+   "last_rank": 47,
+   "other_excluded": 0,
+   "population": {
+    "contracts": [
+     "MC_LETTER"
+    ],
+    "corpus_version": "mmlu-pro-v2"
+   },
+   "skipped_by_component": 0,
+   "train_candidates": 7441
+  },
+  "verbatim_audit": {
+   "hits": 0,
+   "shingle": 8
+  },
+  "views_blob": "blob:7a0f0ab31a09e02fcc54db6b8ce26d99284b1603"
+ },
+ "of_record": "REGISTERED ARCH-V2-INDUCE-RUBRIC-1 (attempt 1 of record)",
+ "rubric": "The ideal response outputs a single uppercase letter (A-Z) exactly matching one option identifier in the question's option list.\n\nScore 1 (perfect) if: exactly one uppercase letter matching an option identifier, no other text or characters.\n\nScore 0 (incorrect) if: wrong/missing letter, multiple letters, lowercase, extra text, explanations, or formatting.\n\nNo credit for reasoning, computations, or near-matches.",
+ "rubric_sha256": "ef9c9e8759147960dedff70c3b86fe9f6b8b9caad8ddc39fb0fdc1c253e0eb07"
+}

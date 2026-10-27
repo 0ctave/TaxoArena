@@ -1,0 +1,83 @@
+# ANCHOR-FREE-REDRAW arm R4 af_s42_o1: the anchor-free recipe at the record's sample, construction
+# order re-drawn. BASE experiment_configs/anchorfree/af_s42.toml. ONE KEY:
+# constructionOrderShuffleSeed = 1 (H9-REM instrument: permutes the split-pass BFS/id-hash order and
+# the merge-pass enumeration order, nothing else; requires runPipeline = true, present in the body).
+# The only construction-randomness instrument that exists (registration). Same p8a29 split as the
+# record (seed 42), so purity on the pool of record is 70.4% in-sample exactly as the record's.
+#
+# REGISTRATION. docs/judge_v2_program.md, "Registered 2026-09-17 (before running) - ANCHOR-FREE-REDRAW"
+# (commit d61f2cf; plan docs/agents/plans/2026-09-17_anchor_free_redraw.md). Zero judge calls.
+# Every arm = its BASE with exactly ONE treatment key on an active key line (never inside a
+# header comment: commit 92009dc), its own outputDir under experiment_results/anchorfree/redraw/
+# and its own -Dranking.db.path (experiment_results/anchorfree/redraw/ratings_<arm>.db, set by
+# tools/chains/anchor_free_redraw.sh). Label-free, z 2.0, mcs 55, 256-dim slice, bar 0.025.
+# Nothing is activated (pool_guard --activate no longer exists, 2026-09-16); verify the pool of
+# record with `python tools/analysis/pool_guard.py --pool p2dca21ab5f4ef3ae`. The tree this
+# builds is STRUCTURAL EVIDENCE ONLY; the registration does NOT authorise judging on it.
+# Instrument: 300-rep site null at the build's slice (256, dropTop 0, whiten false),
+# anchor_free_readout.py vs experiment_results/anchorfree/af/seed_42 with
+# site_null_af_s42.csv as control, then tools/analysis/anchor_free_redraw.py.
+# Order in the sweep: R1, R1c, R2, R3, R4; all five run regardless (no early stopping).
+#
+datasetType   = "MMLU_PRO"
+
+models        = [
+    "gpt-4o-2024-08-06",
+    "claude-3-5-sonnet-20241022",
+    "gemini-1.5-pro-002",
+    "deepseek-chat-v2_5",
+    "Meta-Llama-3_1-70B-Instruct",
+    "Qwen1.5-72B-Chat",
+    "gpt-4o-mini",
+    "claude-3-5-haiku-20241022",
+    "Mixtral-8x7B-Instruct-v0.1",
+    "c4ai-command-r-v01",
+    "Qwen1.5-14B-Chat",
+    "Meta-Llama-3_1-8B-Instruct",
+    "gemini-1.5-flash-002",
+    "Llama-2-70b-hf",
+    "Llama-2-13b-hf"
+]
+
+category      = ""
+queryLimit    = 0
+outputDir     = "experiment_results/anchorfree/redraw/af_s42_o1"
+testRatio     = 0.3
+seed          = 42
+
+# Body = o0_s42.toml (seed 42 = the frozen build's split and construction seed). The ONE
+# instrument key of this registration; o0 differs from this file only by its absence.
+anchorFree = true
+constructionOrderShuffleSeed = 1
+
+runPipeline        = true
+runBenchmark       = false
+runTrickle         = true
+runBaselines       = false
+enableFinalMetrics = false
+enableLabeling     = false
+judgeInduction     = false
+
+dagMode = "DAG_MAX"
+
+maxDepth              = 8
+minClusterSize        = 55
+proposalSeparationBar = 0.025
+tau                   = 1e-6
+acceptanceZ           = 2.0
+enableRefitGate       = false
+
+membershipFloor       = 0.25
+routingBeamGamma      = 0.2
+descentMargin         = 0.12
+
+effectiveSupportFloor = 2.0
+defaultKappaPrior     = 10.0
+
+numIterations         = 50
+maxLeafAssignments    = 5
+
+fusionSimilarityThreshold = 0.90
+enableGtWarmStart         = false
+
+enableProfiling           = true

@@ -1,0 +1,19 @@
+pool: the B0-2 check is the operator's (v2_union_pool.py --dry-run); this mode opens no pool table
+[PCS] DRY RUN: zero calls, nothing written, no null replicate, no verdict
+[CPC] heavy foreign processes (java): none
+[PCS] member B0/mmlu_pro_lb = snapshot 20261001_094311_Headless_Run_Auto_ge; root n00000001 'MMLU_PRO_LB' n = 6993 (TRAIN); CPC labels Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\experiment_results/cert_positive_control/declared_labels.tsv sha256 c0a20662047c6314 (= the pin)
+[PCS] the 14 declared groups (N_g): biology 381, business 467, chemistry 676, computer science 243, economics 504, engineering 580, health 410, history 238, law 578, math 809, other 555, philosophy 298, physics 778, psychology 476
+[PCS] n 486 (PS1) allocation (PCS-1): 26 32 47 17 35 40 29 17 40 56 39 21 54 33; min group 17
+[PCS] n 441 (PS2) allocation (PCS-1): 24 29 43 15 32 37 26 15 36 51 35 19 49 30; min group 15
+[PCS] n 264 (DESCRIPTIVE) allocation (PCS-1): 14 18 26 9 19 22 15 9 22 31 21 11 29 18; min group 9
+[PCS] n 486: 5 draws, pairwise overlaps min 24 / max 38 items
+[PCS] n 441: 5 draws, pairwise overlaps min 14 / max 31 items
+[PCS] n 264: 5 draws, pairwise overlaps min 5 / max 17 items
+[PCS] G12 TOP-site n (beside; the sizes were fixed by the registration): [264, 322, 409, 441, 443, 483, 483, 489, 490, 532, 564, 765, 770, 778]
+[PCS] site file experiment_results/cert_pc_size/site_labels.tsv: 16 sites, 12948 rows, sha256 231db2e0e11974b28f19244753a1c0a1a5b5c4f96ff695fead2599fe78cfe737 (absent: --prepare writes it)
+[PCS] heap (g12_site_null's rule, the IDENTITY site n 6993): live 12, peak 2.48 GB -> fits the 6g default
+[PCS] wall: under about 24 min at 12 threads (bound: CPC's arm, 14 anchors + root at both arms + C0, took 24.2 min; this arm runs the root's plain arm + 15 subsamples, sum n^2 x 2 arms = 5003730)
+[PCS] pool file sha256-lf 79d48f4b36434a55 (= the stamp's)
+[PCS] LAUNCH FROM Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run
+[PCS] COMMAND: .\gradlew.bat certPcSize --console=plain --offline --no-daemon -PjvmThreads=12 -PnullReps=300 "-DsnapshotId=20261001_094311_Headless_Run_Auto_ge" "-DsliceDim=512" "-DsepBar=0.0145" "-DdropTop=0" "-Dwhiten=false" "-DsiteLabels=experiment_results/cert_pc_size/site_labels.tsv" "-DoutDir=experiment_results/cert_pc_size/arm"
+[PCS] after the arm: .\gradlew.bat --stop

@@ -1,0 +1,118 @@
+{
+  "id": "MAXT-MULTIPLICITY",
+  "title": "MAXT-MULTIPLICITY: FRAMEWORK item 6: the max-t simultaneous critical value per cell, and how many ORDERED edges survive a simultaneous call (zero calls)",
+  "question": "q_cell = the 95th percentile of the max over all pairs of |d* - d_hat| / s from the existing resamples, on x12 per-anchor (920 edges), x12 pooled (66), merged per-anchor (2,538) and merged pooled (190, the board of record); three readings: hybrid (raw-scale quantile against the tau-widened statistic), raw-z, widened-q; tier maps under both calls.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "eaf1dbf",
+    "program_lines": "docs/judge_v2_program.md L3603-L3611 (by reference; docs/design/FRAMEWORK.md L359 item 6); the Block 1 record bullet at L3718",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-15 (before any run) — BY REFERENCE: the 26 tests in docs/design/FRAMEWORK.md \"Tests to register before shipping\" (commit 8d77f7b), with the criteria, predictions and call counts stated there, scheduled in docs/plan_2026-09-15.md",
+    "outcome_heading": [
+      "L3662: ## Block 1 record (2026-09-15/16, zero calls) — FRAMEWORK items 1-12, 14-16: fourteen zero-call tests built, each adversarially checked; verdicts of record below (checker's number wins where it refutes the builder)",
+      "L3718: - **MAXT-MULTIPLICITY (2026-09-15, zero calls): readout DELIVERED; prediction \"ORDERED falls 15-25%\" FAIL, for a stronger reason than the builder gave: the band is reached only under a hybrid reading, and under either scale-consistent reading the fall is at most 14.1% and the tier map of record does not change.**"
+    ],
+    "date": "2026-09-15"
+  },
+  "script": {
+    "path": "tools/analysis/maxt_multiplicity.py",
+    "sha16": "83181c46f6376433",
+    "commit": "7076615"
+  },
+  "ready": null,
+  "go": "n/a (0 calls; Block 1)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/maxt_multiplicity.txt",
+    "outcome_commit": "7076615",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (pool_guard.assert_pool_of_record() first; union pool paeec37aa28063c75 by explicit id where used)",
+    "date": "2026-09-15/16"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); each Block 1 test was 'adversarially checked' at build time and the checker's number wins where it refutes the builder (Block 1 record header L3662-L3663); the checker-confirmed defects are listed in the bullet",
+    "commit": "7076615",
+    "verdict": ""
+  },
+  "criteria": [
+    {
+      "id": "readout",
+      "text": "q_cell per cell delivered; ORDERED marginal vs simultaneous; tier maps under both calls (registered readout, no pass/fail)",
+      "result": "DELIVERED",
+      "value": "q_cell: x12 per-anchor 3.16-3.45 (median 3.31), x12 pooled 3.17, merged per-anchor 3.43-3.80, merged pooled 3.45 (all 30 values reproduce to 3 dp); widened-scale q_w 2.42-3.42 per anchor, 1.89 / 1.84 pooled; x12 per-anchor 920: hybrid 651 -> 504 (22.6%), wrong 1(1) -> 0(0), raw-z 8.0%, widened-q 14.1%; merged per-anchor 2,538: hybrid 1,714 -> 1,352 (21.1%), wrong 4(4) -> 1(1), raw-z 6.5%, widened-q 12.4%; x12 pooled 66: 57 -> 51 (10.5%), raw-z 0.0%, widened-q 0.0%; merged pooled 190: hybrid 150 -> 126 (16.0%) [14.7%, 16.0%], raw-z 0.0%, widened-q 0.0%; tier maps: hybrid collapses [9,9,2] -> [20]; under both scale-consistent readings the board of record stays [9,9,2] with all 150 ORDERED",
+      "denominator": "four boards; existing resamples"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "ORDERED falls by 15-25%",
+      "result": "FAILED",
+      "value": "under the hybrid 3 of 4 boards in band; under either scale-consistent reading no board reaches 15% (max 14.1%); the 15-25% figure was carried over from a raw 1.96*s call on a different object (the raw call here falls 15.1% / 17.5% per anchor, 0.0% / 2.8% pooled)",
+      "denominator": "four boards"
+    }
+  ],
+  "falsifier": {
+    "text": "none (registered readout)",
+    "fired": false,
+    "note": "checker HIGH: the hybrid 'simultaneous' call compares |m|/sqrt(s^2 + tau^2) with a critical value computed on |d* - d_hat|/s; 100% of the pooled removed edges are ones the resamples separate simultaneously, removed only because tau inflates the denominator; FRAMEWORK L103 ('tier maps use the simultaneous call') is UNDERDETERMINED until it fixes which statistic q_cell applies to"
+  },
+  "numbers_of_record": {
+    "q_cell": "x12 per-anchor 3.16-3.45 (median 3.31); x12 pooled 3.17; merged per-anchor 3.43-3.80; merged pooled 3.45; widened q_w 2.42-3.42 / 1.89 / 1.84",
+    "falls": "x12 per-anchor hybrid 22.6% / raw-z 8.0% / widened-q 14.1%; merged per-anchor 21.1% / 6.5% / 12.4%; x12 pooled 10.5% / 0.0% / 0.0%; merged pooled 16.0% [14.7%, 16.0%] / 0.0% / 0.0% (all 24 lost edges have raw z >= q_cell, min 4.70, median 11.84)",
+    "tier_maps": "hybrid: x12 per-anchor 29 -> 16 tiers, merged 21 -> 14, x12 pooled 6 -> 2, board of record [9,9,2] -> [20]; scale-consistent: unchanged ([9,9,2], 150 ORDERED; x12 pooled 6 tiers)",
+    "wrong_after": "merged per-anchor 4(4) -> 1(1) under the hybrid (Law, Llama-3.1-70B residue)"
+  },
+  "sentence_of_record": "MAXT-MULTIPLICITY (2026-09-15, zero calls): readout DELIVERED (q_cell 3.16-3.80 per cell, all 30 values to 3 dp); prediction 'ORDERED falls 15-25%' FAIL, for a stronger reason than the builder gave: the band is reached only under a hybrid reading (raw-scale quantile against the tau-widened statistic), and under either scale-consistent reading the fall is at most 14.1% and the tier map of record ([9,9,2], all 150 ORDERED) does not change; the hybrid's 'board collapses to one tier' is the same artefact (dropped separations z_raw 11.75 and 4.70). FRAMEWORK L103 is UNDERDETERMINED until it fixes which statistic q_cell applies to.",
+  "chips": [
+    "READOUT DELIVERED (DESCRIPTIVE)",
+    "PREDICTION 15-25% FAIL (MAX 14.1% SCALE-CONSISTENT)"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-16",
+      "by": "Block 1 record corrections for LEDGER-CONSISTENCY (programme L3839; FRAMEWORK L103 bracketed at a75df45)",
+      "text": "FRAMEWORK L103: which statistic the simultaneous call applies to is underdetermined; on the resamples alone the board of record does not change."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a simultaneous call on the widened statistic (the hybrid is a scale artefact)",
+    "any change to the tier map of record under a scale-consistent reading"
+  ],
+  "ledger": {
+    "row_id": "MAXT-MULTIPLICITY",
+    "version": "v103 (684be03); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "TIER-HONEST-X20",
+    "KEY-TIE-DECLINE",
+    "SYSTEMATIC-BUDGET",
+    "PROFILE-DEVIATION-CERT"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L3603-L3611 (by-reference registration eaf1dbf) and docs/design/FRAMEWORK.md L359 item 6: criterion, prediction, call count",
+    "docs/judge_v2_program.md L3718 ff. (Block 1 record bullet, 7076615): the criterion table, predictions scored, checker-confirmed defects, script and output",
+    "experiment_results/x12_crossdomain/maxt_multiplicity.txt (7076615)",
+    "docs/test_ledger.html row MAXT-MULTIPLICITY (v103 684be03): chips verbatim, design / criteria / observed cells, evidence",
+    "script sha16 = sha256 of tools/analysis/maxt_multiplicity.py at 7076615 (its first commit), first 16 hex (identity, computed by the registrar 2026-09-22; later edited at 13f2142 for the pool_guard change)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' heading and the '- **ID (...)**' bullet line inside the Block 1 record, to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Computes a stricter threshold that controls errors across all model pairs at once, from existing resamples on four boards. It then counts how many model orderings survive it. No judge calls.",
+    "why": "Checks whether the published tier maps of models still hold when many pairwise comparisons are corrected for together.",
+    "information": "A big loss of orderings would weaken the leaderboard tiers. Little loss would confirm them. Result: delivered as a readout. The predicted 15-25% drop only appears under a mixed reading that compares quantities on different scales. Under consistent readings the drop is at most 14%, and the main tier map does not change. Which statistic the framework rule should use is still open. This test belongs to the older question pool, so it now counts as history, not evidence.",
+    "written": "2026-10-07"
+  }
+}

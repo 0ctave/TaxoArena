@@ -1,0 +1,238 @@
+{
+  "id": "SUPERGPQA-STAGE0b",
+  "title": "SUPERGPQA-STAGE0b: SUPERGPQA-STAGE0 with the 1,251 MMLU-Pro-colliding items (4.7156%) excluded and no A4 bar; POST-COUNT, PRE-KEY (zero-call; REGISTERED; the author's decision (a) of 2026-09-27)",
+  "question": "On SuperGPQA minus its 1,251 MMLU-Pro stem_key collisions, split content-closed under CK-CLOSE-v1 at 0.30 EVAL per field, does a per-discipline policy fitted on TRAIN beat the best single zero-shot model on EVAL, and is the key profile's interaction-only reliability over the declared disciplines above its null?",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "the commit that writes this record (parent bb30526)",
+    "program_lines": "docs/judge_v2_program.md L21848-L21865",
+    "program_lines_as_of": "the commit that writes them, parent bb30526, re-grepped",
+    "date": "2026-09-27",
+    "heading": "## Registered 2026-09-27 (before any code or call; POST-COUNT, PRE-KEY) \u2014 SUPERGPQA-STAGE0b: SUPERGPQA-STAGE0 with the 1,251 MMLU-Pro-colliding items excluded and no A4 bar ...",
+    "label": "POST-COUNT, PRE-KEY (collision and scored-discipline counts seen key-free by READY review 1adce88; no correctness read)",
+    "provenance": "the author's decision (a) of 2026-09-27 as relayed by the orchestrator; docs/plan_2026-09-15.md Amendment 26 (2026-09-27); everything not changed is inherited verbatim from SUPERGPQA-STAGE0 (L21790-L21829)"
+  },
+  "script": {
+    "path": "tools/analysis/supergpqa_stage0.py",
+    "sha16": "blob:c1e8175ebfc6eb81486206828df06a3286557951 / sha256-lf16:dd0e34dbca17623d / sha256-crlf16:0377c1a276d8c192; exclusion json blob:11839fa36aad567acfd1d3ed7e2c7ffc9b261a21 / sha256-lf16:89d17b0df027728e (review pins) [2026-09-29 registrar: at b2ad5ef / merged 481b613: supergpqa_stage0.py blob:35b11858eab0cc20fe0982fe4af14a471a0fb6b1 / sha256-lf16:271528ead60f5279 / sha256-crlf16:b452cdc1bde89218; exclusion json 11839fa3 unchanged (delta-2 review pins, LF blob of record; equal at HEAD 481b613 by git rev-parse)] [2026-09-29 registrar: run at 481b613 with blob:35b11858 (equal at HEAD, review Part 2)]",
+    "commit": "481b613 (by-path merge of 639e60f; not an ancestor) [run on main 481b613]"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_w0_delta3.md",
+    "commit": "3da93fc",
+    "at": "481b613 (the run's main; supergpqa_stage0.py blob:35b11858 = the delta-2 pin)",
+    "verdict": "POST-RUN VALID (Part 2); S-1 MEDIUM wording condition",
+    "conditions": [
+      "S-1 APPLIED: C1 always with the percentile bracket [-0.05, +1.16] and DESCRIPTIVE-ONLY; population sentence binds",
+      "C11-5 LOW carried (unreachable on real data: dup 0 in 49 files)"
+    ],
+    "source": "docs/reviews/READY_w0_delta3.md (3da93fc) Part 2",
+    "previous": {
+      "file": "docs/reviews/READY_w0_delta2.md",
+      "commit": "b2ad5ef",
+      "at": "639e60f (505b34b)",
+      "verdict": "READY-WITH-CONDITIONS (tool only); MERGEABLE; --run after a rule-7 window",
+      "conditions": [
+        "C11-1 OPEN (rule-7 window; A5 confirmed by the steward 8c2b846)",
+        "C11-5 LOW OPEN (duplicate-uuid fixture)",
+        "B2 MET: DATASET-SURVEY SuperGPQA row C2 = ADMIT (steward 8c2b846); orchestrator ruling: STAGE0b proceeds on it"
+      ],
+      "source": "docs/reviews/READY_w0_delta2.md (b2ad5ef)"
+    }
+  },
+  "go": "n/a (0 calls, 0 cce); the author's decision (a) 2026-09-27 (plan Amendment 26)",
+  "run": {
+    "outcome_file": "experiment_results/supergpqa/supergpqa_stage0b_outcome.txt (blob:1eaf9d19c1fc83bc67d3528ad527da570228b289 / sha256-lf16:7e464a61421fe69a; LF working tree; write-once; = run.log after CR strip); key DB supergpqa_stage0b_key.db sha256 9898d91a... (1,238,622 rows) untracked",
+    "outcome_commit": "the registrar's batch commit of 2026-09-29 (this record's commit; the outcome was untracked until then)",
+    "calls": 0,
+    "cce": 0,
+    "pool": "SuperGPQA split sg893684444c6df3e9 (CK-CLOSE-v1, 0.30 EVAL per field) minus 1,251 MMLU-Pro collisions",
+    "date": "2026-09-29 (~12:33-12:35, main 481b613)"
+  },
+  "review": {
+    "file": "docs/reviews/READY_w0_delta3.md (3da93fc), section \"## PART 2: POST-RUN SUPERGPQA-STAGE0b\"",
+    "commit": "3da93fc",
+    "verdict": "VALID: C1 HELD (notable; DESCRIPTIVE-ONLY by plan) and C2 HELD, both reproduced; F1 does not fire; S-1 MEDIUM (wording): C1 always with the percentile bracket"
+  },
+  "criteria": [
+    {
+      "id": "A1-A6 (A4 -> A4b)",
+      "text": "admission legs as STAGE0 except A4b, an IDENTITY GATE: colliding families excluded from both sides; STOP unless the MMLU-Pro collision count is exactly 1,251 (370 EVAL / 881 TRAIN); 20NG and ag_news readable, any other-store collision also excluded and counted; order A3, A4b, then A2 (A2 samples post-exclusion TRAIN); no STOP path prints a key count",
+      "result": "HELD",
+      "value": "A1 49 zero-shot models; A2 >= 40 pass; A3 PASS; A4b identity PASS (1,251 = 370 EVAL / 881 TRAIN; 20NG / ag_news readable, 0 collisions); A5 PASS; A6 PASS (10 scored disciplines)",
+      "denominator": "the corpus minus collisions (25,278 non-excluded uuids x 49 models)"
+    },
+    {
+      "id": "C1",
+      "text": "G = acc_EVAL(per-discipline TRAIN argmax policy) - acc_EVAL(pooled TRAIN best single) over the scored disciplines' EVAL items: HELD iff the two-stage 95% interval (B 2,000, CK-CLOSE components) wholly above 0; FAILED iff wholly below; UNDETERMINED otherwise; placebo interval wholly above 0 VOIDs",
+      "result": "HELD",
+      "value": "HELD by the normal two-stage interval of record, lower end +0.04pp [the percentile interval printed beside contains 0: [-0.05, +1.16]; verdict line DESCRIPTIVE-ONLY]: G = 0.6195 - 0.6130 (best single DeepSeek-R1) = +0.65pp, two-stage SE 0.00309 -> 95% [+0.04, +1.25]pp; placebo +0.28pp [-0.66, +1.23] does not VOID; the review: FRAGILE (own [+0.05, +1.25], percentile [-0.07, +1.11])",
+      "denominator": "7,396 EVAL items of the 10 scored disciplines in 7,395 CK-CLOSE components; 49 models; population SuperGPQA minus its 1,251 MMLU-Pro stem_key collisions"
+    },
+    {
+      "id": "C2",
+      "text": "interaction-only R over the scored disciplines (EVAL): HELD iff the jackknife 95% lower bound exceeds the logit-additive null p95 (19th of 20); FAILED iff the upper bound is at or below it; UNDETERMINED otherwise",
+      "result": "HELD",
+      "value": "R 0.6413, jackknife re-halved 95% [0.4382, 0.8444] (SE 0.1036) > null p95 (19th of 20) 0.0995",
+      "denominator": "10 scored disciplines x 49 models; 7,396 EVAL items"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "legs A1, A2, A3, A5, A6 all pass: 0.70; A1 finds 49: 0.85; >= 40 models pass A2: 0.75",
+      "result": "HELD",
+      "value": "all legs pass; A1 finds 49 (P1a HELD); >= 40 pass A2 (P1c HELD)",
+      "denominator": "A1-A6 without A4"
+    },
+    {
+      "id": "P2",
+      "text": "SEEN post-count: 10 scored disciplines (recorded as an identity, not scored)",
+      "result": "n/a",
+      "value": "identity, not scored: observed 10 = 10",
+      "denominator": "A6"
+    },
+    {
+      "id": "P3",
+      "text": "G = +1.0pp (80% [-0.2, +2.5]); C1 HELD 0.35, UNDETERMINED 0.60, FAILED 0.05",
+      "result": "HELD",
+      "value": "+0.65pp in [-0.2, +2.5]; realised C1 class HELD (prior 0.35)",
+      "denominator": "C1"
+    },
+    {
+      "id": "P4",
+      "text": "R = 0.85 (80% [0.70, 0.93]); C2 HELD 0.85",
+      "result": "FAILED",
+      "value": "0.6413 outside [0.70, 0.93]; C2 HELD (prior 0.85)",
+      "denominator": "C2"
+    },
+    {
+      "id": "P5",
+      "text": "the best single is the TRAIN argmax in >= 5 scored disciplines: 0.60",
+      "result": "FAILED",
+      "value": "3 of 10 disciplines (< 5)",
+      "denominator": "dominance column"
+    },
+    {
+      "id": "P6",
+      "text": "the placebo's interval covers 0: 0.90",
+      "result": "HELD",
+      "value": "placebo [-0.66, +1.23]pp covers 0",
+      "denominator": "C1 validity"
+    },
+    {
+      "id": "P7",
+      "text": "the best zero-shot model's pooled EVAL accuracy <= 0.65 (DESCRIPTIVE; the 'mostly solved' readout): 0.85",
+      "result": "HELD",
+      "value": "0.6119 (DeepSeek-R1, 7,591 EVAL) <= 0.65",
+      "denominator": "descriptive"
+    }
+  ],
+  "falsifier": {
+    "text": "F1 = C2 FAILED: the key-profile interaction licence (R above its null on MMLU-Pro and the union, id-disjoint only) does not transport to SuperGPQA's declared disciplines at this roster; overturns the planned SQ5 corpus-invariance of the key-R clause, not any recorded number.",
+    "fired": false,
+    "outcome": "F1 NOT FIRED (C2 HELD)"
+  },
+  "numbers_of_record": {
+    "none_yet": "registered; nothing run (the Support figures are planning values of the registration, not outcomes) [SUPERSEDED 2026-09-29 at the outcome]",
+    "C1_G": "+0.65pp (0.6195 - 0.6130, best single DeepSeek-R1), two-stage 95% [+0.04, +1.25]pp (SE 0.00309), percentile [-0.05, +1.16]pp CONTAINS 0; n 7,396 in 7,395 components; HELD by the normal interval of record, DESCRIPTIVE-ONLY verdict line",
+    "C1_support_measured": "SE_iid 0.00280, SE_2stage 0.00309, DEFF 1.218, n_eff 6,074, MDE80 0.86pp (plan DEFF 1.312, SE 0.005265, MDE80 1.47pp)",
+    "C2_R": "0.6413, jackknife 95% [0.4382, 0.8444] (SE 0.1036), null p95 0.0995; 10 disciplines x 49 models",
+    "placebo": "+0.28pp, two-stage [-0.66, +1.23]pp (does not fire)",
+    "population": "SuperGPQA minus its MMLU-Pro stem_key collisions: 1,251 of 26,529 excluded (4.7156%; 370 EVAL / 881 TRAIN)",
+    "descriptive_grains": "G_field +0.91pp [-0.30, +2.13] (18 fields, n 4,927); G_family +0.54pp [-0.04, +1.12] (16 families); DESCRIPTIVE"
+  },
+  "sentence_of_record": "SUPERGPQA-STAGE0b (2026-09-29, 0 calls; post-run review 3da93fc VALID): on SuperGPQA minus its MMLU-Pro stem_key collisions, a per-discipline policy fitted on TRAIN beats the best single zero-shot model (DeepSeek-R1) on EVAL by +0.65pp, C1 HELD by the normal two-stage interval of record [+0.04, +1.25] (n 7,396 in 7,395 components), and the key profile's interaction-only R over the 10 declared disciplines is 0.6413 [0.4382, 0.8444] against a null p95 of 0.0995 (C2 HELD). [C1: lower end +0.04pp; the percentile interval printed beside contains 0: [-0.05, +1.16]; verdict line DESCRIPTIVE-ONLY; population excludes 1,251 of 26,529 items (4.7156%); never a gain of SuperGPQA as a whole.]",
+  "chips": [
+    "REGISTERED 2026-09-27, POST-COUNT, PRE-KEY; NO KEY READ [plan]",
+    "EXCLUDES 1,251 MMLU-PRO COLLISIONS (4.7156%); NO A4 BAR [plan]",
+    "C1 DESCRIPTIVE-ONLY (MDE 1.47PP); C2 SCOREABLE [plan]",
+    "BUILT; READY-WITH-CONDITIONS, TOOL ONLY (fd6a349); BoN AND TWO-ROSTER STRUCK [plan]",
+    "BUILT; READY-WITH-CONDITIONS (b2ad5ef); MERGED 481b613; A3 / A4b / A5 / A6 PASS; SURVEY C2 ADMIT [plan]",
+    "VALID (POST-RUN 3da93fc); C1 HELD BY THE NORMAL TWO-STAGE INTERVAL, LOWER END +0.04PP; PERCENTILE [-0.05, +1.16] CONTAINS 0; VERDICT LINE DESCRIPTIVE-ONLY [warn]",
+    "C2 HELD: R 0.6413 [0.4382, 0.8444] > NULL p95 0.0995; F1 NOT FIRED [ok]",
+    "P4 P5 FAILED; POPULATION = SUPERGPQA MINUS 1,251 MMLU-PRO COLLISIONS (4.7156%); NOT A GAIN OF SUPERGPQA AS A WHOLE [warn]"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-29",
+      "by": "the registrar (research lead's rulings 1-21 accepted by the orchestrator; orchestrator rulings B5-1, C7-2; steward 5572465; delta READY fd6a349; merge cfcec54; insertion only; zero calls; pre-data)",
+      "text": "Delta READY fd6a349: READY-WITH-CONDITIONS (tool only) at 505b34b; run NOT READY. Ruling 20 (research lead, accepted; PRE-KEY): best-of-N and the two-roster contrast are STRUCK from STAGE0b by this bracket; printed 'STRUCK (bracket: the 2026-09-29 registrar's record)', never 'UNDEFINED'; either returns only in a later registration with a definition and a whitelist amendment. Ruling 21: leg order A1 before A2 accepted as the registrar's reading (A1 key-free presence on the post-exclusion population; print the count of models whose completeness differs from the full-corpus count). OPEN: A5, a rule-7 window, C11-3, C11-4. State registered -> built."
+    },
+    {
+      "date": "2026-09-29",
+      "by": "the registrar (steward 8c2b846; delta-2 READY b2ad5ef; merge 481b613; the author's machine cap ~22/24 threads; orchestrator ruling STAGE0b / survey --analyze; refused gemma embed; insertion only; zero calls; pre-data)",
+      "text": "Steward 8c2b846 (dry-run at 639e60f, no correctness read): ruling 21 = 0 of 49 models differ (post-exclusion 25,278 vs full 26,529); A3 PASS; A4b PASS (1,251 = 370 EVAL / 881 TRAIN); A5 PASS (odc-by); A6 PASS (10 disciplines, scored EVAL 7,396). ORCHESTRATOR RULING: STAGE0b proceeds on its DATASET-SURVEY C2 ADMIT row. Delta-2 READY b2ad5ef: READY-WITH-CONDITIONS (tool only) at 639e60f; merged by path 481b613. OPEN: C11-1 rule-7 window, C11-5 LOW. State built."
+    },
+    {
+      "date": "2026-09-29",
+      "by": "the registrar (post-run reviews 3da93fc / 80ce082; merge 219dec0; run commits b61e496, 61c99ad; insertion only; zero calls)",
+      "text": "OUTCOME recorded (review 3da93fc Part 2 VALID; S-1 applied). C1 HELD by the normal two-stage interval of record, lower end +0.04pp [percentile [-0.05, +1.16] contains 0; DESCRIPTIVE-ONLY]; C2 HELD; F1 not fired; P1 P3 P6 P7 HELD, P4 P5 FAILED, P2 identity. Outcome committed in this batch. State built -> done."
+    }
+  ],
+  "does_not_show": [
+    "anything yet: registered; not built, not run; no SuperGPQA number in the record [SUPERSEDED 2026-09-29 at the outcome: the test ran; see the items below]",
+    "anything about the 1,251 excluded items or SuperGPQA as a whole (population: SuperGPQA minus its MMLU-Pro stem_key collisions)",
+    "whether the exclusion changes G or R (no with-collisions arm)",
+    "stage 1 (tree, FLAT, filing): a separate registration",
+    "anything from the Records' aggregate JSON (sealed; never opened)",
+    "a gain on SuperGPQA as a whole (the population sentence binds; +0.65pp is never quoted without it)",
+    "a C1 that survives the percentile interval form (it does not: [-0.05, +1.16] contains 0)",
+    "the field or family grain as a result (DESCRIPTIVE)"
+  ],
+  "ledger": {
+    "row_id": "SUPERGPQA-STAGE0b",
+    "version": "v312 (2026-09-29: OUTCOME: an outcome bracket in the observed cell; three chips added (warn, ok, warn)) | v311 (2026-09-29: a dated bracket into the observed cell; one chip added)"
+  },
+  "depends_on": [
+    "SUPERGPQA-STAGE0 (inherits its registration verbatim except A4)",
+    "DATASET-SURVEY (its SuperGPQA row must ADMIT)",
+    "ROUTER-CLEAN-POLICY",
+    "PROFILE-RELIABILITY-INTERACTION",
+    "READY review 1adce88 fixes B1, H1, M1, M2"
+  ],
+  "supersedes": "SUPERGPQA-STAGE0 (before any run; its A4 bar failed post-count)",
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing; touches no closed line (CONTEXT section 5 checked at bb30526)"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L21848-L21865 (section \"## Registered 2026-09-27 (before any code or call; POST-COUNT, PRE-KEY) \u2014 SUPERGPQA-STAGE0b: ...\"; _as_of the commit that writes it, parent bb30526, re-grepped)",
+    "docs/judge_v2_program.md L21831-L21846 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run; pre-data) \u2014 the author's decisions (a)-(c) of 2026-09-27 and the orchestrator's rulings ...\"; _as_of the commit that writes it, parent bb30526, re-grepped)",
+    "docs/plan_2026-09-15.md Amendment 26 (2026-09-27)",
+    "docs/reviews/READY_w0_rp11-supergpqa-stage0.md (1adce88) rows 4, 5, 8, 16",
+    "docs/judge_v2_program.md L21790-L21829 (SUPERGPQA-STAGE0, inherited)",
+    "docs/judge_v2_program.md L21867-L21892 (section \"## Registrar's record 2026-09-29 (insertion only; zero calls; nothing run; pre-data) \u2014 the research lead's 21 pre-data rulings (accepted by the orchestrator), the data-steward's counts 5572465 ...\"; _as_of the commit that writes it, parent cfcec54, re-grepped)",
+    "docs/reviews/READY_w0_delta1.md (fd6a349)",
+    "docs/judge_v2_program.md L21894-L21903 (section \"## Registrar's record 2026-09-29 (insertion only; zero calls; nothing run; pre-data) \u2014 the data-steward's preconditions 8c2b846, the delta-2 READY b2ad5ef, the by-path merge 481b613, ...\"; _as_of the commit that writes it, parent 481b613, re-grepped)",
+    "docs/judge_v2_program.md L21917-L21925 (section \"## SUPERGPQA-STAGE0b (2026-09-29, 0 calls) \u2014 VALID (post-run review docs/reviews/READY_w0_delta3.md Part 2, 3da93fc): C1 HELD by the normal two-stage interval of record, lower end +0.04pp ...\"; _as_of the commit that writes it, parent 80ce082, re-grepped)",
+    "docs/judge_v2_program.md L21905-L21915 (section \"## Registrar's record 2026-09-29 (insertion only; zero calls; nothing run by the registrar) \u2014 delta-3 READY 3da93fc and by-path merge 219dec0; ...\"; _as_of the commit that writes it, parent 80ce082, re-grepped)"
+  ],
+  "last_update": "2026-09-29 (registrar: steward 8c2b846, delta-2 READY b2ad5ef, merge 481b613, author cap ~22 threads, orchestrator ruling STAGE0b / survey, refused gemma embed); 2026-09-29 (registrar: OUTCOME recorded; review 3da93fc VALID with S-1; state done; ledger v312)",
+  "support": {
+    "a": "C1 EVAL items of the 10 scored disciplines after exclusion, n 7,396 in 7,395 CK-CLOSE components (Kish 1.00027 measured key-free; review 1adce88 row 16); C2 those 10 disciplines",
+    "b": "C1 two-stage 1.312 TRANSPORTED from ROUTER-CLEAN-POLICY x component Kish 1.00027 MEASURED = 1.312; C2 SE transported from PROFILE-RELIABILITY-INTERACTION K12 half-width 0.0665",
+    "c": "7,396 / 1.312 = 5,637",
+    "d": "d = 0.00491^2 x 6,482 = 0.15627; SE_iid = sqrt(0.15627 / 7,396) = 0.004597; x sqrt(1.312) = 0.005265; at d 0.25: 0.006659; C2 0.0665 / 1.96 = 0.0339",
+    "e": "C1 2.80 x 0.005265 = 1.47pp (1.86pp at d 0.25); C2 0.095",
+    "f": "C1 DESCRIPTIVE-ONLY (+1.0pp < MDE 1.47pp); C2 SCOREABLE",
+    "g": "as STAGE0; A6 met on the seen count (10 >= 120 EVAL), C2 not support-unreachable"
+  },
+  "cost": {
+    "calls_expected": 0,
+    "cce_expected": 0,
+    "calls_max": 0,
+    "cce_max": 0,
+    "machine": "about 4.3 GB download; about 1-2 CPU-h single-threaded (unsourced); not a pool reader of the programme's DBs",
+    "priced": "UNPRICED (the experiment-manager's)"
+  },
+  "plain_description": {
+    "sq": "SQ5 Invariance",
+    "what": "On SuperGPQA, after removing the 1,251 questions that duplicate MMLU-Pro, it fits a per-discipline 'pick the best model' policy on training questions and tests it on held-out ones against the best single model. It also checks whether model strengths vary by discipline more than chance. No judge calls.",
+    "why": "It asks whether the per-cell routing gain and the 'models differ by discipline' finding carry over to a new corpus.",
+    "information": "If both hold, the cell-conditional claims transfer beyond MMLU-Pro and the union. Result: done. The policy beats the best single model (DeepSeek-R1) by +0.65pp, but the lower bound is only +0.04pp and one interval form contains zero, so it is descriptive only. The discipline-interaction reliability is 0.64, clearly above the null of 0.10. This holds only for SuperGPQA minus the duplicates, never for SuperGPQA as a whole.",
+    "written": "2026-10-07"
+  }
+}

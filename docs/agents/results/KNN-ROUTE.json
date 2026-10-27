@@ -1,0 +1,150 @@
+{
+ "id": "KNN-ROUTE",
+ "title": "KNN-ROUTE: cell-free kNN routing (k = 50 deciding; own-source [SC]) vs AF-U on the union routing data; unrestricted kNN floor [LF] and a correctness-pattern [TS] ceiling beside (zero calls; REGISTERED 2026-10-04)",
+ "question": "Do cells add anything over raw neighbourhoods for routing?",
+ "kind": "zero-call",
+ "state": "UNDETERMINED",
+ "registration": {
+  "commit": "the commit that writes it (parent bd5ca001)",
+  "program_lines": "docs/judge_v2_program.md L24278-L24289",
+  "program_lines_as_of": "the commit that writes them, parent bd5ca001, re-grepped",
+  "date": "2026-10-04",
+  "provenance": "docs/literature/2026-10-04_testing_logic_review.md (bd5ca001) section 3; the author's Go (docs/agents/plans/2026-10-04_W1_W2_schedule.md (be8e54d3))"
+ },
+ "script": {
+  "path": "tools/analysis/knn_route.py",
+  "sha16": "blob:ec5fbc41 (LF; per the outcome and the review row 15)",
+  "commit": "c9b982d9 (branch zero-call-route-readouts; merged b0525292)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_route_readouts.md",
+  "commit": "b0525292",
+  "blob": "54b99df4 (LF)",
+  "verdict": "READY under C1-C5"
+ },
+ "go": "the author's Go for zero-call windows (2026-10-04)",
+ "run": {
+  "outcome_file": "experiment_results/archv2/knn_route/outcome.txt (write-once; never committed); backup E:/TaxoArena_backup_2026-10-04_route_trio/knn_route/outcome.txt (SHA256SUMS.txt)",
+  "outcome_sha256": "119ee31049291cd1d41f3d9d32b050b578e2f6e402297c4dfb589f6e85f6966c",
+  "outcome_commit": "run from main after 0e34eb56 (never committed)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "pv2_1575de61bb20e977 (B0-2 pool check rc 0; read-only views, sha256 before = after)",
+  "date": "2026-10-04",
+  "concurrency": "concurrency with GRANULARITY-GT (and another agent's tree_like --mutants): all zero-call CPU readers, no construction or site null (rule 7 not engaged); view sha256 before = after = pins; ruled non-affecting by the review"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_route_trio.md",
+  "commit": "b5ed5e96",
+  "blob": "a8e4f5fc (LF)",
+  "verdict": "VALID"
+ },
+ "criteria": [
+  {
+   "id": "KN1",
+   "text": "DECIDING: D_N = G_KNN-SC - G_AF; CELLS-ADD iff 95% interval wholly < 0 AND |D_N| > spread_K; CELLS-UNNEEDED iff 90% interval inside +/-0.5pp OR 95% wholly > 0; UNDETERMINED otherwise. Verdict line: DESCRIPTIVE-ONLY at the prediction; the TOST branch is unreachable at SE 0.44pp (stated pre-data)",
+   "result": "UNDETERMINED",
+   "value": "D_N = G_KNN-SC(50) - G_AF = +0.12pp (+0.00119), two-stage 95% [-1.16, +1.40], 90% [-0.96, +1.19]; realised SE 0.653pp, DEFF 1.816, n_eff 3,253, MDE80 1.83pp; spread_K 0.00576; TOST unreachable (as registered); interval not re-run by the reviewer (verdict holds at any SE >= 0.07pp)",
+   "denominator": "5,907 EVAL items / 5,404 components (Kish 1.311); kNN pool 11,841 TRAIN"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "D_N -0.3pp [-1.5, +0.8]; KN1 CELLS-ADD 0.15, CELLS-UNNEEDED 0.15, UNDETERMINED 0.70",
+   "result": "HELD",
+   "value": "D_N +0.12pp in [-1.5, +0.8]; KN1 UNDETERMINED occurred (p 0.70, modal); Brier 0.1350",
+   "denominator": "union EVAL 5,907 items / 5,404 components"
+  },
+  {
+   "id": "P2",
+   "text": "G_KNN-ALL +1.0pp [-0.2, +2.2] (descriptive)",
+   "result": "HELD",
+   "value": "G_KNN-ALL +1.69pp in [-0.2, +2.2] (descriptive; [LF] floor, cross)",
+   "denominator": "union EVAL 5,907 items / 5,404 components"
+  },
+  {
+   "id": "P3",
+   "text": "TS - G_declared +1.0pp [-0.5, +3.0] (ceiling, descriptive)",
+   "result": "FAILED",
+   "value": "TS - G_declared mean -28.12pp outside [-0.5, +3.0]; R-KN-TS: the correctness-pattern arm is registered as a ceiling and is not one here",
+   "denominator": "union EVAL 5,907 items / 5,404 components"
+  }
+ ],
+ "falsifier": {
+  "text": "F-KN fires iff KN1 CELLS-UNNEEDED: change 4's cell premise fails; value moves to reporting and filing discipline.",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "D_N": "+0.12pp (+0.00119), two-stage 95% [-1.16, +1.40]; SE 0.653pp (registered 0.44pp), DEFF 1.816, n_eff 3,253, MDE80 1.83pp; 5,907 / 5,404 (the deciding number; R-KN-HEAD)",
+  "G_KNN_SC": "k 25 / 50 / 100: +1.42 / +1.64 / +1.59pp (backoff share k 50 0.7279)",
+  "G_KNN_ALL": "k 25 / 50 / 100: +1.42 / +1.69 / +1.68pp; k 50 [+0.87, +2.52] (descriptive [LF] floor, cross; never the deciding number)",
+  "TS_minus_G_declared": "s0-s4 -27.78 / -24.53 / -29.46 / -29.56 / -29.25pp, mean -28.12pp (registered as a ceiling; not one here; R-KN-TS)",
+  "spread_K": "0.00576",
+  "C1_cross_source": "without the 191 cross-source EVAL filings D_N -0.280pp; UNDETERMINED unchanged",
+  "kish": "1.311 (R-SUP)"
+ },
+ "sentence_of_record": "KNN-ROUTE (2026-10-04, 0 calls) — VALID; KN1 UNDETERMINED, F-KN not fired. On 5,907 EVAL items / 5,404 components, own-source kNN routing (k 50, [SC]) lands +0.12pp from AF-U's [SC] cells, two-stage 95% [-1.16, +1.40] (realised SE 0.65pp, 1.48x the registered 0.44pp; MDE80 1.83pp; the TOST branch unreachable, as registered): cells neither shown to add nor shown unneeded. The unrestricted kNN floor (+1.69pp, [LF], cross) is descriptive; the correctness-pattern arm (registered as a ceiling; it is not one here) reads -28.1pp below declared.",
+ "chips": [
+  "REGISTERED 2026-10-04, BEFORE ANY CODE; not built",
+  "VALID (POST-RUN b5ed5e96): KN1 UNDETERMINED (D_N +0.12pp [&minus;1.16, +1.40]); F-KN NOT FIRED",
+  "DECIDING NUMBER D_N, NEVER G_KNN-ALL +1.69pp (LF FLOOR, CROSS); TS NOT A CEILING HERE (&minus;28.1pp); SE 1.48&times; REGISTERED"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-04",
+   "by": "registrar (pre-data; READY_route_readouts)",
+   "text": "C1 D-4 asymmetry (favours CELLS-UNNEEDED); C2 G_AF and spread_K seen (inputs); C3 kNN pool = 11,841 key-complete items; C4 [KN1-OVERLAP] inert (spread_K 0.00576); D3."
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (POSTRUN b5ed5e96)",
+   "text": "outcome recorded; duties applied: R-RS-P1, R-KN-HEAD, R-KN-TS, R-KI1 (HIGH), R-RWS (183 vs 123 blocks), R-SUP (realised SE; Kish 1.311); concurrency with GRANULARITY-GT disclosed (non-affecting). docs/judge_v2_program.md L24472-L24485 (section \"## KNN-ROUTE (2026-10-04, 0 calls) — VALID (POSTRUN b5ed5e96) ...\"; _as_of the commit that writes it, parent 4572dbd4, re-grepped); OUTCOME brackets on the registration lines."
+  }
+ ],
+ "does_not_show": [
+  "that cells add over own-source neighbourhoods",
+  "that cells are unneeded",
+  "a label-free result against AF-U (KNN-ALL is cross)",
+  "any ceiling (TS is not one at this filing)",
+  "other corpora, rosters or draws"
+ ],
+ "ledger": {
+  "row_id": "KNN-ROUTE",
+  "version": "v385 (2026-10-04: OUTCOME bracket, NULL + WARN chips) | v382 (2026-10-04: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "UNION-AF-ROUTE"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none (no judge, rubric, reference, frontier, temperature or LR)"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "< 1 h",
+  "agent_hours": "about 3 h",
+  "reads_pool": true
+ },
+ "outputs": "never committed: stored on E: with SHA256SUMS.txt; temp on E: via scratch_dir",
+ "sources": [
+  "docs/judge_v2_program.md L24278-L24289 (_as_of the commit that writes it, parent bd5ca001, re-grepped)",
+  "docs/literature/2026-10-04_testing_logic_review.md (bd5ca001)",
+  "docs/agents/plans/2026-10-04_W1_W2_schedule.md (be8e54d3)",
+  "docs/reviews/POSTRUN_route_trio.md (b5ed5e96; blob a8e4f5fc, LF)",
+  "docs/judge_v2_program.md L24472-L24485 (section \"## KNN-ROUTE (2026-10-04, 0 calls) — VALID (POSTRUN b5ed5e96) ...\"; _as_of the commit that writes it, parent 4572dbd4, re-grepped)",
+  "E:/TaxoArena_backup_2026-10-04_route_trio/SHA256SUMS.txt"
+ ],
+ "last_update": "2026-10-04",
+ "plain_description": {
+  "sq": "SQ1 Use",
+  "what": "Compares routing each question by its 50 nearest neighbours (within its own source corpus) with routing by the discovered cells of the label-free union tree, on about 5,900 evaluation questions. No calls.",
+  "why": "It asks whether cells add anything for routing over raw neighbourhoods.",
+  "information": "If neighbours did as well, cells would only matter for reporting. If cells did better, they would earn their routing role. Result: undetermined. The gap is +0.12 points with an interval of -1.2 to +1.4, so cells are neither shown to add nor shown unneeded. The result is source-conditioned (it uses the source corpus). The unrestricted neighbour comparison is descriptive only.",
+  "written": "2026-10-07"
+ }
+}

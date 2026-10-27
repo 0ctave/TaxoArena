@@ -1,0 +1,20 @@
+=== POINTWISE vs PAIRWISE [with reference] (same judge, rubric, matches; only the format differs) ===
+  graded answers 3674 of 3689 | key-decidable pairs compared 941
+  (1) PRIMARY  pairwise 0.864 vs pointwise 0.808 (-0.056) | pairwise-only 87 : pointwise-only 34 | McNemar p=1.572e-06
+      founding hypothesis -> SUPPORTED: pairwise wins
+  top cluster (n=265): pairwise 0.721 vs pointwise 0.649 (-0.072)
+  (3) TIES     pointwise 0.094 vs pairwise 0.070
+  (2) BOARD    rho vs key accuracy: pointwise-derived 0.9930 | pairwise 0.9790 | raw mean grade 0.9860 (n=1971 matches)
+      gemini-3.1-pro_5-shots         pointwise theta +1.088 | pairwise +1.831 | mean grade  79.8 | key 0.913
+      arx_0314                       pointwise theta +0.984 | pairwise +1.250 | mean grade  76.8 | key 0.834
+      iask_pro                       pointwise theta +0.952 | pairwise +1.780 | mean grade  74.3 | key 0.817
+      gpt-4o-2024-08-06              pointwise theta +0.723 | pairwise +1.099 | mean grade  68.4 | key 0.750
+      deepseek-chat-v2_5             pointwise theta +0.307 | pairwise +0.548 | mean grade  58.8 | key 0.657
+      Meta-Llama-3_1-70B-Instruct    pointwise theta +0.099 | pairwise -0.078 | mean grade  60.5 | key 0.630
+  (4) COST     pointwise 3674 calls for 1980 matches = 1.86/match | pairwise 3960 = 2.00/match (question reuse 2.68x)
+  DESCRIPTIVE  distinct grades used 25 | most common: [(100, 1486), (0, 1263), (40, 251), (95, 195), (20, 87), (98, 83)]
+               grade AUC vs key correctness 0.873 (mean grade correct 84.8 vs wrong 19.1)
+
+=== TOP-4 BOARD on the 598 top-cluster matches both formats judged (key order gemini-3.1-pro_5-shots > arx_0314 > iask_pro > gpt-4o-2024-08-06) ===
+  pairwise   gemini-3.1-pro_5-shots > iask_pro > arx_0314 > gpt-4o-2024-08-06 (1 key-order violations)
+  pointwise  gemini-3.1-pro_5-shots > arx_0314 > iask_pro > gpt-4o-2024-08-06 (0 key-order violations)

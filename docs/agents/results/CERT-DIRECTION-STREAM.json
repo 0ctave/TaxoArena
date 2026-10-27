@@ -1,0 +1,235 @@
+{
+  "id": "CERT-DIRECTION-STREAM",
+  "title": "CERT-DIRECTION-STREAM: integrated over the arm direction stream, how often does CERT-UNDER-FILTER's C1 hold, and what is its two-stage interval? (DESCRIPTIVE; zero calls; it CANNOT change C1's recorded verdict)",
+  "question": "Integrated over the arm direction stream (200 streams), how often does CERT-UNDER-FILTER's C1 hold, what are the distributions of Delta_W and of the interval's upper end, and what is the two-stage interval? DESCRIPTIVE; cannot change C1's recorded verdict.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "46889ea (the registration commit; it adds this record and the programme section and precedes all code: no script exists for this test at 46889ea)",
+    "program_lines": "docs/judge_v2_program.md L14758-L14792",
+    "program_lines_as_of": "46889ea",
+    "heading": "## Registered 2026-09-23 (before any code or call) — CERT-DIRECTION-STREAM: integrated over the arm direction stream, how often does CERT-UNDER-FILTER's C1 hold, and what is its two-stage interval? (DESCRIPTIVE; zero calls; it CANNOT change C1's recorded verdict)",
+    "date": "2026-09-23"
+  },
+  "script": {
+    "path": "tools/analysis/cert_direction_stream.py (MERGED on main at 989ff1d, from 1c9c739)",
+    "sha16": "blob:a4be06c34aa7df18b7e50db754309f9911d007e0 / sha256-lf16:b9164a0457affbd1 / sha256-crlf16:62f34cd56026ec0e",
+    "commit": "989ff1d"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_cert_direction_stream_rr.md",
+    "commit": "a21256d",
+    "verdict": "READY-WITH-CONDITIONS at 1c9c739 (supersedes 751cf57); merged 989ff1d",
+    "script": "tools/analysis/cert_direction_stream.py blob:a4be06c34aa7df18b7e50db754309f9911d007e0 / sha256-lf16:b9164a0457affbd1 / sha256-crlf16:62f34cd56026ec0e",
+    "conditions": [
+      "**C1.** Merge by pathspec. Launch from the MAIN checkout (not from the worktree: CERT's ROOT resolves the inputs from its own location): `python tools/analysis/cert_direction_stream.py --run --workers 8`. The header must print: blob:a4be06c34aa7df18b7e50db754309f9911d007e0 / sha256-lf16:b9164a0457affbd1 (LF); CERT MATCH f7d59019 / 0db2026f17b559a1; build pin 128baa007a44a219; `before:` eb0bec2795f3e5a0 / 4f65414f7625a1e7 / 390c313e5a40e0a7.",
+      "**C2.** The outcome must read `per-stream digit match: 20 of 20` and C0 HELD, and s = 42 exactly as in row 8. Anything else is an instrument or environment fault: this review and 751cf57 reproduced all 21 rows on the same data.",
+      "**C3. WINDOW.** At least **3.5 h at 8 workers**, or at least 3.0 h at 12 workers. The coordinator's 3.0 h at 8 workers is NOT sufficient on the machine as measured today (3.07-3.40 h). A 3.0 h window at 8 workers is admissible only if a --dry-run in the same window, immediately before the run, prints an extrapolation of at most 2.7 h (stream wall x 200). The run cannot resume. Rule 7 W1-W5 applies, with at least 12 GB free: the run needs about 1.1 GB at 8 workers and 1.45 GB at 12. No other CPU-heavy reader or construction may run in the window.",
+      "**C4.** `experiment_results/x12_crossdomain/cert_direction_stream_outcome.txt` must still be absent at launch. It is absent now: `ls` returns No such file.",
+      "**C5.** The post-run review recomputes C3 (plo, phi, mixture SE) and P1-P3 from the outcome's PER STREAM d_a lines alone, before any readout is recorded."
+    ],
+    "window": ">= 3.5 h at 8 workers (or >= 3.0 h at 12; 3.0 h at 8 only if a same-window dry-run extrapolates <= 2.7 h); no other CPU-heavy process; not resumable; never shares a window with SPLIT-EXPOSURE-SENSITIVITY",
+    "record": "docs/judge_v2_program.md L14883-L14897"
+  },
+  "go": "n/a: ZERO calls; below the 4,000-match rule; no plan amendment owed. The author asked for new tests from today's findings (relayed by the coordinator), recorded as the DECISION TO SCHEDULE. Operational gates: an instrument, a committed adversarial-reviewer READY, a zero-call --dry-run, one rule-7 window.",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/cert_direction_stream_outcome.txt blob:1563f1d1ece71daed048d3dcdfd311a8983c5f74 / sha256-lf16:bccac1060dc03fda / sha256-crlf16:947a990aabefb6ca",
+    "outcome_commit": "e5dbb0f",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (routing bareq512_s42, id-disjoint only)",
+    "date": "2026-09-24",
+    "wall_s": 12331,
+    "note": "the relaunch after the crash disclosed at f9bb8a9; streams 1-54 identical to the aborted log on 5 printed fields"
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-24_cert_direction_stream_post.md",
+    "commit": "597bf99",
+    "verdict": "NUMBERS CONFIRMED; every registered score correct as registered; RECORDABLE with the D1 bracket (MEDIUM: h conditional on the shared cluster-bootstrap seed-42 matrix); D2-D8 LOW"
+  },
+  "criteria": [
+    {
+      "id": "C0",
+      "text": "VALIDITY, first: stream 42 reproduces the outcome of record to the digit; the review's 20 alternate streams reproduce (W_F 16-19, Delta_W -4.75 to -8.05, 15 of 20 cross)",
+      "result": "HELD",
+      "value": "s = 42 = b4b1688 in every field; the review's 20 streams 20 / 20",
+      "denominator": "21 streams"
+    },
+    {
+      "id": "C1",
+      "text": "the HELD share h over 200 streams with its Wilson interval and the sizing band (>= 0.80 robust; 0.20-0.80 marginal; < 0.20 at one stream only), printed beside CERT's C1; deciding nothing about C1",
+      "result": "n/a",
+      "value": "DESCRIPTIVE: h = 49 / 200 = 0.2450, Wilson [0.1906, 0.3090] (direction-stream component only, bootstrap seed 42 pinned); band MARGINAL; exact-SE k 59 / 200; bootstrap seeds 1-100 k 33-83 (D1)",
+      "denominator": "200 streams"
+    },
+    {
+      "id": "C2",
+      "text": "distributions of Delta_W and the upper end (mean, sd, 2.5 / 50 / 97.5 percentiles)",
+      "result": "n/a",
+      "value": "Delta_W mean -6.474 (sd 0.943); upper-end median +0.79",
+      "denominator": "200 streams"
+    },
+    {
+      "id": "C3",
+      "text": "the two-stage interval (stream x 13-anchor cluster bootstrap, 20,000 replicates) and the mixture SE",
+      "result": "n/a",
+      "value": "two-stage percentile [-14.35, +0.75], mixture SE 3.878: contains 0",
+      "denominator": "752 edges, 13 anchors, 200 streams"
+    },
+    {
+      "id": "C4",
+      "text": "the Monte-Carlo SE of h and the stream count for a Wilson half-width <= 0.05 (the D-1 reference; the standard is PROPOSED, not adopted)",
+      "result": "n/a",
+      "value": "MC SE of h 0.0304; streams for a Wilson half-width <= 0.05: 282 / 320 / 381",
+      "denominator": "200 streams"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "h = 0.30 [0.18, 0.45]: band MARGINAL [RULED 2026-09-23: the falsifier's strict words govern: HELD iff 0.18 <= h < 0.45 (36 <= k < 90 of 200); FAILED iff k >= 90 or k < 36 (docs/judge_v2_program.md L14843-L14865)]",
+      "result": "HELD",
+      "value": "49 in 36 <= k < 90",
+      "denominator": "200 streams"
+    },
+    {
+      "id": "P2",
+      "text": "mean Delta_W -6.56 [-7.0, -6.1]; sd 1.06 [0.8, 1.4]; median upper end +0.4 [-0.1, +0.9]",
+      "result": "HELD",
+      "value": "-6.474 / 0.943 / +0.791 in their brackets",
+      "denominator": "200 streams"
+    },
+    {
+      "id": "P3",
+      "text": "mixture SE 3.76 [3.65, 3.90]; two-stage interval about [-13.9, +0.8], upper end +0.8 [+0.2, +1.5] (crossing 0)",
+      "result": "HELD",
+      "value": "3.878 in [3.65, 3.90] (by 0.022: D2); +0.750 in [+0.2, +1.5]",
+      "denominator": "752 edges / 200 streams"
+    },
+    {
+      "id": "P4",
+      "text": "C0 HELD",
+      "result": "HELD",
+      "value": "= C0 (D7)",
+      "denominator": "21 streams"
+    },
+    {
+      "id": "P5",
+      "text": "about 320 streams for a Wilson half-width <= 0.05 at h near 0.3 [RULED 2026-09-23: NOT SCORED (descriptive; no interval registered) (docs/judge_v2_program.md L14843-L14865)]",
+      "result": "n/a",
+      "value": "NOT SCORED (no interval registered): 282 at the measured h, 320 at 0.30",
+      "denominator": "arithmetic"
+    }
+  ],
+  "falsifier": {
+    "text": "P1 fails if h >= 0.45 or < 0.18. h >= 0.80 QUALIFIES CERT's 'MARGINAL: FLIPS ON 15/20 DIRECTION STREAMS' by insertion; h < 0.20 strengthens it to 'HELD AT ONE STREAM ONLY'. IN NO BRANCH does C1's recorded verdict, CERT's falsifier reading or the L95 precondition change.",
+    "fired": false,
+    "reading": "NOT FIRED (h in [0.18, 0.45)); CERT-UNDER-FILTER C1 unmoved (docs/judge_v2_program.md L15267-L15300)"
+  },
+  "numbers_of_record": {
+    "h": "49 / 200 = 0.2450, Wilson [0.1906, 0.3090], MC SE 0.0304 (direction-stream component, bootstrap seed 42)",
+    "h_bootstrap_seed": "exact SE k 59 / 200 = 0.295; seeds 1-100 k 33-83; band 'one stream' at 3 / 100, P1 fails at 2 / 100",
+    "delta_w": "mean -6.474, sd 0.943; upper-end median +0.79",
+    "two_stage": "[-14.35, +0.75], mixture SE 3.878",
+    "streams_for_halfwidth_0.05": "282 (measured h) / 320 (0.30) / 381 (0.50)"
+  },
+  "sentence_of_record": "CERT-DIRECTION-STREAM (zero calls; outcome e5dbb0f, blob:1563f1d1ece71dae / sha256-lf16:bccac1060dc03fda): over the 200 registered arm-bootstrap streams (s = 1..200, 42 inside), CERT-UNDER-FILTER's C1 upper end lies below 0 on 49 (h = 0.2450, Wilson [0.1906, 0.3090], the direction-stream component only, at the registered cluster-bootstrap seed 42), band \"HELD at the registered stream, MARGINAL over the direction stream\"; Delta_W mean -6.474 (sd 0.943), upper-end median +0.79; the two-stage percentile interval [-14.35, +0.75] (mixture SE 3.878) contains 0; C0 HELD (s = 42 and the review's 20 streams to the digit), P1-P3 HELD, P4 (= C0) HELD, P5 not scored; C1's recorded verdict does not move. [Reviewer, 2026-09-24, recomputed from the per-stream d_a: at the exact (B -> infinity) cluster-bootstrap SE k = 59/200 = 0.295, and over cluster-bootstrap seeds 1-100 k spans 33-83, so the band is MARGINAL at the registered seed and at the exact SE but not Monte-Carlo determinate at the 0.20 edge.] [run e5dbb0f (the relaunch after the crash disclosed at f9bb8a9), review 597bf99, zero calls; denominators: 200 registered direction streams (s = 1..200, 42 inside) over 752 established edges in 13 anchor clusters; h's Wilson interval covers ONLY the direction-stream component at the pinned cluster-bootstrap seed 42 (D1); CERT-UNDER-FILTER C1's recorded verdict does not move]",
+  "chips": [
+    "REGISTERED 2026-09-23, BEFORE ANY CODE",
+    "C0 HELD",
+    "h 49/200 MARGINAL",
+    "BOOTSTRAP-SEED DEPENDENCE k 33-83",
+    "ZERO CALLS",
+    "DESCRIPTIVE; CANNOT MOVE C1"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-23",
+      "by": "registrar (builder's gaps, relayed by the coordinator)",
+      "text": "Built at f645271 (blob:f6884ec387f9891efd207977b6d5bae24dc96ea1 / sha256-lf16:bd1e91bbc4472829). Ruled: P1 at h = 0.45 FAILED (the falsifier governs; 36 <= k < 90 HELD); P5 NOT SCORED; d1-d9 confirmed with two precisions. Notes: the connection log is per process (workers open nothing, checked per job); a -journal launch refusal; the run cannot resume. docs/judge_v2_program.md L14843-L14865."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (READY a21256d; merge 989ff1d)",
+      "text": "READY-WITH-CONDITIONS (C1-C5 verbatim; C3 window >= 3.5 h at 8 workers); merged 989ff1d; not launched; must not share a window with SPLIT-EXPOSURE-SENSITIVITY. docs/judge_v2_program.md L14883-L14897."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (the coordinator's relay)",
+      "text": "First launch aborted by a PC crash at stream 54 of 200 (started 2026-09-23 22:01:02); no outcome; inputs unchanged; per-stream lines 1-54 visible before the outcome, log committed as evidence and DISCLOSED, never a result; relaunched from the start; determinism diff of streams 1-54 is the proof of record. State running. docs/judge_v2_program.md L15149-L15157."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (run e5dbb0f; review 597bf99)",
+      "text": "OUTCOME recorded; C0 HELD; h 49/200 MARGINAL; D1 bootstrap-seed dependence (k 33-83); CERT-UNDER-FILTER C1 unmoved; the D-1 standard extended to every stream including the bootstrap seed (proposed); CDS-SPOTCHECK queued. docs/judge_v2_program.md L15267-L15300."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "any change to C1's recorded verdict (it cannot move it)",
+    "the effect of new data (more anchors or boards)",
+    "the R-draw stream's variance beyond the registered K = 20 (fixed as registered; 605675c D-4 sizes it)",
+    "[post-run review 597bf99] Anything about the population: 13 anchor clusters, DESCRIPTIVE-ONLY at any stream count (registration (g)). h is a share of seeds on the SAME data, not a probability of the effect.",
+    "[post-run review 597bf99] That C1 would hold, or fail, on new data, boards or anchors.",
+    "[post-run review 597bf99] The band's robustness to the cluster-bootstrap seed (D1).",
+    "[post-run review 597bf99] Convention B (not built, as ruled).",
+    "[post-run review 597bf99] The design effect across streams (D8).",
+    "[post-run review 597bf99] A content-closed split: the routing is bareq512_s42, id-disjoint only.",
+    "[post-run review 597bf99] Rule-7 compliance of the relaunch window (D6).",
+    "[post-run review 597bf99] The full sha256 of mmlu_pro_dataset_cache_v2.db and snapshots.db after the run, re-derived by me. Size and mtime only; the x12 cache was re-hashed."
+  ],
+  "ledger": {
+    "row_id": "CERT-DIRECTION-STREAM",
+    "version": "v195 (adjudicated; chips replaced; audit OK); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "CERT-UNDER-FILTER"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing and reopens nothing; posts nothing; proposes no recipe change"
+  },
+  "support": "752 established edges in 13 anchor clusters, Kish m 57.99; DEFF 1.636 MEASURED on this cache (605675c; ratio 1.558 beside); n_eff 459.5; SE 2.889 x sqrt(1.636) = 3.695 edges; MDE 2.80 x 3.695 = 10.35 edges vs the bar 0; |Delta_W| 7.15 < 10.35: DESCRIPTIVE-ONLY; structural: more streams shrink only Monte-Carlo error, the direction question stays DESCRIPTIVE-ONLY at any stream count. docs/judge_v2_program.md L14758-L14792",
+  "sources": [
+    "docs/judge_v2_program.md L14758-L14792",
+    "the coordinator's relay of the author's request (2026-09-23)",
+    "docs/judge_v2_program.md L14843-L14865",
+    "docs/judge_v2_program.md L14883-L14897",
+    "docs/judge_v2_program.md L15149-L15157",
+    "docs/judge_v2_program.md L15267-L15300",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "builder_readings": "d1-d9 CONFIRMED (docs/judge_v2_program.md L14843-L14865), with two precisions: d3 the READY confirms s = 1..20 are the review's seeds; d7 P3's upper end is scored on C3's percentile interval (the normal-approximation +0.8 prints beside); the P1.CONFLICT branch is replaced by ruling (1)",
+  "ready_history": [
+    {
+      "file": "docs/reviews/READY_cert_direction_stream.md (751cf57)",
+      "commit": "751cf57",
+      "verdict": "NOT READY at blob:11ead7be86d8 (9176bbc) on D1 HIGH"
+    }
+  ],
+  "aborted_attempts": [
+    {
+      "started": "2026-09-23 22:01:02",
+      "ended": "PC crash and restart at stream 54 of 200 (elapsed about 3,359 s)",
+      "outcome_written": false,
+      "inputs_after": "x12 eb0bec2795f3e5a0, mmlu 4f65414f7625a1e7, snapshots 390c313e5a40e0a7 = pre-run; every -wal 0 B; no -journal",
+      "log": "docs/agents/results/evidence/CERT-DIRECTION-STREAM_aborted_run_2026-09-23_stream54.log.txt (sha256 99b6f63a77b809bfb5977a9996c1ebd6344bea20c77dcb1f65919a3c79345a32) [2026-09-24: sha256 above = the CRLF rendering; LF of record: blob:6038e168cb27a4a772da2d7506bf40e46ee8a86c / sha256-lf 87246f53fdbb86054657d88b00cbdf6afbffbe1844b07109f55690d73812c8a6]",
+      "status": "DISCLOSED; not a result; never quoted, scored or pooled; the relaunch's streams 1-54 are diffed against it (elapsed fields excepted), a difference voids the run as UNDETERMINED BY VALIDITY",
+      "record": "docs/judge_v2_program.md L15149-L15157"
+    }
+  ],
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Re-runs an earlier certificate check (CERT-UNDER-FILTER) over 200 random draws instead of the one registered draw. It counts how often the result still holds and builds an interval that includes this extra randomness. No new calls.",
+    "why": "It asks whether an earlier trust result depended on one lucky random draw.",
+    "information": "A high hold rate would mean the earlier result is robust. A low one would mean it depends on the draw. Result: descriptive only. The result holds in 49 of 200 draws (about 25%), and the wider interval includes zero. So it held at the registered draw but is marginal across draws, and even that band depends on the bootstrap seed. The earlier verdict cannot and does not change. A later ruling classes the underlying judged data as history.",
+    "written": "2026-10-07"
+  }
+}

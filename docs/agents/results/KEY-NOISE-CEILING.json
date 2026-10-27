@@ -1,0 +1,147 @@
+{
+  "id": "KEY-NOISE-CEILING",
+  "title": "KEY-NOISE-CEILING: how much of the arena's remaining error is the key's own noise? (zero calls)",
+  "question": "Per anchor, 40 disjoint halvings of the JUDGED questions: the key's direction agreement between halves is its own ceiling; compare the arena's direction agreement with the key (raw certificate, called edges) on all and on McNemar-established edges against that ceiling at the same support; if the arena is within 2pp on established edges the measurable judge line on MMLU-Pro is CLOSED.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "60cb7f3",
+    "program_lines": "docs/judge_v2_program.md L3312 (section) and L3314-L3327 (A. KEY-NOISE-CEILING)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-15 (before any run) — six tests from the big picture after the review. Standing rules from the review apply to all six: every wrong-direction count carries its McNemar-established count on the anchor's judged questions; UNDETERMINED is a registered outcome; the key denominator is named; nulls preserve what the question conditions on; the data object is checked before strata are read into it.",
+    "outcome_heading": [
+      "L3399: ## BIG-PICTURE TESTS A, C, D, E — outcomes (2026-09-15, zero calls). Each built by one agent from the registration at 60cb7f3 and recomputed by an independent checker; every number reproduced; verdict labels corrected by the checker where the builder's rested on an unregistered reading.",
+      "L3401: - **KEY-NOISE-CEILING (2026-09-15, zero calls): criterion (1) PASSES on its wording (arena −0.55pp from the key's split-half ceiling on established calls); the registered consequence \"judge line CLOSED\" does NOT follow from it; prediction FAILED on (c) and reading-dependent on (b); falsifier does not fire.**"
+    ],
+    "date": "2026-09-15"
+  },
+  "script": {
+    "path": "tools/analysis/key_noise_ceiling.py",
+    "sha16": "c1c855e0aea3b544",
+    "commit": "22e16f7"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/key_noise_ceiling.txt",
+    "outcome_commit": "22e16f7",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-15"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the independent checker's recomputation recorded inside the outcome bullet (check_*.py scratch scripts named there; 'every number reproduced; verdict labels corrected by the checker where the builder's rested on an unregistered reading')",
+    "commit": "22e16f7",
+    "verdict": "every number reproduced by the independent checker; verdict labels as corrected by the checker"
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "PRIMARY: arena direction-agreement on established called edges vs the key's split-half ceiling, within 2pp",
+      "result": "HELD",
+      "value": "n = 712, wrong 4(4); arena 0.9944; ceiling raw 0.9997 / SB 0.9999; gap -0.55pp (SB, primary) / -0.54pp (raw); LOAO jackknife 95% [-1.40, +0.30]pp: PASS on wording; checker MEDIUM: on established edges the split-half ceiling is 0.9997-1.0000 BY CONSTRUCTION (McNemar p < 0.05 on the full anchor implies the halves agree), so (1) reduces to '<= 14 wrong established calls of 712' and cannot see the ~0.55pp of pure judge error that is there; 'the measurable judge line is CLOSED' is NOT drawn",
+      "denominator": "712 established called edges of the 891 (key gap >= 0.02; the 920 set gives identical verdicts); 2,811 judged questions, 40 halvings Random(42)"
+    },
+    {
+      "id": "(2)",
+      "text": "the gap on ALL edges, the label-noise share as a number",
+      "result": "DELIVERED",
+      "value": "n = 739, wrong 8(4); arena 0.9892; ceiling raw 0.9942 / SB 0.9971; gap -0.79pp SB / -0.50pp raw, jackknife [-1.78, +0.20]pp; share = key self-disagreement / arena error = 0.29/1.08 = 27% (SB) or 0.58/1.08 = 54% (raw); 4 of the 8 wrong calls are non-established (key half-agreement 0.567-0.895), 4 established with half-agreement 1.000",
+      "denominator": "739 called edges"
+    },
+    {
+      "id": "(3)",
+      "text": "per anchor: which anchors are at ceiling",
+      "result": "DELIVERED",
+      "value": "established calls: 12 anchors at 0.00 to +0.08pp; Other -2.00pp exactly (1 wrong of 50); Law -5.56pp (3(3) wrong of 54: Llama-3.1-70B vs Qwen1.5-72B 59/29, vs deepseek-v2.5 54/25, arx vs gpt-4o 45/15, all key half-agreement 1.000); all called edges: History -3.04pp (2 wrong of 51, both non-established), Law -5.93pp (4(3) of 58); one edge = 1.7-2.3pp per anchor",
+      "denominator": "14 anchors"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "(a) the arena is within 2pp of the ceiling on established edges overall",
+      "result": "HELD",
+      "value": "-0.55pp",
+      "denominator": "712"
+    },
+    {
+      "id": "P2",
+      "text": "(b) below the ceiling on Law and History",
+      "result": "FAILED",
+      "value": "reading-dependent: on established edges Law is below, History is at ceiling (0 wrong of 46) -> NOT MET; on all called edges Law -5.93pp and History -3.04pp -> MET",
+      "denominator": "per anchor"
+    },
+    {
+      "id": "P3",
+      "text": "(c) the all-edge gap is 3-5pp",
+      "result": "FAILED",
+      "value": "-0.50 to -0.86pp on every seed and reading (seeds 7/137/2048, 200 halvings, ties as disagreement or 0.5, 891 or 920 edges); never 3-5pp",
+      "denominator": "739"
+    }
+  ],
+  "falsifier": {
+    "text": "an arena more than 5pp below the ceiling on established edges means there is measurable judge headroom left and the 'ceiling' story is wrong",
+    "fired": false,
+    "note": "does not fire; firing needs >= 36 wrong established calls of 712, there are 4"
+  },
+  "numbers_of_record": {
+    "established": "n 712, wrong 4(4), arena 0.9944, ceiling raw 0.9997 / SB 0.9999, gap -0.55pp [-1.40, +0.30]",
+    "all": "n 739, wrong 8(4), arena 0.9892, ceiling 0.9942 / 0.9971, gap -0.79pp SB / -0.50pp raw [-1.78, +0.20]; share 27% (SB) / 54% (raw) of the 1.08% error",
+    "per_anchor": "12 anchors at 0 to +0.08pp; Other -2.00; Law -5.56 (established) / -5.93 (all); History -3.04 (all only)",
+    "instrument_caveat": "arena and key are read on the SAME questions, so the split-half rate bounds agreement with an independent measurement, not with a same-question judge; the test cannot separate 'key bounds the judge' from 'ceiling is not a bound'; build cache validated field for field (b0 -3.2326, b1 +3.3133; 809 of 891 established; 44(26) wrong; 739 called / 8(4) wrong)"
+  },
+  "sentence_of_record": "KEY-NOISE-CEILING (2026-09-15, zero calls): criterion (1) PASSES on its wording (arena -0.55pp from the key's split-half ceiling on established calls, jackknife [-1.40, +0.30]pp); the registered consequence 'the measurable judge line on MMLU-Pro is CLOSED' does NOT follow from it, because on established edges the split-half ceiling is 0.9997-1.0000 by construction and criterion (1) cannot see the ~0.55pp of pure judge error that is there (all 4 residual established errors have key half-agreement 1.000); the all-edge gap is -0.5 to -0.9pp on every seed and reading (the key's self-disagreement accounts for 27-54% of the arena's 1.08% error); prediction FAILED on (c) and reading-dependent on (b); falsifier does not fire.",
+  "chips": [
+    "(1) PASS ON WORDING",
+    "CONSEQUENCE NOT DRAWN",
+    "PREDICTION PARTLY FAILED"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-15",
+      "by": "the independent checker (check_knc.py), recorded in the outcome bullet (22e16f7) and the ledger row v98",
+      "text": "criterion (1)'s PASS is on wording: on established edges the ceiling is 0.9997-1.0000 by construction; 'the judge line is CLOSED' is NOT drawn from it; SB-adjusted ceiling made primary though the registration defines the raw rate (moves <= 0.3pp); prediction (b) reading-dependent, not a bare FAIL."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "that the measurable judge line on MMLU-Pro is closed (criterion (1) cannot see the residual judge error)",
+    "a same-question bound on the judge (the ceiling bounds agreement with an independent measurement)"
+  ],
+  "ledger": {
+    "row_id": "KEY-NOISE-CEILING",
+    "version": "v98 (22e16f7); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "SYSTEMATIC-BUDGET",
+    "KEY-TIE-DECLINE",
+    "TIER-HONEST-X20",
+    "X20-MERGED"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L3312 / L3314-L3327 (A. KEY-NOISE-CEILING) (registration 60cb7f3): question, criteria, prediction, falsifier",
+    "docs/judge_v2_program.md L3401 ff. (outcome bullet, 22e16f7): the criterion table, predictions scored, the checker's recomputation and defects",
+    "experiment_results/x12_crossdomain/key_noise_ceiling.txt (22e16f7)",
+    "docs/test_ledger.html row KEY-NOISE-CEILING (v98 (22e16f7)): chips verbatim, design / criteria / observed cells, evidence",
+    "script sha16 = sha256 of tools/analysis/key_noise_ceiling.py at 22e16f7, first 16 hex (identity, computed by the registrar 2026-09-22; later edited at 13f2142 for the pool_guard change)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' or '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Splits the judged questions into two random halves 40 times per subject area. This measures how often the answer key agrees with itself on which model is better, and compares the arena judge's agreement with the key against that ceiling. No calls.",
+    "why": "Asks how much of the arena's remaining error is noise in the answer key rather than judge mistakes, and whether judge improvement on MMLU-Pro is exhausted.",
+    "information": "Arena close to the ceiling would mean little measurable judge headroom is left. Result: done. The criterion passes on its wording (arena 0.55 points below the ceiling on established edges), but the 'judge line is closed' conclusion does not follow. On those edges the ceiling is near 100% by construction and cannot see the remaining pure judge errors. On all edges, key noise explains 27-54% of the arena's 1.08% error. Arena-pool data, later ruled history, not evidence.",
+    "written": "2026-10-07"
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "id": "ROUTER-REGRET-MMLU",
+  "title": "ROUTER-REGRET-MMLU: is there anything to route on MMLU-Pro at all? (zero calls; key as oracle on the pool of record)",
+  "question": "With the key as oracle on the pool of record, per leaf of the promoted bareq512_s42 tree (nearest-centroid routing) and per anchor, the best model by TRAIN-side key accuracy; on the RESERVED side, the accuracy of the routed choice vs the best single model vs the per-question oracle; router gain = routed - best-single at leaf and anchor level, 12- and 46-model rosters, with a query-level bootstrap SE.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "f8c3af5",
+    "program_lines": "docs/judge_v2_program.md L594-L604 (registration) and L605-L612 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-11 01:30 (zero calls) — ROUTER-REGRET-MMLU and ORACLE-BOARD (descriptive baselines for the fusion chapter)",
+    "outcome_heading": [
+      "L605: - **ROUTER-REGRET-MMLU (2026-09-11 01:40, zero calls): prediction met — on MMLU-Pro there is nothing to route.**"
+    ],
+    "date": "2026-09-11"
+  },
+  "script": {
+    "path": "tools/analysis/router_regret.py",
+    "sha16": "e5bc248de8d8e747 (at f8c3af5)",
+    "commit": "f8c3af5"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/router_regret_outcome.txt",
+    "outcome_commit": "f8c3af5",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae; 10,925 keyed questions routed (train 7,795 / reserved 3,130; 87 leaves, 14 anchors)",
+    "date": "2026-09-11"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); descriptive baseline",
+    "commit": "1ee0f5c",
+    "verdict": "NOTHING TO ROUTE: gemini best in all 14 anchors on both rosters; gain 0.000 (anchor) / -0.002 (leaf)"
+  },
+  "criteria": [
+    {
+      "id": "readout",
+      "text": "router gain = routed - best-single at leaf and anchor level, 12- and 46-model rosters, query-level bootstrap SE",
+      "result": "DELIVERED",
+      "value": "gemini-3.1-pro is the best model by train-side key accuracy in ALL 14 anchors for both rosters; reserved side: best single 0.912; routed by anchor 0.912 (+0.000 +- 0.007); routed by leaf 0.911 (-0.002 +- 0.007); per-question oracle 0.967 (12 models) / 0.982 (46)",
+      "denominator": "3,130 reserved keyed questions; 87 leaves / 14 anchors"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "gain <= 1pp at anchor level and <= 0 at leaf level (one model dominates)",
+      "result": "HELD",
+      "value": "+0.000 / -0.002",
+      "denominator": "reserved side"
+    }
+  ],
+  "falsifier": {
+    "text": "none (descriptive)",
+    "fired": false,
+    "note": "the oracle gap (5.5-7pp) is real but unreachable by any topic-based router because model x topic interaction, though statistically present (X12, R2, LEAF-PROFILE A), never flips the argmax; the quantitative motivation for the multi-corpus fusion (MC-E2E +3.4pp clean) [ID-ONLY 2026-09-23 (CLAIMS-SWEEP-BRACKETS, registrar): pool union paeec37aa28063c75; verified by id only, not by content; reviewed twins on this pool (reviews 1df2cf1, 8ebfa7a): 471 ids / 427 texts exact, 478 / 432 norm-v1 (GPQA 288, MMLU-Pro 185, MATH 3, BBH 2); see docs/judge_v2_program.md L14280-L14340 (CONTENT-DISJOINT-SPLIT-AUDIT) and L14455-L14487 (SPLIT-FOLLOWUPS).]"
+  },
+  "numbers_of_record": {
+    "gain": "anchor +0.000 +- 0.007; leaf -0.002 +- 0.007; best single 0.912; oracle 0.967 / 0.982",
+    "dominance": "gemini best in 14 / 14 anchors, both rosters"
+  },
+  "sentence_of_record": "ROUTER-REGRET-MMLU (2026-09-11, zero calls): on MMLU-Pro there is nothing to route: gemini is best in all 14 anchors on both rosters; routing gain 0.000 (anchor) and -0.002 (leaf) against an oracle ceiling of 0.967 / 0.982. A single-corpus benchmark with one dominant model has no routing signal to find; this motivates the multi-corpus line, where the same machinery gains +3.4pp on the clean subset. [ID-ONLY 2026-09-23 (CLAIMS-SWEEP-BRACKETS, registrar): pool union paeec37aa28063c75; verified by id only, not by content; reviewed twins on this pool (reviews 1df2cf1, 8ebfa7a): 471 ids / 427 texts exact, 478 / 432 norm-v1 (GPQA 288, MMLU-Pro 185, MATH 3, BBH 2); see docs/judge_v2_program.md L14280-L14340 (CONTENT-DISJOINT-SPLIT-AUDIT) and L14455-L14487 (SPLIT-FOLLOWUPS).]",
+  "chips": [
+    "NOTHING TO ROUTE"
+  ],
+  "brackets": [],
+  "does_not_show": [
+    "a routing gain on MMLU-Pro at any granularity",
+    "a reachable oracle gap by a topic router"
+  ],
+  "ledger": {
+    "row_id": "ROUTER-REGRET-MMLU",
+    "version": "v77 (1ee0f5c; the outcome dates 2026-09-11)"
+  },
+  "depends_on": [
+    "MC-ROUTER",
+    "MC-E2E",
+    "LEAF-PROFILE"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L594-L612 (f8c3af5)",
+    "experiment_results/x12_crossdomain/router_regret_outcome.txt (f8c3af5)",
+    "docs/test_ledger.html row ROUTER-REGRET-MMLU (v77): chips verbatim, evidence",
+    "script sha16 = sha256 of tools/analysis/router_regret.py at f8c3af5, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (rubric_v2_design.md / multi_corpus_design.md lines as of their last commits named in sources)"
+  ],
+  "last_update": "2026-09-22",
+  "plain_description": {
+    "sq": "SQ1 Use",
+    "what": "Using the key on MMLU-Pro, it picks the best model per tree leaf and per subject on the training side, and compares held-out accuracy with the best single model and a perfect oracle, on 12- and 46-model rosters. No calls.",
+    "why": "Asks whether a single benchmark has any routing signal at all.",
+    "information": "A gain would justify routing within MMLU-Pro. Result: nothing to route. The same model (gemini) is best in all 14 subjects, and the routing gain is zero. Model-by-topic effects exist but never change the winner. This motivated the multi-benchmark line. The train/test split was checked by question id only, not by content.",
+    "written": "2026-10-07"
+  }
+}

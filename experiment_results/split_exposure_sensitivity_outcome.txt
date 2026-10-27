@@ -1,0 +1,375 @@
+reserved_pool_id=p2dca21ab5f4ef3ae
+=== SPLIT-EXPOSURE-SENSITIVITY (registered 2026-09-23, commit 46889ea; docs/judge_v2_program.md L14701-L14756; route (A) ruled a4d736a, L14867-L14881) ===
+  script identity: split_exposure_sensitivity.py sha256-lf16:aae4bce3f9be1cbd blob:145749acd2f9b6e4aaf0ba579747ad98311bf24a (LF rendering; working tree CRLF (sha256-crlf16:f8ef2e35d1a7b123))
+  imported instrument: cert_under_filter.py sha256-lf16:0db2026f17b559a1 blob:f7d59019c3d65128687df46aebdcb798b43c3062 (pinned blob:f7d59019c3d65128687df46aebdcb798b43c3062 / sha256-lf16:0db2026f17b559a1; working tree CRLF (sha256-crlf16:b144a7d4377acfd3))
+  route (A) child: split_exposure_child.py sha256-lf16:23a719ffe6c6eac0 blob:a8df433ec75952759f385a478b64a093613251d8 (LF rendering)
+  A1 J6             j6_rubrics.py blob:a898515f4184537e4918d515258579222981f3d4 / sha256-lf16:de747c39fc368ce0 (pinned; checked at launch)
+  A1 LADDER         rubric_ladder.py blob:d94831fc534eac9cc8bd753f32cb26bb84d844cf / sha256-lf16:ca0485db122070fa (pinned; checked at launch)
+  A1 LEAF-POWERED   leaf_powered.py blob:ca46cee930dfdae1fd02eea6d6c04a47a261ebf9 / sha256-lf16:71d81ed60c1a437b (pinned; checked at launch)
+  A1 RUBRIC-512     rubric_512.py blob:81ae1d3914b0fef5358191a8b2033f9befc142f6 / sha256-lf16:b99b3e0eb823429d (pinned; checked at launch)
+  A1 RUBRIC-512-R   rubric_512_r.py blob:70b10af1e66f6ca52a35b9d1896d56b72db9cca4 / sha256-lf16:1347ea95753daf3e (pinned; checked at launch)
+  A1 RUBRIC-512-SS  rubric_512_ss.py blob:f401668c0a2014b8d24def7882518565c26e0278 / sha256-lf16:41aa59a4db8a7f2d (pinned; checked at launch)
+  A1 STACK          stack_judge.py blob:6acfc3195d05c160afd5c01648d9f24835703c8e / sha256-lf16:a368321cd11066d0 (pinned; checked at launch)
+  A1 STACK-v2       stack_judge.py blob:6acfc3195d05c160afd5c01648d9f24835703c8e / sha256-lf16:a368321cd11066d0 (pinned; checked at launch)
+  D5 helper judge_free_tests.py    blob:9307ca718126af88f8da341dc09fd7989cba7f7d / sha256-lf16:b9dfbfbe62a8598b (pinned; checked at launch and per child)
+  D5 helper pool_guard.py          blob:6521b51ac0fce04063563f9e6dcf42554ad86591 / sha256-lf16:8ca50c0fba9b8ce3 (pinned; checked at launch and per child)
+  D5 helper prompt_v2.py           blob:52b369657f968b5dde2540fc405ac7f4720ed94c / sha256-lf16:878941634b5bfc6b (pinned; checked at launch and per child)
+  D5 helper rejudge_grok.py        blob:939de7c7e31af6c2e2e1c02c4a37cef3b25366c5 / sha256-lf16:685aa7584bf09cf1 (pinned; checked at launch and per child)
+  D5 helper rejudge_reasoning.py   blob:1339592ae5205d6d93cdb1f38b8936b819e24d87 / sha256-lf16:fbe6569f0c05e97e (pinned; checked at launch and per child)
+  D5 helper rejudge_reference.py   blob:7640f80027f5f06cad8eb7f27c9256029fcf2e19 / sha256-lf16:e992f299cc32ad6c (pinned; checked at launch and per child)
+  D5 helper rubric_p8.py           blob:2eda08ff635616e298947579d5c191c5a7b02441 / sha256-lf16:d8e6a089446ebf45 (pinned; checked at launch and per child)
+  D5 helper rubric_value_contrast.py blob:9e1541a7bdf1260268c850ccac81db4570c064e4 / sha256-lf16:adc15a4a89454038 (pinned; checked at launch and per child)
+  D5 helper split_side.py          blob:05224b5a4b76e74353bc3931ec69f0b14f0e340b / sha256-lf16:19501df01e3d6285 (pinned; checked at launch and per child)
+  ZERO judge calls (route (A) children: credentials stripped, socket guard, call count printed per consumer); no DB written; cert_under_filter imported unedited in THIS process (its connection log and stack_judge stub in force), every other consumer in its own subprocess (A5); systematic_budget.build LF source sha16 128baa007a44a219 (cert's pin)
+  readings fixed before the run (docstring r1-r11): quantiles numpy.percentile linear over the R null shifts only; FLAGGED iff delta < q2.5 or > q97.5 (strict); mid-rank percentile; removal = whole questions, anchor-matched, random.Random(NULL_SEED0 + j) with NULL_SEED0 = 14701, anchors sorted; CERT re-run end to end on the reduced data; C2 of CERT = its C1 verdict; leak directions (r7); the falsifier's SCOREABLE clause literal (r8).
+  READY HAZARDS of the evidence (programme L14829-L14841; READY f33ca79 D2), carried beside the cells they touch:
+    (a) E14 is a REPRODUCTION of the ladder's 150-per-anchor cap draw (rubric_ladder SEED_CORPUS 556, Random(556) in rowid order) with NO logged corpus as a witness; the 45 twins before the cap do not depend on the draw [cells: e-LADDER, e-STACK, e-STACKv2, e-J6, f-CERT]
+    (b) internal-node labelling was NOT reproduced (seeded, unreproduced): E74 still contains ALL of E70; the internal-node exposure is not separable [cells: f-CERT]
+    (c) E28 relies on the saved members equalling the members at induction time, witnessed by the 17 / 17 [JUDGE-LEAK] log lines the corpus model reproduces [cells: a-E28, b-E28, c-E28, d-E28]
+    (d) any consumer keyed on another id space must CONVERT THROUGH THE OPTIONS KEY, never by question text (CONTEXT.md rule 6); every consumer here is keyed on eval question_id, and the ids outside the pool are MEASURED per cell (a cell with any is UNDETERMINED (BY VALIDITY)) [cells: all 13]
+  run started 2026-09-24 05:20:53
+  read-only source experiment_results\x12_crossdomain\stack_v2_promptv2_x12all.db (mode=ro&immutable=1): -wal absent, -journal absent (a non-empty -wal or -journal refuses)
+  read-only source mmlu_pro_dataset_cache_v2.db (mode=ro&immutable=1): -wal 0 bytes, -journal absent (a non-empty -wal or -journal refuses)
+  read-only source snapshots.db (mode=ro&immutable=1): -wal 0 bytes, -journal absent (a non-empty -wal or -journal refuses)
+  exposed set E14: docs\agents\results\evidence\SPLIT-EXPOSURE_E14.txt, 14 ids (registered 14), sha256-lf 2b758ed2d955d409b89acb6db64a95cd3507836ee02730176aeea9723f669e6f (pinned): all in the pool's judgeable EVAL ids
+  exposed set E28: docs\agents\results\evidence\SPLIT-EXPOSURE_E28.txt, 28 ids (registered 28), sha256-lf 525aad9a16e6106623cee915f2cb115c5f35a94450710aec61fd58281c287815 (pinned): all in the pool's judgeable EVAL ids
+  exposed set E70: docs\agents\results\evidence\SPLIT-EXPOSURE_E70.txt, 70 ids (registered 70), sha256-lf 0dfea2fcdf8af2bb35eb7a28e540f2378d5464146ac9442d619533d18a450326 (pinned): all in the pool's judgeable EVAL ids
+  exposed set E74: docs\agents\results\evidence\SPLIT-EXPOSURE_E74.txt, 74 ids (registered 74), sha256-lf 1ca79db5764ba80d62cfabaa8c1d0b6b3980de658a22ff802c580c0b09e91bd1 (pinned): all in the pool's judgeable EVAL ids
+  read-only source experiment_results\x12_crossdomain\stack_v2_promptv2_x12all.db (mode=ro&immutable=1): no WAL sidecar (a non-empty -wal refuses the run)
+  read-only source mmlu_pro_dataset_cache_v2.db (mode=ro&immutable=1): WAL sidecar 0 bytes (a non-empty -wal refuses the run)
+  read-only source snapshots.db (mode=ro&immutable=1): WAL sidecar 0 bytes (a non-empty -wal refuses the run)
+  routing bareq512_s42: 3445 routed questions; pool p2dca21ab5f4ef3ae: 3445 ids; routed set == pool: yes
+
+--- CELL a-E28: RUBRIC-512 x E28 [registered support: DESCRIPTIVE-ONLY] ---
+  reuses tools/analysis/rubric_512.py blob:81ae1d3914b0fef5358191a8b2033f9befc142f6, analyze('bareq512_s42'); recorded headline: cell vs cached generic, Mistral: +1.8pp, 42:25, McNemar p 0.0498 on 946 key-decidable
+  ROUTE (A) (ruling a4d736a): rubric_512.py imported unedited in 9 subprocess(es) (pids 26256,46792,20824,45468,45148,1492...; the parent is 46328), identity blob:81ae1d3914b0fef5358191a8b2033f9befc142f6 / sha256-lf16:b99b3e0eb823429d (pinned 81ae1d3914b0fef5358191a8b2033f9befc142f6 / b99b3e0eb823429d)
+    connection log (every open redirected to file:<abs>?mode=ro&immutable=1 after the -wal/-journal check):
+      experiment_results\rubric_512\bareq512_s42.db                      opens  1002 | immutable; in-memory copy of the immutable URI, removal applied, PRAGMA query_only
+      experiment_results\x12_crossdomain\rubric_contrast.db              opens  1002 | immutable
+      mmlu_pro_dataset_cache_v2.db                                       opens  1002 | immutable
+    import-time opens none | ZERO CALLS, ENFORCED BY the socket guard (Python socket + audit hook socket.connect): outbound connection attempts 0 (must be 0) | .env reads refused 0 (the credentials' only source) | other refused operations 0 | environment credentials stripped (descriptive only) 0 left | opened files unchanged (sha256_16, size, mtime): yes | local modules pinned: 4 | child memory working set 143 MB (peak 195 MB) | child wall 1.9/23.2/23.0/22.8 s
+    capture (A6): the original's own analyze('bareq512_s42') with stdout captured; headline line(s) pinned: header, primary; T = +1 x (b - c) / n from the printed integers; scored set by the pinned line 'rows[mid] = (w == d, gen[mid] == d, anc)', expr (mid, q, anc)
+  C0: recorded headline reproduced to the digit from the same code path: T_pp +1.8, b 42, c 25, n 946, p 0.0498
+  scored set: n = 946 matches on 784 questions (Kish mean cluster size 1.391); k = 7 matches on 7 exposed questions (per anchor: Health 3, Law 2, Other 1, Philosophy 1)
+  HAZARD (c): E28 relies on the saved members equalling the members at induction time, witnessed by the 17 / 17 [JUDGE-LEAK] log lines the corpus model reproduces
+  HAZARD (d): id space verdicts.qid (eval question_id); 0 of 784 scored qids outside the pool of record (joined by eval question_id, never by text)
+  T with = +1.797 pp | T without = +1.810 pp | observed shift delta = +0.013 pp
+  NULL: R = 1000 anchor-matched random removals of the same number of NON-exposed scored questions per anchor (whole questions), random.Random(14702); shifts: mean -0.025, SD 0.087 pp; central 95% (numpy.percentile linear, observed excluded): [-0.198, +0.124]; observed mid-rank percentile 0.457
+  C1: NOT FLAGGED - the observed shift lies within the null's central 95%.
+  BOUND: removing k = 7 matches can move T by at most 0.759 pp (planning 0.87 pp); Delta* 0.00 pp
+  STRUCTURAL LEG: reachable - the bound 0.759 pp is not below Delta* 0.00 pp.
+  C2 (DESCRIPTIVE-ONLY): the recorded verdict [cell > generic AND p8.mcn(b, c) < 0.05] with the exposed questions PASS, without PASS -> SAME
+  SUPPORT: registered DESCRIPTIVE-ONLY (Delta* 0.00 pp against the planned MDE 0.24 pp). Measured: null SD 0.0865 pp; iid SD 0.0746 pp; DEFF 1.345 (declared pilot 1.2); n_eff 703.1; MDE (2.80 x null SD) 0.242 pp
+    measured check Delta* > MDE: DESCRIPTIVE-ONLY, as registered.
+
+--- CELL a-E70: RUBRIC-512 x E70 [registered support: DESCRIPTIVE-ONLY] ---
+  reuses tools/analysis/rubric_512.py blob:81ae1d3914b0fef5358191a8b2033f9befc142f6, analyze('bareq512_s42'); recorded headline: cell vs cached generic, Mistral: +1.8pp, 42:25, McNemar p 0.0498 on 946 key-decidable
+  ROUTE (A) (ruling a4d736a): rubric_512.py imported unedited in 9 subprocess(es) (pids 26256,30664,25016,13908,32240,42524...; the parent is 46328), identity blob:81ae1d3914b0fef5358191a8b2033f9befc142f6 / sha256-lf16:b99b3e0eb823429d (pinned 81ae1d3914b0fef5358191a8b2033f9befc142f6 / b99b3e0eb823429d)
+    connection log (every open redirected to file:<abs>?mode=ro&immutable=1 after the -wal/-journal check):
+      experiment_results\rubric_512\bareq512_s42.db                      opens  1002 | immutable; in-memory copy of the immutable URI, removal applied, PRAGMA query_only
+      experiment_results\x12_crossdomain\rubric_contrast.db              opens  1002 | immutable
+      mmlu_pro_dataset_cache_v2.db                                       opens  1002 | immutable
+    import-time opens none | ZERO CALLS, ENFORCED BY the socket guard (Python socket + audit hook socket.connect): outbound connection attempts 0 (must be 0) | .env reads refused 0 (the credentials' only source) | other refused operations 0 | environment credentials stripped (descriptive only) 0 left | opened files unchanged (sha256_16, size, mtime): yes | local modules pinned: 4 | child memory working set 143 MB (peak 195 MB) | child wall 1.9/22.4/22.2/22.4 s
+    capture (A6): the original's own analyze('bareq512_s42') with stdout captured; headline line(s) pinned: header, primary; T = +1 x (b - c) / n from the printed integers; scored set by the pinned line 'rows[mid] = (w == d, gen[mid] == d, anc)', expr (mid, q, anc)
+  C0: recorded headline reproduced to the digit from the same code path: T_pp +1.8, b 42, c 25, n 946, p 0.0498
+  scored set: n = 946 matches on 784 questions (Kish mean cluster size 1.391); k = 20 matches on 19 exposed questions (per anchor: Biology 3, Health 7, Law 6, Other 1, Philosophy 1, Psychology 1)
+  HAZARD (d): id space verdicts.qid (eval question_id); 0 of 784 scored qids outside the pool of record (joined by eval question_id, never by text)
+  T with = +1.797 pp | T without = +1.728 pp | observed shift delta = -0.069 pp
+  NULL: R = 1000 anchor-matched random removals of the same number of NON-exposed scored questions per anchor (whole questions), random.Random(14703); shifts: mean -0.052, SD 0.132 pp; central 95% (numpy.percentile linear, observed excluded): [-0.284, +0.157]; observed mid-rank percentile 0.302
+  C1: NOT FLAGGED - the observed shift lies within the null's central 95%.
+  BOUND: removing k = 20 matches can move T by at most 2.199 pp (planning 2.09 pp); Delta* 0.00 pp
+  STRUCTURAL LEG: reachable - the bound 2.199 pp is not below Delta* 0.00 pp.
+  C2 (DESCRIPTIVE-ONLY): the recorded verdict [cell > generic AND p8.mcn(b, c) < 0.05] with the exposed questions PASS, without FAIL -> CHANGED
+  SUPPORT: registered DESCRIPTIVE-ONLY (Delta* 0.00 pp against the planned MDE 0.38 pp). Measured: null SD 0.1318 pp; iid SD 0.1269 pp; DEFF 1.077 (declared pilot 1.2); n_eff 878.0; MDE (2.80 x null SD) 0.369 pp
+    measured check Delta* > MDE: DESCRIPTIVE-ONLY, as registered.
+
+--- CELL b-E28: RUBRIC-512-SS x E28 [registered support: SCOREABLE] ---
+  reuses tools/analysis/rubric_512_ss.py blob:f401668c0a2014b8d24def7882518565c26e0278, analyze(); recorded headline: cell vs same-session generic: +1.0pp, 35:26, p 0.31
+  ROUTE (A) (ruling a4d736a): rubric_512_ss.py imported unedited in 9 subprocess(es) (pids 44204,45384,30912,35892,38692,38124...; the parent is 46328), identity blob:f401668c0a2014b8d24def7882518565c26e0278 / sha256-lf16:41aa59a4db8a7f2d (pinned f401668c0a2014b8d24def7882518565c26e0278 / 41aa59a4db8a7f2d)
+    connection log (every open redirected to file:<abs>?mode=ro&immutable=1 after the -wal/-journal check):
+      experiment_results\rubric_512\bareq512_s42.db                      opens  1002 | immutable
+      experiment_results\rubric_512\generic_ss.db                        opens  1002 | immutable; in-memory copy of the immutable URI, removal applied, PRAGMA query_only
+      experiment_results\x12_crossdomain\ratings_x12.db                  opens  1002 | immutable
+      experiment_results\x12_crossdomain\rejudge_grok.db                 opens  1002 | immutable
+      experiment_results\x12_crossdomain\rubric_contrast.db              opens  1002 | immutable
+      mmlu_pro_dataset_cache_v2.db                                       opens  1002 | immutable
+    import-time opens none | ZERO CALLS, ENFORCED BY the socket guard (Python socket + audit hook socket.connect): outbound connection attempts 0 (must be 0) | .env reads refused 0 (the credentials' only source) | other refused operations 0 | environment credentials stripped (descriptive only) 0 left | opened files unchanged (sha256_16, size, mtime): yes | local modules pinned: 5 | child memory working set 150 MB (peak 210 MB) | child wall 2.1/22.5/22.7/22.7 s
+    capture (A6): the original's own analyze() with stdout captured; headline line(s) pinned: header, primary; T = +1 x (b - c) / n from the printed integers; scored set by the pinned line 'rows[mid] = {"cell": cell[mid][0] == d, "fresh": fresh[mid] == d, "cac', expr (mid, q, cell[mid][1])
+  C0: recorded headline reproduced to the digit from the same code path: T_pp +1.0, b 35, c 26, p 0.31
+  scored set: n = 946 matches on 784 questions (Kish mean cluster size 1.391); k = 7 matches on 7 exposed questions (per anchor: Health 3, Law 2, Other 1, Philosophy 1)
+  HAZARD (c): E28 relies on the saved members equalling the members at induction time, witnessed by the 17 / 17 [JUDGE-LEAK] log lines the corpus model reproduces
+  HAZARD (d): id space verdicts.qid via match_history (eval question_id); 0 of 784 scored qids outside the pool of record (joined by eval question_id, never by text)
+  T with = +0.951 pp | T without = +0.958 pp | observed shift delta = +0.007 pp
+  NULL: R = 1000 anchor-matched random removals of the same number of NON-exposed scored questions per anchor (whole questions), random.Random(14704); shifts: mean -0.028, SD 0.079 pp; central 95% (numpy.percentile linear, observed excluded): [-0.204, +0.116]; observed mid-rank percentile 0.442
+  C1: NOT FLAGGED - the observed shift lies within the null's central 95%.
+  BOUND: removing k = 7 matches can move T by at most 0.753 pp (planning 0.86 pp); Delta* 1.00 pp
+  STRUCTURAL LEG: BOUNDED - the consequential shift is UNREACHABLE at any draw at the measured k.
+  C2 (DESCRIPTIVE-ONLY): the recorded verdict [cell > fresh generic AND p8.mcn(b, c) < 0.05] with the exposed questions FAIL, without FAIL -> SAME
+    C2 is SETTLED BY THE BOUND (registration (g)): exposure of this size cannot change what the record says.
+  SUPPORT: registered SCOREABLE (Delta* 1.00 pp against the planned MDE 0.23 pp). Measured: null SD 0.0790 pp; iid SD 0.0713 pp; DEFF 1.229 (declared pilot 1.2); n_eff 769.7; MDE (2.80 x null SD) 0.221 pp
+    measured check Delta* > MDE: SCOREABLE, as registered.
+
+--- CELL b-E70: RUBRIC-512-SS x E70 [registered support: SCOREABLE] ---
+  reuses tools/analysis/rubric_512_ss.py blob:f401668c0a2014b8d24def7882518565c26e0278, analyze(); recorded headline: cell vs same-session generic: +1.0pp, 35:26, p 0.31
+  ROUTE (A) (ruling a4d736a): rubric_512_ss.py imported unedited in 9 subprocess(es) (pids 44204,34432,43312,11364,45488,11796...; the parent is 46328), identity blob:f401668c0a2014b8d24def7882518565c26e0278 / sha256-lf16:41aa59a4db8a7f2d (pinned f401668c0a2014b8d24def7882518565c26e0278 / 41aa59a4db8a7f2d)
+    connection log (every open redirected to file:<abs>?mode=ro&immutable=1 after the -wal/-journal check):
+      experiment_results\rubric_512\bareq512_s42.db                      opens  1002 | immutable
+      experiment_results\rubric_512\generic_ss.db                        opens  1002 | immutable; in-memory copy of the immutable URI, removal applied, PRAGMA query_only
+      experiment_results\x12_crossdomain\ratings_x12.db                  opens  1002 | immutable
+      experiment_results\x12_crossdomain\rejudge_grok.db                 opens  1002 | immutable
+      experiment_results\x12_crossdomain\rubric_contrast.db              opens  1002 | immutable
+      mmlu_pro_dataset_cache_v2.db                                       opens  1002 | immutable
+    import-time opens none | ZERO CALLS, ENFORCED BY the socket guard (Python socket + audit hook socket.connect): outbound connection attempts 0 (must be 0) | .env reads refused 0 (the credentials' only source) | other refused operations 0 | environment credentials stripped (descriptive only) 0 left | opened files unchanged (sha256_16, size, mtime): yes | local modules pinned: 5 | child memory working set 150 MB (peak 210 MB) | child wall 2.1/23.0/23.5/23.6 s
+    capture (A6): the original's own analyze() with stdout captured; headline line(s) pinned: header, primary; T = +1 x (b - c) / n from the printed integers; scored set by the pinned line 'rows[mid] = {"cell": cell[mid][0] == d, "fresh": fresh[mid] == d, "cac', expr (mid, q, cell[mid][1])
+  C0: recorded headline reproduced to the digit from the same code path: T_pp +1.0, b 35, c 26, p 0.31
+  scored set: n = 946 matches on 784 questions (Kish mean cluster size 1.391); k = 20 matches on 19 exposed questions (per anchor: Biology 3, Health 7, Law 6, Other 1, Philosophy 1, Psychology 1)
+  HAZARD (d): id space verdicts.qid via match_history (eval question_id); 0 of 784 scored qids outside the pool of record (joined by eval question_id, never by text)
+  T with = +0.951 pp | T without = +0.864 pp | observed shift delta = -0.087 pp
+  NULL: R = 1000 anchor-matched random removals of the same number of NON-exposed scored questions per anchor (whole questions), random.Random(14705); shifts: mean -0.031, SD 0.110 pp; central 95% (numpy.percentile linear, observed excluded): [-0.299, +0.134]; observed mid-rank percentile 0.164
+  C1: NOT FLAGGED - the observed shift lies within the null's central 95%.
+  BOUND: removing k = 20 matches can move T by at most 2.180 pp (planning 2.07 pp); Delta* 1.00 pp
+  STRUCTURAL LEG: reachable - the bound 2.180 pp is not below Delta* 1.00 pp.
+  C2 (DESCRIPTIVE-ONLY): the recorded verdict [cell > fresh generic AND p8.mcn(b, c) < 0.05] with the exposed questions FAIL, without FAIL -> SAME
+  SUPPORT: registered SCOREABLE (Delta* 1.00 pp against the planned MDE 0.36 pp). Measured: null SD 0.1105 pp; iid SD 0.1213 pp; DEFF 0.829 (declared pilot 1.2); n_eff 1140.8; MDE (2.80 x null SD) 0.309 pp
+    measured check Delta* > MDE: SCOREABLE, as registered.
+
+--- CELL c-E28: RUBRIC-512-R x E28 [registered support: SCOREABLE] ---
+  reuses tools/analysis/rubric_512_r.py blob:70b10af1e66f6ca52a35b9d1896d56b72db9cca4, analyze(); recorded headline: reasoning judge: 0.842 = 0.842, 24:24 on 946
+  ROUTE (A) (ruling a4d736a): rubric_512_r.py imported unedited in 9 subprocess(es) (pids 13024,38164,6792,26940,14448,39484...; the parent is 46328), identity blob:70b10af1e66f6ca52a35b9d1896d56b72db9cca4 / sha256-lf16:1347ea95753daf3e (pinned 70b10af1e66f6ca52a35b9d1896d56b72db9cca4 / 1347ea95753daf3e)
+    connection log (every open redirected to file:<abs>?mode=ro&immutable=1 after the -wal/-journal check):
+      experiment_results\rubric_512\grok_reasoning_cell.db               opens  1002 | immutable; in-memory copy of the immutable URI, removal applied, PRAGMA query_only
+      experiment_results\rubric_512\grok_reasoning_generic.db            opens  1002 | immutable; in-memory copy of the immutable URI, removal applied, PRAGMA query_only
+      experiment_results\x12_crossdomain\ratings_x12.db                  opens  1002 | immutable
+      experiment_results\x12_crossdomain\rejudge_grok.db                 opens  1002 | immutable
+      mmlu_pro_dataset_cache_v2.db                                       opens  1002 | immutable
+    import-time opens none | ZERO CALLS, ENFORCED BY the socket guard (Python socket + audit hook socket.connect): outbound connection attempts 0 (must be 0) | .env reads refused 0 (the credentials' only source) | other refused operations 0 | environment credentials stripped (descriptive only) 0 left | opened files unchanged (sha256_16, size, mtime): yes | local modules pinned: 6 | child memory working set 147 MB (peak 207 MB) | child wall 2.0/24.8/24.9/25.3 s
+    capture (A6): the original's own analyze() with stdout captured; headline line(s) pinned: header, primary; T = +1 x (b - c) / n from the printed integers; scored set by the pinned line 'rows[mid] = (arms["cell"][mid][0] == d, arms["generic"][mid][0] == d, ', expr (mid, q, arms['cell'][mid][1])
+  C0: recorded headline reproduced to the digit from the same code path: b 24, c 24, n 946, pc 0.842, pg 0.842
+  scored set: n = 946 matches on 784 questions (Kish mean cluster size 1.391); k = 7 matches on 7 exposed questions (per anchor: Health 3, Law 2, Other 1, Philosophy 1)
+  HAZARD (c): E28 relies on the saved members equalling the members at induction time, witnessed by the 17 / 17 [JUDGE-LEAK] log lines the corpus model reproduces
+  HAZARD (d): id space match_history.eval_question_id; 0 of 784 scored qids outside the pool of record (joined by eval question_id, never by text)
+  T with = +0.000 pp | T without = +0.000 pp | observed shift delta = +0.000 pp
+  NULL: R = 1000 anchor-matched random removals of the same number of NON-exposed scored questions per anchor (whole questions), random.Random(14706); shifts: mean -0.022, SD 0.068 pp; central 95% (numpy.percentile linear, observed excluded): [-0.213, +0.107]; observed mid-rank percentile 0.587
+  C1: NOT FLAGGED - the observed shift lies within the null's central 95%.
+  BOUND: removing k = 7 matches can move T by at most 0.745 pp (planning 0.85 pp); Delta* 1.00 pp
+  STRUCTURAL LEG: BOUNDED - the consequential shift is UNREACHABLE at any draw at the measured k.
+  C2 (DESCRIPTIVE-ONLY): the recorded verdict [cell > generic AND p8.mcn(b, c) < 0.05] with the exposed questions FAIL, without FAIL -> SAME
+    C2 is SETTLED BY THE BOUND (registration (g)): exposure of this size cannot change what the record says.
+  SUPPORT: registered SCOREABLE (Delta* 1.00 pp against the planned MDE 0.21 pp). Measured: null SD 0.0681 pp; iid SD 0.0633 pp; DEFF 1.159 (declared pilot 1.2); n_eff 816.1; MDE (2.80 x null SD) 0.191 pp
+    measured check Delta* > MDE: SCOREABLE, as registered.
+
+--- CELL c-E70: RUBRIC-512-R x E70 [registered support: SCOREABLE] ---
+  reuses tools/analysis/rubric_512_r.py blob:70b10af1e66f6ca52a35b9d1896d56b72db9cca4, analyze(); recorded headline: reasoning judge: 0.842 = 0.842, 24:24 on 946
+  ROUTE (A) (ruling a4d736a): rubric_512_r.py imported unedited in 9 subprocess(es) (pids 13024,24900,32272,34384,32368,5168...; the parent is 46328), identity blob:70b10af1e66f6ca52a35b9d1896d56b72db9cca4 / sha256-lf16:1347ea95753daf3e (pinned 70b10af1e66f6ca52a35b9d1896d56b72db9cca4 / 1347ea95753daf3e)
+    connection log (every open redirected to file:<abs>?mode=ro&immutable=1 after the -wal/-journal check):
+      experiment_results\rubric_512\grok_reasoning_cell.db               opens  1002 | immutable; in-memory copy of the immutable URI, removal applied, PRAGMA query_only
+      experiment_results\rubric_512\grok_reasoning_generic.db            opens  1002 | immutable; in-memory copy of the immutable URI, removal applied, PRAGMA query_only
+      experiment_results\x12_crossdomain\ratings_x12.db                  opens  1002 | immutable
+      experiment_results\x12_crossdomain\rejudge_grok.db                 opens  1002 | immutable
+      mmlu_pro_dataset_cache_v2.db                                       opens  1002 | immutable
+    import-time opens none | ZERO CALLS, ENFORCED BY the socket guard (Python socket + audit hook socket.connect): outbound connection attempts 0 (must be 0) | .env reads refused 0 (the credentials' only source) | other refused operations 0 | environment credentials stripped (descriptive only) 0 left | opened files unchanged (sha256_16, size, mtime): yes | local modules pinned: 6 | child memory working set 147 MB (peak 207 MB) | child wall 2.0/25.2/24.5/24.8 s
+    capture (A6): the original's own analyze() with stdout captured; headline line(s) pinned: header, primary; T = +1 x (b - c) / n from the printed integers; scored set by the pinned line 'rows[mid] = (arms["cell"][mid][0] == d, arms["generic"][mid][0] == d, ', expr (mid, q, arms['cell'][mid][1])
+  C0: recorded headline reproduced to the digit from the same code path: b 24, c 24, n 946, pc 0.842, pg 0.842
+  scored set: n = 946 matches on 784 questions (Kish mean cluster size 1.391); k = 20 matches on 19 exposed questions (per anchor: Biology 3, Health 7, Law 6, Other 1, Philosophy 1, Psychology 1)
+  HAZARD (d): id space match_history.eval_question_id; 0 of 784 scored qids outside the pool of record (joined by eval question_id, never by text)
+  T with = +0.000 pp | T without = +0.000 pp | observed shift delta = +0.000 pp
+  NULL: R = 1000 anchor-matched random removals of the same number of NON-exposed scored questions per anchor (whole questions), random.Random(14707); shifts: mean -0.046, SD 0.116 pp; central 95% (numpy.percentile linear, observed excluded): [-0.325, +0.112]; observed mid-rank percentile 0.634
+  C1: NOT FLAGGED - the observed shift lies within the null's central 95%.
+  BOUND: removing k = 20 matches can move T by at most 2.160 pp (planning 2.05 pp); Delta* 1.00 pp
+  STRUCTURAL LEG: reachable - the bound 2.160 pp is not below Delta* 1.00 pp.
+  C2 (DESCRIPTIVE-ONLY): the recorded verdict [cell > generic AND p8.mcn(b, c) < 0.05] with the exposed questions FAIL, without FAIL -> SAME
+  SUPPORT: registered SCOREABLE (Delta* 1.00 pp against the planned MDE 0.32 pp). Measured: null SD 0.1161 pp; iid SD 0.1077 pp; DEFF 1.161 (declared pilot 1.2); n_eff 814.5; MDE (2.80 x null SD) 0.325 pp
+    measured check Delta* > MDE: SCOREABLE, as registered.
+
+--- CELL d-E28: LEAF-POWERED x E28 [registered support: SCOREABLE] ---
+  reuses tools/analysis/leaf_powered.py blob:ca46cee930dfdae1fd02eea6d6c04a47a261ebf9, analyze(); recorded headline: anchor vs leaf rubric, single order: -0.3pp, 9:7 on 786 key-decidable
+  ROUTE (A) (ruling a4d736a): leaf_powered.py imported unedited in 9 subprocess(es) (pids 45136,46444,43312,42356,1732,44444...; the parent is 46328), identity blob:ca46cee930dfdae1fd02eea6d6c04a47a261ebf9 / sha256-lf16:71d81ed60c1a437b (pinned ca46cee930dfdae1fd02eea6d6c04a47a261ebf9 / 71d81ed60c1a437b)
+    connection log (every open redirected to file:<abs>?mode=ro&immutable=1 after the -wal/-journal check):
+      experiment_results\x12_crossdomain\leaf_powered.db                 opens  1002 | immutable; in-memory copy of the immutable URI, removal applied, PRAGMA query_only
+      experiment_results\x12_crossdomain\rubric_ladder.db                opens  1002 | immutable
+      mmlu_pro_dataset_cache_v2.db                                       opens  1002 | immutable
+      snapshots.db                                                       opens  1002 | immutable
+    import-time opens none | ZERO CALLS, ENFORCED BY the socket guard (Python socket + audit hook socket.connect): outbound connection attempts 0 (must be 0) | .env reads refused 0 (the credentials' only source) | other refused operations 0 | environment credentials stripped (descriptive only) 0 left | opened files unchanged (sha256_16, size, mtime): yes | local modules pinned: 10 | child memory working set 173 MB (peak 204 MB) | child wall 3.3/32.8/32.6/32.6 s
+    capture (A6): the original's own analyze() with stdout captured; headline line(s) pinned: header, primary; T = -1 x (b - c) / n from the printed integers; scored set by the pinned line 'rows.append((anc, d["anchor"] == win, d["leaf"] == win))', expr (m, q, anc)
+  C0: recorded headline reproduced to the digit from the same code path: T_pp -0.3, b 9, c 7, n 786
+  scored set: n = 786 matches on 506 questions (Kish mean cluster size 1.959); k = 8 matches on 4 exposed questions (per anchor: Biology 3, Philosophy 1)
+  HAZARD (c): E28 relies on the saved members equalling the members at induction time, witnessed by the 17 / 17 [JUDGE-LEAK] log lines the corpus model reproduces
+  HAZARD (d): id space schedule.qid (eval question_id); 0 of 506 scored qids outside the pool of record (joined by eval question_id, never by text)
+  T with = -0.254 pp | T without = -0.257 pp | observed shift delta = -0.003 pp
+  NULL: R = 1000 anchor-matched random removals of the same number of NON-exposed scored questions per anchor (whole questions), random.Random(14708); shifts: mean +0.002, SD 0.038 pp; central 95% (numpy.percentile linear, observed excluded): [-0.130, +0.126]; observed mid-rank percentile 0.184
+  C1: NOT FLAGGED - the observed shift lies within the null's central 95%.
+  BOUND: removing k = 8 matches can move T by at most 1.031 pp (planning 0.77 pp); Delta* 2.00 pp
+  STRUCTURAL LEG: BOUNDED - the consequential shift is UNREACHABLE at any draw at the measured k.
+  C2 (DESCRIPTIVE-ONLY): the recorded verdict [leaf - anchor >= 0.02 AND p8.mcn(b, c) < 0.05] with the exposed questions FAIL, without FAIL -> SAME
+    C2 is SETTLED BY THE BOUND (registration (g)): exposure of this size cannot change what the record says.
+  SUPPORT: registered SCOREABLE (Delta* 2.00 pp against the planned MDE 0.14 pp). Measured: null SD 0.0380 pp; iid SD 0.0516 pp; DEFF 0.540 (declared pilot 1.2); n_eff 1454.3; MDE (2.80 x null SD) 0.106 pp
+    measured check Delta* > MDE: SCOREABLE, as registered.
+
+--- CELL d-E70: LEAF-POWERED x E70 [registered support: SCOREABLE] ---
+  reuses tools/analysis/leaf_powered.py blob:ca46cee930dfdae1fd02eea6d6c04a47a261ebf9, analyze(); recorded headline: anchor vs leaf rubric, single order: -0.3pp, 9:7 on 786 key-decidable
+  ROUTE (A) (ruling a4d736a): leaf_powered.py imported unedited in 9 subprocess(es) (pids 45136,45952,36620,38888,19536,37864...; the parent is 46328), identity blob:ca46cee930dfdae1fd02eea6d6c04a47a261ebf9 / sha256-lf16:71d81ed60c1a437b (pinned ca46cee930dfdae1fd02eea6d6c04a47a261ebf9 / 71d81ed60c1a437b)
+    connection log (every open redirected to file:<abs>?mode=ro&immutable=1 after the -wal/-journal check):
+      experiment_results\x12_crossdomain\leaf_powered.db                 opens  1002 | immutable; in-memory copy of the immutable URI, removal applied, PRAGMA query_only
+      experiment_results\x12_crossdomain\rubric_ladder.db                opens  1002 | immutable
+      mmlu_pro_dataset_cache_v2.db                                       opens  1002 | immutable
+      snapshots.db                                                       opens  1002 | immutable
+    import-time opens none | ZERO CALLS, ENFORCED BY the socket guard (Python socket + audit hook socket.connect): outbound connection attempts 0 (must be 0) | .env reads refused 0 (the credentials' only source) | other refused operations 0 | environment credentials stripped (descriptive only) 0 left | opened files unchanged (sha256_16, size, mtime): yes | local modules pinned: 10 | child memory working set 173 MB (peak 204 MB) | child wall 3.3/32.1/32.3/32.3 s
+    capture (A6): the original's own analyze() with stdout captured; headline line(s) pinned: header, primary; T = -1 x (b - c) / n from the printed integers; scored set by the pinned line 'rows.append((anc, d["anchor"] == win, d["leaf"] == win))', expr (m, q, anc)
+  C0: recorded headline reproduced to the digit from the same code path: T_pp -0.3, b 9, c 7, n 786
+  scored set: n = 786 matches on 506 questions (Kish mean cluster size 1.959); k = 22 matches on 13 exposed questions (per anchor: Biology 11, Business 1, Philosophy 1)
+  HAZARD (d): id space schedule.qid (eval question_id); 0 of 506 scored qids outside the pool of record (joined by eval question_id, never by text)
+  T with = -0.254 pp | T without = -0.262 pp | observed shift delta = -0.007 pp
+  NULL: R = 1000 anchor-matched random removals of the same number of NON-exposed scored questions per anchor (whole questions), random.Random(14709); shifts: mean -0.005, SD 0.063 pp; central 95% (numpy.percentile linear, observed excluded): [-0.139, +0.124]; observed mid-rank percentile 0.341
+  C1: NOT FLAGGED - the observed shift lies within the null's central 95%.
+  BOUND: removing k = 22 matches can move T by at most 2.887 pp (planning 2.08 pp); Delta* 2.00 pp
+  STRUCTURAL LEG: reachable - the bound 2.887 pp is not below Delta* 2.00 pp.
+  C2 (DESCRIPTIVE-ONLY): the recorded verdict [leaf - anchor >= 0.02 AND p8.mcn(b, c) < 0.05] with the exposed questions FAIL, without FAIL -> SAME
+  SUPPORT: registered SCOREABLE (Delta* 2.00 pp against the planned MDE 0.23 pp). Measured: null SD 0.0628 pp; iid SD 0.0864 pp; DEFF 0.529 (declared pilot 1.2); n_eff 1487.2; MDE (2.80 x null SD) 0.176 pp
+    measured check Delta* > MDE: SCOREABLE, as registered.
+
+--- CELL e-LADDER: LADDER x E14 [registered support: SCOREABLE] ---
+  reuses tools/analysis/rubric_ladder.py blob:d94831fc534eac9cc8bd753f32cb26bb84d844cf, analyze(); recorded headline: leaf vs anchor 35:38 on 967 fully paired key-decidable: -0.3pp, one-sided p 0.68
+  ROUTE (A) (ruling a4d736a): rubric_ladder.py imported unedited in 9 subprocess(es) (pids 43128,6792,24900,31492,40680,46316...; the parent is 46328), identity blob:d94831fc534eac9cc8bd753f32cb26bb84d844cf / sha256-lf16:ca0485db122070fa (pinned d94831fc534eac9cc8bd753f32cb26bb84d844cf / ca0485db122070fa)
+    connection log (every open redirected to file:<abs>?mode=ro&immutable=1 after the -wal/-journal check):
+      experiment_results\x12_crossdomain\ratings_x12.db                  opens  2004 | immutable
+      experiment_results\x12_crossdomain\rubric_contrast.db              opens  1002 | immutable
+      experiment_results\x12_crossdomain\rubric_ladder.db                opens  1003 | immutable; in-memory copy of the immutable URI, removal applied, PRAGMA query_only
+      mmlu_pro_dataset_cache_v2.db                                       opens  1002 | immutable
+    import-time opens none | ZERO CALLS, ENFORCED BY the socket guard (Python socket + audit hook socket.connect): outbound connection attempts 0 (must be 0) | .env reads refused 0 (the credentials' only source) | other refused operations 0 | environment credentials stripped (descriptive only) 0 left | opened files unchanged (sha256_16, size, mtime): yes | local modules pinned: 3 | child memory working set 67 MB (peak 74 MB) | child wall 9.7/349.4/349.5/352.3 s
+    capture (A6): the original's own analyze() with stdout captured; headline line(s) pinned: header, primary_a, primary_b; T = +1 x (b - c) / n from the printed integers; scored set by its locals at return, expr [(mid, meta[mid][0], None) for mid in common]
+  C0: recorded headline reproduced to the digit from the same code path: T_pp -0.3, b 35, c 38, n 967, p 0.68
+  scored set: n = 967 matches on 787 questions (Kish mean cluster size 1.445); k = 2 matches on 2 exposed questions (per anchor: Health 2)
+  HAZARD (a): E14 is a REPRODUCTION of the ladder's 150-per-anchor cap draw (rubric_ladder SEED_CORPUS 556, Random(556) in rowid order) with NO logged corpus as a witness; the 45 twins before the cap do not depend on the draw
+  HAZARD (d): id space match_history.eval_question_id; 0 of 787 scored qids outside the pool of record (joined by eval question_id, never by text)
+  T with = -0.310 pp | T without = -0.311 pp | observed shift delta = -0.001 pp
+  NULL: R = 1000 anchor-matched random removals of the same number of NON-exposed scored questions per anchor (whole questions), random.Random(14710); shifts: mean -0.007, SD 0.036 pp; central 95% (numpy.percentile linear, observed excluded): [-0.105, +0.103]; observed mid-rank percentile 0.753
+  C1: NOT FLAGGED - the observed shift lies within the null's central 95%.
+  BOUND: removing k = 2 matches can move T by at most 0.208 pp (planning 0.42 pp); Delta* 2.00 pp
+  STRUCTURAL LEG: BOUNDED - the consequential shift is UNREACHABLE at any draw at the measured k.
+  C2 (DESCRIPTIVE-ONLY): the recorded verdict [PRIMARY (a) leaf > anchor one-sided exact McNemar p < 0.05 AND (b) monotone; printed (a)/(b)] with the exposed questions FAIL/FAIL, without FAIL/FAIL -> SAME
+    C2 is SETTLED BY THE BOUND (registration (g)): exposure of this size cannot change what the record says.
+  SUPPORT: registered SCOREABLE (Delta* 2.00 pp against the planned MDE 0.17 pp). Measured: null SD 0.0362 pp; iid SD 0.0402 pp; DEFF 0.807 (declared pilot 1.2); n_eff 1198.1; MDE (2.80 x null SD) 0.101 pp
+    measured check Delta* > MDE: SCOREABLE, as registered.
+
+--- CELL e-STACK: STACK x E14 [registered support: SCOREABLE] ---
+  reuses tools/analysis/stack_judge.py blob:6acfc3195d05c160afd5c01648d9f24835703c8e, analyze() PROMPT='v1'; recorded headline: accuracy 0.843 on 944 decidable
+  ROUTE (A) (ruling a4d736a): stack_judge.py imported unedited in 9 subprocess(es) (pids 24420,46804,45712,24656,5680,46832...; the parent is 46328), identity blob:6acfc3195d05c160afd5c01648d9f24835703c8e / sha256-lf16:a368321cd11066d0 (pinned 6acfc3195d05c160afd5c01648d9f24835703c8e / a368321cd11066d0)
+    connection log (every open redirected to file:<abs>?mode=ro&immutable=1 after the -wal/-journal check):
+      esults\x12_crossdomain\rejudge_mistral_reference_grok_reasoning.db opens  1002 | immutable
+      experiment_results\x12_crossdomain\stack_v2.db                     opens  1003 | immutable; in-memory copy of the immutable URI, removal applied, PRAGMA query_only
+      mmlu_pro_dataset_cache_v2.db                                       opens  2004 | immutable
+    import-time opens none | ZERO CALLS, ENFORCED BY the socket guard (Python socket + audit hook socket.connect): outbound connection attempts 0 (must be 0) | .env reads refused 0 (the credentials' only source) | other refused operations 0 | environment credentials stripped (descriptive only) 0 left | opened files unchanged (sha256_16, size, mtime): yes | local modules pinned: 7 | child memory working set 723 MB (peak 841 MB) | child wall 3.7/90.3/89.6/89.5 s
+    capture (A6): the original's own analyze() with stdout captured; headline line(s) pinned: header, crit1; T = the original's local acc x n at its return (cross-checked with the printed value); scored set by the pinned line 'rows[mid] = {"st": w == d, "tie": w == "TIE", "top": a in TOP4 and b i', expr (mid, q, None)
+  C0: recorded headline reproduced to the digit from the same code path: acc 0.843, n 944
+  scored set: n = 944 matches on 782 questions (Kish mean cluster size 1.392); k = 3 matches on 3 exposed questions (per anchor: Health 2, Philosophy 1)
+  HAZARD (a): E14 is a REPRODUCTION of the ladder's 150-per-anchor cap draw (rubric_ladder SEED_CORPUS 556, Random(556) in rowid order) with NO logged corpus as a witness; the 45 twins before the cap do not depend on the draw
+  HAZARD (d): id space verdicts.qid (eval question_id); 0 of 782 scored qids outside the pool of record (joined by eval question_id, never by text)
+  T with = 0.8432 | T without = 0.8438 | observed shift delta = +0.056 pp
+  NULL: R = 1000 anchor-matched random removals of the same number of NON-exposed scored questions per anchor (whole questions), random.Random(14711); shifts: mean +0.021, SD 0.091 pp; central 95% (numpy.percentile linear, observed excluded): [-0.083, +0.236]; observed mid-rank percentile 0.722
+  C1: NOT FLAGGED - the observed shift lies within the null's central 95%.
+  BOUND: removing k = 3 matches can move T by at most 0.269 pp (planning 0.36 pp); Delta* 0.40 pp
+  STRUCTURAL LEG: BOUNDED - the consequential shift is UNREACHABLE at any draw at the measured k.
+  C2 (DESCRIPTIVE-ONLY): the recorded verdict [(1) all-decidable accuracy >= 0.839] with the exposed questions OK, without OK -> SAME
+    C2 is SETTLED BY THE BOUND (registration (g)): exposure of this size cannot change what the record says.
+  SUPPORT: registered SCOREABLE (Delta* 0.40 pp against the planned MDE 0.24 pp). Measured: null SD 0.0908 pp; iid SD 0.0669 pp; DEFF 1.843 (declared pilot 1.2); n_eff 512.1; MDE (2.80 x null SD) 0.254 pp
+    measured check Delta* > MDE: SCOREABLE, as registered.
+
+--- CELL e-STACKv2: STACK-v2 x E14 [registered support: SCOREABLE] ---
+  reuses tools/analysis/stack_judge.py blob:6acfc3195d05c160afd5c01648d9f24835703c8e, analyze() PROMPT='v2'; recorded headline: accuracy 0.865 on 944
+  ROUTE (A) (ruling a4d736a): stack_judge.py imported unedited in 9 subprocess(es) (pids 23288,17216,32592,9812,10440,38776...; the parent is 46328), identity blob:6acfc3195d05c160afd5c01648d9f24835703c8e / sha256-lf16:a368321cd11066d0 (pinned 6acfc3195d05c160afd5c01648d9f24835703c8e / a368321cd11066d0)
+    connection log (every open redirected to file:<abs>?mode=ro&immutable=1 after the -wal/-journal check):
+      esults\x12_crossdomain\rejudge_mistral_reference_grok_reasoning.db opens  1002 | immutable
+      experiment_results\x12_crossdomain\stack_v2_promptv2.db            opens  1003 | immutable; in-memory copy of the immutable URI, removal applied, PRAGMA query_only
+      mmlu_pro_dataset_cache_v2.db                                       opens  2004 | immutable
+    import-time opens none | ZERO CALLS, ENFORCED BY the socket guard (Python socket + audit hook socket.connect): outbound connection attempts 0 (must be 0) | .env reads refused 0 (the credentials' only source) | other refused operations 0 | environment credentials stripped (descriptive only) 0 left | opened files unchanged (sha256_16, size, mtime): yes | local modules pinned: 7 | child memory working set 721 MB (peak 842 MB) | child wall 3.7/91.5/89.8/89.8 s
+    capture (A6): the original's own analyze() with stdout captured; headline line(s) pinned: header, crit1; T = the original's local acc x n at its return (cross-checked with the printed value); scored set by the pinned line 'rows[mid] = {"st": w == d, "tie": w == "TIE", "top": a in TOP4 and b i', expr (mid, q, None)
+  C0: recorded headline reproduced to the digit from the same code path: acc 0.865, n 944
+  scored set: n = 944 matches on 782 questions (Kish mean cluster size 1.392); k = 3 matches on 3 exposed questions (per anchor: Health 2, Philosophy 1)
+  HAZARD (a): E14 is a REPRODUCTION of the ladder's 150-per-anchor cap draw (rubric_ladder SEED_CORPUS 556, Random(556) in rowid order) with NO logged corpus as a witness; the 45 twins before the cap do not depend on the draw
+  HAZARD (d): id space verdicts.qid (eval question_id); 0 of 782 scored qids outside the pool of record (joined by eval question_id, never by text)
+  T with = 0.8655 | T without = 0.8661 | observed shift delta = +0.063 pp
+  NULL: R = 1000 anchor-matched random removals of the same number of NON-exposed scored questions per anchor (whole questions), random.Random(14712); shifts: mean +0.001, SD 0.079 pp; central 95% (numpy.percentile linear, observed excluded): [-0.072, +0.220]; observed mid-rank percentile 0.822
+  C1: NOT FLAGGED - the observed shift lies within the null's central 95%.
+  BOUND: removing k = 3 matches can move T by at most 0.276 pp (planning 0.37 pp); Delta* 2.60 pp
+  STRUCTURAL LEG: BOUNDED - the consequential shift is UNREACHABLE at any draw at the measured k.
+  C2 (DESCRIPTIVE-ONLY): the recorded verdict [(1) all-decidable accuracy >= 0.839] with the exposed questions OK, without OK -> SAME
+    C2 is SETTLED BY THE BOUND (registration (g)): exposure of this size cannot change what the record says.
+  SUPPORT: registered SCOREABLE (Delta* 2.60 pp against the planned MDE 0.22 pp). Measured: null SD 0.0790 pp; iid SD 0.0627 pp; DEFF 1.584 (declared pilot 1.2); n_eff 595.9; MDE (2.80 x null SD) 0.221 pp
+    measured check Delta* > MDE: SCOREABLE, as registered.
+
+--- CELL e-J6: J6 x E14 [registered support: DESCRIPTIVE-ONLY] ---
+  reuses tools/analysis/j6_rubrics.py blob:a898515f4184537e4918d515258579222981f3d4, analyze(); recorded headline: contrastive vs Mistral-induced 23:40 on 944, -1.8pp, p 0.043
+  ROUTE (A) (ruling a4d736a): j6_rubrics.py imported unedited in 9 subprocess(es) (pids 44428,3256,35892,24184,44968,46452...; the parent is 46328), identity blob:a898515f4184537e4918d515258579222981f3d4 / sha256-lf16:de747c39fc368ce0 (pinned a898515f4184537e4918d515258579222981f3d4 / de747c39fc368ce0)
+    connection log (every open redirected to file:<abs>?mode=ro&immutable=1 after the -wal/-journal check):
+      experiment_results\rubric_512\generic_ss.db                        opens  1002 | immutable
+      experiment_results\x12_crossdomain\rubric_j6.db                    opens  1002 | immutable; in-memory copy of the immutable URI, removal applied, PRAGMA query_only
+      mmlu_pro_dataset_cache_v2.db                                       opens  1002 | immutable
+    import-time opens none | ZERO CALLS, ENFORCED BY the socket guard (Python socket + audit hook socket.connect): outbound connection attempts 0 (must be 0) | .env reads refused 0 (the credentials' only source) | other refused operations 0 | environment credentials stripped (descriptive only) 0 left | opened files unchanged (sha256_16, size, mtime): yes | local modules pinned: 9 | child memory working set 145 MB (peak 197 MB) | child wall 1.9/28.3/28.2/28.3 s
+    capture (A6): the original's own analyze() with stdout captured; headline line(s) pinned: primary; T = +1 x (b - c) / n from the printed integers; scored set by the pinned line 'rows[mid] = {arm: arms[arm][0] == d for arm in ARMS}; rows[mid]["gener', expr (mid, q, anc)
+  C0: recorded headline reproduced to the digit from the same code path: T_pp -1.8, b 23, c 40, n 944, p 0.043
+  scored set: n = 944 matches on 783 questions (Kish mean cluster size 1.388); k = 3 matches on 3 exposed questions (per anchor: Health 2, Philosophy 1)
+  HAZARD (a): E14 is a REPRODUCTION of the ladder's 150-per-anchor cap draw (rubric_ladder SEED_CORPUS 556, Random(556) in rowid order) with NO logged corpus as a witness; the 45 twins before the cap do not depend on the draw
+  HAZARD (d): id space verdicts.qid (eval question_id); 0 of 783 scored qids outside the pool of record (joined by eval question_id, never by text)
+  T with = -1.801 pp | T without = -1.807 pp | observed shift delta = -0.006 pp
+  NULL: R = 1000 anchor-matched random removals of the same number of NON-exposed scored questions per anchor (whole questions), random.Random(14713); shifts: mean -0.016, SD 0.030 pp; central 95% (numpy.percentile linear, observed excluded): [-0.116, -0.006]; observed mid-rank percentile 0.809
+  C1: NOT FLAGGED - the observed shift lies within the null's central 95%.
+  BOUND: removing k = 3 matches can move T by at most 0.325 pp (planning 0.43 pp); Delta* 0.10 pp
+  STRUCTURAL LEG: reachable - the bound 0.325 pp is not below Delta* 0.10 pp.
+  C2 (DESCRIPTIVE-ONLY): the recorded verdict [contrastive > mistral_anchor AND p8.mcn(b, c) < 0.05] with the exposed questions FAIL, without FAIL -> SAME
+  SUPPORT: registered DESCRIPTIVE-ONLY (Delta* 0.10 pp against the planned MDE 0.17 pp). Measured: null SD 0.0303 pp; iid SD 0.0474 pp; DEFF 0.408 (declared pilot 1.2); n_eff 2312.1; MDE (2.80 x null SD) 0.085 pp
+    measured check Delta* > MDE reads SCOREABLE, NOT the registered DESCRIPTIVE-ONLY; the registered support line stands (reading r10); flagged for the READY.
+
+--- CELL f-CERT: CERT-UNDER-FILTER x E74 [registered support: DESCRIPTIVE-ONLY] ---
+  reuses tools/analysis/cert_under_filter.py blob:f7d59019c3d65128687df46aebdcb798b43c3062, load_real / synth_pins / prepare / _arm_job / wrong_maps / c1_stats / c1_verdict (readout's C1 composition, convention A); recorded headline: Delta_W = 17 - 24.15 = -7.15 over 752 established edges in 13 anchors; [-14.22, -0.08] (SE 3.606); C1 HELD
+  cert's G1 / G2 gates are checked on the FULL data in C0 (cert.PINS); on a reduced copy they compare against the reduced data's own counts and CHECK NOTHING (reading r4: U, the edge set, the established set and the key direction are RE-DERIVED on every removal, observed and null alike).
+  C0: recorded headline reproduced to the digit from the same code path: WF 17, WR_mean 24.15, delta -7.15, interval [-14.22, -0.08], n_anchors 13, n_edges 752, se 3.606, verdict HELD
+  scored set: n = 9142 matches on 2811 questions (Kish mean cluster size 5.006); k = 201 matches on 69 exposed questions (per anchor: Biology 14, Business 1, Health 19, Law 28, Other 1, Philosophy 3, Psychology 3)
+  HAZARD (a): E14 is a REPRODUCTION of the ladder's 150-per-anchor cap draw (rubric_ladder SEED_CORPUS 556, Random(556) in rowid order) with NO logged corpus as a witness; the 45 twins before the cap do not depend on the draw
+  HAZARD (b): internal-node labelling was NOT reproduced (seeded, unreproduced): E74 still contains ALL of E70; the internal-node exposure is not separable
+  HAZARD (d): id space verdicts.qid (eval question_id; cert.load_real); 0 of 2811 scored qids outside the pool of record (joined by eval question_id, never by text)
+  T with = -7.15 edges | T without = -3.45 edges | observed shift delta = +3.70 edges
+  NULL: R = 200 anchor-matched random removals of the same number of NON-exposed scored questions per anchor (whole questions), random.Random(14714); shifts: mean +0.78, SD 1.354 edges; central 95% (numpy.percentile linear, observed excluded): [-1.96, +3.25]; observed mid-rank percentile 0.990
+  C1: FLAGGED - the observed shift lies outside the null's central 95%; direction LEAK (reading r7).
+  STRUCTURAL LEG: the registration's BOUND is defined for a paired difference or an accuracy, not for Delta_W; not printed (reading r11). Delta* 0.08 edges (registered).
+  C2 (DESCRIPTIVE-ONLY): the recorded verdict [C1: 13-anchor cluster-bootstrap interval (B 2000, seed 42) wholly below 0 (cert.c1_verdict)] with the exposed questions HELD, without UNDETERMINED -> CHANGED
+  beside, deciding nothing: 605675c item 7 (the review's basis: 10 anchor-matched random exclusions of 69 judged qids x 5 arm direction streams, shifts averaged over the 5 streams): exposed exclusion +0.96 against controls -1.56 +- 1.66 (range -4.37 to +0.06); printed beside, deciding nothing
+  beside: without the exposed questions W_F 22, mean W_R 25.45, 754 established edges in 13 anchors, interval [-12.70, +5.80] (SE 4.722), anchors removed Business
+  SUPPORT: registered DESCRIPTIVE-ONLY (Delta* 0.08 edges against the planned MDE 4.65 edges). Measured: null SD 1.3542 edges; MDE (2.80 x null SD) 3.792 edges; DEFF registered 1.636 (605675c; no iid form for Delta_W)
+    measured check Delta* > MDE: DESCRIPTIVE-ONLY, as registered.
+
+=== C3: THE FAMILY READING ===
+  FLAGGED 1 of 13 cells scored (of 13 registered); expected under the global null 0.65; P(X >= 1 | 13, 0.05) = 0.4867
+  registered reference at 13 cells: 0.65 expected, P(>= 2) = 0.14, P(>= 3) = 0.026. A single FLAG is not evidence of a leak effect by itself.
+  directions: f-CERT LEAK
+
+=== PREDICTIONS (the registrar's; scored HELD / FAILED / UNDETERMINED by reading r9) ===
+  P1 RUBRIC-512/-SS/-R x E28, E70: NOT FLAGGED, delta in [-0.30, +0.25]pp, pct in [0.05, 0.95] -> HELD
+  P2 LEAF-POWERED x E28, E70: NOT FLAGGED, delta in [-0.20, +0.20]pp                -> HELD
+  P3 ladder cells x E14: NOT FLAGGED, delta in [-0.15, +0.15]pp                     -> HELD
+  P4 CERT-UNDER-FILTER x E74: NOT FLAGGED, percentile in [0.80, 0.99]               -> FAILED (failed: f-CERT)
+  P5 0 FLAGGED of 13 [0, 1] AND C2 unchanged on every SCOREABLE cell                -> HELD (FLAGGED 1 of 13 scored; C2 changed on SCOREABLE: none)
+  P6 C0 reproduces everywhere; 0 BY SUPPORT at E70; <= 3 at E14                     -> HELD (C0 failed: none; E70 by support: none; E14 by support: 0; not built: none)
+
+=== FALSIFIER ===
+  NOT FIRED: 1 cell(s) FLAG (< 2).
+  f-CERT FLAGGED (direction LEAK) on a DESCRIPTIVE-ONLY cell: printed descriptively; no [QUALIFIED] branch fires (reading r8, confirmed a4d736a); it COUNTS toward C3 and P5; added to the author's rebuild-or-disclose item as a descriptive note.
+  NOT OVERTURNED in any branch: any recorded verdict (C2 is descriptive), the pools of record, the trees of record, any board.
+
+  route (A) files opened by the consumer children: 15; unchanged at the end of the run: yes
+  inputs before / after:
+    docs\agents\results\evidence\SPLIT-EXPOSURE_E14.txt                    size 68 mtime_ns 1790180721143417200 sha256_16 2b758ed2d955d409 -> unchanged
+    docs\agents\results\evidence\SPLIT-EXPOSURE_E28.txt                    size 137 mtime_ns 1790180721141911200 sha256_16 525aad9a16e61066 -> unchanged
+    docs\agents\results\evidence\SPLIT-EXPOSURE_E70.txt                    size 346 mtime_ns 1790180721142913700 sha256_16 0dfea2fcdf8af2bb -> unchanged
+    docs\agents\results\evidence\SPLIT-EXPOSURE_E74.txt                    size 365 mtime_ns 1790180721143917200 sha256_16 1ca79db5764ba80d -> unchanged
+    experiment_configs\reserved_pool_frozen_p2dca.json                     size 33658 mtime_ns 1788973806641797500 sha256_16 8bf21fe97f97491a -> unchanged
+    experiment_results\promoted\bareq512_s42\seed_42\headless_run.log      size 335752 mtime_ns 1788981702648409500 sha256_16 a6c91f7aeaa56060 -> unchanged
+    experiment_results\promoted\bareq512_s42_reserved_leaf_assignments.csv size 342342 mtime_ns 1788981735232082800 sha256_16 14187941a4140a48 -> unchanged
+    experiment_results\x12_crossdomain\stack_v2_promptv2_x12all.db         size 39124992 mtime_ns 1789063117390531800 sha256_16 eb0bec2795f3e5a0 -> unchanged
+    mmlu_pro_dataset_cache_v2.db                                           size 974917632 mtime_ns 1789828210106974800 sha256_16 4f65414f7625a1e7 -> unchanged
+    snapshots.db                                                           size 1065541632 mtime_ns 1790130866590831700 sha256_16 390c313e5a40e0a7 -> unchanged
+  CONNECTION LOG (R3 (iii) as re-ruled): 4 sqlite3.connect call(s), 0 at import; stack cache opened exactly once, file:Z:/FAC/TUBerlin/THESIS/TaxoArena/experiment_results/x12_crossdomain/stack_v2_promptv2_x12all.db?mode=ro&immutable=1; 0 refused attempt(s); stack_judge.py never loaded:
+    file:Z:/FAC/TUBerlin/THESIS/TaxoArena/mmlu_pro_dataset_cache_v2.db?mode=ro&immutable=1
+    file:Z:/FAC/TUBerlin/THESIS/TaxoArena/experiment_results/x12_crossdomain/stack_v2_promptv2_x12all.db?mode=ro&immutable=1
+    file:Z:/FAC/TUBerlin/THESIS/TaxoArena/mmlu_pro_dataset_cache_v2.db?mode=ro&immutable=1
+    file:Z:/FAC/TUBerlin/THESIS/TaxoArena/snapshots.db?mode=ro&immutable=1
+  run finished 2026-09-24 09:14:48

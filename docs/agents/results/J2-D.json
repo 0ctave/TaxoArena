@@ -1,0 +1,113 @@
+{
+  "id": "J2-D",
+  "title": "J2-D: two references on the disagree stratum (~1.4k Mistral calls)",
+  "question": "Questions where Mistral's S1 answer differs from the reasoning model's (37% of R3; 884 questions, 652 matches): both answers shown as disagreeing references, v1 prompt, Mistral, dual order; comparator J2-R's cached verdicts; key-decidable accuracy on the disagree stratum vs J2-R's 0.774, paired McNemar p < 0.05, either direction; prediction NULL or slightly negative.",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "1e8203c",
+    "program_lines": "docs/judge_v2_program.md L43-L51 (registration, in the 'New registered tests' block) and L118-L127 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "### J2-D — two references on the disagree stratum (~1.4k Mistral calls)",
+    "outcome_heading": [
+      "L118: - **J2-D (2026-09-10 01:13): NULL, direction negative — the branch is closed.** Disagree stratum, ..."
+    ],
+    "date": "2026-09-09"
+  },
+  "script": {
+    "path": "tools/analysis/j2d_two_refs.py",
+    "sha16": "acb49f8606d12cfb (at 1a472dd)",
+    "commit": "1a472dd"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (~1.4k Mistral calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/j2d_outcome.txt",
+    "outcome_commit": "3331fe0",
+    "calls": "~1,400 (652 matches, dual order)",
+    "cce": "not stated",
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-10",
+    "other_files": [
+      "rejudge_mistral_two_refs.db (cache)",
+      "j2d_two_refs.log"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/)",
+    "commit": "3331fe0",
+    "verdict": "NULL (negative); the branch is closed"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "key-decidable accuracy on the disagree stratum vs J2-R's 0.774, paired McNemar p < 0.05, either direction",
+      "result": "FAILED",
+      "value": "349 key-decidable: two refs 0.748 vs the reasoning ref alone 0.774 (-2.6pp; 14:23; p 0.19) vs no ref 0.705; the second candidate dilutes a good reference (ref-correct stratum 0.862 -> 0.810) and rescues only the 42 Mistral-right cases (0.571 -> 0.690); neither-right: both 0.368, below no-ref 0.474",
+      "denominator": "349 key-decidable matches of 652 on the disagree stratum"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "NULL or slightly negative",
+      "result": "HELD",
+      "value": "-2.6pp, p 0.19",
+      "denominator": "349"
+    }
+  ],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "one strongest reference only; branch closed (3331fe0); closed line: two-reference variants (CONTEXT.md section 5: J2-D)"
+  },
+  "numbers_of_record": {
+    "accuracy": "two refs 0.748 vs reasoning ref 0.774 (-2.6pp, 14:23, p 0.19) vs no ref 0.705",
+    "strata": "ref-correct 0.862 -> 0.810; Mistral-right (42) 0.571 -> 0.690; neither-right 0.368 vs no-ref 0.474"
+  },
+  "sentence_of_record": "J2-D (2026-09-10, ~1.4k calls): NULL, direction negative: on the disagree stratum two references 0.748 vs the reasoning reference alone 0.774 (-2.6pp; 14:23; p = 0.19) vs no reference 0.705; the second candidate dilutes a good reference (ref-correct stratum 0.862 -> 0.810) and rescues only the 42 Mistral-right cases (0.571 -> 0.690); neither-right: both 0.368, below no-ref 0.474. One strongest reference only; the branch is closed.",
+  "chips": [
+    "NULL (negative)"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a gain from a second reference"
+  ],
+  "ledger": {
+    "row_id": "J2-D",
+    "version": "v22 (849fb17); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "J2-R",
+    "ENSEMBLE-REF",
+    "REF-CONF"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "two-reference variants (CONTEXT.md section 5: ENSEMBLE-REF, J2-D, REF-CONF, ABSTAIN)"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L43-L51 and L118-L127 (1e8203c lineage / 3331fe0)",
+    "experiment_results/x12_crossdomain/j2d_outcome.txt (3331fe0)",
+    "docs/test_ledger.html row J2-D (v22): chips verbatim, evidence (j2d_two_refs.py, j2d_two_refs.log, rejudge_mistral_two_refs.db)",
+    "script sha16 = sha256 of tools/analysis/j2d_two_refs.py at 1a472dd, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "On matches where the models disagree, it gives the judge two reference answers instead of the single strongest one (about 1,400 calls).",
+    "why": "It tests whether adding a second reference improves judge accuracy.",
+    "information": "A gain would argue for multi-reference judging. Result: null, with a negative direction. Two references scored 0.748 against 0.774 with the best single reference (not significant). The second reference dilutes a good one and helps only when the second model was right. One strongest reference only, and this line is closed. A later ruling classes this run's judged data as history, not evidence.",
+    "written": "2026-10-07"
+  }
+}

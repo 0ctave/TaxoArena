@@ -1,0 +1,294 @@
+{
+  "id": "EVAL-METRIC-DETERMINISM",
+  "title": "EVAL-METRIC-DETERMINISM: compute TotalDasguptaCost, TripletAccuracy, DendrogramPurity and the spherical silhouette in a canonical order (ascending rawText, declared tie rule) so MAIN_taxonomy_quality.csv and tuning_ledger.csv are byte-reproducible over 3 replicate AG_NEWS smoke builds, everything else byte-identical to the pre-change build (engineering; zero calls; REGISTERED)",
+  "question": "Does imposing a canonical order (rawText by String.compareTo; equal texts by the vector, Double.compare) at exactly four consumers of leaf.queries (computeTotalDasguptaCost, computeTripletAccuracy, dagDendrogramPurity, the generateReport silhouette block) make MAIN_taxonomy_quality.csv and tuning_ledger.csv byte-reproducible over 3 replicate AG_NEWS smoke builds at fixed (config, seed, code, inputs), without moving any other output byte relative to the pre-change build?",
+  "kind": "engineering",
+  "state": "done",
+  "registration": {
+    "commit": "the commit that writes this record (parent 93cc7de)",
+    "program_lines": "docs/judge_v2_program.md L20311-L20389",
+    "program_lines_as_of": "the commit that writes them, parent 93cc7de, re-grepped",
+    "date": "2026-09-25",
+    "heading": "## Registered 2026-09-25 (before any code or call) — EVAL-METRIC-DETERMINISM: does computing TotalDasguptaCost, TripletAccuracy, DendrogramPurity and the spherical silhouette in a canonical order ...",
+    "supersedes_queue_entry": "docs/judge_v2_program.md L19716-L19730 (section \"## Queued 2026-09-25 (DRAFTED, NOT REGISTERED; no code, no call) — EVAL-METRIC-DETERMINISM: ...\"); a line-end bracket at L19730, same commit",
+    "provenance": "POSTRUN_lcb_d9.md d7eca94 follow-up B / D2 MEDIUM (code cause); POSTRUN_lcb_d9b.md 5a51d52 (noise as CV, margin, pareto.py); READY_lcb_d9b.md d984724 claim 2a / D5 (latent writers); the orchestrator's brief of 2026-09-25; not an author decision"
+  },
+  "script": {
+    "path": "src/main/kotlin/taxonomy/utils/AdditionalMetrics.kt (computeTotalDasguptaCost L100-L149, computeTripletAccuracy L235 ff.), src/main/kotlin/taxonomy/utils/HierarchicalMetrics.kt (dagDendrogramPurity L98 ff.), src/main/kotlin/taxonomy/utils/TaxonomyMetrics.kt (generateReport silhouette block L282-L296), _as_of 7c6c588; + one NEW src/test file (name declared before the READY); harness: experiment_results/lcb_stage0/d9/helpers/d9_compare.py, experiment_results/lcb_stage0/d9b/helpers/d9b_compare.py, d9b_prep.py, d9b_aux.py, d9_legrun.cmd, d9_leg_check_v2.py (the five-leg loop pinned before the READY)",
+    "sha16": "NOT BUILT; base pins: AdditionalMetrics.kt blob:91a72d14 / sha256-lf16:050b6e352a470569; HierarchicalMetrics.kt blob:78dcd600 / sha256-lf16:17bf6efd9911b34a; TaxonomyMetrics.kt blob:47d8877c / sha256-lf16:c252b313444523d7 (working trees CRLF); harness d9_compare.py blob:743cd1a1 / sha256-lf16:8636b21591e70a76; d9b_compare.py blob:209eb2e6 / sha256-lf16:55b961cac7165688 [2026-10-01 FIX pins (READY_emd3_g10r2 '## Pins'): AdditionalMetrics.kt blob:c908caf5 lf16:2367a3bbb940f3c0; HierarchicalMetrics.kt blob:4af03144 lf16:85f75032350c6688; TaxonomyMetrics.kt blob:930adb43 lf16:45a1931d95dceadb; EvalMetricDeterminismTest.kt blob:45d8f0ab lf16:46aa0389e67c7df4 (working trees CRLF beside)]",
+    "commit": "n/a (not built) [CORRECTED 2026-09-27 by INCONSISTENCIES-PASS (RP01, A8): built at eef090a on branch eval-metric-det, unmerged, no READY] [2026-10-01: eval-metric-det3 b2e1aed (BASE 2f080e0, FIX 6569cd3) READY 1e56d14c; NOT merged (merge only on DONE, C-EM-2)]"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_emd3_g10r2.md",
+    "commit": "1e56d14c",
+    "at": "eval-metric-det3 b2e1aed (BASE 2f080e0, FIX 6569cd3)",
+    "verdict": "READY for the five-leg run (B-EM-1, B-EM-2 discharged; suite 515/2 known, golden BASE 8/7 failed incl. TDC sampled, X1 3/0, harness 184/184, mutants 97/97); NOT mergeable until DONE (C-EM-2); C-EM-1 one W1-W5 window; D-EM-3, D-EM-4 LOW",
+    "source": "READY_emd3_g10r2.md (1e56d14c) '## VERDICT', '## Defects and conditions'; supersedes READY_backfill b938c14 NOT READY"
+  },
+  "go": "n/a (0 calls, 0 cce; no author decision); scheduling: ONE rule-7 window, NOT while the JV2-RATE-PROBE READY review is running CPU tests",
+  "run": {
+    "outcome_file": "experiment_results/eval_metric_det/run_2026-10-01/run_emd_1/emd_verdict.txt blob:c45b15934598da26120689a584aeb781d4fb8e57 (LF of record; 0 CR)",
+    "outcome_commit": "35bd6695 (eval-metric-det3; range b7c5be82..35bd6695); on main via the by-path merge 1f671215",
+    "calls": 0,
+    "cce": 0,
+    "pool": "n/a (AG_NEWS smoke legs; V2 input copies identical over the 5 legs)",
+    "date": "2026-10-01",
+    "legs": "P1, R1, R2, P2, R3 (BASE 2f080e0 / FIX 6569cd3); 10,128-10,749 ms per leg, Gradle 48-49 s; THREAD-CAP witness requested=12 availableProcessors=12 in 5 of 5",
+    "verdict_of_harness": "DONE, MERGEABLE; MECHANISM SHOWN",
+    "merge": "1f671215 (by path; C-EM-2: main src unchanged since 2f080e0)",
+    "validity": "V1-V10 + TC ALL MET; X1 canonicalByRawText .class counts P1 = P2 = 0, R1 = R2 = R3 = 3"
+  },
+  "review": {
+    "file": "docs/reviews/POSTRUN_rp12_r2.md",
+    "commit": "78a30da1",
+    "verdict": "VALID (DONE as recorded; MERGEABLE confirmed; merge 1f671215 src = the 4 FIX files), under W-7 and D-5 (MEDIUM, discharged at 1c5316d8 + E: backup); no BLOCKER"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "REPRODUCIBILITY (THE criterion): validation/MAIN_taxonomy_quality.csv (all 7 lines, DP / SS / TDC rows included) and ../tuning_ledger.csv (all 50 columns incl. DP, SS, TDC and CommitSHA) byte-identical over the replicate pairs R1/R2, R1/R3, R2/R3 at FIX; HELD iff 0 of 6 differ, FAILED iff >= 1; exact count, no interval; scored from $ST\\c1\\",
+      "result": "HELD",
+      "value": "0 of 6 differ",
+      "denominator": "2 objects x 3 replicate pairs = 6 comparisons"
+    },
+    {
+      "id": "C2",
+      "text": "GOLDEN UNIT TEST: a new test on a fixed synthetic tree (>= 2 depths, >= 4 leaves, a text in two leaves, m >= 120 so TDC samples; plus an exact-branch fixture; an equal-rawText pair with different vectors), K = 20 seeded permutations of every leaf.queries: TDC, TA, DP and generateReport().sphericalSilhouette bit-identical (doubleToRawLongBits) + 4 golden literals; HELD iff it passes on FIX AND the same file FAILS on BASE at least on TDC's permutation assertion (non-vacuity; otherwise VOID, a READY defect)",
+      "result": "HELD",
+      "value": "FIX suite: 8 of 8 golden testcases pass; BASE: tdcSampledPermutationInvariant() FAILED (7 of 8 BASE testcases fail; mainFixtureIsNonDegenerate passes)",
+      "denominator": "80 bit-identity assertions + 4 golden literals; plus the BASE leg"
+    },
+    {
+      "id": "C3",
+      "text": "INERTNESS: the 24 D9b C1' objects under exactly D9b's declared drops (quality CSV rows DP / SS / TDC; ledger columns CommitSHA / DP / SS / TDC; wall_ms; the 13 run_manifest keys; created_at), P1 (BASE) vs R1 (FIX), d9b_compare.py; HELD iff 0 of 24 differ; VOID unless V3 (discriminator X1), V4 and V5 show the changed code ran",
+      "result": "HELD",
+      "value": "0 of 24 differ, P1 vs R1",
+      "denominator": "24 objects x 1 pair"
+    },
+    {
+      "id": "C4",
+      "text": "(secondary, does not gate the merge) the 24 D9 objects under D9's non-metric drops only, R1/R2, R1/R3, R2/R3; HELD iff 0 of 72 differ",
+      "result": "HELD",
+      "value": "0 of 72 differ",
+      "denominator": "24 objects x 3 pairs = 72"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "C1: 0 of 6 differ (probability 0.85)",
+      "result": "HELD",
+      "value": "0 of 6",
+      "denominator": "6"
+    },
+    {
+      "id": "P2",
+      "text": "C2: passes on FIX and fails on BASE on TDC's permutation assertion (0.90); on BASE TA's also fails (0.85)",
+      "result": "HELD",
+      "value": "FIX passes; BASE fails on TDC's and TA's permutation assertions",
+      "denominator": "the fixture"
+    },
+    {
+      "id": "P3",
+      "text": "C3: 0 of 24 differ, P1 vs R1 (0.92)",
+      "result": "HELD",
+      "value": "0 of 24",
+      "denominator": "24"
+    },
+    {
+      "id": "P4",
+      "text": "C4: 0 of 72 differ (0.83)",
+      "result": "HELD",
+      "value": "0 of 72",
+      "denominator": "72"
+    },
+    {
+      "id": "P5",
+      "text": "V3 / X1: P1 = P2 = 0; R1 = R2 = R3 >= 1 (0.98)",
+      "result": "HELD",
+      "value": "P1 = P2 = 0; R1 = R2 = R3 = 3",
+      "denominator": "5 legs"
+    },
+    {
+      "id": "P6",
+      "text": "(mechanism, descriptive) TDC(P1) != TDC(P2) (0.95; 9 of 9 pre-change pairs differed); DP(P1) != DP(P2) (0.80); SS(P1) != SS(P2) (0.40)",
+      "result": "HELD",
+      "value": "TDC(P1) 2.2279580668280315E8 != TDC(P2) 2.238354559435673E8 (rel 0.467%); |dDP| 1.33e-15 (DP differs); |dSS| 2.78e-17 (SS differs)",
+      "denominator": "1 pair"
+    },
+    {
+      "id": "P7",
+      "text": "(descriptive) TDC(R1) != TDC(P1) (0.99); |TDC(R1) - TDC(P1)| / TDC(P1) <= 1.0% (0.95); |dDP| <= 1e-13 and |dSS| <= 1e-15, P1 vs R1 (0.95)",
+      "result": "FAILED",
+      "value": "margin clause FAILED: |TDC(R1) - TDC(P1)| / TDC(P1) = 0.01890 (1.89%) > 1.0% (TDC(R1) 2.2700770263931996E8); TDC(R1) != TDC(P1) HELD; |dDP| 3.76e-14 <= 1e-13 and |dSS| 2.78e-17 <= 1e-15 HELD; LOW, disclosed, fires nothing",
+      "denominator": "1 pair"
+    },
+    {
+      "id": "P8",
+      "text": "FIX suite (cleanTest test --offline --no-build-cache): failures a subset of {MrlRoutingTest defaults, TraceEnvelopeUnwrapTest blank-trace}; no existing test edited (0.85)",
+      "result": "HELD",
+      "value": "FIX suite failures = MrlRoutingTest testMrlConfigDefaults, TraceEnvelopeUnwrapTest blank-trace (the two known)",
+      "denominator": "the suite"
+    },
+    {
+      "id": "P9",
+      "text": "per leg duration_ms in [5,000, 60,000] ms and Gradle BUILD SUCCESSFUL in <= 120 s",
+      "result": "HELD",
+      "value": "10,128-10,749 ms; Gradle 48-49 s",
+      "denominator": "5 legs"
+    }
+  ],
+  "falsifier": {
+    "text": "F1 FIX INCOMPLETE: C1 FAILED with V1-V10 met; overturns the D9 post-run review's code-level claim that list order at these four consumers causes the drift (code-read, not instrumented) and the FRAMEWORK.md L297 NOTE; no merge, new registration. F2 FIX LEAKS: C3 FAILED with V1-V10 met; overturns the declared scope E1-E4; no merge. Both may fire (recorded joined). Neither touches any judged result, board, tree of record or recorded prose number. P6 failing (TDC(P1) = TDC(P2)) fires nothing but withholds the mechanism words.",
+    "fired": false,
+    "outcome": "F1 (FIX INCOMPLETE) NOT FIRED; F2 (FIX LEAKS) NOT FIRED (outcome file)"
+  },
+  "numbers_of_record": {
+    "scope": "149 MAIN_taxonomy_quality.csv files on disk across 29 run families (17 git-tracked); 13 tracked tuning_ledger.csv; *_thesis_metrics.csv/json; snapshot metadata (review count)",
+    "noise_until_fixed": "TDC differences below about 0.6% are within noise (bareq512 range 0.577%, CV 0.29%; AG smoke CV 0.085%); DP / SS only in the last 2 digits (review 'Magnitude') [CORRECTED 2026-09-25 by LCB-D9B-BYTE-INERTNESS (registrar; post-run review 5a51d52): 0.6% is a RANGE of 3 builds and ANTI-CONSERVATIVE; AG smoke TDC CV 0.292%, range 0.723% (n = 6 builds; source POSTRUN_lcb_d9b.md); D9b CV 0.332%, range 0.640% (n = 3); pairwise 95% band about +/-0.8%; TDC differences below about 1% are within noise]",
+    "pareto": "tools/tuning/pareto.py minimises TotalDasguptaCost: its comparisons below ~0.6% TDC are within noise [CORRECTED 2026-09-25 by LCB-D9B-BYTE-INERTNESS (registrar): pareto.py has NO noise floor (TDC minimised raw; objective list L110 / L113); the registration must make it FLAG OR REFUSE TDC-decided dominance below a margin of at least 1% (or 2.8 x CV) until the fix lands]",
+    "noise_of_record": "TotalDasguptaCost, AG_NEWS smoke (m = 1,400, 5,000 sampled pairs): CV 0.332% (n = 3, D9b A / B / A2; range 0.640%) and CV 0.292% (n = 6, D9b + D9's three; range 0.723%); pairwise SD about 0.41%, two-sided 95% band about +/-0.8%; bareq512 CV 0.29% (range 0.577%, n = 3); DP differences about 1e-14 (max 2.0e-15 over D9b's pairs); SS about 1e-16 or less (max 2.8e-17). Sources: POSTRUN_lcb_d9b.md 5a51d52; POSTRUN_lcb_d9.md d7eca94 'Magnitude'",
+    "margin_of_record": "max(1%, 2.8 x CV) = max(1%, 2.8 x 0.292% = 0.818%) = 1.0% of TDC (with the n = 3 CV: 0.930%, still 1.0%); binds every PRIOR TDC value in cross-build or Pareto comparisons and post-change CROSS-TREE comparisons (the estimator error remains); DP / SS differences below 1e-13 / 1e-15 are within noise (programme L20352)",
+    "pareto_interim_words": "until PARETO-NOISE-FLOOR merges: 'TDC-decided dominance below 1.0% is within noise and is not a decision' (tools/tuning/pareto.py dominates() L105 ff., objective lists L112-L113, no tolerance; DP, SS and KappaShrinkageMean also compared raw)",
+    "C1": "0 of 6 byte comparisons differ (2 files x 3 replicate pairs R1/R2, R1/R3, R2/R3; exact count)",
+    "C3": "0 of 24 D9b objects differ, P1 (BASE) vs R1 (FIX) (exact count)",
+    "C4": "0 of 72 differ (24 objects x 3 pairs; secondary)",
+    "P7_rel_dTDC_BASE_to_FIX": "0.01890 (1.89%; one pair P1 vs R1; above the 1.0% margin of record; LOW, disclosed)",
+    "P6_rel_dTDC_P1_P2": "0.00467 (0.467%; one pre-fix pair)",
+    "source_of_outcome_numbers": "emd_verdict.txt blob:c45b1593 (copied, not computed here)"
+  },
+  "sentence_of_record": "Computing TotalDasguptaCost, TripletAccuracy, DendrogramPurity and the spherical silhouette in a canonical order makes MAIN_taxonomy_quality.csv and tuning_ledger.csv byte-identical over 3 replicate AG_NEWS smoke builds (0 of 6 comparisons differ; 0 of 24 other objects moved) [EVAL-METRIC-DETERMINISM, POSTRUN_rp12_r2 78a30da1 VALID; P7 FAILED on its margin: a pre- and a post-fix TDC differ by 1.89% > 1.0%; never \"deterministic\"]",
+  "chips": [
+    "REGISTERED 2026-09-25, BEFORE ANY CODE [plan]",
+    "DONE (VALID, POSTRUN_rp12_r2 78a30da1): C1 0/6, C2, C3 0/24, C4 0/72 HELD; F1/F2 NOT FIRED; MERGED BY PATH 1f671215; BYTE-IDENTICAL OVER 3 AG_NEWS SMOKE BUILDS, NEVER &ldquo;DETERMINISTIC&rdquo; [ok]",
+    "P7 FAILED (LOW, DISCLOSED): |REL dTDC| BASE&rarr;FIX 1.89% &gt; 1.0% MARGIN [warn]",
+    "C1&ndash;C3 SCOREABLE (EXACT COUNTS); &ldquo;NO RESIDUAL NON-DETERMINISM&rdquo; DESCRIPTIVE-ONLY [plan]",
+    "0 CALLS; ONE RULE-7 WINDOW (~8&ndash;11 CPU-MIN); NOT DURING THE JV2-RATE-PROBE READY CPU TESTS [plan]",
+    "PARETO.PY NOISE FLOOR: SEPARATE ITEM PARETO-NOISE-FLOOR (DRAFTED); UNTIL THEN TDC-DECIDED DOMINANCE BELOW 1.0% IS NOT A DECISION [warn]"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-25",
+      "by": "registrar (queue entry; zero calls; insertion only)",
+      "text": "QUEUED (drafted, NOT registered) at docs/judge_v2_program.md L19716-L19730 (section \"## Queued 2026-09-25 (DRAFTED, NOT REGISTERED; no code, no call) — EVAL-METRIC-DETERMINISM: ...\"; _as_of the commit that writes it, parent f222c28, re-grepped) from the post-run review's follow-up B and defect D2 MEDIUM (d7eca94); disclosure carried: post-fix TDC / DP / SS values not comparable digit for digit with prior ones; affects tools/tuning/pareto.py comparisons below ~0.6% TDC; no ledger row (not registered)"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (LCB-D9B-BYTE-INERTNESS outcome; zero calls; insertion only)",
+      "text": "DISCLOSURE AMENDED insertion-only (line-end bracket at L19725 of docs/judge_v2_program.md): the 'about 0.6%' margin is anti-conservative (a range of 3 builds); the noise is stated as TDC CV 0.292% (n = 6 AG smoke builds; range 0.723%; D9b CV 0.332%, range 0.640%, n = 3), pairwise 95% band about +/-0.8%; the registration must use a margin >= 1% and make tools/tuning/pareto.py (no noise floor) flag or refuse Pareto decisions below it; ordering condition met (D9b has its outcome); still DRAFTED, NOT REGISTERED; source docs/reviews/POSTRUN_lcb_d9b.md at 5a51d52 (blob:dae41b9301e1b36f9e65de35f9368049dd12eb57; file bytes LF = LF of record, sha256 66bdc184034b67f3870af358b9471ff80aaf70cb744173968ca9b2df72cf5bb5); docs/judge_v2_program.md L19897-L19974 (section \"## LCB-D9B-BYTE-INERTNESS (2026-09-25, 0 calls) — DISCHARGED: S5c exit 0; C1' HELD (0 of 24) and C2 HELD (0 of 24) ...\"; _as_of the commit that writes it, parent 3187b6f, re-grepped)"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (EVAL-METRIC-DETERMINISM registration; zero calls; insertion only; before any code)",
+      "text": "REGISTERED at docs/judge_v2_program.md L20311-L20389 (section \"## Registered 2026-09-25 (before any code or call) — EVAL-METRIC-DETERMINISM: does computing TotalDasguptaCost, TripletAccuracy, DendrogramPurity and the spherical silhouette in a canonical order ...\"; _as_of the commit that writes it, parent 93cc7de, re-grepped); the queue entry L19716-L19730 superseded (line-end bracket at L19730); C1 (3 replicates, 2 files, 6 comparisons), C2 (golden permutation test, non-vacuous on BASE), C3 (24-object inertness vs BASE with discriminator X1), C4 secondary; the drafted A/A before-fix leg carried as P1 / P2 (mechanism readout); noise as a CV with n and source; margin of record 1.0%; the pareto.py floor a SEPARATE item PARETO-NOISE-FLOOR (drafted, queued in the same commit); the three latent writers OUT of scope; the generateReport-wide sort DECLINED (it would move ARI / hF1 / edgeF1 untested); ledger v293, new row EVAL-METRIC-DETERMINISM"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "the orchestrator (relayed by the coordinator; recorded by the registrar, insertion only, before the build)",
+      "text": "P2 KEPT: all five legs stay as registered (P1, R1, R2, P2, R3); the drop option in COST AND CONSEQUENCE is not taken; nothing else changes; line-end bracket at docs/judge_v2_program.md L20382 (section \"## Registered 2026-09-25 (before any code or call) — EVAL-METRIC-DETERMINISM: ...\", L20311-L20389; _as_of the commit that writes it, parent 55a6ce1, re-grepped); ledger v294"
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (INCONSISTENCIES-PASS RP01, A8; insertion only; zero calls)",
+      "text": "[CORRECTED 2026-09-27 by INCONSISTENCIES-PASS (RP01, A8): BUILT at eef090a on branch eval-metric-det (2026-09-26; git branch --contains eef090a = eval-metric-det), NOT MERGED, NO READY recorded; the reviewer's READY is owed before any leg; state stays registered, ready stays null. docs/judge_v2_program.md L21506-L21533 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — INCONSISTENCIES-PASS (RP01): the  ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)]"
+    },
+    {
+      "date": "2026-09-30",
+      "by": "registrar (completeness check; zero calls)",
+      "text": "Registration L20311-L20389 (_as_of c09c0ac) found COMPLETE (hygiene, V1-V10, C1-C4 with failing observables, P1-P9, F1 / F2, Support (a)-(g)). Built eef090a (branch eval-metric-det, merge-base 8bf15da; the 3 metric files unchanged on main since; 11 other src/main files changed). Owed before the READY: BASE = current main (re-cut or rebase, printed); the same -PjvmThreads in all five legs; one rule-7 window, never beside a construction or site null."
+    },
+    {
+      "date": "2026-10-01",
+      "by": "registrar",
+      "text": "Re-cut at 77f7cb8 (patch-id = eef090a's); READY_backfill b938c14 NOT READY (B-EM-1, B-EM-2). The corrupt worktree .claude/worktrees/eval-metric-det2 was removed and fsck is clean (the orchestrator, 2026-10-01); the commit is intact; a fresh worktree and the re-cut harness are owed before a READY. docs/judge_v2_program.md L22230-L22240 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data) — INTENT-TRANSFER-S0 embedding DBs pinned (f4ad285); ...\"; _as_of the commit that writes it, parent f4ad285, re-grepped)"
+    },
+    {
+      "date": "2026-10-01",
+      "by": "the registrar (READY_emd3_g10r2 1e56d14c; the orchestrator's brief; insertion only)",
+      "text": "READY for the five-leg run at eval-metric-det3 b2e1aed (B-EM-1, B-EM-2 discharged); merge only on DONE, by path (C-EM-2); EMD leaves per-node queryId order unchanged (hence ARCH-V2-E-T-R2 ruling (A)); D-EM-4: latent order-dependent writers out of scope. The five-leg window is RUNNING per the orchestrator's brief. [NOTE: the chips list of the previous update did not mirror the ledger row ('NOT BUILT, NOT READY, NOT RUN' vs the ledger's 'BUILT 77f7cb8; NOT READY ...'); it now mirrors the ledger row at v324.] State built -> READY -> running. docs/judge_v2_program.md L22436-L22443 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data) — C-G-1: the orchestrator's ruling (A) on ...\"; _as_of the commit that writes it, parent 12ceb48c, re-grepped)"
+    },
+    {
+      "date": "2026-10-01",
+      "by": "registrar (outcome; zero calls; insertion only)",
+      "text": "five-leg run DONE, MERGEABLE by the registered harness (emd_verdict.txt blob:c45b1593, 35bd6695); C1-C4 HELD; F1, F2 not fired; P7 FAILED on its margin clause (1.89% > 1.0%; LOW, disclosed); merged by path 1f671215; post-run review OWED. docs/judge_v2_program.md L22483-L22492 (section \"## EVAL-METRIC-DETERMINISM (2026-10-01, 0 calls) — DONE, MERGEABLE (the registered harness's verdict; post-run review OWED): ...\"; _as_of the commit that writes it, parent 2703f2c2, re-grepped)"
+    },
+    {
+      "date": "2026-10-01",
+      "by": "the registrar",
+      "text": "Post-run review docs/reviews/POSTRUN_rp12_r2.md (78a30da1) VALID under W-7; D-5 discharged (C2/P8 XMLs force-added at 1c5316d8; 285 evidence files backed up at E:/TaxoArena_backup_2026-10-01_emd_run_emd_1, sha256sum -c 285/285 OK); run-unreviewed -> done. docs/judge_v2_program.md L22526-L22530 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run) — EVAL-METRIC-DETERMINISM post-run review VALID ...\"; _as_of the commit that writes it, parent 1c5316d8, re-grepped)"
+    }
+  ],
+  "does_not_show": [
+    "determinism beyond 3 replicates (a residual moving fewer than 41.5% of builds is undetectable at 80% power); words 'byte-identical over 3 replicate AG_NEWS smoke builds', never 'deterministic'",
+    "any other arm: bridges, small leaves, partition ties; MMLU-Pro, 20NG, LCB, union",
+    "the stored per-node queryId order (not canonicalised; hence ARCH-V2-E-T-R2 compares A4 as sets)",
+    "that the post-fix TDC is more accurate than the pre-fix one (the Monte-Carlo estimator is unchanged)",
+    "any revision of a prior value (pre-/post-fix TDC not comparable; may differ by more than the 1.0% margin, P7)"
+  ],
+  "ledger": {
+    "row_id": "EVAL-METRIC-DETERMINISM",
+    "version": "v326 (2026-10-01: review bracket; run chip replaced by an ok DONE (VALID) chip) | v325 (2026-10-01: outcome bracket; READY chip replaced by a run chip and a P7 warn chip) | v324 (2026-10-01: bracket; READY chip replaces 'BUILT 77f7cb8; NOT READY') | v320 (2026-10-01: bracket and chip, registrar's record) | v293 (2026-09-25: registered; a new section-7 row, PLAN chips, before JV2-RATE-PROBE) | v294 (2026-09-25: P2 kept; a bracket in the observed cell)"
+  },
+  "depends_on": [
+    "LCB-D9-BYTE-INERTNESS (the finding)",
+    "LCB-D9B-BYTE-INERTNESS (done; the noise figures and the harness)",
+    "LCB-STAGE0-INTERACTION (its merged Kotlin ca4afcd is on the base line)"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing; the pareto noise floor is PARETO-NOISE-FLOOR (drafted)"
+  },
+  "cost": {
+    "calls_expected": 0,
+    "cce_expected": 0,
+    "calls_max": 0,
+    "cce_max": 0,
+    "machine": "5 AG smoke legs (~1 min each; D9b Gradle 34-58 s) + the FIX suite under cleanTest --no-build-cache (~2-4 min) + the golden test on BASE (~1 min) + compares (< 1 min): ~8-11 CPU-min in ONE rule-7 window of ~25 min; the brief's 4-6 CPU-min assumed 3 builds (P1 / P2 added by the registration; P2 droppable by a pre-READY amendment) [2026-09-25, the orchestrator: P2 KEPT; five legs as registered]",
+    "agent": "engine-coder ~1 h; adversarial-reviewer READY before any leg; run-operator; post-run review",
+    "source": "the orchestrator's brief (engine-coder ~1 h; 4-6 CPU-min for 3 builds + suite); D9b's measured leg times; PROVISIONAL, the experiment-manager's to confirm"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L20311-L20389 (section \"## Registered 2026-09-25 (before any code or call) — EVAL-METRIC-DETERMINISM: does computing TotalDasguptaCost, TripletAccuracy, DendrogramPurity and the spherical silhouette in a canonical order ...\"; _as_of the commit that writes it, parent 93cc7de, re-grepped)",
+    "docs/judge_v2_program.md L19716-L19730 (the superseded queue entry; bracket at L19730)",
+    "docs/judge_v2_program.md L19716-L19730 (section \"## Queued 2026-09-25 (DRAFTED, NOT REGISTERED; no code, no call) — EVAL-METRIC-DETERMINISM: ...\"; _as_of the commit that writes it, parent f222c28, re-grepped)",
+    "docs/reviews/POSTRUN_lcb_d9.md at d7eca94 (blob:08caa30b1d95842dfc325ea39468243d1733c137; file bytes LF = LF of record, sha256 6049d1f5a8f16f597efd52645e1381fdad1e67be66fa04048201bfe333e5cd37): follow-up B, defect D2, 'Prior recorded numbers that may carry this jitter', code cause",
+    "docs/reviews/POSTRUN_lcb_d9b.md at 5a51d52 (blob:dae41b9301e1b36f9e65de35f9368049dd12eb57; file bytes LF = LF of record, sha256 66bdc184034b67f3870af358b9471ff80aaf70cb744173968ca9b2df72cf5bb5): section 'What the TDC spread says about the record's 0.6%'",
+    "docs/judge_v2_program.md L19897-L19974 (section \"## LCB-D9B-BYTE-INERTNESS (2026-09-25, 0 calls) — DISCHARGED: S5c exit 0; C1' HELD (0 of 24) and C2 HELD (0 of 24) ...\"; _as_of the commit that writes it, parent 3187b6f, re-grepped)",
+    "docs/reviews/READY_lcb_d9b.md at d984724 (blob:b9f097997d0db7f22c01820f8ef33e5c02231772; file bytes LF, sha256-lf16:8769af06a456373c): claim 2a and D5 (latent writers)",
+    "docs/judge_v2_program.md L22172-L22180 (section \"## Registrar's record 2026-09-30 (insertion only; zero calls; nothing run; pre-data) — the author's 15-hour request and the schedule's research checkpoints A/B/C (c09c0ac); ...\"; _as_of the commit that writes it, parent c09c0ac, re-grepped)",
+    "docs/judge_v2_program.md L22230-L22240 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data) — INTENT-TRANSFER-S0 embedding DBs pinned (f4ad285); ...\"; _as_of the commit that writes it, parent f4ad285, re-grepped)",
+    "docs/reviews/READY_emd3_g10r2.md (1e56d14c)",
+    "docs/judge_v2_program.md L22436-L22443 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data) — C-G-1: the orchestrator's ruling (A) on ...\"; _as_of the commit that writes it, parent 12ceb48c, re-grepped)",
+    "docs/judge_v2_program.md L22483-L22492 (section \"## EVAL-METRIC-DETERMINISM (2026-10-01, 0 calls) — DONE, MERGEABLE (the registered harness's verdict; post-run review OWED): ...\"; _as_of the commit that writes it, parent 2703f2c2, re-grepped)",
+    "experiment_results/eval_metric_det/run_2026-10-01/run_emd_1/emd_verdict.txt (blob:c45b15934598da26120689a584aeb781d4fb8e57, LF)",
+    "docs/judge_v2_program.md L22526-L22530 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run) — EVAL-METRIC-DETERMINISM post-run review VALID ...\"; _as_of the commit that writes it, parent 1c5316d8, re-grepped)",
+    "docs/reviews/POSTRUN_rp12_r2.md (78a30da1)",
+    "1c5316d8 (D-5 XMLs)"
+  ],
+  "last_update": "2026-09-30 (registrar: E1-ROUTE and LCB-STAGE0-POWER-RESIM registered; F-E1 added pre-data; EVAL-METRIC-DETERMINISM registration found complete; the author's 15h request and checkpoints A/B/C (plan Amendment 30); ledger v319); 2026-10-01 (registrar: re-cut 77f7cb8 (eval-metric-det2); READY_backfill b938c14 NOT READY (B-EM-1, B-EM-2); worktree removed, fsck clean; ledger v320); 2026-10-01 (registrar: READY 1e56d14c; five-leg window running; ledger v324); 2026-10-01 (registrar: five-leg outcome DONE, MERGEABLE, merged 1f671215; state run-unreviewed, post-run review owed; ledger v325); 2026-10-01 (registrar: post-run review VALID 78a30da1; D-5 discharged; done; ledger v326)",
+  "registration_requirements": [
+    "state the TDC noise as a CV with its n and its source, never as a range (AG smoke CV 0.292%, n = 6, POSTRUN_lcb_d9b.md at 5a51d52)",
+    "an interim margin of at least 1% (or 2.8 x CV), not 0.6%",
+    "tools/tuning/pareto.py flags or refuses TDC-decided Pareto dominance below that margin until the fix lands"
+  ],
+  "validity": "V1 diff scope (src/main only among the 3 utils files; src/test additions only; no build / config / tools); V2 input copies identical over the 5 legs; V3 = X1 the declared identifier's .class count P1 = P2 = 0, R1 = R2 = R3 >= 1; V4 [BOOT] token per leg; V5 compileKotlin executed per leg; V6 build lines, pool, split, exit_reason, manifest commit and dirty False; V7 misses equal; V8 durations < 8 min; V9 main DBs unchanged (content pins), evidence hashed before worktree removal; V10 the golden test executed in the FIX suite and in the BASE leg",
+  "support": {
+    "a": "C1: 2 objects x 3 replicate pairs = 6 byte comparisons, one construction per leg; no clusters (Kish mean cluster size 1); C2: 80 assertions + 4 literals; C3: 24 objects x 1 pair",
+    "b": "DEFF NOT APPLICABLE, DECLARED (exact byte / bit comparisons); the pre-change noise is MEASURED: TDC CV 0.292% (n = 6) / 0.332% (n = 3), POSTRUN_lcb_d9b.md 5a51d52",
+    "c": "not applicable",
+    "d": "none (exact counts)",
+    "e": "vs the recorded mechanism: 9 of 9 pre-change pairs differed; one-sided 95% lower bound 0.05^(1/9) = 0.717, so power >= 0.717 (about 1 at the observed rate); vs an unknown residual moving a build with probability q: miss = (1 - q)^3, 80% power needs q >= 1 - 0.2^(1/3) = 0.415",
+    "f": "C1, C2, C3 SCOREABLE; 'no residual non-determinism' DESCRIPTIVE-ONLY (words: 'byte-identical over 3 replicate builds', never 'deterministic')",
+    "g": "reachable: other quality rows deterministic (SeparationJ sorted, StatisticsUtils L260; WLP integer; NSI structural); ledger non-metric columns equal in 7 of 7 builds; latent writers (bridge TopRepresentativeQueries HeadlessBenchmarkRunner L2600; KappaShrinkageMean L2796-L2815; PARTITION tie-breaks BatchTrickleEvaluator L67 ff.) inactive on AG (0 bridges, SmallLeafFraction 0, weights 1.0): OUT OF SCOPE explicitly (vacuous here); they limit the words to this arm; ARI / edgeF1 / hF1 / ancestorCorrectRate (snapshot metadata only) not compared, not claimed"
+  },
+  "registration_requirements_status": "all three met in the registration: the noise as a CV with n and source (NOISE STATEMENT); the margin max(1%, 2.8 x CV) = 1.0%; the pareto.py flag / refuse moved to the separate item PARETO-NOISE-FLOOR with interim words of record",
+  "plain_description": {
+    "sq": "Engineering/infrastructure",
+    "what": "Makes four tree-quality metrics process questions in a fixed order. It then checks whether three repeat builds of a small AG_NEWS tree give byte-identical quality files and leave every other output unchanged.",
+    "why": "Tree-quality numbers drifted slightly between identical builds, which made small comparisons between configurations unreliable.",
+    "information": "If the files match, the drift came from processing order and is now fixed. If they don't, there is another cause. Result: 0 of 6 comparisons differ and 0 of 24 other outputs moved, so the files are byte-identical over 3 repeat builds. This is not a claim of full determinism. Numbers from before the fix cannot be compared digit for digit with numbers after it.",
+    "written": "2026-10-07"
+  }
+}

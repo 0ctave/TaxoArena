@@ -1,0 +1,8 @@
+=== L1-V [mistral_refgrok]: 337 matches with all three arms ===
+  original  correct-verdict rate 0.772 | mean len correct 1803 wrong 818
+  truncate  correct-verdict rate 0.350 | mean len correct 755 wrong 818
+  pad       correct-verdict rate 0.783 | mean len correct 1803 wrong 1994
+  original vs truncate drop +0.421 | discordant orig-only 142 vs truncate-only 0 | McNemar p=0.0000 -> PASS (REGISTERED PRIMARY)
+  original vs pad      drop -0.012 | discordant orig-only 8 vs pad-only 12 | McNemar p=0.5034 -> FAIL (SECONDARY)
+  L1-V REGISTERED PRIMARY (truncation drop <= 0.25 AND truncate arm >= 0.55; L1 was -0.507 / 0.259): drop +0.421, truncate 0.350 -> FAIL
+  L1-V SECONDARY (pad within +/-0.03 of original): pad 0.783 vs original 0.772 -> PASS

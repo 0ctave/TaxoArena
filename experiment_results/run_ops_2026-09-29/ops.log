@@ -1,0 +1,38 @@
+## 2026-09-29T13:52:09+02:00 gradle daemons 56228/54468 idle (CPU +0.05s over 20s, started 11:47); W12 'no JVM' -> ./gradlew --stop
+Stopping Daemon(s)
+1 Daemon stopped
+exit 0
+v2_declared_cells --run --leg U exit 2 wall 0s
+v2_declared_cells --run --leg M exit 2 wall 0s
+k46_key_read --run exit 2 wall 0s
+cert_redraw_r512 --run exit 0 wall 91s
+(previous three exit-2 lines: operator typo, script path lacked .py; python could not open the file; nothing executed)
+v2_declared_cells.py --run --leg U exit 0 wall 46s
+v2_declared_cells.py --run --leg M exit 0 wall 61s
+k46_key_read.py --run exit 0 wall 2s
+C8-4 LOW: not patched; production embed_fn ollama_embed refuses a count mismatch (embedder_arms.py L163-L164, blob 4f56e79d); recorded per the review's second option
+## 2026-09-29T13:56:24+02:00 embedder_arms --embed-missing gemma_raw --expect-missing 3520 (no --go): exit 1 REFUSED (missing 3504 != 3520); per brief: STOP
+embeddings_cache_embeddinggemma_latest.db sha256 3e9ce57772160749e0b5ea0267713286ca4109444d5a6b676e877a5b0501df29 mtime 2026-09-29 11:52:08.238190900 +0200 sidecars: 0
+embeddings_cache_nomic-embed-text_latest.db sha256 53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95 mtime 2026-09-27 16:25:01.667983800 +0200 sidecars: 0
+embeddings_cache.db sha256 52229e1ebfdda76ebaed3e461eeee80ae654dfb35ac480eb9cb9868bb0269769 mtime 2026-09-23 14:33:13.182829700 +0200 sidecars: 1
+pool p2dca21ab5f4ef3ae OK: experiment_configs/reserved_pool_frozen_p2dca.json hashes to it; reserved_pool rows in mmlu_pro_dataset_cache_v2.db agree
+  keys=14 ids=3599 judgeable=3445 sentinels=154 corpus_set=MMLU_PRO (mmlu-pro-v2) origin=20260727_042523_Headless_Run_Auto_ge
+pool_guard p2dca21ab5f4ef3ae exit 0
+[POOL-GUARD] pool pd610c9ad05255f16 is not in the registry Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\reserved_pools.json (known: p2dca21ab5f4ef3ae, paeec37aa28063c75)
+pool_guard pd610c9ad05255f16 exit 0
+[POOL-GUARD] pool p19d9f473b5a610a0 is not in the registry Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\reserved_pools.json (known: p2dca21ab5f4ef3ae, paeec37aa28063c75)
+pool_guard p19d9f473b5a610a0 exit 0
+[POOL-GUARD] pool p8a29d8f3ff75aa55 is not in the registry Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\reserved_pools.json (known: p2dca21ab5f4ef3ae, paeec37aa28063c75)
+pool_guard p8a29d8f3ff75aa55 exit 0
+BEFORE RP05 embeddings_cache.db sha256 52229e1ebfdda76ebaed3e461eeee80ae654dfb35ac480eb9cb9868bb0269769
+BEFORE RP05 mmlu_pro_dataset_cache_v2.db sha256 4f65414f7625a1e7da44cc599bbf4a951e8866f472fa9532f09ee103953efa73
+BEFORE RP05 snapshots.db sha256 390c313e5a40e0a77a79254802662152a1a01d447891d51c1bfb2bbc83d4c46b
+## 2026-09-29T13:58:02+02:00 RP05 flat_generality --run launched (one single-threaded process, per the script's launch sequence; not chunked in parallel)
+flat_generality --run exit 0 wall 169s
+flat_generality --analyze exit 0 wall 506s
+AFTER RP05 embeddings_cache.db sha256 52229e1ebfdda76ebaed3e461eeee80ae654dfb35ac480eb9cb9868bb0269769
+AFTER RP05 mmlu_pro_dataset_cache_v2.db sha256 4f65414f7625a1e7da44cc599bbf4a951e8866f472fa9532f09ee103953efa73
+AFTER RP05 snapshots.db sha256 390c313e5a40e0a77a79254802662152a1a01d447891d51c1bfb2bbc83d4c46b
+gemma_raw dry (3504) exit 0
+3e9ce57772160749e0b5ea0267713286ca4109444d5a6b676e877a5b0501df29 *E:/TaxoArena_backup_2026-09-29/embeddings_cache_embeddinggemma_latest.db.pre_embed
+## 2026-09-29T14:10:35+02:00 gemma_raw --go NOT RUN: the permission system denied the write to the shared gemma cache DB (Modify Shared Resources). Stopped; card embeds, arm pins and E0b/E1 not run. Gemma DB unchanged: 3e9ce57772160749e0b5ea0267713286ca4109444d5a6b676e877a5b0501df29; backup E:/TaxoArena_backup_2026-09-29/...pre_embed

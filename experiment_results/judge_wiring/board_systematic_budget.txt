@@ -1,0 +1,91 @@
+=== SYSTEMATIC-BUDGET: fit the continuous widener, and check it independently ===
+  form: tau(A) = exp(b0 + b1*A) added in quadrature to the bootstrap SD; call iff
+  min(c_raw, Phi(|m|/sqrt(s^2+tau^2))) >= 0.975. TWO free parameters, NO key at inference.
+
+  THE POPULATION, and the correction it forces to a number already published:
+    edges with ANY key gap (the honest denominator): 918, of which 57 point the wrong way
+    edges with a key gap >= 0.02 (what SYSTEMATIC-SIGNAL reported): 890, 42 wrong
+    raw certificate on ALL edges:      745 called, 7 wrong = 0.94%
+    raw certificate on FILTERED edges: 739 called, 6 wrong = 0.81%
+    The key-gap filter is not available at deployment AND it selects the population - the
+    excluded edges are far more often wrong. Every published rate must be restated on the
+    unfiltered denominator.
+
+=== (1) THE FIT, on the 890 filtered edges so it is comparable to the derivation ===
+  b0 = -3.4050 | b1 = +3.0576
+  tau at A = 0.30 / 0.45 / 0.60 / 0.80 / 0.90: 0.083 / 0.131 / 0.208 / 0.383 / 0.520
+  against a per-anchor bootstrap s of median 0.247 (p10 0.200, p90 0.303)
+  b1 > 0 means the widener GROWS with answer agreement, which is the direction
+  SYSTEMATIC-SIGNAL predicted (+1.511, z=+7.0).
+  refit on the unfiltered 918: b0 = -3.4079 | b1 = +3.2659
+
+  MONOTONICITY CHECK: edges the budget makes MORE confident: 0 (must be 0)
+
+=== (2) CALIBRATION: in sample and leave-one-ANCHOR-out (14 folds) ===
+  certificate                  called   wrong   nominal    ratio
+  raw (tau = 0)                   739       6      1.00     6.0x
+  budget, in sample               674       2      1.11     1.8x
+  budget, LEAVE-ONE-ANCHOR-OUT      669       2      1.00     2.0x
+  out-of-fold nominal over ALL 890 edges: 42.5 against 42 observed wrong  (CONSERVATIVE)
+
+  REGISTERED CRITERIA:
+   (1) LOAO calibration, realised at or below nominal: PASS in aggregate (2 wrong vs 1.00 nominal)
+   (2) still calls >= 60% of edges: PASS (75.2%)
+   (3) no answer-key input at inference: PASS - inputs are m, s and answer agreement only
+   (4) at most 3 free parameters: PASS - two, and no bins or fitted thresholds
+
+=== (3) THE REGISTERED HEADLINE PREDICTION: does arx/iask stop being separated? ===
+  pooled 66-pair board: raw 62 called / 1 wrong  ->  budget 58 called / 0 wrong
+  arx vs iask: raw c 1.0000 -> budget c 0.8171 | agreement 0.880 | key direction WRONG
+  -> PREDICTION HELD: the budget withdraws the separation the key contradicts
+
+  pooled pairs that LOSE their call:
+  pair                                             agree budget c      key
+  gemini-3.1-pro_5-sho vs gpt-4o-2024-08-06        0.778   0.9612    right
+  gpt-4o-2024-08-06 vs iask_pro                    0.814   0.9159    right
+  arx_0314 vs gemini-3.1-pro_5-sho                 0.862   0.8719    right
+  arx_0314 vs iask_pro                             0.880   0.8171    WRONG
+
+  pooled board, every pair the KEY says the arena has backwards:
+    arx_0314 vs iask_pro                           key gap 0.0161 | raw c 1.0000 -> budget c 0.8171
+
+=== (4) LABEL NOISE: how much of the fit is edges the key cannot actually adjudicate? ===
+  An edge's 'wrong direction' label rests on a key gap that is itself an estimate. Refit using
+  only edges whose key direction is established by an exact binomial at 5%.
+  test: exact two-sided McNemar on the two models' per-question correctness in that anchor.
+  established at 5%: 810 of 890 edges | indeterminate: 80
+  wrong-direction edges: 25 of 810 sit on ESTABLISHED labels, 17 of 80 on indeterminate ones
+  so 17 of the 42 wrong edges (40%) rest on a key direction the key does not establish
+  refit on established-direction edges only: b1 = +2.0451 against +3.0576 (67% of it)
+  -> the fitted effect SURVIVES the attack that killed the conformal form
+
+=== (5) THE COMPARISON THAT DECIDES WHETHER THE FIT EARNS ITS KEEP ===
+  SYSTEMATIC-SIGNAL rejected a hard gate on the grounds that at a ~1% base rate any gate
+  catching half the errors discards many good calls. That argued against a gate as a SUBSTITUTE
+  for the certificate. It did NOT establish that a fitted two-parameter widener beats one. This
+  compares them on the same edges at the same operating point, out of fold for the budget.
+
+  PER-ANCHOR (739 raw calls, 6 wrong):
+  rule                                 called   wrong   correct lost
+  raw certificate                         739       6              0
+  budget, out of fold                     669       2             66
+  agreement gate A < 0.60                 567       1            167
+  agreement gate A < 0.65                 607       2            128
+  agreement gate A < 0.70                 635       2            100
+  agreement gate A < 0.75                 674       3             62
+  agreement gate A < 0.80                 709       3             27
+  agreement gate A < 0.85                 728       5             10
+
+  POOLED 66-pair board (62 raw calls, 1 wrong):
+  rule                                 called   wrong   correct lost
+  raw certificate                          62       1              0
+  budget                                   58       0              3
+  agreement gate A < 0.70                  56       0              5
+  agreement gate A < 0.75                  58       0              3
+  agreement gate A < 0.80                  59       0              2
+  agreement gate A < 0.85                  60       0              1
+  agreement gate A < 0.90                  62       1              0
+
+  READ: the widener earns its keep only if it removes the same errors for FEWER correct calls
+  than the best gate. If a one-line gate matches it, the two fitted parameters are not paying
+  for themselves and the honest product is the gate plus the diagnosis.

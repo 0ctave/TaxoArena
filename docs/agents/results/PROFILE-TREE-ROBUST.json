@@ -1,0 +1,165 @@
+{
+  "id": "PROFILE-TREE-ROBUST",
+  "title": "PROFILE-TREE-ROBUST: does the sub-anchor capability profile survive a change of TREE? (H10's question, zero calls)",
+  "question": "The same x12 verdicts re-celled under two trees built on the same clean reserved pool with different embedding configurations, bareq512_s42 (87 leaves) and abt2d512_s42 (47 leaves); per-leaf BT boards, model-demeaned, against a size-matched random-partition null; registered: adopt sub-anchor reporting only if the cross-tree correlation exceeds both the null's 95th pct and 0.50; router agreement and realised gain secondary; the sign-reversal rate reported whatever the primary does; falsifier stated in advance. [ID-ONLY 2026-09-23 (CLAIMS-SWEEP-BRACKETS, registrar): pool bareq512_s42 (p2dca); verified by id only, not by content; reviewed twins on this pool (reviews 1df2cf1, 8ebfa7a): 37 exact / 70 norm-v1 EVAL texts among members of bareq512_s42 (20260909_212117); judged-row option-set 64 / ordered 31; labelling and induction ON: 28 norm-only twins in induction corpora (exact), 26 twin texts in labelling prompts; see docs/judge_v2_program.md L14280-L14340 (CONTENT-DISJOINT-SPLIT-AUDIT) and L14455-L14487 (SPLIT-FOLLOWUPS).]",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "4ede920",
+    "program_lines": "docs/judge_v2_program.md L2460-L2503 (registration), L2504-L2559 (first outcome) and L3240-L3290 (CORRECTED outcome, 2026-09-15)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-14 (before any run, ZERO calls) — PROFILE-TREE-ROBUST: does the sub-anchor capability profile survive a change of tree?",
+    "outcome_heading": [
+      "L2504: - **PROFILE-TREE-ROBUST (2026-09-14, zero calls): the sub-anchor capability structure is REAL and survives a",
+      "L3240: - **PROFILE-TREE-ROBUST, CORRECTED (2026-09-15, zero calls): \"the structure is real and tree-robust\" is"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "tools/analysis/profile_tree_robust.py",
+    "sha16": "1ee2d6cb9bc51bbc at 1430ffc (first run); ca479ca4193b6ba0 (at 7ecc5c7 (the corrected rerun with the within-anchor null))",
+    "commit": "7ecc5c7 (the corrected rerun with the within-anchor null)"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/profile_tree_robust.txt (sections 1c, 4, 6, 7 from the corrected rerun)",
+    "outcome_commit": "7ecc5c7",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (2,811 judged questions under two trees)",
+    "date": "2026-09-14 (corrected 2026-09-15)"
+  },
+  "review": {
+    "file": "docs/review_session_2026-09-14.md (the adversarial REVIEW of 2026-09-14/15, ba12200; programme L3099): the random-partition null shuffled ACROSS anchors; the [REVIEW] UNDER CORRECTION insertion and the CORRECTED rerun with a within-anchor null and (model, anchor) demeaning (programme L3240; 7ecc5c7)",
+    "commit": "ba12200",
+    "verdict": "NOT TREE-ROBUST (key and judge); HEADLINE WITHDRAWN: the registered primary PASSED and was the wrong instrument; the registered question reads NO"
+  },
+  "criteria": [
+    {
+      "id": "PRIMARY",
+      "text": "cross-tree correlation exceeds both the null's 95th pct and 0.50",
+      "result": "FAILED",
+      "value": "[CORRECTED 2026-09-15] the key's +0.8143 sits AT its within-anchor null (median +0.8130, 95th +0.8321): it measured the anchor profile the two trees share on 2,800 of 2,811 questions; (model, anchor)-demeaned key +0.4135, judge +0.2982, above their nulls overall but stratified by how much a question's cell company changes: most-changed third key -0.071, judge -0.084; middle +0.515 / +0.155; least-changed +0.851 / +0.741: where the trees genuinely re-cell a question the residual is zero or negative for BOTH instruments (shared data, not reproducible structure); first reading: raw +0.9147 [+0.9115, +0.9179] against a null 95th of +0.8764, but a RANDOM partition scores +0.8643, so the 0.50 bar was miscalibrated; the registered primary PASSES and was the wrong instrument, reported rather than banked",
+      "denominator": "2,811 questions under two trees; within-anchor null"
+    },
+    {
+      "id": "(2)",
+      "text": "router agreement and realised gain",
+      "result": "DELIVERED",
+      "value": "agreement 0.598; leaf routers 0.8494 / 0.8515 against global best gemini 0.9068: LEAF-POWER's prediction HELD",
+      "denominator": "2,811"
+    },
+    {
+      "id": "(3)",
+      "text": "sign-reversal rate",
+      "result": "DELIVERED",
+      "value": "0.072, and 0.039 for |centred| >= 0.20",
+      "denominator": "leaf cells"
+    },
+    {
+      "id": "(4)",
+      "text": "the KEY across trees",
+      "result": "DELIVERED",
+      "value": "+0.8143 vs the ACROSS-anchor null +0.0348 (first reading: judge-artefact rejected) [CORRECTED: at its within-anchor null; shared anchor profile]",
+      "denominator": "2,811"
+    },
+    {
+      "id": "(5)",
+      "text": "split-half reliability on disjoint halves of the same cell",
+      "result": "DELIVERED",
+      "value": "judge +0.0860 against key +0.7201; the judge's cross-tree number is 5.5x its own reliability; a disattenuation returned +1.1947 (impossible) and is discarded; stands after the correction",
+      "denominator": "8 measured leaves, mean 71 q"
+    },
+    {
+      "id": "(6)",
+      "text": "stratified by cell-company overlap",
+      "result": "DELIVERED",
+      "value": "judge 0.7497 -> 0.4815 -> 0.1895 as overlap falls 0.585 -> 0.146, key 0.9406 -> 0.8112 -> 0.6836",
+      "denominator": "three overlap strata"
+    },
+    {
+      "id": "(7)",
+      "text": "questions per leaf for reliability 0.80",
+      "result": "DELIVERED",
+      "value": "21.3x the per-cell evidence, ~1,127 per leaf against 53 (first reading); base corrected to the 8 measured leaves (mean 71 q): 0.80 needs ~1,514 q per leaf; must come from NEW questions (TEMP-0: the 5.7% floor is intrinsic)",
+      "denominator": "8 leaves"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "the registered falsifier (stated in advance)",
+    "fired": true,
+    "note": "the falsifier FIRED on the two statistics the controls show to be contaminated, and is recorded as having fired and been wrong; withdrawn: 'structure is real and tree-robust', 'the judge cannot resolve it', and the reframing of the five leaf results; each replacement analysis was written into the script BEFORE its result was computed; flagged against the audit's C-7 criterion-substitution pattern; anchor-level agreement 0.996 is a null by construction"
+  },
+  "numbers_of_record": {
+    "corrected": "key +0.8143 at its within-anchor null (median +0.8130 / +0.8164, 95th +0.8321); demeaned key +0.4135, judge +0.2982; most-changed third -0.071 / -0.084",
+    "first_reading": "raw +0.9147 [+0.9115, +0.9179]; null 95th +0.8764; random partition +0.8643; judge model-demeaned +0.4754 vs null +0.0258",
+    "reliability": "judge +0.0860 vs key +0.7201; 0.80 needs ~1,514 q per leaf (8 leaves, mean 71 q)",
+    "router": "agreement 0.598; leaf routers 0.8494 / 0.8515 vs gemini 0.9068",
+    "sign_reversal": "0.072; 0.039 at |centred| >= 0.20"
+  },
+  "sentence_of_record": "PROFILE-TREE-ROBUST (2026-09-14, zero calls; CORRECTED 2026-09-15 with a within-anchor null and (model, anchor) demeaning): the key's +0.8143 sits AT its within-anchor null (median +0.8130, 95th +0.8321): it measured the anchor profile the two trees share on 2,800 of 2,811 questions; (model, anchor)-demeaned key +0.4135, judge +0.2982, but where the trees genuinely re-cell a question (most-changed third) the residual is -0.071 / -0.084 for BOTH instruments: shared data, not reproducible structure; the registered question reads NO; withdrawn: 'structure is real and tree-robust', 'the judge cannot resolve it', and the reframing of the five leaf results; the split-half reliabilities (0.086 / 0.720) stand; 0.80 needs ~1,514 q per leaf on the 8 measured leaves. The registered primary PASSED (raw +0.9147 against a null 95th of +0.8764, but a random partition scores +0.8643, so the 0.50 bar was miscalibrated) and was the wrong instrument, which is reported rather than banked; the falsifier fired on contaminated statistics and is recorded as having fired and been wrong.",
+  "chips": [
+    "NOT TREE-ROBUST (key and judge)",
+    "HEADLINE WITHDRAWN"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-15",
+      "by": "the REVIEW ([REVIEW] UNDER CORRECTION insertion) and the CORRECTED rerun (programme L3240; 7ecc5c7)",
+      "text": "the random-partition null shuffled ACROSS anchors; a within-anchor null puts the key's +0.8143 at its own median (+0.8164), so 'structure is real and tree-robust' measured the anchor profile the two trees share on 2,800 of 2,811 questions; the registered primary PASSES and was the wrong instrument; with (model, anchor) demeaning the residual where trees genuinely re-cell a question is zero or negative for both instruments; headline withdrawn."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the coordinator's verified record-integrity blocker A1 (insertion only, zero calls; no number of this record moves)",
+      "text": "DISCLOSED 2026-09-23 by the registrar (blocker A1, insertion only, zero calls; NO number of this record moves and nothing above is rewritten): THE MMLU-PRO TREE THIS RESULT IS ROUTED ON FAILS THE TRAIN-ONLY INVARIANT. Snapshot 20260910_043557 (bareq512_s42) carries 37 distinct EVAL texts among its member slots by exact text and 70 under the split function's own key norm-v1 (FRAMEWORK L229 / L373, `gradlew trainOnlyAudit`, read-only), i.e. 70 of the 3,445 p2dca EVAL ids = 2.03% of the routed population were visible to construction. THE WORST-CASE BOUND, which needs no run and assumes every contaminated item is correct BECAUSE of the contamination: AT MOST 2.03pp on any routed proportion - about 5 questions per anchor spread over the 14 anchors at 119-304 questions per anchor. IT IS A BOUND AND NOT AN ESTIMATE; no clean re-read was run, and whether to rebuild under content closure (0 judge calls, new snapshot ids, every routed readout moves) or to disclose at this bound is an OPEN AUTHOR DECISION registered in docs/agents/results/SPLIT-FUNCTION-IMPL.json."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "reproducible sub-anchor structure under a change of tree",
+    "a reliable per-leaf profile on MMLU-Pro at any call budget",
+    "[DISCLOSED 2026-09-23 by the registrar (blocker A1, insertion only, zero calls; NO number of this record moves and nothing above is rewritten): THE MMLU-PRO TREE THIS RESULT IS ROUTED ON FAILS THE TRAIN-ONLY INVARIANT. Snapshot 20260910_043557 (bareq512_s42) carries 37 distinct EVAL texts among its member slots by exact text and 70 under the split function's own key norm-v1 (FRAMEWORK L229 / L373, `gradlew trainOnlyAudit`, read-only), i.e. 70 of the 3,445 p2dca EVAL ids = 2.03% of the routed population were visible to construction. THE WORST-CASE BOUND, which needs no run and assumes every contaminated item is correct BECAUSE of the contamination: AT MOST 2.03pp on any routed proportion - about 5 questions per anchor spread over the 14 anchors at 119-304 questions per anchor. IT IS A BOUND AND NOT AN ESTIMATE; no clean re-read was run, and whether to rebuild under content closure (0 judge calls, new snapshot ids, every routed readout moves) or to disclose at this bound is an OPEN AUTHOR DECISION registered in docs/agents/results/SPLIT-FUNCTION-IMPL.json.]"
+  ],
+  "ledger": {
+    "row_id": "PROFILE-TREE-ROBUST",
+    "version": "v85 (90260ca); corrected 2026-09-15 (REVIEW insertion and rerun) [UPDATED 2026-09-23 at ledger v130 (audit OK, 227 rows): the blocker-A1 TRAIN-ONLY disclosure, with its counts and its worst-case bound, inserted into this row's observed cell. No number in the row moves.]; [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "LEAF-POWER",
+    "LEAF-SHRINK",
+    "LEAF-POWERED",
+    "MC-LEAF",
+    "PROFILE-RELIABILITY",
+    "KEY-SUBANCHOR-SCALE",
+    "TEMP-0"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "sub-anchor profiles (CONTEXT.md section 5: PROFILE-TREE-ROBUST, KEY-SUBANCHOR-SCALE)"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L2460-L2559 and L3240-L3290 (4ede920 / 1430ffc / 7ecc5c7)",
+    "experiment_results/x12_crossdomain/profile_tree_robust.txt (7ecc5c7)",
+    "docs/review_session_2026-09-14.md (the adversarial REVIEW of 2026-09-14/15, ba12200; programme L3099)",
+    "docs/test_ledger.html row PROFILE-TREE-ROBUST (v85; corrected 2026-09-15): chips verbatim, observed cell, evidence",
+    "script sha16 = sha256 of tools/analysis/profile_tree_robust.py at 1430ffc and 7ecc5c7, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ5 Invariance",
+    "what": "Takes the same 12-model verdicts and re-assigns them to cells under two different trees (87 leaves vs 47 leaves) built with different embedding settings. It then checks whether per-leaf model strengths agree between the trees beyond chance. No calls.",
+    "why": "Asks whether the fine-grained, below-subject capability profile is real structure or an artefact of one particular tree.",
+    "information": "High agreement beyond chance would support reporting below the subject level. Result: done, corrected. The first 'structure is real' headline was withdrawn: the agreement came from subject-level structure the trees share. Where the trees actually re-cell questions, agreement is zero or negative. So no reproducible below-subject structure was shown. Later disclosure: the tree saw about 2% of evaluation questions during construction. Older judged question family, later ruled 'history, not evidence'.",
+    "written": "2026-10-07"
+  }
+}

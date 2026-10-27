@@ -1,0 +1,17 @@
+[POOL] p2dca21ab5f4ef3ae (pool of record; active pool verified by pool_guard)
+[GATE] --pass 4 --run: --go True | docs\reviews\READY_canary_epoch2_rung.md exists (tracked True, clean True) | verdict 'READY-WITH-CONDITIONS' -> OPEN
+[PIN] before --pass 4 --run: pass 1 5142795bdc8c5a8e (pin 5142795bdc8c5a8e) | pass 2 9e2f4b7cb2b30b3a (pin 9e2f4b7cb2b30b3a) -> UNCHANGED
+[RUNG] pass 3's last row 2026-09-24 13:47:56 | pass 4 start = pass 4's persisted start 2026-09-24 14:06:09 (run_meta 'started') | gap 1093 s against the 7200 s window -> WITHIN
+[PASS-4 PRE-FLIGHT] read-only: go
+[GUARD] cached 283 | invalid or non-terminated 0 (0.0%) -> OK
+[SCAN] pre-call full-payload scan over 34 payloads: decomposition 34 | frame identical across orders 34 | frame clean 34 | reported, not refused: contestant names inside trace slots 0, key-side tokens in the question + reference slot 0 -> PASS
+[ACCOUNT] CANARY-EPOCH2-RUNG (--pass 4 --run): (i) own 1213 (cache 1166, ledgers 1213) + 34 = 1247 of 1248 | (ii) matches 624 of 4000 | (iii) 4060 + CANARY-EPOCH2-RUNG 1213 + TRACE-TRUNCATION 2178 + 34 = 7485 of 14000 | ledger of record for today's posts: Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\day_calls_2026-09-24.json -> OK
+CANARY-EPOCH2-RUNG pass 4 [grok-4-1-fast-non-reasoning]: set 300 | cached 283 | to judge 17 (34 calls) | workers 8 | maxtok 8192 | temperature omitted | posting order = the set's order (pass 2's), sha16 20b51354c05c5ad4
+  ERROR match 8720: HTTP Error 429: Too Many Requests
+  ERROR match 879: HTTP Error 429: Too Many Requests
+  ERROR match 9136: HTTP Error 429: Too Many Requests
+[ACCOUNT] appended 33 posted calls for CANARY-EPOCH2-RUNG --pass 4 --run to Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\day_calls_2026-09-24.json
+done: ok 14, errors 3 | 33 calls posted (errors are posted calls, counted, never cached) (errored matches are not cached; relaunch to resume them)
+[GUARD] pass 4: 297 judged | 0 invalid, 0 invalid or non-terminated (0.0%) | finish_reason over 594 calls: {'stop': 594} | fingerprint: {'azure:grok-4-1-fast-non-reasoning': 594} -> OK
+[PIN] after --pass 4 --run: pass 1 5142795bdc8c5a8e (pin 5142795bdc8c5a8e) | pass 2 9e2f4b7cb2b30b3a (pin 9e2f4b7cb2b30b3a) -> UNCHANGED
+[OPERATOR 2026-09-24 15:02:32] pass-4 resume1: 'done: ok 14, errors 3 | 33 calls posted' (8720, 879, 9136 HTTP 429). Pass 4 holds 297 of 300. A further resume needs 6 calls: 1246 + 6 = 1252 > 1248 -> would be REFUSED; STOPPED per condition 4; --analyze-epoch2 NOT run.

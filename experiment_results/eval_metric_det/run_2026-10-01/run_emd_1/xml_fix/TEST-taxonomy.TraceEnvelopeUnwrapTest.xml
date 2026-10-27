@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="taxonomy.TraceEnvelopeUnwrapTest" tests="5" skipped="0" failures="1" errors="0" timestamp="2026-10-01T07:09:27" hostname="HORTENSIA" time="0.007">
+  <properties/>
+  <testcase name="banned models are rejected at roster load()" classname="taxonomy.TraceEnvelopeUnwrapTest" time="0.001"/>
+  <testcase name="no ingested trace is a raw JSON envelope()" classname="taxonomy.TraceEnvelopeUnwrapTest" time="0.001"/>
+  <testcase name="no model has a wholly blank trace column()" classname="taxonomy.TraceEnvelopeUnwrapTest" time="0.001">
+    <failure message="org.opentest4j.AssertionFailedError: these models now have traces and should be removed from knownTraceless: [deepseek, flash_0shots_00_35_03, gpt4o(2024-05-13), opus_2shots_00_37_14, sonnet-3.5_0shots_09_34_29, sonnet_0shots_12_01_18] ==&gt; expected: &lt;true&gt; but was: &lt;false&gt;" type="org.opentest4j.AssertionFailedError">org.opentest4j.AssertionFailedError: these models now have traces and should be removed from knownTraceless: [deepseek, flash_0shots_00_35_03, gpt4o(2024-05-13), opus_2shots_00_37_14, sonnet-3.5_0shots_09_34_29, sonnet_0shots_12_01_18] ==&gt; expected: &lt;true&gt; but was: &lt;false&gt;
+	at app//org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at app//org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at app//org.junit.jupiter.api.AssertTrue.failNotTrue(AssertTrue.java:63)
+	at app//org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:36)
+	at app//org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:214)
+	at app//taxonomy.TraceEnvelopeUnwrapTest.no model has a wholly blank trace column(TraceEnvelopeUnwrapTest.kt:124)
+	at java.base@21.0.6/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base@21.0.6/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base@21.0.6/java.util.ArrayList.forEach(ArrayList.java:1596)
+</failure>
+  </testcase>
+  <testcase name="no ingested trace carries a reason_code field()" classname="taxonomy.TraceEnvelopeUnwrapTest" time="0.002"/>
+  <testcase name="unwrap keeps only the response field()" classname="taxonomy.TraceEnvelopeUnwrapTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

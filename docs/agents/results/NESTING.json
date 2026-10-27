@@ -1,0 +1,151 @@
+{
+ "id": "NESTING",
+ "title": "NESTING: do independently fitted flat spherical k-means at a coarse (depth 2 / 3 cell count) and a fine (leaf count) granularity nest, on the fit sets of Q_e1sd1-3, beside the tree and bisecting k-means (nested by construction, identity check) (zero calls; REGISTERED 2026-10-08)",
+ "question": "Can 'flat k-means at every level' serve as a hierarchy without a reconciliation step?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "e83b59d5",
+  "program_lines": "docs/judge_v2_program.md L25016-L25027",
+  "program_lines_as_of": "e83b59d5 (parent d8ab39fa), re-grepped",
+  "date": "2026-10-08",
+  "heading": "## Registered 2026-10-08 (before any code or call) — NESTING: are two independently fitted flat spherical k-means partitions ...",
+  "provenance": "the orchestrator's brief of 2026-10-08 (design); criteria, Support, predictions, falsifier the registrar's; docs/judge_v2_program.md L24950-L24956 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — six zero-call tests registered ...\"; _as_of the commit that writes it, parent d8ab39fa, re-grepped)"
+ },
+ "script": {
+  "path": "tools/analysis/tree_cut_granularity.py",
+  "blob": "blob:c80c3c1023ab62193483c1a4387000b532620640",
+  "sha16": "sha256-lf16:b1c3d18d2f489423",
+  "commit": "db44a46a (built, branch worktree-wf_fa0ebf63-18c-3)",
+  "merged": "c5f23e7a (registrar's batch, by path; parent 17c34de9)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_hier-fair-backoff_tree-cut-granularity.md",
+  "commit": "17c34de9",
+  "verdict": "READY (C1-C3)"
+ },
+ "go": "the author's 2026-10-08 authorisation (relayed in the orchestrator's brief, words not supplied): register and run the zero-call batch a-f; no judged calls",
+ "run": {
+  "outcome_file": "experiment_results/tree_cut_granularity/tree_cut_granularity_outcome.txt (sha256 264788bdc781b2abd83d0870a9147f7b0f80514c89d9485f61ad7c1d1ac247f1, 130 lines; write-once, never committed); backup E:/TaxoArena_backup_20261008_tree_cut_granularity (SHA256SUMS 3/3 OK, review) (shared with TREE-CUT-GRANULARITY; one run)",
+  "outcome_commit": "outcome not committed (run from main after merge c5f23e7a)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "p5fb86f1075d76e34 / p6d15d913354f256d / p69d2762ac6223d93 (e1sd splits, content-closed CK-CLOSE-v1; pool_guard passed; never pools of record); no DB of record written (review row 18)",
+  "date": "2026-10-08"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_hier-fair-backoff_tree-cut-granularity.md",
+  "commit": "37672103",
+  "verdict": "VALID; NV NON-NESTED 6/6; all 30 V90 values reproduced to 4 dp; tree identity 0"
+ },
+ "criteria": [
+  {
+   "id": "NV1",
+   "text": "per tree and depth (POINT of the per-seed values): NON-NESTED iff V90 > 0.10 on 5 of 5 seeds; NESTED iff V90 <= 0.10 on 5 of 5; MIXED otherwise",
+   "result": "HELD",
+   "value": "NON-NESTED in every cell: seed means Q_e1sd1 d2 0.4805 [0.4362, 0.5133], d3 0.5882 [0.5582, 0.6314]; Q_e1sd2 d2 0.4049 [0.3807, 0.4245], d3 0.5918 [0.5778, 0.6035]; Q_e1sd3 d2 0.4447 [0.4219, 0.4765], d3 0.6031 [0.5453, 0.6592]",
+   "denominator": "5 seeds per cell; fit 8,171 / 8,247 / 8,269"
+  },
+  {
+   "id": "NV",
+   "text": "DECIDING: NON-NESTED iff NON-NESTED in >= 5 of 6 tree-depth cells; NESTED iff NESTED in >= 5 of 6; MIXED otherwise. SCOREABLE (predicted 0.40 vs bar 0.10, MDE80 0.056; DEFF not applicable, declared)",
+   "result": "HELD",
+   "value": "NON-NESTED (6 of 6 cells); rule 8 not refuted; identity: tree and BKM V90 0.0000 in 6/6",
+   "denominator": "6 tree-depth cells x 5 seeds"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "V90 seed mean depth 2 0.40 [0.25, 0.55]; depth 3 0.55 [0.40, 0.70] (per tree)",
+   "result": "HELD",
+   "value": "x6: depth 2 0.4805 / 0.4049 / 0.4447 in [0.25, 0.55]; depth 3 0.5882 / 0.5918 / 0.6031 in [0.40, 0.70]",
+   "denominator": "per tree"
+  },
+  {
+   "id": "P2",
+   "text": "NV NON-NESTED 0.95 / MIXED 0.04 / NESTED 0.01",
+   "result": "HELD",
+   "value": "NON-NESTED (forecast 0.95); Brier 0.0042",
+   "denominator": "6 cells"
+  }
+ ],
+ "falsifier": {
+  "text": "F-NV fires iff NV reads NESTED; overturns the reading that 'flat at every granularity' needs a reconciliation step to serve as a hierarchy",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "NV": "NON-NESTED in 6 of 6 tree-depth cells",
+  "V90": "min 0.3807 (Q_e1sd2 d2), max 0.6592 (Q_e1sd3 d3) over 30 seed values; seed means 0.4049-0.6031; bar 0.10",
+  "identity": "tree (primary leaf) and bisecting k-means V90 0.0000 in 6/6 cells (by construction; not a finding)",
+  "support_realised": "across-seed SD 0.0110-0.0539 (registered 0.045; W-4)"
+ },
+ "sentence_of_record": "NESTING (2026-10-08, 0 calls) — VALID; NV NON-NESTED in 6 of 6 tree-depth cells: flat spherical k-means fitted independently at the depth-2 / depth-3 cell count and at the leaf count do not nest (V90, the share of fit items in fine clusters with less than 90% in one coarse cluster, 0.3807-0.6592 over 30 seed values against the bar 0.10). F-NV NOT FIRED. [POSTRUN docs/reviews/POSTRUN_hier-fair-backoff_tree-cut-granularity.md, 37672103: the tree and bisecting k-means read 0 by construction (identity check, not a finding); a property, not a value; fit sets of Q_e1sd1-3, MMLU-Pro, qwen3.]",
+ "chips": [
+  "REGISTERED 2026-10-08, BEFORE ANY CODE",
+  "VALID (POST-RUN 37672103): NV NON-NESTED 6/6; F-NV NOT FIRED"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-08",
+   "by": "registrar (docs/judge_v2_program.md L25147-L25157 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — rulings GAP-FIX-CC C-1 (B-3), SI-NULL-TRIAD B1 and SIN-2; ...\"; _as_of the commit that writes it, parent 17c34de9, re-grepped))",
+   "text": "READY; tool merged to main by path, blob verified. Same tool and run as TREE-CUT-GRANULARITY. C1 run blob c80c3c10 exactly ([SCRIPT] line)."
+  },
+  {
+   "date": "2026-10-08",
+   "by": "registrar (POSTRUN 37672103, VALID; docs/judge_v2_program.md L25194-L25203 (section \"## NESTING (2026-10-08, 0 calls) — VALID (POSTRUN 37672103): ...\"; _as_of the commit that writes it, parent f4dd6292, re-grepped))",
+   "text": "OUTCOME bracket appended to READOUTS AND CRITERIA of the registration (L25021): NV NON-NESTED 6 of 6; F-NV NOT FIRED."
+  },
+  {
+   "date": "2026-10-08",
+   "by": "registrar (D-2026-10-08)",
+   "text": "D-2026-10-08-1 (the author's words, now supplied verbatim): \"a. Certificates (recommended), b+c. Hierarchy tests (recommended), d. SCPB gate, e+f. GAP-FIX-CC and SuperGPQA\"; judged spend \"None for now (Recommended)\". The go of record is unchanged in substance. Source: docs/judge_v2_program.md L25317-L25327 (section \"## Author's decision 2026-10-08 (recorded by the registrar; zero calls; insertion only) — D-2026-10-08-1..6 ...\"; _as_of the commit that writes it, parent 5211616a, re-grepped); authority docs/agents/author_decisions/2026-10-08.md (5211616a); plan Amendment 40"
+  }
+ ],
+ "does_not_show": [
+  "that nesting has routing or evaluation value (a property, not a value)",
+  "held-out quality (TREE-CUT-GRANULARITY)",
+  "that bisecting k-means is worse (it nests too)",
+  "other corpora or embedders"
+ ],
+ "ledger": {
+  "row_id": "NESTING",
+  "version": "v417 (2026-10-08: OUTCOME bracket; VALID ok chip beside REGISTERED) | v414 (2026-10-08: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "TREE-CUT-GRANULARITY (same tool and trees)",
+  "E1-SPLIT-DRAWS (trees)"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; geometry only"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "minutes inside TREE-CUT-GRANULARITY's run",
+  "agent_hours": "shared",
+  "reads_pool": true
+ },
+ "outputs": "never committed: pinned by sha256, stored on E: with SHA256SUMS.txt; temp under E:/TaxoArena_tmp via scratch_dir",
+ "sources": [
+  "docs/judge_v2_program.md L25016-L25027 (_as_of the commit that writes it, parent d8ab39fa, re-grepped)",
+  "docs/judge_v2_program.md L24950-L24956 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — six zero-call tests registered ...\"; _as_of the commit that writes it, parent d8ab39fa, re-grepped)",
+  "docs/judge_v2_program.md L25147-L25157 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — rulings GAP-FIX-CC C-1 (B-3), SI-NULL-TRIAD B1 and SIN-2; ...\"; _as_of the commit that writes it, parent 17c34de9, re-grepped)",
+  "docs/judge_v2_program.md L25194-L25203 (section \"## NESTING (2026-10-08, 0 calls) — VALID (POSTRUN 37672103): ...\"; _as_of the commit that writes it, parent f4dd6292, re-grepped)",
+  "docs/judge_v2_program.md L25317-L25327 (section \"## Author's decision 2026-10-08 (recorded by the registrar; zero calls; insertion only) — D-2026-10-08-1..6 ...\"; _as_of the commit that writes it, parent 5211616a, re-grepped); authority docs/agents/author_decisions/2026-10-08.md (5211616a); plan Amendment 40"
+ ],
+ "last_update": "2026-10-08",
+ "label_status": "trees [LF]; k-means [LF]",
+ "pilot_disclosure": "SEEN before registration, pilot role only (never evidence): E:/TaxoArena_tmp/cert_split (results.json sha256 32fcf7cd8baa1367..., VERIFIED_HEADLINE.txt 98b32054b56bde7b...), E:/TaxoArena_tmp/hier_tests (granularity_free/results.json 2fc8ba3a99b8dc54..., nesting/results.json cb5a74cf0d870081..., test3_fair_backoff/results.json 866284ca1bb5cf98..., + review dirs), E:/TaxoArena_tmp/scpb/review_v3_synthesis.md d341748f5265229d...; 2026-10-07, zero calls, TRAIN only, not committed",
+ "plain_description": {
+  "sq": "SQ3 Taxonomy",
+  "what": "Fits flat k-means separately at a coarse and at a fine number of clusters and measures how often a fine cluster spreads over several coarse clusters; the tree is nested by construction. No judge calls.",
+  "why": "If separate flat clusterings at each size do not nest, they cannot replace a tree as a hierarchy without extra reconciliation.",
+  "information": "Shows how far separately fitted flat clusterings fail to form a hierarchy. Result: done. They do not nest: in every case 38% to 66% of items sit in fine clusters that are split across coarse clusters, so 'flat k-means at every level' cannot replace a tree without a reconciliation step.",
+  "written": "2026-10-08"
+ }
+}

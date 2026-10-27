@@ -1,0 +1,158 @@
+{
+  "id": "REF-QUAL-KIMI-JSON",
+  "title": "REF-QUAL-KIMI-JSON: the matched-protocol re-solve: is a better reference buyable, and is Kimi it? (569 reasoning calls under the incumbent's JSON answer-only protocol at a 32,768-token cap)",
+  "question": "After two instrument failures (8,192 cap; an unmatched CoT prompt), solve Kimi-K2.6 under the incumbent's exact protocol (judge_solve_map.SYSTEM, user_prompt, parse_answer) with a 32,768-token cap in its own cache: (1) beat 0.726 on the discriminating subset by >= 3pp; (3) no frontier contestant gains > 3pp of agreement; (4) NEW: non-termination on the discriminating subset <= 5%, or the candidate fails on deployability whatever its accuracy.",
+  "kind": "solve",
+  "state": "done",
+  "registration": {
+    "commit": "60cb7f3",
+    "program_lines": "docs/judge_v2_program.md L3312 (section) and L3378-L3397 (F. REF-QUAL-KIMI-JSON)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-15 (before any run) — six tests from the big picture after the review. Standing rules from the review apply to all six: every wrong-direction count carries its McNemar-established count on the anchor's judged questions; UNDETERMINED is a registered outcome; the key denominator is named; nulls preserve what the question conditions on; the data object is checked before strata are read into it.",
+    "outcome_heading": [
+      "L3510: - **REF-QUAL-KIMI-JSON (2026-09-15, 569 calls, the matched-protocol re-solve): DO NOT PROMOTE - gates (3) and (4) FAIL. And the accuracy underneath is the strongest a candidate reference has shown, which is the finding for the paper: a better reference EXISTS; this one is not deployable and would leak.**"
+    ],
+    "date": "2026-09-15"
+  },
+  "script": {
+    "path": "tools/analysis/ref_qualify.py --protocol json",
+    "sha16": "9142728036b23655 (at 9768e40, the last pre-run commit of the script)",
+    "commit": "9768e40 (later 16b5a91 / 13f2142)"
+  },
+  "ready": null,
+  "go": "~569 reasoning calls registered (under the 4,000-match rule); no amendment",
+  "run": {
+    "outcome_file": "experiment_results/judge_solve/refqual_Kimi_K2_6_json_mt32768.txt (the guard's refusal) and docs/judge_v2_program.md L3510-L3559 (the strata)",
+    "outcome_commit": "35216b3",
+    "calls": 569,
+    "cce": "not stated in the programme (32,768-token cap; median 3,840 / p90 20,352 completion tokens)",
+    "pool": "p2dca21ab5f4ef3ae (the discriminating subset 294 + History 95 / Engineering 100 / Law 93)",
+    "date": "2026-09-15",
+    "other_files": [
+      "experiment_results/judge_solve/refqual_Kimi_K2_6_json_mt32768.db (own cache; 552 of 569 answered, 17 deterministic content-filter 400s)"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the guard (registered after the first void: refuse gate (1) above 5% unparsed on the discriminating subset) is the instrument of record; REFQUAL-REGEN (programme L3947) regenerated the two earlier Kimi reports under the same refusing guard",
+    "commit": "35216b3",
+    "verdict": "DO NOT PROMOTE; gates (3) and (4) FAIL; the falsifier fires; the Kimi line is CLOSED; a better reference exists in principle (+4 to +8pp on the hardest subset)"
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "beat 0.726 on the discriminating subset by >= 3pp",
+      "result": "HELD",
+      "value": "PASSES on both readings: terminated paired 0.821 vs 0.737 (+8.4pp); every truncation scored wrong 0.765 vs 0.724 (+4.1pp); recorded as a NON-GATE number because the guard's rule forbids reading (1) when the subset's unparsed rate exceeds 5%",
+      "denominator": "294 discriminating answers (274 terminated)"
+    },
+    {
+      "id": "(3)",
+      "text": "no frontier contestant gains > 3pp of agreement",
+      "result": "FAILED",
+      "value": "gemini 0.858 vs the incumbent's 0.787 (+0.071); arx +0.027, iask +0.016, gpt-4o +0.004 (under the CoT prompt the same gate passed at +0.023); DECOMP's mechanism: a more accurate reference agrees more with the most accurate contestant by construction (gemini 0.913 on the key), so (3) is coupled to what (1) rewards",
+      "denominator": "per-contestant agreement on the answered questions"
+    },
+    {
+      "id": "(4)",
+      "text": "non-termination on the discriminating subset <= 5%",
+      "result": "FAILED",
+      "value": "20 of 294 = 6.8%, all finish_reason 'length'; 29 of 552 (5.3%) overall; median 5,044 -> 3,840 tokens, p90 20,352, max 32,466; a full re-judge would be ~80M output tokens against the incumbent's 0.4M visible with one hard question in fifteen returning no reference",
+      "denominator": "294 discriminating answers"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "non-termination falls below 5% under the answer-only prompt",
+      "result": "FAILED",
+      "value": "6.8%: the median fell, the tail did not, and the tail is what the gate measures",
+      "denominator": "294"
+    },
+    {
+      "id": "P2",
+      "text": "accuracy on the discriminating subset lands at 0.74-0.78 and passes (1)",
+      "result": "HELD",
+      "value": "0.765 on the deployment reading",
+      "denominator": "294"
+    },
+    {
+      "id": "P3",
+      "text": "leakage passes (3)",
+      "result": "FAILED",
+      "value": "+0.071 on gemini",
+      "denominator": "frontier contestants"
+    },
+    {
+      "id": "P4",
+      "text": "Kimi is PROMOTABLE",
+      "result": "FAILED",
+      "value": "DO NOT PROMOTE",
+      "denominator": "gates (1) (3) (4)"
+    }
+  ],
+  "falsifier": {
+    "text": "non-termination stays above 5%: Kimi is not deployable as a reference at any protocol and the line closes",
+    "fired": true,
+    "note": "FIRES at 6.8%; the Kimi line is CLOSED; REF-FORM-BY-CELL (2026-09-19) names this row as the bar any stronger solver MODEL per cell must clear (gates (1) (3) (4))"
+  },
+  "numbers_of_record": {
+    "run": "569 calls; 552 answered; 17 HTTP 400 content-filter refusals (the 10 seen on every earlier attempt plus 7 new), deterministic, none retryable; 29 unparsed of 552 (5.3%), 20 of 294 (6.8%) on the discriminating subset, all 'length'",
+    "strata": "DISCRIMINATING 294, non-term 6.8%, terminated paired 0.821 vs 0.737 (+0.084), truncation-as-wrong 0.765 vs 0.724 (+0.041); History 95, 0.0%, 0.779 vs 0.674 (+0.105); Engineering 100, 9.0%, 0.901 vs 0.835 (+0.066) / 0.820 vs 0.780 (+0.040); Law 93, 2.2%, 0.736 vs 0.725 (+0.011) / 0.720 vs 0.720",
+    "leakage": "gemini agreement 0.858 vs 0.787 (+0.071); arx +0.027; iask +0.016; gpt-4o +0.004; CoT prompt +0.023",
+    "tokens": "median 5,044 -> 3,840; p90 20,352; max 32,466; full re-judge ~10,000 solves ~80M output tokens vs the incumbent's 0.4M",
+    "what_stands": "a better reference exists in principle (+4 to +8pp on the hardest subset, the first live confirmation of ORACLE); it fails on exactly the two axes predicted (cost / termination; agreement leakage toward the top); a future leakage gate should condition agreement on correctness (-> REF-QUAL-GATE3-COND, which found the conditional form does not decouple)"
+  },
+  "sentence_of_record": "REF-QUAL-KIMI-JSON (2026-09-15, 569 calls, the matched-protocol re-solve): DO NOT PROMOTE; gates (3) and (4) FAIL. The guard refused the gate correctly: 20 of 294 discriminating answers (6.8%) hit the cap, all 'length'; beneath it the strongest reference gain measured on this subset (terminated paired 0.821 vs 0.737; truncation-as-wrong 0.765 vs 0.724, +4.1pp), recorded as a non-gate number. Gate (3) FAILS at +0.071 on gemini: a more accurate reference agrees more with the most accurate contestant BY CONSTRUCTION (DECOMP's leakage), so (3) is coupled to what (1) rewards. Gate (4) FAILS at 6.8%. The falsifier fires; the Kimi line is closed. What stands: a better reference exists in principle, fails on exactly the two axes the programme predicted, and a future leakage gate should condition agreement on correctness.",
+  "chips": [
+    "(1) PASS +4.1 / +8.4pp",
+    "(3) FAIL +7.1pp gemini",
+    "(4) FAIL 6.8%",
+    "DO NOT PROMOTE — LINE CLOSED"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a promotable reference candidate (Kimi fails deployability and leakage)",
+    "gate (1) as a gate result (the guard forbids reading it above 5% unparsed; recorded as a non-gate number)",
+    "a leakage gate decoupled from accuracy (REF-QUAL-GATE3-COND: the conditional form does not decouple)"
+  ],
+  "ledger": {
+    "row_id": "REF-QUAL-KIMI-JSON",
+    "version": "v100 (35216b3); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "REF-QUAL-KIMI",
+    "ORACLE",
+    "DECOMP",
+    "ARENA-13",
+    "REFQUAL-REGEN"
+  ],
+  "supersedes": "REF-QUAL-KIMI's two voided attempts (8,192 cap; unmatched CoT prompt)",
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "the Kimi reference line (falsifier fired); a stronger solver MODEL per cell is admissible only under REF-QUAL's gates (1) (3) (4) naming this row as the result it would overturn (REF-FORM-BY-CELL note)"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L3312 / L3378-L3397 (registration 60cb7f3, section F): protocol, gates (1) (3) (4), predictions, falsifier",
+    "docs/judge_v2_program.md L3510-L3559 (outcome bullet 35216b3): the run, the guard, the strata table, gates scored, predictions, what stands",
+    "experiment_results/judge_solve/refqual_Kimi_K2_6_json_mt32768.txt (35216b3): the guard's refusal",
+    "docs/test_ledger.html row REF-QUAL-KIMI-JSON (v100): chips verbatim, observed cell, evidence (ref_qualify.py --protocol json, the cache, 60cb7f3)",
+    "script sha16 = sha256 of tools/analysis/ref_qualify.py at 9768e40, first 16 hex (identity, computed by the registrar 2026-09-22; the programme names no run commit for the script)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' or '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "The test re-solved 569 questions with the Kimi model under exactly the same answer protocol as the current reference model. It checked whether Kimi would be a better reference for the judge, applying gates on accuracy, bias toward one contestant, and failure to finish answers.",
+    "why": "A more accurate reference answer is the biggest lever on judge accuracy, so a better reference was worth looking for.",
+    "information": "Passing would mean promoting Kimi as the reference. Failing shows which obstacles block a better reference. Result: done. Not promoted: two gates failed. First, Kimi is more accurate (about +4 points), but 6.8% of its answers hit the length limit, above the 5% allowed. Second, it failed the bias gate: it agrees more with the strongest contestant, which follows from being more accurate. The Kimi line is closed. A future bias check should take correctness into account. Later ruled history rather than evidence, because it ran on the older question pool.",
+    "written": "2026-10-07"
+  }
+}

@@ -1,0 +1,42 @@
+STAGE 1c UNION ROOT ROUTING — rule "flatLeaf" (experiment_configs/multicorpus/union_s42_flatleaf.toml), 2026-09-11, zero LLM calls
+Same graft as stage 1b: the six per-corpus snapshots (BBH 20260911_135229, MATH 20260911_140810, MUSR 20260911_141022,
+IFEVAL 20260911_141054, GPQA 20260911_140945, MMLU_PRO_LB 20260911_135112) under a union root — 6 corpus roots, 239 nodes,
+143 leaves, root vMF on 15,226 region embeddings (kappa 339.2, shrinkage 0.8370); union pool paeec37aa28063c75 (6,482 ids,
+52 domains) recorded and activated on multicorpus_cache_v1.db ([POOL-PIN]). Nothing was rebuilt and no node was refitted;
+the assembly is re-run only because the union mode saves its own snapshot (20260911_144033_Union_graft_of_6_cor). Wall 76 s.
+
+Rule. `unionRootRouting = "flatLeaf"` replaces the union ROOT step only: each held-out query is routed to the nearest leaf
+centroid over ALL 143 grafted leaves (cosine against each leaf's fitted vMF direction, on the leaf's own slice width),
+and the source/domain are read off that leaf's depth-1 and depth-2 tree ancestors. Held-out embeddings come from the
+cache (0 misses); the production descent is not used. Single-corpus construction and routing are untouched.
+
+Held-out routing on the union (6,482 queries, 0 unrouted):
+  standard Top-1 (routed leaf's dominant training domain == designed (source, domain) key): 81.58% [80.62, 82.50]
+  per source (validation/MAIN_union_routing.csv; source = routed depth-1 corpus root == true source,
+  domain = routed depth-2 anchor == designed domain):
+    source        n   top1    source  domain
+    BBH        1728 100.00% 100.00% 100.00%
+    GPQA        358  77.65%  77.93%  77.65%
+    IFEVAL      162  86.42%  86.42%  86.42%
+    MATH        398  60.80%  86.18%  60.80%
+    MMLU_PRO_LB 3609  74.06%  96.18%  73.23%
+    MUSR        227 100.00% 100.00% 100.00%
+    ALL        6482  81.58%  95.46%  81.12%
+  source flow (validation/MAIN_union_source_flow.csv), true source -> routed corpus root:
+    MMLU_PRO_LB -> MATH 85, GPQA 36, BBH 9, IFEVAL 8 (3,471 of 3,609 stay);
+    GPQA -> MMLU_PRO_LB 78, IFEVAL 1; MATH -> MMLU_PRO_LB 55; IFEVAL -> MMLU_PRO_LB 17, BBH 4, GPQA 1;
+    BBH 1728/1728 and MUSR 227/227 stay (no leak).
+
+Paired against the "descent" baseline on the same 6,482 queries (validation/MAIN_union_routing_queries.csv):
+  Top-1   +9.50pp  (819 gains, 203 losses, McNemar p = 1.8e-82)
+  source  +11.2pp  (862 gains, 133 losses, McNemar p = 7.5e-118)
+  domain  +9.58pp  (825 gains, 204 losses, McNemar p = 3.1e-83)
+
+Reading. flatLeaf recovers the whole root-descent loss: 81.58% is exactly the flat nearest-centroid sweep stage 1b read
+over the same leaves (0.81580), so the sweep was not an unreachable upper bound but a routing rule the union can adopt.
+The corpus that the six-way root step was giving away — MMLU-Pro — gains the most: source accuracy 78.00% -> 96.18% and
+Top-1 59.46% -> 74.06%, i.e. within 1.7pp of the 75.78% the MMLU-Pro tree scores when routed alone; BBH goes to a clean
+100%. The cost lands on the two small corpora that the root descent had been over-feeding: GPQA 87.99% -> 77.65% and
+MATH 65.58% -> 60.80%, both losing questions to MMLU-Pro leaves that are genuinely closer (GPQA physics/chemistry,
+MATH word problems). That is the same semantic adjacency stage 1b described, now resolved in MMLU-Pro's favour because
+the leaf centroid, not a six-way root softmax with a beam/descent gate, decides. Net: +616 questions.

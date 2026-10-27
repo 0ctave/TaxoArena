@@ -1,0 +1,42 @@
+JV2-RATE-PROBE outcome (registration docs/judge_v2_program.md L18979-L19094, bf9d80b; script blob 5f075d18f1e04638d5b33b3e35c4077066a21d6d)
+NOT READ: accuracy, ties, leakage. There is no key of record, no reference of record and no contestant, so the 5.7% test-retest floor, both tie conventions and the CONSENSUS-FIT REF coefficient do not apply.
+judge grok-4-1-fast-non-reasoning, provider azure, cap 8192, temperature omitted; single order; SYNTHETIC-DEV payloads (seed JV2-RATE-PROBE:bf9d80b0ec59154434503243bbf024c109fca0fd); system sha256 d0c524bbd66b5a5e9781f049c93584401f27ed503742c687733afa03a2a7171e = K46's
+ACCOUNTING: journal invocations 398 (unresolved 0; by outcome {"RETURNED": 398}) | ledgers 398 | ceiling 400 | posting days {"2026-09-26": 398} | JudgeBench rows on a posting day: none
+X1 / X2 at every step boundary: 14 sample(s), all OK: True
+ADMISSIBILITY OF RECORD: (a) 429 share <= 2% or <= 1 HTTP 429 (A3); (b) 0 exhausted-429; (c) p95 <= 1.5 x p95(S1), S1 exempt, no absolute cap (A2 as revised on O2); registered (a) and (c) superseded pre-data, docs/judge_v2_program.md section of 2026-09-25 JV2-RATE-PROBE BUILT (d10e029)
+PER STEP (latency = reservation to return, rr's backoff included; p95 nearest-rank; rate = invocations over the step's wall per minute; admissibility as amended pre-data: (a) 429 share <= 2% or <= 1 HTTP 429 (A3); (b) 0 exhausted-429; (c) p95 <= 1.5 x p95(S1), S1 exempt, no absolute cap (A2 as revised on O2); registered (a) and (c) superseded pre-data, docs/judge_v2_program.md section of 2026-09-25 JV2-RATE-PROBE BUILT (d10e029)):
+  S1 N=[1]: inv 24, HTTP 24, 429 0 (share 0.0000, CP95 0.1173), exhausted 0, orphans 0, not sent 0, 19.67 calls/min, latency median 2.898 / p95 4.148 / max 4.240 s, median completion tokens 235.0, median user bytes 2634.0, unparsed 0 of 24 returned -> ADMISSIBLE [(c) exempt (A2)]
+  S2 N=[2]: inv 36, HTTP 36, 429 0 (share 0.0000, CP95 0.0798), exhausted 0, orphans 0, not sent 0, 39.56 calls/min, latency median 2.877 / p95 3.894 / max 4.749 s, median completion tokens 238.5, median user bytes 2634.0, unparsed 0 of 36 returned -> ADMISSIBLE
+  S3 N=[4]: inv 48, HTTP 48, 429 0 (share 0.0000, CP95 0.0605), exhausted 0, orphans 0, not sent 0, 74.85 calls/min, latency median 3.147 / p95 3.708 / max 4.027 s, median completion tokens 249.5, median user bytes 2634.0, unparsed 0 of 48 returned -> ADMISSIBLE
+  S4 N=[8]: inv 64, HTTP 64, 429 0 (share 0.0000, CP95 0.0457), exhausted 0, orphans 0, not sent 0, 138.09 calls/min, latency median 3.185 / p95 4.155 / max 4.200 s, median completion tokens 254.0, median user bytes 2634.0, unparsed 0 of 64 returned -> ADMISSIBLE
+  S5 N=[12]: inv 76, HTTP 76, 429 0 (share 0.0000, CP95 0.0387), exhausted 0, orphans 0, not sent 0, 203.10 calls/min, latency median 3.231 / p95 3.861 / max 4.973 s, median completion tokens 248.5, median user bytes 2634.0, unparsed 0 of 76 returned -> ADMISSIBLE
+  S6 N=[12]: inv 150, HTTP 150, 429 0 (share 0.0000, CP95 0.0198), exhausted 0, orphans 0, not sent 0, 210.13 calls/min, latency median 3.188 / p95 4.090 / max 4.791 s, median completion tokens 247.5, median user bytes 2634.0, unparsed 0 of 150 returned -> ADMISSIBLE
+N* = 12, G = 10.326, knee: none
+N* is measured under rr's retry schedule (6 attempts, Retry-After ignored); every HTTP 429 counts for admissibility; it does not transfer as-is to a pool that honours Retry-After (A4)
+REALISM: probe median user bytes 2634.0 vs K46 q50 user bytes 2634 (+-10%); probe median completion tokens 248.0 vs K46 254.0 (+-30%)
+429 / 5xx provider error codes, DESCRIPTIVE (A4): quota vs capacity is reported, not decided: none
+RATE HEADERS (names; x-ratelimit-remaining-* among them), DESCRIPTIVE (A4): quota vs capacity is reported, not decided: ['x-ratelimit-abusepenalty-active', 'x-ratelimit-key', 'x-ratelimit-limit-requests', 'x-ratelimit-limit-tokens', 'x-ratelimit-remaining-requests', 'x-ratelimit-remaining-tokens', 'x-ratelimit-renewalperiod-requests', 'x-ratelimit-renewalperiod-tokens', 'x-ratelimit-reset-requests', 'x-ratelimit-reset-tokens']
+10-s BINS (t from the first send, sends, 429s): [(0.0, 3, 0), (10.0, 3, 0), (20.0, 4, 0), (30.0, 2, 0), (50.0, 1, 0), (60.0, 2, 0), (70.0, 4, 0), (80.0, 4, 0), (90.0, 1, 0), (150.0, 4, 0), (160.0, 5, 0), (170.0, 8, 0), (180.0, 6, 0), (190.0, 7, 0), (200.0, 6, 0), (270.0, 12, 0), (280.0, 12, 0), (290.0, 13, 0), (300.0, 11, 0), (370.0, 20, 0), (380.0, 26, 0), (390.0, 18, 0), (460.0, 37, 0), (470.0, 36, 0), (480.0, 3, 0), (540.0, 14, 0), (550.0, 40, 0), (560.0, 38, 0), (570.0, 40, 0), (580.0, 18, 0)]
+
+SCORING:
+  C0 VALIDITY: HELD (V1 exclusivity held; V2 content gate held; V3 ledger == journal and <= 400 held; V4 pilot guard held)
+  V5 REALISM: HELD (median user bytes and median completion tokens inside their bands)
+  C1 DECISION (readout of record): N* = 12 (ramp N* 12 at S5; S6 admissible)
+  C2 VALUE (readout of record): G = 10.326 >= 1.5 -> "build JV2-PARALLEL-POSTING"
+    [C2 SUPERSEDED FOR THE BUILD DECISION ONLY by the author's override (plan Amendment 24): the build is not deferred whatever G reads; G informs gate (3) and the quota question]; rate(S6) / rate(S1) = 10.683
+  C3 JUDGEBENCH NOTE (informational): S3 HTTP overhead (attempts - invocations) / invocations = (48 - 48) / 48 = 0.000, beside JudgeBench's HTTP margin 770 / 700 = 10%
+  P1: FAILED ((i) N* = 12 in {1, 2}: False; (ii) rate(S3) = 74.85 calls/min < 35: False)
+  P2: UNDETERMINED (no inadmissible step)
+  P3: FAILED (S1 median invocation latency 2.898 s in [3.0, 4.5]; S1 exhausted-429 0, bar 0)
+  P4 (readout, not scored): rate headers returned: yes (x-ratelimit-abusepenalty-active, x-ratelimit-key, x-ratelimit-limit-requests, x-ratelimit-limit-tokens, x-ratelimit-remaining-requests, x-ratelimit-remaining-tokens, x-ratelimit-renewalperiod-requests, x-ratelimit-renewalperiod-tokens, x-ratelimit-reset-requests, x-ratelimit-reset-tokens)
+  P5: HELD (= V5: median user bytes 2634.0 vs K46 q50 2634 +-10%; median completion tokens 248.0 vs K46 254.0 +-30%)
+  FALSIFIER: FIRED: S3 ran at 74.85 calls/min >= 50 with 429 share 0.0000 <= 2%, 0 exhausted, p95 3.708 <= 1.5 x p95(S1): the 09-16 regime is back; P1 FALSIFIED; C2 reads build
+  P1 and the falsifier, joined (R6): P1 FAILED, falsifier FIRED
+
+SUPPORT (the registration's (a)-(g)): deciding denominators = the per-step invocations (registered 24 / 36 / 48 / 64 / 76, S6 150) and their HTTP attempts; observed: S1 24 inv / 24 att, S2 36 inv / 36 att, S3 48 inv / 48 att, S4 64 inv / 64 att, S5 76 inv / 76 att, S6 150 inv / 150 att.
+  cluster structure temporal (one limiter window); Kish NOT DEFINED; DEFF NO SOURCE: declared DEFF = n per step, n_eff = 1 per step for any inference about the regime; SE none reported.
+  exact CP 95% upper bounds of the 429 share (DESCRIPTIVE, R1; they decide nothing): S1 0/24 -> 0.1173, S2 0/36 -> 0.0798, S3 0/48 -> 0.0605, S4 0/64 -> 0.0457, S5 0/76 -> 0.0387, S6 0/150 -> 0.0198.
+  MDE: at n = 48, P(<= 1 of 48 | p = 0.10) = 0.0403; a step cannot certify a 429 share <= 2% (the bar is a screening threshold); the regimes differ >= 2x in rate per doubling against a timing spread 1.31.
+  SCOREABLE: C0, P1, P2, P3, P5 and the falsifier on the observed points; DESCRIPTIVE-ONLY: the 429 share at the 2% bar and any inference beyond the probe day (X3: consumers outside this machine are not seen).
+
+WHAT THIS DOES NOT SHOW: the limit on any other day (N* is a snapshot); the reasoning deployment; whether concurrency changes verdicts; whether synthetic items are judged like real ones; consumers outside this machine (X3).

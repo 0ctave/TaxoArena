@@ -1,0 +1,236 @@
+{
+  "id": "ANCHOR-FREE-REDRAW",
+  "title": "ANCHOR-FREE-REDRAW: does the anchor-free tree's certified trunk survive a re-draw of the sample, the split and the construction order? (zero judge calls; five constructions + five 300-rep site nulls)",
+  "question": "Every anchor-free result in the record is ONE draw (seed 42 on the contaminated p8a29 split). Which of the record's anchor-free claims (the certified trunk: root, both depth-1 sites; 'anchors cost certification' 16 of 69 vs 5 of 65) are properties of the recipe on this corpus, and which are properties of seed 42? Arms: R1 af_clean_s42 (the clean split, pool of record by reservedPoolFile), R1c o0_clean_s42 (anchored control on the clean split), R2 af_s137 and R3 af_s2048 (sample re-draws, own splits), R4 af_s42_o1 (order re-draw).",
+  "kind": "build",
+  "state": "done",
+  "registration": {
+    "commit": "d61f2cf",
+    "program_lines": "docs/judge_v2_program.md L4629-L4783 (no pre-run bracket; registrar's notes (1)-(5) at registration) [re-lined 2026-09-22: batch-1 lines were read at 9c1f37b-era HEAD and shifted by +2 by later insertions]",
+    "program_lines_as_of": "6aa2a0d",
+    "heading": "## Registered 2026-09-17 (before running) — ANCHOR-FREE-REDRAW: does the anchor-free tree's certified trunk survive a re-draw of the sample, the split and the construction order? (zero judge calls; plan docs/agents/plans/2026-09-17_anchor_free_redraw.md)",
+    "outcome_heading": [
+      "L6394: ## ANCHOR-FREE-REDRAW (2026-09-18, zero judge calls) — the embeddings-only tree exists on every draw (C1 5/5) with the same first axis (C2 4/4 anchor-free arms,"
+    ],
+    "date": "2026-09-17"
+  },
+  "script": {
+    "path": "tools/analysis/anchor_free_redraw.py (with tools/chains/anchor_free_redraw.sh, anchor_free_readout.py; configs experiment_configs/anchorfree/{af_clean_s42,o0_clean_s42,af_s137,af_s2048,af_s42_o1}.toml)",
+    "sha16": "929618b522cbced3",
+    "commit": "190cb48"
+  },
+  "ready": null,
+  "go": "n/a (0 judge calls; 5 constructions + 5 site nulls, ~3-3.5 h serialised, the night chain)",
+  "run": {
+    "outcome_file": "experiment_results/anchorfree/redraw/anchor_free_redraw_outcome.txt",
+    "outcome_commit": "17a4434",
+    "calls": 0,
+    "cce": 0,
+    "pool": "R1 / R1c p2dca21ab5f4ef3ae (0 of 3,445 in-sample); R2 pd610c9ad05255f16 (68.4% of the pool of record in-sample); R3 p19d9f473b5a610a0 (69.6%); R4 the record's p8a29 split (69.8%)",
+    "date": "2026-09-18",
+    "other_files": [
+      "experiment_results/anchorfree/redraw/anchor_free_<arm>_readout.txt (5)",
+      "experiment_results/anchorfree/redraw/site_null_<arm>.csv (5, 300 reps)",
+      "experiment_results/anchorfree/redraw/<arm>/seed_<n>/ (manifests, diagnostics, proposals.csv; untracked build dirs)",
+      "chain.log, night_2026-09-18.log, <arm>.build.out, sitenull_<arm>.out, readout_<arm>.log",
+      "snapshots in the untracked snapshots.db (20260917_201353, 20260918_040207, 20260918_041114, 20260918_043908, 20260918_050715), never snapshots_frozen.db"
+    ]
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-18_night_batch.md section ANCHOR-FREE-REDRAW",
+    "commit": "17a4434 (file last at 074eb3d)",
+    "verdict": "numbers CONFIRMED to the digit; C5 holds under all three matching readings; F4 FIRES; defects (1)-(8): R1's quantitative depth-1 failure is a K-SELECTION event at the bar (HIGH), the stable set is the discursive spine only (HIGH), 'anchors cost certification' withdrawn as a headline (HIGH), purity draw-sensitive beyond its CI, the certified count a per-draw object, 'readout exit 1' a shell artefact, R1's null restarted"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "EXISTENCE: leaves in [60, 100] in >= 4 of the 5 arms",
+      "result": "HELD",
+      "value": "82 / 84 / 79 / 81 / 81 -> 5 of 5",
+      "denominator": "5 arms"
+    },
+    {
+      "id": "C2",
+      "text": "TRUNK AXIS: root k = 2 and >= 11 of the 12 scored categories on the record's side, in every arm that builds",
+      "result": "HELD",
+      "value": "root k = 2 with n00000004 quantitative / n00000005 discursive and 12 of 12 in R1, R2, R3, R4 (4 of 4 anchor-free arms; R1c's anchored root k = 14 is N/A)",
+      "denominator": "4 anchor-free arms; 12 scored categories (business / computer science reported, not scored)"
+    },
+    {
+      "id": "C3",
+      "text": "TRUNK CERTIFICATION: both depth-1 sites certified in every arm that builds; the root certified in >= 3 of the 4 anchor-free arms",
+      "result": "FAILED",
+      "value": "depth-1 FAILED (3 of 4: R1's quantitative site n00000004 NOT certified at 0.746, k = 2 accepted at min-pair 0.025148 = 1.006x the bar; discursive n00000005 certified 4/4 at 2.097-2.127); root HELD (4 of 4: 1.141 / 1.138 / 1.127 / 1.121) [CORRECTED 2026-09-19 by K-SELECTION: the 3/4 was the greedy first-k-that-passes rule's; under hysteresis at 1.05 x bar the site certifies at k = 3 on 3 of 3 primed draws at the cost of a different tree below it]",
+      "denominator": "4 anchor-free arms; margins observed / cert_site_p95"
+    },
+    {
+      "id": "C4",
+      "text": "CERTIFIED COUNT in [11, 21] and share in [16%, 30%] in every anchor-free arm that builds",
+      "result": "FAILED",
+      "value": "R3 10 of 66 = 15.2% (R1 14 / 20.3%, R2 12 / 18.8%, R4 16 / 23.2% in band)",
+      "denominator": "the arm's sites (69 / 64 / 66 / 69)"
+    },
+    {
+      "id": "C5",
+      "text": "SITE IDENTITY: >= 6 of the record's 16 certified sites reproduce (Jaccard >= 0.5 on shared train texts) in each of R1, R2, R3; >= 14 of 16 in R4",
+      "result": "HELD",
+      "value": "7 / 8 / 8 / 16 under the registered global-greedy rule; 6 / 6 / 6 under margin-order greedy; 8 best-any",
+      "denominator": "the record's 16 certified sites"
+    },
+    {
+      "id": "C6",
+      "text": "CONTROL: R1 certifies >= R1c + 8 sites (the clean-split instance of 'anchors cost certification')",
+      "result": "FAILED",
+      "value": "14 vs 11 (a 3-site difference; needed 19); R1c's 11 = 5 depth-1 anchors (Chemistry 1.485, Biology 1.503, Engineering 1.188, Math 1.049, Computer science 1.018) + 6 sub-anchor sites at 1.003-1.237",
+      "denominator": "R1 69 sites vs R1c 60 sites"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P-R1",
+      "text": "R1: builds 74-90 leaves; depth-1 margins 1.0-1.2x the bar; root k = 2; 12 of 12; both depth-1 sites certified at >= 1.6x p95; root certified; 13-19 certified of 60-80; 7-10 of 16 reproduce; mu-match 50-65 of 81; purity 0.68-0.71 (below the record's 0.715); key-only +12.5 to +13.5 / 1000",
+      "result": "FAILED",
+      "value": "leaves 82 HELD; depth-1 margins NOT DECIDABLE (n00000004 1.006x exact; n00000005 in [1.00, 2.380]x, the accepted min-pair not recorded by the engine); root k = 2 HELD; 12/12 HELD; both depth-1 at >= 1.6x FAILED (0.746 / 2.097); root certified HELD (1.141); 14 of 69 HELD; 7 reproduce HELD; mu-match 55 HELD; purity FAILED (0.727 [0.712, 0.741], ABOVE the record: the in-sample-optimism reading was wrong); F6 +12.785 HELD",
+      "denominator": "R1 af_clean_s42"
+    },
+    {
+      "id": "P-R1c",
+      "text": "R1c: 80-92 leaves; 3-7 certified of 60-70; purity 0.74-0.77; R1 - R1c purity -5 to -9 pp",
+      "result": "FAILED",
+      "value": "leaves 84 HELD; certified 11 of 60 FAILED; purity 0.770 [0.756, 0.784] FAILED; R1 - R1c -4.3 pp FAILED",
+      "denominator": "R1c o0_clean_s42"
+    },
+    {
+      "id": "P-R2",
+      "text": "R2: root k = 2, 11-12 of 12, depth-1 certified, 12-20 certified, 6-10 of 16 reproduce, mu-match 50-65",
+      "result": "HELD",
+      "value": "79 leaves; root k = 2; 12/12; depth-1 certified (1.703 / 2.115); 12 of 64; 8 reproduce; mu-match 61; purity 0.738 NOT SCORABLE (no band; 68.4% in-sample)",
+      "denominator": "R2 af_s137"
+    },
+    {
+      "id": "P-R3",
+      "text": "R3: as R2",
+      "result": "FAILED",
+      "value": "81 leaves HELD; root HELD; 12/12 HELD; depth-1 HELD (1.688 / 2.127); 12-20 certified FAILED (10); 8 reproduce HELD; mu-match 58 HELD; purity 0.749 NOT SCORABLE (69.6%)",
+      "denominator": "R3 af_s2048"
+    },
+    {
+      "id": "P-R1-R3",
+      "text": "root certified in 2 of the 3 sample arms; ONE of the three sample arms has a depth-1 separation within 0.002 of the bar",
+      "result": "FAILED",
+      "value": "root 3 of 3 FAILED; within 0.002 of the bar HELD (R1 at 0.025148)",
+      "denominator": "R1 / R2 / R3"
+    },
+    {
+      "id": "P-R4",
+      "text": "R4: leaves 79-83; certified 15-17; >= 14 of 16 reproduce; mu-match >= 78 of 81",
+      "result": "HELD",
+      "value": "81; 16; 16 of 16; 81 (median cos 1.000): the order re-draw is byte-inert on membership",
+      "denominator": "R4 af_s42_o1"
+    },
+    {
+      "id": "P-sweep",
+      "text": "C1 HELD (4-5 of 5); C2 HELD in every arm; C3 depth-1 HELD, root FAILS (2 of 4); C4 HELD; C5 HELD (6-10 / 14-16); C6 HELD; re-draw-stable set 5-8 sites all with record n >= 560",
+      "result": "FAILED",
+      "value": "C1 HELD; C2 HELD; C3 depth-1 FAILED (3 of 4), C3 root 4 of 4 (the prediction 'exactly 2 of 4' FAILED, the criterion HELD, per the registrar's note (5)); C4 FAILED; C5 HELD; C6 FAILED; stable set 5 (min n 629) HELD; overall 'half right in the opposite direction': the axis, the ROOT and the DISCURSIVE depth-1 site are recipe properties, the quantitative depth-1 certification 3/4, the fringe count per-draw (10 / 12 / 14 / 16, SD ~2.6)",
+      "denominator": "the sweep"
+    }
+  ],
+  "falsifier": {
+    "text": "F1: C2 fails in >= 2 arms -> ANCHOR-FREE's 'certified trunk' is a seed-42 artefact. F2: C1 fails in >= 2 arms -> the anchor-free recipe at bar 0.025 is a coincidence of seed 42. F3: C5 < 6 in R1, R2 or R3 -> 'certified' is not a property a site carries across draws. F4: C6 fails (R1 - R1c < 8) -> the 16-vs-5 contrast was the p8a29 split's and the clean-split contrast replaces it by insertion.",
+    "fired": true,
+    "which": "F4 FIRES (14 - 11 = 3): ANCHOR-FREE L4306 / L4337-4340, ANCHOR-FREE-CERT L4597-4599 / L4615-4617, the ledger rows and cells.md section 1.3 bracketed; 'anchors cost certification' WITHDRAWN as a headline. F1 (0 of 4), F2 (0 of 5), F3 (7 / 8 / 8) NOT FIRED"
+  },
+  "numbers_of_record": {
+    "arms": "R1 af_clean_s42 (built 2026-09-17 20:13, snapshot 20260917_201353, train 8,230 / test 3,770, gate 843, commit 190cb485); R1c o0_clean_s42 (04:02, anchored, af176a25); R2 af_s137 (04:11, 8,237 / 3,763); R3 af_s2048 (04:39, 8,206 / 3,794); R4 af_s42_o1 (05:07, constructionOrderShuffleSeed 1); site nulls 300 reps on 69 / 60 / 64 / 66 / 69 sites; arms UNDETERMINED none; failed builds none",
+    "per_arm": "R1 82 leaves / 14 of 69 (20.3%) / margins root 1.141, n00000004 NOT certified 0.746, n00000005 2.097 / 7 of 16 reproduce / mu-match 55 of 81 / purity 0.727 [0.712, 0.741] clean / F6 +12.785; R1c 84 / 11 of 60 (18.3%) / root k = 14 / 3 / 52 / 0.770 [0.756, 0.784] / +13.949; R2 79 / 12 of 64 (18.8%) / 1.138, 1.703, 2.115 / 8 / 61 / 0.738 [0.723, 0.753] / +12.970; R3 81 / 10 of 66 (15.2%) / 1.127, 1.688, 2.127 / 8 / 58 / 0.749 [0.735, 0.764] / +13.847; R4 81 / 16 of 69 (23.2%) / 1.121, 1.734, 2.103 / 16 / 81 / 0.715 [0.700, 0.730]",
+    "existence_margin_quantitative_depth-1": "record 0.02410, R2 0.02034, R3 0.01975 REFUSE k = 2 and accept k = 3 at joint 0.0561-0.0564 (certified 1.69-1.73x); R1 ACCEPTS k = 2 at 0.025148 = 1.006x the bar, uncertified against p95 0.033733 (record's p95 0.032649, n 3,837 vs 3,757: the same null); R1's k = 2 children chemistry / physics / engineering 1,522 vs math / physics / business 2,391; discursive site refuses k = 2 at 0.0127-0.0148 everywhere and accepts k = 4 at 0.0595-0.0607",
+    "re_draw_stable_certified_set": "5 of 16 (R1 ∩ R2 ∩ R3), the discursive spine: n00000001 (root, n 8,133, 1.12), n00000005 (discursive d1, 4,508, 2.10), n00000017 (d2, 1,683, health / biology / psychology, 1.77), n00000016 (d2, 1,287, psychology / philosophy / other / history, 1.41), n00000032 (d3, 629, biology, 1.19); quantitative side 0 (n00000004 reproduces in R2 / R3 not R1; n00000043 Jaccard 0.646-0.652 in R1 / R2, below the rule)",
+    "control_contrast_clean": "anchor-free 14 of 69 (20.3%) vs anchored 11 of 60 (18.3%); across draws free 10-16 of 64-69, anchored 5-11 of 60-65; post-hoc margin sensitivity (unregistered): >= 1.05 13 vs 5, >= 1.10 11 vs 5, >= 1.15 8 vs 4",
+    "purity": "re-draw spread ~3 pp (R2 0.738, R3 0.749 vs record 0.715); anchored-over-free gap 4.3 pp clean vs the record's 6.4 pp",
+    "certified_count_per_draw": "10 / 12 / 14 / 16 (SD ~2.6); root margin stable 1.12-1.14",
+    "trunk_axis": "root k = 2, 12 of 12 scored categories on the record's side in R1-R4; business / computer science R1 128:104 / 59:64, R2 108:124 / 47:76"
+  },
+  "sentence_of_record": "ANCHOR-FREE-REDRAW: the embeddings-only tree exists on every draw (5/5) with the same first axis (4/4 anchor-free arms, 12/12 categories) and a certified root (4/4, margin 1.12-1.14) and discursive depth-1 site (4/4, 2.10-2.13); the quantitative depth-1 site certifies in 3/4 (R1 accepted k=2 at 0.025148 vs bar 0.025, uncertified at 0.746: k-selection at the bar, not null width); 7-8 of 16 record sites reproduce per sample re-draw (16/16 under order re-draw); the re-draw-stable certified set is 5 sites = root + the discursive spine, the quantitative side 0; the certified fringe is 10-16 of 64-69 per draw; on the clean split the anchored control certifies 11 of 60 against 14 of 69 (C6 FAILED, F4 FIRED): the record's 16-vs-5 belonged to the contaminated split and 'anchors cost certification' is withdrawn as a headline; purity re-draw spread ~3 pp, anchored-over-free gap 4.3 pp clean. [CORRECTED 2026-09-19 by K-SELECTION (review a949a35; ledger v118): the 3/4 was the greedy first-k-that-passes rule's, not the corpus's; with proposalAcceptMultiplier 1.05 (R1' af_clean_s42_k105) k=2 at 1.006x is refused and k=3 accepted and certified at 1.688; 'a different, weaker object' stands; the certified site is bought with a different tree below it (73 vs 82 leaves; purity 0.712 vs 0.727, -1.5 pp, established p 0.0088); the primed tree is STRUCTURAL EVIDENCE ONLY and R1 af_clean_s42 remains the clean free tree of record.]",
+  "chips": [
+    "TREE REPRODUCES (C1 5/5, C2 4/4)",
+    "ROOT + DISCURSIVE D1 CERTIFIED 4/4; QUANTITATIVE D1 3/4 (K AT THE BAR)",
+    "STABLE CERTIFIED SET = 5 (DISCURSIVE SPINE)",
+    "FRINGE 10-16 PER DRAW",
+    "C6 FAILED, F4 FIRED: 14 vs 11 CLEAN; \"ANCHORS COST CERTIFICATION\" WITHDRAWN",
+    "C4 FAILED (R3 15.2%)",
+    "PURITY PREDICTIONS FAILED (0.727 CLEAN)"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-18",
+      "by": "F4 fired (outcome section L6459-L6462, 3dd0900): ANCHOR-FREE L4306 / L4337-4340, ANCHOR-FREE-CERT L4597-4599 / L4615-4617, the ledger rows ANCHOR-FREE and ANCHOR-FREE-CERT (v114), docs/agents/leads/2026-09-17_cells.md section 1.3",
+      "text": "the 16-vs-5 contrast was the p8a29 split's; the clean-split contrast (anchor-free 14 of 69 = 20.3% vs anchored 11 of 60 = 18.3%) replaces it by insertion; 'anchors cost certification' is a 3-site difference on one clean draw and is WITHDRAWN as a headline."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "K-SELECTION (chain 15:26-16:58, zero calls; review a949a35; programme L6422 / L6440 / L6471; ledger observed cell v118)",
+      "text": "on the same draw with proposalAcceptMultiplier 1.05 (R1' af_clean_s42_k105, same seed / split / engine; flag inert when absent, I2 identical to R1) k=2 at 1.006x is refused and k=3 accepted at iteration 3 (joint 0.056502 = 2.26x bar, dJ 0.0457 vs k=2's 0.0248 on the same 3,858 members), certified at 1.688 (p95 0.033471); the children are the record's n00000045/46/47 at J 0.94-0.98. The 3/4 was the greedy first-k-that-passes rule's, not the corpus's; 'a different, weaker object' stands. The certified site is bought with a different tree below it (73 vs 82 leaves; purity 0.712 vs 0.727, -1.5 pp, established p 0.0088); the primed tree is STRUCTURAL EVIDENCE ONLY and R1 af_clean_s42 remains the clean free tree of record. The C3 depth-1 chip is read with this bracket."
+    },
+    {
+      "date": "2026-09-18",
+      "by": "operator disclosure (outcome section L6389-L6391, L6400-L6402; checker (8))",
+      "text": "'readout exit 1' in the chain log is a shell artefact of anchor_free_redraw.sh L164 (fixed 17a4434 after the run, nothing re-run); R1's site null was interrupted on 09-17 (0-byte output) and restarted from zero unattended at 03:32: a complete 300-rep null, not a partial one."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "CORRECTIONS_2026-09-23 (registrar)",
+      "text": "[CORRECTED 2026-09-23 by the registrar (line pointer only, zero calls; no number, no criterion and no sentence moves): registration.program_lines names docs/judge_v2_program.md L4629, and that was exact when it was written. After commit cd83eac inserted four one-line correction brackets mid-file (hunks @@ -3911,0 / -6535,0 / -6692,0 / -6949,0 @@), the heading of record \"## Registered 2026-09-17 (before running) — ANCHOR-FREE-REDRAW: does the anchor-free tree's certified trunk survive a re-draw of the sample, ...\" stands at L4630, +1; the whole span shifts by the same +1. Verified at HEAD by sed -n '4630p' docs/judge_v2_program.md. The map for every such pointer is the programme's \"## Line-shift map, appended 2026-09-23\" section: +0 up to old L3911, +1 to L6535, +2 to L6692, +3 to L6949, +4 below. The recorded span is left standing beside this bracket, not rewritten.]"
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on CONTENT-DISJOINT-SPLIT-AUDIT (review 1df2cf1; insertion only, zero calls)",
+      "text": "af_clean_s42 is CONTENT-CLOSED under stem_key (build.out '[SPLIT-CLOSURE] 171'): its 'clean split' is earned at norm-v1 (near-duplicates below norm-v1 not measured)."
+    }
+  ],
+  "does_not_show": [
+    "a board on any free cell (structural evidence only)",
+    "a routing gain on the union",
+    "a tree-robust cell set",
+    "whether R1's k = 2 at n00000004 would certify under a different k-selection or bar rule (none registered at the time; answered by K-SELECTION 2026-09-19)",
+    "a like-for-like purity comparison of R1 with the record (R1 vs record confounds re-draw with contamination removal)",
+    "anything about the 512 slice or the mcs / z levers (ANCHOR-FREE-CERT, closed)",
+    "a sixth arm"
+  ],
+  "ledger": {
+    "row_id": "ANCHOR-FREE-REDRAW",
+    "version": "v118 (row added v114; observed cell bracketed at v118 by K-SELECTION)"
+  },
+  "depends_on": [
+    "ANCHOR-FREE",
+    "ANCHOR-FREE-CERT",
+    "ANCHOR-FREE-FULL",
+    "ANCHOR-FREE-MCS",
+    "ANCHOR-FREE-Z",
+    "H9-REM-FLAG",
+    "SPLIT-RATIO-SEEDS",
+    "EPOCH-NULL",
+    "PROFILE-TREE-ROBUST"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L4627-L4781 (registration d61f2cf): question, closed-lines check, hygiene, arms, instrument (a)-(e), criteria C1-C6, predictions per arm and sweep, falsifiers F1-F4, cost, registrar's notes",
+    "docs/judge_v2_program.md L6388-L6514 (outcome section, 3dd0900; K-SELECTION brackets L6422 / L6440 / L6471 at 023ed7d): every number, criteria and predictions scored, falsifiers, F4's consequence, defects (1)-(8), does-not-show, the sentence of record",
+    "docs/reviews/2026-09-18_night_batch.md section ANCHOR-FREE-REDRAW (17a4434; file last at 074eb3d): CONFIRMED status, the three matching readings, the stable set, the shell artefact",
+    "docs/reviews/2026-09-19_k_selection_post.md (a949a35): the REDRAW C3 bracket text",
+    "experiment_results/anchorfree/redraw/anchor_free_redraw_outcome.txt (17a4434) and the per-arm readouts and site nulls",
+    "docs/test_ledger.html row ANCHOR-FREE-REDRAW (v114; observed cell bracketed v118): chips verbatim, evidence (d61f2cf, 190cb48, 17a4434, 3dd0900)",
+    "script sha16 = sha256 of tools/analysis/anchor_free_redraw.py at 190cb48, first 16 hex (identity, computed by the registrar 2026-09-20; the file was later edited at a616826)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' lines to grep -n regardless of line drift; line numbers re-lined 2026-09-22 as of programme HEAD 6aa2a0d (shift +2 from the batch-1 reading)"
+  ],
+  "last_update": "2026-09-23",
+  "plain_description": {
+    "sq": "SQ5 Invariance",
+    "what": "Rebuilds the tree discovered from embeddings alone, with no declared categories, five times: on a clean question split, with a new random sample (two draws), and with a different construction order. A tree built with declared categories on the clean split serves as a control. For each build it checks which branch points are statistically certified. No judge calls.",
+    "why": "All earlier anchor-free claims came from a single draw (seed 42, on a contaminated split). This test checks whether the 'certified trunk', and the claim that anchors cost certification, belong to the method or to that one seed.",
+    "information": "If the trunk comes back on every draw, the tree's top structure is a property of the method. If it does not, it was luck of the sample. Result: done. The tree exists on all 5 draws and has the same first split. The root and the 'discursive' first-level branch are certified on every draw. The 'quantitative' branch is certified on 3 of 4 draws. Only about 7-8 of the 16 original certified branch points come back on a new sample. On the clean split the anchored control certifies 11 of 60 against 14 of 69, so the earlier claim that 'anchors cost certification' was withdrawn as a headline. This is structural evidence only.",
+    "written": "2026-10-07"
+  }
+}

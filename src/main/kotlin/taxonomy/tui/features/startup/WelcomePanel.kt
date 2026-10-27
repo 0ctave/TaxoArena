@@ -1,0 +1,75 @@
+package taxonomy.tui.features.startup
+
+import androidx.compose.runtime.Composable
+import com.jakewharton.mosaic.ui.Color.Companion.Cyan
+import com.jakewharton.mosaic.ui.Color.Companion.Green
+import com.jakewharton.mosaic.ui.Color.Companion.White
+import com.jakewharton.mosaic.ui.Color.Companion.Yellow
+import com.jakewharton.mosaic.text.SpanStyle
+import com.jakewharton.mosaic.text.buildAnnotatedString
+import com.jakewharton.mosaic.text.withStyle
+import com.jakewharton.mosaic.ui.Column
+import com.jakewharton.mosaic.ui.Spacer
+import com.jakewharton.mosaic.ui.Text
+import com.jakewharton.mosaic.ui.TextStyle.Companion.Bold
+import com.jakewharton.mosaic.ui.TextStyle.Companion.Unspecified
+import taxonomy.service.DagSnapshot
+import taxonomy.tui.components.Panel
+import taxonomy.tui.components.take
+
+@Composable
+fun WelcomePanel(
+    width: Int,
+    height: Int,
+    selectedWelcomeIdx: Int,
+    snapshots: List<DagSnapshot>,
+) {
+    val wLimit = (width - 4).coerceAtLeast(1)
+    Panel("LOAD DAG", Cyan, width, height) {
+        Column {
+            Text("  ╔══ TAXO ARENA ══╗".take(wLimit), color = Cyan, textStyle = Bold)
+            Text("  ║  DAG · ARENA   ║".take(wLimit), color = Cyan, textStyle = Bold)
+            Text("  ╚════════════════╝".take(wLimit), color = Cyan, textStyle = Bold)
+            Spacer()
+
+            Text("Select a saved snapshot or start a new generation.".take(wLimit), color = White)
+            Spacer()
+
+            val selectedNew = selectedWelcomeIdx == 0
+            Text(
+                buildAnnotatedString {
+                    append(if (selectedNew) "> " else "  ")
+                    withStyle(SpanStyle(color = Green, textStyle = Bold)) { append("● ") }
+                    withStyle(
+                        SpanStyle(
+                            color = if (selectedNew) Cyan else White,
+                            textStyle = if (selectedNew) Bold else Unspecified
+                        )
+                    ) { append("Generate new DAG") }
+                }.take(wLimit)
+            )
+
+            Spacer()
+            Text("Snapshots".take(wLimit), color = Yellow, textStyle = Bold)
+
+            snapshots.forEachIndexed { idx, snap ->
+                val selected = selectedWelcomeIdx == idx + 1
+                Text(
+                    buildAnnotatedString {
+                        append(if (selected) "> " else "  ")
+                        withStyle(
+                            SpanStyle(
+                                color = if (selected) Cyan else White,
+                                textStyle = if (selected) Bold else Unspecified
+                            )
+                        ) { append(snap.description) }
+                        // Timestamp + node count rendered as muted (White, no Bold) metadata.
+                        withStyle(SpanStyle(color = White)) {
+                            append("  (${snap.timestamp} · ${snap.metrics.totalNodes} nodes)")
+                        }
+                    }.take(wLimit)
+                )
+            }
+        }
+    }
+}

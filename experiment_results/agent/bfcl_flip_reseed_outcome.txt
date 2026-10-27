@@ -1,0 +1,58 @@
+=== BFCL-FLIP-RESEED: do the BFCL pilot's 100 order-flip ties reproduce on a second posting? ===
+  registration docs/judge_v2_program.md L12048-L12314 (heading L12049), commit ca3a7cc (registered 2026-09-23, before any code or call); record docs/agents/results/BFCL-FLIP-RESEED.json
+  pool p2035adddedd1becb | judge grok-4-1-fast-non-reasoning on azure | cap 8192 | temperature OMITTED | seed 137 (provenance label + bootstrap + posting order; NOT a judge seed) | protocol: BFCL-FLIP-RESEED: a SECOND POSTING of the frozen BFCL-JUDGED-PILOT instrument on the 100 dual-order-TIE matches of its deciding subset, both orders, byte-identical payloads (gated), new session; parent protocol: BFCL-JUDGED-PILOT: prompt_v2 verify-first system template + corpus-level SYSTEM_BFCL / RUBRIC_BFCL slots + SCHEMA_INSTRUCTION; reference = the PER-TASK EXPECTED OUTCOME (the corpus's ground-truth call sequence, possible_answer), rendered once per task, identical for both sides, attached to the task statement and OUTSIDE the artefact cap, carrying no per-side verdict (ruling BFCL-REF-ORACLE, programme L11001, commit 6ccf2f7); artefact per side = decoded call sequence + final state_info capped at 2500 estimated tokens (chars/4) with the final state always retained; dual order, TIE on flip, no third call; INVALID if an order is unparsed or finish_reason is length or content_filter
+  cache experiment_results\agent\bfcl_flip_reseed.db (mode=ro) | run_meta script_sha256_16 d4e08a891a85b4cd (LF) | this script LF d4e08a891a85b4cd / working-tree 430e14da1ecca2c2 | parent LF 5e9db53b894eeccb | started 2026-09-23 19:14:27 | resumed ["2026-09-23 19:15:42"]
+  pass-1 partition of the 100 (fwd vote, rev vote): {('Model A', 'Model A'): 57, ('Model A', 'TIE'): 14, ('TIE', 'Model A'): 24, ('TIE', 'TIE'): 3, ('Model B', 'TIE'): 2} | registered {('Model A', 'Model A'): 57, ('Model B', 'Model B'): 0, ('TIE', 'Model A'): 24, ('Model A', 'TIE'): 14, ('TIE', 'TIE'): 3, ('Model B', 'TIE'): 2}
+  pass-2 partition of the 100: {('Model A', 'Model A'): 42, ('Model A', 'TIE'): 8, ('Model A', 'Model B'): 9, ('Model B', 'Model A'): 22, ('TIE', 'Model A'): 10, ('Model B', 'Model B'): 1, ('TIE', 'TIE'): 7, ('TIE', 'Model B'): 1}
+
+=== C1 THE REPRODUCTION RATE R (primary; ONE deciding statistic: the task-clustered interval) ===
+  R = 69 / 100 = 0.6900 (LITERAL denominator the 100; an unusable pass-2 match is not a TIE; 35 task clusters) | interval of record point +- 1.96 x clustered SE 0.0498 = [0.5924, 0.7876] | percentile [0.5882, 0.7778] (B = 2000, seed 137) | Wilson [0.5937, 0.7722]
+  USABLE-ONLY ESTIMATE beside the literal one (printed, DECIDES NOTHING; the literal R decides, confirmed reading D4(a)): R_usable = 69 / 100 = 0.6900 (35 task clusters) | interval point +- 1.96 x clustered SE 0.0498 = [0.5924, 0.7876] | percentile [0.5882, 0.7778] | Wilson [0.5937, 0.7722] | literal 0.6900 - usable-only 0.6900 = +0.0000 is what unusable rows contribute | pending 0 | the usable-only interval reads HELD-side (wholly above 0.566), the same as the literal one
+  anchors: STABLE 0.913 (1 - CANARY-BASELINE pass 2's 0.087) | NOISE 0.2183 (the corpus's marginal tie rate) | BAR 0.566
+  SUPPORT AS MEASURED (beside the deciding statistic): 100 matches over 35 task clusters (cluster sizes size:count 1:12/2:9/3:2/4:4/5:2/6:5/8:1, Kish mean 4.24) | MEASURED DEFF 1.160 (clustered bootstrap variance / binomial variance, the pilot's 3.60 definition) | n_eff 86.2 | MDE at 80% power, alpha .05 two-sided: +-0.151 at R = 0.5 (the registration's planning form) and +-0.139 at the measured SE
+    planning values of record (registration SUPPORT AND MDE): DEFF 3.60 -> n_eff 27.8, MDE +-0.265; pessimistic DEFF 5.0 -> n_eff 20.0, MDE +-0.313; anchors 0.695 apart
+  C1: HELD - the flips REPRODUCE: the clustered interval [0.5924, 0.7876] lies wholly above 0.566; the 0.2183 is a stable per-match property, not boundary noise
+  point estimate 0.6900 is printed and DECIDES NOTHING.
+  C1 is a TWO-HYPOTHESIS DISCRIMINATION at a pre-set bar (0.913 stable vs 0.2183 noise, bar 0.566); it licenses no statement of the form 'the flips reproduce at X%' with a tight interval.
+  STATED ASSUMPTION (registration, WHAT THIS RUN WILL NOT SHOW (1)): the 'different 100' leg is answered only INDIRECTLY, through the noise anchor 0.2183, and that inference rests on the corpus's marginal tie rate being itself stable across sessions - which this run cannot check.
+  STATED DEPENDENCY (registration bracket): POSITION-INDEX-ALL, if it has landed, is quoted in the outcome section as CONTEXT and is NEVER folded into R, into C1's bar or into any interval here.
+
+=== FALSIFIER ===
+  falsifier does not fire (C1 HELD). C1 HELD overturns nothing: it establishes that the flips are reproducible and NOT that position bias (rather than template mis-fit) causes them - a stable effect is consistent with BOTH; separating them is BFCL-FINAL-STATE-SWAP's job. The record gains ONE sentence and BFCL-JUDGED-PILOT's does_not_show item on reproducibility is amended by insertion; no fidelity number.
+
+=== C2 THE POSITION SIGNATURE (descriptive, no bar) ===
+  (a) the (Model A, Model A) subclass again (Model A, Model A) in pass 2 = 32 / 57 = 0.5614 (denominator the 57 pass-1 (Model A, Model A) matches; 25 task clusters) | interval of record point +- 1.96 x clustered SE 0.0833 = [0.3982, 0.7246] | percentile [0.3898, 0.7143] (B = 2000, seed 137) | Wilson [0.4328, 0.6823]
+  (b) the (Model A, Model A) subclass a dual-order TIE again by any route = 40 / 57 = 0.7018 (denominator the 57; 25 task clusters) | interval of record point +- 1.96 x clustered SE 0.0676 = [0.5692, 0.8343] | percentile [0.5660, 0.8214] (B = 2000, seed 137) | Wilson [0.5734, 0.8047]
+  (c) pass-2 first-position rate = 133 / 167 = 0.7964 (denominator the pass-2 NON-TIE votes of the 200 cells; 35 task clusters) | interval of record point +- 1.96 x clustered SE 0.0305 = [0.7366, 0.8562] | percentile [0.7358, 0.8521] (B = 2000, seed 137) | Wilson [0.7290, 0.8505] | beside the pilot's MARGINAL 0.5862 of 870 non-tie votes (z = 5.09; recomputed from the pilot cache 510 / 870 = 0.5862) - NOTE OF RECORD: on this SELECTED subset the pass-1 value is 1.0 for 57 of the 100 BY CONSTRUCTION, so (c) is a REGRESSION readout and never a replication of z = 5.09
+  (d) pass-1 ('TIE', 'TIE') subclass: 3 match(es), counted separately; pass-2 dual-order outcomes {'TIE': 3}
+  (d) pass-1 ('Model B', 'TIE') subclass: 2 match(es), counted separately; pass-2 dual-order outcomes {'COMMITTED': 1, 'TIE': 1}
+  C2: HELD ((a)-(d) computed and printed with their denominators and intervals; NO BAR on any of them: at n = 57 and DEFF ~3.6, n_eff ~16 and the MDE ~+-0.35)
+
+=== C3 THE PAIRED PER-ORDER STATISTIC (no bar) ===
+  exact two-sided McNemar on the 200 (mid, arm) cells, outcome 'named the FIRST-SHOWN side' (pass 1 -> pass 2): b (first-shown in pass 1, not in pass 2) = 32, c (not -> first-shown) = 13, exact p = 0.006609; pass-2 cells unusable or missing counted as not first-shown: 0 | selected set, direction not verdict
+  C3: HELD (b, c and the exact p computed and printed on the 200-cell denominator; selected set, direction not verdict)
+
+=== C4 INSTRUMENT COUNTS AND THE BYTE-IDENTITY GATE ===
+[BYTE-GATE] (A) SCHEDULE-WIDE PAYLOAD ANCHOR over all 1,216 assembled payloads plus the system prompt (608 schedule rows, the self-preference stratum's payload BYTES INCLUDED - hashed only, none of its data read, none posted), recomputed through the parent module: 951ec3a0a063b5a8 vs of record 951ec3a0a063b5a8 -> MATCH
+[BYTE-GATE] (B) (mid, arm) cells whose own-assembly sha16 equals the PARENT MODULE'S RE-ASSEMBLY of the same cell (the pilot cache stores no per-cell hash; tied to pass 1 only through (A)): 200 of 200
+[BYTE-GATE] (C) system prompt byte-identical to the parent's system_prompt(): True | its OWN sha16 058faa54f0697ad9 vs of record 058faa54f0697ad9 -> MATCH
+[BYTE-GATE] (D) SYSTEM_BFCL / RUBRIC_BFCL equal to the pilot run_meta's pinned values: True | (E) schedule hash bcf9d1654e68e4ca re-derived, 608 cached rows reproduce with 0 differences: True
+[BYTE-GATE] assert_no_per_side_verdict executed on 200 of 200 re-assembled payloads (one per cell) -> PASS (every gate)
+  (b) unusable rows (content_filter + length + unparsed) 0 of 200 posted calls (0.0000)
+  (c) finish_reason {'stop': 200} | provider fingerprint {'azure:grok-4-1-fast-non-reasoning': 200} (expected azure:grok-4-1-fast-non-reasoning)
+  (d) max completion tokens 435 of the 8192 cap
+  (e) truncated sides 0 of 200, state-over-cap sides 0 (expected 0 by inheritance)
+  (f) measured DEFF for R 1.160, n_eff 86.2 (beside every C1 interval above)
+  (g) [NIGHT] cumulative grok calls tonight 4060 of 14000 (plan Amendment 9 hard ceiling; count of record experiment_results\night_calls_2026-09-23.json) | this launch (--analyze (0 calls)) would post at most 0 -> 4060 | source: experiment_results\night_calls_2026-09-23.json (9 launch rows); this test's own cache holds 200 posted rows
+  C4: HELD ((a)-(g) printed)
+
+=== PREDICTIONS (registered before any code; scored explicitly) ===
+  P1 R in [0.75, 0.95] (point 0.88): 0.6900 -> FAILED
+  P2 C2(a) in [0.60, 0.90] (point 0.75): 0.5614 of 57 -> FAILED
+  P3 pass-2 convention-B agreement with the checker on the matches that commit in pass 2, in [0.55, 0.90] (point 0.72; DESCRIPTIVE): 25 / 31 = 0.8065 (convention A beside: 25 / 100) -> HELD
+  P4 unusable rows <= 1% of the posted calls: 0 of 200 = 0.0000 -> HELD
+  P5 the byte-identity gate passes 200 of 200 (as read under the D1 ruling: the schedule-wide payload anchor equals 951ec3a0a063b5a8 and the system prompt is byte-identical to the parent's with its own sha16 058faa54f0697ad9): 200 of 200 cells, anchor 951ec3a0a063b5a8, system prompt byte-identical True, own sha16 058faa54f0697ad9 -> HELD
+  P6 measured task-clustered DEFF for R in [2.5, 6.0] (point 3.8): 1.160 -> FAILED
+
+=== WHAT THIS RUN DOES NOT SHOW (registered) ===
+  (1) no 'different 100' is observed (no decisive-in-pass-1 match is re-posted); (2) nothing about WHY a flip happens (position bias, template mis-fit and corpus difficulty all predict reproduction); (3) no fidelity, no rung, no ladder, no 0.75 bar, no 'for Agents' bridge; (4) no profile cell, agent ranking, per-trajectory or process claim (57 EVAL tasks against the 120-question support rule); (5) not a calibration of the judge.

@@ -1,0 +1,143 @@
+{
+  "id": "RK-1b",
+  "title": "RK-1b: does a DATA-ONLY leaf card (answer form, distractor spacing, numeric error signature, <= 6 conceptual misconception pairs from train-side attractors; zero induction calls) help STACK-v2? (~8k calls)",
+  "question": "R3's 1,980 matches, Mistral, both arms fresh and interleaved; pairs matching a judged correct option dropped at build; 5-gram leakage audit at judge time; PRIMARY +1pp on key-decidable at paired McNemar p < 0.05; SECONDARY quantitative > discursive; prediction +0 to +2pp.",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "98c580f",
+    "program_lines": "docs/judge_v2_program.md L347-L366 (outcome bullet; the registration lives in docs/rubric_v2_design.md, RK-1b section, 98c580f)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "- **RK-1b (2026-09-10 14:30): PRIMARY PASS, SECONDARY PASS.** STACK-v2 + data-only leaf card 0.875 vs STACK-v2",
+    "outcome_heading": [
+      "L347: the same bullet"
+    ],
+    "date": "2026-09-10"
+  },
+  "script": {
+    "path": "tools/analysis/rubric_kit2.py",
+    "sha16": "f807132e060363f6 at 98c580f; d25ee9f42727ce64 (at 3f15e10)",
+    "commit": "3f15e10"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (~8k calls, both arms fresh); 3,948 matches, i.e. UNDER the rule, whose denominator is matches and whose \"~8k calls\" is the two-calls-per-match conversion, not a second threshold; no go was owed (registrar 2026-09-23; corrects INCONSISTENCIES 8eeddaf item 9).",
+  "run": {
+    "outcome_file": "docs/judge_v2_program.md L347-L366 and docs/rubric_v2_design.md (the record; no rk1b_outcome.txt on disk; rk1b_judge.log untracked)",
+    "outcome_commit": "3f15e10",
+    "calls": "~8k (3,948 judged, 0 errors)",
+    "cce": "not stated",
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-10",
+    "other_files": [
+      "experiment_results/x12_crossdomain/rubric_kit_rk1b_cards.db",
+      "experiment_results/x12_crossdomain/rk1b_judge.log (untracked)"
+    ]
+  },
+  "review": {
+    "file": "the REVIEW of 2026-09-14 (restated in RK-1b-GROK's observed cell): conditional on committing the card is worth +0.25pp; ~1.4 of the 1.7 points is the tie-rate drop 6.4 -> 4.8%; Holm-adjusted p across the twelve-test rubric family = 0.35; the PASS-FAIL split vs RK-1 is a control draw (three controls 0.8676 / 0.8581 / 0.8591 vs 0.8750), honest estimate +1.34pp; AGGREGATE's tie-break is the substitute to ship",
+    "commit": "ba12200",
+    "verdict": "PASS (+1.7pp, p = 0.029) as registered; RESTATED 2026-09-14 as an abstention effect, not discrimination"
+  },
+  "criteria": [
+    {
+      "id": "PRIMARY",
+      "text": "+1pp on key-decidable at p < 0.05",
+      "result": "HELD",
+      "value": "944 decidable: datacard 0.875 vs STACK-v2 0.858 (32:16, p = 0.029); leakage audit CLEAN",
+      "denominator": "944 key-decidable R3 pairs"
+    },
+    {
+      "id": "SECONDARY",
+      "text": "quantitative > discursive",
+      "result": "HELD",
+      "value": "quantitative +3.0 (18:5, p = 0.011) vs discursive +0.6 (n.s.); top cluster 0.695 vs 0.692; Business +9.1, Chemistry +6.0; Economics -6.2 (0:4)",
+      "denominator": "944"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "+0 to +2pp",
+      "result": "HELD",
+      "value": "+1.7pp",
+      "denominator": "944"
+    }
+  ],
+  "falsifier": {
+    "text": "none beyond the criteria",
+    "fired": false,
+    "note": "first rubric-side gain on the stack that clears its bar, with zero induction calls; restated 2026-09-14 as ~86% abstention reduction; the ARENA-V3 rerun on it was withdrawn for ARENA-V3-COMPILED"
+  },
+  "numbers_of_record": {
+    "accuracy": "0.875 vs 0.858 (32:16, p = 0.029)",
+    "secondary": "quantitative +3.0 (18:5, p = 0.011) vs discursive +0.6",
+    "restated_2026-09-14": "conditional on committing +0.25pp; ties 6.4 -> 4.8% carry ~1.4 of 1.7 points; Holm p = 0.35; honest estimate +1.34pp"
+  },
+  "sentence_of_record": "RK-1b (2026-09-10, ~8k calls): PASS: 3,948 judged, 0 errors, leakage audit CLEAN; 944 decidable: datacard 0.875 vs STACK-v2 0.858 (32:16, p = 0.029); quantitative +3.0 (18:5, p = 0.011) vs discursive +0.6 (n.s.), secondary PASS; the first rubric-side gain on the stack that clears its bar, with zero induction calls. [RESTATED 2026-09-14: conditional on the judge committing the card is worth +0.25pp; the tie-rate drop carries ~1.4 of the 1.7 points, so it reduces abstention rather than improving discrimination; Holm-adjusted p = 0.35; the PASS-FAIL split against RK-1 is a control draw, honest estimate +1.34pp; AGGREGATE's tie-break is the substitute to ship.]",
+  "chips": [
+    "PASS (+1.7pp, p=0.029)"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-14",
+      "by": "the ledger audit / REVIEW (the [RESTATED 2026-09-14] insertion in RK-1b-GROK's observed cell, which covers RK-1b)",
+      "text": "conditional on the judge COMMITTING the card is worth +0.25pp (Mistral); the tie-rate drop 6.4 -> 4.8% carries ~1.4 of the 1.7 points, so it reduces ABSTENTION rather than improving discrimination; Holm-adjusted p across the twelve-test rubric family = 0.35; the RK-1 / RK-1b PASS-FAIL split is a control draw (three byte-identical controls at 0.8676 / 0.8581 / 0.8591 against one treatment at 0.8750), honest estimate +1.34pp; AGGREGATE's replicate tie-break addresses the same mechanism at +8.0pp, so the two are SUBSTITUTES and the tie-break is the one to ship."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "INCONSISTENCIES-PASS (registrar, zero calls; insertion only)",
+      "text": "NO-FILE 2026-09-23 by INCONSISTENCIES-PASS (registrar, zero calls; insertion only): rk1b_judge.log is on disk at experiment_results/x12_crossdomain/ but gitignored (*.log) and untracked, and no rk1b_outcome.txt exists; the readout of record is the programme bullet '- **RK-1b (2026-09-10 14:30): PRIMARY PASS, SECONDARY PASS.**' with docs/rubric_v2_design.md (the registration). [ledger: evidence cell of row RK-1b, v132]"
+    },
+    {
+      "date": "2026-09-23",
+      "by": "INCONSISTENCIES-PASS (registrar, zero calls; insertion only)",
+      "text": "POINTER 2026-09-23 by INCONSISTENCIES-PASS (registrar, zero calls; insertion only): the ledger audit's [RESTATED 2026-09-14] insertion that qualifies THIS row's +1.7pp sits in RK-1b-GROK's observed cell: conditional on the judge committing, the card is worth +0.25pp (Mistral); the tie-rate drop 6.4→4.8% carries ~1.4 of the 1.7 points (abstention, not discrimination); Holm-adjusted p across the twelve-test rubric family = 0.35; the RK-1/RK-1b PASS-FAIL split is a control draw (three byte-identical controls at 0.8676 / 0.8581 / 0.8591 against one treatment at 0.8750), honest estimate +1.34pp. Read it as this row's qualification; it is not repeated in full here. [ledger: observed cell of row RK-1b, v132]"
+    },
+    {
+      "date": "2026-09-23",
+      "by": "INCONSISTENCIES-PASS (registrar, zero calls; insertion only)",
+      "text": "PIN 2026-09-23 by INCONSISTENCIES-PASS (registrar, zero calls; insertion only): NO POOL PIN AT RUN TIME. The pool-pin audit of 2026-09-14 (programme, the paragraph ending 'THREE HAD NO PIN AT ALL - j6_rubrics.py, rubric_kit.py and rubric_kit2.py') found rubric_kit2.py calling no pool guard when this ran; pool_guard.assert_pool_of_record() was added after the run. The run's pool is the pool of record p2dca21ab5f4ef3ae BY THE FROZEN SPLIT, NOT BY A CHECK. The after-the-fact check (the cache's question ids against experiment_configs/reserved_pool_frozen_p2dca.json, read-only) is OPEN and was not done in this pass. [ledger: observed cell of row RK-1b, v132]"
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a discrimination gain (the gain is mostly abstention reduction)",
+    "a family-wise significant rubric effect (Holm p = 0.35)"
+  ],
+  "ledger": {
+    "row_id": "RK-1b",
+    "version": "v33 (1b9312f); the 2026-09-14 restatement sits in the RK-1b-GROK row, not this one [v132 2026-09-23: INCONSISTENCIES-PASS insertion in this row]; [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "STACK-v2",
+    "RK-1",
+    "RK-1b-GROK",
+    "RK-1c",
+    "AGGREGATE",
+    "ARENA-V3"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L347-L366 (98c580f / 3f15e10)",
+    "docs/rubric_v2_design.md (RK-1b design and result)",
+    "docs/test_ledger.html row RK-1b (v33): chips verbatim, observed cell, evidence",
+    "docs/test_ledger.html row RK-1b-GROK: the [RESTATED 2026-09-14] insertion",
+    "script sha16 = sha256 of tools/analysis/rubric_kit2.py at 98c580f and 3f15e10, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Adds a 'data card' for each leaf, built only from data (answer format, distractor spacing, numeric error patterns, common misconceptions), to the judge prompt. It is compared with the plain production judge on 1,980 matches. About 8k calls.",
+    "why": "It checks whether cell-specific context built from the tree makes the judge more accurate at no extra induction cost.",
+    "information": "A gain would show the tree's cells can improve judging itself. Result: done, passed as registered: +1.7 points on decidable matches (0.875 vs 0.858), larger on quantitative cells. Later restated: most of the gain comes from the judge abstaining (saying 'tie') less often, not from better discrimination. After correcting for the twelve rubric tests it is not significant (adjusted p 0.35), and the honest estimate is about +1.3 points. A tie-break method replaces it. Older p2dca question family, later ruled 'history, not evidence'.",
+    "written": "2026-10-07"
+  }
+}

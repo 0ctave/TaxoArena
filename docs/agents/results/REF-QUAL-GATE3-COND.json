@@ -1,0 +1,148 @@
+{
+  "id": "REF-QUAL-GATE3-COND",
+  "title": "REF-QUAL-GATE3-COND: FRAMEWORK item 12: does the correctness-conditional form of REF-QUAL gate (3) decouple 'agrees because right' from 'agrees because correlated'? (zero calls; the readout REF-QUAL-KIMI-JSON named)",
+  "question": "Decompose gemini's +0.071 agreement gain under the Kimi reference (523 terminated Kimi answers, n = 520) into a both-right share change and a both-wrong term; compare the GAIN on the both-wrong stratum against the frontier-3 / roster-11 spread (PRIMARY common stratum; LITERAL per-reference strata); sensitivity on the level and on all 552 answers with truncations scored wrong.",
+  "kind": "zero-call",
+  "state": "UNDETERMINED",
+  "registration": {
+    "commit": "eaf1dbf",
+    "program_lines": "docs/judge_v2_program.md L3603-L3611 (by reference; docs/design/FRAMEWORK.md L365 item 12); the Block 1 record bullet at L3787",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-15 (before any run) — BY REFERENCE: the 26 tests in docs/design/FRAMEWORK.md \"Tests to register before shipping\" (commit 8d77f7b), with the criteria, predictions and call counts stated there, scheduled in docs/plan_2026-09-15.md",
+    "outcome_heading": [
+      "L3662: ## Block 1 record (2026-09-15/16, zero calls) — FRAMEWORK items 1-12, 14-16: fourteen zero-call tests built, each adversarially checked; verdicts of record below (checker's number wins where it refutes the builder)",
+      "L3787: - **REF-QUAL-GATE3-COND (2026-09-15, zero calls): UNDETERMINED at support on every reading; the point-check label is reading-dependent; the correctness-conditional gate (3) is as accuracy-coupled as the marginal one and does not decouple \"agrees because right\" from \"agrees because correlated\".**"
+    ],
+    "date": "2026-09-15"
+  },
+  "script": {
+    "path": "tools/analysis/refqual_gate3_cond.py",
+    "sha16": "bb676212caddf816",
+    "commit": "7076615"
+  },
+  "ready": null,
+  "go": "n/a (0 calls; Block 1)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/refqual_gate3_cond.txt",
+    "outcome_commit": "7076615",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (pool_guard.assert_pool_of_record() first; union pool paeec37aa28063c75 by explicit id where used)",
+    "date": "2026-09-15/16"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); each Block 1 test was 'adversarially checked' at build time and the checker's number wins where it refutes the builder (Block 1 record header L3662-L3663); the checker-confirmed defects are listed in the bullet",
+    "commit": "7076615",
+    "verdict": ""
+  },
+  "criteria": [
+    {
+      "id": "readout",
+      "text": "decomposition of gemini's +0.071 on the 523 terminated Kimi answers",
+      "result": "DELIVERED",
+      "value": "+0.063 both-right share change (0.712 -> 0.775, 89%) + +0.008 both-wrong term; per-reference a_bw(Kimi) / a_bw(grok): gemini 0.811 / 0.736 (53/53), arx 0.750 / 0.701, iask 0.651 / 0.641, gpt-4o 0.686 / 0.602; common stratum gemini 36/44 vs 33/44 (b = 4, c = 1, p 0.375), arx 39/52 vs 37/52, iask 35/53 vs 33/53, gpt-4o 41/60 vs 41/60",
+      "denominator": "523 terminated Kimi answers, n = 520 paired"
+    },
+    {
+      "id": "P-primary",
+      "text": "PRIMARY: GAIN on the common both-wrong stratum inside the frontier-3 spread",
+      "result": "UNDETERMINED",
+      "value": "+0.068 vs [0.000, +0.038]: OUTSIDE by +0.030; bootstrap 95% [-0.025, +0.171]; re-fails in 59% of resamples; vs roster-11 [-0.061, +0.038] OUTSIDE",
+      "denominator": "44 common both-wrong questions"
+    },
+    {
+      "id": "P-literal",
+      "text": "LITERAL: GAIN on per-reference both-wrong strata vs frontier-3",
+      "result": "UNDETERMINED",
+      "value": "+0.075 vs [+0.010, +0.084]: INSIDE by 0.008 (the upper edge is gpt-4o's single per-reference gain on 70 vs 93 q); bootstrap [-0.036, +0.191]; re-holds in 53%",
+      "denominator": "per-reference both-wrong strata"
+    },
+    {
+      "id": "sens-level",
+      "text": "sensitivity: LEVEL a_bw(gemini, Kimi) vs incumbents",
+      "result": "UNDETERMINED",
+      "value": "0.811 vs frontier-3 [0.651, 0.750] and roster-11 [0.179, 0.750]: OUTSIDE; vs incumbent REFERENCE caches on 442 common q: 0.778 vs [0.460, 0.682], OUTSIDE",
+      "denominator": "53 / 442 q"
+    },
+    {
+      "id": "sens-552",
+      "text": "sensitivity: all 552 answers, truncations scored wrong",
+      "result": "n/a",
+      "value": "gemini marginal +0.051; all six cells outside; builder FAIL, checker: unscored (degenerate reading by the builder's own account)",
+      "denominator": "552 answers"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "gemini's +0.071 marginal gain falls inside the incumbents' spread on the both-wrong stratum",
+      "result": "UNDETERMINED",
+      "value": "FAILS at the point on the common-stratum reading, HOLDS at the point on the per-reference reading, UNDETERMINED at support on every reading (every interval contains zero; 4-vs-1 discordant questions)",
+      "denominator": "44 common both-wrong q"
+    }
+  ],
+  "falsifier": {
+    "text": "none beyond the readout (registered by reference)",
+    "fired": false,
+    "note": "the record's (c) decoupling is NOT delivered by the conditional form: a_bw(gemini, ref) rises monotonically with reference accuracy across all five incumbent caches (grok 0.460 at acc 0.505; mistral 0.553; grok-reasoning variants 0.674-0.682; Kimi 0.778 at 0.807); on gemini's 44 common both-wrong questions Kimi and grok pick the same wrong option on 38 with gemini joining on 32: the stratum measures three-way convergence on non-key options; FRAMEWORK's plan to run gate (3) 'in its correctness-conditional form' should not proceed on this readout"
+  },
+  "numbers_of_record": {
+    "decomposition": "+0.071 = +0.063 both-right share change (0.712 -> 0.775) + +0.008 both-wrong term",
+    "common_stratum_gain": "+0.068 vs frontier-3 [0.000, +0.038]; bootstrap [-0.025, +0.171]; re-fails 59%",
+    "per_reference_gain": "+0.075 vs [+0.010, +0.084]; bootstrap [-0.036, +0.191]; re-holds 53%",
+    "level": "a_bw(gemini, Kimi) 0.811 vs frontier-3 [0.651, 0.750]; vs incumbent reference caches on 442 q 0.778 vs [0.460, 0.682]",
+    "accuracy_coupling": "a_bw(gemini, ref) rises with reference accuracy across all five incumbent caches (0.460 / 0.553 / 0.674-0.682 / 0.778); on 44 common both-wrong q Kimi and grok share the wrong option on 38, gemini joins on 32",
+    "denominator_note": "blank contestant preds (Qwen 109, Yi 97, Llama-2-13b 95, Llama-2-7b 67, c4ai 58, iask 21 of 523) dropped from the paired denominator per the record's gate-(3) code; blank-as-wrong changes no label; option counts 9.42 vs 9.32 (the 'fewer live distractors' mechanism unsupported)"
+  },
+  "sentence_of_record": "REF-QUAL-GATE3-COND (2026-09-15, zero calls): UNDETERMINED at support on every reading; the point-check label is reading-dependent (FAILS on the common both-wrong stratum, +0.068 vs [0.000, +0.038]; HOLDS on the per-reference reading, +0.075 vs [+0.010, +0.084]; every interval contains zero); the correctness-conditional gate (3) is as accuracy-coupled as the marginal one (a_bw(gemini, ref) rises monotonically with reference accuracy across all five incumbent caches) and does not decouple 'agrees because right' from 'agrees because correlated'; the stratum measures three-way convergence on non-key options. FRAMEWORK's plan to run gate (3) in its correctness-conditional form should not proceed on this readout.",
+  "chips": [
+    "UNDETERMINED AT SUPPORT (EVERY READING)",
+    "GATE (3) CONDITIONAL FORM DOES NOT DECOUPLE"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-16",
+      "by": "Block 1 record corrections for LEDGER-CONSISTENCY (programme L3839: FRAMEWORK 'New reference family' bracketed at a75df45)",
+      "text": "gate (3) conditional form does not decouple; the FRAMEWORK plan to run it in that form should not proceed on this readout."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a decoupling of agreement from correctness by conditioning (the conditional stratum is accuracy-coupled too)",
+    "a point verdict at this support (4-vs-1 discordant questions)"
+  ],
+  "ledger": {
+    "row_id": "REF-QUAL-GATE3-COND",
+    "version": "v103 (684be03); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "REF-QUAL-KIMI-JSON",
+    "DECOMP",
+    "CONSENSUS-FIT",
+    "ARENA-13"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L3603-L3611 (by-reference registration eaf1dbf) and docs/design/FRAMEWORK.md L365 item 12: criterion, prediction, call count",
+    "docs/judge_v2_program.md L3787 ff. (Block 1 record bullet, 7076615): the criterion table, predictions scored, checker-confirmed defects, script and output",
+    "experiment_results/x12_crossdomain/refqual_gate3_cond.txt (7076615)",
+    "docs/test_ledger.html row REF-QUAL-GATE3-COND (v103 684be03): chips verbatim, design / criteria / observed cells, evidence",
+    "script sha16 = sha256 of tools/analysis/refqual_gate3_cond.py at 7076615 (its first commit), first 16 hex (identity, computed by the registrar 2026-09-22; later edited at 13f2142 for the pool_guard change)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' heading and the '- **ID (...)**' bullet line inside the Block 1 record, to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "When a judge model agrees more with a better reference answer, the gain was split into two parts: agreeing because both are right, and agreeing because both are wrong in the same way. Only the both-wrong part was compared with the spread across models.",
+    "why": "It asks whether conditioning on correctness can separate 'agrees because right' from 'agrees because the models make correlated errors'.",
+    "information": "Result (no new calls): undetermined. Every interval contains zero, and the verdict depends on the reading. The conditional version is as tied to reference accuracy as the plain one. On the both-wrong questions, the models mostly converge on the same wrong option. The plan to use this conditional gate should not proceed. It is on older judged data now ruled history.",
+    "written": "2026-10-07"
+  }
+}

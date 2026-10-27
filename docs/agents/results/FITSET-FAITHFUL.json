@@ -1,0 +1,175 @@
+{
+ "id": "FITSET-FAITHFUL",
+ "title": "FITSET-FAITHFUL (stage 0 only): with A's (B0 of lane r2) leaves and topology fixed, does re-estimating leaf means on declared-class TRAIN fit sets file EVAL better than A (FF1), and does the per-anchor gain track routed fit-set impurity beyond size (FF2)? (zero calls; REGISTERED 2026-10-03)",
+ "question": "Is depth-2 fit-set purity (DSC's k-means bridge) a lever for the vMF construction's own leaves?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "the commit that writes it (parent 2daeae31)",
+  "program_lines": "docs/judge_v2_program.md L23580-L23614",
+  "program_lines_as_of": "the commit that writes them, parent 2daeae31, re-grepped",
+  "date": "2026-10-03",
+  "heading": "## Registered 2026-10-03 (before any code or call) — FITSET-FAITHFUL (stage 0 only): with B0 of lane r2's leaves and topology held fixed, ...",
+  "provenance": "docs/agents/plans/2026-10-03_checkpoint_D.md (2daeae31) section 2, stage S0 only; the orchestrator's brief under the autonomous-scheduling authorisation; criteria, Support, predictions, falsifier the registrar's"
+ },
+ "script": {
+  "path": "tools/analysis/fitset_faithful.py",
+  "sha16": "blob ed34306... (merged 3945326f from fitset-faithful d4baa036)",
+  "commit": "3945326f"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_fitset_faithful.md",
+  "commit": "3945326f"
+ },
+ "go": "autonomous-scheduling authorisation (cheap, zero calls); --run ALSO waits on the author's scope word (checkpoint D Q4) and the C-PB-1 ruling (Q2); S1 and A replicates NOT registered (the author's) [2026-10-03: GIVEN for stage 0 by THE AUTHOR (\"yes run FITSET-FAITHFUL stage 0\"; checkpoint D Q4 answered, stage 0 only); C-PB-1 resolved (author's WAL checkpoint, (0,0,0); pool_guard p2dca OK); S1 and A replicates still not authorised]",
+ "run": {
+  "outcome_file": "experiment_results/archv2/rp12_r2/fitset_faithful_s0_outcome.txt (sha256 f726c753...; never committed; backup E:/TaxoArena_backup_2026-10-03_fitset_faithful, SHA256SUMS OK)",
+  "outcome_commit": "run from main 3945326f + e50105a6; outcome untracked",
+  "calls": 0,
+  "cce": 0,
+  "pool": "pv2_1575de61bb20e977 (B0-2 check)",
+  "date": "2026-10-03"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_fitset_faithful.md",
+  "commit": "158d81cb",
+  "verdict": "VALID (W-1..W-5)"
+ },
+ "criteria": [
+  {
+   "id": "IDENTITY",
+   "text": "precondition (refuse): P_A 0.8119, P(B_0) 0.7985, P(D_0) 0.8334, P(B-gt_0) - P(D_0) +0.0028 and DSC I1-I4 reproduced",
+   "result": "HELD",
+   "value": "reproduced P_A 0.811859",
+   "denominator": "6,139 EVAL items / 5,628 CK-CLOSE components (Kish 1.3043); DEFF 1.223 transported (DSC C-DB, measured); B 2,000 component bootstrap"
+  },
+  {
+   "id": "FF1",
+   "text": "D = P(A-refit) - P_A; INTERVAL AND POINT jointly: HELD iff 95% interval wholly > 0 AND D > spread_B 0.0125 (transported bar); FAILED (REVERSED) symmetric; UNDETERMINED otherwise (never parity). Verdict line: DESCRIPTIVE-ONLY at prediction (SE 0.00446, MDE80 0.0125; SCOREABLE only for true D >= 0.025)",
+   "result": "HELD",
+   "value": "D +0.0256 [+0.0193, +0.0320] (157 / 6,139) > bar 0.012543; D' (common rule) +0.0251 [+0.0188, +0.0316] also HELD; MMLU-Pro carries 155 of 157; not knife-edge",
+   "denominator": "6,139 EVAL items / 5,628 CK-CLOSE components (Kish 1.3043); DEFF 1.223 transported (DSC C-DB, measured); B 2,000 component bootstrap"
+  },
+  {
+   "id": "FF2",
+   "text": "partial Spearman rho(Delta_a, F-tree impurity_a | log fit-set size) over split anchors; the INTERVAL decides: HELD iff lower > 0, FAILED iff upper <= 0. Verdict line: DESCRIPTIVE-ONLY (MDE rho about 0.50 vs predicted 0.30)",
+   "result": "UNDETERMINED",
+   "value": "partial rho +0.235 [-0.130, +0.544] (m 32); never 'the gain tracks impurity'",
+   "denominator": "split anchors with >= 30 EVAL items (planning 30 of 32); Fisher-z SE 0.196"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "D +0.015 [-0.005, +0.035]; FF1 HELD 0.30, UNDETERMINED 0.62, REVERSED 0.08",
+   "result": "HELD",
+   "value": "+0.0256 in [-0.005, +0.035]",
+   "denominator": "6,139 EVAL items / 5,628 CK-CLOSE components (Kish 1.3043); DEFF 1.223 transported (DSC C-DB, measured); B 2,000 component bootstrap"
+  },
+  {
+   "id": "P2",
+   "text": "FF2 rho +0.30 [-0.10, +0.65]; HELD 0.20",
+   "result": "HELD",
+   "value": "rho +0.2351 in [-0.10, +0.65]",
+   "denominator": "split anchors with >= 30 EVAL items (planning 30 of 32); Fisher-z SE 0.196"
+  },
+  {
+   "id": "P3",
+   "text": "F-FF fires 0.12",
+   "result": "n/a",
+   "value": "F-FF (p 0.12) did not fire",
+   "denominator": "6,139 EVAL items / 5,628 CK-CLOSE components (Kish 1.3043); DEFF 1.223 transported (DSC C-DB, measured); B 2,000 component bootstrap"
+  },
+  {
+   "id": "P4",
+   "text": "MMLU_PRO_LB D +0.025 [0.000, +0.050] (descriptive)",
+   "result": "HELD",
+   "value": "MMLU_PRO_LB +0.0446 in [0, +0.05]",
+   "denominator": "MMLU_PRO_LB 3,478 / 3,386"
+  }
+ ],
+ "falsifier": {
+  "text": "F-FF fires iff FF1's interval lies wholly at or below 0: fit-set purity is not the lever for the vMF rule's leaves; the DSC bridge is read as a k-means artefact; checkpoint D's #8' is withdrawn. No recorded number revised.",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "FF1": "D +0.0256 [+0.0193, +0.0320] (157 / 6,139; P(A-refit) 0.837433 vs P_A 0.811859); D' +0.0251 [+0.0188, +0.0316]",
+  "FF2": "partial rho +0.235 [-0.130, +0.544], m 32",
+  "MMLU_PRO_LB": "+0.0446 [+0.0344, +0.0555] (155 / 3,478)",
+  "support": "SE 0.00320, DEFF 1.052 (measured), MDE80 0.0090, bar 0.012543"
+ },
+ "sentence_of_record": "FF1 HELD: the class-pure refit files EVAL better than A as built, D +0.0256 (157 / 6,139 items), 95% [+0.0193, +0.0320], above the transported bar spread_B 0.012543 (B's five-seed spread; A's own construction-seed spread is unmeasured and A-refit is deterministic). Against A filed by the same common rule (C-1), D' +0.0251 [+0.0188, +0.0316]: held as well. [\"Re-estimating the leaf MEANS of B0 (lane r2, one construction) on the TRAIN items of each anchor's declared class, with B0's 133 leaves and topology fixed\". Never \"a construction with declared fit sets\" (S1, unregistered), never \"the tree's splits\", never \"label-free\". It is an anchored-tree variant that USES MORE TRAIN LABELS than A (fit-set membership below depth 2); nothing about anchor-free trees, label-free cells or RP13. MMLU-Pro carries 155 of the 157 net items; FF2 UNDETERMINED (never 'the gain tracks impurity'); not evidence that a construction (S1) would gain]",
+ "chips": [
+  "REGISTERED 2026-10-03, BEFORE ANY CODE (STAGE 0 ONLY); not built",
+  "VALID (POST-RUN 158d81cb): FF1 HELD +0.0256 [+0.0193, +0.0320]; F-FF NOT FIRED",
+  "RE-ESTIMATED MEANS ON FIXED TOPOLOGY (ANCHORED, MORE TRAIN LABELS); MMLU-PRO CARRIES 155 OF 157; FF2 UNDETERMINED; S1 UNAUTHORISED"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-03",
+   "by": "registrar",
+   "text": "both --run gates cleared: the author's go for stage 0 (scope answered) and C-PB-1 (WAL checkpoint). Programme bracket at L23582."
+  },
+  {
+   "date": "2026-10-03",
+   "by": "registrar (pre-data; READY_fitset_faithful)",
+   "text": "C-2 bar exact 77/6,139 = 0.012543; C-1 PIPELINE KNIFE-EDGE qualifier (HELD at D = 78-80/6,139; F-FF non-fire with upper in (0, +0.000489]); (ii) impurity choice immaterial; (iii) --root operational; FF2 m = 32, SE_z 0.189, rho-MDE 0.485, DESCRIPTIVE-ONLY. Brackets L23598, L23599."
+  },
+  {
+   "date": "2026-10-03",
+   "by": "registrar (POSTRUN 158d81cb)",
+   "text": "outcome recorded; memo v2 #8' moved to SUPPORTED (stage 0, re-estimated means, mostly MMLU-Pro). docs/judge_v2_program.md L23819-L23829 (section \"## FITSET-FAITHFUL stage 0 (2026-10-03, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent 158d81cb)"
+  },
+  {
+   "date": "2026-10-03",
+   "by": "registrar (FITSET-INTENT POSTRUN 06f03005 W-4)",
+   "text": "scope: 'mostly MMLU-Pro' stands; on CLINC (C-AN) the same refit lowers fine filing (interval below 0); not shown on MASSIVE. docs/judge_v2_program.md L24001-L24009 (section \"## FITSET-INTENT (2026-10-03, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent b8f7cbee)"
+  }
+ ],
+ "does_not_show": [
+  "that a construction with declared fit sets would file better (S1, unregistered)",
+  "A's construction-seed variance (one build)",
+  "anything about anchor-free trees or label-free cells (RP13); a split-rule effect (topology fixed)",
+  "parity (no TOST); any certificate",
+  "that labels below depth 2 are free (added TRAIN-label use; anchored trees only)",
+  "another draw, recipe, embedder or slice"
+ ],
+ "ledger": {
+  "row_id": "FITSET-FAITHFUL",
+  "version": "v360 (2026-10-03: OUTCOME bracket, OK + WARN chips) | v350 (2026-10-03: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "DEEP-SPLIT-COMPARE",
+  "G13-BREAKDOWN",
+  "ARCH-V2-E-T-R2"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; sub-anchor profile lines (model profiles) and MIX-LRT-SITE checked, not touched; SPLIT-VMF / HYB-LC not indicated, not closed"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "minutes",
+  "agent_hours": "engine-coder about 2 h",
+  "reads_pool": true,
+  "not_registered": "S1 (anchorFitSet=declared flag + A-gt construction) and A replicates at further construction seeds: the author's"
+ },
+ "sources": [
+  "docs/judge_v2_program.md L23580-L23614 (section \"## Registered 2026-10-03 (before any code or call) — FITSET-FAITHFUL (stage 0 only): with B0 of lane r2's leaves and topology held fixed, ...\"; _as_of the commit that writes it, parent 2daeae31, re-grepped)",
+  "docs/agents/plans/2026-10-03_checkpoint_D.md (2daeae31) section 2",
+  "docs/agents/results/DEEP-SPLIT-COMPARE.json (numbers of record, W2)",
+  "experiment_results/archv2/rp12_r2/deep_split_compare_outcome.txt line 221"
+ ],
+ "last_update": "2026-10-03",
+ "plain_description": {
+  "sq": "SQ3 Taxonomy",
+  "what": "The leaves and shape of one existing anchored tree are kept fixed, but each leaf's centre is recomputed using only training questions of the leaf's declared class. It then checks whether this 'class-pure' version files held-out questions better than the tree as built.",
+  "why": "It tests whether the purity of the questions used to fit each leaf is the lever behind k-means' filing advantage over the tree.",
+  "information": "A gain says purer fit sets improve filing. No gain would say the k-means advantage comes from something else. Result: done. The class-pure refit filed held-out questions 2.6 points better (95% interval +1.9 to +3.2), above the noise bar. It uses more training labels than the original tree, almost all of the gain is on MMLU-Pro, and it says nothing about anchor-free or label-free trees. Whether the gain tracks impurity is undetermined.",
+  "written": "2026-10-07"
+ }
+}

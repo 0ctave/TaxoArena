@@ -1,0 +1,384 @@
+FOREIGN-GATE-D4 - trip rate of the FOREIGN gate at windows 50/100/200 on the D4 artefacts (item 14, registered by reference at eaf1dbf)
+pool of record active: p2dca21ab5f4ef3ae (analysis addresses the D4 artefacts by explicit snapshot id; the guard is a formality)
+gate readings: reference A = host anchor the leaf reports under; B = leaf's modal train-side cell (LITERAL text of FRAMEWORK L53 / RESOLVE L145);
+               C = leaf's modal train-side cell among REGISTERED cells only (the excluded domain is not a cell; most favourable reading);
+               T = train-side check, modal train cell != anchor (no arrivals; diagnostic only)
+thresholds: R = 0.60 fixed (RESOLVE prose); F = purity - 2*sqrt(p(1-p)/w) (FRAMEWORK form; purity = train-side share in the reference cell);
+            F2 = purity - 2*sqrt(p(1-p)/n_train) (criterion table and specificity only)
+windows: STRICT sliding windows of w arrivals (evaluated only once w arrivals exist); LENIENT = one partial window when n < w
+no wrong-direction counts in this test (no board edge); key denominators = held-out arrivals per node (3,599 per arm) and train memberships per node
+
+== arm arrive_law_s137 | snapshot 20260909_224527_Headless_Run_Auto_ge | 184 nodes, 98 leaves | anchors: Biology, Business, Chemistry, Computer science, Economics, Engineering, Health, History, Math, Other, Philosophy, Physics, Psychology | held-out arrivals 3599 (law: 330) | Top-1 anchor precision 0.592
+   arrivals per leaf: min 6 median 34 max 196 | leaves with >= 50: 15, >= 100: 1, >= 200: 0 of 98
+   region table (>= 60% law, n >= 20) reproduces d4_outcome.txt exactly: 12 regions
+== arm arrive_philosophy_s137 | snapshot 20260909_224046_Headless_Run_Auto_ge | 161 nodes, 88 leaves | anchors: Biology, Business, Chemistry, Computer science, Economics, Engineering, Health, History, Law, Math, Other, Physics, Psychology | held-out arrivals 3599 (philosophy: 150) | Top-1 anchor precision 0.703
+   arrivals per leaf: min 17 median 39 max 196 | leaves with >= 50: 19, >= 100: 1, >= 200: 0 of 88
+   region table (>= 60% philosophy, n >= 20) reproduces d4_outcome.txt exactly: 4 regions
+
+Law arm: 12 regions >= 60% Law (n >= 20), of which 11 at >= 90% ('the 94%-pure Law regions'): n00000013, n00000044, n00000029, n00000089, n00000220, n00000219, n00000176, n00000088, n00000279, n00000280, n00000177
+Philosophy arm: H1 host anchors of absorbed Philosophy = Other(n00000008), History(n00000007), Psychology(n00000004), Computer science(n00000013); H2 ordinary leaves under them = 22; Philosophy regions >= 60% = n00000077, n00000171, n00000157, n00000158
+Law arm: Philosophy anchor n00000013 has 4 leaves, of which Philosophy-modal (H3, genuine host content): 1 ['n00000116']
+
+---- C1 units: the Law-arm Law regions (>= 60% Law; the >= 90% ones are the criterion's) ----
+   node       depth kind   n_train share_dom train_pur(ref)  | arrivals | per window w: evaluated/tripped rate [first, ever] (perm-ever) thr ; lenient partial-window trip
+  reading A, threshold R
+   n00000007  1     split      494      0.72       0.19 (other) |      210 | w50: 161/161 1.00 [1,1] (1.00) thr 0.60 ; w100: 111/111 1.00 [1,1] (1.00) thr 0.60 ; w200: 11/11 1.00 [1,1] (1.00) thr 0.60
+   n00000013  1     split      386      0.94       0.04 (philosophy) |      165 | w50: 116/116 1.00 [1,1] (1.00) thr 0.60 ; w100: 66/66 1.00 [1,1] (1.00) thr 0.60 ; w200: n=165<w NOT EVALUABLE; lenient share 0.08 thr 0.60 -> TRIP
+   n00000044  2     split      372      0.97       0.00 (philosophy) |      153 | w50: 104/104 1.00 [1,1] (1.00) thr 0.60 ; w100: 54/54 1.00 [1,1] (1.00) thr 0.60 ; w200: n=153<w NOT EVALUABLE; lenient share 0.01 thr 0.60 -> TRIP
+   n00000029  2     split      319      0.94       0.02 (other) |      152 | w50: 103/103 1.00 [1,1] (1.00) thr 0.60 ; w100: 53/53 1.00 [1,1] (1.00) thr 0.60 ; w200: n=152<w NOT EVALUABLE; lenient share 0.02 thr 0.60 -> TRIP
+   n00000089  3     split      216      0.92       0.03 (other) |      102 | w50: 53/53 1.00 [1,1] (1.00) thr 0.60 ; w100: 3/3 1.00 [1,1] (1.00) thr 0.60 ; w200: n=102<w NOT EVALUABLE; lenient share 0.03 thr 0.60 -> TRIP
+   n00000220  3     split      205      0.95       0.00 (philosophy) |       77 | w50: 28/28 1.00 [1,1] (1.00) thr 0.60 ; w100: n=77<w NOT EVALUABLE; lenient share 0.01 thr 0.60 -> TRIP ; w200: n=77<w NOT EVALUABLE; lenient share 0.01 thr 0.60 -> TRIP
+   n00000219  3     leaf       167      1.00       0.00 (philosophy) |       76 | w50: 27/27 1.00 [1,1] (1.00) thr 0.60 ; w100: n=76<w NOT EVALUABLE; lenient share 0.01 thr 0.60 -> TRIP ; w200: n=76<w NOT EVALUABLE; lenient share 0.01 thr 0.60 -> TRIP
+   n00000176  4     leaf       117      0.94       0.05 (other) |       58 | w50: 9/9 1.00 [1,1] (1.00) thr 0.60 ; w100: n=58<w NOT EVALUABLE; lenient share 0.03 thr 0.60 -> TRIP ; w200: n=58<w NOT EVALUABLE; lenient share 0.03 thr 0.60 -> TRIP
+   n00000088  3     leaf       103      0.99       0.00 (other) |       50 | w50: 1/1 1.00 [1,1] (1.00) thr 0.60 ; w100: n=50<w NOT EVALUABLE; lenient share 0.00 thr 0.60 -> TRIP ; w200: n=50<w NOT EVALUABLE; lenient share 0.00 thr 0.60 -> TRIP
+   n00000279  4     leaf       103      0.95       0.00 (philosophy) |       40 | w50: n=40<w NOT EVALUABLE; lenient share 0.00 thr 0.60 -> TRIP ; w100: n=40<w NOT EVALUABLE; lenient share 0.00 thr 0.60 -> TRIP ; w200: n=40<w NOT EVALUABLE; lenient share 0.00 thr 0.60 -> TRIP
+   n00000280  4     leaf       102      0.94       0.01 (philosophy) |       37 | w50: n=37<w NOT EVALUABLE; lenient share 0.03 thr 0.60 -> TRIP ; w100: n=37<w NOT EVALUABLE; lenient share 0.03 thr 0.60 -> TRIP ; w200: n=37<w NOT EVALUABLE; lenient share 0.03 thr 0.60 -> TRIP
+   n00000177  4     leaf        99      0.90       0.01 (other) |       44 | w50: n=44<w NOT EVALUABLE; lenient share 0.02 thr 0.60 -> TRIP ; w100: n=44<w NOT EVALUABLE; lenient share 0.02 thr 0.60 -> TRIP ; w200: n=44<w NOT EVALUABLE; lenient share 0.02 thr 0.60 -> TRIP
+  reading A, threshold F
+   n00000007  1     split      494      0.72       0.19 (other) |      210 | w50: 161/3 0.02 [0,1] (1.00) thr 0.08 ; w100: 111/14 0.13 [0,1] (0.85) thr 0.12 ; w200: 11/11 1.00 [1,1] (1.00) thr 0.14
+   n00000013  1     split      386      0.94       0.04 (philosophy) |      165 | w50: 116/0 0.00 [0,0] (0.00) thr -0.02 ; w100: 66/0 0.00 [0,0] (0.00) thr -0.00 ; w200: n=165<w NOT EVALUABLE; lenient share 0.08 thr 0.01 -> no trip
+   n00000044  2     split      372      0.97       0.00 (philosophy) |      153 | w50: 104/0 0.00 [0,0] (0.00) thr -0.01 ; w100: 54/0 0.00 [0,0] (0.00) thr -0.01 ; w200: n=153<w NOT EVALUABLE; lenient share 0.01 thr -0.00 -> no trip
+   n00000029  2     split      319      0.94       0.02 (other) |      152 | w50: 103/0 0.00 [0,0] (0.00) thr -0.02 ; w100: 53/0 0.00 [0,0] (0.00) thr -0.01 ; w200: n=152<w NOT EVALUABLE; lenient share 0.02 thr 0.00 -> no trip
+   n00000089  3     split      216      0.92       0.03 (other) |      102 | w50: 53/0 0.00 [0,0] (0.00) thr -0.02 ; w100: 3/0 0.00 [0,0] (0.00) thr -0.00 ; w200: n=102<w NOT EVALUABLE; lenient share 0.03 thr 0.01 -> no trip
+   n00000220  3     split      205      0.95       0.00 (philosophy) |       77 | w50: 28/0 0.00 [0,0] (0.00) thr -0.01 ; w100: n=77<w NOT EVALUABLE; lenient share 0.01 thr -0.01 -> no trip ; w200: n=77<w NOT EVALUABLE; lenient share 0.01 thr -0.00 -> no trip
+   n00000219  3     leaf       167      1.00       0.00 (philosophy) |       76 | w50: 27/0 0.00 [0,0] (0.00) thr 0.00 ; w100: n=76<w NOT EVALUABLE; lenient share 0.01 thr 0.00 -> no trip ; w200: n=76<w NOT EVALUABLE; lenient share 0.01 thr 0.00 -> no trip
+   n00000176  4     leaf       117      0.94       0.05 (other) |       58 | w50: 9/0 0.00 [0,0] (0.00) thr -0.01 ; w100: n=58<w NOT EVALUABLE; lenient share 0.03 thr 0.01 -> no trip ; w200: n=58<w NOT EVALUABLE; lenient share 0.03 thr 0.02 -> no trip
+   n00000088  3     leaf       103      0.99       0.00 (other) |       50 | w50: 1/0 0.00 [0,0] (0.00) thr 0.00 ; w100: n=50<w NOT EVALUABLE; lenient share 0.00 thr 0.00 -> no trip ; w200: n=50<w NOT EVALUABLE; lenient share 0.00 thr 0.00 -> no trip
+   n00000279  4     leaf       103      0.95       0.00 (philosophy) |       40 | w50: n=40<w NOT EVALUABLE; lenient share 0.00 thr 0.00 -> no trip ; w100: n=40<w NOT EVALUABLE; lenient share 0.00 thr 0.00 -> no trip ; w200: n=40<w NOT EVALUABLE; lenient share 0.00 thr 0.00 -> no trip
+   n00000280  4     leaf       102      0.94       0.01 (philosophy) |       37 | w50: n=37<w NOT EVALUABLE; lenient share 0.03 thr -0.02 -> no trip ; w100: n=37<w NOT EVALUABLE; lenient share 0.03 thr -0.01 -> no trip ; w200: n=37<w NOT EVALUABLE; lenient share 0.03 thr -0.00 -> no trip
+   n00000177  4     leaf        99      0.90       0.01 (other) |       44 | w50: n=44<w NOT EVALUABLE; lenient share 0.02 thr -0.02 -> no trip ; w100: n=44<w NOT EVALUABLE; lenient share 0.02 thr -0.01 -> no trip ; w200: n=44<w NOT EVALUABLE; lenient share 0.02 thr -0.00 -> no trip
+  reading B, threshold R
+   n00000007  1     split      494      0.72       0.72 (law) |      210 | w50: 161/0 0.00 [0,0] (0.00) thr 0.60 ; w100: 111/0 0.00 [0,0] (0.00) thr 0.60 ; w200: 11/0 0.00 [0,0] (0.00) thr 0.60
+   n00000013  1     split      386      0.94       0.94 (law) |      165 | w50: 116/0 0.00 [0,0] (0.00) thr 0.60 ; w100: 66/0 0.00 [0,0] (0.00) thr 0.60 ; w200: n=165<w NOT EVALUABLE; lenient share 0.90 thr 0.60 -> no trip
+   n00000044  2     split      372      0.97       0.97 (law) |      153 | w50: 104/0 0.00 [0,0] (0.00) thr 0.60 ; w100: 54/0 0.00 [0,0] (0.00) thr 0.60 ; w200: n=153<w NOT EVALUABLE; lenient share 0.97 thr 0.60 -> no trip
+   n00000029  2     split      319      0.94       0.94 (law) |      152 | w50: 103/0 0.00 [0,0] (0.00) thr 0.60 ; w100: 53/0 0.00 [0,0] (0.00) thr 0.60 ; w200: n=152<w NOT EVALUABLE; lenient share 0.95 thr 0.60 -> no trip
+   n00000089  3     split      216      0.92       0.92 (law) |      102 | w50: 53/0 0.00 [0,0] (0.00) thr 0.60 ; w100: 3/0 0.00 [0,0] (0.00) thr 0.60 ; w200: n=102<w NOT EVALUABLE; lenient share 0.93 thr 0.60 -> no trip
+   n00000220  3     split      205      0.95       0.95 (law) |       77 | w50: 28/0 0.00 [0,0] (0.00) thr 0.60 ; w100: n=77<w NOT EVALUABLE; lenient share 0.95 thr 0.60 -> no trip ; w200: n=77<w NOT EVALUABLE; lenient share 0.95 thr 0.60 -> no trip
+   n00000219  3     leaf       167      1.00       1.00 (law) |       76 | w50: 27/0 0.00 [0,0] (0.00) thr 0.60 ; w100: n=76<w NOT EVALUABLE; lenient share 0.99 thr 0.60 -> no trip ; w200: n=76<w NOT EVALUABLE; lenient share 0.99 thr 0.60 -> no trip
+   n00000176  4     leaf       117      0.94       0.94 (law) |       58 | w50: 9/0 0.00 [0,0] (0.00) thr 0.60 ; w100: n=58<w NOT EVALUABLE; lenient share 0.95 thr 0.60 -> no trip ; w200: n=58<w NOT EVALUABLE; lenient share 0.95 thr 0.60 -> no trip
+   n00000088  3     leaf       103      0.99       0.99 (law) |       50 | w50: 1/0 0.00 [0,0] (0.00) thr 0.60 ; w100: n=50<w NOT EVALUABLE; lenient share 1.00 thr 0.60 -> no trip ; w200: n=50<w NOT EVALUABLE; lenient share 1.00 thr 0.60 -> no trip
+   n00000279  4     leaf       103      0.95       0.95 (law) |       40 | w50: n=40<w NOT EVALUABLE; lenient share 1.00 thr 0.60 -> no trip ; w100: n=40<w NOT EVALUABLE; lenient share 1.00 thr 0.60 -> no trip ; w200: n=40<w NOT EVALUABLE; lenient share 1.00 thr 0.60 -> no trip
+   n00000280  4     leaf       102      0.94       0.94 (law) |       37 | w50: n=37<w NOT EVALUABLE; lenient share 0.89 thr 0.60 -> no trip ; w100: n=37<w NOT EVALUABLE; lenient share 0.89 thr 0.60 -> no trip ; w200: n=37<w NOT EVALUABLE; lenient share 0.89 thr 0.60 -> no trip
+   n00000177  4     leaf        99      0.90       0.90 (law) |       44 | w50: n=44<w NOT EVALUABLE; lenient share 0.91 thr 0.60 -> no trip ; w100: n=44<w NOT EVALUABLE; lenient share 0.91 thr 0.60 -> no trip ; w200: n=44<w NOT EVALUABLE; lenient share 0.91 thr 0.60 -> no trip
+  reading B, threshold F
+   n00000007  1     split      494      0.72       0.72 (law) |      210 | w50: 161/0 0.00 [0,0] (0.00) thr 0.59 ; w100: 111/0 0.00 [0,0] (0.00) thr 0.63 ; w200: 11/0 0.00 [0,0] (0.00) thr 0.66
+   n00000013  1     split      386      0.94       0.94 (law) |      165 | w50: 116/49 0.42 [0,1] (0.85) thr 0.87 ; w100: 66/26 0.39 [1,1] (0.65) thr 0.89 ; w200: n=165<w NOT EVALUABLE; lenient share 0.90 thr 0.90 -> TRIP
+   n00000044  2     split      372      0.97       0.97 (law) |      153 | w50: 104/0 0.00 [0,0] (0.35) thr 0.92 ; w100: 54/0 0.00 [0,0] (0.00) thr 0.94 ; w200: n=153<w NOT EVALUABLE; lenient share 0.97 thr 0.95 -> no trip
+   n00000029  2     split      319      0.94       0.94 (law) |      152 | w50: 103/0 0.00 [0,0] (0.00) thr 0.88 ; w100: 53/0 0.00 [0,0] (0.00) thr 0.90 ; w200: n=152<w NOT EVALUABLE; lenient share 0.95 thr 0.91 -> no trip
+   n00000089  3     split      216      0.92       0.92 (law) |      102 | w50: 53/0 0.00 [0,0] (0.00) thr 0.85 ; w100: 3/0 0.00 [0,0] (0.00) thr 0.87 ; w200: n=102<w NOT EVALUABLE; lenient share 0.93 thr 0.88 -> no trip
+   n00000220  3     split      205      0.95       0.95 (law) |       77 | w50: 28/0 0.00 [0,0] (0.00) thr 0.88 ; w100: n=77<w NOT EVALUABLE; lenient share 0.95 thr 0.90 -> no trip ; w200: n=77<w NOT EVALUABLE; lenient share 0.95 thr 0.91 -> no trip
+   n00000219  3     leaf       167      1.00       1.00 (law) |       76 | w50: 27/4 0.15 [0,1] (1.00) thr 1.00 ; w100: n=76<w NOT EVALUABLE; lenient share 0.99 thr 1.00 -> TRIP ; w200: n=76<w NOT EVALUABLE; lenient share 0.99 thr 1.00 -> TRIP
+   n00000176  4     leaf       117      0.94       0.94 (law) |       58 | w50: 9/0 0.00 [0,0] (0.00) thr 0.87 ; w100: n=58<w NOT EVALUABLE; lenient share 0.95 thr 0.89 -> no trip ; w200: n=58<w NOT EVALUABLE; lenient share 0.95 thr 0.91 -> no trip
+   n00000088  3     leaf       103      0.99       0.99 (law) |       50 | w50: 1/0 0.00 [0,0] (0.00) thr 0.96 ; w100: n=50<w NOT EVALUABLE; lenient share 1.00 thr 0.97 -> no trip ; w200: n=50<w NOT EVALUABLE; lenient share 1.00 thr 0.98 -> no trip
+   n00000279  4     leaf       103      0.95       0.95 (law) |       40 | w50: n=40<w NOT EVALUABLE; lenient share 1.00 thr 0.89 -> no trip ; w100: n=40<w NOT EVALUABLE; lenient share 1.00 thr 0.91 -> no trip ; w200: n=40<w NOT EVALUABLE; lenient share 1.00 thr 0.92 -> no trip
+   n00000280  4     leaf       102      0.94       0.94 (law) |       37 | w50: n=37<w NOT EVALUABLE; lenient share 0.89 thr 0.87 -> no trip ; w100: n=37<w NOT EVALUABLE; lenient share 0.89 thr 0.89 -> TRIP ; w200: n=37<w NOT EVALUABLE; lenient share 0.89 thr 0.91 -> TRIP
+   n00000177  4     leaf        99      0.90       0.90 (law) |       44 | w50: n=44<w NOT EVALUABLE; lenient share 0.91 thr 0.81 -> no trip ; w100: n=44<w NOT EVALUABLE; lenient share 0.91 thr 0.84 -> no trip ; w200: n=44<w NOT EVALUABLE; lenient share 0.91 thr 0.86 -> no trip
+  reading C, threshold R
+   n00000007  1     split      494      0.72       0.19 (other) |      210 | w50: 161/161 1.00 [1,1] (1.00) thr 0.60 ; w100: 111/111 1.00 [1,1] (1.00) thr 0.60 ; w200: 11/11 1.00 [1,1] (1.00) thr 0.60
+   n00000013  1     split      386      0.94       0.04 (philosophy) |      165 | w50: 116/116 1.00 [1,1] (1.00) thr 0.60 ; w100: 66/66 1.00 [1,1] (1.00) thr 0.60 ; w200: n=165<w NOT EVALUABLE; lenient share 0.08 thr 0.60 -> TRIP
+   n00000044  2     split      372      0.97       0.01 (psychology) |      153 | w50: 104/104 1.00 [1,1] (1.00) thr 0.60 ; w100: 54/54 1.00 [1,1] (1.00) thr 0.60 ; w200: n=153<w NOT EVALUABLE; lenient share 0.00 thr 0.60 -> TRIP
+   n00000029  2     split      319      0.94       0.03 (history) |      152 | w50: 103/103 1.00 [1,1] (1.00) thr 0.60 ; w100: 53/53 1.00 [1,1] (1.00) thr 0.60 ; w200: n=152<w NOT EVALUABLE; lenient share 0.01 thr 0.60 -> TRIP
+   n00000089  3     split      216      0.92       0.04 (history) |      102 | w50: 53/53 1.00 [1,1] (1.00) thr 0.60 ; w100: 3/3 1.00 [1,1] (1.00) thr 0.60 ; w200: n=102<w NOT EVALUABLE; lenient share 0.02 thr 0.60 -> TRIP
+   n00000220  3     split      205      0.95       0.02 (psychology) |       77 | w50: 28/28 1.00 [1,1] (1.00) thr 0.60 ; w100: n=77<w NOT EVALUABLE; lenient share 0.00 thr 0.60 -> TRIP ; w200: n=77<w NOT EVALUABLE; lenient share 0.00 thr 0.60 -> TRIP
+   n00000219  3     leaf       167      1.00       0.00 (?) |       76 | w50: 27/27 1.00 [1,1] (1.00) thr 0.60 ; w100: n=76<w NOT EVALUABLE; lenient share 0.00 thr 0.60 -> TRIP ; w200: n=76<w NOT EVALUABLE; lenient share 0.00 thr 0.60 -> TRIP
+   n00000176  4     leaf       117      0.94       0.05 (other) |       58 | w50: 9/9 1.00 [1,1] (1.00) thr 0.60 ; w100: n=58<w NOT EVALUABLE; lenient share 0.03 thr 0.60 -> TRIP ; w200: n=58<w NOT EVALUABLE; lenient share 0.03 thr 0.60 -> TRIP
+   n00000088  3     leaf       103      0.99       0.01 (history) |       50 | w50: 1/1 1.00 [1,1] (1.00) thr 0.60 ; w100: n=50<w NOT EVALUABLE; lenient share 0.00 thr 0.60 -> TRIP ; w200: n=50<w NOT EVALUABLE; lenient share 0.00 thr 0.60 -> TRIP
+   n00000279  4     leaf       103      0.95       0.02 (history) |       40 | w50: n=40<w NOT EVALUABLE; lenient share 0.00 thr 0.60 -> TRIP ; w100: n=40<w NOT EVALUABLE; lenient share 0.00 thr 0.60 -> TRIP ; w200: n=40<w NOT EVALUABLE; lenient share 0.00 thr 0.60 -> TRIP
+   n00000280  4     leaf       102      0.94       0.03 (psychology) |       37 | w50: n=37<w NOT EVALUABLE; lenient share 0.00 thr 0.60 -> TRIP ; w100: n=37<w NOT EVALUABLE; lenient share 0.00 thr 0.60 -> TRIP ; w200: n=37<w NOT EVALUABLE; lenient share 0.00 thr 0.60 -> TRIP
+   n00000177  4     leaf        99      0.90       0.08 (history) |       44 | w50: n=44<w NOT EVALUABLE; lenient share 0.05 thr 0.60 -> TRIP ; w100: n=44<w NOT EVALUABLE; lenient share 0.05 thr 0.60 -> TRIP ; w200: n=44<w NOT EVALUABLE; lenient share 0.05 thr 0.60 -> TRIP
+  reading C, threshold F
+   n00000007  1     split      494      0.72       0.19 (other) |      210 | w50: 161/3 0.02 [0,1] (1.00) thr 0.08 ; w100: 111/14 0.13 [0,1] (0.85) thr 0.12 ; w200: 11/11 1.00 [1,1] (1.00) thr 0.14
+   n00000013  1     split      386      0.94       0.04 (philosophy) |      165 | w50: 116/0 0.00 [0,0] (0.00) thr -0.02 ; w100: 66/0 0.00 [0,0] (0.00) thr -0.00 ; w200: n=165<w NOT EVALUABLE; lenient share 0.08 thr 0.01 -> no trip
+   n00000044  2     split      372      0.97       0.01 (psychology) |      153 | w50: 104/0 0.00 [0,0] (0.00) thr -0.02 ; w100: 54/0 0.00 [0,0] (0.00) thr -0.01 ; w200: n=153<w NOT EVALUABLE; lenient share 0.00 thr -0.00 -> no trip
+   n00000029  2     split      319      0.94       0.03 (history) |      152 | w50: 103/0 0.00 [0,0] (0.00) thr -0.02 ; w100: 53/0 0.00 [0,0] (0.00) thr -0.00 ; w200: n=152<w NOT EVALUABLE; lenient share 0.01 thr 0.00 -> no trip
+   n00000089  3     split      216      0.92       0.04 (history) |      102 | w50: 53/0 0.00 [0,0] (0.00) thr -0.02 ; w100: 3/0 0.00 [0,0] (0.00) thr -0.00 ; w200: n=102<w NOT EVALUABLE; lenient share 0.02 thr 0.01 -> no trip
+   n00000220  3     split      205      0.95       0.02 (psychology) |       77 | w50: 28/0 0.00 [0,0] (0.00) thr -0.02 ; w100: n=77<w NOT EVALUABLE; lenient share 0.00 thr -0.01 -> no trip ; w200: n=77<w NOT EVALUABLE; lenient share 0.00 thr 0.00 -> TRIP
+   n00000219  3     leaf       167      1.00       0.00 (?) |       76 | w50: 27/0 0.00 [0,0] (0.00) thr 0.00 ; w100: n=76<w NOT EVALUABLE; lenient share 0.00 thr 0.00 -> no trip ; w200: n=76<w NOT EVALUABLE; lenient share 0.00 thr 0.00 -> no trip
+   n00000176  4     leaf       117      0.94       0.05 (other) |       58 | w50: 9/0 0.00 [0,0] (0.00) thr -0.01 ; w100: n=58<w NOT EVALUABLE; lenient share 0.03 thr 0.01 -> no trip ; w200: n=58<w NOT EVALUABLE; lenient share 0.03 thr 0.02 -> no trip
+   n00000088  3     leaf       103      0.99       0.01 (history) |       50 | w50: 1/0 0.00 [0,0] (0.00) thr -0.02 ; w100: n=50<w NOT EVALUABLE; lenient share 0.00 thr -0.01 -> no trip ; w200: n=50<w NOT EVALUABLE; lenient share 0.00 thr -0.00 -> no trip
+   n00000279  4     leaf       103      0.95       0.02 (history) |       40 | w50: n=40<w NOT EVALUABLE; lenient share 0.00 thr -0.02 -> no trip ; w100: n=40<w NOT EVALUABLE; lenient share 0.00 thr -0.01 -> no trip ; w200: n=40<w NOT EVALUABLE; lenient share 0.00 thr -0.00 -> no trip
+   n00000280  4     leaf       102      0.94       0.03 (psychology) |       37 | w50: n=37<w NOT EVALUABLE; lenient share 0.00 thr -0.02 -> no trip ; w100: n=37<w NOT EVALUABLE; lenient share 0.00 thr -0.00 -> no trip ; w200: n=37<w NOT EVALUABLE; lenient share 0.00 thr 0.01 -> TRIP
+   n00000177  4     leaf        99      0.90       0.08 (history) |       44 | w50: n=44<w NOT EVALUABLE; lenient share 0.05 thr 0.00 -> no trip ; w100: n=44<w NOT EVALUABLE; lenient share 0.05 thr 0.03 -> no trip ; w200: n=44<w NOT EVALUABLE; lenient share 0.05 thr 0.04 -> no trip
+
+---- C2 / H1 units: the Philosophy-arm host anchors of absorbed Philosophy (depth 1) ----
+   node       depth kind   n_train share_dom train_pur(ref)  | arrivals | per window w: evaluated/tripped rate [first, ever] (perm-ever) thr ; lenient partial-window trip
+  reading A, threshold R
+   n00000008  1     split      784      0.26       0.46 (other) |      289 | w50: 240/229 0.95 [1,1] (1.00) thr 0.60 ; w100: 190/190 1.00 [1,1] (1.00) thr 0.60 ; w200: 90/90 1.00 [1,1] (1.00) thr 0.60
+   n00000007  1     split      350      0.09       0.71 (history) |      133 | w50: 84/0 0.00 [0,0] (0.00) thr 0.60 ; w100: 34/0 0.00 [0,0] (0.00) thr 0.60 ; w200: n=133<w NOT EVALUABLE; lenient share 0.76 thr 0.60 -> no trip
+   n00000004  1     split      798      0.13       0.59 (psychology) |      285 | w50: 236/136 0.58 [1,1] (1.00) thr 0.60 ; w100: 186/158 0.85 [1,1] (1.00) thr 0.60 ; w200: 86/86 1.00 [1,1] (1.00) thr 0.60
+   n00000013  1     split      602      0.08       0.40 (computer science) |      262 | w50: 213/213 1.00 [1,1] (1.00) thr 0.60 ; w100: 163/163 1.00 [1,1] (1.00) thr 0.60 ; w200: 63/63 1.00 [1,1] (1.00) thr 0.60
+  reading A, threshold F
+   n00000008  1     split      784      0.26       0.46 (other) |      289 | w50: 240/0 0.00 [0,0] (0.35) thr 0.32 ; w100: 190/0 0.00 [0,0] (0.30) thr 0.36 ; w200: 90/0 0.00 [0,0] (0.00) thr 0.39
+   n00000007  1     split      350      0.09       0.71 (history) |      133 | w50: 84/0 0.00 [0,0] (0.00) thr 0.58 ; w100: 34/0 0.00 [0,0] (0.00) thr 0.62 ; w200: n=133<w NOT EVALUABLE; lenient share 0.76 thr 0.65 -> no trip
+   n00000004  1     split      798      0.13       0.59 (psychology) |      285 | w50: 236/0 0.00 [0,0] (0.55) thr 0.45 ; w100: 186/0 0.00 [0,0] (0.30) thr 0.49 ; w200: 86/0 0.00 [0,0] (0.00) thr 0.52
+   n00000013  1     split      602      0.08       0.40 (computer science) |      262 | w50: 213/23 0.11 [0,1] (0.60) thr 0.26 ; w100: 163/0 0.00 [0,0] (0.80) thr 0.30 ; w200: 63/0 0.00 [0,0] (0.60) thr 0.33
+  reading B, threshold R
+   n00000008  1     split      784      0.26       0.46 (other) |      289 | w50: 240/229 0.95 [1,1] (1.00) thr 0.60 ; w100: 190/190 1.00 [1,1] (1.00) thr 0.60 ; w200: 90/90 1.00 [1,1] (1.00) thr 0.60
+   n00000007  1     split      350      0.09       0.71 (history) |      133 | w50: 84/0 0.00 [0,0] (0.00) thr 0.60 ; w100: 34/0 0.00 [0,0] (0.00) thr 0.60 ; w200: n=133<w NOT EVALUABLE; lenient share 0.76 thr 0.60 -> no trip
+   n00000004  1     split      798      0.13       0.59 (psychology) |      285 | w50: 236/136 0.58 [1,1] (1.00) thr 0.60 ; w100: 186/158 0.85 [1,1] (1.00) thr 0.60 ; w200: 86/86 1.00 [1,1] (1.00) thr 0.60
+   n00000013  1     split      602      0.08       0.40 (computer science) |      262 | w50: 213/213 1.00 [1,1] (1.00) thr 0.60 ; w100: 163/163 1.00 [1,1] (1.00) thr 0.60 ; w200: 63/63 1.00 [1,1] (1.00) thr 0.60
+  reading B, threshold F
+   n00000008  1     split      784      0.26       0.46 (other) |      289 | w50: 240/0 0.00 [0,0] (0.35) thr 0.32 ; w100: 190/0 0.00 [0,0] (0.30) thr 0.36 ; w200: 90/0 0.00 [0,0] (0.00) thr 0.39
+   n00000007  1     split      350      0.09       0.71 (history) |      133 | w50: 84/0 0.00 [0,0] (0.00) thr 0.58 ; w100: 34/0 0.00 [0,0] (0.00) thr 0.62 ; w200: n=133<w NOT EVALUABLE; lenient share 0.76 thr 0.65 -> no trip
+   n00000004  1     split      798      0.13       0.59 (psychology) |      285 | w50: 236/0 0.00 [0,0] (0.55) thr 0.45 ; w100: 186/0 0.00 [0,0] (0.30) thr 0.49 ; w200: 86/0 0.00 [0,0] (0.00) thr 0.52
+   n00000013  1     split      602      0.08       0.40 (computer science) |      262 | w50: 213/23 0.11 [0,1] (0.60) thr 0.26 ; w100: 163/0 0.00 [0,0] (0.80) thr 0.30 ; w200: 63/0 0.00 [0,0] (0.60) thr 0.33
+  reading C, threshold R
+   n00000008  1     split      784      0.26       0.46 (other) |      289 | w50: 240/229 0.95 [1,1] (1.00) thr 0.60 ; w100: 190/190 1.00 [1,1] (1.00) thr 0.60 ; w200: 90/90 1.00 [1,1] (1.00) thr 0.60
+   n00000007  1     split      350      0.09       0.71 (history) |      133 | w50: 84/0 0.00 [0,0] (0.00) thr 0.60 ; w100: 34/0 0.00 [0,0] (0.00) thr 0.60 ; w200: n=133<w NOT EVALUABLE; lenient share 0.76 thr 0.60 -> no trip
+   n00000004  1     split      798      0.13       0.59 (psychology) |      285 | w50: 236/136 0.58 [1,1] (1.00) thr 0.60 ; w100: 186/158 0.85 [1,1] (1.00) thr 0.60 ; w200: 86/86 1.00 [1,1] (1.00) thr 0.60
+   n00000013  1     split      602      0.08       0.40 (computer science) |      262 | w50: 213/213 1.00 [1,1] (1.00) thr 0.60 ; w100: 163/163 1.00 [1,1] (1.00) thr 0.60 ; w200: 63/63 1.00 [1,1] (1.00) thr 0.60
+  reading C, threshold F
+   n00000008  1     split      784      0.26       0.46 (other) |      289 | w50: 240/0 0.00 [0,0] (0.35) thr 0.32 ; w100: 190/0 0.00 [0,0] (0.30) thr 0.36 ; w200: 90/0 0.00 [0,0] (0.00) thr 0.39
+   n00000007  1     split      350      0.09       0.71 (history) |      133 | w50: 84/0 0.00 [0,0] (0.00) thr 0.58 ; w100: 34/0 0.00 [0,0] (0.00) thr 0.62 ; w200: n=133<w NOT EVALUABLE; lenient share 0.76 thr 0.65 -> no trip
+   n00000004  1     split      798      0.13       0.59 (psychology) |      285 | w50: 236/0 0.00 [0,0] (0.55) thr 0.45 ; w100: 186/0 0.00 [0,0] (0.30) thr 0.49 ; w200: 86/0 0.00 [0,0] (0.00) thr 0.52
+   n00000013  1     split      602      0.08       0.40 (computer science) |      262 | w50: 213/23 0.11 [0,1] (0.60) thr 0.26 ; w100: 163/0 0.00 [0,0] (0.80) thr 0.30 ; w200: 63/0 0.00 [0,0] (0.60) thr 0.33
+
+---- C2 secondary: the Philosophy-arm Philosophy regions (77-81%) ----
+   node       depth kind   n_train share_dom train_pur(ref)  | arrivals | per window w: evaluated/tripped rate [first, ever] (perm-ever) thr ; lenient partial-window trip
+  reading A, threshold R
+   n00000077  3     split      176      0.80       0.05 (other) |       64 | w50: 15/15 1.00 [1,1] (1.00) thr 0.60 ; w100: n=64<w NOT EVALUABLE; lenient share 0.00 thr 0.60 -> TRIP ; w200: n=64<w NOT EVALUABLE; lenient share 0.00 thr 0.60 -> TRIP
+   n00000171  4     leaf        93      0.77       0.05 (psychology) |       39 | w50: n=39<w NOT EVALUABLE; lenient share 0.03 thr 0.60 -> TRIP ; w100: n=39<w NOT EVALUABLE; lenient share 0.03 thr 0.60 -> TRIP ; w200: n=39<w NOT EVALUABLE; lenient share 0.03 thr 0.60 -> TRIP
+   n00000157  4     leaf        89      0.81       0.02 (other) |       24 | w50: n=24<w NOT EVALUABLE; lenient share 0.00 thr 0.60 -> TRIP ; w100: n=24<w NOT EVALUABLE; lenient share 0.00 thr 0.60 -> TRIP ; w200: n=24<w NOT EVALUABLE; lenient share 0.00 thr 0.60 -> TRIP
+   n00000158  4     leaf        87      0.79       0.08 (other) |       40 | w50: n=40<w NOT EVALUABLE; lenient share 0.00 thr 0.60 -> TRIP ; w100: n=40<w NOT EVALUABLE; lenient share 0.00 thr 0.60 -> TRIP ; w200: n=40<w NOT EVALUABLE; lenient share 0.00 thr 0.60 -> TRIP
+  reading A, threshold F
+   n00000077  3     split      176      0.80       0.05 (other) |       64 | w50: 15/0 0.00 [0,0] (0.00) thr -0.01 ; w100: n=64<w NOT EVALUABLE; lenient share 0.00 thr 0.01 -> TRIP ; w200: n=64<w NOT EVALUABLE; lenient share 0.00 thr 0.02 -> TRIP
+   n00000171  4     leaf        93      0.77       0.05 (psychology) |       39 | w50: n=39<w NOT EVALUABLE; lenient share 0.03 thr -0.01 -> no trip ; w100: n=39<w NOT EVALUABLE; lenient share 0.03 thr 0.01 -> no trip ; w200: n=39<w NOT EVALUABLE; lenient share 0.03 thr 0.02 -> no trip
+   n00000157  4     leaf        89      0.81       0.02 (other) |       24 | w50: n=24<w NOT EVALUABLE; lenient share 0.00 thr -0.02 -> no trip ; w100: n=24<w NOT EVALUABLE; lenient share 0.00 thr -0.01 -> no trip ; w200: n=24<w NOT EVALUABLE; lenient share 0.00 thr 0.00 -> TRIP
+   n00000158  4     leaf        87      0.79       0.08 (other) |       40 | w50: n=40<w NOT EVALUABLE; lenient share 0.00 thr 0.00 -> TRIP ; w100: n=40<w NOT EVALUABLE; lenient share 0.00 thr 0.03 -> TRIP ; w200: n=40<w NOT EVALUABLE; lenient share 0.00 thr 0.04 -> TRIP
+  reading B, threshold R
+   n00000077  3     split      176      0.80       0.80 (philosophy) |       64 | w50: 15/0 0.00 [0,0] (0.00) thr 0.60 ; w100: n=64<w NOT EVALUABLE; lenient share 0.83 thr 0.60 -> no trip ; w200: n=64<w NOT EVALUABLE; lenient share 0.83 thr 0.60 -> no trip
+   n00000171  4     leaf        93      0.77       0.77 (philosophy) |       39 | w50: n=39<w NOT EVALUABLE; lenient share 0.79 thr 0.60 -> no trip ; w100: n=39<w NOT EVALUABLE; lenient share 0.79 thr 0.60 -> no trip ; w200: n=39<w NOT EVALUABLE; lenient share 0.79 thr 0.60 -> no trip
+   n00000157  4     leaf        89      0.81       0.81 (philosophy) |       24 | w50: n=24<w NOT EVALUABLE; lenient share 0.75 thr 0.60 -> no trip ; w100: n=24<w NOT EVALUABLE; lenient share 0.75 thr 0.60 -> no trip ; w200: n=24<w NOT EVALUABLE; lenient share 0.75 thr 0.60 -> no trip
+   n00000158  4     leaf        87      0.79       0.79 (philosophy) |       40 | w50: n=40<w NOT EVALUABLE; lenient share 0.88 thr 0.60 -> no trip ; w100: n=40<w NOT EVALUABLE; lenient share 0.88 thr 0.60 -> no trip ; w200: n=40<w NOT EVALUABLE; lenient share 0.88 thr 0.60 -> no trip
+  reading B, threshold F
+   n00000077  3     split      176      0.80       0.80 (philosophy) |       64 | w50: 15/0 0.00 [0,0] (0.00) thr 0.69 ; w100: n=64<w NOT EVALUABLE; lenient share 0.83 thr 0.72 -> no trip ; w200: n=64<w NOT EVALUABLE; lenient share 0.83 thr 0.74 -> no trip
+   n00000171  4     leaf        93      0.77       0.77 (philosophy) |       39 | w50: n=39<w NOT EVALUABLE; lenient share 0.79 thr 0.66 -> no trip ; w100: n=39<w NOT EVALUABLE; lenient share 0.79 thr 0.69 -> no trip ; w200: n=39<w NOT EVALUABLE; lenient share 0.79 thr 0.72 -> no trip
+   n00000157  4     leaf        89      0.81       0.81 (philosophy) |       24 | w50: n=24<w NOT EVALUABLE; lenient share 0.75 thr 0.70 -> no trip ; w100: n=24<w NOT EVALUABLE; lenient share 0.75 thr 0.73 -> no trip ; w200: n=24<w NOT EVALUABLE; lenient share 0.75 thr 0.75 -> TRIP
+   n00000158  4     leaf        87      0.79       0.79 (philosophy) |       40 | w50: n=40<w NOT EVALUABLE; lenient share 0.88 thr 0.68 -> no trip ; w100: n=40<w NOT EVALUABLE; lenient share 0.88 thr 0.71 -> no trip ; w200: n=40<w NOT EVALUABLE; lenient share 0.88 thr 0.74 -> no trip
+  reading C, threshold R
+   n00000077  3     split      176      0.80       0.12 (law) |       64 | w50: 15/15 1.00 [1,1] (1.00) thr 0.60 ; w100: n=64<w NOT EVALUABLE; lenient share 0.08 thr 0.60 -> TRIP ; w200: n=64<w NOT EVALUABLE; lenient share 0.08 thr 0.60 -> TRIP
+   n00000171  4     leaf        93      0.77       0.06 (business) |       39 | w50: n=39<w NOT EVALUABLE; lenient share 0.10 thr 0.60 -> TRIP ; w100: n=39<w NOT EVALUABLE; lenient share 0.10 thr 0.60 -> TRIP ; w200: n=39<w NOT EVALUABLE; lenient share 0.10 thr 0.60 -> TRIP
+   n00000157  4     leaf        89      0.81       0.16 (law) |       24 | w50: n=24<w NOT EVALUABLE; lenient share 0.12 thr 0.60 -> TRIP ; w100: n=24<w NOT EVALUABLE; lenient share 0.12 thr 0.60 -> TRIP ; w200: n=24<w NOT EVALUABLE; lenient share 0.12 thr 0.60 -> TRIP
+   n00000158  4     leaf        87      0.79       0.08 (other) |       40 | w50: n=40<w NOT EVALUABLE; lenient share 0.00 thr 0.60 -> TRIP ; w100: n=40<w NOT EVALUABLE; lenient share 0.00 thr 0.60 -> TRIP ; w200: n=40<w NOT EVALUABLE; lenient share 0.00 thr 0.60 -> TRIP
+  reading C, threshold F
+   n00000077  3     split      176      0.80       0.12 (law) |       64 | w50: 15/0 0.00 [0,0] (0.00) thr 0.03 ; w100: n=64<w NOT EVALUABLE; lenient share 0.08 thr 0.05 -> no trip ; w200: n=64<w NOT EVALUABLE; lenient share 0.08 thr 0.07 -> no trip
+   n00000171  4     leaf        93      0.77       0.06 (business) |       39 | w50: n=39<w NOT EVALUABLE; lenient share 0.10 thr -0.00 -> no trip ; w100: n=39<w NOT EVALUABLE; lenient share 0.10 thr 0.02 -> no trip ; w200: n=39<w NOT EVALUABLE; lenient share 0.10 thr 0.03 -> no trip
+   n00000157  4     leaf        89      0.81       0.16 (law) |       24 | w50: n=24<w NOT EVALUABLE; lenient share 0.12 thr 0.05 -> no trip ; w100: n=24<w NOT EVALUABLE; lenient share 0.12 thr 0.08 -> no trip ; w200: n=24<w NOT EVALUABLE; lenient share 0.12 thr 0.11 -> no trip
+   n00000158  4     leaf        87      0.79       0.08 (other) |       40 | w50: n=40<w NOT EVALUABLE; lenient share 0.00 thr 0.00 -> TRIP ; w100: n=40<w NOT EVALUABLE; lenient share 0.00 thr 0.03 -> TRIP ; w200: n=40<w NOT EVALUABLE; lenient share 0.00 thr 0.04 -> TRIP
+
+---- C2 / H3 units: the Law arm's Philosophy-modal leaves under the Philosophy anchor ----
+   node       depth kind   n_train share_dom train_pur(ref)  | arrivals | per window w: evaluated/tripped rate [first, ever] (perm-ever) thr ; lenient partial-window trip
+  reading A, threshold R
+   n00000116  3     leaf        14      0.07       0.93 (philosophy) |       12 | w50: n=12<w NOT EVALUABLE; lenient share 0.92 thr 0.60 -> no trip ; w100: n=12<w NOT EVALUABLE; lenient share 0.92 thr 0.60 -> no trip ; w200: n=12<w NOT EVALUABLE; lenient share 0.92 thr 0.60 -> no trip
+  reading A, threshold F
+   n00000116  3     leaf        14      0.07       0.93 (philosophy) |       12 | w50: n=12<w NOT EVALUABLE; lenient share 0.92 thr 0.86 -> no trip ; w100: n=12<w NOT EVALUABLE; lenient share 0.92 thr 0.88 -> no trip ; w200: n=12<w NOT EVALUABLE; lenient share 0.92 thr 0.89 -> no trip
+  reading B, threshold R
+   n00000116  3     leaf        14      0.07       0.93 (philosophy) |       12 | w50: n=12<w NOT EVALUABLE; lenient share 0.92 thr 0.60 -> no trip ; w100: n=12<w NOT EVALUABLE; lenient share 0.92 thr 0.60 -> no trip ; w200: n=12<w NOT EVALUABLE; lenient share 0.92 thr 0.60 -> no trip
+  reading B, threshold F
+   n00000116  3     leaf        14      0.07       0.93 (philosophy) |       12 | w50: n=12<w NOT EVALUABLE; lenient share 0.92 thr 0.86 -> no trip ; w100: n=12<w NOT EVALUABLE; lenient share 0.92 thr 0.88 -> no trip ; w200: n=12<w NOT EVALUABLE; lenient share 0.92 thr 0.89 -> no trip
+  reading C, threshold R
+   n00000116  3     leaf        14      0.07       0.93 (philosophy) |       12 | w50: n=12<w NOT EVALUABLE; lenient share 0.92 thr 0.60 -> no trip ; w100: n=12<w NOT EVALUABLE; lenient share 0.92 thr 0.60 -> no trip ; w200: n=12<w NOT EVALUABLE; lenient share 0.92 thr 0.60 -> no trip
+  reading C, threshold F
+   n00000116  3     leaf        14      0.07       0.93 (philosophy) |       12 | w50: n=12<w NOT EVALUABLE; lenient share 0.92 thr 0.86 -> no trip ; w100: n=12<w NOT EVALUABLE; lenient share 0.92 thr 0.88 -> no trip ; w200: n=12<w NOT EVALUABLE; lenient share 0.92 thr 0.89 -> no trip
+
+---- C2 / H2 units: ordinary (non-Philosophy-modal) leaves under the four Philosophy host anchors, Philosophy arm: 22 leaves ----
+   reading A thr R  | w50 strict 4/22 tripped 3, lenient 8/22 | w100 strict 0/22 tripped 0, lenient 8/22 | w200 strict 0/22 tripped 0, lenient 8/22
+   reading A thr F  | w50 strict 4/22 tripped 1, lenient 2/22 | w100 strict 0/22 tripped 0, lenient 2/22 | w200 strict 0/22 tripped 0, lenient 3/22
+   reading A thr F2 | w50 strict 4/22 tripped 1, lenient 2/22 | w100 strict 0/22 tripped 0, lenient 2/22 | w200 strict 0/22 tripped 0, lenient 2/22
+   reading B thr R  | w50 strict 4/22 tripped 3, lenient 7/22 | w100 strict 0/22 tripped 0, lenient 7/22 | w200 strict 0/22 tripped 0, lenient 7/22
+   reading B thr F  | w50 strict 4/22 tripped 2, lenient 3/22 | w100 strict 0/22 tripped 0, lenient 3/22 | w200 strict 0/22 tripped 0, lenient 3/22
+   reading B thr F2 | w50 strict 4/22 tripped 2, lenient 3/22 | w100 strict 0/22 tripped 0, lenient 3/22 | w200 strict 0/22 tripped 0, lenient 3/22
+   reading C thr R  | w50 strict 4/22 tripped 3, lenient 7/22 | w100 strict 0/22 tripped 0, lenient 7/22 | w200 strict 0/22 tripped 0, lenient 7/22
+   reading C thr F  | w50 strict 4/22 tripped 2, lenient 3/22 | w100 strict 0/22 tripped 0, lenient 3/22 | w200 strict 0/22 tripped 0, lenient 3/22
+   reading C thr F2 | w50 strict 4/22 tripped 2, lenient 3/22 | w100 strict 0/22 tripped 0, lenient 3/22 | w200 strict 0/22 tripped 0, lenient 3/22
+
+==== CRITERION TABLE (strict windows; 'trips' = ever trips over the sliding windows; NOT EVALUABLE when n < w) ====
+C1: trips on the 11 Law regions at >= 90% Law    C2: does NOT trip on the Philosophy hosts = H1 (4 anchors) + H2 (22 ordinary leaves under them) + H3 (1 leaves)
+  reading A thr R  w= 50 | C1 evaluable  8/11, ever-trip  8, first-window trip  8 (lenient incl. partial: 11/11) | C2 H1 3/4 H2 3/4 H3 0/0 tripped/evaluable | FAIL (trips on 6 Philosophy host unit(s): H1 3/4, H2 3/4, H3 0/0)
+  reading A thr R  w=100 | C1 evaluable  4/11, ever-trip  4, first-window trip  4 (lenient incl. partial: 11/11) | C2 H1 3/4 H2 0/0 H3 0/0 tripped/evaluable | FAIL (trips on 3 Philosophy host unit(s): H1 3/4, H2 0/0, H3 0/0) [C2 has no leaf-level unit with 100 arrivals; its count rests on the H1 anchor-level units only]
+  reading A thr R  w=200 | C1 evaluable  0/11, ever-trip  0, first-window trip  0 (lenient incl. partial: 11/11) | C2 H1 3/3 H2 0/0 H3 0/0 tripped/evaluable | NOT COMPUTED (no Law region has 200 arrivals)
+  reading A thr F  w= 50 | C1 evaluable  8/11, ever-trip  0, first-window trip  0 (lenient incl. partial:  0/11) | C2 H1 1/4 H2 1/4 H3 0/0 tripped/evaluable | FAIL (gate never trips on a Law region)
+  reading A thr F  w=100 | C1 evaluable  4/11, ever-trip  0, first-window trip  0 (lenient incl. partial:  0/11) | C2 H1 0/4 H2 0/0 H3 0/0 tripped/evaluable | FAIL (gate never trips on a Law region) [C2 has no leaf-level unit with 100 arrivals; its count rests on the H1 anchor-level units only]
+  reading A thr F  w=200 | C1 evaluable  0/11, ever-trip  0, first-window trip  0 (lenient incl. partial:  0/11) | C2 H1 0/3 H2 0/0 H3 0/0 tripped/evaluable | NOT COMPUTED (no Law region has 200 arrivals)
+  reading A thr F2 w= 50 | C1 evaluable  8/11, ever-trip  3, first-window trip  0 (lenient incl. partial:  3/11) | C2 H1 3/4 H2 1/4 H3 0/0 tripped/evaluable | FAIL (trips on 3 of 8 evaluable Law regions AND on 4 hosts)
+  reading A thr F2 w=100 | C1 evaluable  4/11, ever-trip  1, first-window trip  0 (lenient incl. partial:  1/11) | C2 H1 3/4 H2 0/0 H3 0/0 tripped/evaluable | FAIL (trips on 1 of 4 evaluable Law regions AND on 3 hosts) [C2 has no leaf-level unit with 100 arrivals; its count rests on the H1 anchor-level units only]
+  reading A thr F2 w=200 | C1 evaluable  0/11, ever-trip  0, first-window trip  0 (lenient incl. partial:  0/11) | C2 H1 1/3 H2 0/0 H3 0/0 tripped/evaluable | NOT COMPUTED (no Law region has 200 arrivals)
+  reading B thr R  w= 50 | C1 evaluable  8/11, ever-trip  0, first-window trip  0 (lenient incl. partial:  0/11) | C2 H1 3/4 H2 3/4 H3 0/0 tripped/evaluable | FAIL (gate never trips on a Law region)
+  reading B thr R  w=100 | C1 evaluable  4/11, ever-trip  0, first-window trip  0 (lenient incl. partial:  0/11) | C2 H1 3/4 H2 0/0 H3 0/0 tripped/evaluable | FAIL (gate never trips on a Law region) [C2 has no leaf-level unit with 100 arrivals; its count rests on the H1 anchor-level units only]
+  reading B thr R  w=200 | C1 evaluable  0/11, ever-trip  0, first-window trip  0 (lenient incl. partial:  0/11) | C2 H1 3/3 H2 0/0 H3 0/0 tripped/evaluable | NOT COMPUTED (no Law region has 200 arrivals)
+  reading B thr F  w= 50 | C1 evaluable  8/11, ever-trip  2, first-window trip  0 (lenient incl. partial:  2/11) | C2 H1 1/4 H2 2/4 H3 0/0 tripped/evaluable | FAIL (trips on 2 of 8 evaluable Law regions AND on 3 hosts)
+  reading B thr F  w=100 | C1 evaluable  4/11, ever-trip  1, first-window trip  1 (lenient incl. partial:  3/11) | C2 H1 0/4 H2 0/0 H3 0/0 tripped/evaluable | FAIL (trips on 1 of 4 evaluable Law regions) [C2 has no leaf-level unit with 100 arrivals; its count rests on the H1 anchor-level units only]
+  reading B thr F  w=200 | C1 evaluable  0/11, ever-trip  0, first-window trip  0 (lenient incl. partial:  3/11) | C2 H1 0/3 H2 0/0 H3 0/0 tripped/evaluable | NOT COMPUTED (no Law region has 200 arrivals)
+  reading B thr F2 w= 50 | C1 evaluable  8/11, ever-trip  5, first-window trip  3 (lenient incl. partial:  6/11) | C2 H1 3/4 H2 2/4 H3 0/0 tripped/evaluable | FAIL (trips on 5 of 8 evaluable Law regions AND on 5 hosts)
+  reading B thr F2 w=100 | C1 evaluable  4/11, ever-trip  1, first-window trip  1 (lenient incl. partial:  3/11) | C2 H1 3/4 H2 0/0 H3 0/0 tripped/evaluable | FAIL (trips on 1 of 4 evaluable Law regions AND on 3 hosts) [C2 has no leaf-level unit with 100 arrivals; its count rests on the H1 anchor-level units only]
+  reading B thr F2 w=200 | C1 evaluable  0/11, ever-trip  0, first-window trip  0 (lenient incl. partial:  3/11) | C2 H1 1/3 H2 0/0 H3 0/0 tripped/evaluable | NOT COMPUTED (no Law region has 200 arrivals)
+  reading C thr R  w= 50 | C1 evaluable  8/11, ever-trip  8, first-window trip  8 (lenient incl. partial: 11/11) | C2 H1 3/4 H2 3/4 H3 0/0 tripped/evaluable | FAIL (trips on 6 Philosophy host unit(s): H1 3/4, H2 3/4, H3 0/0)
+  reading C thr R  w=100 | C1 evaluable  4/11, ever-trip  4, first-window trip  4 (lenient incl. partial: 11/11) | C2 H1 3/4 H2 0/0 H3 0/0 tripped/evaluable | FAIL (trips on 3 Philosophy host unit(s): H1 3/4, H2 0/0, H3 0/0) [C2 has no leaf-level unit with 100 arrivals; its count rests on the H1 anchor-level units only]
+  reading C thr R  w=200 | C1 evaluable  0/11, ever-trip  0, first-window trip  0 (lenient incl. partial: 11/11) | C2 H1 3/3 H2 0/0 H3 0/0 tripped/evaluable | NOT COMPUTED (no Law region has 200 arrivals)
+  reading C thr F  w= 50 | C1 evaluable  8/11, ever-trip  0, first-window trip  0 (lenient incl. partial:  0/11) | C2 H1 1/4 H2 2/4 H3 0/0 tripped/evaluable | FAIL (gate never trips on a Law region)
+  reading C thr F  w=100 | C1 evaluable  4/11, ever-trip  0, first-window trip  0 (lenient incl. partial:  0/11) | C2 H1 0/4 H2 0/0 H3 0/0 tripped/evaluable | FAIL (gate never trips on a Law region) [C2 has no leaf-level unit with 100 arrivals; its count rests on the H1 anchor-level units only]
+  reading C thr F  w=200 | C1 evaluable  0/11, ever-trip  0, first-window trip  0 (lenient incl. partial:  2/11) | C2 H1 0/3 H2 0/0 H3 0/0 tripped/evaluable | NOT COMPUTED (no Law region has 200 arrivals)
+  reading C thr F2 w= 50 | C1 evaluable  8/11, ever-trip  5, first-window trip  2 (lenient incl. partial:  5/11) | C2 H1 3/4 H2 2/4 H3 0/0 tripped/evaluable | FAIL (trips on 5 of 8 evaluable Law regions AND on 5 hosts)
+  reading C thr F2 w=100 | C1 evaluable  4/11, ever-trip  2, first-window trip  1 (lenient incl. partial:  3/11) | C2 H1 3/4 H2 0/0 H3 0/0 tripped/evaluable | FAIL (trips on 2 of 4 evaluable Law regions AND on 3 hosts) [C2 has no leaf-level unit with 100 arrivals; its count rests on the H1 anchor-level units only]
+  reading C thr F2 w=200 | C1 evaluable  0/11, ever-trip  0, first-window trip  0 (lenient incl. partial:  2/11) | C2 H1 1/3 H2 0/0 H3 0/0 tripped/evaluable | NOT COMPUTED (no Law region has 200 arrivals)
+
+==== READING T (diagnostic): leaves whose modal TRAIN-side cell differs from the anchor they report under - needs no arrivals ====
+  arm law: law-modal leaves flagged 7/7; ordinary leaves flagged 13/91 {('math', 'computer science'): 2, ('engineering', 'math'): 1, ('philosophy', 'history'): 2, ('other', 'history'): 3, ('business', 'psychology'): 1, ('philosophy', 'psychology'): 3, ('health', 'psychology'): 1}; regions >= 60% law flagged 12/12 (depth-1 anchors count as flagged: their label is the foreign name)
+  arm philosophy: philosophy-modal leaves flagged 3/3; ordinary leaves flagged 3/85 {('business', 'psychology'): 1, ('math', 'computer science'): 2}; regions >= 60% philosophy flagged 4/4 (depth-1 anchors count as flagged: their label is the foreign name)
+
+==== SPECIFICITY: strict ever-trip counts over ALL leaves (and lenient partial-window trips), per arm, by (reading, threshold, window) ====
+  a leaf is 'dominated by the excluded domain' when its modal train-side cell is the arm's excluded domain; 'ordinary' otherwise
+  arm law: 98 leaves = 7 law-modal + 91 ordinary
+    reading A thr R  w= 50 | law-modal leaves: strict tripped 3/3 evaluable ; lenient tripped 7/7 | ordinary leaves: strict tripped 7/12 evaluable ; lenient tripped 26/91
+    reading A thr R  w=100 | law-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 7/7 | ordinary leaves: strict tripped 1/1 evaluable ; lenient tripped 26/91
+    reading A thr R  w=200 | law-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 7/7 | ordinary leaves: strict tripped 0/0 evaluable ; lenient tripped 25/91
+    reading A thr F  w= 50 | law-modal leaves: strict tripped 0/3 evaluable ; lenient tripped 0/7 | ordinary leaves: strict tripped 1/12 evaluable ; lenient tripped 8/91
+    reading A thr F  w=100 | law-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 1/7 | ordinary leaves: strict tripped 0/1 evaluable ; lenient tripped 15/91
+    reading A thr F  w=200 | law-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 1/7 | ordinary leaves: strict tripped 0/0 evaluable ; lenient tripped 21/91
+    reading A thr F2 w= 50 | law-modal leaves: strict tripped 1/3 evaluable ; lenient tripped 2/7 | ordinary leaves: strict tripped 2/12 evaluable ; lenient tripped 15/91
+    reading A thr F2 w=100 | law-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 1/7 | ordinary leaves: strict tripped 0/1 evaluable ; lenient tripped 14/91
+    reading A thr F2 w=200 | law-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 1/7 | ordinary leaves: strict tripped 0/0 evaluable ; lenient tripped 14/91
+    reading B thr R  w= 50 | law-modal leaves: strict tripped 0/3 evaluable ; lenient tripped 1/7 | ordinary leaves: strict tripped 7/12 evaluable ; lenient tripped 21/91
+    reading B thr R  w=100 | law-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 1/7 | ordinary leaves: strict tripped 1/1 evaluable ; lenient tripped 21/91
+    reading B thr R  w=200 | law-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 1/7 | ordinary leaves: strict tripped 0/0 evaluable ; lenient tripped 20/91
+    reading B thr F  w= 50 | law-modal leaves: strict tripped 1/3 evaluable ; lenient tripped 1/7 | ordinary leaves: strict tripped 1/12 evaluable ; lenient tripped 9/91
+    reading B thr F  w=100 | law-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 2/7 | ordinary leaves: strict tripped 0/1 evaluable ; lenient tripped 17/91
+    reading B thr F  w=200 | law-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 2/7 | ordinary leaves: strict tripped 0/0 evaluable ; lenient tripped 23/91
+    reading B thr F2 w= 50 | law-modal leaves: strict tripped 1/3 evaluable ; lenient tripped 2/7 | ordinary leaves: strict tripped 3/12 evaluable ; lenient tripped 17/91
+    reading B thr F2 w=100 | law-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 2/7 | ordinary leaves: strict tripped 0/1 evaluable ; lenient tripped 16/91
+    reading B thr F2 w=200 | law-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 2/7 | ordinary leaves: strict tripped 0/0 evaluable ; lenient tripped 16/91
+    reading C thr R  w= 50 | law-modal leaves: strict tripped 3/3 evaluable ; lenient tripped 7/7 | ordinary leaves: strict tripped 7/12 evaluable ; lenient tripped 21/91
+    reading C thr R  w=100 | law-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 7/7 | ordinary leaves: strict tripped 1/1 evaluable ; lenient tripped 21/91
+    reading C thr R  w=200 | law-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 7/7 | ordinary leaves: strict tripped 0/0 evaluable ; lenient tripped 20/91
+    reading C thr F  w= 50 | law-modal leaves: strict tripped 0/3 evaluable ; lenient tripped 0/7 | ordinary leaves: strict tripped 1/12 evaluable ; lenient tripped 9/91
+    reading C thr F  w=100 | law-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 1/7 | ordinary leaves: strict tripped 0/1 evaluable ; lenient tripped 17/91
+    reading C thr F  w=200 | law-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 2/7 | ordinary leaves: strict tripped 0/0 evaluable ; lenient tripped 23/91
+    reading C thr F2 w= 50 | law-modal leaves: strict tripped 1/3 evaluable ; lenient tripped 2/7 | ordinary leaves: strict tripped 3/12 evaluable ; lenient tripped 17/91
+    reading C thr F2 w=100 | law-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 1/7 | ordinary leaves: strict tripped 0/1 evaluable ; lenient tripped 16/91
+    reading C thr F2 w=200 | law-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 1/7 | ordinary leaves: strict tripped 0/0 evaluable ; lenient tripped 16/91
+  arm law depth-1 anchors (train n, law share, own-name train purity, arrivals): Physics n=907 0.00 pur=0.75 arr=396; Computer science n=695 0.00 pur=0.34 arr=308; Math n=945 0.00 pur=0.78 arr=376; Health n=536 0.00 pur=0.78 arr=228; Economics n=588 0.00 pur=0.83 arr=239; History n=677 0.03 pur=0.38 arr=234; Other n=494 0.72 pur=0.19 arr=210; Biology n=614 0.00 pur=0.68 arr=268; Chemistry n=938 0.00 pur=0.72 arr=359; Business n=587 0.00 pur=0.70 arr=237; Philosophy n=386 0.94 pur=0.04 arr=165; Psychology n=993 0.02 pur=0.51 arr=361; Engineering n=530 0.00 pur=0.77 arr=218
+    anchors tripping (strict, ever) reading A thr R  | w50: Physics, Computer science, History, Other, Philosophy, Psychology | w100: Computer science, History, Other, Philosophy, Psychology | w200: Computer science, History, Other, Psychology
+    anchors tripping (strict, ever) reading A thr F  | w50: Physics, Computer science, Math, Economics, Other, Engineering | w100: Physics, Computer science, Math, Other | w200: Math, Other
+    anchors tripping (strict, ever) reading A thr F2 | w50: Physics, Computer science, Math, Health, Economics, History, Other, Biology, Chemistry, Business, Psychology, Engineering | w100: Physics, Computer science, Math, Health, Economics, Other, Biology, Chemistry, Psychology, Engineering | w200: Physics, Computer science, Math, Other, Psychology
+    anchors tripping (strict, ever) reading B thr R  | w50: Physics, Computer science, History, Psychology | w100: Computer science, History, Psychology | w200: Computer science, History, Psychology
+    anchors tripping (strict, ever) reading B thr F  | w50: Physics, Computer science, Math, Economics, Philosophy, Engineering | w100: Physics, Computer science, Math, Philosophy | w200: Math
+    anchors tripping (strict, ever) reading B thr F2 | w50: Physics, Computer science, Math, Health, Economics, History, Biology, Chemistry, Business, Philosophy, Psychology, Engineering | w100: Physics, Computer science, Math, Health, Economics, Biology, Chemistry, Philosophy, Psychology, Engineering | w200: Physics, Computer science, Math, Psychology
+    anchors tripping (strict, ever) reading C thr R  | w50: Physics, Computer science, History, Other, Philosophy, Psychology | w100: Computer science, History, Other, Philosophy, Psychology | w200: Computer science, History, Other, Psychology
+    anchors tripping (strict, ever) reading C thr F  | w50: Physics, Computer science, Math, Economics, Other, Engineering | w100: Physics, Computer science, Math, Other | w200: Math, Other
+    anchors tripping (strict, ever) reading C thr F2 | w50: Physics, Computer science, Math, Health, Economics, History, Other, Biology, Chemistry, Business, Psychology, Engineering | w100: Physics, Computer science, Math, Health, Economics, Other, Biology, Chemistry, Psychology, Engineering | w200: Physics, Computer science, Math, Other, Psychology
+  arm philosophy: 88 leaves = 3 philosophy-modal + 85 ordinary
+    reading A thr R  w= 50 | philosophy-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 3/3 | ordinary leaves: strict tripped 7/19 evaluable ; lenient tripped 19/85
+    reading A thr R  w=100 | philosophy-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 3/3 | ordinary leaves: strict tripped 1/1 evaluable ; lenient tripped 19/85
+    reading A thr R  w=200 | philosophy-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 3/3 | ordinary leaves: strict tripped 0/0 evaluable ; lenient tripped 18/85
+    reading A thr F  w= 50 | philosophy-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 1/3 | ordinary leaves: strict tripped 1/19 evaluable ; lenient tripped 9/85
+    reading A thr F  w=100 | philosophy-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 1/3 | ordinary leaves: strict tripped 0/1 evaluable ; lenient tripped 13/85
+    reading A thr F  w=200 | philosophy-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 2/3 | ordinary leaves: strict tripped 0/0 evaluable ; lenient tripped 18/85
+    reading A thr F2 w= 50 | philosophy-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 1/3 | ordinary leaves: strict tripped 3/19 evaluable ; lenient tripped 14/85
+    reading A thr F2 w=100 | philosophy-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 1/3 | ordinary leaves: strict tripped 0/1 evaluable ; lenient tripped 12/85
+    reading A thr F2 w=200 | philosophy-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 1/3 | ordinary leaves: strict tripped 0/0 evaluable ; lenient tripped 12/85
+    reading B thr R  w= 50 | philosophy-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 0/3 | ordinary leaves: strict tripped 7/19 evaluable ; lenient tripped 18/85
+    reading B thr R  w=100 | philosophy-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 0/3 | ordinary leaves: strict tripped 1/1 evaluable ; lenient tripped 18/85
+    reading B thr R  w=200 | philosophy-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 0/3 | ordinary leaves: strict tripped 0/0 evaluable ; lenient tripped 17/85
+    reading B thr F  w= 50 | philosophy-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 0/3 | ordinary leaves: strict tripped 2/19 evaluable ; lenient tripped 10/85
+    reading B thr F  w=100 | philosophy-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 0/3 | ordinary leaves: strict tripped 0/1 evaluable ; lenient tripped 14/85
+    reading B thr F  w=200 | philosophy-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 1/3 | ordinary leaves: strict tripped 0/0 evaluable ; lenient tripped 18/85
+    reading B thr F2 w= 50 | philosophy-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 0/3 | ordinary leaves: strict tripped 4/19 evaluable ; lenient tripped 15/85
+    reading B thr F2 w=100 | philosophy-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 0/3 | ordinary leaves: strict tripped 0/1 evaluable ; lenient tripped 13/85
+    reading B thr F2 w=200 | philosophy-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 0/3 | ordinary leaves: strict tripped 0/0 evaluable ; lenient tripped 13/85
+    reading C thr R  w= 50 | philosophy-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 3/3 | ordinary leaves: strict tripped 7/19 evaluable ; lenient tripped 18/85
+    reading C thr R  w=100 | philosophy-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 3/3 | ordinary leaves: strict tripped 1/1 evaluable ; lenient tripped 18/85
+    reading C thr R  w=200 | philosophy-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 3/3 | ordinary leaves: strict tripped 0/0 evaluable ; lenient tripped 17/85
+    reading C thr F  w= 50 | philosophy-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 1/3 | ordinary leaves: strict tripped 2/19 evaluable ; lenient tripped 10/85
+    reading C thr F  w=100 | philosophy-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 1/3 | ordinary leaves: strict tripped 0/1 evaluable ; lenient tripped 14/85
+    reading C thr F  w=200 | philosophy-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 1/3 | ordinary leaves: strict tripped 0/0 evaluable ; lenient tripped 18/85
+    reading C thr F2 w= 50 | philosophy-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 1/3 | ordinary leaves: strict tripped 4/19 evaluable ; lenient tripped 15/85
+    reading C thr F2 w=100 | philosophy-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 1/3 | ordinary leaves: strict tripped 0/1 evaluable ; lenient tripped 13/85
+    reading C thr F2 w=200 | philosophy-modal leaves: strict tripped 0/0 evaluable ; lenient tripped 1/3 | ordinary leaves: strict tripped 0/0 evaluable ; lenient tripped 13/85
+  arm philosophy depth-1 anchors (train n, philosophy share, own-name train purity, arrivals): Math n=930 0.00 pur=0.80 arr=377; Physics n=908 0.00 pur=0.76 arr=394; Economics n=572 0.00 pur=0.85 arr=235; Other n=784 0.26 pur=0.46 arr=289; Health n=520 0.01 pur=0.78 arr=224; Chemistry n=937 0.00 pur=0.72 arr=359; History n=350 0.09 pur=0.71 arr=133; Psychology n=798 0.13 pur=0.59 arr=285; Biology n=602 0.00 pur=0.69 arr=268; Business n=585 0.00 pur=0.72 arr=236; Computer science n=602 0.08 pur=0.40 arr=262; Law n=726 0.01 pur=0.95 arr=320; Engineering n=531 0.00 pur=0.76 arr=217
+    anchors tripping (strict, ever) reading A thr R  | w50: Physics, Other, Psychology, Computer science | w100: Other, Psychology, Computer science | w200: Other, Psychology, Computer science
+    anchors tripping (strict, ever) reading A thr F  | w50: Math, Physics, Economics, Computer science, Engineering | w100: Math, Economics | w200: Math
+    anchors tripping (strict, ever) reading A thr F2 | w50: Math, Physics, Economics, Other, Health, Chemistry, Psychology, Biology, Business, Computer science, Law, Engineering | w100: Math, Physics, Economics, Other, Chemistry, Psychology, Biology, Computer science, Law, Engineering | w200: Math, Physics, Economics, Computer science
+    anchors tripping (strict, ever) reading B thr R  | w50: Physics, Other, Psychology, Computer science | w100: Other, Psychology, Computer science | w200: Other, Psychology, Computer science
+    anchors tripping (strict, ever) reading B thr F  | w50: Math, Physics, Economics, Computer science, Engineering | w100: Math, Economics | w200: Math
+    anchors tripping (strict, ever) reading B thr F2 | w50: Math, Physics, Economics, Other, Health, Chemistry, Psychology, Biology, Business, Computer science, Law, Engineering | w100: Math, Physics, Economics, Other, Chemistry, Psychology, Biology, Computer science, Law, Engineering | w200: Math, Physics, Economics, Computer science
+    anchors tripping (strict, ever) reading C thr R  | w50: Physics, Other, Psychology, Computer science | w100: Other, Psychology, Computer science | w200: Other, Psychology, Computer science
+    anchors tripping (strict, ever) reading C thr F  | w50: Math, Physics, Economics, Computer science, Engineering | w100: Math, Economics | w200: Math
+    anchors tripping (strict, ever) reading C thr F2 | w50: Math, Physics, Economics, Other, Health, Chemistry, Psychology, Biology, Business, Computer science, Law, Engineering | w100: Math, Physics, Economics, Other, Chemistry, Psychology, Biology, Computer science, Law, Engineering | w200: Math, Physics, Economics, Computer science
+
+==== READING A COST: share of ALL held-out arrivals that would be filed FOREIGN (arrival counted FOREIGN once its leaf has tripped, strict), per arm ====
+  arm law thr R  w= 50 | leaves tripped 10/98 | arrivals filed FOREIGN after the trip:  250/3599 (6.9%), of which law: 36/330
+  arm law thr R  w=100 | leaves tripped  1/98 | arrivals filed FOREIGN after the trip:   88/3599 (2.4%), of which law: 0/330
+  arm law thr R  w=200 | leaves tripped  0/98 | arrivals filed FOREIGN after the trip:    0/3599 (0.0%), of which law: 0/330
+  arm law thr F  w= 50 | leaves tripped  1/98 | arrivals filed FOREIGN after the trip:    8/3599 (0.2%), of which law: 0/330
+  arm law thr F  w=100 | leaves tripped  0/98 | arrivals filed FOREIGN after the trip:    0/3599 (0.0%), of which law: 0/330
+  arm law thr F  w=200 | leaves tripped  0/98 | arrivals filed FOREIGN after the trip:    0/3599 (0.0%), of which law: 0/330
+  arm law thr F2 w= 50 | leaves tripped  3/98 | arrivals filed FOREIGN after the trip:  153/3599 (4.3%), of which law: 1/330
+  arm law thr F2 w=100 | leaves tripped  0/98 | arrivals filed FOREIGN after the trip:    0/3599 (0.0%), of which law: 0/330
+  arm law thr F2 w=200 | leaves tripped  0/98 | arrivals filed FOREIGN after the trip:    0/3599 (0.0%), of which law: 0/330
+  arm philosophy thr R  w= 50 | leaves tripped  7/88 | arrivals filed FOREIGN after the trip:  245/3599 (6.8%), of which philosophy: 22/150
+  arm philosophy thr R  w=100 | leaves tripped  1/88 | arrivals filed FOREIGN after the trip:   88/3599 (2.4%), of which philosophy: 0/150
+  arm philosophy thr R  w=200 | leaves tripped  0/88 | arrivals filed FOREIGN after the trip:    0/3599 (0.0%), of which philosophy: 0/150
+  arm philosophy thr F  w= 50 | leaves tripped  1/88 | arrivals filed FOREIGN after the trip:    3/3599 (0.1%), of which philosophy: 0/150
+  arm philosophy thr F  w=100 | leaves tripped  0/88 | arrivals filed FOREIGN after the trip:    0/3599 (0.0%), of which philosophy: 0/150
+  arm philosophy thr F  w=200 | leaves tripped  0/88 | arrivals filed FOREIGN after the trip:    0/3599 (0.0%), of which philosophy: 0/150
+  arm philosophy thr F2 w= 50 | leaves tripped  3/88 | arrivals filed FOREIGN after the trip:  156/3599 (4.3%), of which philosophy: 0/150
+  arm philosophy thr F2 w=100 | leaves tripped  0/88 | arrivals filed FOREIGN after the trip:    0/3599 (0.0%), of which philosophy: 0/150
+  arm philosophy thr F2 w=200 | leaves tripped  0/88 | arrivals filed FOREIGN after the trip:    0/3599 (0.0%), of which philosophy: 0/150
+
+==== INTERPRETATION ====
+1. WINDOW. The largest leaf arrival count is 196 (Law arm) / 196 (Philosophy arm); leaves with >= 50/100/200 arrivals: 15/1/0 of 98 and 19/1/0 of 88.
+   The FRAMEWORK gate's 'last 200 arrivals' is never evaluable at leaf level on the D4 artefacts; Law regions with 200 arrivals: 0 of 11.
+2. LITERAL GATE (reading B: declared cell vs the leaf's modal TRAIN-side cell). The Law regions' modal train cell IS Law, so Law arrivals
+   match (arrival Law share 0.89-1.00 over the 11 regions): at 0.60 the gate trips on 0 of 8 evaluable Law regions at w=50 and 0 of 4 at w=100.
+   Under purity - 2 SD it trips on 2 of 8 evaluable regions at w=50: n00000013 (train purity 0.94, thr 0.87, 42% of windows, perm-ever 0.85); n00000219 (train purity 1.00, thr 1.00, 15% of windows, perm-ever 1.00) - trips by sampling noise against a threshold at or near the
+   train purity, not by mislabelling. As written the gate is a drift detector and cannot be the 'fix for D4' (RESOLVE L145): D4's failure is
+   train-side content that disagrees with the anchor name, and reading T finds it with no arrivals at all (7/7 Law-modal leaves, 12/12 Law regions;
+   false flags on ordinary leaves: 13/91 Law arm, 3/85 Philosophy arm).
+3. ANCHOR-REFERENCED GATE (reading A: declared cell vs the host anchor's name), 0.60 fixed: trips on 8/8 evaluable Law regions at w=50 and 4/4 at w=100,
+   first-window trips 8/8 and 4/4 - the RESOLVE claim holds there. But it also trips 3 of the 4 Philosophy host anchors at w=50 (Other 0.46, Psychology 0.59, Computer science 0.40 own-name train purity),
+   3/4 evaluable ordinary leaves under them, 7/12 (Law arm) and 7/19 (Philosophy arm) evaluable ORDINARY leaves overall at w=50, and 6 / 4 depth-1 anchors per arm:
+   the tree's own routing precision (Top-1 anchor 0.59 / 0.70) sits under 0.60 routinely, so a fixed 0.60 is not specific to a takeover.
+   With purity - 2 SD (F: 0/8, F2: 3/8 Law regions at w=50) reading A does not trip on the Law regions, because the train-side share in the anchor's cell
+   is already 0.00-0.05 there and the threshold falls to or below 0.
+   Cost at leaf level (the gate's own unit): in the Law arm 36 of 330 held-out Law arrivals are filed FOREIGN at w=50 and 0 at w=100 under 0.60, because
+   most Law leaves never reach w arrivals inside the 3,599-query trickle; 89-100% of held-out Law stays attributed to its host at every window.
+3b. REGISTERED-MODAL GATE (reading C, the reading most favourable to the programme: the excluded domain is not a cell, so the Law regions'
+   reference is their small registered remainder, 0.00-0.08 train share): at 0.60 it trips on 8/8 evaluable Law regions at w=50 (first window 8/8) and 4/4 at w=100,
+   but still on H1 3/4, H2 3/4 host units (an ordinary leaf whose own registered mode is under 0.60 of its arrivals trips regardless of reference),
+   7/12 (Law arm) and 7/19 (Philosophy arm) evaluable ordinary leaves at w=50; under purity - 2 SD it trips on 0/8 Law regions (threshold at or below 0 again).
+4. No (reading, threshold, window) combination satisfies both halves of the criterion. The two halves pull apart: the reference that makes
+   the Law regions trip (the anchor's name) is the one on which ordinary leaves also fall under 0.60, and the threshold form that spares ordinary
+   leaves (purity - 2 SD in the reference cell) is zero on the Law regions. What separates D4's regions from the hosts is the train-side
+   disagreement between a leaf's modal declared cell and its anchor (reading T), which is a build-time property and not a property of any arrival window.
+
+==== TRIP RATE (headline): leaves that ever trip / leaves with >= w arrivals (strict), and lenient partial-window trips / all leaves, per arm ====
+  arm law        reading A thr R  | w50 strict 10/15 (0.67) lenient 33/98 (0.34) | w100 strict 1/1 (1.00) lenient 33/98 (0.34) | w200 strict 0/0 (n/a) lenient 32/98 (0.33)
+  arm law        reading A thr F  | w50 strict 1/15 (0.07) lenient 8/98 (0.08) | w100 strict 0/1 (0.00) lenient 16/98 (0.16) | w200 strict 0/0 (n/a) lenient 22/98 (0.22)
+  arm law        reading A thr F2 | w50 strict 3/15 (0.20) lenient 17/98 (0.17) | w100 strict 0/1 (0.00) lenient 15/98 (0.15) | w200 strict 0/0 (n/a) lenient 15/98 (0.15)
+  arm law        reading B thr R  | w50 strict 7/15 (0.47) lenient 22/98 (0.22) | w100 strict 1/1 (1.00) lenient 22/98 (0.22) | w200 strict 0/0 (n/a) lenient 21/98 (0.21)
+  arm law        reading B thr F  | w50 strict 2/15 (0.13) lenient 10/98 (0.10) | w100 strict 0/1 (0.00) lenient 19/98 (0.19) | w200 strict 0/0 (n/a) lenient 25/98 (0.26)
+  arm law        reading B thr F2 | w50 strict 4/15 (0.27) lenient 19/98 (0.19) | w100 strict 0/1 (0.00) lenient 18/98 (0.18) | w200 strict 0/0 (n/a) lenient 18/98 (0.18)
+  arm law        reading C thr R  | w50 strict 10/15 (0.67) lenient 28/98 (0.29) | w100 strict 1/1 (1.00) lenient 28/98 (0.29) | w200 strict 0/0 (n/a) lenient 27/98 (0.28)
+  arm law        reading C thr F  | w50 strict 1/15 (0.07) lenient 9/98 (0.09) | w100 strict 0/1 (0.00) lenient 18/98 (0.18) | w200 strict 0/0 (n/a) lenient 25/98 (0.26)
+  arm law        reading C thr F2 | w50 strict 4/15 (0.27) lenient 19/98 (0.19) | w100 strict 0/1 (0.00) lenient 17/98 (0.17) | w200 strict 0/0 (n/a) lenient 17/98 (0.17)
+  arm philosophy reading A thr R  | w50 strict 7/19 (0.37) lenient 22/88 (0.25) | w100 strict 1/1 (1.00) lenient 22/88 (0.25) | w200 strict 0/0 (n/a) lenient 21/88 (0.24)
+  arm philosophy reading A thr F  | w50 strict 1/19 (0.05) lenient 10/88 (0.11) | w100 strict 0/1 (0.00) lenient 14/88 (0.16) | w200 strict 0/0 (n/a) lenient 20/88 (0.23)
+  arm philosophy reading A thr F2 | w50 strict 3/19 (0.16) lenient 15/88 (0.17) | w100 strict 0/1 (0.00) lenient 13/88 (0.15) | w200 strict 0/0 (n/a) lenient 13/88 (0.15)
+  arm philosophy reading B thr R  | w50 strict 7/19 (0.37) lenient 18/88 (0.20) | w100 strict 1/1 (1.00) lenient 18/88 (0.20) | w200 strict 0/0 (n/a) lenient 17/88 (0.19)
+  arm philosophy reading B thr F  | w50 strict 2/19 (0.11) lenient 10/88 (0.11) | w100 strict 0/1 (0.00) lenient 14/88 (0.16) | w200 strict 0/0 (n/a) lenient 19/88 (0.22)
+  arm philosophy reading B thr F2 | w50 strict 4/19 (0.21) lenient 15/88 (0.17) | w100 strict 0/1 (0.00) lenient 13/88 (0.15) | w200 strict 0/0 (n/a) lenient 13/88 (0.15)
+  arm philosophy reading C thr R  | w50 strict 7/19 (0.37) lenient 21/88 (0.24) | w100 strict 1/1 (1.00) lenient 21/88 (0.24) | w200 strict 0/0 (n/a) lenient 20/88 (0.23)
+  arm philosophy reading C thr F  | w50 strict 2/19 (0.11) lenient 11/88 (0.12) | w100 strict 0/1 (0.00) lenient 15/88 (0.17) | w200 strict 0/0 (n/a) lenient 19/88 (0.22)
+  arm philosophy reading C thr F2 | w50 strict 4/19 (0.21) lenient 16/88 (0.18) | w100 strict 0/1 (0.00) lenient 14/88 (0.16) | w200 strict 0/0 (n/a) lenient 14/88 (0.16)
+
+==== VERDICT ====
+Literal gate (reading B, modal train-side cell), 0.60 fixed: w50 FAIL (gate never trips on a Law region) ; w100 FAIL (gate never trips on a Law region) [C2 has no leaf-level unit with 100 arrivals; its count rests on the H1 anchor-level units only] ; w200 NOT COMPUTED (no Law region has 200 arrivals)
+Literal gate (reading B, modal train-side cell), purity - 2 SD, SD over the window: w50 FAIL (trips on 2 of 8 evaluable Law regions AND on 3 hosts) ; w100 FAIL (trips on 1 of 4 evaluable Law regions) [C2 has no leaf-level unit with 100 arrivals; its count rests on the H1 anchor-level units only] ; w200 NOT COMPUTED (no Law region has 200 arrivals)
+Literal gate (reading B, modal train-side cell), purity - 2 SD, SD over n_train: w50 FAIL (trips on 5 of 8 evaluable Law regions AND on 5 hosts) ; w100 FAIL (trips on 1 of 4 evaluable Law regions AND on 3 hosts) [C2 has no leaf-level unit with 100 arrivals; its count rests on the H1 anchor-level units only] ; w200 NOT COMPUTED (no Law region has 200 arrivals)
+Anchor-referenced gate (reading A, host anchor's cell), 0.60 fixed: w50 FAIL (trips on 6 Philosophy host unit(s): H1 3/4, H2 3/4, H3 0/0) ; w100 FAIL (trips on 3 Philosophy host unit(s): H1 3/4, H2 0/0, H3 0/0) [C2 has no leaf-level unit with 100 arrivals; its count rests on the H1 anchor-level units only] ; w200 NOT COMPUTED (no Law region has 200 arrivals)
+Anchor-referenced gate (reading A, host anchor's cell), purity - 2 SD, SD over the window: w50 FAIL (gate never trips on a Law region) ; w100 FAIL (gate never trips on a Law region) [C2 has no leaf-level unit with 100 arrivals; its count rests on the H1 anchor-level units only] ; w200 NOT COMPUTED (no Law region has 200 arrivals)
+Anchor-referenced gate (reading A, host anchor's cell), purity - 2 SD, SD over n_train: w50 FAIL (trips on 3 of 8 evaluable Law regions AND on 4 hosts) ; w100 FAIL (trips on 1 of 4 evaluable Law regions AND on 3 hosts) [C2 has no leaf-level unit with 100 arrivals; its count rests on the H1 anchor-level units only] ; w200 NOT COMPUTED (no Law region has 200 arrivals)
+Registered-modal gate (reading C, modal registered train-side cell), 0.60 fixed: w50 FAIL (trips on 6 Philosophy host unit(s): H1 3/4, H2 3/4, H3 0/0) ; w100 FAIL (trips on 3 Philosophy host unit(s): H1 3/4, H2 0/0, H3 0/0) [C2 has no leaf-level unit with 100 arrivals; its count rests on the H1 anchor-level units only] ; w200 NOT COMPUTED (no Law region has 200 arrivals)
+Registered-modal gate (reading C, modal registered train-side cell), purity - 2 SD, SD over the window: w50 FAIL (gate never trips on a Law region) ; w100 FAIL (gate never trips on a Law region) [C2 has no leaf-level unit with 100 arrivals; its count rests on the H1 anchor-level units only] ; w200 NOT COMPUTED (no Law region has 200 arrivals)
+Registered-modal gate (reading C, modal registered train-side cell), purity - 2 SD, SD over n_train: w50 FAIL (trips on 5 of 8 evaluable Law regions AND on 5 hosts) ; w100 FAIL (trips on 2 of 4 evaluable Law regions AND on 3 hosts) [C2 has no leaf-level unit with 100 arrivals; its count rests on the H1 anchor-level units only] ; w200 NOT COMPUTED (no Law region has 200 arrivals)
+OVERALL: w=50 FAIL under every reading; w=100 FAIL under every reading; w=200 NOT COMPUTED.

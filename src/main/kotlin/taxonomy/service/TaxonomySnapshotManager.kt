@@ -1,0 +1,1014 @@
+package taxonomy.service
+
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import org.slf4j.LoggerFactory
+import org.springframework.stereotype.Component
+import taxonomy.*
+import taxonomy.arena.*
+import taxonomy.config.*
+import taxonomy.controller.*
+import taxonomy.dataset.*
+import taxonomy.model.*
+import taxonomy.operations.*
+import taxonomy.prompts.*
+import taxonomy.runner.*
+import taxonomy.service.*
+import taxonomy.tui.*
+import taxonomy.utils.*
+import java.io.File
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
+/**
+ * Metrics stored alongside a DAG snapshot.
+ *
+ * The fields mirror the canonical [taxonomy.model.TaxonomyMetricsData] exactly
+ * (plus the snapshot-only [nodesWithJudges]); all defaults are tolerant so old
+ * snapshot rows written before a field existed still deserialize. The JSON
+ * shape is kept FLAT (unchanged from earlier versions) for backward
+ * compatibility — never reorder/rename existing fields.
+ *
+ * Construction must go through [fromReport] so there is a single place that
+ * maps a computed report into persisted metrics. Use [toData] / [fromData] to
+ * convert to and from the canonical payload.
+ */
+@Serializable
+data class SnapshotMetrics(
+    val totalNodes: Int,
+    val leafNodes: Int,
+    val crossDomainNodes: Int,
+    val maxDepth: Int,
+    val totalUniqueQueries: Int,
+    val nmi: Double = 0.0,
+    val ari: Double = 0.0,
+    val dendrogramPurity: Double = 0.0,
+    val weightedLeafPurity: Double = 0.0,
+    val edgeF1: Double = 0.0,
+    val sphericalSilhouette: Double = 0.0,
+    val ancestorCorrectRate: Double = 0.0,
+    val hPrecision: Double = 0.0,
+    val hRecall: Double = 0.0,
+    val hF1: Double = 0.0,
+    val avgMatchCount: Double = 1.0,
+    val contaminationRatio: Double = 0.0,
+    val nodesWithJudges: Int = 0,
+    val avgLeafDepth: Double = 0.0,
+    val residualQueries: Int = 0,
+    val residualRatio: Double = 0.0,
+    val maxLeafConcentration: Double = 0.0,
+    val equilibriumIndex: Double = 0.0,
+    val leafDistribEntropy: Double = 0.0,
+    val medianLeafAssignments: Double = 0.0,
+    /** Average vMF κ per depth level. Defaulted for backward compatibility. */
+    val kappaByDepth: Map<Int, Double> = emptyMap(),
+    // Publication-grade metrics (PR #49)
+    val totalDasguptaCost: Double = 0.0,
+    val routingECE: Double = 0.0,
+    val tripletAccuracy: Double = 0.0,
+    val normalisedSackin: Double = 0.0,
+) {
+    /** Project onto the canonical metrics payload (drops snapshot-only fields). */
+    fun toData(): TaxonomyMetricsData = TaxonomyMetricsData(
+        totalNodes            = totalNodes,
+        leafNodes             = leafNodes,
+        crossDomainNodes      = crossDomainNodes,
+        maxDepth              = maxDepth,
+        avgLeafDepth          = avgLeafDepth,
+        medianLeafAssignments = medianLeafAssignments,
+        totalUniqueQueries    = totalUniqueQueries,
+        residualQueries       = residualQueries,
+        residualRatio         = residualRatio,
+        maxLeafConcentration  = maxLeafConcentration,
+        contaminationRatio    = contaminationRatio,
+        equilibriumIndex      = equilibriumIndex,
+        nmi                   = nmi,
+        ari                   = ari,
+        dendrogramPurity      = dendrogramPurity,
+        weightedLeafPurity    = weightedLeafPurity,
+        edgeF1                = edgeF1,
+        sphericalSilhouette   = sphericalSilhouette,
+        ancestorCorrectRate   = ancestorCorrectRate,
+        hPrecision            = hPrecision,
+        hRecall               = hRecall,
+        hF1                   = hF1,
+        avgMatchCount         = avgMatchCount,
+        kappaByDepth          = kappaByDepth,
+        leafDistribEntropy    = leafDistribEntropy,
+        totalDasguptaCost     = totalDasguptaCost,
+        routingECE            = routingECE,
+        tripletAccuracy       = tripletAccuracy,
+        normalisedSackin      = normalisedSackin,
+    )
+
+    companion object {
+        /** Single bridge from the canonical payload to persisted snapshot metrics. */
+        fun fromData(data: TaxonomyMetricsData, nodesWithJudges: Int = 0): SnapshotMetrics =
+            SnapshotMetrics(
+                totalNodes            = data.totalNodes,
+                leafNodes             = data.leafNodes,
+                crossDomainNodes      = data.crossDomainNodes,
+                maxDepth              = data.maxDepth,
+                totalUniqueQueries    = data.totalUniqueQueries,
+                nmi                   = data.nmi,
+                ari                   = data.ari,
+                dendrogramPurity      = data.dendrogramPurity,
+                weightedLeafPurity    = data.weightedLeafPurity,
+                edgeF1                = data.edgeF1,
+                sphericalSilhouette   = data.sphericalSilhouette,
+                ancestorCorrectRate   = data.ancestorCorrectRate,
+                hPrecision            = data.hPrecision,
+                hRecall               = data.hRecall,
+                hF1                   = data.hF1,
+                avgMatchCount         = data.avgMatchCount,
+                contaminationRatio    = data.contaminationRatio,
+                nodesWithJudges       = nodesWithJudges,
+                avgLeafDepth          = data.avgLeafDepth,
+                residualQueries       = data.residualQueries,
+                residualRatio         = data.residualRatio,
+                maxLeafConcentration  = data.maxLeafConcentration,
+                equilibriumIndex      = data.equilibriumIndex,
+                leafDistribEntropy    = data.leafDistribEntropy,
+                medianLeafAssignments = data.medianLeafAssignments,
+                kappaByDepth          = data.kappaByDepth,
+                totalDasguptaCost     = data.totalDasguptaCost,
+                routingECE            = data.routingECE,
+                tripletAccuracy       = data.tripletAccuracy,
+                normalisedSackin      = data.normalisedSackin,
+            )
+
+        /** Single bridge from a freshly computed report to persisted snapshot metrics. */
+        fun fromReport(report: TaxonomyMetrics.Report, nodesWithJudges: Int = 0): SnapshotMetrics =
+            fromData(report.toData(), nodesWithJudges)
+    }
+}
+
+@Serializable
+data class SnapshotSettings(
+    val selectedDomains: List<String>,
+    val maxDepth: Int,
+    val enableLabeling: Boolean,
+    val proposalSeparationBar: Double,
+    val minClusterSize: Int,
+    // Removed: routingSoftmaxTau/constructionMargin/arenaMargin/tauKappaScalingFactor/
+    // kappaAdaptive. Those thresholded a raw nats gap whose practical width depended on local
+    // vMF kappa, needing per-region recalibration to behave consistently and never quite doing
+    // so. Replaced by membershipFloor: a posterior-probability threshold on each child's own
+    // (temperature=1, true Bayesian) responsibility, which means the same thing everywhere in
+    // the tree. Kept here (defaulted) only so legacy snapshot rows still deserialize.
+    val routingSoftmaxTau: Double = 1.0,
+    val enableProfiling: Boolean = false,
+    val deltaAssign: Double = 0.20,
+    val constructionMargin: Double = 0.20,
+    val arenaMargin: Double = 0.40,
+    val maxLeafAssignments: Int = 5,
+    val refitMuPerIteration: Boolean = false,
+    val enableGtWarmStart: Boolean = true,
+    val tauKappaScalingFactor: Double = 0.0,
+    val membershipFloor: Double = 0.10,
+    val routingBeamGamma: Double = 0.15,
+    val descentMargin: Double = 0.0,
+    val dagMode: taxonomy.config.DagMode = taxonomy.config.DagMode.DAG_MAX,
+    // Removed: EMA blending of mu across iterations. Matched-config A/B runs showed
+    // it amplifies oscillation and prior-domination rather than stabilizing the fit.
+    // Kept here (with a default) only so legacy snapshot rows that still carry this
+    // key deserialize cleanly; it is no longer read from or written to the live config.
+    val emaAlpha: Double = 0.7,
+    val datasetType: DatasetType = DatasetType.MMLU_PRO,
+    /**
+     * Ground-truth category labels for the dataset used during this generation run.
+     * Populated at save time from the dataset loader; empty for legacy snapshots that
+     * predate this field. Used by the CONFIG panel and supervision metrics.
+     */
+    val groundTruthCategories: List<String> = emptyList(),
+    /**
+     * Identity of the split function this snapshot's TRAIN/GATE sides were derived with
+     * (FRAMEWORK item 18). Null for snapshots that predate it; a later normaliser change is a
+     * version mismatch here, never a silent re-split.
+     */
+    val splitFunction: taxonomy.dataset.FunctionStamp? = null,
+    /**
+     * RP12 ARCH-V2-E-T: the build stamp of a v2 construction (pool, side export, engine pool file,
+     * counts, config sha; [taxonomy.dataset.V2BuildStamp]). NEVER encoded when null, so every non-v2
+     * snapshot's settings JSON is byte-identical to the pre-stamp encoding (encodeDefaults = true
+     * would otherwise write `"buildStamp": null`).
+     */
+    @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
+    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER)
+    val buildStamp: taxonomy.dataset.V2BuildStamp? = null
+) {
+    /** Map the legacy persisted settings onto the effective config; unknown fields keep defaults. */
+    fun toEffectiveConfig(): EffectiveConfig = EffectiveConfig(
+        execution = EffectiveConfig.Execution(
+            enableLabeling = enableLabeling
+        ),
+        dataset = EffectiveConfig.Dataset(
+            datasetType = datasetType,
+            selectedDomains = selectedDomains
+        ),
+        formalism = EffectiveConfig.Formalism(
+            maxDepth = maxDepth,
+            minClusterSize = minClusterSize,
+            proposalSeparationBar = proposalSeparationBar,
+            membershipFloor = membershipFloor,
+            routingBeamGamma = routingBeamGamma,
+            descentMargin = descentMargin,
+            maxLeafAssignments = maxLeafAssignments,
+            enableGtWarmStart = enableGtWarmStart,
+            dagMode = dagMode
+        ),
+        diagnostics = EffectiveConfig.Diagnostics(
+            enableProfiling = enableProfiling
+        )
+    )
+}
+
+@Serializable
+data class DagSnapshot(
+    val id: String,
+    val timestamp: String,
+    val description: String,
+    val graph: SerializedGraph,
+    val metrics: SnapshotMetrics,
+    val settings: SnapshotSettings,
+    val logUuid: String? = null,
+    val reservedQueries: Map<String, List<Int>> = emptyMap(),
+    // Full effective config that travels with the snapshot. Null for legacy
+    // snapshots saved before config embedding; callers fall back to [settings].
+    val config: EffectiveConfig? = null,
+    // Tail of the TUI log buffer captured at save time (bounded to the last
+    // MAX_LOG_TRACE lines). Defaulted to empty so snapshots written before this
+    // field still deserialize cleanly.
+    val logTrace: List<String> = emptyList()
+)
+
+@Serializable
+data class DagSnapshotMetadata(
+    val id: String,
+    val timestamp: String,
+    val description: String,
+    val metrics: SnapshotMetrics,
+    val settings: SnapshotSettings,
+    val logUuid: String? = null,
+    val reservedQueries: Map<String, List<Int>> = emptyMap(),
+    val config: EffectiveConfig? = null
+)
+
+/** Upper bound on the number of log lines carried inside a [DagSnapshot.logTrace]. */
+private const val MAX_LOG_TRACE = 5000
+
+@Component
+class TaxonomySnapshotManager(
+    private val config: TaxonomyConfig,
+    private val persistence: TaxonomyPersistence,
+    private val evalLoader: ModelEvalLoader,
+    private val perfTracker: TaxonomyPerformanceTracker
+) {
+    private val log = LoggerFactory.getLogger("taxonomy.SnapshotManager")
+    private val json = Json { 
+        prettyPrint = true 
+        ignoreUnknownKeys = true
+        encodeDefaults = true 
+    }
+    /** Content id of the reserved pool carried by the most recently loaded snapshot; the
+     *  benchmark path pins judging to it (HeadlessBenchmarkRunner [POOL-PIN]). */
+    @Volatile
+    var lastLoadedReservedPoolId: String? = null
+
+    /**
+     * TRAIN-only reading of the most recently loaded snapshot: how many DISTINCT texts of its own
+     * reserved pool are members of its tree ([taxonomy.model.TrainOnlyGuard.Report.distinctKeys]).
+     * Reported, never FATAL, on load (audits and the incident's frozen tree must stay loadable);
+     * the runner refuses to judge on a non-zero count unless it is acknowledged and disclosed.
+     */
+    @Volatile
+    var lastLoadedEvalMembersInTree: Int = -1
+
+    /** Whether [lastLoadedEvalMembersInTree] could be computed (the pool resolved to texts). */
+    @Volatile
+    var lastLoadedEvalMembersKnown: Boolean = false
+
+    private val dbUrl = if (System.getProperty("java.class.path")?.contains("junit") == true ||
+        System.getProperty("org.gradle.test.worker") != null
+    ) {
+        "jdbc:sqlite:snapshots_test.db?journal_mode=WAL&synchronous=NORMAL&busy_timeout=10000"
+    } else {
+        "jdbc:sqlite:snapshots.db?journal_mode=WAL&synchronous=NORMAL&busy_timeout=10000"
+    }
+
+    private val isTest = System.getProperty("org.gradle.test.worker") != null ||
+            System.getProperty("java.class.path")?.contains("junit") == true
+
+    private val dbLock = Any()
+    private val sharedConnection: java.sql.Connection by lazy {
+        java.sql.DriverManager.getConnection(dbUrl).also { conn ->
+            conn.autoCommit = true
+        }
+    }
+
+    private val connection: java.sql.Connection
+        get() {
+            if (isTest) {
+                return java.sql.DriverManager.getConnection(dbUrl).also { conn ->
+                    conn.autoCommit = true
+                }
+            }
+            return java.lang.reflect.Proxy.newProxyInstance(
+                java.sql.Connection::class.java.classLoader,
+                arrayOf(java.sql.Connection::class.java)
+            ) { _, method, args ->
+                if (method.name == "close") {
+                    null
+                } else {
+                    synchronized(dbLock) {
+                        try {
+                            method.invoke(sharedConnection, *(args ?: emptyArray()))
+                        } catch (e: java.lang.reflect.InvocationTargetException) {
+                            throw e.cause ?: e
+                        }
+                    }
+                }
+            } as java.sql.Connection
+        }
+
+    init {
+        initDatabase()
+        migrateExistingJsonSnapshots()
+        if (!isTest) {
+            try {
+                Runtime.getRuntime().addShutdownHook(Thread {
+                    runCatching {
+                        synchronized(dbLock) {
+                            if (!sharedConnection.isClosed) {
+                                sharedConnection.close()
+                                log.info("SQLite snapshot database connection closed cleanly via shutdown hook.")
+                            }
+                        }
+                    }
+                })
+            } catch (_: Exception) {}
+        }
+    }
+
+    /** Decode the embedded effective config, falling back to legacy [SnapshotSettings] for old rows. */
+    private fun decodeConfig(configStr: String?, settings: SnapshotSettings): EffectiveConfig =
+        if (!configStr.isNullOrEmpty()) {
+            try {
+                json.decodeFromString<EffectiveConfig>(configStr)
+            } catch (e: Exception) {
+                settings.toEffectiveConfig()
+            }
+        } else {
+            settings.toEffectiveConfig()
+        }
+
+    private fun readConfig(rs: java.sql.ResultSet, settings: SnapshotSettings): EffectiveConfig {
+        val configStr = try { rs.getString("config") } catch (e: Exception) { null }
+        return decodeConfig(configStr, settings)
+    }
+
+    private fun initDatabase() {
+        try {
+            val logsDir = File("snapshots/logs")
+            if (!logsDir.exists()) {
+                logsDir.mkdirs()
+            }
+            connection.use { conn ->
+                conn.createStatement().use { stmt ->
+                    stmt.execute("""
+                        CREATE TABLE IF NOT EXISTS snapshots (
+                            id TEXT PRIMARY KEY,
+                            timestamp TEXT NOT NULL,
+                            description TEXT NOT NULL,
+                            graph TEXT NOT NULL,
+                            metrics TEXT NOT NULL,
+                            settings TEXT NOT NULL,
+                            log_uuid TEXT,
+                            reserved_queries TEXT,
+                            config TEXT
+                        )
+                    """.trimIndent())
+
+                    try {
+                        stmt.execute("ALTER TABLE snapshots ADD COLUMN reserved_queries TEXT")
+                    } catch (e: Exception) {
+                        // Column might already exist, which is fine
+                    }
+
+                    try {
+                        stmt.execute("ALTER TABLE snapshots ADD COLUMN config TEXT")
+                    } catch (e: Exception) {
+                        // Column might already exist, which is fine
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            log.error("Failed to initialize snapshots database", e)
+        }
+    }
+
+    private fun migrateExistingJsonSnapshots() {
+        val isTest = System.getProperty("java.class.path")?.contains("junit") == true || 
+                     System.getProperty("org.gradle.test.worker") != null ||
+                     System.getenv("SPRING_PROFILES_ACTIVE") == "test"
+        if (isTest) {
+            log.info("Test environment detected. Skipping JSON snapshot migration.")
+            return
+        }
+        try {
+            val snapshotsDir = File("snapshots")
+            if (!snapshotsDir.exists()) return
+            val jsonFiles = snapshotsDir.listFiles { _, name -> name.endsWith(".json") } ?: return
+            if (jsonFiles.isEmpty()) return
+
+            log.info("Migrating ${jsonFiles.size} existing JSON snapshots to snapshots.db...")
+            connection.use { conn ->
+                conn.prepareStatement("""
+                    INSERT OR REPLACE INTO snapshots (id, timestamp, description, graph, metrics, settings, log_uuid, reserved_queries, config)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """).use { stmt ->
+                    for (file in jsonFiles) {
+                        try {
+                            val content = file.readText()
+                            val snapshot = json.decodeFromString<DagSnapshot>(content)
+
+                            stmt.setString(1, snapshot.id)
+                            stmt.setString(2, snapshot.timestamp)
+                            stmt.setString(3, snapshot.description)
+                            stmt.setString(4, json.encodeToString(snapshot.graph))
+                            stmt.setString(5, json.encodeToString(snapshot.metrics))
+                            stmt.setString(6, json.encodeToString(snapshot.settings))
+                            stmt.setString(7, snapshot.logUuid)
+                            stmt.setString(8, json.encodeToString(snapshot.reservedQueries))
+                            stmt.setString(9, snapshot.config?.let { json.encodeToString(it) })
+                            stmt.execute()
+
+                            // Delete migrated JSON file
+                            file.delete()
+                            
+                            // Also check if there is an old .tmp file and delete it (it's now stored in db)
+                            val tmpFile = File(snapshotsDir, "${snapshot.id}.tmp")
+                            if (tmpFile.exists()) {
+                                tmpFile.delete()
+                            }
+                        } catch (e: Exception) {
+                            log.error("Failed to migrate snapshot file ${file.name}", e)
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            log.error("Error during JSON snapshots migration", e)
+        }
+    }
+
+    fun listSnapshots(): List<DagSnapshot> {
+        val list = mutableListOf<DagSnapshot>()
+        try {
+            connection.use { conn ->
+                conn.createStatement().use { stmt ->
+                    stmt.executeQuery("""
+                        SELECT id, timestamp, description, metrics, settings, log_uuid, reserved_queries, config
+                        FROM snapshots
+                        ORDER BY timestamp DESC
+                    """.trimIndent()).use { rs ->
+                        while (rs.next()) {
+                            val id = rs.getString("id")
+                            val timestamp = rs.getString("timestamp")
+                            val description = rs.getString("description")
+                            val metricsStr = rs.getString("metrics")
+                            val settingsStr = rs.getString("settings")
+                            val logUuid = rs.getString("log_uuid")
+                            val reservedQueriesStr = try { rs.getString("reserved_queries") } catch (e: Exception) { null }
+
+                            val metrics = json.decodeFromString<SnapshotMetrics>(metricsStr)
+                            val settings = json.decodeFromString<SnapshotSettings>(settingsStr)
+                            val reservedQueries = safeDecodeReservedIds(reservedQueriesStr)
+
+                            list.add(
+                                DagSnapshot(
+                                    id = id,
+                                    timestamp = timestamp,
+                                    description = description,
+                                    graph = SerializedGraph(rootId = "", nodes = emptyList()),
+                                    metrics = metrics,
+                                    settings = settings,
+                                    logUuid = logUuid,
+                                    reservedQueries = reservedQueries,
+                                    config = readConfig(rs, settings)
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            log.error("Failed to list snapshots from DB", e)
+        }
+        return list
+    }
+
+    /**
+     * Effective config of the most recently saved/loaded snapshot, used to restore tunables on
+     * startup. Falls back to legacy [SnapshotSettings] for snapshots saved before config embedding.
+     */
+    fun latestConfig(): EffectiveConfig? {
+        try {
+            connection.use { conn ->
+                conn.createStatement().use { stmt ->
+                    stmt.executeQuery("""
+                        SELECT settings, config FROM snapshots ORDER BY timestamp DESC LIMIT 1
+                    """.trimIndent()).use { rs ->
+                        if (rs.next()) {
+                            val settings = json.decodeFromString<SnapshotSettings>(rs.getString("settings"))
+                            return decodeConfig(rs.getString("config"), settings)
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            log.error("Failed to load latest snapshot config from DB", e)
+        }
+        return null
+    }
+
+    /**
+     * [expectedPoolId], when given, is the content id of the split THIS run made. The stored
+     * reserved list is read from the shared root file at save time, and on 2026-07-27 a
+     * concurrent run had rewritten that file between the split and the save, so the frozen
+     * snapshot carried a foreign pool for six weeks. The check makes that FATAL.
+     */
+    fun saveSnapshot(
+        root: GraphNode, description: String, logsToSave: List<String>? = null, expectedPoolId: String? = null,
+        buildStamp: taxonomy.dataset.V2BuildStamp? = null
+    ): DagSnapshot {
+        val startSave = System.currentTimeMillis()
+        val timestampStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+        val fileTimestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
+        val sanitizedDesc = description.replace(Regex("[^a-zA-Z0-9_]"), "_").take(20)
+        val snapshotId = "${fileTimestamp}_${sanitizedDesc}"
+
+        val tempFile = File("temp_graph_save.tmp")
+        val serializedGraph = try {
+            persistence.save(root, tempFile.absolutePath)
+        } finally {
+            if (tempFile.exists()) tempFile.delete()
+        }
+        
+        val nodesWithJudges = serializedGraph.nodes.count { !it.judgePrompt.isNullOrEmpty() }
+        val report = TaxonomyMetrics(root).generateReport()
+        val metrics = SnapshotMetrics.fromReport(report, nodesWithJudges)
+
+        val settings = SnapshotSettings(
+            selectedDomains = config.dataset.selectedDomains,
+            maxDepth = config.formalism.maxDepth,
+            enableLabeling = config.execution.enableLabeling,
+            proposalSeparationBar = config.formalism.proposalSeparationBar,
+            minClusterSize = config.formalism.minClusterSize,
+            routingSoftmaxTau = 1.0,
+            enableProfiling = config.diagnostics.enableProfiling,
+            deltaAssign = 0.0,
+            constructionMargin = 0.0,
+            arenaMargin = 0.0,
+            maxLeafAssignments = config.formalism.maxLeafAssignments,
+            refitMuPerIteration = true,
+            enableGtWarmStart = config.formalism.enableGtWarmStart,
+            tauKappaScalingFactor = 0.0,
+            membershipFloor = config.formalism.membershipFloor,
+            routingBeamGamma = config.formalism.routingBeamGamma,
+            descentMargin = config.formalism.descentMargin,
+            dagMode = config.formalism.dagMode,
+            emaAlpha = 0.0,
+            datasetType = config.dataset.datasetType,
+            splitFunction = taxonomy.dataset.SplitSide.stamp(expectedPoolId),
+            buildStamp = buildStamp
+        )
+        
+        val timestampFileStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
+        val datasetName = config.dataset.datasetType.name
+        val uuid = "$datasetName/${timestampFileStr}_${java.util.UUID.randomUUID()}"
+        // Prefer an explicit override, then the trace recorded during the last generation
+        // (per-snapshot partitioning), falling back to the whole live buffer for snapshots saved
+        // outside a generation lifecycle (e.g. after loading and editing an existing DAG).
+        val logs = logsToSave
+            ?: TuiLogAppender.lastGenerationTrace().ifEmpty {
+                synchronized(TuiLogAppender.logs) { TuiLogAppender.logs.toList() }
+            }
+        writeLogs(uuid, logs)
+        // Bound the in-object trace so a long-running session doesn't bloat the snapshot row.
+        val logTrace = logs.takeLast(MAX_LOG_TRACE)
+        
+        val reservedFile = File("reserved_test_queries.json")
+        val reservedQueries = if (reservedFile.exists()) {
+            try {
+                val content = reservedFile.readText()
+                json.decodeFromString<Map<String, List<Int>>>(content)
+            } catch (e: Exception) {
+                log.error("Failed to read/parse reserved_test_queries.json during save", e)
+                emptyMap()
+            }
+        } else {
+            emptyMap()
+        }
+        if (expectedPoolId != null) {
+            val stored = taxonomy.dataset.ReservedPool.computePoolId(
+                reservedQueries.mapValues { (_, ids) -> ids.filter { it > 0 } }.filterValues { it.isNotEmpty() }
+            )
+            check(reservedQueries.isNotEmpty() && stored == expectedPoolId) {
+                "[POOL-PIN] refusing to save snapshot: reserved_test_queries.json now hashes to $stored but this " +
+                    "run's own split is $expectedPoolId — another process rewrote the root file (do not run two " +
+                    "constructions in one repo root)"
+            }
+            log.info("[POOL-PIN] snapshot stores this run's own reserved pool $stored")
+            // TRAIN-only tree state (FRAMEWORK guard 3), by content: a snapshot pinned to a pool
+            // must not hold the text of any question in it. FATAL here; the runner also checks
+            // after construction, so this is the last line of defence before persistence.
+            val evalTexts = evalLoader.store.getReservedQuestionTexts(expectedPoolId)
+            // RP12: plus the global reserved keys of a v2 build (the same set when none is installed).
+            val report = taxonomy.model.TrainOnlyGuard.evalMembers(root, taxonomy.model.TrainOnlyGuard.withGlobal(taxonomy.model.TrainOnlyGuard.keysOf(evalTexts)))
+            taxonomy.model.TrainOnlyGuard.assertNone(report, "saveSnapshot($expectedPoolId)")
+            log.info("[TRAIN-ONLY] saveSnapshot: 0 EVAL texts among the tree's members (${evalTexts.size} pool texts checked)")
+        }
+        check(buildStamp == null || expectedPoolId != null) {
+            "[SPLIT-V2] refusing to save a v2-stamped snapshot (${buildStamp?.poolId}) without its own recorded pool"
+        }
+
+        val effectiveConfig = config.toEffectiveConfig()
+
+        val snapshot = DagSnapshot(
+            id = snapshotId,
+            timestamp = timestampStr,
+            description = description,
+            graph = serializedGraph,
+            metrics = metrics,
+            settings = settings,
+            logUuid = uuid,
+            reservedQueries = reservedQueries,
+            config = effectiveConfig,
+            logTrace = logTrace
+        )
+
+        try {
+            connection.use { conn ->
+                conn.prepareStatement("""
+                    INSERT OR REPLACE INTO snapshots (id, timestamp, description, graph, metrics, settings, log_uuid, reserved_queries, config)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """).use { stmt ->
+                    stmt.setString(1, snapshotId)
+                    stmt.setString(2, timestampStr)
+                    stmt.setString(3, description)
+                    stmt.setString(4, json.encodeToString(serializedGraph))
+                    stmt.setString(5, json.encodeToString(metrics))
+                    stmt.setString(6, json.encodeToString(settings))
+                    stmt.setString(7, uuid)
+                    stmt.setString(8, json.encodeToString(reservedQueries))
+                    stmt.setString(9, json.encodeToString(effectiveConfig))
+                    stmt.execute()
+                }
+            }
+            log.info("Successfully created and saved snapshot to DB: $snapshotId")
+        } catch (e: Exception) {
+            log.error("Failed to save snapshot $snapshotId into DB", e)
+        }
+        
+        val endSave = System.currentTimeMillis()
+        if (config.diagnostics.enableProfiling) {
+            perfTracker.recordTime("persistence.snapshot_save", endSave - startSave, 1L)
+        }
+        return snapshot
+    }
+
+    fun renameSnapshot(snapshotId: String, newDescription: String): DagSnapshot? {
+        try {
+            var snapshot: DagSnapshot? = null
+            connection.use { conn ->
+                conn.prepareStatement("""
+                    SELECT timestamp, metrics, settings, log_uuid, reserved_queries, config FROM snapshots WHERE id = ?
+                """).use { stmt ->
+                    stmt.setString(1, snapshotId)
+                    stmt.executeQuery().use { rs ->
+                        if (rs.next()) {
+                            val timestamp = rs.getString("timestamp")
+                            val metrics = json.decodeFromString<SnapshotMetrics>(rs.getString("metrics"))
+                            val settings = json.decodeFromString<SnapshotSettings>(rs.getString("settings"))
+                            val logUuid = rs.getString("log_uuid")
+                            val reservedQueriesStr = try { rs.getString("reserved_queries") } catch (e: Exception) { null }
+                            val reservedQueries = safeDecodeReservedIds(reservedQueriesStr)
+                            snapshot = DagSnapshot(snapshotId, timestamp, newDescription, SerializedGraph("", emptyList()), metrics, settings, logUuid, reservedQueries, readConfig(rs, settings))
+                        }
+                    }
+                }
+                
+                if (snapshot != null) {
+                    conn.prepareStatement("UPDATE snapshots SET description = ? WHERE id = ?").use { stmt ->
+                        stmt.setString(1, newDescription)
+                        stmt.setString(2, snapshotId)
+                        stmt.execute()
+                    }
+                    return snapshot
+                }
+            }
+        } catch (e: Exception) {
+            log.error("Failed to rename snapshot $snapshotId in DB", e)
+        }
+        return null
+    }
+
+    fun updateSnapshot(snapshotId: String, root: GraphNode): DagSnapshot? {
+        return try {
+            var oldSnapshot: DagSnapshot? = null
+            connection.use { conn ->
+                conn.prepareStatement("""
+                    SELECT timestamp, description, settings, log_uuid, reserved_queries, config FROM snapshots WHERE id = ?
+                """).use { stmt ->
+                    stmt.setString(1, snapshotId)
+                    stmt.executeQuery().use { rs ->
+                        if (rs.next()) {
+                            val timestamp = rs.getString("timestamp")
+                            val description = rs.getString("description")
+                            val settings = json.decodeFromString<SnapshotSettings>(rs.getString("settings"))
+                            val logUuid = rs.getString("log_uuid")
+                            val reservedQueriesStr = try { rs.getString("reserved_queries") } catch (e: Exception) { null }
+                            val reservedQueries = safeDecodeReservedIds(reservedQueriesStr)
+                            oldSnapshot = DagSnapshot(snapshotId, timestamp, description,
+                                SerializedGraph("", emptyList()),
+                                SnapshotMetrics(0, 0, 0, 0, 0),  // placeholder; real metrics recomputed below
+                                settings, logUuid, reservedQueries, readConfig(rs, settings))                        }
+                    }
+                }
+            }
+            val oldSnap = oldSnapshot ?: return null
+            
+            val tempFile = File("temp_graph_update.tmp")
+            val serializedGraph = try {
+                persistence.save(root, tempFile.absolutePath)
+            } finally {
+                if (tempFile.exists()) tempFile.delete()
+            }
+
+            val nodesWithJudges = serializedGraph.nodes.count { !it.judgePrompt.isNullOrEmpty() }
+            val report = TaxonomyMetrics(root).generateReport()
+            val metrics = SnapshotMetrics.fromReport(report, nodesWithJudges)
+            
+            val updatedSnapshot = oldSnap.copy(
+                graph = serializedGraph,
+                metrics = metrics
+            )
+            
+            connection.use { conn ->
+                conn.prepareStatement("""
+                    UPDATE snapshots SET graph = ?, metrics = ? WHERE id = ?
+                """).use { stmt ->
+                    stmt.setString(1, json.encodeToString(serializedGraph))
+                    stmt.setString(2, json.encodeToString(metrics))
+                    stmt.setString(3, snapshotId)
+                    stmt.execute()
+                }
+            }
+            log.info("Successfully updated snapshot $snapshotId in DB with new DAG data.")
+            updatedSnapshot
+        } catch (e: Exception) {
+            log.error("Failed to update snapshot $snapshotId in DB", e)
+            null
+        }
+    }
+
+    fun loadSnapshot(snapshotId: String): GraphNode? {
+        val startLoad = System.currentTimeMillis()
+        try {
+            var graphStr: String? = null
+            var reservedQueriesStr: String? = null
+            connection.use { conn ->
+                conn.prepareStatement("SELECT graph, reserved_queries FROM snapshots WHERE id = ?").use { stmt ->
+                    stmt.setString(1, snapshotId)
+                    stmt.executeQuery().use { rs ->
+                        if (rs.next()) {
+                            graphStr = rs.getString("graph")
+                            reservedQueriesStr = try { rs.getString("reserved_queries") } catch (e: Exception) { null }
+                        }
+                    }
+                }
+            }
+            val serializedGraphJson = graphStr ?: return null
+            val graph = json.decodeFromString<SerializedGraph>(serializedGraphJson)
+            
+            // Restore reserved_test_queries.json (the split transport trickle and the TUI read) and
+            // pin THIS load to the snapshot's own pool id. Nothing is activated and no flag is
+            // written (FRAMEWORK item 18): the pool is recorded in the dataset DB if it is not
+            // already (idempotent, additive) so that every read by id can resolve it, and the
+            // runner's [POOL-PIN] compares the request's pool with lastLoadedReservedPoolId.
+            val reservedQueriesStrClean = reservedQueriesStr?.trim()
+            var evalKeys: Set<String> = emptySet()
+            var evalKnown = false
+            if (!reservedQueriesStrClean.isNullOrEmpty()) {
+                val reservedQueries = safeDecodeReservedIds(reservedQueriesStrClean)
+                // Same sentinel filtering as the fetcher at split time, so the ids agree.
+                val judgeable = reservedQueries.mapValues { (_, ids) -> ids.filter { it > 0 } }.filterValues { it.isNotEmpty() }
+                val expectedPool = taxonomy.dataset.ReservedPool.computePoolId(judgeable)
+                val reservedFile = File("reserved_test_queries.json")
+                reservedFile.writeText(Json { prettyPrint = true }.encodeToString(reservedQueries))
+                log.info("Restored reserved_test_queries.json from snapshot $snapshotId (${reservedQueries.size} domains).")
+                if (judgeable.isNotEmpty() && !evalLoader.store.isReservedPoolRecorded(expectedPool)) {
+                    val recorded = evalLoader.store.recordReservedPool(judgeable)
+                    check(recorded == expectedPool) { "[POOL-PIN] recorded $recorded for snapshot $snapshotId, expected $expectedPool" }
+                }
+                lastLoadedReservedPoolId = expectedPool
+                log.info("[POOL-PIN] snapshot $snapshotId -> reserved pool $expectedPool (recorded; nothing activated)")
+                try {
+                    evalKeys = taxonomy.model.TrainOnlyGuard.keysOf(evalLoader.store.getReservedQuestionTexts(expectedPool))
+                    evalKnown = true
+                } catch (e: Exception) {
+                    log.warn("[TRAIN-ONLY] pool $expectedPool of snapshot $snapshotId resolves to no texts here; eval-member count unknown (${e.message})")
+                }
+            } else {
+                // If there's no reserved_queries saved, delete the file so it falls back to splitting
+                val reservedFile = File("reserved_test_queries.json")
+                if (reservedFile.exists()) {
+                    reservedFile.delete()
+                }
+                lastLoadedReservedPoolId = null
+                log.warn("No reserved queries found in snapshot $snapshotId database entry. Cleaned up reserved_test_queries.json.")
+            }
+
+            val root = persistence.loadFromSerialized(graph)
+            if (root != null) {
+                assignQueryIds(root, config.formalism.enableStableQuestionIds)
+            }
+            // TRAIN-only reading of the loaded tree against its own pool, by content. REPORT only.
+            lastLoadedEvalMembersKnown = evalKnown && root != null
+            lastLoadedEvalMembersInTree = if (lastLoadedEvalMembersKnown) {
+                val report = taxonomy.model.TrainOnlyGuard.evalMembers(root!!, evalKeys)
+                if (report.clean) log.info("[TRAIN-ONLY] snapshot $snapshotId: 0 EVAL texts among the tree's members")
+                else log.warn("[TRAIN-ONLY] snapshot $snapshotId: $report; judging needs acknowledgedEvalMembers = [\"$snapshotId:${report.distinctKeys}\"]")
+                report.distinctKeys
+            } else -1
+            val endLoad = System.currentTimeMillis()
+            if (config.diagnostics.enableProfiling) {
+                perfTracker.recordTime("persistence.snapshot_load", endLoad - startLoad, 1L)
+            }
+            return root
+        } catch (e: Exception) {
+            log.error("Failed to load snapshot $snapshotId from DB", e)
+            return null
+        }
+    }
+
+    /**
+     * The serialized graph of [snapshotId] as stored — a pure read: no pool activation, no
+     * reserved_test_queries.json rewrite, no hydration. Stage 1b's union graft re-keys it before
+     * hydrating ([UnionGraft.rekey]), which is why it needs the serialized form rather than
+     * [loadSnapshot]'s GraphNode. `null` if the snapshot does not exist.
+     */
+    fun readSerializedGraph(snapshotId: String): SerializedGraph? {
+        val graphStr = connection.use { conn ->
+            conn.prepareStatement("SELECT graph FROM snapshots WHERE id = ?").use { stmt ->
+                stmt.setString(1, snapshotId)
+                stmt.executeQuery().use { rs -> if (rs.next()) rs.getString("graph") else null }
+            }
+        } ?: return null
+        return json.decodeFromString<SerializedGraph>(graphStr)
+    }
+
+    /**
+     * The reserved pool [snapshotId] carries (`domain key -> ids`, sentinels included), as a pure
+     * read; `null` if the snapshot does not exist, empty if it stored no pool. Same decoding as
+     * [loadSnapshot], without its side effects.
+     */
+    /** RP12 B2: the v2 build stamp stored in a snapshot's settings, or null (no stamp, or no such snapshot). */
+    fun readBuildStamp(snapshotId: String): taxonomy.dataset.V2BuildStamp? {
+        val raw = connection.use { conn ->
+            conn.prepareStatement("SELECT settings FROM snapshots WHERE id = ?").use { stmt ->
+                stmt.setString(1, snapshotId)
+                stmt.executeQuery().use { rs -> if (rs.next()) rs.getString(1) else null }
+            }
+        } ?: return null
+        return json.decodeFromString<SnapshotSettings>(raw).buildStamp
+    }
+
+    fun readReservedQueries(snapshotId: String): Map<String, List<Int>>? {
+        var found = false
+        val raw = connection.use { conn ->
+            conn.prepareStatement("SELECT reserved_queries FROM snapshots WHERE id = ?").use { stmt ->
+                stmt.setString(1, snapshotId)
+                stmt.executeQuery().use { rs ->
+                    if (rs.next()) { found = true; try { rs.getString("reserved_queries") } catch (e: Exception) { null } } else null
+                }
+            }
+        }
+        if (!found) return null
+        return safeDecodeReservedIds(raw?.trim())
+    }
+
+    fun deleteSnapshot(snapshotId: String): Boolean {
+        try {
+            var logUuid: String? = null
+            connection.use { conn ->
+                conn.prepareStatement("SELECT log_uuid FROM snapshots WHERE id = ?").use { stmt ->
+                    stmt.setString(1, snapshotId)
+                    stmt.executeQuery().use { rs ->
+                        if (rs.next()) {
+                            logUuid = rs.getString("log_uuid")
+                        }
+                    }
+                }
+            }
+            
+            if (logUuid != null) {
+                val logFile = File("snapshots/logs/$logUuid.log")
+                if (logFile.exists()) {
+                    logFile.delete()
+                }
+            }
+            
+            var rowsDeleted = 0
+            connection.use { conn ->
+                conn.prepareStatement("DELETE FROM snapshots WHERE id = ?").use { stmt ->
+                    stmt.setString(1, snapshotId)
+                    stmt.execute()
+                    rowsDeleted = stmt.updateCount
+                }
+            }
+            return rowsDeleted > 0
+        } catch (e: Exception) {
+            log.error("Failed to delete snapshot $snapshotId from DB", e)
+            return false
+        }
+    }
+
+    private fun writeLogs(uuid: String, lines: List<String>) {
+        val logFile = File("snapshots/logs/$uuid.log")
+        val parent = logFile.parentFile
+        if (parent != null && !parent.exists()) {
+            parent.mkdirs()
+        }
+        logFile.writeText(lines.joinToString("\n"))
+    }
+
+    private fun appendLogs(uuid: String, lines: List<String>) {
+        val logFile = File("snapshots/logs/$uuid.log")
+        val parent = logFile.parentFile
+        if (parent != null && !parent.exists()) {
+            parent.mkdirs()
+        }
+        logFile.appendText(if (logFile.exists()) "\n" + lines.joinToString("\n") else lines.joinToString("\n"))
+    }
+
+    fun appendLogsToSnapshot(snapshotId: String, logsToAppend: List<String>) {
+        try {
+            var currentLogUuid: String? = null
+            connection.use { conn ->
+                conn.prepareStatement("SELECT log_uuid FROM snapshots WHERE id = ?").use { stmt ->
+                    stmt.setString(1, snapshotId)
+                    stmt.executeQuery().use { rs ->
+                        if (rs.next()) {
+                            currentLogUuid = rs.getString("log_uuid")
+                        }
+                    }
+                }
+            }
+            
+            if (currentLogUuid == null) {
+                val timestampFileStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
+                val datasetName = config.dataset.datasetType.name
+                currentLogUuid = "$datasetName/${timestampFileStr}_${java.util.UUID.randomUUID()}"
+                connection.use { conn ->
+                    conn.prepareStatement("UPDATE snapshots SET log_uuid = ? WHERE id = ?").use { stmt ->
+                        stmt.setString(1, currentLogUuid)
+                        stmt.setString(2, snapshotId)
+                        stmt.execute()
+                    }
+                }
+            }
+            appendLogs(currentLogUuid, logsToAppend)
+        } catch (e: Exception) {
+            log.error("Failed to append logs to snapshot $snapshotId in DB", e)
+        }
+    }
+
+    fun loadSnapshotLogs(uuid: String): List<String> {
+        val logFile = File("snapshots/logs/$uuid.log")
+        return if (logFile.exists()) {
+            logFile.readLines()
+        } else {
+            emptyList()
+        }
+    }
+
+    private fun safeDecodeReservedIds(raw: String?): Map<String, List<Int>> {
+        if (raw.isNullOrEmpty()) return emptyMap()
+        return try {
+            json.decodeFromString<Map<String, List<Int>>>(raw)
+        } catch (_: Exception) {
+            // Old snapshot — texts. Resolve via evalLoader.
+            try {
+                val texts = json.decodeFromString<Map<String, List<String>>>(raw)
+                evalLoader.resolveTextsToIds(texts).let { ids ->
+                    mapOf("legacy" to ids.toList())  // flat, domain key lost — acceptable for old snapshots
+                }
+            } catch (_: Exception) {
+                emptyMap()
+            }
+        }
+    }
+}

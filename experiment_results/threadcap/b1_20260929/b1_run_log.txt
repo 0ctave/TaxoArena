@@ -1,0 +1,161 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.10/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+Configuration on demand is an incubating feature.
+Calculating task graph as configuration cache cannot be reused because the set of Gradle properties has changed: 'jvmThreads' was removed.
+> Task :checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :processTestResources UP-TO-DATE
+> Task :processResources UP-TO-DATE
+
+> Task :compileKotlin
+w: file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/runner/HeadlessBenchmarkRunner.kt:2444:48 'fun exec(p0: String!): Process!' is deprecated. Deprecated in Java.
+
+> Task :compileJava NO-SOURCE
+> Task :classes UP-TO-DATE
+> Task :jar
+> Task :compileTestKotlin
+> Task :compileTestJava NO-SOURCE
+> Task :testClasses UP-TO-DATE
+
+> Task :processTestAot
+14:52:48.072 [main] INFO org.springframework.test.context.aot.TestClassScanner -- Scanning for Spring test classes in all packages in classpath roots [Z:\FAC\TUBerlin\THESIS\TaxoArena\build\classes\kotlin\test, Z:\FAC\TUBerlin\THESIS\TaxoArena\build\resources\test]
+
+> Task :compileAotTestKotlin NO-SOURCE
+> Task :processAotTestResources UP-TO-DATE
+> Task :compileAotTestJava
+> Task :aotTestClasses
+
+> Task :siteNull
+
+SeparationNullBySizeTest > siteNull - site-level and deflated nulls on every accepted split of the frozen artifact() STANDARD_OUT
+    [THREAD-CAP] requested=12 availableProcessors=12 heapEstimate=n/a budget=5.80GB
+    [EMB-CACHE] siteNull reads embeddings_cache.db (absent -> default); model qwen3-embedding:latest (default (no -DembeddingCacheFile, no -DembeddingModel, no manifest reachable: the DB of record's canonical model))
+    [THREAD-CAP] requested=12 availableProcessors=12 heapEstimate=2.50GB budget=5.80GB
+    [SITENULL-HEAP] sliceDim=512 largest site n=8133 live=12 -> peak live 2.50 GB; budget 0.90 * maxMemory(6.44 GB) = 5.80 GB
+    [EMB-GUARD] model=qwen3-embedding:latest (default (no -DembeddingCacheFile, no -DembeddingModel, no manifest reachable: the DB of record's canonical model)); cache=embeddings_cache.db; native dim expected 4096; vectors read 8133 of 8133 ids, raw dims {4096=8133}; slice width 512
+    [EMB-GUARD] vmfMu cosine over 87 sites: min 0.9996 (site n00000129 'Emergent Concept #128' n=191), median 1.0000; budget 0.99 -> ADMIT
+    [EMB-GUARD]   site n00000129  n=191   found=191   cos=0.9996  Emergent Concept #128
+    [EMB-GUARD]   site n00000133  n=167   found=167   cos=0.9997  Emergent Concept #132
+    [EMB-GUARD]   site n00000157  n=137   found=137   cos=0.9997  Emergent Concept #156
+    ====================================================================================================================================
+    SITE-LEVEL + DEFLATED WITHIN-NODE NULLS — FROZEN ARTIFACT.  snapshot=20260917_161817_Headless_Run_Auto_ge  minClusterSize=55  bar=0.025
+    87 accepted split sites, reps=24 per site per arm. Null fitted to each SITE'S OWN population.
+    [SEPBAR] proposalSeparationBar=0.025 (-DsepBar absent -> default 0.025); sliceDim=512 dropTop=0 whiten=false reps=24
+    q = fraction of ALL null replicates >= observed (unconditional; non-reached score 0). cert = observed >= null p95.
+    deflated = between-child-centroid subspace (<= k-1 dims) projected out of the centered observations before sampling.
+    ====================================================================================================================================
+    site                                           depth     n   k | observed |  siteP50  siteP95  qSite reach% | dd  deflP50  deflP95  qDefl reach% | verdict
+    MMLU_PRO                                           0  8133   2 |  0.03600 |  0.02971  0.03043  0.000 100.0% |  1  0.01742  0.01781  0.000 100.0% | SITE-CERT DEFL-CERT
+    Emergent Concept #3                                1  4368   3 |  0.03516 |  0.02277  0.02370  0.000 100.0% |  2  0.01733  0.01782  0.000 100.0% | SITE-CERT DEFL-CERT
+    Emergent Concept #4                                1  3833   2 |  0.02524 |  0.03001  0.03096  1.000 100.0% |  1  0.02207  0.02274  0.000 100.0% | site-fail DEFL-CERT
+    Emergent Concept #12                               2  2449   2 |  0.03133 |  0.02814  0.02930  0.000 100.0% |  1  0.02078  0.02150  0.000 100.0% | SITE-CERT DEFL-CERT
+    Emergent Concept #8                                2  1902   2 |  0.01782 |  0.02111  0.02262  1.000 100.0% |  1  0.01829  0.01978  0.875 100.0% | site-fail defl-fail
+    Emergent Concept #10                               2  1830   2 |  0.02474 |  0.02940  0.03143  1.000 100.0% |  1  0.02204  0.02316  0.000 100.0% | site-fail DEFL-CERT
+    Emergent Concept #11                               2  1427   2 |  0.04101 |  0.03777  0.03986  0.042 100.0% |  1  0.03013  0.03159  0.000 100.0% | SITE-CERT DEFL-CERT
+    Emergent Concept #9                                2   722   2 |  0.04870 |  0.04146  0.04521  0.000 100.0% |  1  0.02928  0.03129  0.000 100.0% | SITE-CERT DEFL-CERT
+    Emergent Concept #38                               3  1288   2 |  0.02655 |  0.02857  0.03039  0.958 100.0% |  1  0.02566  0.02715  0.167 100.0% | site-fail defl-fail
+    Emergent Concept #37                               3  1193   2 |  0.03546 |  0.03616  0.03940  0.750 100.0% |  1  0.02066  0.02200  0.000 100.0% | site-fail DEFL-CERT
+    Emergent Concept #16                               3  1174   2 |  0.04246 |  0.02662  0.03039  0.000 100.0% |  1  0.01892  0.02189  0.000 100.0% | SITE-CERT DEFL-CERT
+    Emergent Concept #27                               3  1146   2 |  0.02411 |  0.02549  0.02697  0.917 100.0% |  1  0.01756  0.01861  0.000 100.0% | site-fail DEFL-CERT
+    Emergent Concept #26                               3   794   2 |  0.02841 |  0.02583  0.02848  0.083 100.0% |  1  0.02230  0.02362  0.000 100.0% | site-fail DEFL-CERT
+    Emergent Concept #69                               3   730   2 |  0.05500 |  0.06611  0.07113  0.667 100.0% |  1  0.03560  0.03816  0.000 100.0% | site-fail DEFL-CERT
+    Emergent Concept #70                               3   726   2 |  0.04330 |  0.04001  0.04375  0.125 100.0% |  1  0.02549  0.02785  0.000 100.0% | site-fail DEFL-CERT
+    Emergent Concept #15                               3   678   2 |  0.02340 |  0.02886  0.03032  1.000 100.0% |  1  0.02505  0.02700  0.917 100.0% | site-fail defl-fail
+    Emergent Concept #114                              3   365   2 |  0.04312 |  0.06372  0.06852  1.000 100.0% |  1  0.04138  0.06203  0.417 100.0% | site-fail defl-fail
+    Emergent Concept #115                              3   363   2 |  0.02082 |  0.07596  0.08058  1.000 100.0% |  1  0.04806  0.05450  1.000 100.0% | site-fail defl-fail
+    Emergent Concept #56                               4   910   2 |  0.01941 |  0.03274  0.03479  1.000 100.0% |  1  0.02774  0.02865  1.000 100.0% | site-fail defl-fail
+    Emergent Concept #52                               4   732   2 |  0.02302 |  0.02239  0.02506  0.458 100.0% |  1  0.02191  0.02395  0.250 100.0% | site-fail defl-fail
+    Emergent Concept #59                               4   722   2 |  0.02715 |  0.02633  0.02801  0.250 100.0% |  1  0.02162  0.02357  0.000 100.0% | site-fail DEFL-CERT
+    Emergent Concept #41                               4   717   2 |  0.01897 |  0.02482  0.02742  1.000 100.0% |  1  0.02084  0.02237  1.000 100.0% | site-fail defl-fail
+    Emergent Concept #58                               4   476   2 |  0.03450 |  0.05796  0.06443  1.000 100.0% |  1  0.03384  0.05112  0.375 100.0% | site-fail defl-fail
+    Emergent Concept #42                               4   473   2 |  0.02456 |  0.02975  0.04820  0.958 100.0% |  1  0.02504  0.02898  0.708 100.0% | site-fail defl-fail
+    Emergent Concept #53                               4   426   2 |  0.03199 |  0.03008  0.03350  0.208 100.0% |  1  0.02151  0.02378  0.000 100.0% | site-fail DEFL-CERT
+    Emergent Concept #104                              4   412   2 |  0.02576 |  0.05495  0.05979  1.000 100.0% |  1  0.04994  0.05478  1.000 100.0% | site-fail defl-fail
+    Emergent Concept #102                              4   410   2 |  0.04270 |  0.02996  0.04745  0.125 100.0% |  1  0.02459  0.02742  0.000 100.0% | site-fail DEFL-CERT
+    Emergent Concept #54                               4   410   2 |  0.03320 |  0.03343  0.05090  0.583 100.0% |  1  0.02495  0.02697  0.000 100.0% | site-fail DEFL-CERT
+    Emergent Concept #55                               4   397   2 |  0.01838 |  0.03385  0.05232  1.000 100.0% |  1  0.02947  0.04825  1.000 100.0% | site-fail defl-fail
+    Emergent Concept #57                               4   383   3 |  0.04029 |  0.02919  0.05083  0.208 100.0% |  2  0.02763  0.03196  0.042 100.0% | site-fail DEFL-CERT
+    Emergent Concept #266                              4   332   2 |  0.05256 |  0.06940  0.07855  1.000 100.0% |  1  0.04306  0.06289  0.250 100.0% | site-fail defl-fail
+    Emergent Concept #103                              4   320   2 |  0.03793 |  0.05910  0.06934  0.958 100.0% |  1  0.03465  0.05537  0.375 100.0% | site-fail defl-fail
+    Emergent Concept #101                              4   279   2 |  0.02929 |  0.05974  0.06624  1.000 100.0% |  1  0.05213  0.06136  1.000 100.0% | site-fail defl-fail
+    Emergent Concept #176                              4   247   2 |  0.06160 |  0.06319  0.07288  0.667 100.0% |  1  0.03227  0.03614  0.000 100.0% | site-fail DEFL-CERT
+    Emergent Concept #264                              4   181   2 |  0.05363 |  0.04802  0.05718  0.167 100.0% |  1  0.03584  0.04011  0.000 100.0% | site-fail DEFL-CERT
+    Emergent Concept #86                               5   662   2 |  0.03470 |  0.03163  0.03482  0.125 100.0% |  1  0.02793  0.02982  0.000 100.0% | site-fail DEFL-CERT
+    Emergent Concept #74                               5   456   2 |  0.02630 |  0.02658  0.03018  0.625 100.0% |  1  0.02056  0.02233  0.000 100.0% | site-fail DEFL-CERT
+    Emergent Concept #91                               5   455   2 |  0.01465 |  0.02639  0.02861  1.000 100.0% |  1  0.02224  0.02374  1.000 100.0% | site-fail defl-fail
+    Emergent Concept #77                               5   379   2 |  0.02335 |  0.02209  0.02459  0.167 100.0% |  1  0.02081  0.02319  0.000 100.0% | site-fail DEFL-CERT
+    Emergent Concept #78                               5   368   2 |  0.02375 |  0.03138  0.04627  1.000 100.0% |  1  0.02460  0.02731  0.750 100.0% | site-fail defl-fail
+    Emergent Concept #75                               5   322   2 |  0.03282 |  0.02892  0.05041  0.167 100.0% |  1  0.02855  0.03388  0.083 100.0% | site-fail defl-fail
+    Emergent Concept #162                              5   289   2 |  0.03744 |  0.05590  0.06056  0.833 100.0% |  1  0.03109  0.04882  0.083 100.0% | site-fail defl-fail
+    Emergent Concept #261                              5   280   2 |  0.04480 |  0.05497  0.06262  0.667 100.0% |  1  0.05383  0.05765  0.667 100.0% | site-fail defl-fail
+    Emergent Concept #90                               5   276   2 |  0.04242 |  0.05906  0.07165  0.667 100.0% |  1  0.03287  0.05582  0.292 100.0% | site-fail defl-fail
+    Emergent Concept #83                               5   273   2 |  0.01561 |  0.02963  0.03619  1.000 100.0% |  1  0.02429  0.02788  1.000 100.0% | site-fail defl-fail
+    Emergent Concept #73                               5   266   2 |  0.02465 |  0.02898  0.03235  1.000 100.0% |  1  0.02564  0.03098  0.708 100.0% | site-fail defl-fail
+    Emergent Concept #158                              5   263   2 |  0.02920 |  0.03504  0.05788  1.000 100.0% |  1  0.02948  0.03547  0.625 100.0% | site-fail defl-fail
+    Emergent Concept #85                               5   256   2 |  0.06226 |  0.07429  0.08692  0.833 100.0% |  1  0.04777  0.07127  0.458 100.0% | site-fail defl-fail
+    Emergent Concept #81                               5   249   2 |  0.02948 |  0.03272  0.05463  0.833 100.0% |  1  0.02784  0.03172  0.250 100.0% | site-fail defl-fail
+    Emergent Concept #79                               5   227   2 |  0.02303 |  0.02994  0.03551  1.000 100.0% |  1  0.02596  0.02896  0.917 100.0% | site-fail defl-fail
+    Emergent Concept #80                               5   202   2 |  0.03321 |  0.03491  0.05723  0.750 100.0% |  1  0.03070  0.03324  0.083 100.0% | site-fail defl-fail
+    Emergent Concept #89                               5   186   2 |  0.04162 |  0.03985  0.04417  0.250 100.0% |  1  0.03196  0.03822  0.042 100.0% | site-fail DEFL-CERT
+    Emergent Concept #165                              5   184   2 |  0.02038 |  0.03749  0.04261  1.000 100.0% |  1  0.03637  0.04093  1.000 100.0% | site-fail defl-fail
+    Emergent Concept #161                              5   176   2 |  0.03694 |  0.04078  0.04595  0.917 100.0% |  1  0.03598  0.03880  0.250 100.0% | site-fail defl-fail
+    Emergent Concept #82                               5   167   2 |  0.05409 |  0.04915  0.05665  0.125 100.0% |  1  0.03293  0.03766  0.000 100.0% | site-fail DEFL-CERT
+    Emergent Concept #159                              5   154   2 |  0.03080 |  0.03274  0.04139  0.833 100.0% |  1  0.03006  0.03543  0.458 100.0% | site-fail defl-fail
+    Emergent Concept #76                               5   153   2 |  0.04279 |  0.04095  0.04499  0.375 100.0% |  1  0.03735  0.04322  0.083 100.0% | site-fail defl-fail
+    Emergent Concept #260                              5   148   2 |  0.05483 |  0.04224  0.05196  0.042 100.0% |  1  0.03546  0.04050  0.000 100.0% | SITE-CERT DEFL-CERT
+    Emergent Concept #329                              5   146   2 |  0.03202 |  0.04158  0.05080  1.000 100.0% |  1  0.03923  0.04606  0.917 100.0% | site-fail defl-fail
+    Emergent Concept #150                              6   339   2 |  0.03687 |  0.06692  0.07382  1.000 100.0% |  1  0.05362  0.06003  0.750 100.0% | site-fail defl-fail
+    Emergent Concept #151                              6   333   3 |  0.04075 |  0.04019  0.05157  0.500 100.0% |  2  0.02503  0.02816  0.000 100.0% | site-fail DEFL-CERT
+    Emergent Concept #157                              6   324   2 |  0.02617 |  0.02749  0.04917  0.917 100.0% |  1  0.02620  0.02932  0.542 100.0% | site-fail defl-fail
+    Emergent Concept #119                              6   245   2 |  0.02151 |  0.02723  0.03009  1.000 100.0% |  1  0.02649  0.03092  1.000 100.0% | site-fail defl-fail
+    Emergent Concept #118                              6   217   2 |  0.01679 |  0.02835  0.03442  1.000 100.0% |  1  0.02748  0.03041  1.000 100.0% | site-fail defl-fail
+    Emergent Concept #130                              6   213   3 |  0.03767 |  0.02889  0.03236  0.000 100.0% |  2  0.02728  0.02906  0.000 100.0% | SITE-CERT DEFL-CERT
+    Emergent Concept #133                              6   212   2 |  0.03916 |  0.03346  0.05435  0.083 100.0% |  1  0.03004  0.03372  0.000 100.0% | site-fail DEFL-CERT
+    Emergent Concept #128                              6   191   2 |  0.03430 |  0.03917  0.04744  0.958 100.0% |  1  0.03072  0.03472  0.125 100.0% | site-fail defl-fail
+    Emergent Concept #138                              6   189   2 |  0.02171 |  0.03254  0.05379  1.000 100.0% |  1  0.03210  0.03814  1.000 100.0% | site-fail defl-fail
+    Emergent Concept #131                              6   176   2 |  0.02359 |  0.02843  0.03211  0.958 100.0% |  1  0.02442  0.02887  0.583 100.0% | site-fail defl-fail
+    Emergent Concept #132                              6   167   2 |  0.02437 |  0.03693  0.04243  1.000 100.0% |  1  0.02898  0.03646  1.000 100.0% | site-fail defl-fail
+    Emergent Concept #147                              6   157   2 |  0.02801 |  0.03240  0.03955  0.917 100.0% |  1  0.02754  0.03130  0.458 100.0% | site-fail defl-fail
+    Emergent Concept #250                              6   155   2 |  0.04468 |  0.04429  0.05053  0.458 100.0% |  1  0.03915  0.04954  0.125 100.0% | site-fail defl-fail
+    Emergent Concept #129                              6   144   2 |  0.04007 |  0.04232  0.05082  0.750 100.0% |  1  0.03178  0.03743  0.000 100.0% | site-fail DEFL-CERT
+    Emergent Concept #244                              6   144   2 |  0.01667 |  0.03314  0.04270  1.000 100.0% |  1  0.03269  0.03734  1.000 100.0% | site-fail defl-fail
+    Emergent Concept #155                              6   143   2 |  0.05924 |  0.05039  0.05736  0.000 100.0% |  1  0.04724  0.05832  0.042 100.0% | SITE-CERT DEFL-CERT
+    Emergent Concept #148                              6   139   2 |  0.10590 |  0.07462  0.08517  0.000 100.0% |  1  0.05088  0.05624  0.000 100.0% | SITE-CERT DEFL-CERT
+    Emergent Concept #154                              6   137   2 |  0.02047 |  0.04191  0.05157  1.000 100.0% |  1  0.04431  0.05109  1.000 100.0% | site-fail defl-fail
+    Emergent Concept #156                              6   137   2 |  0.03629 |  0.03214  0.03981  0.167  91.7% |  1  0.02976  0.03534  0.042  95.8% | site-fail DEFL-CERT
+    Emergent Concept #135                              6   135   2 |  0.02409 |  0.03438  0.03876  1.000 100.0% |  1  0.03508  0.04052  1.000 100.0% | site-fail defl-fail
+    Emergent Concept #240                              6   134   2 |  0.02743 |  0.03748  0.04356  1.000 100.0% |  1  0.03345  0.03831  0.958 100.0% | site-fail defl-fail
+    Emergent Concept #258                              6   122   2 |  0.03578 |  0.03875  0.04865  0.708  70.8% |  1  0.03974  0.04611  0.625  75.0% | site-fail defl-fail [DEGENERATE]
+    Emergent Concept #229                              7   247   2 |  0.04052 |  0.06586  0.06979  0.958 100.0% |  1  0.03951  0.06223  0.500 100.0% | site-fail defl-fail
+    Emergent Concept #236                              7   183   2 |  0.02867 |  0.03386  0.03702  1.000 100.0% |  1  0.03147  0.03615  0.833 100.0% | site-fail defl-fail
+    Emergent Concept #228                              7   153   2 |  0.03185 |  0.03396  0.04158  0.750 100.0% |  1  0.02844  0.03233  0.083 100.0% | site-fail defl-fail
+    Emergent Concept #235                              7   144   2 |  0.03812 |  0.04620  0.05144  1.000 100.0% |  1  0.04258  0.05292  0.958 100.0% | site-fail defl-fail
+    Emergent Concept #200                              7   140   2 |  0.02883 |  0.03397  0.03996  0.917 100.0% |  1  0.03030  0.03455  0.667  95.8% | site-fail defl-fail
+    Emergent Concept #198                              7   128   2 |  0.03441 |  0.03939  0.04434  0.958  95.8% |  1  0.03978  0.04312  0.917  95.8% | site-fail defl-fail
+
+    wrote experiment_results\threadcap\b1_20260929\b1_sitenull_j12_r24.csv  (87 sites; geometry sliceDim=512 dropTop=0 whiten=false)
+
+    ====================================================================================================================================
+    REGISTERED CHECKS (P2, frozen 2026-09-08)
+    (a) POWER CHECK — deflated null certifies the CS contamination split, leaves Philosophy's two sites uncertified:
+          Computer science depth-1 ............ MISSING   (required: CERT)
+          Philosophy depth-1 (n00000014) ...... MISSING   (required: uncert)
+          Core Philosophical Concepts/Theorists MISSING   (required: uncert)
+          => FAIL
+    (b) TRUNK VIABILITY — >= 15 sites certified at site-level p95, including Chemistry and Biology depth-1:
+          certified at site-level p95 ......... 10/87   (required: >= 15)
+          Chemistry depth-1 ................... MISSING   (required: CERT)
+          Biology depth-1 ..................... MISSING   (required: CERT)
+          => FAIL
+
+    CERTIFIED TRUNK (maximal all-certified prefix, site-level p95): 3 sites
+          depth=0  MMLU_PRO                                             n=8133 qSite=0.000
+          depth=1  Emergent Concept #3                                  n=4368 qSite=0.000
+          depth=2  Emergent Concept #9                                  n=722  qSite=0.000
+
+    Summary: site-cert 10/87, defl-cert 33/87, both 10, trunk 3, infeasible 0, degenerate 1
+    ====================================================================================================================================
+
+BUILD SUCCESSFUL in 9m 22s
+9 actionable tasks: 6 executed, 3 up-to-date
+Configuration cache entry stored.
+EXIT 0

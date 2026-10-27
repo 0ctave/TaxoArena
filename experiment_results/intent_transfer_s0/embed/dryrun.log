@@ -1,0 +1,34 @@
+# HEAD 6885f9291be81b7854e2daeeb64f9f1bb97be633; blob c5346ce29d55202ee4d4fdb068a3aca2c5563215; TIME_WAIT 19
+[INTENT-S0] pool of record: none read (the study's own DBs only); zero judge calls
+[INTENT-S0] pin intent_transfer_corpora_v1.db: sha256 487e0093719c184c98bca53bc9bc61c193559690abb206d77010fd77f81c09a2 [PIN OK]
+[INTENT-S0] CENSUS: EVAL {"banking77": 3908, "clinc": 6672, "clinc_oos": 1350, "massive": 4946} vs planned {"banking77": 3925, "clinc": 6750, "clinc_oos": 1350, "massive": 4890}: WITHIN 5%
+[INTENT-S0] DENOMINATORS massive: EVAL 4946 / GATE 1691 / TRAIN 9870 in-scope kept; OOS EVAL 0; dropped 14; components 16432
+[INTENT-S0] DENOMINATORS clinc: EVAL 6672 / GATE 2333 / TRAIN 13487 in-scope kept; OOS EVAL 1350; dropped 8; components 23845
+[INTENT-S0] DENOMINATORS banking77: EVAL 3908 / GATE 1290 / TRAIN 7885 in-scope kept; OOS EVAL 0; dropped 0; components 13071
+[INTENT-S0] == SUPPORT (planning values of the draft beside the measured ones) ==
+[INTENT-S0]   C1 massive: EVAL in-scope n 4946 (planned 4890), components 4923, Kish DEFF 1.0093 (declared 1.05), n_eff 4900
+[INTENT-S0]   C1 clinc: EVAL in-scope n 6672 (planned 6750), components 6672, Kish DEFF 1.0000 (declared 1.05), n_eff 6672
+[INTENT-S0]   C1 banking77: EVAL in-scope n 3908 (planned 3925), components 3905, Kish DEFF 1.0015 (declared 1.05), n_eff 3902
+[INTENT-S0]   C2: OOS EVAL n 1350 (planned 1350), components 1350, Kish DEFF 1.0000; in-scope as C1 clinc; R-2: EVERY kept CLINC OOS row (hash sides {"EVAL": 408, "GATE": 136, "TRAIN": 806}, all read as EVAL; 0 OOS rows dropped by a collision)
+[INTENT-S0]   C3 massive: K_f 60 cells (unit = cell; SE_z 1/sqrt(K-3) = 0.132, rho-MDE80 ~ 0.37)
+[INTENT-S0]   C3 clinc: K_f 150 cells (unit = cell; SE_z 1/sqrt(K-3) = 0.082, rho-MDE80 ~ 0.23)
+[INTENT-S0]   C3 banking77: K_f 77 cells (unit = cell; SE_z 1/sqrt(K-3) = 0.116, rho-MDE80 ~ 0.33)
+[INTENT-S0] DERIVED: C4 variants 3222 ({"annot_text_mismatch": 0, "eval_items": 4946, "no_alternative": 56, "train_collision": 32, "unchanged": 0, "variants": 3222, "with_slot": 3310}); D5 pairs {'massive': 500, 'clinc': 500}; text set 57350 texts, sha256 0ba7eb3c805127d5fdfc837f9c2e620beaa3f8d795cdf76056608604defa2a8d
+[INTENT-S0] EMB qwen3: Z:\FAC\TUBerlin\THESIS\TaxoArena\intent_emb_qwen3.db absent; 57350 texts to embed
+[INTENT-S0] EMB nomic: Z:\FAC\TUBerlin\THESIS\TaxoArena\intent_emb_nomic.db absent; 57350 texts to embed
+[INTENT-S0] EMB gemma: Z:\FAC\TUBerlin\THESIS\TaxoArena\intent_emb_gemma.db absent; 57350 texts to embed
+[INTENT-S0] heavy foreign processes: ['"java.exe","46384","Console","1","387ÿ504 Ko"', '"java.exe","56940","Console","1","678ÿ500 Ko"']
+[INTENT-S0] Ollama endpoint http://127.0.0.1:11434/api/embed (resolved from OLLAMA_HOST='http://127.0.0.1:11434' by embedder_arms.client_base)
+[INTENT-S0] TRANSPORT parity bar qwen3: min cos >= 0.9980 (source: orchestrator's ruling 2026-09-30 on experiment_results/intent_transfer_s0/qwen3_parity_diagnosis_2026-09-30.txt (9699d7d): drift >= 0.99915, smallest route error 0.9846)
+[INTENT-S0] TRANSPORT route parity qwen3: 20 texts of embeddings_cache.db re-embedded via /api/embed, cos after slice-256 + renormalise min 0.999155 median 1.000000 (bar >= 0.9980): PASS
+[INTENT-S0] PRICE qwen3: timed probe 500 texts in 21.0 s = 23.9 texts/s -> 57350 texts to embed = 40.1 min (estimate from the probe)
+[INTENT-S0] TRANSPORT parity bar nomic: min cos >= 0.9999 (source: embedder_arms.PARITY_COS 0.9999 (READY_w0_delta1 C8-3))
+[INTENT-S0] TRANSPORT route parity nomic: 20 texts of embeddings_cache_nomic-embed-text_latest.db re-embedded via /api/embed, cos after slice-256 + renormalise min 1.000000 median 1.000000 (bar >= 0.9999): PASS
+[INTENT-S0] PRICE nomic: timed probe 500 texts in 2.6 s = 194.4 texts/s -> 57350 texts to embed = 4.9 min (estimate from the probe)
+[INTENT-S0] TRANSPORT parity bar gemma: min cos >= 0.9999 (source: embedder_arms.PARITY_COS 0.9999 (READY_w0_delta1 C8-3))
+[INTENT-S0] TRANSPORT route parity gemma: 20 texts of embeddings_cache_embeddinggemma_latest.db re-embedded via /api/embed, cos after slice-256 + renormalise min 0.999995 median 1.000000 (bar >= 0.9999): PASS
+[INTENT-S0] PRICE gemma: timed probe 500 texts in 3.9 s = 126.7 texts/s -> 57350 texts to embed = 7.5 min (estimate from the probe)
+[INTENT-S0] PRICE total: 52.5 min of Ollama embedding, serial, one heavy process (estimate from the timed probes)
+[INTENT-S0] TRANSPORT PREFLIGHT PASSED (3 of 3 embedders)
+[INTENT-S0] dry: nothing written
+rc=0

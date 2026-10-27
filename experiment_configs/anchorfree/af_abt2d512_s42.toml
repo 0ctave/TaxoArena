@@ -1,0 +1,112 @@
+# ANCHOR-FREE-CERT arm abt2d512: af_d512_s42.toml with splitDropTopPcs = 2 (512 dims, bar 0.025). Run only if arms d512 and abt2 both certify > 16. Registered 2026-09-17, EXPLORATORY, zero judge calls.
+# ANCHOR-FREE, ARM af: THE TREE GROWN FROM THE EMBEDDINGS ALONE, NO CATEGORY ANCHORS.
+# REGISTERED 2026-09-16 (docs/judge_v2_program.md, "ANCHOR-FREE") BEFORE ANY CODE OR RUN. NOT YET RUN.
+#
+# This file is experiment_configs/h9_order/o0_s42.toml (the same-code seed-42 anchored control,
+# label-free, zero LLM calls) with exactly three differences: `anchorFree = true`, its own
+# outputDir, and its own ratings db. o0 is the comparator for every readout; run o0 first.
+#
+# INSTRUMENT (registered). anchorFree = true, fail-closed (unknown value fatal; refused with
+# excludeFromAnchoring, without runPipeline, or with unionSnapshots), inert when absent
+# (byte-identical DAG on o0's config: AnchorFreeInertnessTest reproduces the golden of
+# ConstructionOrderInertnessTest with the flag absent). With it: no category grouping, all
+# train queries placed at the root with full weight, the root admitted as a GROW site with
+# the standard separation gate and ascending-k rule, depth-1 nodes no longer treated as label
+# anchors anywhere in the loop (formalism.anchorDepth = 0: never-relabel, never-prune,
+# never-fuse, never-collapse all move down one level to the root). Labelling, judging and
+# final metrics OFF (zero LLM calls).
+#
+# MEASUREMENT (registered): NOT the runner's Top-1 / anchor-drift / migration readouts (they
+# assume depth-1 = category and may degrade); a Python readout applied identically to this
+# tree and to o0:
+#   (1) held-out category purity by flatLeaf routing of the 3,445 pool questions to the
+#       nearest leaf centroid, leaves labelled by majority TRAIN category, Wilson CI;
+#   (2) structure: leaf count, depth, certified sites (gradlew siteNull, 300 reps) vs o0;
+#   (3) capability information: key-only leaf-vs-category LOO Brier on the 10,925 keyed
+#       questions, and split-half reliability of the KEY profile at depth-1 cells, vs o0;
+#   (4) descriptive: migration matrix TrueCategory x anchor-free depth-1 cell; mu-match to o0.
+# CRITERIA: C1 purity within 10pp of o0 (o0 under the same instrument is the bar);
+#           C2 certified sites >= o0's minus 2; C3 key-only leaf LOO Brier within 1/1000 of o0's.
+# PREDICTIONS: C1 FAIL (purity 10-25pp below o0); leaves fewer, depth similar; C2 borderline;
+#           C3 HELD; the migration matrix shows a few big cells straddling adjacent category
+#           pairs (Physics/Chemistry, Math/CS, Law/Philosophy).
+# FALSIFIER: C1 PASS => the anchors buy nothing but names and the FRAMEWORK sentence stands;
+#           C1 FAIL with C3 HELD => the sentence narrows to "not a routing mechanism for
+#           capability, but the source of the category names".
+#
+# PROVENANCE. anchor_free = true is written to diagnostics/run_manifest.json, printed in the
+# config report ("Anchor-Free: true") and announced by a [ANCHOR-FREE] warn at the runner's
+# apply site and at TaxonomyEngine.adaptTaxonomy.
+#
+# OPS: one arm per process; own outputDir and own -Dranking.db.path
+# (-Dranking.db.path=experiment_results/anchorfree/ratings_af.db); the frozen artifact and
+# snapshots_frozen.db are never modified (new snapshot ids only). This construction activates
+# its own reserved split (seed 42 => the split the frozen build used, NOT the pool of record
+# p2dca21ab5f4ef3ae); nothing is activated any more (2026-09-16); verify with
+# `python tools/analysis/pool_guard.py --pool <id>`. runBenchmark = false, so no judging
+# touches the pool. Cost: one construction (~2 min) + one site null (~35 min) + zero-call
+# readouts. Consequence: a ledger row either way; no change to any tree of record.
+#
+datasetType   = "MMLU_PRO"
+
+models        = [
+    "gpt-4o-2024-08-06",
+    "claude-3-5-sonnet-20241022",
+    "gemini-1.5-pro-002",
+    "deepseek-chat-v2_5",
+    "Meta-Llama-3_1-70B-Instruct",
+    "Qwen1.5-72B-Chat",
+    "gpt-4o-mini",
+    "claude-3-5-haiku-20241022",
+    "Mixtral-8x7B-Instruct-v0.1",
+    "c4ai-command-r-v01",
+    "Qwen1.5-14B-Chat",
+    "Meta-Llama-3_1-8B-Instruct",
+    "gemini-1.5-flash-002",
+    "Llama-2-70b-hf",
+    "Llama-2-13b-hf"
+]
+
+category      = ""
+queryLimit    = 0
+outputDir     = "experiment_results/anchorfree/af_abt2d512"
+testRatio     = 0.3
+seed          = 42
+
+# Body = o0_s42.toml (seed 42 = the frozen build's split and construction seed). The ONE
+# instrument key of this registration; o0 differs from this file only by its absence.
+anchorFree = true
+
+embeddingSliceDim = 512
+splitDropTopPcs = 2
+runPipeline        = true
+runBenchmark       = false
+runTrickle         = true
+runBaselines       = false
+enableFinalMetrics = false
+enableLabeling     = false
+judgeInduction     = false
+
+dagMode = "DAG_MAX"
+
+maxDepth              = 8
+minClusterSize        = 55
+proposalSeparationBar = 0.025
+tau                   = 1e-6
+acceptanceZ           = 2.0
+enableRefitGate       = false
+
+membershipFloor       = 0.25
+routingBeamGamma      = 0.2
+descentMargin         = 0.12
+
+effectiveSupportFloor = 2.0
+defaultKappaPrior     = 10.0
+
+numIterations         = 50
+maxLeafAssignments    = 5
+
+fusionSimilarityThreshold = 0.90
+enableGtWarmStart         = false
+
+enableProfiling           = true

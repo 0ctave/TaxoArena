@@ -1,0 +1,211 @@
+{
+ "id": "CERT-K2-DEFLATED",
+ "title": "CERT-K2-DEFLATED: CERT-PC-K2-KNOWN's merged pairs and CERT-PC-K2's source split re-run under the existing DEFLATED site null (fresh seeds), with a random-relabelling negative control (zero calls; REGISTERED 2026-10-04)",
+ "question": "Is the plain null's NO-CONTROL at k = 2 explained by its keeping the site's own between-category elongation?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "the commit that writes it (parent ed52c912)",
+  "program_lines": "docs/judge_v2_program.md L24123-L24141",
+  "program_lines_as_of": "the commit that writes them, parent ed52c912, re-grepped",
+  "date": "2026-10-04",
+  "provenance": "docs/agents/plans/2026-10-04_10h_schedule.md (ed52c912); docs/literature/2026-10-03_tree_uses.md (7812c100); the orchestrator's brief; autonomous scheduling"
+ },
+ "script": {
+  "path": "tools/analysis/cert_k2_deflated.py + certK2Deflated arm",
+  "sha16": "f5f7f178 (git blob, LF)",
+  "commit": "1d282351 (amended build; branch cert-k2-deflated; not merged)"
+ },
+ "ready": null,
+ "go": "autonomous-scheduling authorisation (zero calls); the author's 10-hour instruction",
+ "run": {
+  "outcome_file": "E:/TaxoArena_backup_2026-10-04_cert_k2_deflated/outcome.txt (sha256 4d7533be...) + df_sites.csv + arm/*; never committed",
+  "outcome_commit": "ops ca17f3de (rp12-r2-run @ 8419d4ce + path checkout of 1d282351)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "R2 B0 MMLU_PRO_LB member, draw 5a3e756 TRAIN",
+  "date": "2026-10-04"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_cert_k2_deflated.md",
+  "commit": "761e606c",
+  "verdict": "VALID (W-1..W-5)"
+ },
+ "criteria": [
+  {
+   "id": "DF0",
+   "text": "gate: deflated false-certification on 20 random-relabelling sites; VALID-NULL iff <= 2 of 20, else ANTI-CONSERVATIVE (DF1 / DF2 NOT EVALUABLE) [C-2: rests on the 9 of 20 sites able to pass; detects collapse, not calibration]",
+   "result": "HELD",
+   "value": "VALID-NULL, 0 of 20 (reached 300/300; a collapse check, not calibration; 11 of 20 could not pass)",
+   "denominator": "20 negative-control sites, 300 reps each"
+  },
+  {
+   "id": "DF1",
+   "text": "DECIDING (point of counts), n 486, STRONG and MID: DEFL-SENSITIVE iff both >= 4/5 DEFL-CERT; DEFL-INSENSITIVE iff both <= 1/5; MIXED otherwise (DF1b at n 441). Verdict line: SCOREABLE as the 4-of-5 count; DEFF 1.0, SE 0.0126, MDE80 0.0352 [AMENDED 2026-10-04 (option b): per pair SENSITIVE-PAIR needs >= 4/5 DEFL-CERT, its PC1 median-cut control NOT DEFL-CERTIFIED-AT-SIZE and mean(declared - control) > sample SD; else ELONGATION-CONFOUNDED; DF1 DEFL-SENSITIVE iff both SENSITIVE-PAIR; DEFL-INSENSITIVE unchanged; DF1b SENSITIVE withheld (no control at 441)]",
+   "result": "UNDETERMINED",
+   "value": "ELONGATION-CONFOUNDED (not informative): STRONG, MID 5/5 DEFL-CERT and their PC1 median-cut controls 5/5; DF1b DEFL-CERTIFIED, ELONGATION-UNCONTROLLED",
+   "denominator": "5 subsamples per pair, 300 reps each"
+  },
+  {
+   "id": "DF2",
+   "text": "deciding: source split at n 486: LIBERAL iff >= 2 of 3 anchors DEFL-CERTIFIED-AT-SIZE; DISCRIMINATING iff 0; MIXED otherwise [read with the axis-cut caveat: licenses nothing about source-family structure]",
+   "result": "n/a",
+   "value": "DISCRIMINATING, 0 of 3 (k 300 of 300): axis variance, not discrimination",
+   "denominator": "3 anchors x 5 subsamples"
+  },
+  {
+   "id": "C-1",
+   "text": "a DEGENERATE site (deflated null reached < 20 of 300) is NOT EVALUABLE (CERT-PC-SIZE Q-2), every site class",
+   "result": "n/a",
+   "value": "no DEGENERATE site (reached 300/300 everywhere)",
+   "denominator": "all sites"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "deflated p95 at STRONG n-486 subsamples, median 0.105 [0.085, 0.118]",
+   "result": "FAILED",
+   "value": "deflated p95 median 0.0555 outside [0.085, 0.118]",
+   "denominator": "5 sites"
+  },
+  {
+   "id": "P2",
+   "text": "DF1: DEFL-SENSITIVE 0.40, MIXED 0.30, DEFL-INSENSITIVE 0.30 [re-stated pre-data: DEFL-SENSITIVE 0.15, ELONGATION-CONFOUNDED 0.25, MIXED 0.30, DEFL-INSENSITIVE 0.30]",
+   "result": "n/a",
+   "value": "ELONGATION-CONFOUNDED occurred; Brier 0.7650 (re-stated 4-way; SENSITIVE settled pre-run)",
+   "denominator": "STRONG, MID"
+  },
+  {
+   "id": "P3",
+   "text": "DF2: LIBERAL 0.25, MIXED 0.25, DISCRIMINATING 0.50",
+   "result": "n/a",
+   "value": "DISCRIMINATING occurred; Brier 0.3750",
+   "denominator": "3 anchors"
+  },
+  {
+   "id": "P4",
+   "text": "DF0 VALID-NULL 0.95",
+   "result": "HELD",
+   "value": "VALID-NULL; Brier 0.0025",
+   "denominator": "20 sites"
+  },
+  {
+   "id": "P5",
+   "text": "elongation-cut control DEFL-CERTIFIED-AT-SIZE: STRONG 0.70, MID 0.70",
+   "result": "HELD",
+   "value": "both controls DEFL-CERTIFIED-AT-SIZE; Brier 0.0900 each",
+   "denominator": "2 controls x 5 subsamples"
+  }
+ ],
+ "falsifier": {
+  "text": "F-DF fires iff DF1 DEFL-INSENSITIVE: refutes the covariance-inflation hypothesis (POSTRUN_cert_pc_k2_known W-3) as the explanation of NO-CONTROL at G12's sizes.",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "seen_pre_arm_margins": "DF1 clause (b) from the build's dry-run: STRONG margin 0.007269 > SD 0.002022; MID margin -0.000274 < SD 0.002416; DF1 cannot read DEFL-SENSITIVE; P2's 0.15 settled pre-run",
+  "DF0": "0 of 20 DEFL-CERT; reached 300/300",
+  "DF1": "ELONGATION-CONFOUNDED; pairs and controls 5/5 (k 0); margins STRONG 0.007269 > 0.002022, MID -0.000274 < 0.002416",
+  "DF2": "0 of 3 (k 300 of 300)",
+  "deflated_over_plain_p95": "0.438-0.610 merged pairs; 0.899-1.017 source splits (descriptive)",
+  "P1": "deflated p95 median 0.0555",
+  "replication": "30/30, a ceiling (k 300 in both draws)"
+ },
+ "sentence_of_record": "CERT-K2-DEFLATED (zero calls; VALID; draw 5a3e756 TRAIN, B0 MMLU_PRO_LB, qwen3 512, sepBar 0.0145, 300 reps, deflated seed base 20261004): IDENTITY reproduced (0.107803). DF0 VALID-NULL, 0 of 20: the deflated null did not collapse (reached 300/300); not a calibration test, since 11 of 20 controls could not pass. DF1 ELONGATION-CONFOUNDED: STRONG and MID are deflated-null certified 5 of 5 at n 486 (k 0 of 300). So are their PC1 median-cut controls (5 of 5, k 0). STRONG margin 0.007269 > SD 0.002022; MID -0.000274 < SD 0.002416. Not informative about two-category structure or the covariance-inflation hypothesis; F-DF NOT FIRED (not refuted, not supported; DEFL-SENSITIVE was unreachable pre-run, DF-J). DF1b DEFL-CERTIFIED, ELONGATION-UNCONTROLLED (descriptive). DF2 DISCRIMINATING, 0 of 3 (k 300 of 300): the deflated null certifies cuts along high-variance axes, with or without discrete structure, and not the low-variance source-family splits. Its p95 is 0.44-0.61 of the plain p95 on merged pairs and 0.90-1.02 on source splits. This is axis variance, not structural discrimination. Nothing about source-family structure, and nothing about G12's 0 of 60 beyond 'the deflated null does not demand more than the cut axis's own spread'. The deflated null is not a candidate certificate for data-driven sites; the plain J site null remains the certificate of record. P1 FAILED (0.0555 vs [0.085, 0.118]); P2 Brier 0.765 (re-stated; SENSITIVE settled pre-run); P3 0.375; P4 0.0025; P5 HELD ×2 (0.09 each). Replication 30/30 (both draws k 300: a ceiling, not a replication of discrimination).",
+ "chips": [
+  "REGISTERED 2026-10-04, BEFORE ANY CODE; not built",
+  "VALID (POST-RUN 761e606c): DF1 ELONGATION-CONFOUNDED; DF2 DISCRIMINATING; F-DF NOT FIRED",
+  "NOT INFORMATIVE ON TWO-CATEGORY STRUCTURE OR THE HYPOTHESIS; DF2 = AXIS VARIANCE; NOT A CERTIFICATE FOR DATA-DRIVEN SPLITS; k = 2 SENSITIVITY UNDETERMINED"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-04",
+   "by": "registrar (pre-data; R-1)",
+   "text": "R-1 disclosure corrected (on-disk deflated counts exist for CERT-PC-K2's 30 subsamples only) L24126; IDENTITY = declared statistic only, DEGENERATE a warning L24129; DF0 mainly catches a collapsed null L24132."
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (pre-data; orchestrator's option (b); flagged for the author at checkpoint H)",
+   "text": "B-1 elongation-cut control added; DF1 reading replaced (ELONGATION-CONFOUNDED); F-DF unchanged; C-1 DEGENERATE = NOT EVALUABLE; C-2 DF0 rests on 9 sites. Brackets L24127-L24141; record L24208-L24212."
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (pre-run disclosure DF-J; build 1d282351)",
+   "text": "STRONG margin 0.007269 > SD 0.002022; MID -0.000274 < SD 0.002416: DF1 cannot read DEFL-SENSITIVE, P2's 0.15 settled; F-DF undecided. DF0 NOT EVALUABLE fails the gate (DF1 / DF1b / DF2 NOT EVALUABLE). Programme L24132, L24133, L24137, L24138."
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (POSTRUN 761e606c)",
+   "text": "outcome recorded; memo v3 certificate lines bracketed (k = 2 sensitivity undetermined; both instruments characterised). docs/judge_v2_program.md L24214-L24224 (section \"## CERT-K2-DEFLATED (2026-10-04, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent 761e606c)"
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (consistency check 2026-10-04; zero calls)",
+   "text": "the 'chips' list had drifted from the ledger row's chips (wording or replaced chips); the chips of record are the ledger's, copied verbatim into 'chips_ledger_verbatim' (ledger v379); 'chips' is kept as history."
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (consistency check 2026-10-04; zero calls)",
+   "text": "READY pointer completed: docs/reviews/READY_cert_k2_deflated_delta.md committed in c4e7499b (blob c36748f8, LF); first review docs/reviews/READY_cert_k2_deflated.md (a45b4c10) NOT READY; 'ready' kept as written."
+  }
+ ],
+ "does_not_show": [
+  "two-category structure or the covariance hypothesis (DF1)",
+  "that the deflated null discriminates real from spurious structure (DF2 = axis variance)",
+  "anything about G12's 0 of 60 beyond the registered WOULD NOT",
+  "a usable certificate for data-driven splits",
+  "a calibrated deflated null (DF0 is a collapse check)"
+ ],
+ "ledger": {
+  "row_id": "CERT-K2-DEFLATED",
+  "version": "v378 (2026-10-04: OUTCOME bracket, NULL + WARN chips) | v375 (2026-10-04: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "CERT-PC-K2-KNOWN",
+  "CERT-PC-K2"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; a J site-null variant, not MIX-LRT-SITE's LR (closed); the plain J site null stays the certificate of record"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "86 site nulls, about 1-2 h machine (rule 7; temp on E:)",
+  "agent_hours": "about 1.5 h",
+  "reads_pool": true
+ },
+ "outputs": "never committed: pinned by sha256, stored / backed up on E: with SHA256SUMS.txt (the author prefers E:)",
+ "sources": [
+  "docs/judge_v2_program.md L24123-L24141 (_as_of the commit that writes it, parent ed52c912, re-grepped)",
+  "docs/agents/plans/2026-10-04_10h_schedule.md (ed52c912)",
+  "docs/reviews/POSTRUN_cert_k2_deflated.md (761e606c; blob 11016140, LF)",
+  "docs/judge_v2_program.md L24214-L24224 (section \"## CERT-K2-DEFLATED (2026-10-04, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent 761e606c)"
+ ],
+ "last_update": "2026-10-04",
+ "prior_data_disclosure": "[CORRECTED 2026-10-04, R-1] only CERT-PC-K2's 30 subsamples carry on-disk deflated counts (the K2-KNOWN arm ran deflated = false, columns empty); the read-afterwards replication applies to the source split only",
+ "g12_license": "if DEFL-SENSITIVE: the plain null's k = 2 demand includes the site's own elongation; if DEFL-INSENSITIVE: G12's 0/60 not explained by covariance inflation; never: G12 would certify, uninformative, insensitive",
+ "review_pending": "READY_cert_k2_deflated (a45b4c10): NOT READY (B-1); amended pre-data per option (b); delta review owed",
+ "author_review": "checkpoint H: may overrule the orchestrator's option (b) amendment before the run",
+ "chips_ledger_verbatim": [
+  "plan: REGISTERED 2026-10-04, BEFORE ANY CODE; not built",
+  "null: VALID (POST-RUN 761e606c): DF1 ELONGATION-CONFOUNDED; DF2 DISCRIMINATING; F-DF NOT FIRED",
+  "warn: NOT INFORMATIVE ON TWO-CATEGORY STRUCTURE; DF2 = AXIS VARIANCE; NOT A CERTIFICATE FOR DATA-DRIVEN SPLITS; k = 2 SENSITIVITY UNDETERMINED"
+ ],
+ "ready_of_record": {
+  "file": "docs/reviews/READY_cert_k2_deflated_delta.md",
+  "commit": "c4e7499b",
+  "blob": "c36748f8 (LF)",
+  "note": "first review docs/reviews/READY_cert_k2_deflated.md (a45b4c10) NOT READY"
+ },
+ "plain_description": {
+  "sq": "SQ2 Trust",
+  "what": "Earlier two-way split tests were re-run against a stricter 'deflated' random baseline for the structure certificate. A negative control cut the data along its longest axis. No calls were made.",
+  "why": "It checks whether the certificate can tell real two-category structure apart from data that is merely stretched in one direction.",
+  "information": "If the deflated baseline certified real splits but not the axis-cut controls, it would be a usable certificate for data-driven splits. Result: done, valid. The deflated baseline certified the real splits and the meaningless axis cuts alike (5 of 5 each). Its verdicts follow high-variance directions whether or not discrete structure is there. So it does not discriminate, and it is not a usable certificate for this purpose. The hypothesis it was meant to test was neither refuted nor supported.",
+  "written": "2026-10-07"
+ }
+}

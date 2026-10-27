@@ -1,0 +1,191 @@
+=== PLACEMENT-CEILING: is the newcomer band at 400 matches a key-tie band or a budget band? (0 calls) ===
+  pool p2dca21ab5f4ef3ae | cache experiment_results\x12_crossdomain\newcomer_placement.db (mode=ro; producing script sha e460a379cefd7e2c, this script 8fe92a98b789bf7d) | judge grok-4-1-fast-non-reasoning | max_tokens 8192 | temperature omitted | reference grok-reasoning
+  cache rows: schedule 800 | verdicts 1600 (invalid 1; finish_reason {'content_filter': 1, 'stop': 1599}) = 2 newcomers x 4 anchors x 100 questions x 2 orders
+  board of record: x12 9142 + x20 12394 = 21536 verdicts, 20 models, Meta-Llama-3-70B-Instruct absent; key = eval_results is_correct over the 2811 x20-judged questions (the tier key), pool-wide key over 3445 pool questions printed beside; eval_results roster 47 models (46 with Meta-Llama-3-70B-Instruct excluded)
+  key tiers at 0.017 gap: 14
+    tier  1: gemini-3.1-pro_5-shots 0.912 (pool 0.913)
+    tier  2: arx_0314 0.833 (pool 0.834), iask_pro 0.816 (pool 0.817)
+    tier  3: arx_3 0.784 (pool 0.790), claude-3-5-sonnet-20241022 0.782 (pool 0.779)
+    tier  4: gpt-4o-2024-08-06 0.750 (pool 0.750)
+    tier  5: deepseek-chat-v2_5 0.651 (pool 0.657)
+    tier  6: gpt-4o-mini 0.631 (pool 0.633), claude-3-5-haiku-20241022 0.629 (pool 0.630), Meta-Llama-3_1-70B-Instruct 0.628 (pool 0.630)
+    tier  7: Qwen1.5-110B 0.492 (pool 0.487), Qwen1.5-72B-Chat 0.476 (pool 0.474)
+    tier  8: Mixtral-8x7B-Instruct-v0.1 0.417 (pool 0.412)
+    tier  9: c4ai-command-r-v01 0.370 (pool 0.363), Meta-Llama-3_1-8B 0.369 (pool 0.371)
+    tier 10: Qwen1.5-14B-Chat 0.351 (pool 0.355)
+    tier 11: gemma-7b 0.313 (pool 0.312)
+    tier 12: Yi-6b-Chat 0.274 (pool 0.271)
+    tier 13: Llama-2-13b-hf 0.239 (pool 0.235)
+    tier 14: Llama-2-7b-hf 0.184 (pool 0.178)
+  frontier band read from FRONTIER-FIT (frontier_fit.FRONTIER, membership only, nothing inside it ordered): arx_0314, iask_pro, gemini-3.1-pro_5-shots, gpt-4o-2024-08-06
+  conventions: PRIMARY = ties 1/2, unusable excluded (the recorded rule); A = ties 1/2, unusable 1/2 in the denominator; B = committed verdicts only
+
+--- claude-3-5-sonnet-20241022 (own key tier 3, key 0.782, pool key 0.779) ---
+  step 1 [ 0,18] vs Qwen1.5-72B-Chat                88 :   6 (ties  6, unusable  0) -> up (steps row of record)
+  step 2 [ 0, 8] vs gpt-4o-2024-08-06               41 :  40 (ties 18, unusable  1) -> up (steps row of record)
+  step 3 [ 0, 3] vs gemini-3.1-pro_5-shots          19 :  74 (ties  7, unusable  0) -> down (steps row of record)
+  step 4 [ 2, 3] vs arx_3                           40 :  38 (ties 22, unusable  0) -> up (steps row of record)
+  [PRIMARY] per-anchor certificate, win share, question-clustered bootstrap B=2000, seed 42 replayed in step order:
+    step 1 vs Qwen1.5-72B-Chat               (key tier  7, key 0.476): n 100, share 0.910, sd 0.026 | draws above 0.5: 2000, below: 0 | newcomer ABOVE anchor at 0.975
+    step 2 vs gpt-4o-2024-08-06              (key tier  4, key 0.750): n  99, share 0.505, sd 0.046 | draws above 0.5: 1069, below: 851 | UNSEPARATED at 0.975
+    step 3 vs gemini-3.1-pro_5-shots         (key tier  1, key 0.912): n 100, share 0.225, sd 0.040 | draws above 0.5: 0, below: 2000 | anchor ABOVE newcomer at 0.975
+    step 4 vs arx_3                          (key tier  3, key 0.784): n 100, share 0.510, sd 0.044 | draws above 0.5: 1153, below: 758 | UNSEPARATED at 0.975
+    key-tier interval: tiers 1..7 (7 tiers)
+  [A] per-anchor certificate, win share, question-clustered bootstrap B=2000, seed 42 replayed in step order:
+    step 1 vs Qwen1.5-72B-Chat               (key tier  7, key 0.476): n 100, share 0.910, sd 0.026 | draws above 0.5: 2000, below: 0 | newcomer ABOVE anchor at 0.975
+    step 2 vs gpt-4o-2024-08-06              (key tier  4, key 0.750): n 100, share 0.505, sd 0.044 | draws above 0.5: 1070, below: 852 | UNSEPARATED at 0.975
+    step 3 vs gemini-3.1-pro_5-shots         (key tier  1, key 0.912): n 100, share 0.225, sd 0.039 | draws above 0.5: 0, below: 2000 | anchor ABOVE newcomer at 0.975
+    step 4 vs arx_3                          (key tier  3, key 0.784): n 100, share 0.510, sd 0.044 | draws above 0.5: 1132, below: 795 | UNSEPARATED at 0.975
+    key-tier interval: tiers 1..7 (7 tiers)
+  [B] per-anchor certificate, win share, question-clustered bootstrap B=2000, seed 42 replayed in step order:
+    step 1 vs Qwen1.5-72B-Chat               (key tier  7, key 0.476): n  94, share 0.936, sd 0.026 | draws above 0.5: 2000, below: 0 | newcomer ABOVE anchor at 0.975
+    step 2 vs gpt-4o-2024-08-06              (key tier  4, key 0.750): n  81, share 0.506, sd 0.056 | draws above 0.5: 1060, below: 940 | UNSEPARATED at 0.975
+    step 3 vs gemini-3.1-pro_5-shots         (key tier  1, key 0.912): n  93, share 0.204, sd 0.042 | draws above 0.5: 0, below: 2000 | anchor ABOVE newcomer at 0.975
+    step 4 vs arx_3                          (key tier  3, key 0.784): n  78, share 0.513, sd 0.055 | draws above 0.5: 1080, below: 734 | UNSEPARATED at 0.975
+    key-tier interval: tiers 1..7 (7 tiers)
+  ASSERTED: PRIMARY interval 1..7, own tier 3 = the recorded 1..7 / 3: OK
+  [PRIMARY] decomposition of the band (tiers 1..7, 11 incumbents):
+    tier  1 gemini-3.1-pro_5-shots         key 0.912 (pool 0.913)  (ii)  FRONTIER-FIT band member
+    tier  2 arx_0314                       key 0.833 (pool 0.834)  (ii)  FRONTIER-FIT band member
+    tier  2 iask_pro                       key 0.816 (pool 0.817)  (ii)  FRONTIER-FIT band member
+    tier  3 arx_3                          key 0.784 (pool 0.790)  (i)   KEY-TIE |dkey| 0.002 < 0.017
+    tier  4 gpt-4o-2024-08-06              key 0.750 (pool 0.750)  (ii)  FRONTIER-FIT band member
+    tier  5 deepseek-chat-v2_5             key 0.651 (pool 0.657)  (iii-b) never judged against
+    tier  6 gpt-4o-mini                    key 0.631 (pool 0.633)  (iii-b) never judged against (the peer newcomer: excluded from the anchor set by D5)
+    tier  6 claude-3-5-haiku-20241022      key 0.629 (pool 0.630)  (iii-b) never judged against
+    tier  6 Meta-Llama-3_1-70B-Instruct    key 0.628 (pool 0.630)  (iii-b) never judged against
+    tier  7 Qwen1.5-110B                   key 0.492 (pool 0.487)  (iii-b) never judged against
+    tier  7 Qwen1.5-72B-Chat               key 0.476 (pool 0.474)  (iii-c) judged, CERTIFIED BELOW the newcomer at 100 (bounds the band)
+    tier attribution (majority; ties to the worse, (iii) > (ii) > (i)): tier 1 -> (ii), tier 2 -> (ii), tier 3 -> (i), tier 4 -> (ii), tier 5 -> (iii), tier 6 -> (iii), tier 7 -> (iii)
+    (i) 1 tier: incumbents arx_3(t3)
+    (ii) 3 tiers: incumbents gemini-3.1-pro_5-shots(t1), arx_0314(t2), iask_pro(t2), gpt-4o-2024-08-06(t4)
+    (iii) 3 tiers: incumbents deepseek-chat-v2_5(t5), gpt-4o-mini(t6), claude-3-5-haiku-20241022(t6), Meta-Llama-3_1-70B-Instruct(t6), Qwen1.5-110B(t7), Qwen1.5-72B-Chat(t7)
+    (iii) split: iii-a 0, iii-b 5, iii-c 1 incumbents
+    C1 [PRIMARY]: (i) 1 + (ii) 3 + (iii) 3 = 7 vs band width 7 (denominator: the 11 band incumbents listed): HELD
+  [A] decomposition of the band (tiers 1..7, 11 incumbents):
+    tier  1 gemini-3.1-pro_5-shots         key 0.912 (pool 0.913)  (ii)  FRONTIER-FIT band member
+    tier  2 arx_0314                       key 0.833 (pool 0.834)  (ii)  FRONTIER-FIT band member
+    tier  2 iask_pro                       key 0.816 (pool 0.817)  (ii)  FRONTIER-FIT band member
+    tier  3 arx_3                          key 0.784 (pool 0.790)  (i)   KEY-TIE |dkey| 0.002 < 0.017
+    tier  4 gpt-4o-2024-08-06              key 0.750 (pool 0.750)  (ii)  FRONTIER-FIT band member
+    tier  5 deepseek-chat-v2_5             key 0.651 (pool 0.657)  (iii-b) never judged against
+    tier  6 gpt-4o-mini                    key 0.631 (pool 0.633)  (iii-b) never judged against (the peer newcomer: excluded from the anchor set by D5)
+    tier  6 claude-3-5-haiku-20241022      key 0.629 (pool 0.630)  (iii-b) never judged against
+    tier  6 Meta-Llama-3_1-70B-Instruct    key 0.628 (pool 0.630)  (iii-b) never judged against
+    tier  7 Qwen1.5-110B                   key 0.492 (pool 0.487)  (iii-b) never judged against
+    tier  7 Qwen1.5-72B-Chat               key 0.476 (pool 0.474)  (iii-c) judged, CERTIFIED BELOW the newcomer at 100 (bounds the band)
+    tier attribution (majority; ties to the worse, (iii) > (ii) > (i)): tier 1 -> (ii), tier 2 -> (ii), tier 3 -> (i), tier 4 -> (ii), tier 5 -> (iii), tier 6 -> (iii), tier 7 -> (iii)
+    (i) 1 tier: incumbents arx_3(t3)
+    (ii) 3 tiers: incumbents gemini-3.1-pro_5-shots(t1), arx_0314(t2), iask_pro(t2), gpt-4o-2024-08-06(t4)
+    (iii) 3 tiers: incumbents deepseek-chat-v2_5(t5), gpt-4o-mini(t6), claude-3-5-haiku-20241022(t6), Meta-Llama-3_1-70B-Instruct(t6), Qwen1.5-110B(t7), Qwen1.5-72B-Chat(t7)
+    (iii) split: iii-a 0, iii-b 5, iii-c 1 incumbents
+    C1 [A]: (i) 1 + (ii) 3 + (iii) 3 = 7 vs band width 7 (denominator: the 11 band incumbents listed): HELD
+  [B] decomposition of the band (tiers 1..7, 11 incumbents):
+    tier  1 gemini-3.1-pro_5-shots         key 0.912 (pool 0.913)  (ii)  FRONTIER-FIT band member
+    tier  2 arx_0314                       key 0.833 (pool 0.834)  (ii)  FRONTIER-FIT band member
+    tier  2 iask_pro                       key 0.816 (pool 0.817)  (ii)  FRONTIER-FIT band member
+    tier  3 arx_3                          key 0.784 (pool 0.790)  (i)   KEY-TIE |dkey| 0.002 < 0.017
+    tier  4 gpt-4o-2024-08-06              key 0.750 (pool 0.750)  (ii)  FRONTIER-FIT band member
+    tier  5 deepseek-chat-v2_5             key 0.651 (pool 0.657)  (iii-b) never judged against
+    tier  6 gpt-4o-mini                    key 0.631 (pool 0.633)  (iii-b) never judged against (the peer newcomer: excluded from the anchor set by D5)
+    tier  6 claude-3-5-haiku-20241022      key 0.629 (pool 0.630)  (iii-b) never judged against
+    tier  6 Meta-Llama-3_1-70B-Instruct    key 0.628 (pool 0.630)  (iii-b) never judged against
+    tier  7 Qwen1.5-110B                   key 0.492 (pool 0.487)  (iii-b) never judged against
+    tier  7 Qwen1.5-72B-Chat               key 0.476 (pool 0.474)  (iii-c) judged, CERTIFIED BELOW the newcomer at 100 (bounds the band)
+    tier attribution (majority; ties to the worse, (iii) > (ii) > (i)): tier 1 -> (ii), tier 2 -> (ii), tier 3 -> (i), tier 4 -> (ii), tier 5 -> (iii), tier 6 -> (iii), tier 7 -> (iii)
+    (i) 1 tier: incumbents arx_3(t3)
+    (ii) 3 tiers: incumbents gemini-3.1-pro_5-shots(t1), arx_0314(t2), iask_pro(t2), gpt-4o-2024-08-06(t4)
+    (iii) 3 tiers: incumbents deepseek-chat-v2_5(t5), gpt-4o-mini(t6), claude-3-5-haiku-20241022(t6), Meta-Llama-3_1-70B-Instruct(t6), Qwen1.5-110B(t7), Qwen1.5-72B-Chat(t7)
+    (iii) split: iii-a 0, iii-b 5, iii-c 1 incumbents
+    C1 [B]: (i) 1 + (ii) 3 + (iii) 3 = 7 vs band width 7 (denominator: the 11 band incumbents listed): HELD
+  power column (descriptive; unseparated anchors on PRIMARY; SE_n = sd_100 x sqrt(100 / n); certify at 0.975 if the share held):
+    vs gpt-4o-2024-08-06              (ii) share 0.505 sd 0.046 n 99 -> 31001 question-pairs
+    vs arx_3                          (i) share 0.510 sd 0.044 n 100 -> 7549 question-pairs
+    (iii-a) anchors: none
+  C2 resolution curve (same four anchors; 300 question-stratified draws per size, seed 42; per draw the recorded rule at B=2000):
+     25 q/anchor = 100 question-pairs: median width 7 tiers, [p5, p95] = [7, 7] over 300 draws | key-contradicted draws 0 | full-span (14-tier) draws 0 (0.000)
+     50 q/anchor = 200 question-pairs: median width 7 tiers, [p5, p95] = [7, 7] over 300 draws | key-contradicted draws 0 | full-span (14-tier) draws 0 (0.000)
+     75 q/anchor = 300 question-pairs: median width 7 tiers, [p5, p95] = [7, 7] over 300 draws | key-contradicted draws 0 | full-span (14-tier) draws 0 (0.000)
+    100 q/anchor = 400 question-pairs: median width 7 tiers, [p5, p95] = [7, 7] over 300 draws | key-contradicted draws 0 | full-span (14-tier) draws 0 (0.000)
+    400 question-pairs = the recorded 7 tiers by identity (PRIMARY interval asserted above; the draws at 100 differ only by the inner bootstrap's RNG)
+
+--- gpt-4o-mini (own key tier 6, key 0.631, pool key 0.633) ---
+  step 1 [ 0,18] vs Qwen1.5-72B-Chat                64 :  22 (ties 14, unusable  0) -> up (steps row of record)
+  step 2 [ 0, 8] vs arx_0314                        10 :  76 (ties 14, unusable  0) -> down (steps row of record)
+  step 3 [ 5, 8] vs claude-3-5-haiku-20241022       47 :  28 (ties 25, unusable  0) -> up (steps row of record)
+  step 4 [ 5, 5] vs gpt-4o-2024-08-06               26 :  54 (ties 20, unusable  0) -> down (steps row of record)
+  [PRIMARY] per-anchor certificate, win share, question-clustered bootstrap B=2000, seed 42 replayed in step order:
+    step 1 vs Qwen1.5-72B-Chat               (key tier  7, key 0.476): n 100, share 0.710, sd 0.041 | draws above 0.5: 2000, below: 0 | newcomer ABOVE anchor at 0.975
+    step 2 vs arx_0314                       (key tier  2, key 0.833): n 100, share 0.170, sd 0.032 | draws above 0.5: 0, below: 2000 | anchor ABOVE newcomer at 0.975
+    step 3 vs claude-3-5-haiku-20241022      (key tier  6, key 0.629): n 100, share 0.595, sd 0.042 | draws above 0.5: 1964, below: 29 | newcomer ABOVE anchor at 0.975
+    step 4 vs gpt-4o-2024-08-06              (key tier  4, key 0.750): n 100, share 0.360, sd 0.043 | draws above 0.5: 1, below: 1998 | anchor ABOVE newcomer at 0.975
+    key-tier interval: tiers 4..6 (3 tiers)
+  [A] per-anchor certificate, win share, question-clustered bootstrap B=2000, seed 42 replayed in step order:
+    step 1 vs Qwen1.5-72B-Chat               (key tier  7, key 0.476): n 100, share 0.710, sd 0.041 | draws above 0.5: 2000, below: 0 | newcomer ABOVE anchor at 0.975
+    step 2 vs arx_0314                       (key tier  2, key 0.833): n 100, share 0.170, sd 0.032 | draws above 0.5: 0, below: 2000 | anchor ABOVE newcomer at 0.975
+    step 3 vs claude-3-5-haiku-20241022      (key tier  6, key 0.629): n 100, share 0.595, sd 0.042 | draws above 0.5: 1964, below: 29 | newcomer ABOVE anchor at 0.975
+    step 4 vs gpt-4o-2024-08-06              (key tier  4, key 0.750): n 100, share 0.360, sd 0.043 | draws above 0.5: 1, below: 1998 | anchor ABOVE newcomer at 0.975
+    key-tier interval: tiers 4..6 (3 tiers)
+  [B] per-anchor certificate, win share, question-clustered bootstrap B=2000, seed 42 replayed in step order:
+    step 1 vs Qwen1.5-72B-Chat               (key tier  7, key 0.476): n  86, share 0.744, sd 0.046 | draws above 0.5: 2000, below: 0 | newcomer ABOVE anchor at 0.975
+    step 2 vs arx_0314                       (key tier  2, key 0.833): n  86, share 0.116, sd 0.034 | draws above 0.5: 0, below: 2000 | anchor ABOVE newcomer at 0.975
+    step 3 vs claude-3-5-haiku-20241022      (key tier  6, key 0.629): n  75, share 0.627, sd 0.055 | draws above 0.5: 1977, below: 23 | newcomer ABOVE anchor at 0.975
+    step 4 vs gpt-4o-2024-08-06              (key tier  4, key 0.750): n  80, share 0.325, sd 0.053 | draws above 0.5: 1, below: 1998 | anchor ABOVE newcomer at 0.975
+    key-tier interval: tiers 4..6 (3 tiers)
+  ASSERTED: PRIMARY interval 4..6, own tier 6 = the recorded 4..6 / 6: OK
+  [PRIMARY] decomposition of the band (tiers 4..6, 4 incumbents):
+    tier  4 gpt-4o-2024-08-06              key 0.750 (pool 0.750)  (ii)  FRONTIER-FIT band member
+    tier  5 deepseek-chat-v2_5             key 0.651 (pool 0.657)  (iii-b) never judged against
+    tier  6 claude-3-5-haiku-20241022      key 0.629 (pool 0.630)  (i)   KEY-TIE |dkey| 0.002 < 0.017
+    tier  6 Meta-Llama-3_1-70B-Instruct    key 0.628 (pool 0.630)  (i)   KEY-TIE |dkey| 0.003 < 0.017
+    tier attribution (majority; ties to the worse, (iii) > (ii) > (i)): tier 4 -> (ii), tier 5 -> (iii), tier 6 -> (i)
+    (i) 1 tier: incumbents claude-3-5-haiku-20241022(t6), Meta-Llama-3_1-70B-Instruct(t6)
+    (ii) 1 tier: incumbents gpt-4o-2024-08-06(t4)
+    (iii) 1 tier: incumbents deepseek-chat-v2_5(t5)
+    (iii) split: iii-a 0, iii-b 1, iii-c 0 incumbents
+    C1 [PRIMARY]: (i) 1 + (ii) 1 + (iii) 1 = 3 vs band width 3 (denominator: the 4 band incumbents listed): HELD
+  [A] decomposition of the band (tiers 4..6, 4 incumbents):
+    tier  4 gpt-4o-2024-08-06              key 0.750 (pool 0.750)  (ii)  FRONTIER-FIT band member
+    tier  5 deepseek-chat-v2_5             key 0.651 (pool 0.657)  (iii-b) never judged against
+    tier  6 claude-3-5-haiku-20241022      key 0.629 (pool 0.630)  (i)   KEY-TIE |dkey| 0.002 < 0.017
+    tier  6 Meta-Llama-3_1-70B-Instruct    key 0.628 (pool 0.630)  (i)   KEY-TIE |dkey| 0.003 < 0.017
+    tier attribution (majority; ties to the worse, (iii) > (ii) > (i)): tier 4 -> (ii), tier 5 -> (iii), tier 6 -> (i)
+    (i) 1 tier: incumbents claude-3-5-haiku-20241022(t6), Meta-Llama-3_1-70B-Instruct(t6)
+    (ii) 1 tier: incumbents gpt-4o-2024-08-06(t4)
+    (iii) 1 tier: incumbents deepseek-chat-v2_5(t5)
+    (iii) split: iii-a 0, iii-b 1, iii-c 0 incumbents
+    C1 [A]: (i) 1 + (ii) 1 + (iii) 1 = 3 vs band width 3 (denominator: the 4 band incumbents listed): HELD
+  [B] decomposition of the band (tiers 4..6, 4 incumbents):
+    tier  4 gpt-4o-2024-08-06              key 0.750 (pool 0.750)  (ii)  FRONTIER-FIT band member
+    tier  5 deepseek-chat-v2_5             key 0.651 (pool 0.657)  (iii-b) never judged against
+    tier  6 claude-3-5-haiku-20241022      key 0.629 (pool 0.630)  (i)   KEY-TIE |dkey| 0.002 < 0.017
+    tier  6 Meta-Llama-3_1-70B-Instruct    key 0.628 (pool 0.630)  (i)   KEY-TIE |dkey| 0.003 < 0.017
+    tier attribution (majority; ties to the worse, (iii) > (ii) > (i)): tier 4 -> (ii), tier 5 -> (iii), tier 6 -> (i)
+    (i) 1 tier: incumbents claude-3-5-haiku-20241022(t6), Meta-Llama-3_1-70B-Instruct(t6)
+    (ii) 1 tier: incumbents gpt-4o-2024-08-06(t4)
+    (iii) 1 tier: incumbents deepseek-chat-v2_5(t5)
+    (iii) split: iii-a 0, iii-b 1, iii-c 0 incumbents
+    C1 [B]: (i) 1 + (ii) 1 + (iii) 1 = 3 vs band width 3 (denominator: the 4 band incumbents listed): HELD
+  power column (descriptive; unseparated anchors on PRIMARY; SE_n = sd_100 x sqrt(100 / n); certify at 0.975 if the share held):
+    no unseparated anchor
+    (iii-a) anchors: none
+  C2 resolution curve (same four anchors; 300 question-stratified draws per size, seed 42; per draw the recorded rule at B=2000):
+     25 q/anchor = 100 question-pairs: median width 6 tiers, [p5, p95] = [4, 13] over 300 draws | key-contradicted draws 0 | full-span (14-tier) draws 0 (0.000)
+     50 q/anchor = 200 question-pairs: median width 4 tiers, [p5, p95] = [3, 6] over 300 draws | key-contradicted draws 0 | full-span (14-tier) draws 0 (0.000)
+     75 q/anchor = 300 question-pairs: median width 4 tiers, [p5, p95] = [3, 6] over 300 draws | key-contradicted draws 0 | full-span (14-tier) draws 0 (0.000)
+    100 q/anchor = 400 question-pairs: median width 3 tiers, [p5, p95] = [3, 3] over 300 draws | key-contradicted draws 0 | full-span (14-tier) draws 0 (0.000)
+    400 question-pairs = the recorded 3 tiers by identity (PRIMARY interval asserted above; the draws at 100 differ only by the inner bootstrap's RNG)
+
+=== criteria, predictions (blind, labelled) and the falsifier ===
+  C1 HELD under PRIMARY, A and B for both newcomers (asserted above)
+  C2 the curve at 100 / 200 / 300 / 400 question-pairs with [p5, p95] over 300 draws (>= 300 required) and the power column, printed above -> HELD
+  P1 sonnet's width entirely (i) + (ii), (iii) = 0 tiers: (i) 1 + (ii) 3 + (iii) 3 -> FAILED
+  P2 gpt-4o-mini: tier 6 -> (i), tiers 4 and 5 -> (ii) or (iii): tier 4 (ii), tier 5 (iii), tier 6 (i) -> HELD
+  P3 claude-3-5-sonnet-20241022: median width at 100 question-pairs 7 minus at 400 7 = 0 <= 1 -> HELD
+  P3 gpt-4o-mini: median width at 100 question-pairs 6 minus at 400 3 = 3 <= 1 -> FAILED
+  P3 overall: FAILED
+  registrar's addition: sonnet at 100 question-pairs reaches the full 14-tier span in 0.000 of draws (< 0.5: HELD)
+  FALSIFIER (iii) >= 2 tiers for either newcomer (PRIMARY): sonnet (iii) 3, gpt-4o-mini (iii) 1 -> FIRED for claude-3-5-sonnet-20241022: budget IS the band there; C6 PLACEMENT-CURVE is worth registering (a registration, not a launch)
+    under convention A: sonnet (iii) 3, gpt-4o-mini (iii) 1 -> fired for claude-3-5-sonnet-20241022
+    under convention B: sonnet (iii) 3, gpt-4o-mini (iii) 1 -> fired for claude-3-5-sonnet-20241022
+  not overturned by this test: the FAIL of criterion (22), the two placements' directions, the contained key tiers, the frontier order (nothing inside the band is ordered)

@@ -1,0 +1,16 @@
+frozen : it 10 nodes 154 leaves 87 depth 6 top1 0.775
+o0: it 10 nodes 152 leaves 86 depth 6 top1 0.772 | anchor drift 0.53pp | mu-match 81/87
+o1: it 10 nodes 153 leaves 86 depth 6 top1 0.774 | anchor drift 0.52pp | mu-match 81/87
+o2: it 10 nodes 152 leaves 86 depth 6 top1 0.774 | anchor drift 0.52pp | mu-match 81/87
+o3: it 10 nodes 154 leaves 86 depth 5 top1 0.774 | anchor drift 0.53pp | mu-match 79/87
+alpha: Top-1 spread 0.3pp (registered bar 2.5pp): PASS
+
+=== arm-vs-arm leaf identity (mu-match at cos >= 0.95, the h9_stability rule, with o0 = same-code unshuffled rebuild as reference) ===
+load() keys: ['it', 'nodes', 'leaves', 'depth', 'top1', 'ashare']
+mu-match o0 vs o1: 86/86 at cos>=0.95 | 86/86 at cos>=0.99 | min best-cos 0.993, 5th pct 0.996
+mu-match o0 vs o2: 86/86 at cos>=0.95 | 83/86 at cos>=0.99 | min best-cos 0.964, 5th pct 0.994
+mu-match o0 vs o3: 85/86 at cos>=0.95 | 78/86 at cos>=0.99 | min best-cos 0.943, 5th pct 0.967
+mu-match o1 vs o2: 86/86 at cos>=0.95 | 83/86 at cos>=0.99 | min best-cos 0.964, 5th pct 0.997
+mu-match o1 vs o3: 85/86 at cos>=0.95 | 78/86 at cos>=0.99 | min best-cos 0.882, 5th pct 0.967
+mu-match o2 vs o3: 85/86 at cos>=0.95 | 75/86 at cos>=0.99 | min best-cos 0.842, 5th pct 0.966
+Top-1: o0 0.7719, o1 0.7735, o2 0.7735, o3 0.7744 | spread across o1-o3 vs o0: 0.25pp

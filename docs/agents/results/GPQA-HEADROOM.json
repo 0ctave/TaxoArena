@@ -1,0 +1,90 @@
+{
+  "id": "GPQA-HEADROOM",
+  "title": "GPQA-HEADROOM: does a harder corpus restore the discriminative power MMLU-Pro has lost? (zero calls)",
+  "question": "Top-4 saturation and the mean pairwise differing share on the 18-model multi-corpus roster, GPQA vs the leaderboard MMLU-Pro.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "2c181aa",
+    "program_lines": "docs/judge_v2_program.md L1072-L1099 (the 'Three probes' bullet; not separately registered: exploratory probes reading existing caches)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "- **Three probes (2026-09-14, zero calls): the judge needs a correct reference, not competence; GPQA has the headroom MMLU-Pro lost; and the pointwise board advantage does not survive small samples.**",
+    "outcome_heading": [
+      "L1072: the same bullet"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "n/a (free check; scratch script, no script of record; the output file is the record)",
+    "sha16": "n/a",
+    "commit": "2c181aa"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/three_probes.txt",
+    "outcome_commit": "2c181aa",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-14"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); descriptive probes",
+    "commit": "2c181aa",
+    "verdict": "descriptive"
+  },
+  "criteria": [
+    {
+      "id": "readout",
+      "text": "descriptive: top-4 all-correct share and mean pairwise differing share",
+      "result": "DELIVERED",
+      "value": "GPQA: top-4 all-correct 7.2%, mean pairwise differ 36.1%; MMLU-Pro: 36.7% and 20.4%",
+      "denominator": "18-model multi-corpus roster"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none (descriptive)",
+    "fired": false,
+    "note": ""
+  },
+  "numbers_of_record": {
+    "gpqa": "top-4 all-correct 7.2%; pairwise differ 36.1%",
+    "mmlu_pro": "36.7%; 20.4%"
+  },
+  "sentence_of_record": "GPQA-HEADROOM (2026-09-14, zero calls): GPQA top-4 all-correct 7.2%, mean pairwise differ 36.1%, against MMLU-Pro's 36.7% and 20.4%: GPQA has not saturated and is the natural venue for frontier work once MMLU-Pro's 8.8% frontier budget is exhausted.",
+  "chips": [
+    "YES — GPQA unsaturated"
+  ],
+  "brackets": [],
+  "does_not_show": [
+    "a judged result on GPQA (a saturation readout only)"
+  ],
+  "ledger": {
+    "row_id": "GPQA-HEADROOM",
+    "version": "v65 (2c181aa)"
+  },
+  "depends_on": [
+    "MC-BUILD",
+    "FRONTIER",
+    "PROFILE-INTERVAL-ALL-UNION"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L1072-L1099 (2c181aa)",
+    "experiment_results/x12_crossdomain/three_probes.txt (2c181aa)",
+    "docs/test_ledger.html row GPQA-HEADROOM (v65): chips verbatim, evidence (three_probes.txt)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (rubric_v2_design.md / multi_corpus_design.md lines as of their last commits named in sources)"
+  ],
+  "last_update": "2026-09-22",
+  "plain_description": {
+    "sq": "SQ1 Use",
+    "what": "Using 18 models' existing results, the test compared a harder benchmark (GPQA) with MMLU-Pro. It counted how often the top 4 models all get a question right, and how often two models disagree on a question.",
+    "why": "Ranking the strongest models needs questions they do not all solve, and MMLU-Pro may be nearly used up for that purpose.",
+    "information": "If GPQA still separates the strong models, it is the place for work on the top of the leaderboard. Result: done, with no judging involved. On GPQA the top 4 all succeed on only 7% of questions, against 37% on MMLU-Pro, and models disagree more often (36% against 20%). So GPQA has not saturated and is the natural place for that work. This is a saturation readout only, not a judged result.",
+    "written": "2026-10-07"
+  }
+}

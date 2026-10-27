@@ -1,0 +1,110 @@
+# Law -- 8-MODEL BASELINE, paired MAIN vs C5, RESOLVED mode. 2026-07-31.
+#
+# WHY THE ROSTER CHANGED. Spearman rho was measured unusable on the 12-model roster: two
+# runs of an identical configuration (seeds 42 and 137, RESOLVED, history) gave d rho of
+# +6.00/+8.00 and 0.00/0.00 grid steps -- a spread of 6-8 steps against a registered
+# decisive threshold of 2. The cause is not the arena. On 131 routed questions, 10 of the
+# 11 adjacent pairs in the old roster are TIES IN THE GROUND TRUTH ITSELF, three of them
+# separated by 0.76pp against a 5.7pp standard error (z = 0.13). rho was scoring the arena
+# against an ordering the reference does not determine, and all of its instability lived
+# there. Restricted to the 45 pairs the ground truth does separate, the old arena scored
+# 45/45 in both arms and both seeds -- perfect, and invisible to rho.
+#
+# THE NEW ROSTER is the maximal-separation 8-subset of the 46 candidate models with full
+# reserved-pool coverage (>3000 rows each), chosen to maximise the minimum adjacent
+# separation. Selected independently at N=131 and N=237; both optimisations converge on the
+# same set, which is a good sign it is the natural choice rather than an artefact.
+#
+#   model                          acc      gap     z@131  z@237
+#   gemini-3.1-pro_5-shots       0.9126   7.89pp    1.93   2.60
+#   arx_0314                     0.8337   8.39pp    1.68   2.26
+#   gpt-4o-2024-08-06            0.7498  12.02pp    2.12   2.85
+#   Meta-Llama-3_1-70B-Instruct  0.6296  15.53pp    2.56   3.44
+#   Qwen1.5-72B-Chat             0.4743  10.30pp    1.70   2.28
+#   Meta-Llama-3_1-8B            0.3713  10.01pp    1.75   2.35
+#   Yi-6b-Chat                   0.2711   9.35pp    1.82   2.45
+#   Llama-2-7b-hf                0.1776
+#
+# THE BAN LIST IS PART OF THE SELECTION. A first attempt at this roster was REJECTED at
+# startup by EvalIngestValidator.enforceNamedExclusions: it contained
+# sonnet-3.5_0shots_09_34_29, which has no trace field in the upstream archive, so
+# getRobustTrace would have substituted a one-line stub and reproduced the 99.4% format
+# preference inside its own comparisons. Ten models are banned for that class of reason;
+# excluding them cuts the candidate pool from 46 to 37. opus_2shots_00_37_14 and
+# Meta-Llama-3-70B-Instruct are on that list too, which is why neither appears here.
+#
+# 9 models was tested and rejected: only 5 of 8 adjacent pairs clear 2 SE even at N=237,
+# with several at z ~ 1.9. Eight is the most this candidate pool supports.
+#
+# HISTORY IS MARGINAL BY DESIGN, ACCEPTED. Every adjacent pair sits at z = 1.68-2.56 on 131
+# questions -- roughly 91-99% confident individually, two already past the 2 SE bar. That is a
+# different regime from the old roster's z = 0.13-0.15 coin flips. From physics (N=237)
+# upward every pair clears 2 SE at z = 2.26-3.44, so rho is fully determined there.
+#
+# NOT COMPARABLE TO ANY PRIOR RESULT: this roster shares exactly one model with the 12-model
+# batch. Every earlier per-domain number is historical.
+#
+# 8 models = 28 pairs against 66, so ~2.4x deeper evidence per pair at the same budget, and
+# 28 per-cell pair-slots against 264 -- the lever most likely to make per-cell profiles
+# resolvable (see docs/findings-2026-07-31.md section 2).
+#
+# NOT REGISTERED. Roster trial.
+
+#
+# BATCH NOTE. One of eight domains forming the new 12-model-superseding baseline. Every
+# earlier batch is historical: this roster shares exactly ONE model with the previous one.
+#
+# WHAT THIS BATCH CAN AND CANNOT SHOW, decided before it ran:
+#   CAN  -- tie rate, judge/key agreement on decidable comparisons, per-cell capability
+#           gradients, GT-decidable pairwise accuracy. All per-verdict, n in the hundreds
+#           to thousands, and the tie rate replicated to 0.1pp across seeds.
+#   CANNOT -- an arm contrast from Delta rho. On history both arms produced the IDENTICAL
+#           ranking (26/28 pairs correct, same two swaps), so Delta rho = 0.00 under both
+#           tie conventions. Bradley-Terry aggregation over hundreds of verdicts averages
+#           away the ~23% verdict-level disagreement between the rubrics. Do not report
+#           Delta rho as evidence for or against the rubric.
+#
+datasetType   = "MMLU_PRO"
+models        = [
+    "gemini-3.1-pro_5-shots",
+    "arx_0314",
+    "gpt-4o-2024-08-06",
+    "Meta-Llama-3_1-70B-Instruct",
+    "Qwen1.5-72B-Chat",
+    "Meta-Llama-3_1-8B",
+    "Yi-6b-Chat",
+    "Llama-2-7b-hf"
+]
+snapshotId    = "20260727_042523_Headless_Run_Auto_ge"
+category      = "Law"
+queryLimit    = 0            # all in-domain reserved questions
+outputDir     = "experiment_results/r8_law"
+testRatio     = 0.3
+seed          = 42
+
+runPipeline        = false
+regenerateSplit    = false   # load-bearing: use the canonical reserved pool as-is
+runBenchmark       = true
+runTrickle         = false
+runBaselines       = false
+enableFinalMetrics = false
+enableLabeling     = false   # rubrics already in the snapshot
+judgeInduction     = false
+
+conditions         = ["MAIN", "C5"]
+questionsPerRound  = 1
+confidenceGate     = 0.0     # DISABLED for both arms: C5 emits a flat 0.85 and
+                             # MAIN emits real values, so a live gate would filter one
+                             # arm and not the other - the paired design would break at
+                             # the verdict level while looking intact at the question level.
+parallelism        = 4
+reservedOnly       = true
+
+dagMode = "DAG_MAX"
+maxDepth              = 8
+minClusterSize        = 55
+proposalSeparationBar = 0.025
+
+# Judge sees no candidate set; each trace carries its OWN selected option, resolved
+# from `pred` to the option text. Applies to BOTH arms.
+judgeOptionMode = "RESOLVED"

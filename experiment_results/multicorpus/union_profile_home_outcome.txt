@@ -1,0 +1,225 @@
+reserved_pool_id=paeec37aa28063c75
+=== UNION-PROFILE-HOME: are the 39 order-reliable union strata or the 14 MMLU-Pro anchors the profile's home? (the numbers the choice needs) ===
+  registered 2026-09-19 (commit 8b3f6e2, docs/judge_v2_program.md L7926-L8063); zero calls; key only; every DB mode=ro; pool paeec37aa28063c75; RUN
+
+--- DATA CHECK (the object, before any stratum is read; profile_interval_union.data_check) ---
+  [ok] frozen id file reserved_pool_frozen_paeec.json: 52 keys, 6482 judgeable ids  
+  [ok] DB reserved_pool holds 8 pools; paeec37aa28063c75 (6482 rows) is the pool of record; every other id is refused by the reader (incl. pa95843d826d40ffd, 6482 rows)  
+  [ok] reader refuses pool pa95843d826d40ffd by id  
+  [ok] reserved_pool rows of paeec37aa28063c75 == frozen file (key, id) set  
+  [ok] routing CSV of record: 6482 rows, 52 keys, per-key counts == frozen file, true_source == key source (no id column: row-level identity not checkable)  
+  [ok] frozen keys agree with corpus_questions (source, domain) on every pool id (MMLU_PRO_LB <-> MMLU_PRO); the frozen key stays the stratum  (0)
+  [ok] eval_results = 388,908 rows, 21,606 questions x 18 models  ((388908, 21606, 18))
+  [ok] Meta-Llama-3-70B-Instruct absent from the roster  
+  [ok] eval_results_mathfix covers all 398 MATH pool ids x 18 models (MATH column read from MATH-FIX only)  
+  info: MATH-FIX differs from the ingested MATH rows on 1598 of 7164 pool (question, model) cells (the ingested rows are NOT read into the key)
+
+  stratum (frozen key = SOURCE/domain)               n  support
+  BBH/boolean_expressions                           75  >= 25
+  BBH/causal_judgement                              56  >= 25
+  BBH/date_understanding                            75  >= 25
+  BBH/disambiguation_qa                             75  >= 25
+  BBH/formal_fallacies                              75  >= 25
+  BBH/geometric_shapes                              75  >= 25
+  BBH/hyperbaton                                    75  >= 25
+  BBH/logical_deduction_five_objects                75  >= 25
+  BBH/logical_deduction_seven_objects               75  >= 25
+  BBH/logical_deduction_three_objects               75  >= 25
+  BBH/movie_recommendation                          75  >= 25
+  BBH/navigate                                      75  >= 25
+  BBH/object_counting                               75  >= 25
+  BBH/penguins_in_a_table                           44  >= 25
+  BBH/reasoning_about_colored_objects               75  >= 25
+  BBH/ruin_names                                    75  >= 25
+  BBH/salient_translation_error_detection           75  >= 25
+  BBH/snarks                                        53  >= 25
+  BBH/sports_understanding                          75  >= 25
+  BBH/temporal_sequences                            75  >= 25
+  BBH/tracking_shuffled_objects_five_objects        75  >= 25
+  BBH/tracking_shuffled_objects_seven_objects       75  >= 25
+  BBH/tracking_shuffled_objects_three_objects       75  >= 25
+  BBH/web_of_lies                                   75  >= 25
+  MATH/Algebra                                      92  >= 25
+  MATH/Counting & Probability                       37  >= 25
+  MATH/Geometry                                     40  >= 25
+  MATH/Intermediate Algebra                         84  >= 25
+  MATH/Number Theory                                46  >= 25
+  MATH/Prealgebra                                   58  >= 25
+  MATH/Precalculus                                  41  >= 25
+  MUSR/murder_mysteries                             75  >= 25
+  MUSR/object_placements                            77  >= 25
+  MUSR/team_allocation                              75  >= 25
+  IFEVAL/ifeval                                    162  >= 25
+  GPQA/Physics                                     150  >= 25
+  GPQA/Chemistry                                   147  >= 25
+  GPQA/Biology                                      61  >= 25
+  MMLU_PRO_LB/business                             237  >= 25
+  MMLU_PRO_LB/law                                  330  >= 25
+  MMLU_PRO_LB/psychology                           239  >= 25
+  MMLU_PRO_LB/biology                              215  >= 25
+  MMLU_PRO_LB/chemistry                            340  >= 25
+  MMLU_PRO_LB/history                              114  >= 25
+  MMLU_PRO_LB/other                                277  >= 25
+  MMLU_PRO_LB/health                               245  >= 25
+  MMLU_PRO_LB/economics                            253  >= 25
+  MMLU_PRO_LB/math                                 405  >= 25
+  MMLU_PRO_LB/physics                              390  >= 25
+  MMLU_PRO_LB/computer science                     123  >= 25
+  MMLU_PRO_LB/philosophy                           150  >= 25
+  MMLU_PRO_LB/engineering                          291  >= 25
+
+  per source (reserved-side support, expected per reserved_pool_meta):
+  [ok] MMLU_PRO_LB   3609 q over 14 strata (expected 3609 / 14)
+  [ok] BBH           1728 q over 24 strata (expected 1728 / 24)
+  [ok] MATH           398 q over  7 strata (expected 398 / 7)
+  [ok] MUSR           227 q over  3 strata (expected 227 / 3)
+  [ok] IFEVAL         162 q over  1 strata (expected 162 / 1)
+  [ok] GPQA           358 q over  3 strata (expected 358 / 3)
+  support floor: 25 reserved questions -> UNSUPPORTED; strata below it: none
+  roster (18 models): DeepSeek-R1-Distill-Llama-8B, DeepSeek-R1-Distill-Qwen-32B, Falcon3-10B-Instruct, Llama-3.1-70B-Instruct, Llama-3.2-3B-Instruct, Llama-3.3-70B-Instruct, Mistral-Small-Instruct-2409, Mixtral-8x7B-Instruct-v0.1, OLMo-2-1124-7B-Instruct, Phi-3.5-mini-instruct, Qwen2.5-32B-Instruct, Qwen2.5-72B-Instruct, Qwen2.5-7B-Instruct, Qwen2.5-Coder-7B-Instruct, Qwen2.5-Math-7B-Instruct, Yi-1.5-34B-Chat-16K, c4ai-command-r-plus-08-2024, internlm2_5-20b-chat
+  KEY DENOMINATOR: each stratum's RESERVED questions of pool paeec37aa28063c75 (n per row); key = is_correct (MATH: eval_results_mathfix only).
+  classes of record from profile_interval_all_union_strata.csv: order {'PASS': 39, 'FAIL': 5, 'PASS-WITH-INTERVAL': 8}, profile {'PASS': 31, 'FAIL': 9, 'PASS-WITH-INTERVAL': 12}
+
+=== (1) RELIABILITY WITH INTERVALS, interaction-only (model- AND stratum-demeaned half-vectors, Pearson across the 18 models, Spearman-Brown, 40 halvings Random(7), per-half floor 12) ===
+  leave-one-stratum-out jackknife RE-HALVED (primary) / FIXED (beside), z = 1.96; halving SD on the SB scale; model-demeaned R beside. A jackknife over <= 3 strata is a RESOLUTION statement.
+  reliability()'s 50-point floor (a 14 x 12 board floor) is read at 2 x 18 = 36 points through the fixed-halving mirror (PROFILE-INTERVAL-ALL-UNION C3b precedent); asserted equal to reliability() wherever >= 50 points.
+  (1a) GATE C1: interaction-only R over the 52 strata = 0.8537 (r 0.7447, 40 halvings) vs the checker's 0.8537 -> REPRODUCES to 4 dp
+  object      demean strata        r    R(SB)   halvSD  jk RE-HALVED 95%    jk FIXED 95%         note
+  52          model      52   0.8912   0.9424   0.0048  [0.9217, 0.9632]   [0.9264, 0.9585]  recorded 0.9424 [0.9264, 0.9585] (PROFILE-INTERVAL-ALL-UNION C2; fixed jk)
+  52          both       52   0.7447   0.8537   0.0088  [0.8024, 0.9049]   [0.8124, 0.8950]  the checker's 0.8537 (no interval on record until now): C1 GATE
+  39          model      39   0.8896   0.9416   0.0056  [0.9192, 0.9639]   [0.9212, 0.9620]  
+  39          both       39   0.7622   0.8651   0.0119  [0.8155, 0.9146]   [0.8220, 0.9081]  C2, P1: class PASS
+  14          model      14   0.8958   0.9450   0.0107  [0.9010, 0.9891]   [0.9081, 0.9820]  
+  14          both       14   0.5167   0.6814   0.0382  [0.5613, 0.8014]   [0.5716, 0.7911]  C3, P2: beside K12 0.8665 [0.8000, 0.9330] / K46 0.8118 [0.7254, 0.8983] on p2dca's 2,811 judged q; NO level comparison
+  MMLU_PRO_LB model      14   0.8958   0.9450   0.0107  [0.9010, 0.9891]   [0.9081, 0.9820]  
+  MMLU_PRO_LB both       14   0.5167   0.6814   0.0382  [0.5613, 0.8014]   [0.5716, 0.7911]  
+  BBH         model      24   0.8490   0.9184   0.0097  [0.8810, 0.9557]   [0.8761, 0.9607]  
+  BBH         both       24   0.6413   0.7815   0.0200  [0.6743, 0.8886]   [0.6705, 0.8924]  
+  MATH        model       7   0.8189   0.9004   0.0238  [0.8078, 0.9930]   [0.8094, 0.9914]  
+  MATH        both        7   0.4922   0.6597   0.0418  [0.4468, 0.8727]   [0.4330, 0.8865]  
+  MUSR        model       3   0.7523   0.8587   0.0621  [0.5702, 1.1471]   [0.4938, 1.2235]    (jackknife over 3 strata = resolution statement)
+  MUSR        both        3   0.5114   0.6767   0.0778  [0.3306, 1.0228]   [0.2959, 1.0576]    (jackknife over 3 strata = resolution statement)
+  IFEVAL      undefined by construction (1 stratum: demeaning leaves nothing to correlate)  [IFEVAL: 1 strata over its own strata]
+  GPQA        model       3   0.6890   0.8158   0.0554  [-0.3117, 1.9434]   [-0.4022, 2.0339]    (jackknife over 3 strata = resolution statement)
+  GPQA        both        3   0.5726   0.7282   0.0764  [-0.1102, 1.5665]   [-0.1559, 1.6123]    (jackknife over 3 strata = resolution statement)
+  leave-one-stratum-out (interaction-only, re-halved), the 39: -temporal_sequences 0.8476, -Algebra 0.8575, -chemistry 0.8612, -engineering 0.8617, -business 0.8618, -Counting & Probability 0.8620 ... -date_understanding 0.8699, -snarks 0.8706, -penguins_in_a_table 0.8713
+  logit-additive null (PROFILE-RELIABILITY-INTERACTION C2): a_m, d_s fitted on the real 18 x 52 table; 20 tables; each object re-halved on its own strata; median [range]
+    additive-logit MLE: 8 sweeps, 0 logits clipped; a_m range [-1.133, 0.530]; variance shares of the accuracy table model / stratum / interaction 0.20 / 0.58 / 0.22
+    52          null model-only median 0.9202 [0.9164, 0.9245] (real 0.9424) | interaction-only median 0.1266 [0.0363, 0.2323] (real 0.8537; real - null +0.7270)
+    39          null model-only median 0.9170 [0.9140, 0.9199] (real 0.9416) | interaction-only median 0.1263 [0.0119, 0.2711] (real 0.8651; real - null +0.7388)
+    14          null model-only median 0.9373 [0.9340, 0.9420] (real 0.9450) | interaction-only median 0.0786 [-0.0352, 0.2271] (real 0.6814; real - null +0.6027)
+    MMLU_PRO_LB null model-only median 0.9373 [0.9340, 0.9420] (real 0.9450) | interaction-only median 0.0786 [-0.0352, 0.2271] (real 0.6814; real - null +0.6027)
+    BBH         null model-only median 0.8912 [0.8821, 0.8961] (real 0.9184) | interaction-only median 0.1179 [-0.0255, 0.2335] (real 0.7815; real - null +0.6636)
+    MATH        null model-only median 0.8769 [0.8613, 0.8980] (real 0.9004) | interaction-only median 0.1421 [-0.1166, 0.3481] (real 0.6597; real - null +0.5176)
+    MUSR        null model-only median 0.8384 [0.7783, 0.8590] (real 0.8587) | interaction-only median 0.0595 [-0.2910, 0.3966] (real 0.6767; real - null +0.6172)
+    GPQA        null model-only median 0.7154 [0.5362, 0.8199] (real 0.8158) | interaction-only median 0.1625 [-0.2666, 0.5039] (real 0.7282; real - null +0.5656)
+
+=== (4) ROSTER CAVEAT: the union roster is 18 models (paeec); the MMLU-Pro anchor rows of record are K12 (ARENA12) and K46 on p2dca (2,811 judged q); no level comparison between (1c) and 0.8665 / 0.8118 ===
+  roster subsets by unweighted mean accuracy over the 52 strata (the checker's abil[:9] / abil[4:13] / abil[9:]); re-read for (1a) and (1b), both demeanings (point, no jackknife):
+  roster      sprdSD  52 model 52 both   39 model 39 both 
+  all 18       0.099    0.9424   0.8537    0.9416   0.8651
+  middle 9     0.039    0.9416   0.8580    0.9431   0.8858
+  top 9        0.056    0.9502   0.8213    0.9482   0.8385
+  bottom 9     0.055    0.9321   0.8483    0.9335   0.8677
+
+=== (2) COVERAGE of the union pool (6482 reserved questions) ===
+  39 order-reliable strata (cls_raw PASS): 5411 / 6482 = 0.8348
+  27 PASS-of-record strata (worse of profile and order): 4315 / 6482 = 0.6657
+  47 non-FAIL strata (order reading): 5979 / 6482 = 0.9224
+    MMLU_PRO_LB   3609 q: order-reliable 1.000 (14/14 strata) | PASS-of-record 0.869 (11) | non-FAIL 1.000 (14)
+    BBH           1728 q: order-reliable 0.707 (17/24 strata) | PASS-of-record 0.347 (8) | non-FAIL 0.968 (23)
+    MATH           398 q: order-reliable 0.897 (6/7 strata) | PASS-of-record 0.897 (6) | non-FAIL 1.000 (7)
+    MUSR           227 q: order-reliable 0.000 (0/3 strata) | PASS-of-record 0.000 (0) | non-FAIL 0.339 (1)
+    IFEVAL         162 q: order-reliable 1.000 (1/1 strata) | PASS-of-record 1.000 (1) | non-FAIL 1.000 (1)
+    GPQA           358 q: order-reliable 0.170 (1/3 strata) | PASS-of-record 0.170 (1) | non-FAIL 0.170 (1)
+
+=== (3) UNDOMINATED SETS per stratum: U_s = models with no ESTABLISHED ORDERED-KEY edge above them (exact two-sided McNemar p < 0.05 on the stratum's reserved questions, systematic_budget.mcnemar_edge, integer arithmetic; the wrong(established) rule) ===
+  U_src by the same rule on the source's pooled reserved questions; 'differs' = U_s != U_src as sets; beside: argmax accuracy differs (ties to roster order) and |U_s| (the honesty of the row).
+  the 5 order-FAIL strata carry no order claim and no undominated set (printed 'no order'); the 8 order-PWI are printed beside, not counted.
+  source MMLU_PRO_LB  n= 3609  U_src = ['Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct'] (|U| 2; established edges 141 of 153)  argmax Qwen2.5-32B-Instruct
+  source BBH          n= 1728  U_src = ['Qwen2.5-72B-Instruct', 'internlm2_5-20b-chat'] (|U| 2; established edges 141 of 153)  argmax internlm2_5-20b-chat
+  source MATH         n=  398  U_src = ['Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct', 'Qwen2.5-Math-7B-Instruct'] (|U| 3; established edges 131 of 153)  argmax Qwen2.5-72B-Instruct
+  source MUSR         n=  227  U_src = ['DeepSeek-R1-Distill-Qwen-32B', 'Llama-3.1-70B-Instruct', 'Llama-3.3-70B-Instruct', 'Yi-1.5-34B-Chat-16K', 'c4ai-command-r-plus-08-2024', 'internlm2_5-20b-chat'] (|U| 6; established edges 40 of 153)  argmax c4ai-command-r-plus-08-2024
+  source IFEVAL       n=  162  U_src = ['Llama-3.1-70B-Instruct', 'Llama-3.3-70B-Instruct', 'Qwen2.5-72B-Instruct'] (|U| 3; established edges 123 of 153)  argmax Llama-3.3-70B-Instruct
+  source GPQA         n=  358  U_src = ['Mistral-Small-Instruct-2409', 'Phi-3.5-mini-instruct', 'Qwen2.5-72B-Instruct', 'c4ai-command-r-plus-08-2024'] (|U| 4; established edges 35 of 153)  argmax Phi-3.5-mini-instruct
+  stratum                                      n order  profile             record              differs  |U| argmax!=  argmax   U_s
+  BBH/boolean_expressions                     75 PASS   PASS                PASS                YES       12 yes       Llama-3. ['Falcon3-10B-Instruct', 'Llama-3.1-70B-Instruct', 'Llama-3.3-70B-Instruct', 'Mistral-Small-Instruct-2409', 'Mixtral-8x7B-Instruct-v0.1', 'Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct', 'Qwen2.5-Coder-7B-Instruct', 'Qwen2.5-Math-7B-Instruct', 'Yi-1.5-34B-Chat-16K', 'c4ai-command-r-plus-08-2024', 'internlm2_5-20b-chat']
+  BBH/causal_judgement                        56 FAIL   FAIL                FAIL                -          - yes       Llama-3. no order
+  BBH/date_understanding                      75 PASS   FAIL                FAIL                no         2 no        internlm ['Qwen2.5-72B-Instruct', 'internlm2_5-20b-chat']
+  BBH/disambiguation_qa                       75 PWI    PASS                PASS-WITH-INTERVAL  YES        1 no        internlm ['internlm2_5-20b-chat']  [PWI: beside, not counted]
+  BBH/formal_fallacies                        75 PWI    FAIL                FAIL                YES        4 yes       Llama-3. ['Llama-3.1-70B-Instruct', 'Llama-3.3-70B-Instruct', 'Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct']  [PWI: beside, not counted]
+  BBH/geometric_shapes                        75 PWI    PASS-WITH-INTERVAL  PASS-WITH-INTERVAL  YES        6 yes       Qwen2.5- ['Falcon3-10B-Instruct', 'Qwen2.5-32B-Instruct', 'Qwen2.5-7B-Instruct', 'Qwen2.5-Coder-7B-Instruct', 'Yi-1.5-34B-Chat-16K', 'internlm2_5-20b-chat']  [PWI: beside, not counted]
+  BBH/hyperbaton                              75 PASS   PASS                PASS                YES        1 no        internlm ['internlm2_5-20b-chat']
+  BBH/logical_deduction_five_objects          75 PASS   FAIL                FAIL                YES        3 no        internlm ['Falcon3-10B-Instruct', 'Qwen2.5-72B-Instruct', 'internlm2_5-20b-chat']
+  BBH/logical_deduction_seven_objects         75 PASS   FAIL                FAIL                YES        6 no        internlm ['Llama-3.1-70B-Instruct', 'Llama-3.3-70B-Instruct', 'Mistral-Small-Instruct-2409', 'Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct', 'internlm2_5-20b-chat']
+  BBH/logical_deduction_three_objects         75 PASS   PASS-WITH-INTERVAL  PASS-WITH-INTERVAL  YES        5 yes       Qwen2.5- ['Llama-3.1-70B-Instruct', 'Llama-3.3-70B-Instruct', 'Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct', 'internlm2_5-20b-chat']
+  BBH/movie_recommendation                    75 PASS   PASS                PASS                YES        1 no        internlm ['internlm2_5-20b-chat']
+  BBH/navigate                                75 PASS   PASS-WITH-INTERVAL  PASS-WITH-INTERVAL  YES        3 yes       Qwen2.5- ['Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct', 'Yi-1.5-34B-Chat-16K']
+  BBH/object_counting                         75 PASS   PASS                PASS                YES        6 yes       Qwen2.5- ['Llama-3.1-70B-Instruct', 'Llama-3.3-70B-Instruct', 'Qwen2.5-72B-Instruct', 'Qwen2.5-Coder-7B-Instruct', 'Qwen2.5-Math-7B-Instruct', 'internlm2_5-20b-chat']
+  BBH/penguins_in_a_table                     44 PASS   FAIL                FAIL                YES        5 yes       Qwen2.5- ['Llama-3.1-70B-Instruct', 'Llama-3.3-70B-Instruct', 'Qwen2.5-32B-Instruct', 'c4ai-command-r-plus-08-2024', 'internlm2_5-20b-chat']
+  BBH/reasoning_about_colored_objects         75 PASS   PASS                PASS                YES        5 yes       Llama-3. ['Llama-3.1-70B-Instruct', 'Llama-3.3-70B-Instruct', 'Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct', 'internlm2_5-20b-chat']
+  BBH/ruin_names                              75 PASS   PASS                PASS                YES        5 no        internlm ['Llama-3.1-70B-Instruct', 'Llama-3.3-70B-Instruct', 'Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct', 'internlm2_5-20b-chat']
+  BBH/salient_translation_error_detection     75 PASS   PASS-WITH-INTERVAL  PASS-WITH-INTERVAL  YES        5 no        internlm ['Llama-3.3-70B-Instruct', 'Mistral-Small-Instruct-2409', 'Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct', 'internlm2_5-20b-chat']
+  BBH/snarks                                  53 PASS   FAIL                FAIL                YES        3 yes       Qwen2.5- ['Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct', 'internlm2_5-20b-chat']
+  BBH/sports_understanding                    75 PASS   PASS                PASS                YES        4 yes       Llama-3. ['Llama-3.1-70B-Instruct', 'Llama-3.3-70B-Instruct', 'Qwen2.5-72B-Instruct', 'internlm2_5-20b-chat']
+  BBH/temporal_sequences                      75 PASS   PASS                PASS                YES        5 yes       Llama-3. ['Llama-3.1-70B-Instruct', 'Llama-3.3-70B-Instruct', 'Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct', 'internlm2_5-20b-chat']
+  BBH/tracking_shuffled_objects_five_objects    75 PWI    FAIL                FAIL                YES        4 no        internlm ['Llama-3.1-70B-Instruct', 'Llama-3.3-70B-Instruct', 'Qwen2.5-72B-Instruct', 'internlm2_5-20b-chat']  [PWI: beside, not counted]
+  BBH/tracking_shuffled_objects_seven_objects    75 PWI    FAIL                FAIL                YES        3 no        internlm ['Llama-3.1-70B-Instruct', 'Qwen2.5-72B-Instruct', 'internlm2_5-20b-chat']  [PWI: beside, not counted]
+  BBH/tracking_shuffled_objects_three_objects    75 PWI    PASS-WITH-INTERVAL  PASS-WITH-INTERVAL  YES        4 no        internlm ['Mistral-Small-Instruct-2409', 'Yi-1.5-34B-Chat-16K', 'c4ai-command-r-plus-08-2024', 'internlm2_5-20b-chat']  [PWI: beside, not counted]
+  BBH/web_of_lies                             75 PASS   PASS-WITH-INTERVAL  PASS-WITH-INTERVAL  YES        4 yes       Llama-3. ['Llama-3.3-70B-Instruct', 'Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct', 'Qwen2.5-7B-Instruct']
+  MATH/Algebra                                92 PASS   PASS                PASS                YES        4 yes       Qwen2.5- ['Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct', 'Qwen2.5-7B-Instruct', 'Qwen2.5-Math-7B-Instruct']
+  MATH/Counting & Probability                 37 PASS   PASS                PASS                YES        4 yes       Qwen2.5- ['Llama-3.3-70B-Instruct', 'Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct', 'Qwen2.5-Math-7B-Instruct']
+  MATH/Geometry                               40 PASS   PASS                PASS                YES        4 yes       Qwen2.5- ['Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct', 'Qwen2.5-7B-Instruct', 'Qwen2.5-Math-7B-Instruct']
+  MATH/Intermediate Algebra                   84 PASS   PASS                PASS                YES        4 no        Qwen2.5- ['Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct', 'Qwen2.5-7B-Instruct', 'Qwen2.5-Math-7B-Instruct']
+  MATH/Number Theory                          46 PASS   PASS                PASS                YES        4 no        Qwen2.5- ['Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct', 'Qwen2.5-7B-Instruct', 'Qwen2.5-Math-7B-Instruct']
+  MATH/Prealgebra                             58 PASS   PASS                PASS                YES        4 no        Qwen2.5- ['Llama-3.3-70B-Instruct', 'Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct', 'Qwen2.5-Math-7B-Instruct']
+  MATH/Precalculus                            41 PWI    PASS-WITH-INTERVAL  PASS-WITH-INTERVAL  YES        7 yes       Qwen2.5- ['Llama-3.1-70B-Instruct', 'Llama-3.3-70B-Instruct', 'Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct', 'Qwen2.5-7B-Instruct', 'Qwen2.5-Math-7B-Instruct', 'internlm2_5-20b-chat']  [PWI: beside, not counted]
+  MUSR/murder_mysteries                       75 FAIL   PASS-WITH-INTERVAL  FAIL                -          - yes       Llama-3. no order
+  MUSR/object_placements                      77 PWI    PASS                PASS-WITH-INTERVAL  YES        4 no        c4ai-com ['Mistral-Small-Instruct-2409', 'Yi-1.5-34B-Chat-16K', 'c4ai-command-r-plus-08-2024', 'internlm2_5-20b-chat']  [PWI: beside, not counted]
+  MUSR/team_allocation                        75 FAIL   PASS-WITH-INTERVAL  FAIL                -          - yes       DeepSeek no order
+  IFEVAL/ifeval                              162 PASS   PASS                PASS                no         3 no        Llama-3. ['Llama-3.1-70B-Instruct', 'Llama-3.3-70B-Instruct', 'Qwen2.5-72B-Instruct']
+  GPQA/Physics                               150 FAIL   PASS                FAIL                -          - no        Phi-3.5- no order
+  GPQA/Chemistry                             147 FAIL   PASS                FAIL                -          - yes       Qwen2.5- no order
+  GPQA/Biology                                61 PASS   PASS                PASS                YES        7 yes       Qwen2.5- ['Falcon3-10B-Instruct', 'Mistral-Small-Instruct-2409', 'Phi-3.5-mini-instruct', 'Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct', 'Yi-1.5-34B-Chat-16K', 'c4ai-command-r-plus-08-2024']
+  MMLU_PRO_LB/business                       237 PASS   PASS-WITH-INTERVAL  PASS-WITH-INTERVAL  YES        3 no        Qwen2.5- ['Llama-3.3-70B-Instruct', 'Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct']
+  MMLU_PRO_LB/law                            330 PASS   PASS                PASS                YES        3 yes       Llama-3. ['Llama-3.1-70B-Instruct', 'Llama-3.3-70B-Instruct', 'Qwen2.5-72B-Instruct']
+  MMLU_PRO_LB/psychology                     239 PASS   PASS                PASS                YES        4 no        Qwen2.5- ['Llama-3.1-70B-Instruct', 'Llama-3.3-70B-Instruct', 'Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct']
+  MMLU_PRO_LB/biology                        215 PASS   PASS                PASS                YES        5 no        Qwen2.5- ['Llama-3.1-70B-Instruct', 'Llama-3.3-70B-Instruct', 'Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct', 'c4ai-command-r-plus-08-2024']
+  MMLU_PRO_LB/chemistry                      340 PASS   PASS                PASS                YES        4 no        Qwen2.5- ['Falcon3-10B-Instruct', 'Llama-3.3-70B-Instruct', 'Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct']
+  MMLU_PRO_LB/history                        114 PASS   PASS-WITH-INTERVAL  PASS-WITH-INTERVAL  YES        3 yes       Qwen2.5- ['Llama-3.1-70B-Instruct', 'Llama-3.3-70B-Instruct', 'Qwen2.5-72B-Instruct']
+  MMLU_PRO_LB/other                          277 PASS   PASS                PASS                YES        4 yes       Llama-3. ['Llama-3.1-70B-Instruct', 'Llama-3.3-70B-Instruct', 'Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct']
+  MMLU_PRO_LB/health                         245 PASS   PASS                PASS                YES        4 yes       Llama-3. ['Llama-3.1-70B-Instruct', 'Llama-3.3-70B-Instruct', 'Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct']
+  MMLU_PRO_LB/economics                      253 PASS   PASS                PASS                YES        3 no        Qwen2.5- ['Llama-3.1-70B-Instruct', 'Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct']
+  MMLU_PRO_LB/math                           405 PASS   PASS                PASS                YES        1 no        Qwen2.5- ['Qwen2.5-32B-Instruct']
+  MMLU_PRO_LB/physics                        390 PASS   PASS                PASS                no         2 no        Qwen2.5- ['Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct']
+  MMLU_PRO_LB/computer science               123 PASS   PASS-WITH-INTERVAL  PASS-WITH-INTERVAL  YES        3 yes       Qwen2.5- ['Llama-3.1-70B-Instruct', 'Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct']
+  MMLU_PRO_LB/philosophy                     150 PASS   PASS                PASS                YES        4 yes       Llama-3. ['Llama-3.1-70B-Instruct', 'Llama-3.3-70B-Instruct', 'Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct']
+  MMLU_PRO_LB/engineering                    291 PASS   PASS                PASS                YES        3 no        Qwen2.5- ['Falcon3-10B-Instruct', 'Qwen2.5-32B-Instruct', 'Qwen2.5-72B-Instruct']
+  D = 36 of 39 order-reliable strata whose undominated set differs from its source's; median |U_s| over the 39 = 4.0; argmax differs from the source's in 27 of 52 strata (registered object: reserved side, MATH-FIX; 5 argmax ties)
+  beside (labelled): MC-ROUTER's object replayed - argmax by TRAIN-side accuracy on its own per-(source, domain) 0.30 split (seed 42) over the 21606-question corpus with the INGESTED MATH rows: 25 of 52 differ (FW L180 says 25)
+  the 14 MMLU_PRO_LB strata against the MMLU_PRO_LB source (FW L179 predicts identical sets on p2dca's rosters; here the 18-model union key): 13 of 14 differ; argmax per stratum {'Qwen2.5-32B-Instruct': 8, 'Llama-3.3-70B-Instruct': 2, 'Qwen2.5-72B-Instruct': 2, 'Llama-3.1-70B-Instruct': 2}; source argmax Qwen2.5-32B-Instruct
+  ROUTING-ATTENUATION (FW L183): these strata are DESIGNED (declared source x domain on the reserved side); the ~20%% shrinkage applies to a routed deployment of the profile, not to these rows.
+
+=== CRITERIA (in the registration's words) ===
+  C1 'the 52-stratum interaction-only R reproduces 0.8537 to 4 dp (the gate)': 0.8537 -> HELD
+  C2 'the 39-stratum interaction-only R with its jackknife interval is PUBLISHED': R = 0.8651, re-halved jk [0.8155, 0.9146], fixed jk [0.8220, 0.9081], halving SD 0.0119 -> PUBLISHED; class PASS (PASS if lower >= 0.70; PWI if point >= 0.70 and lower below; FAIL otherwise; re-halved primary)
+  C3 'the 14 MMLU_PRO_LB strata's interaction-only R with interval PUBLISHED beside K12 / K46, rosters and pools named, no level claim': R = 0.6814 [0.5613, 0.8014] re-halved, [0.5716, 0.7911] fixed (18-model union roster, pool paeec37aa28063c75, 3,609 reserved q) beside K12 0.8665 [0.8000, 0.9330] and K46 0.8118 [0.7254, 0.8983] (p2dca, 2,811 judged q) -> PUBLISHED, no level claim
+  C4 HOME COUNT: D = 36 of 39
+
+=== VERDICT RULE (the plan's, 'the number decides') ===
+  D = 36 of 39 -> D >= 20: the record may say 'the union strata are the profile's home: they carry an order-reliable key profile AND a routing consequence the sources do not'.
+
+=== PREDICTIONS (the plan's R3 P1-P3 and the registrar's blind additions P4-P8, labelled; scored HELD / FAILED) ===
+  P1 (plan) 'interaction-only R over the 39 order-reliable strata in [0.80, 0.90]': 0.8651 -> HELD
+  P2 (plan) 'the 14 MMLU_PRO_LB strata's interaction-only R in [0.80, 0.90]': 0.6814 -> FAILED
+  P3 (plan) 'D >= 20 of 39 undominated sets differ from the source's': 36 -> HELD
+  P4 (registrar) 'the 52-stratum jackknife interval has half-width <= 0.06': re-halved 0.0513 (fixed 0.0413) -> HELD
+  P5 (registrar) 'coverage of the 39 order-reliable strata >= 0.85 of 6482': 0.8348 -> FAILED
+  P6 (registrar) 'BBH's 24-stratum interaction-only R < the 39-stratum reading': 0.7815 vs 0.8651 -> HELD
+  P7 (registrar) 'the argmax-differs count over the 52 reproduces 25 exactly (the gate for (3))': 27 on the registered object (reserved side, MATH-FIX) -> FAILED; FW L180's 25 is MC-ROUTER's train-side own-split ingested-MATH count (25 of 52 beside) - a different object, stated in inconsistency (b); (3) is delivered on the registered object and the registrar decides whether P7's 'gate' wording binds C4
+  P8 (registrar) 'the median size of U_s over the 39 strata >= 3 models': 4.0 -> HELD
+
+=== FALSIFIER (the plan's) ===
+  F1 'D < 10 of 39': silent
+  McNEMAR-ESTABLISHED RULE: wrong(established) applies to the undominated sets in (3) only; no judge direction exists here (both conventions n/a).
+  runtime 85s, zero LLM calls

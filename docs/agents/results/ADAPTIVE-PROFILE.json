@@ -1,0 +1,277 @@
+{
+ "id": "ADAPTIVE-PROFILE",
+ "title": "ADAPTIVE-PROFILE: LOMO-Rasch, empirical-Bayes-shrunk capability profiles read at a certified ADAPTIVE depth of AF-U (s_max 0.20 logit, BH q 0.05 / z 1.96 within siblings) vs benchmark-level, best fixed depth, flat k-means and bisecting k-means; Brier on the content-closed v2 union EVAL (zero calls; REGISTERED 2026-10-08; HF blog fingerprints)",
+ "question": "Do adaptive-granularity, difficulty-adjusted tree profiles predict a model's held-out correctness better than benchmark-level, fixed-depth or k-means profiles?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "the commit that writes it (parent 375cbcc9)",
+  "program_lines": "docs/judge_v2_program.md L25133-L25145",
+  "program_lines_as_of": "the commit that writes it, parent 375cbcc9, re-grepped",
+  "date": "2026-10-08",
+  "heading": "## Registered 2026-10-08 (before any code or call) — ADAPTIVE-PROFILE: on the content-closed v2 union split, do key-based, LOMO-difficulty-adjusted capability profiles read at an ADAPTIVE ...",
+  "provenance": "the orchestrator's brief of 2026-10-08 (design); criteria, Support, predictions, falsifier, s_max, z and delta_min the registrar's; docs/judge_v2_program.md L25127-L25131 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — ADAPTIVE-PROFILE registered at the author's 2026-10-08 authorisation (next section)\"; _as_of the commit that writes it, parent 375cbcc9, re-grepped)"
+ },
+ "script": {
+  "path": "tools/analysis/adaptive_profile.py",
+  "sha16": "blob:37b9b293 (LF; from the READY review)",
+  "commit": "d998b511",
+  "blob_run": "blob:f23193bb808cefe74642ce8fd400d67ff9335d74 (LF; sha256-lf16 8d35e9db59c4fed4 of record, sha256-crlf16 abc5409efd486631 working tree; branch ap-denom-fix ab7448c3, merged to main by path cf35c3e2; per READY_ADAPTIVE-PROFILE_delta4.md and the outcome header) [superseded run blobs: aff80c1d (refused attempt), 37b9b293 (MATH-FIX overlay, never run)]"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_ADAPTIVE-PROFILE_delta4.md",
+  "commit": "1b7a603a",
+  "verdict": "READY (delta 4) at blob f23193bb (ab7448c3): B-1 / L-1 of delta 3 closed; L-A1 LOW (X109 not applied on the commit blob; selftest only); merged by path cf35c3e2 [earlier: delta3 69032fdb NOT READY at 7d05a59e; delta2 999799ab READY at aff80c1d (refused run)]"
+ },
+ "go": "the author's 2026-10-08 authorisation (relayed in the orchestrator's brief; the author's words to the session: \"Yes register it\"): register and build ADAPTIVE-PROFILE, zero calls [2026-10-09: re-run after the refused attempt authorised as a declared deviation, D-2026-10-09-1, docs/agents/author_decisions/2026-10-09.md (defab40c); after the R-1..R-4 fix and a delta READY only]",
+ "run": {
+  "outcome_file": "experiment_results/archv2/adaptive_profile/outcome.txt (sha256 fc715e4d... of the file bytes, per the operator and the backup SHA256SUMS; 174 lines; write-once, never committed); backup E:/TaxoArena_backup_20261009_adaptive_profile (6/6 OK: outcome, fingerprint export, moved marker 82a5d320)",
+  "outcome_commit": "outcome not committed (run from main after merge cf35c3e2; declared deviation D-2026-10-09-1, line printed once)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "pv2_1575de61bb20e977 (content-closed v2 union, draw 5a3e756); gen and eval views equal before and after; selftest 13/13, dry-run rc 0 (67 lines); marker moved 20:43:43 (sha 82a5d320, logged) [first attempt 2026-10-09 at aff80c1d refused at [AP-DENOM], NO outcome, POSTRUN 0e85a2d3]",
+  "date": "2026-10-09"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_ADAPTIVE-PROFILE_run2.md",
+  "commit": "8012b48a",
+  "verdict": "VALID; own LOMO MAP Rasch / BH / component bootstrap: AP1 point, both 95% bounds, SD, d* and certified count to the digit; independent stream (seed 7) [+0.000783, +0.001125]; C-1 MEDIUM (GRANULARITY-PAYS against the benchmark level only; adaptive certified rule loses to D_7, E, F_flat, F_bis and the uncertified path; certification costs about 0.002 Brier); L-1 LOW (measured DEFF about 1.0 vs transported 2.118); L-2 LOW carried (L-A1). [first attempt: POSTRUN_ADAPTIVE-PROFILE.md 0e85a2d3, NO OUTCOME]"
+ },
+ "pre_registered_parameters": {
+  "s_max": "0.20 logit (posterior SE of the child's offset)",
+  "z": "BH q 0.05 within the sibling family (single-sibling |z| > 1.96)",
+  "delta_min": "0.0005 Brier",
+  "sensitivity_grid": "s_max {0.15, 0.20, 0.30, inf} x q {0.10, 0.05, 0.01, none}; descriptive"
+ },
+ "criteria": [
+  {
+   "id": "AP1",
+   "text": "DECIDING (point AND 95% interval, one clause each; D_C = Brier(C) - Brier(A)): GRANULARITY-PAYS (HELD) iff LB95(D_C) > 0 AND D_C >= 0.0005; TOO-SMALL (FAILED) iff UB95(D_C) < 0.0005; UNDETERMINED otherwise. SCOREABLE (SE 0.00022, MDE80 0.00062; predicted +0.0012)",
+   "result": "HELD",
+   "value": "GRANULARITY-PAYS: D_C +0.000961, 95% [+0.000784, +0.001137] (90% [+0.000814, +0.001107]; bootstrap SD 0.000090); LB95 > 0 and point >= 0.0005; rule 8 NOT REFUTED [C-1: against the benchmark level only]",
+   "denominator": "EVAL 5,907 items / 5,404 CK-CLOSE components x 18 models = 106,326 (model, item) predictions"
+  },
+  {
+   "id": "AP2",
+   "text": "SECONDARY (D_{d*}, d* on GATE): ADAPTIVE-BETTER iff LB95 > 0; FIXED-BETTER iff UB95 < 0; PARITY iff 90% CI inside +/-0.0005 (TOST); NEITHER otherwise. Sign words DESCRIPTIVE-ONLY; PARITY SCOREABLE (SE 0.000147)",
+   "result": "FAILED",
+   "value": "FIXED-BETTER (sign words DESCRIPTIVE-ONLY by support): D_7 -0.001950, 95% [-0.002257, -0.001643] (bootstrap SD 0.000158); predicted PARITY, rule 8 FAILS; d* = 7",
+   "denominator": "EVAL 5,907 items / 5,404 CK-CLOSE components x 18 models = 106,326 (model, item) predictions"
+  },
+  {
+   "id": "AP3",
+   "text": "SECONDARY, confirmatory of a seen pattern (D_{F_bis}, bisecting spherical k-means hierarchy, same rule, seeds 0-4): TREE-BETTER / KMEANS-BETTER / PARITY (+/-0.0005, 90%) / NEITHER. DESCRIPTIVE-ONLY (SE 0.000207, MDE80 0.00058, predicted -0.0002)",
+   "result": "HELD",
+   "value": "KMEANS-BETTER (descriptive-only; confirmatory of a seen pattern): D_F_bis -0.000842, 95% [-0.001090, -0.000613] (SD 0.000122); rule 8 (fails only by TREE-BETTER) DOES NOT FAIL; predicted word NEITHER did not occur; review spot check",
+   "denominator": "EVAL 5,907 items / 5,404 CK-CLOSE components x 18 models = 106,326 (model, item) predictions"
+  },
+  {
+   "id": "AP4",
+   "text": "SECONDARY, confirmatory of a seen pattern (D_{F_flat}, per-benchmark spherical k-means at AF-U's per-source leaf counts, same shrinkage): TREE-BETTER / KMEANS-BETTER / PARITY / NEITHER. SCOREABLE narrowly for KMEANS-BETTER (predicted -0.0006 vs MDE80 0.00058)",
+   "result": "HELD",
+   "value": "KMEANS-BETTER: D_F_flat -0.002587, 95% [-0.002998, -0.002189] (SD 0.000206); rule 8 DOES NOT FAIL; review spot check",
+   "denominator": "EVAL 5,907 items / 5,404 CK-CLOSE components x 18 models = 106,326 (model, item) predictions"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "AP1 GRANULARITY-PAYS 0.55 / UNDETERMINED 0.20 / TOO-SMALL 0.25; D_C +0.0012 [+0.0005, +0.0020]",
+   "result": "HELD",
+   "value": "D_C +0.000961 in [+0.0005, +0.0020]; word GRANULARITY-PAYS, Brier 0.3050",
+   "denominator": "EVAL 5,907 items / 5,404 CK-CLOSE components x 18 models = 106,326 (model, item) predictions"
+  },
+  {
+   "id": "P2",
+   "text": "AP2 PARITY 0.55 / NEITHER 0.25 / ADAPTIVE-BETTER 0.10 / FIXED-BETTER 0.10; D_{d*} +0.0001 [-0.0003, +0.0005]",
+   "result": "FAILED",
+   "value": "D_7 -0.001950 outside [-0.0003, +0.0005]; word FIXED-BETTER, Brier 1.1850",
+   "denominator": "EVAL 5,907 items / 5,404 CK-CLOSE components x 18 models = 106,326 (model, item) predictions"
+  },
+  {
+   "id": "P3",
+   "text": "AP3 NEITHER 0.55 / KMEANS-BETTER 0.25 / PARITY 0.15 / TREE-BETTER 0.05; D_{F_bis} -0.0002 [-0.0008, +0.0004]",
+   "result": "FAILED",
+   "value": "D_F_bis -0.000842 outside [-0.0008, +0.0004]; word KMEANS-BETTER, Brier 0.8900",
+   "denominator": "EVAL 5,907 items / 5,404 CK-CLOSE components x 18 models = 106,326 (model, item) predictions"
+  },
+  {
+   "id": "P4",
+   "text": "AP4 KMEANS-BETTER 0.50 / NEITHER 0.40 / PARITY 0.05 / TREE-BETTER 0.05; D_{F_flat} -0.0006 [-0.0013, +0.0001]",
+   "result": "FAILED",
+   "value": "D_F_flat -0.002587 outside [-0.0013, +0.0001]; word KMEANS-BETTER occurred, Brier 0.4150",
+   "denominator": "EVAL 5,907 items / 5,404 CK-CLOSE components x 18 models = 106,326 (model, item) predictions"
+  },
+  {
+   "id": "P5",
+   "text": "Brier(E, unshrunk leaves) > Brier(C) (0.80)",
+   "result": "FAILED",
+   "value": "Brier(E) 0.146657 < Brier(C) 0.148555 (p 0.80, Brier 0.6400)",
+   "denominator": "EVAL 5,907 items / 5,404 CK-CLOSE components x 18 models = 106,326 (model, item) predictions"
+  },
+  {
+   "id": "P6",
+   "text": "share of EVAL predictions served below the benchmark level 0.60 [0.35, 0.85]",
+   "result": "HELD",
+   "value": "share below the benchmark level 0.5485 in [0.35, 0.85]",
+   "denominator": "EVAL 5,907 items / 5,404 CK-CLOSE components x 18 models = 106,326 (model, item) predictions"
+  },
+  {
+   "id": "P7",
+   "text": "log-loss agrees with Brier on the sign of D_C (0.90)",
+   "result": "HELD",
+   "value": "log-loss D_C +0.002851, same sign as Brier D_C +0.000961 (p 0.90, Brier 0.0100)",
+   "denominator": "EVAL 5,907 items / 5,404 CK-CLOSE components x 18 models = 106,326 (model, item) predictions"
+  },
+  {
+   "id": "P8",
+   "text": "d* in {2, 3, 4} (0.70)",
+   "result": "FAILED",
+   "value": "d* = 7 not in {2, 3, 4} (p 0.70, Brier 0.4900)",
+   "denominator": "GATE 1,944"
+  },
+  {
+   "id": "P9",
+   "text": "af_clean_s42 leg (descriptive): Brier(B) - Brier(A) +0.0015 [+0.0005, +0.0030]",
+   "result": "n/a",
+   "value": "NOT SCORED: af_clean_s42 leg not built (ruling D-3, prog L25218); neither HELD nor FAILED",
+   "denominator": "union MMLU_PRO_LB items on af_clean_s42's held-out side (OPTIONS-key join; count printed)"
+  }
+ ],
+ "falsifier": {
+  "text": "F-AP fires iff AP1 TOO-SMALL with UB95(D_C) < 0 (adaptive worse than benchmark level); overturns the reading that RESP-PROFILE-INFO RP1 BEYOND-SOURCE converts into per-model prediction under LOMO difficulty and shrinkage; withdraws fingerprints beyond description",
+  "fired": false,
+  "value": "NOT FIRED: UB95(D_C) +0.001137, not < 0"
+ },
+ "support": "(a) EVAL 5,907 / 5,404 components (Kish 1.3115, CELL-DIFFICULTY) x 18 models; (b) DEFF 2.118 transported from RESP-PROFILE-INFO's measured two-stage DEFF (R2_int difference -> Brier difference, declared); (c) n_eff 2,789; (d) SE 0.000865 x V_res 0.17 (declared) = 0.000147; AP1 x 1.5 = 0.00022; AP3/AP4 sqrt(0.000865^2 + 0.000861^2) x 0.17 = 0.000207; (e) MDE80 AP1 0.00062, AP2 0.00041 (TOST needs 0.000366), AP3/AP4 0.00058; (f) AP1 SCOREABLE, AP2 PARITY SCOREABLE / sign words DESCRIPTIVE-ONLY, AP3 DESCRIPTIVE-ONLY, AP4 SCOREABLE narrowly; (g) reachable at infinite budget; A = C exactly if nothing certifies (TOO-SMALL); s_max stops above most leaves by design (~114 items per node per model)",
+ "numbers_of_record": {
+  "AP1_D_C": "+0.000961, 95% [+0.000784, +0.001137], bootstrap SD 0.000090; 5,907 EVAL items / 5,404 components x 18 models (106,326 predictions); GRANULARITY-PAYS",
+  "Brier_arms": "A 0.147595 | C 0.148555 | B 0.151452 | E 0.146657 | D_7 0.145645 | F_flat 0.145008 | F_bis 0.146753 (106,326 predictions)",
+  "AP2_D_7": "-0.001950, 95% [-0.002257, -0.001643] (FIXED-BETTER, descriptive-only)",
+  "AP3_D_F_bis": "-0.000842, 95% [-0.001090, -0.000613] (KMEANS-BETTER, descriptive-only)",
+  "AP4_D_F_flat": "-0.002587, 95% [-0.002998, -0.002189] (KMEANS-BETTER)",
+  "E_minus_A": "-0.000938, 95% [-0.001430, -0.000457] (descriptive)",
+  "uncertified_path_gain": "Brier(C) - Brier(arm) +0.002925 at s_max 0.20, q none, vs A's +0.000961 (descriptive; certification costs about 0.002 Brier, review C-1)",
+  "certified_pairs": "260 of 4,104 (model, node) pairs (127 strong, 133 weak); BH q 0.05 within sibling families, TRAIN fit",
+  "d_star": "7 (GATE argmin, 1,944 GATE items)",
+  "share_below_benchmark": "0.5485 of 106,326 EVAL predictions",
+  "support_measured": "Kish 1.3115; SE 0.000090; DEFF 0.955 (component over item); n_eff 6,184; MDE80 0.000253 (planned SE 0.00022, DEFF 2.118 transported, n_eff 2,789, MDE80 0.00062)",
+  "H_sensitivity_D_C": "+0.000945, 95% [+0.000776, +0.001115] (decides nothing)",
+  "second_stream_review": "[+0.000783, +0.001125], SD 0.000088 (review, seed 7)"
+ },
+ "sentence_of_record": "ADAPTIVE-PROFILE (2026-10-09, 0 calls) — VALID; on the content-closed v2 union EVAL (5,907 items / 5,404 components x 18 models), LOMO-difficulty-adjusted, shrunk profiles read finer than the benchmark level predict held-out correctness better than benchmark-level ability: D_C = Brier(C) - Brier(A) +0.000961, 95% [+0.000784, +0.001137]: GRANULARITY-PAYS; F-AP NOT FIRED. [POSTRUN docs/reviews/POSTRUN_ADAPTIVE-PROFILE_run2.md, 8012b48a, C-1: against the benchmark level only; the registered adaptive certified rule is beaten by fixed depth 7 (-0.001950), the unshrunk leaves (-0.000938), flat k-means (-0.002587), bisecting k-means (-0.000842) and the same path without certification (certification costs about 0.002 Brier); never \"the adaptive certified profile pays\" or \"the tree beats k-means\"; declared deviation D-2026-10-09-1 (second EVAL read after a refused attempt); relative to these 18 models, this split and the qwen3 embedder.]",
+ "chips": [
+  "REGISTERED 2026-10-08, BEFORE ANY CODE",
+  "FAILED PRECONDITION (POST-RUN 0e85a2d3), FIRST ATTEMPT 2026-10-09: [AP-DENOM]; RE-RUN UNDER DECLARED DEVIATION D-2026-10-09-1",
+  "VALID (POST-RUN 8012b48a): AP1 GRANULARITY-PAYS AGAINST THE BENCHMARK LEVEL ONLY (C-1: ADAPTIVE CERTIFIED RULE LOSES TO D_7, E AND BOTH K-MEANS ARMS); F-AP NOT FIRED"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-08",
+   "by": "registrar (pre-data rulings; docs/judge_v2_program.md L25212-L25219 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — rulings GAP-FIX-CC P-1 (seed replacement), the R1 twin rule ...\"; _as_of the commit that writes it, parent 8daf8220, re-grepped))",
+   "text": "READY review docs/reviews/READY_ADAPTIVE-PROFILE.md (f4dd6292): NOT READY at blob 7e2949bb (B1 [R1-EVAL] refuses on 115 EVAL-side twin items; D-2 F_bis SE gate untested; D-3; L-1). RULING R1 (binds ADAPTIVE-PROFILE, WIN-MAP, SATURATION-IRT): twin items are dropped wherever they fall and the registered denominators stand; the scored EVAL set (5,907 items / 5,404 components) carries 0 twin items (twin v2 items have n_q >= 2 and are unscored; WIN-MAP reviews 12f42190 row 8, 7e2673d4 row 7); an instrument refuses iff a twin is among its SCORED EVAL items; the 115 EVAL-side twin items (TRAIN 265 / GATE 47 / EVAL 115 of 427) are unscored, dropped and counted. EVAL 5,792 is NOT of record; R1 stays applicable on the v2 EVAL side. Support unchanged. The [R1-EVAL] pre-check tested every EVAL-side item with an AF cell, a wider set than the scored 5,907. RULING D-3: the af_clean_s42 leg is accepted as NOT BUILT (declared deviation); P9 NOT SCORED, neither HELD nor FAILED. L-1 not ruled (to the delta review). Builder delta owed: [R1-EVAL] on scored EVAL membership with a mutant, D-2 planted F_bis case; then a delta READY."
+  },
+  {
+   "date": "2026-10-08",
+   "by": "registrar (HARNESS-EXTRACTOR)",
+   "text": "MATH scorer of record: MATH-FIX STAYS (ruling L15137, R2) pending the author's decision on the audit's hybrid H (recommended, not adopted; eligible only after HARNESS-EXTRACTOR READY). Not re-pinned now. CONDITIONAL: if the author adopts H, re-pin the MATH label source to H before --run (registrar's record + builder delta + delta READY; denominators unchanged). A MATH-reading outcome discloses the pilot: MATH-FIX false credits about 368 of 7,516 (4.9%, MC 95% 338-686); ranks below 12th move under H. Source: docs/judge_v2_program.md L25221-L25227 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — HARNESS-EXTRACTOR amended to the MATH + IFEval scorer-gap study ...\"; _as_of the commit that writes it, parent cc49fc6a, re-grepped)"
+  },
+  {
+   "date": "2026-10-08",
+   "by": "registrar (D-2026-10-08)",
+   "text": "D-2026-10-08-5 (the author, verbatim: \"Official scorer, H as sensitivity (Recommended)\"): the MATH scorer of record for this run is the official scorer eval_results.is_correct (the imported leaderboard/harness verdict), with NO MATH-FIX overlay; this supersedes MATH-FIX and voids the conditional re-pin to H. H (pinned definition, with corrected refs 2060002 / 2060129 / 2000164 for H only) is a sensitivity line read from a per-row table that must be sha256-pinned (LF) before --run; it decides nothing. Declared pre-run deviation: every outcome header carries the scorer line; criteria, Support, denominators and predictions stand as registered. Not retroactive. CONDITION: the READY blob 37b9b293 (d998b511) hardcodes the overlay (union_cells_io.py L187 read_key(..., True, ...)); builder delta + delta READY owed before --run. Source: docs/judge_v2_program.md L25317-L25327 (section \"## Author's decision 2026-10-08 (recorded by the registrar; zero calls; insertion only) — D-2026-10-08-1..6 ...\"; _as_of the commit that writes it, parent 5211616a, re-grepped); authority docs/agents/author_decisions/2026-10-08.md (5211616a); plan Amendment 40"
+  },
+  {
+   "date": "2026-10-09",
+   "by": "registrar (docs/judge_v2_program.md L25352-L25361 (section \"## Registrar's record 2026-10-09 (insertion only; zero calls; nothing run) — H table pinned ...\"; _as_of the commit that writes it, parent 38eac1c8, re-grepped))",
+   "text": "READY (delta 2, 999799ab) at blob aff80c1d recorded; H table PINNED (D-2026-10-08-5 deviation (2)): experiment_results/math_scorer_h/math_h_table.csv sha256-lf 6b010fa60dde727816b91196d2cb3045094082c3800fe738adebe21d19eeb1d1, 23,832 rows, H 7,126 / official 2,335 (READY f4f7e0a0, run 62d269af); decides nothing (meets C-1). C-2 merge by path owed before --run; briefs cite aff80c1d, not 37b9b293. Not run (no run commit, backup or output). registered -> READY."
+  },
+  {
+   "date": "2026-10-09",
+   "by": "registrar (docs/judge_v2_program.md L25386-L25392 (section \"## Registrar's record 2026-10-09 (insertion only; zero calls; nothing run) — ADAPTIVE-PROFILE refused at [AP-DENOM] ...\"; _as_of the commit that writes it, parent b453cedd, re-grepped))",
+   "text": "Run 2026-10-09 at blob aff80c1d refused at [AP-DENOM]: VALID failed precondition, NO outcome; nothing scored, AP1 not computed, no H line. Owed: R-1 BLOCKER ([AP-DENOM] counts TRAIN components from the data, len(set(D.comp[k] for k in D.T)), independent of train_unit; ruling 3 unchanged), R-2 HIGH (selftest on the real unit + a mutant killed under it), R-3 (delta READY on the new blob; dry-run prints the TRAIN component count), R-4 MEDIUM (EVAL-free denominator checks before the marker and the EVAL read). AUTHOR DECISION A-1 OWED: whether the run slot counts as used (clearing the marker = a declared deviation). Registered Support unchanged. READY -> blocked. Bracket appended to DATA OBJECTS AND HYGIENE (L25137)."
+  },
+  {
+   "date": "2026-10-09",
+   "by": "registrar (docs/judge_v2_program.md L25394-L25401 (section \"## Author's decision 2026-10-09 (recorded by the registrar; zero calls; insertion only) — D-2026-10-09-1 ...\"; _as_of the commit that writes it, parent defab40c, re-grepped))",
+   "text": "D-2026-10-09-1 (the AUTHOR, verbatim: \"Re-run as a declared deviation (Recommended)\"; docs/agents/author_decisions/2026-10-09.md (defab40c)): A-1 decided. DECLARED DEVIATION: the refused 2026-10-09 attempt (blob aff80c1d, main 980c3982; [AP-DENOM], no fit, no EVAL statistic) does not consume the run slot; the write-once marker adaptive_profile.READ_STARTED may be cleared only after the R-1..R-4 fix and a committed delta READY; the re-run's outcome is of record and carries the line 'DECLARED DEVIATION D-2026-10-09-1: second EVAL read after the refused attempt of 2026-10-09 (aff80c1d)' (registrar); the ruling covers that one refused attempt only (registrar). State blocked (R-1..R-4, delta READY owed)."
+  },
+  {
+   "date": "2026-10-09",
+   "by": "registrar (docs/judge_v2_program.md L25403-L25410 (section \"## Registrar's record 2026-10-09 (insertion only; zero calls; nothing run) — delta READY reviews 69032fdb recorded ...\"; _as_of the commit that writes it, parent 69032fdb, re-grepped))",
+   "text": "Delta READY review docs/reviews/READY_ADAPTIVE-PROFILE_delta3.md (69032fdb), blob 7d05a59e (git blob; LF sha256-lf16 7c5bdf53d38bedb7): NOT READY (one BLOCKER, small; code fix of R-1..R-4 CONFIRMED). B-1: the \"DECLARED DEVIATION D-2026-10-09-1\" line is not printed and the outcome file is write-once; builder say()+test, then delta READY. Operator skipped; nothing ran; no outcome. State blocked."
+  },
+  {
+   "date": "2026-10-09",
+   "by": "registrar (docs/judge_v2_program.md L25420-L25427 (section \"## Registrar's record 2026-10-09 (insertion only; zero calls; nothing run) — delta READYs 1b7a603a recorded ...\"; _as_of the commit that writes it, parent 8012b48a, re-grepped); docs/judge_v2_program.md L25429-L25439 (section \"## ADAPTIVE-PROFILE (2026-10-09, 0 calls) — VALID (POSTRUN 8012b48a): AP1 GRANULARITY-PAYS against the benchmark level only ...\"; _as_of the commit that writes it, parent 8012b48a, re-grepped))",
+   "text": "READY delta 4 (1b7a603a) at blob f23193bb; merged by path cf35c3e2; marker moved (82a5d320); run 2026-10-09 under D-2026-10-09-1; POSTRUN 8012b48a VALID: AP1 GRANULARITY-PAYS (HELD) with reading condition C-1 (against the benchmark level only); AP2 FIXED-BETTER (PARITY prediction FAILS), AP3 / AP4 KMEANS-BETTER; F-AP NOT FIRED; P1 / P6 / P7 HELD, P2 / P3 / P4 / P5 / P8 FAILED, P9 NOT SCORED; support as realised SE 0.000090, DEFF 0.955 (L-1). Outcome and support-as-realised brackets at prog L25139 / L25140. State done."
+  }
+ ],
+ "does_not_show": [
+  "that the certified adaptive rule is the best granular reader (C-1: D_7, the unshrunk leaves, both k-means arms and the uncertified path beat it)",
+  "that the tree's content beats k-means (AP3 / AP4 KMEANS-BETTER)",
+  "that a fingerprint is a capability claim or tree-robust (no cross-tree leg)",
+  "anything beyond these 18 models, draw 5a3e756 and the qwen3 embedder",
+  "a label-free deciding result (AF-U is [SC])",
+  "anything on af_clean_s42 (P9 NOT SCORED); any judged quantity"
+ ],
+ "ledger": {
+  "row_id": "ADAPTIVE-PROFILE",
+  "version": "v425 (2026-10-09: OUTCOME bracket; warn chip re-worded to the first attempt, VALID ok chip added) | v423 (2026-10-09: D-2026-10-09-1 bracket; no chip changed) | v422 (2026-10-09: failed-precondition bracket; warn chip beside REGISTERED) | v416 (2026-10-08: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "RESP-PROFILE-INFO (RP1/RP2; DEFF 2.118; the prediction)",
+  "CELL-DIFFICULTY (difficulty strata)",
+  "PROFILE-RELIABILITY / PROFILE-RELIABILITY-INTERACTION (~210 q crossing)",
+  "PROFILE-DEVIATION-CERT (127/280 key-certified)",
+  "UNION-AF-ROUTE (AF-U, filing D-4)",
+  "CONTENT-DISJOINT-SPLIT-AUDIT (the 471 twins)",
+  "the G14 reader (union correctness)"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; does not reopen sub-anchor profiles (PROFILE-TREE-ROBUST, KEY-SUBANCHOR-SCALE: cross-tree reproducibility); this asks out-of-sample predictive value on one tree with LOMO difficulty, EB shrinkage and certified adaptive depth; a gain below the anchor level is predictive value on AF-U only"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "about 30-90 min",
+  "agent_hours": "about 5 h",
+  "reads_pool": true
+ },
+ "outputs": "never committed: pinned by sha256, stored on E:/TaxoArena_backup_<date>_adaptive_profile with SHA256SUMS.txt; temp under E:/TaxoArena_tmp via scratch_dir",
+ "sources": [
+  "docs/judge_v2_program.md L25133-L25145 (_as_of the commit that writes it, parent 375cbcc9, re-grepped)",
+  "docs/judge_v2_program.md L25127-L25131 (_as_of the commit that writes it, parent 375cbcc9, re-grepped)",
+  "docs/judge_v2_program.md L25212-L25219 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — rulings GAP-FIX-CC P-1 (seed replacement), the R1 twin rule ...\"; _as_of the commit that writes it, parent 8daf8220, re-grepped)",
+  "docs/judge_v2_program.md L25221-L25227 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — HARNESS-EXTRACTOR amended to the MATH + IFEval scorer-gap study ...\"; _as_of the commit that writes it, parent cc49fc6a, re-grepped)",
+  "docs/judge_v2_program.md L25317-L25327 (section \"## Author's decision 2026-10-08 (recorded by the registrar; zero calls; insertion only) — D-2026-10-08-1..6 ...\"; _as_of the commit that writes it, parent 5211616a, re-grepped); authority docs/agents/author_decisions/2026-10-08.md (5211616a); plan Amendment 40",
+  "docs/judge_v2_program.md L25352-L25361 (section \"## Registrar's record 2026-10-09 (insertion only; zero calls; nothing run) — H table pinned ...\"; _as_of the commit that writes it, parent 38eac1c8, re-grepped)",
+  "docs/reviews/READY_ADAPTIVE-PROFILE_delta2.md (999799ab)",
+  "docs/judge_v2_program.md L25386-L25392 (section \"## Registrar's record 2026-10-09 (insertion only; zero calls; nothing run) — ADAPTIVE-PROFILE refused at [AP-DENOM] ...\"; _as_of the commit that writes it, parent b453cedd, re-grepped)",
+  "docs/reviews/POSTRUN_ADAPTIVE-PROFILE.md (0e85a2d3)",
+  "docs/judge_v2_program.md L25394-L25401 (section \"## Author's decision 2026-10-09 (recorded by the registrar; zero calls; insertion only) — D-2026-10-09-1 ...\"; _as_of the commit that writes it, parent defab40c, re-grepped)",
+  "docs/agents/author_decisions/2026-10-09.md (defab40c)",
+  "docs/reviews/READY_ADAPTIVE-PROFILE_delta3.md (69032fdb)",
+  "docs/judge_v2_program.md L25420-L25427 (section \"## Registrar's record 2026-10-09 (insertion only; zero calls; nothing run) — delta READYs 1b7a603a recorded ...\"; _as_of the commit that writes it, parent 8012b48a, re-grepped)",
+  "docs/judge_v2_program.md L25429-L25439 (section \"## ADAPTIVE-PROFILE (2026-10-09, 0 calls) — VALID (POSTRUN 8012b48a): AP1 GRANULARITY-PAYS against the benchmark level only ...\"; _as_of the commit that writes it, parent 8012b48a, re-grepped)",
+  "docs/reviews/READY_ADAPTIVE-PROFILE_delta4.md (1b7a603a)",
+  "docs/reviews/POSTRUN_ADAPTIVE-PROFILE_run2.md (8012b48a)",
+  "experiment_results/archv2/adaptive_profile/outcome.txt (sha256 fc715e4d...; not committed)"
+ ],
+ "last_update": "2026-10-09",
+ "label_status": "AF-U [SC] (deciding); af_clean_s42 label-free (descriptive leg)",
+ "data_disclosure": "DATA ALREADY LOOKED AT (disclosed): PROFILE-RELIABILITY anchor R 0.6728, ~210 q crossing; PROFILE-RELIABILITY-INTERACTION 0.8665 vs null 0.3142; RESP-PROFILE-INFO RP1 +0.052744 vs RWS p97.5 +0.037950, SRC +0.045400, RP2 D -0.004423 (K0-BETTER), DEFF 2.118; PROFILE-DEVIATION-CERT 127/280; CELL-DIFFICULTY 0.6985; SCPB iteration 3 (E:, exploratory) ~210 items per reliable profile. The brief's 'PROFILE-RELIABILITY 0.88 vs 0.51 null' is not in any committed record: relayed, not of record",
+ "null_means_for_post": "TOO-SMALL: beyond the benchmark, granularity adds no predictive value for these 18 models; fingerprints shown as description only",
+ "series": "HF blog series (fingerprint visual)",
+ "plain_description": {
+  "sq": "SQ1 Use",
+  "what": "Estimates each model's strengths and weaknesses on the tree's topics after removing question difficulty, goes deeper into the tree only where a model's deviation is certified and precise, and checks on unseen questions whether that predicts right/wrong answers better than per-benchmark ability, a fixed tree depth, or k-means groups. No judge calls.",
+  "why": "Tells whether topic-level model profiles ('fingerprints') carry predictive information beyond knowing which benchmark a question is from.",
+  "information": "Would show whether finer-than-benchmark profiles help prediction for these 18 models. Result: ready to run (script approved; merge to main owed), not run yet.",
+  "written": "2026-10-09"
+ }
+}

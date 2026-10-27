@@ -1,0 +1,138 @@
+{
+  "id": "BUDGET-LOMO",
+  "title": "BUDGET-LOMO: was leave-one-ANCHOR-out the wrong fold structure? (zero calls; BUDGET-TRANSFER's first reading suggested the leakage runs along the MODEL axis)",
+  "question": "Leave-one-MODEL-out on the 891 x12 edges (for each of the 12 models remove every edge touching it, fit b0 and b1 on the remainder, score the held-out edges), beside leave-one-anchor-out (14) and leave-one-pair-out (66) on the identical edge set: does the calibration claim survive (LOMO of the same order as LOAO's 2.4x); the spread of b1 across folds; utility under LOMO.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "14e3915",
+    "program_lines": "docs/judge_v2_program.md L2863-L2887",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-14 (before any run, ZERO calls) — BUDGET-LOMO: was leave-one-ANCHOR-out the wrong fold structure?",
+    "outcome_heading": [
+      "L2977: - **BUDGET-LOMO (2026-09-14, zero calls): my prediction FAILED and the adopted calibration figure STANDS. ...**",
+      "L3281: - **BUDGET-LOMO, CORRECTED (2026-09-15, zero calls): the conclusion stands and now carries what it lacked.**"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "tools/analysis/budget_lomo.py",
+    "sha16": "453c0d7727978c75",
+    "commit": "63e8b5e (first run; corrected rerun 4ec8f18; later 13f2142)"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/budget_lomo.txt",
+    "outcome_commit": "d4eec8d",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (2,811 judged questions on the merged board of record x12 9,142 + x20 12,394 = 21,536 verdicts; the sparse x20-alone board is retained, labelled)",
+    "date": "2026-09-14 (first run) / 2026-09-15 (corrected rerun)"
+  },
+  "review": {
+    "file": "docs/review_session_2026-09-14.md (the adversarial review of the 2026-09-14/15 session, ba12200; programme L3099-L3145 'REVIEW of the 2026-09-14/15 session') and the corrections by insertion it required",
+    "commit": "ba12200",
+    "verdict": "the review upheld BUDGET-LOMO as a genuine self-falsification and required the McNemar column, the 'scored twice' correction and the withdrawal of the b1-swing explanation (batch 4 of the corrections, d4eec8d)"
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "PRIMARY: the realised wrong-direction rate among LOMO-held-out called edges against its nominal; the calibration claim survives only if LOMO is of the same order as LOAO's 2.4x",
+      "result": "HELD",
+      "value": "with McNemar-established counts: in sample 665 / 2(1) / 1.30 = 1.5x; raw certificate 739 / 8(4) / 0.83 = 9.7x (empirical set, Gaussian nominal; consistent alternatives 9.3x / 10.5x); LOAO 663 / 3(2) / 1.27 = 2.4x; LOPO 664 / 3(2) / 1.29 = 2.3x; LOMO last-fold-wins 666 / 3(2) / 1.18 = 2.5x (1.7x established); LOMO first-fold-wins 668 / 3(2) / 1.30 = 2.3x: the same order; the claim STANDS",
+      "denominator": "891 x12 edges; 12 / 14 / 66 folds"
+    },
+    {
+      "id": "(2)",
+      "text": "the spread of b1 across the 12 LOMO folds",
+      "result": "DELIVERED",
+      "value": "b1 swings 2.61x, +2.0529 (withhold iask_pro) to +5.3673 (withhold deepseek-v2.5); CORRECTED: b0 and b1 co-vary at about -0.99 across folds, so the swing in b1 alone overstates tau's swing at mid agreement and understates it at low agreement; neither 'unstable parameter' nor 'stable despite it' is established by the table",
+      "denominator": "12 folds"
+    },
+    {
+      "id": "(3)",
+      "text": "utility under LOMO",
+      "result": "HELD",
+      "value": "74.7% (last-fold) / 75.0% (first-fold); 74.4-74.7% throughout",
+      "denominator": "891 edges"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "LOMO comes in materially worse than LOAO (4x to 8x) and the anchor fold exposed as an artefact",
+      "result": "FAILED",
+      "value": "2.3-2.5x: the model-axis fold is indistinguishable from the anchor fold, so the anchor fold was not hiding model-axis leakage and the adopted figure stands",
+      "denominator": "891 edges"
+    },
+    {
+      "id": "P2",
+      "text": "b1 swings by more than a factor of two across folds",
+      "result": "HELD",
+      "value": "2.61x; but the 'b1 swings while calibration is stable' explanation is withdrawn (b0 / b1 co-vary at -0.99)",
+      "denominator": "12 folds"
+    }
+  ],
+  "falsifier": {
+    "text": "for the budget itself: if LOMO exceeds the raw certificate's own 9.7x, the widener adds nothing and should be withdrawn in favour of the agreement gate",
+    "fired": false,
+    "note": "does not fire (2.5x vs 9.7x); against the parameter-free gate on the same edges the budget gives 666 called / 3 wrong / 68 correct surrendered against A < 0.65's 608 / 3 / 126: at matched error it surrenders half as many correct calls, out of fold and along the model axis"
+  },
+  "numbers_of_record": {
+    "fold_table": "in sample 665 / 2(1) / 1.30 / 1.5x / 74.6%; raw 739 / 8(4) / 0.83 / 9.7x; LOAO 663 / 3(2) / 1.27 / 2.4x / 74.4%; LOPO 664 / 3(2) / 1.29 / 2.3x / 74.5%; LOMO last-fold 666 / 3(2) / 1.18 / 2.5x / 74.7%; LOMO first-fold 668 / 3(2) / 1.30 / 2.3x / 75.0%",
+    "b1_spread": "+2.0529 (iask_pro withheld) to +5.3673 (deepseek-v2.5 withheld), 2.61x; corr(b0, b1) ~ -0.99",
+    "vs_gate": "budget 666 / 3 / 68 surrendered vs A < 0.65 gate 608 / 3 / 126",
+    "review_fixes": "(a) McNemar-established counts added (LOMO 1.7x established; LOAO / LOPO the same 2 events); (b) the 'scored twice' note was wrong (one score per edge; both conventions printed, agree within 0.2x); (c) the b1-swing explanation withdrawn"
+  },
+  "sentence_of_record": "BUDGET-LOMO, CORRECTED (2026-09-15, zero calls): the conclusion stands and now carries what it lacked: with McNemar-established counts LOAO 663/3(2)/1.27 = 2.4x, LOPO 664/3(2)/1.29 = 2.3x, LOMO 666/3(2)/1.18 = 2.5x all, 1.7x established (first-fold-wins 668/3(2)/1.30 = 2.3x); the model-axis fold is indistinguishable from the anchor fold, so the anchor fold was not hiding model-axis leakage and the adopted 2.4x figure stands; the prediction (4-8x) FAILED; the falsifier (LOMO worse than the raw certificate's 9.7x) does not fire; the 'b1 swings 2.6x while calibration is stable' explanation is withdrawn (b0 and b1 co-vary at -0.99), so neither instability nor robustness-to-it is shown by the b1 column; utility 74.4-74.7% throughout.",
+  "chips": [
+    "CLAIM STANDS",
+    "b1 SWINGS 2.6x"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-15",
+      "by": "the corrected rerun after the REVIEW (programme L3281, d4eec8d; ledger v97 observed cell [CORRECTED 2026-09-15, rerun])",
+      "text": "with McNemar-established counts LOAO 2.4x, LOPO 2.3x, LOMO 2.5x all / 1.7x established, first-fold-wins 2.3x; the 'scored twice' note was wrong (one score per edge); the 'b1 swings 2.6x while calibration is stable' explanation is withdrawn (b0 / b1 co-vary at -0.99); conclusion unchanged; falsifier does not fire; prediction FAILED."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "parameter instability or robustness-to-it from the b1 column alone (b0 / b1 co-vary at -0.99)",
+    "model-axis leakage hidden by the anchor fold (none: the folds agree)"
+  ],
+  "ledger": {
+    "row_id": "BUDGET-LOMO",
+    "version": "v97 (row added v89 at 63e8b5e; [CORRECTED 2026-09-15, rerun] v97 at d4eec8d); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "SYSTEMATIC-BUDGET",
+    "BUDGET-TRANSFER"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L2863-L2887 (registration 14e3915): question, criteria, prediction, falsifier",
+    "docs/judge_v2_program.md outcome bullets and corrections at the headings listed in registration.outcome_heading (first run 2026-09-14; REVIEW L3099; X20-MERGED L3146 00deff3; corrected reruns L3188 010713b / L3281 d4eec8d)",
+    "docs/review_session_2026-09-14.md (ba12200): the adversarial review that found the sparse-board artefact and the McNemar rule's backward application",
+    "experiment_results/x12_crossdomain/budget_lomo.txt (d4eec8d)",
+    "docs/test_ledger.html row BUDGET-LOMO (v97 (row added v89 at 63e8b5e; [CORRECTED 2026-09-15, rerun] v97 at d4eec8d)): chips verbatim, observed cell with its CORRECTED / UNDER CORRECTION insertions, evidence",
+    "script sha16 = sha256 of tools/analysis/budget_lomo.py at 63e8b5e, first 16 hex (identity, computed by the registrar 2026-09-22; sha at the first-run commit 63e8b5e; the corrected rerun is at 4ec8f18)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' or '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Re-tests the calibration of the error-budget widener for the ranking certificate. Each fold leaves out every comparison involving one model (12 folds). This is set beside leaving out one subject area or one model pair, all on the same 891 comparison edges. No judge calls.",
+    "why": "An earlier reading suggested that leaving out one subject area might hide errors that run along models, which would make the adopted 2.4x calibration figure too optimistic.",
+    "information": "If leaving out a model gave much worse calibration, the adopted figure would be wrong. Result: done (corrected rerun). All three fold types agree: 2.3x to 2.5x overall, 1.7x on statistically established edges. So the adopted 2.4x stands, and the predicted 4-8x failed. The falsifier did not fire. One earlier explanation (about parameter instability) was withdrawn. It was judged on the arena pool later ruled 'history, not evidence'.",
+    "written": "2026-10-07"
+  }
+}

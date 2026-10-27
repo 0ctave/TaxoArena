@@ -1,0 +1,122 @@
+{
+  "id": "STAGE3-MATH",
+  "title": "STAGE3-MATH: Block 2 (f), FRAMEWORK item 23: the judged Stage 3 spend on the MATH cell, HELD before any call (zero calls), then re-registered and run as STAGE3-MATH-CAPFREE",
+  "question": "The judged Stage 3 spend on the union pool's MATH cell (STACK-v2/grok, dual order, checker-output reference and filter; <= 3,000 matches), made conditional by the plan on FRAMEWORK item 7 (CHECKER-ANSWER-INGEST) landing and its dry-run passing on the real checker table: may it launch on the 8-model cell as scheduled under rule 9 (D_c < 0.95 -> no edge pass) and rule 10 (length = NON_TERMINATED, never a verdict)?",
+  "kind": "judged",
+  "state": "withdrawn",
+  "registration": {
+    "commit": "eaf1dbf",
+    "program_lines": "docs/judge_v2_program.md L3603-L3611 (by reference; FRAMEWORK L379 item 23; 'plan approved' at L3605); the HELD note at L3841-L3852 ('### STAGE3-MATH HELD (2026-09-16, before any call)')",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-15 (before any run) — BY REFERENCE: the 26 tests in docs/design/FRAMEWORK.md \"Tests to register before shipping\" (commit 8d77f7b), with the criteria, predictions and call counts stated there, scheduled in docs/plan_2026-09-15.md",
+    "outcome_heading": [
+      "L3841: ### STAGE3-MATH HELD (2026-09-16, before any call) — consequence of CHECKER-ANSWER-INGEST's HIGH finding"
+    ],
+    "date": "2026-09-15"
+  },
+  "script": {
+    "path": "tools/analysis/stage3_math.py (default v1 reproduces the held registration byte for byte; the run of record is --checker-table v2 --terminated-only under STAGE3-MATH-CAPFREE)",
+    "sha16": "ce8c24152d9ced18 (at 2976bc4, the re-registration commit)",
+    "commit": "1e3b1ea (Block 2 dry-run); 2976bc4 (v2 flags)"
+  },
+  "ready": null,
+  "go": "plan-approved (<= 3,000 matches) but HELD: rules 9 and 10 forbid the spend on this population; zero calls spent",
+  "run": {
+    "outcome_file": "docs/judge_v2_program.md L3841-L3852 (the HELD note; no outcome file: nothing was judged on this population)",
+    "outcome_commit": "7076615",
+    "calls": 0,
+    "cce": 0,
+    "pool": "paeec37aa28063c75 (union pool), MATH slice; the 8-model cell D_c 0.832 / min domain 0.597 under the consistent cap proxy",
+    "date": "2026-09-16",
+    "other_files": [
+      "experiment_results/multicorpus/checker_answers_v1.db (the <think>-proxy table the dry-run passed on; gitignored)"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); CHECKER-ANSWER-INGEST's adversarial checker (HIGH finding: the 1,024-token cap) is the check that held it",
+    "commit": "7076615",
+    "verdict": "HELD before any call; RESOLVED 2026-09-16 by re-registration as STAGE3-MATH-CAPFREE on the population rule 10 admits (PASS 0.958 / 0.993); the hold on THIS population stands"
+  },
+  "criteria": [
+    {
+      "id": "gate",
+      "text": "launch gated on rule 9 (D_c >= 0.95 on the cell) and rule 10 (a non-terminated response is never a verdict), read on the real checker table",
+      "result": "FAILED",
+      "value": "dry-run passes on the <think> proxy (8-model cell D_c 0.994, min domain 0.985) but under the consistently applied cap proxy the 8-model D_c is 0.8189 [0.7935, 0.8433] (0.832 / min 0.597 on the union-pool cell) and 367 of GEN-ARENA's 1,800 judged MATH matches involve a cap-hit response: rules 9 and 10 forbid the judged spend as scheduled; HELD, zero calls",
+      "denominator": "8-model MATH cell; 3,152 scheduled rows, 321 at the cap"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "(FRAMEWORK item 23) accuracy >= 0.90; calibration UNDETERMINED",
+      "result": "n/a",
+      "value": "not scored on this population (never judged); scored on the admitted population by STAGE3-MATH-CAPFREE (0.958 / 0.993 HELD)",
+      "denominator": "n/a"
+    }
+  ],
+  "falsifier": {
+    "text": "none beyond the launch gate (registered by reference)",
+    "fired": false,
+    "note": "the gate refused the launch; the item was re-registered on the admitted population"
+  },
+  "numbers_of_record": {
+    "think_proxy_dry_run": "8-model cell D_c 0.994, min domain 0.985 (passes)",
+    "consistent_cap_proxy": "8-model D_c 0.8189 [0.7935, 0.8433]; union-pool cell 0.832 / min domain Precalculus 0.597; 12-19% of eval-side rows of Llama-3.1/3.3-70B, Qwen2.5-72B/Math and others end at the 1,024-token cap with no <think> marker; 367 of 1,800 judged MATH matches involve a cap-hit response",
+    "correction_to_Amendment_1_D7": "'non_terminated = 0 for all eight models' is true of the <think> proxy only"
+  },
+  "sentence_of_record": "STAGE3-MATH HELD (2026-09-16, before any call): the plan made STAGE3-MATH conditional on item 7 landing and its dry-run passing on the real checker table; the table landed and the dry-run passes on the <think> proxy, but the checker's confirmed HIGH finding is that the proxy is not the NON_TERMINATED rule (raw lm-eval files cap MATH generations at 1,024 tokens; under a consistent cap proxy the 8-model D_c is 0.8189 [0.7935, 0.8433] and 367 of GEN-ARENA's 1,800 judged MATH matches involve a cap-hit response). FRAMEWORK rules 9 and 10 forbid the judged spend on this cell as scheduled; HELD, not launched, until the checker table carries the consistent cap proxy and the schedule is rebuilt excluding cap-hit responses (a re-registration). Zero calls spent. [RESOLVED 2026-09-16: re-registered and run as STAGE3-MATH-CAPFREE on the population rule 10 admits: PASS, 0.958 / 0.993, rho 1.000 / 0.976; the hold on THIS population stands: D_c 0.832 / min 0.597 and it is not judged.]",
+  "chips": [
+    "HELD BEFORE ANY CALL"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-16",
+      "by": "ledger v105 (eece8b0), the [RESOLVED 2026-09-16] insertion in the observed cell",
+      "text": "re-registered and run as STAGE3-MATH-CAPFREE on the population rule 10 admits (both responses terminated under the consistent cap proxy): PASS, 0.958 / 0.993, rho 1.000 / 0.976; the hold on THIS population stands: its cell reads D_c 0.832 / min 0.597 under the consistent proxy and is not judged."
+    },
+    {
+      "date": "2026-09-16",
+      "by": "the HELD note (programme L3851-L3852) and the ledger observed cell [CORRECTED 2026-09-16]",
+      "text": "plan Amendment 1 D7's 'non_terminated = 0 for all eight models' is true of the <think> proxy only."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "INCONSISTENCIES-PASS (registrar, zero calls; insertion only)",
+      "text": "NO-FILE 2026-09-23 by INCONSISTENCIES-PASS (registrar, zero calls; insertion only): no outcome file, because nothing was judged on this population; the record is the programme subsection '### STAGE3-MATH HELD (2026-09-16, before any call) — consequence of CHECKER-ANSWER-INGEST's HIGH finding'. [ledger: evidence cell of row STAGE3-MATH, v132]"
+    }
+  ],
+  "does_not_show": [
+    "any judged number on the unfiltered MATH cell (never judged)",
+    "that the cap-hit responses are wrong (rule 10 keeps them out of every verdict)"
+  ],
+  "ledger": {
+    "row_id": "STAGE3-MATH",
+    "version": "v105 (row added v103 at 684be03; [RESOLVED] insertion v105 at eece8b0) [v132 2026-09-23: INCONSISTENCIES-PASS insertion in this row]"
+  },
+  "depends_on": [
+    "CHECKER-ANSWER-INGEST",
+    "GEN-ARENA",
+    "CERT-CORPUS"
+  ],
+  "supersedes": null,
+  "superseded_by": "STAGE3-MATH-CAPFREE (the re-registration on the admitted population, 2976bc4 / 5c8b813)",
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L3603-L3611 (by-reference registration eaf1dbf) and docs/design/FRAMEWORK.md L379 item 23; docs/plan_2026-09-15.md (Block 2 f; Amendment 1 D7)",
+    "docs/judge_v2_program.md L3841-L3852 ('### STAGE3-MATH HELD', 7076615): the hold, its numbers, the D7 correction",
+    "docs/judge_v2_program.md L3960-L4019 (STAGE3-MATH-CAPFREE re-registration and outcome): the resolution",
+    "docs/test_ledger.html row STAGE3-MATH (v103 684be03; [RESOLVED] v105): chips verbatim, observed cell, evidence (programme STAGE3-MATH HELD; plan Amendment 1 D7)",
+    "script sha16 = sha256 of tools/analysis/stage3_math.py at 2976bc4, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "state 'withdrawn' is the registrar's mapping of the ledger's HELD-then-RESOLVED-by-re-registration (the population was never judged; the item lives on as STAGE3-MATH-CAPFREE)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' (or '- **ID ...**' bullet) lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06"
+  ],
+  "last_update": "2026-09-23",
+  "plain_description": {
+    "sq": "Engineering/infrastructure",
+    "what": "A planned paid judging run (up to 3,000 matches) on the MATH cell. It was stopped by its launch gate before any call: many MATH answers had been cut off by a 1,024-token generation limit, and the rules forbid judging cut-off answers.",
+    "why": "It guards against a judged result driven by truncated answers rather than model ability.",
+    "information": "It shows the gate works and decides which population may be judged. Result: withdrawn (held, zero calls). It was re-registered on the questions where both answers finished (STAGE3-MATH-CAPFREE), which passed. The original population stays unjudged.",
+    "written": "2026-10-07"
+  }
+}

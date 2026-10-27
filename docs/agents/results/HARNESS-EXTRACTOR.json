@@ -1,0 +1,352 @@
+{
+ "id": "HARNESS-EXTRACTOR",
+ "title": "HARNESS-EXTRACTOR (amended 2026-10-08): MATH + IFEval scorer gap on the 18-model union roster; MATH scorers X0 (stored) / MF (MATH-FIX, of record) / H (audit hybrid), IFEval I0 / prompt-strict / prompt-loose; deciding HX1 min pairwise tau-b >= 0.85 AND max rank shift <= 2 over {X0, MF, H}; MATH legs confirm a disclosed pilot (zero calls; HF post 3)",
+ "question": "Do the documented scorers of the cached raw MATH and IFEval outputs reorder the 18 union models, by how much does each model's accuracy shift, and which disagreement categories drive it?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "the commit that writes it (parent e83b59d5)",
+  "program_lines": "docs/judge_v2_program.md L25081-L25095",
+  "program_lines_as_of": "the commit that writes them, parent e83b59d5, re-grepped",
+  "date": "2026-10-08",
+  "heading": "## Registered 2026-10-08 (before any code or call) — HARNESS-EXTRACTOR: re-scoring cached raw responses under five or six documented answer extractors ...",
+  "provenance": "the orchestrator's brief of 2026-10-08 and docs/drafts/hf/SERIES_PLAN.md (design); criteria, Support, predictions, falsifier the registrar's; docs/judge_v2_program.md L25043-L25049 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — five HF blog-series analyses registered ...\"; _as_of the commit that writes it, parent e83b59d5, re-grepped)",
+  "amended": {
+   "date": "2026-10-08",
+   "program_lines": "docs/judge_v2_program.md L25229-L25315",
+   "record_lines": "docs/judge_v2_program.md L25221-L25227",
+   "as_of": "the commit that writes them, parent cc49fc6a, re-grepped",
+   "commit": "the commit that writes it (parent cc49fc6a)"
+  }
+ },
+ "script": {
+  "path": "tools/analysis/harness_extractor.py",
+  "sha16": "blob:4107eb0b9ed20e48ab5ee9cdca818db3405de33d (LF; sha256-lf16 05ab8b87bbb49869 of record; CRLF worktree sha256-crlf16 e3adab1d1d42c915; per READY_HARNESS-EXTRACTOR_delta4.md)",
+  "commit": "a80fa610 (merge by path from hx-r5 65be3d11); supersedes blob a7ebea9f (9f5fb487, defective F-1 / F-2)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_HARNESS-EXTRACTOR_delta4.md",
+  "commit": "eba84716",
+  "blob": "blob:4107eb0b9ed20e48ab5ee9cdca818db3405de33d (LF)",
+  "verdict": "READY (delta 4) at blob 4107eb0b: F-1 / F-2 closed, S-1 15/15 columns vs the real schemas, 117/117 mutants; D1 LOW (before-sha after the schema check)",
+  "superseded": "READY_HARNESS-EXTRACTOR_delta3.md (1b7a603a, blob a7ebea9f), voided by the 2026-10-09 incident"
+ },
+ "go": "the author's 2026-10-08 authorisation (relayed in the orchestrator's brief, words not supplied): register and build zero-call analyses for the HF blog series (docs/drafts/hf/SERIES_PLAN.md); no judged calls",
+ "run": {
+  "outcome_file": "experiment_results/hf_blog/harness_extractor/harness_extractor_outcome.txt (sha256-lf16 fd31a8e4ede9ee60, 145 lines; never committed); backup E:/TaxoArena_backup_20261009_harness_extractor_run (6/6 OK)",
+  "outcome_commit": "outcome not committed (run from main after merge a80fa610)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "paeec37aa28063c75 (R1's object; id-disjoint only; no split word claimed); multicorpus_cache_v1.db sha256 ad66e30a0eb4abd6 EQUAL before and after; H table 6b010fa6 = pin; busy.ps1 exit 1; selftest 10/10, mutants 117/117, dry-run rc 0, --run rc 0",
+  "date": "2026-10-10",
+  "incident_2026-10-09": "--run rc 1 at L688 (f.is_correct_mathfix) on blob a7ebea9f; POSTRUN 8012b48a INVALID; nothing written; backup E:/TaxoArena_backup_20261009_harness_extractor_incident (3/3 OK)"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_HARNESS-EXTRACTOR_run2.md",
+  "commit": "e313f1d8",
+  "verdict": "VALID; own read-only script sharing no code, every deciding number to the 4th digit (R1 471 / 427; 1,309 / 541; HX1-HX4, P8); HX5 spot-checked (classifier not rebuilt; LOW); D1 LOW (carried), D2 LOW (HX2 / HX3 stay descriptive-only), D3 LOW (P5 FAILED)",
+  "superseded_review": "docs/reviews/POSTRUN_HARNESS-EXTRACTOR.md (8012b48a): INVALID (incident; no outcome)"
+ },
+ "criteria": [
+  {
+   "id": "HX1",
+   "text": "DECIDING (point; S_w beside, \"(stable)\" iff >= 0.80): MATH, scorers {X0, MF, H}: RANKS-HOLD iff min pairwise tau-b >= 0.85 AND max rank shift <= 2, else RANKS-MOVE. SCOREABLE (DEFF 1.2 transported, SE 0.0184, MDE80 0.052, predicted 0.35); confirms a disclosed pilot [HX-R4 2026-10-09: RANKS-MOVE refuted iff every tau-b >= 0.85 AND max shift <= 2; shift 2.5 reads MOVE] [2026-10-09 registrar S-1: SE 0.0420, MDE80 0.118; SCOREABLE]",
+   "result": "HELD",
+   "value": "RANKS-MOVE (stable; S_w 1.0000): min pairwise tau-b -0.0473 (X0-MF), max rank shift 15.0; X0-H 0.0338 / 15.0; MF-H 0.9216 / 3.0; min tau-b 95% [-0.0950, 0.0068] (decides nothing); RANKS-MOVE not refuted (HELD = the registered RANKS-MOVE reading stands, rule 8)",
+   "denominator": "1,309 MATH questions (R1 applied; Kish 1.0000) x 18 models; 153 pairs"
+  },
+  {
+   "id": "HX2",
+   "text": "MATH, pair {MF, H}: RANKS-HOLD / RANKS-MOVE by the HX1 rule (point). SCOREABLE (SE 0.0184, MDE80 0.052, predicted 0.92) [2026-10-09 registrar S-1: SE 0.0420, MDE80 0.118 against a 0.07 margin: DESCRIPTIVE-ONLY BY SUPPORT; word printed \"(descriptive-only by support)\"]",
+   "result": "HELD",
+   "value": "RANKS-MOVE (descriptive-only by support; S_w 0.9720): tau-b 0.9216 [0.8656, 0.9346], max shift 3.0; RANKS-MOVE not refuted (HX-R5); realised SD 0.0197 does not upgrade the word (review D2)",
+   "denominator": "1,309 MATH questions (R1 applied; Kish 1.0000) x 18 models; 153 pairs"
+  },
+  {
+   "id": "HX3",
+   "text": "IFEval, scorers {I0, IS prompt-strict, IL prompt-loose}: RANKS-HOLD / RANKS-MOVE by the HX1 rule (point). DESCRIPTIVE-ONLY by Support (SE 0.0287, MDE80 0.080, predicted 0.88) [HX-R1 2026-10-09: IS / IL = the harness's stored per-sample verdicts, no checker installed; I0 = IS by construction, so HX3 = IS vs IL] [2026-10-09 registrar S-1: SE 0.0658, MDE80 0.184; DESCRIPTIVE-ONLY]",
+   "result": "HELD",
+   "value": "RANKS-HOLD (descriptive-only by support; S_w 0.8845): I0-IS 1.0000 / 0.0, I0-IL 0.9739 / 2.0, IS-IL 0.9739 / 2.0; I0 = IS on every row (HX-R1)",
+   "denominator": "541 IFEval prompts (Kish 1.0000) x 18 models"
+  },
+  {
+   "id": "HX4",
+   "text": "MATH acc_MF - acc_H per model with 95% bootstrap interval (the INTERVAL decides): SHIFT-MATERIAL iff >= 1 model interval wholly beyond |0.02|, else SHIFT-SMALL. SCOREABLE (SE 0.0095, MDE80 0.027) [2026-10-09 registrar S-1: SE 0.0095, MDE80 0.027 unchanged; SCOREABLE]",
+   "result": "HELD",
+   "value": "SHIFT-MATERIAL: 2 models' 95% intervals wholly beyond |0.02| (DeepSeek-R1-Distill-Llama-8B [0.0802, 0.1146], DeepSeek-R1-Distill-Qwen-32B [0.0581, 0.0879]); max |acc_MF - acc_H| 0.0970; SHIFT-MATERIAL not refuted",
+   "denominator": "1,309 paired questions per model; 18 models"
+  },
+  {
+   "id": "HX5",
+   "text": "MATH X0-vs-MF disagreements: FORMAT-DOMINATED iff the share in BOXED-no-Minerva + Minerva-normalisation-mismatch + equivalent-numeric-form >= 0.50 (point), else MIXED. SCOREABLE (DEFF 3.0 declared pilot assumption, SE 0.0072, MDE80 0.020) [2026-10-09 registrar S-1: SE 0.0072, MDE80 0.020 unchanged; SCOREABLE]",
+   "result": "HELD",
+   "value": "FORMAT-DOMINATED (S_w 1.0000): format share 0.9013 [0.8898, 0.9124] (BOXED-no-Minerva 3,284; Minerva mismatch 1,235; equivalent numeric form 67); not refuted; classifier spot-checked by the review, not rebuilt",
+   "denominator": "5,088 X0-vs-MF disagreement rows on 1,022 questions (5,181 before R1)"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "HX1 RANKS-MOVE 0.97",
+   "result": "HELD",
+   "value": "word RANKS-MOVE; Brier 0.0018",
+   "denominator": "18 models"
+  },
+  {
+   "id": "P2",
+   "text": "HX1 min pairwise tau-b 0.35 [-0.20, 0.70] (X0-MF pair)",
+   "result": "HELD",
+   "value": "-0.0473 (X0-MF) in [-0.20, 0.70]",
+   "denominator": "153 pairs"
+  },
+  {
+   "id": "P3",
+   "text": "HX1 max rank shift 15 [10, 17]",
+   "result": "HELD",
+   "value": "15.0 in [10, 17]",
+   "denominator": "18 models"
+  },
+  {
+   "id": "P4",
+   "text": "HX2 tau-b 0.92 [0.86, 0.97]; max rank shift 3 [2, 4]; RANKS-MOVE 0.75",
+   "result": "HELD",
+   "value": "tau-b 0.9216 in [0.86, 0.97]; max shift 3.0 in [2, 4]; word RANKS-MOVE, Brier 0.1250",
+   "denominator": "18 models"
+  },
+  {
+   "id": "P5",
+   "text": "HX3 min tau-b 0.88 [0.75, 0.97]; max rank shift 2 [1, 4]; RANKS-HOLD 0.55",
+   "result": "FAILED",
+   "value": "min tau-b 0.9739 above the 0.97 ceiling (FAILED, review D3); max shift 2.0 in [1, 4] held; word RANKS-HOLD, Brier 0.4050",
+   "denominator": "18 models"
+  },
+  {
+   "id": "P6",
+   "text": "HX4 SHIFT-MATERIAL 0.95; models clearing 0.02: 2 [2, 4]; max |acc_MF - acc_H| 0.099 [0.07, 0.12]",
+   "result": "HELD",
+   "value": "word SHIFT-MATERIAL, Brier 0.0050; models clearing 0.02: 2 in [2, 4]; max 0.0970 in [0.07, 0.12]",
+   "denominator": "18 models"
+  },
+  {
+   "id": "P7",
+   "text": "HX5 format share 0.90 [0.85, 0.93]; FORMAT-DOMINATED 0.97",
+   "result": "HELD",
+   "value": "format share 0.9013 in [0.85, 0.93]; word FORMAT-DOMINATED, Brier 0.0018",
+   "denominator": "X0-vs-MF disagreement rows"
+  },
+  {
+   "id": "P8",
+   "text": "IFEval max |acc_IS - acc_IL| over models 0.05 [0.02, 0.10]",
+   "result": "HELD",
+   "value": "max |acc_IS - acc_IL| 0.0924 in [0.02, 0.10]",
+   "denominator": "18 models"
+  }
+ ],
+ "falsifier": {
+  "text": "F-HX fires iff HX1 reads RANKS-HOLD: overturns the pilot rank preview (imported -> MATH-FIX reorders everything) and post 3's MATH headline; read first as a possible instrument/join defect at the post-run review. Beside: F-H fires iff HX2 reads RANKS-HOLD: the MF-vs-H choice is rank-neutral (overturns the 'R1 distills drop 3 ranks' preview) [2026-10-09 registrar, ruling F-H-SUPPORT: HX2 is DESCRIPTIVE-ONLY by support, so F-H is printed \"(descriptive-only by support)\" and decides nothing; F-HX is the falsifier of record and alone sets fired; P4 stays scored as written]",
+  "fired": false,
+  "value": "F-HX NOT FIRED (HX1 reads RANKS-MOVE); F-H (descriptive-only by support) NOT FIRED, decides nothing"
+ },
+ "numbers_of_record": {
+  "HX1_min_tau_b": "-0.0473 (X0-MF), 95% [-0.0950, 0.0068] (bootstrap SD 0.0248, B 2000); 1,309 MATH questions x 18 models; RANKS-MOVE",
+  "HX1_max_rank_shift": "15.0 (X0-MF and X0-H); 18 models",
+  "HX1_pairs": "X0-MF -0.0473 / 15.0; X0-H 0.0338 / 15.0; MF-H 0.9216 / 3.0",
+  "HX2_tau_b": "0.9216 [0.8656, 0.9346], max shift 3.0; RANKS-MOVE (descriptive-only by support)",
+  "HX3_min_tau_b": "0.9739 (I0-IL and IS-IL; I0-IS 1.0000), max shift 2.0; 541 IFEval prompts x 18; RANKS-HOLD (descriptive-only by support)",
+  "HX4_models_clearing": "2 of 18 (DeepSeek-R1-Distill-Llama-8B [0.0802, 0.1146], DeepSeek-R1-Distill-Qwen-32B [0.0581, 0.0879]); max |acc_MF - acc_H| 0.0970; SHIFT-MATERIAL",
+  "HX5_format_share": "0.9013 [0.8898, 0.9124] of 5,088 X0-vs-MF disagreement rows on 1,022 questions; FORMAT-DOMINATED",
+  "P8_max_IS_IL": "0.0924 over 18 models (541 prompts)",
+  "R1": "471 twin ids / 427 texts dropped; MATH 1,309 of 1,324 kept; IFEval 541",
+  "support_realised": "Kish 1.0000, n_eff 1,309 (review); bootstrap SD HX1 0.0248 (MDE80 0.0694, margin 0.8973), HX2 0.0197, HX3 0.0201, HX4 0.0085, HX5 0.0058 (DEFF 1.93); transported SE(tau) 0.0420 overstated about 2x",
+  "sensitivity": "without 3 corrupted-reference questions HX1 -0.0543 / 15.0, HX2 0.9180 / 3.5; H-L in place of H unchanged (decides nothing)"
+ },
+ "sentence_of_record": "HARNESS-EXTRACTOR (2026-10-10, 0 calls) — VALID; on MATH (1,309 of 1,324 questions after R1 x 18 union models) the stored scorer X0, MATH-FIX and the audit hybrid H reorder the models: min pairwise Kendall tau-b -0.0473 (X0-MF), max rank shift 15: RANKS-MOVE; F-HX NOT FIRED; two models' MF-minus-H accuracy shift clears 0.02 (max 0.0970): SHIFT-MATERIAL; 0.9013 [0.8898, 0.9124] of 5,088 X0-vs-MF disagreements are format: FORMAT-DOMINATED. [POSTRUN docs/reviews/POSTRUN_HARNESS-EXTRACTOR_run2.md, e313f1d8: confirms a disclosed pilot, not a blind test; MF vs H (tau-b 0.9216, shift 3, RANKS-MOVE) and IFEval strict vs loose (min tau-b 0.9739, shift 2, RANKS-HOLD) are descriptive-only by support; the realised SE does not upgrade them; HX5's classifier spot-checked, not rebuilt; pool paeec37aa28063c75 id-disjoint only; relative to these 18 models.]",
+ "chips": [
+  "REGISTERED 2026-10-08, BEFORE ANY CODE",
+  "AMENDED 2026-10-08: MATH + IFEVAL SCORER GAP (G-RAW: MATH + IFEval only)",
+  "INCIDENT 2026-10-09 (POST-RUN 8012b48a INVALID): --run RC 1, NO SUCH COLUMN AT L688; NO OUTCOME; F-1 / F-2 FIX AND DELTA READY OWED",
+  "VALID (POST-RUN e313f1d8): HX1 RANKS-MOVE (MIN TAU-B -0.0473, SHIFT 15); F-HX NOT FIRED; HX4 SHIFT-MATERIAL, HX5 FORMAT-DOMINATED; CONFIRMS A DISCLOSED PILOT",
+  "HX2 RANKS-MOVE / HX3 RANKS-HOLD: DESCRIPTIVE-ONLY BY SUPPORT; P5 FAILED"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-08",
+   "by": "registrar (HARNESS-EXTRACTOR)",
+   "text": "G-RAW read from the orchestrator's brief: raw outputs only for MATH (1,324/model) and IFEval (541/model); MMLU-Pro/BBH/MuSR/GPQA log-likelihood with no stored per-choice scores, out of scope; the MMLU-Pro design SUPERSEDED before any build by the amended registration L25229-L25315; the read-only MATH scorer audit is a DISCLOSED PILOT; MATH-FIX stays the MATH scorer of record pending the author's decision on H. Source: docs/judge_v2_program.md L25221-L25227 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — HARNESS-EXTRACTOR amended to the MATH + IFEval scorer-gap study ...\"; _as_of the commit that writes it, parent cc49fc6a, re-grepped)"
+  },
+  {
+   "date": "2026-10-08",
+   "by": "registrar (D-2026-10-08)",
+   "text": "D-2026-10-08-5 (the author, verbatim: \"Official scorer, H as sensitivity (Recommended)\"): the official scorer (X0) is the MATH scorer of record for the MATH consumers; H is their sensitivity line, not of record. HARNESS-EXTRACTOR keeps its own question (X0 / MF / H), unchanged; HX2 no longer informs a scorer-of-record choice. Its frozen, READY-passed H implementation produces the per-row H table that the consumers pin by sha256 before their runs. D-2026-10-08-2: post 3 = \"MATH scorer gap (Recommended)\" is the author's choice. Source: docs/judge_v2_program.md L25317-L25327 (section \"## Author's decision 2026-10-08 (recorded by the registrar; zero calls; insertion only) — D-2026-10-08-1..6 ...\"; _as_of the commit that writes it, parent 5211616a, re-grepped); authority docs/agents/author_decisions/2026-10-08.md (5211616a); plan Amendment 40"
+  },
+  {
+   "date": "2026-10-09",
+   "by": "registrar (docs/judge_v2_program.md L25352-L25361 (section \"## Registrar's record 2026-10-09 (insertion only; zero calls; nothing run) — H table pinned ...\"; _as_of the commit that writes it, parent 38eac1c8, re-grepped))",
+   "text": "Not run (0 backups; no outcome heading; no POSTRUN file). READY review c953775e (blob 947edb12) NOT READY / BLOCKED: B-1 the in-script busy check matches its own process; C-2 rulings HX-R4 / HX-R1 / HX-R2 owed. H table PINNED (D-2026-10-08-5 deviation (2)): experiment_results/math_scorer_h/math_h_table.csv sha256-lf 6b010fa60dde727816b91196d2cb3045094082c3800fe738adebe21d19eeb1d1, 23,832 rows, H 7,126 / official 2,335 (READY f4f7e0a0, run 62d269af); decides nothing (meets C-1). State registered (blocked)."
+  },
+  {
+   "date": "2026-10-09",
+   "by": "registrar (docs/judge_v2_program.md L25363-L25372 (section \"## Registrar's record 2026-10-09 (insertion only; zero calls; nothing run; pre-data) — HARNESS-EXTRACTOR rulings HX-R4, HX-R1, HX-R2 ...\"; _as_of the commit that writes it, parent 40cd6d41, re-grepped) [CORRECTED 2026-10-09 by the registrar: the parent of da1ef992 is 980c3982, not 40cd6d41; 980c3982 touched only tools/analysis/adaptive_profile.py, so the span and its line numbers stand; docs/judge_v2_program.md L25394-L25401 (section \"## Author's decision 2026-10-09 (recorded by the registrar; zero calls; insertion only) — D-2026-10-09-1 ...\"; _as_of the commit that writes it, parent defab40c, re-grepped).])",
+   "text": "Pre-data rulings on READY c953775e C-2. HX-R4: rule 8 refutes RANKS-MOVE iff every pairwise tau-b >= 0.85 AND max rank shift <= 2 (exact complement of HX1); a mid-rank shift of 2.5 reads RANKS-MOVE, not refuted; binds HX2 and HX3. HX-R1: the official IFEval checker is NOT installed; per D-2026-10-08-5's principle IS / IL are the harness's own stored per-sample prompt-level strict / loose verdicts (18 of 18 sample files); I0 = IS by construction, so HX3 reads strict vs loose (IS vs IL), DESCRIPTIVE-ONLY unchanged; P5, P8 scored as written on that pair. HX-R2: experiment_results/multicorpus/checker_answers_v2.db added to DATA OBJECTS, read-only, math_checker_answers_v2.non_terminated only. C-1 and C-2 met; B-1 (busy self-match) stands: busy.ps1 fix + delta READY owed. State registered (blocked on B-1 only)."
+  },
+  {
+   "date": "2026-10-09",
+   "by": "registrar (docs/judge_v2_program.md L25386-L25392 (section \"## Registrar's record 2026-10-09 (insertion only; zero calls; nothing run) — ADAPTIVE-PROFILE refused at [AP-DENOM] ...\"; _as_of the commit that writes it, parent b453cedd, re-grepped))",
+   "text": "Not run, correctly (NOT READY, B-2 open, delta READY 8b3790ef; zero HX outputs or backups). POSTRUN_SATURATION-IRT.md (b453cedd) C-1: Support (d) (L25274) reuses SATURATION-IRT's planning arithmetic, which understated the realised SE 2.3x (0.0146 planned, 0.0337 realised; a ranking tau's noise is model-level); (d)-(f) must be re-derived by a registrar's insertion before READY. Bracket appended at L25274. State registered (blocked: B-2; Support re-derivation)."
+  },
+  {
+   "date": "2026-10-09",
+   "by": "registrar (docs/judge_v2_program.md L25394-L25401 (section \"## Author's decision 2026-10-09 (recorded by the registrar; zero calls; insertion only) — D-2026-10-09-1 ...\"; _as_of the commit that writes it, parent defab40c, re-grepped))",
+   "text": "Parent slip: pointers to the section written by da1ef992 (HARNESS-EXTRACTOR rulings, L25363-L25372) printed 'parent 40cd6d41'; the parent is 980c3982 (git log -1 --format=%P da1ef992); span and line numbers stand; bracketed inline."
+  },
+  {
+   "date": "2026-10-09",
+   "by": "registrar (docs/judge_v2_program.md L25403-L25410 (section \"## Registrar's record 2026-10-09 (insertion only; zero calls; nothing run) — delta READY reviews 69032fdb recorded ...\"; _as_of the commit that writes it, parent 69032fdb, re-grepped))",
+   "text": "Delta READY review docs/reviews/READY_HARNESS-EXTRACTOR_delta2.md (69032fdb), blob 398336f0 (git blob; LF sha256-lf16 9019ce455051f3ea): NOT READY. B-2 CLOSED (CONFIRMED). S-1: registrar Support (d)-(f) insertion + ruling on F-H once HX2 is descriptive-only owed; then builder delta 3, then delta READY. Operator skipped; nothing ran; no outcome. State registered (blocked)."
+  },
+  {
+   "date": "2026-10-09",
+   "by": "registrar (docs/judge_v2_program.md L25412-L25418 (section \"## Registrar's record 2026-10-09 (insertion only; zero calls; nothing run; pre-data) — WIN-MAP Support (b)-(g) re-derived ...\"; _as_of the commit that writes it, parent 24deb1ab, re-grepped))",
+   "text": "S-1 MET: Support (d)-(f) re-derived, copied from docs/reviews/READY_HARNESS-EXTRACTOR_delta2.md (69032fdb): SE(tau) = 0.03374 x sqrt(2,056 / n) (SATURATION-IRT realised SD, Kish 1.0002; floor 0.0337); HX1 / HX2 0.0420 (MDE80 0.118; 0.094 at the floor), HX3 0.0658 (0.184), HX4 0.0095 (0.027), HX5 0.0072 (0.020); HX1, HX4, HX5 SCOREABLE; HX2 DESCRIPTIVE-ONLY BY SUPPORT (0.07 margin inside 0.094-0.118; shift clause one-rank margin); HX3 DESCRIPTIVE-ONLY; transported SE disclosed as probably an over-statement (same items). Registrar's ruling F-H-SUPPORT: F-H printed '(descriptive-only by support)', decides nothing (reasons: unpowered word; a falsifier cannot outrank its criterion; D-5 left F-H overturning only the audit's preview); P4 scored as written. Builder delta 3 (SUPPORT_PLAN rows, HX2 / F-H qualifiers, T-1 H03 / H04) and its delta READY owed. State registered (blocked)."
+  },
+  {
+   "date": "2026-10-09",
+   "by": "registrar (docs/judge_v2_program.md L25420-L25427 (section \"## Registrar's record 2026-10-09 (insertion only; zero calls; nothing run) — delta READYs 1b7a603a recorded ...\"; _as_of the commit that writes it, parent 8012b48a, re-grepped))",
+   "text": "READY delta 3 (1b7a603a) at blob a7ebea9f; merged by path 9f5fb487; run 2026-10-09: selftest 9/9, dry-run rc 0, --run rc 1 at L688 (f.is_correct_mathfix; the real column is is_correct); nothing written; POSTRUN 8012b48a INVALID (incident, no outcome). Owed: F-1, F-2 (builder), S-1 (dry-run schema conformance), then a delta READY; no deviation needed. State blocked."
+  },
+  {
+   "date": "2026-10-10",
+   "by": "registrar (docs/judge_v2_program.md L25453-L25459 (section \"## Registrar's record 2026-10-10 (insertion only; zero calls; nothing run) — HARNESS-EXTRACTOR: READY delta 4 (eba84716) ...\"; _as_of the commit that writes it, parent e313f1d8, re-grepped); docs/judge_v2_program.md L25461-L25471 (section \"## HARNESS-EXTRACTOR (2026-10-10, 0 calls) — VALID (POSTRUN e313f1d8): HX1 RANKS-MOVE ...\"; _as_of the commit that writes it, parent e313f1d8, re-grepped))",
+   "text": "READY delta 4 (eba84716) at blob 4107eb0b (F-1 / F-2 closed, S-1 met); merged by path a80fa610; run 2026-10-10 rc 0, 0 calls; POSTRUN run2 (e313f1d8) VALID: HX1 RANKS-MOVE (min tau-b -0.0473, shift 15), F-HX NOT FIRED; HX2 RANKS-MOVE, HX3 RANKS-HOLD descriptive-only by support (not upgraded by the realised SE, D2); HX4 SHIFT-MATERIAL; HX5 FORMAT-DOMINATED; P1-P4, P6-P8 HELD, P5 FAILED (D3). OUTCOME bracket on L25257 and support-as-realised bracket on L25263 of the amended registration. State done."
+  }
+ ],
+ "does_not_show": [
+  "which scorer is right beyond the pilot's 150-row adjudication",
+  "that MF and H agree on ranks (HX2 is descriptive-only; it reads RANKS-MOVE)",
+  "MMLU-Pro, BBH, MuSR, GPQA (log-likelihood; out of scope)",
+  "IFEval truth beyond the harness's stored strict / loose verdicts (no checker installed)",
+  "a content-closed claim (pool paeec37aa28063c75 id-disjoint only); a blind test (the MATH legs confirm a disclosed pilot)",
+  "models outside the 18; that a published leaderboard is wrong; judged quality"
+ ],
+ "ledger": {
+  "row_id": "HARNESS-EXTRACTOR",
+  "version": "v426 (2026-10-10: OUTCOME bracket; VALID ok chip and HX2/HX3 descriptive warn chip added) | v425 (2026-10-09: incident bracket; INCIDENT warn chip added) | v424 (2026-10-09: Support (d)-(f) + F-H-SUPPORT bracket; no chip changed) | v423 (2026-10-09: parent-slip bracket; no chip changed) | v422 (2026-10-09: Support re-derivation bracket; no chip changed) | v421 (2026-10-09: HX-R4/HX-R1/HX-R2 bracket; no chip changed; row created v415 with the PLAN chip)"
+ },
+ "depends_on": [
+  "MATH-FIX (MF labels, of record)",
+  "CONTENT-DISJOINT-SPLIT-AUDIT (R1)",
+  "the read-only MATH scorer audit (disclosed pilot; relayed in the orchestrator's brief 2026-10-08; outputs on E: only)"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "minutes",
+  "agent_hours": "about 3 h",
+  "reads_pool": true
+ },
+ "outputs": "never committed: pinned by sha256, stored on E: with SHA256SUMS.txt; temp under E:/TaxoArena_tmp via scratch_dir",
+ "sources": [
+  "docs/judge_v2_program.md L25081-L25095 (_as_of the commit that writes it, parent e83b59d5, re-grepped)",
+  "docs/judge_v2_program.md L25043-L25049 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — five HF blog-series analyses registered ...\"; _as_of the commit that writes it, parent e83b59d5, re-grepped)",
+  "docs/judge_v2_program.md L25221-L25227 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — HARNESS-EXTRACTOR amended to the MATH + IFEval scorer-gap study ...\"; _as_of the commit that writes it, parent cc49fc6a, re-grepped)",
+  "docs/judge_v2_program.md L25229-L25315 (section \"## Registered 2026-10-08 (before any code or call) — HARNESS-EXTRACTOR (amended; supersedes the MMLU-Pro design before any build): ...\"; _as_of the commit that writes it, parent cc49fc6a, re-grepped)",
+  "the orchestrator's brief of 2026-10-08 (the MATH scorer audit, relayed; numbers copied)",
+  "docs/judge_v2_program.md L25317-L25327 (section \"## Author's decision 2026-10-08 (recorded by the registrar; zero calls; insertion only) — D-2026-10-08-1..6 ...\"; _as_of the commit that writes it, parent 5211616a, re-grepped); authority docs/agents/author_decisions/2026-10-08.md (5211616a); plan Amendment 40",
+  "docs/judge_v2_program.md L25352-L25361 (section \"## Registrar's record 2026-10-09 (insertion only; zero calls; nothing run) — H table pinned ...\"; _as_of the commit that writes it, parent 38eac1c8, re-grepped)",
+  "docs/reviews/READY_HARNESS-EXTRACTOR.md (c953775e)",
+  "docs/judge_v2_program.md L25363-L25372 (section \"## Registrar's record 2026-10-09 (insertion only; zero calls; nothing run; pre-data) — HARNESS-EXTRACTOR rulings HX-R4, HX-R1, HX-R2 ...\"; _as_of the commit that writes it, parent 40cd6d41, re-grepped) [CORRECTED 2026-10-09 by the registrar: the parent of da1ef992 is 980c3982, not 40cd6d41; 980c3982 touched only tools/analysis/adaptive_profile.py, so the span and its line numbers stand; docs/judge_v2_program.md L25394-L25401 (section \"## Author's decision 2026-10-09 (recorded by the registrar; zero calls; insertion only) — D-2026-10-09-1 ...\"; _as_of the commit that writes it, parent defab40c, re-grepped).]",
+  "docs/judge_v2_program.md L25386-L25392 (section \"## Registrar's record 2026-10-09 (insertion only; zero calls; nothing run) — ADAPTIVE-PROFILE refused at [AP-DENOM] ...\"; _as_of the commit that writes it, parent b453cedd, re-grepped)",
+  "docs/reviews/POSTRUN_SATURATION-IRT.md (b453cedd) C-1",
+  "docs/judge_v2_program.md L25394-L25401 (section \"## Author's decision 2026-10-09 (recorded by the registrar; zero calls; insertion only) — D-2026-10-09-1 ...\"; _as_of the commit that writes it, parent defab40c, re-grepped)",
+  "docs/reviews/READY_HARNESS-EXTRACTOR_delta2.md (69032fdb)",
+  "docs/judge_v2_program.md L25412-L25418 (section \"## Registrar's record 2026-10-09 (insertion only; zero calls; nothing run; pre-data) — WIN-MAP Support (b)-(g) re-derived ...\"; _as_of the commit that writes it, parent 24deb1ab, re-grepped)",
+  "docs/judge_v2_program.md L25420-L25427 (section \"## Registrar's record 2026-10-09 (insertion only; zero calls; nothing run) — delta READYs 1b7a603a recorded ...\"; _as_of the commit that writes it, parent 8012b48a, re-grepped)",
+  "docs/reviews/READY_HARNESS-EXTRACTOR_delta3.md (1b7a603a)",
+  "docs/reviews/POSTRUN_HARNESS-EXTRACTOR.md (8012b48a)",
+  "docs/judge_v2_program.md L25453-L25459 (section \"## Registrar's record 2026-10-10 (insertion only; zero calls; nothing run) — HARNESS-EXTRACTOR: READY delta 4 (eba84716) ...\"; _as_of the commit that writes it, parent e313f1d8, re-grepped)",
+  "docs/judge_v2_program.md L25461-L25471 (section \"## HARNESS-EXTRACTOR (2026-10-10, 0 calls) — VALID (POSTRUN e313f1d8): HX1 RANKS-MOVE ...\"; _as_of the commit that writes it, parent e313f1d8, re-grepped)",
+  "docs/reviews/POSTRUN_HARNESS-EXTRACTOR_run2.md (e313f1d8)",
+  "docs/reviews/READY_HARNESS-EXTRACTOR_delta4.md (eba84716)",
+  "experiment_results/hf_blog/harness_extractor/harness_extractor_outcome.txt (sha256-lf16 fd31a8e4ede9ee60; numbers copied)",
+  "the operator's hand-back 2026-10-10 (merge a80fa610, run, backup)"
+ ],
+ "last_update": "2026-10-10",
+ "label_status": "correctness under alternative extractors (no labels)",
+ "data_disclosure": "DATA ALREADY LOOKED AT (disclosed): GPQA-HEADROOM 7.2% vs 36.7%, MC-ROUTER oracle 0.907 / best 0.553, UNION-AF-ROUTE best 0.6049 / AF 0.6201 / declared 0.6316, CELL-FLIPS 7/101, MODEL-VINTAGE-CANARY 5/12, K46-KEY-READ 0.9249 / 0.2632; [P-FAM] 2.7:1, +16.4pp, 5.7%, 42:1, +0.39/1k as motivation only; MATH scorer audit (DISCLOSED PILOT): 5,181 of 23,832 rows disagree (all X0 0 / MF 1), 7 categories (BOXED-no-Minerva 3,349; Minerva mismatch 1,253; last-number 329; prefix 77; equivalent form 67; stated-wrong 63; non-terminated 43); 150-row adjudication (124 questions, Kish 1.52); MF false credits ~368 / 7,516 (4.9%, MC 95% 338-686); H credits 7,126; rank preview (X0->MF reorders all, Qwen2.5-32B 16th->1st; MF->H ranks 1-12 unchanged, R1-Distill-Llama-8B 13th->16th (0.198->0.099), R1-Distill-Qwen-32B 15th->18th (0.144->0.070)); IFEval nothing seen",
+ "shared_rules": "shared rules R1-R6: drop the 471 union twins (CONTENT-DISJOINT-SPLIT-AUDIT; recomputed, refusal unless 471 / 427) and collapse exact duplicates; one documented extractor per harness; GPQA text never shown; release ids + 0/1 (and verdicts) only; claims relative to these 18 models",
+ "null_means_for_post": "HX1 RANKS-HOLD (after review clears the instrument): \"scores move, ranks hold\", HX4 shift matrix as hero; HX2 RANKS-HOLD: the two defensible MATH scorers agree on ranks; HX3 descriptive either way; HX1 MOVE + HX2 HOLD: \"a broken scorer reorders the board, two careful scorers agree\"",
+ "series": "HF blog series (docs/drafts/hf/SERIES_PLAN.md)",
+ "plain_description": {
+  "sq": "SQ2 Trust",
+  "what": "Re-scores the models' cached raw MATH and IFEval answers under the documented scorers (stored, MATH-FIX and a corrected hybrid for MATH; stored, strict and loose for IFEval) and compares rankings and per-model accuracy. No judge calls. MMLU-Pro and the other log-likelihood benchmarks have no raw answers and are out of scope.",
+  "why": "Shows whether answer parsing, not ability, can change which model ranks where.",
+  "information": "Would show how stable model ranks are under extraction choices. Result: on MATH the scorer choice reorders the 18 models (the stored scorer vs MATH-FIX: tau-b -0.05, a model moves 15 ranks); IFEval strict vs loose barely moves ranks.",
+  "written": "2026-10-08"
+ },
+ "condition": "G-RAW RECORDED 2026-10-08: raw outputs for MATH and IFEval only (branch (c) for MMLU-Pro); the amended MATH + IFEval design is the registration of record; build unblocked",
+ "title_registered_2026-10-08": "HARNESS-EXTRACTOR: re-score cached raw MMLU-Pro responses under 5-6 documented extractors (cached, extract-v1, per-harness-family, strict, lenient, first); deciding: min pairwise Kendall tau-b >= 0.85 and max rank shift <= 2; CONDITIONAL on the raw-response gate G-RAW (zero calls; REGISTERED 2026-10-08; HF post 3)",
+ "criteria_superseded": [
+  {
+   "id": "HX1",
+   "text": "DECIDING (the POINT decides; word stability S_w printed, '(stable)' iff >= 0.80): RANKS-HOLD iff min pairwise tau-b >= 0.85 AND max rank shift vs X0 <= 2; RANKS-MOVE otherwise. SCOREABLE (DEFF 1.2 transported, SE 0.0061, MDE80 0.017, predicted 0.80)",
+   "result": "SUPERSEDED (MMLU-Pro design amended before any build, 2026-10-08)",
+   "value": "not run",
+   "denominator": "about 11,800 deduplicated MMLU-Pro items; 18 (union) or 12 (x12) models per G-RAW"
+  }
+ ],
+ "predictions_superseded": [
+  {
+   "id": "P1",
+   "text": "HX1 RANKS-MOVE 0.60 / RANKS-HOLD 0.40",
+   "result": "SUPERSEDED (MMLU-Pro design amended before any build, 2026-10-08)",
+   "value": "not run",
+   "denominator": "roster"
+  },
+  {
+   "id": "P2",
+   "text": "min pairwise tau-b 0.80 [0.65, 0.93]",
+   "result": "SUPERSEDED (MMLU-Pro design amended before any build, 2026-10-08)",
+   "value": "not run",
+   "denominator": "roster"
+  },
+  {
+   "id": "P3",
+   "text": "max rank shift 3 [1, 6]",
+   "result": "SUPERSEDED (MMLU-Pro design amended before any build, 2026-10-08)",
+   "value": "not run",
+   "denominator": "roster"
+  },
+  {
+   "id": "P4",
+   "text": "median Delta_m 0.02 [0.005, 0.06]; max Delta_m 0.10 [0.04, 0.25]",
+   "result": "SUPERSEDED (MMLU-Pro design amended before any build, 2026-10-08)",
+   "value": "not run",
+   "denominator": "per model"
+  },
+  {
+   "id": "P5",
+   "text": "X3 (strict) has the largest no-answer rate for >= half the models (0.70)",
+   "result": "SUPERSEDED (MMLU-Pro design amended before any build, 2026-10-08)",
+   "value": "not run",
+   "denominator": "per model"
+  },
+  {
+   "id": "P6",
+   "text": "x12 roster only: X1 vs X2 tau-b 0.90 [0.75, 0.98]",
+   "result": "SUPERSEDED (MMLU-Pro design amended before any build, 2026-10-08)",
+   "value": "not run",
+   "denominator": "12 models"
+  }
+ ],
+ "math_scorer_of_record": "MATH-FIX (eval_results_mathfix.is_correct_mathfix; ruling L15137 and R2) STAYS of record pending the author; the audit's H RECOMMENDED, not adopted, eligible only after HARNESS-EXTRACTOR READY; no registered test re-pinned now; conditional re-pin before --run of SATURATION-IRT, WIN-MAP, ADAPTIVE-PROFILE, JUDGE-KEY-DOSE, JUDGE-RETEST-LENGTH if the author adopts H",
+ "data_objects_added": [
+  "experiment_results/multicorpus/checker_answers_v2.db (HX-R2 2026-10-09; read-only, mode=ro&immutable=1; math_checker_answers_v2.non_terminated only)"
+ ]
+}

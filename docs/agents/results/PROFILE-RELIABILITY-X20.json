@@ -1,0 +1,133 @@
+{
+  "id": "PROFILE-RELIABILITY-X20",
+  "title": "PROFILE-RELIABILITY-X20: does a bigger roster rescue the anchor capability profile? (zero calls; the identical instrument at the identical 0.70 bar on the 20-model board)",
+  "question": "The PROFILE-RELIABILITY instrument (disjoint half-splits of each cell's questions, profiles on each half correlated model-demeaned, Spearman-Brown, 40 halvings) on the 20-model board at leaf and anchor level, the answer key through the same pipeline as comparator: does the anchor-level judge profile clear the 0.70 bar x12 failed at 0.6728? If so RESOLVE may publish per-anchor claims on a board of that size; if not the finding is roster-independent and the deliverable is closed.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "14e3915",
+    "program_lines": "docs/judge_v2_program.md L2909-L2925",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-14 (before any run, ZERO calls) — PROFILE-RELIABILITY-X20: does a bigger roster rescue the anchor profile?",
+    "outcome_heading": [
+      "L2956: - **PROFILE-RELIABILITY-X20 (2026-09-14, zero calls): a bigger roster does not rescue the anchor profile, it ...** (first run, sparse board; reversed 2026-09-15)",
+      "L3099: ## REVIEW of the 2026-09-14/15 session (2026-09-15, zero calls) — three headline conclusions are artefacts",
+      "L3146: - **X20-MERGED (2026-09-15, zero calls): the two x20 instruments rerun on the BOARD OF RECORD. PROFILE-RELIABILITY-X20 reverses from FAIL to PASS; TIER-HONEST-X20's \"within-tier is where the board is dishonest\" inverts.**"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "tools/analysis/x20_replications.py",
+    "sha16": "32ed2e3332aa1b9d",
+    "commit": "0060654 (first run; the rerun of record is tools/analysis/x20_merged.py at ba12200, sha16 c96d662cda2b0ac9)"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/x20_merged.txt (the board of record; x20_replications.txt is the sparse-board first run, retained and labelled)",
+    "outcome_commit": "00deff3",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (2,811 judged questions on the merged board of record x12 9,142 + x20 12,394 = 21,536 verdicts; the sparse x20-alone board is retained, labelled)",
+    "date": "2026-09-14 (first run) / 2026-09-15 (corrected rerun)"
+  },
+  "review": {
+    "file": "docs/review_session_2026-09-14.md (the adversarial review of the 2026-09-14/15 session, ba12200; programme L3099-L3145 'REVIEW of the 2026-09-14/15 session') and the corrections by insertion it required",
+    "commit": "ba12200",
+    "verdict": "REVIEW finding (1): the board was not the board of record; X20-MERGED reversed the verdict from FAIL to PASS (00deff3, ledger v93); the jackknife caveat (ANCHOR-PROFILE-INTERVAL) qualifies the pass"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "the same 0.70 bar on the anchor-level judge profile; if cleared, RESOLVE may publish per-anchor claims on a board of that size and must say so; if not, the deliverable is closed",
+      "result": "HELD",
+      "value": "board of record (21,536 verdicts): anchor judge r 0.5604, R(SB) 0.7183 (14 cells, 201 q/cell) CLEARS 0.70; key R 0.9139; leaf (8 cells, 71 q) judge r 0.2231, R 0.3648, key 0.8284; a point-estimate pass under the registered rule with a wide sampling interval (ANCHOR-PROFILE-INTERVAL: [0.6076, 0.8291]); the sparse board read 0.6283 (x12 0.6728) and its 'FAIL', 'roster-independent', 'deliverable CLOSED' are WITHDRAWN; P5 (closed MOOT on that ground) REOPENED",
+      "denominator": "14 anchors x ~201 judged q on the merged board; 40 halvings; key accuracy over the 2,811 judged questions"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "x20 lands BELOW x12's 0.6728 (190 pairs to pin from the same questions; extra verdicts do not compensate for the extra parameters); a bigger board makes the profile worse",
+      "result": "FAILED",
+      "value": "on the board of record 0.7183 > 0.6728 (the sparse board's 0.6283 'HELD' the prediction, on a board with no direct comparisons among the twelve originals; withdrawn)",
+      "denominator": "merged board"
+    }
+  ],
+  "falsifier": {
+    "text": "none named beyond the 0.70 bar and its consequence clause",
+    "fired": false,
+    "note": "the registered consequence clause applies: RESOLVE may publish per-anchor capability claims on a board of this size WITH the interval (ANCHOR-PROFILE-INTERVAL); the sparse-board reading's 'a granular capability profile is unreachable on this corpus by any judge, any tree and any roster' is withdrawn with it"
+  },
+  "numbers_of_record": {
+    "board_of_record": "anchor judge r 0.5604 / R 0.7183 / key R 0.9139 (14 cells, 201 q/cell); leaf judge r 0.2231 / R 0.3648 / key 0.8284 (8 cells, 71 q)",
+    "sparse_board_first_run": "anchor judge R 0.6283 (x12 0.6728; bar 0.70); leaf judge R -0.0326; key 0.8248 leaf / 0.9045 anchor",
+    "interval": "ANCHOR-PROFILE-INTERVAL: 0.7183 [0.6076, 0.8291], lower bound below 0.70; a point-estimate pass",
+    "later_readings": "PROFILE-RELIABILITY-INTERACTION: the judge's 0.7183 is interaction-only by construction; like-for-like key K20 0.8391; gap +0.121 [0.030, 0.211]; PROFILE-R-FILTERED: under the answer-disagreement filter 0.5613"
+  },
+  "sentence_of_record": "PROFILE-RELIABILITY-X20, CORRECTED (2026-09-15, X20-MERGED): PASS ON THE BOARD OF RECORD: on the merged 21,536-verdict board anchor R = 0.7183, which CLEARS the 0.70 bar; the sparse-board 0.6283 was a board with no direct comparisons among the twelve originals. 'A bigger board makes the profile worse', 'roster-independent' and 'deliverable CLOSED' are WITHDRAWN; the registered consequence clause applies and RESOLVE may publish per-anchor claims on a board of this size: a point-estimate pass under the rule, with a wide sampling interval on 14 anchors ([0.6076, 0.8291], ANCHOR-PROFILE-INTERVAL), published WITH the interval, not as a bare pass. The registered prediction (x20 below 0.6728) FAILED on the board of record.",
+  "chips": [
+    "FAIL (0.6283)",
+    "DELIVERABLE CLOSED",
+    "PASS (CORRECTED v93) ON THE BOARD OF RECORD (0.7183), POINT-ESTIMATE ONLY; JACKKNIFE [0.6076, 0.8291] (ANCHOR-PROFILE-INTERVAL); FILTERED 0.5613 (PROFILE-R-FILTERED)"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-15",
+      "by": "the adversarial REVIEW (ba12200; programme L3099 finding (1)) and X20-MERGED (programme L3146, 00deff3; ledger v93 observed cell 'CORRECTED 2026-09-15: PASS ON THE BOARD OF RECORD [X20-MERGED]')",
+      "text": "on the merged board anchor R = 0.7183 CLEARS the 0.70 bar; the sparse-board 0.6283 was a board with no direct comparisons among the twelve originals; 'a bigger board makes the profile worse', 'roster-independent' and 'deliverable CLOSED' are WITHDRAWN; the registered consequence clause applies; a point-estimate pass with a wide sampling interval on 14 anchors."
+    },
+    {
+      "date": "2026-09-15",
+      "by": "ANCHOR-PROFILE-INTERVAL (ledger v98)",
+      "text": "the jackknife 95% interval is [0.6076, 0.8291], lower bound below 0.70 on every reading and seed; per-anchor claims are published WITH the interval, not as a bare pass."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "INCONSISTENCIES-PASS (registrar, zero calls; insertion only)",
+      "text": "RE-CHIPPED 2026-09-23 by INCONSISTENCIES-PASS (registrar, zero calls; insertion only) (restatement pack H1 and INCONSISTENCIES class 6, done once): the chips 'FAIL (0.6283)' and 'DELIVERABLE CLOSED' pre-date the v93 correction and were never re-chipped, so a chip scanner read the withdrawn number as the verdict. They are LEFT IN PLACE (insertion only) and a third chip is appended, which governs: PASS on the 21,536-verdict board of record at 0.7183 as a POINT ESTIMATE ONLY, with the leave-one-anchor-out jackknife interval [0.6076, 0.8291] (ANCHOR-PROFILE-INTERVAL: the lower bound is below 0.70 on every reading) and the reading under the deployed answer-disagreement filter 0.5613 (PROFILE-R-FILTERED) printed beside it. Never quoted as a bare 'pass' or as 'reliable'. [ledger: observed cell of row PROFILE-RELIABILITY-X20, v132]"
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a comfortable pass (the margin over the bar is about one halving-SD)",
+    "the sparse-board readings (FAIL 0.6283, leaf -0.0326, 'unreachable by any judge, tree and roster'): withdrawn",
+    "the chips' literal text as the current verdict (the ledger chips 'FAIL (0.6283)' / 'DELIVERABLE CLOSED' pre-date the v93 correction and are read with the observed cell's CORRECTED insertion: PASS on the board of record)"
+  ],
+  "ledger": {
+    "row_id": "PROFILE-RELIABILITY-X20",
+    "version": "v93 (row added v89 at 63e8b5e; [UNDER CORRECTION] v92; 'PASS ON THE BOARD OF RECORD [X20-MERGED]' v93 at 00deff3; the chips were not re-chipped) [v132 2026-09-23: INCONSISTENCIES-PASS insertion in this row]; [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "PROFILE-RELIABILITY",
+    "ARENA-V2-X20",
+    "X20-MERGED",
+    "ANCHOR-PROFILE-INTERVAL",
+    "PROFILE-TREE-ROBUST"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L2909-L2925 (registration 14e3915): question, criteria, prediction, falsifier",
+    "docs/judge_v2_program.md outcome bullets and corrections at the headings listed in registration.outcome_heading (first run 2026-09-14; REVIEW L3099; X20-MERGED L3146 00deff3; corrected reruns L3188 010713b / L3281 d4eec8d)",
+    "docs/review_session_2026-09-14.md (ba12200): the adversarial review that found the sparse-board artefact and the McNemar rule's backward application",
+    "experiment_results/x12_crossdomain/x20_merged.txt (the board of record; x20_replications.txt is the sparse-board first run, retained and labelled) (00deff3)",
+    "docs/test_ledger.html row PROFILE-RELIABILITY-X20 (v93 (row added v89 at 63e8b5e; [UNDER CORRECTION] v92; 'PASS ON THE BOARD OF RECORD [X20-MERGED]' v93 at 00deff3; the chips were not re-chipped)): chips verbatim, observed cell with its CORRECTED / UNDER CORRECTION insertions, evidence",
+    "script sha16 = sha256 of tools/analysis/x20_replications.py at 0060654, first 16 hex (identity, computed by the registrar 2026-09-22; the first run's script; the rerun of record is x20_merged.py at ba12200 (sha16 c96d662cda2b0ac9))",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' or '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ1 Use",
+    "what": "No calls. A split-half reliability check on the 20-model board: each cell's questions were split in two at random, per-model strength profiles were computed on each half, and the two were correlated (40 repeats), at subject and leaf level.",
+    "why": "It asks whether per-subject capability profiles are stable enough (bar 0.70) to publish, after the 12-model board just missed the bar (0.67).",
+    "information": "Passing allows per-subject claims on a board of this size. Failing would close that deliverable. Result: done, corrected. On the merged board subject-level reliability is 0.72, which clears the bar, but only narrowly (95% range 0.61 to 0.83). It must be published with that range. An earlier 'fail' reading on a sparser board was withdrawn. Note: older question pool, ruled 'history, not evidence'.",
+    "written": "2026-10-07"
+  }
+}

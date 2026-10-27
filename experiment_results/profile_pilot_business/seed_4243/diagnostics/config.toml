@@ -1,0 +1,62 @@
+# PROFILE-MODE PILOT — NOT A RESULT. Mechanics validation only.
+#
+# WHY (2026-09-06). First live run of profile mode (stop on SE targets per model x
+# stratum; taxonomy.arena.ProfileTargets): validates strata loading, deficit-driven
+# scheduling, the [PROFILE] round telemetry, stratum convergence firing, and resume
+# compatibility, on the cheapest real category (Business = strata business-1 and
+# business-2 of strata_profile_v1.json) at a deliberately loose SE target so it
+# converges in ~15-20 minutes. The registered R2 run uses target 0.15.
+#
+# Run: set -a; source <(tr -d '\r' < .env); set +a; \
+#   ./gradlew.bat bootRun --rerun-tasks \
+#     -Dranking.db.path=experiment_results/profile_pilot_business/ratings_pilot.db \
+#     --args="--config experiment_configs/profile_pilot_business.toml"
+# AFTER: restore frozen_triples_20260727_042523_Headless_Run_Auto_ge_MAIN.json from HEAD.
+#
+datasetType   = "MMLU_PRO"
+models        = [
+    "gemini-3.1-pro_5-shots",
+    "arx_0314",
+    "gpt-4o-2024-08-06",
+    "iask_pro",
+    "deepseek-chat-v2_5",
+    "Meta-Llama-3_1-70B-Instruct",
+    "Qwen1.5-72B-Chat",
+    "c4ai-command-r-v01",
+    "Meta-Llama-3_1-8B",
+    "Yi-6b-Chat",
+    "Llama-2-13b-hf",
+    "Llama-2-7b-hf"
+]
+snapshotId    = "20260727_042523_Headless_Run_Auto_ge"
+category      = "Business"
+queryLimit    = 0
+outputDir     = "experiment_results/profile_pilot_business"
+testRatio     = 0.3
+seed          = 4243
+
+runPipeline        = false
+regenerateSplit    = false
+runBenchmark       = true
+runTrickle         = false
+runBaselines       = false
+enableFinalMetrics = false
+enableLabeling     = false
+judgeInduction     = false
+
+conditions         = ["MAIN"]
+resumeBenchmark    = true
+profileMode        = true
+profileSeTarget    = 0.30
+profileStrataFile  = "experiment_configs/strata_profile_v1.json"
+questionsPerRound  = 250
+confidenceGate     = 0.0
+parallelism        = 4
+reservedOnly       = true
+
+dagMode = "DAG_MAX"
+maxDepth              = 8
+minClusterSize        = 55
+proposalSeparationBar = 0.025
+
+judgeOptionMode = "RESOLVED"

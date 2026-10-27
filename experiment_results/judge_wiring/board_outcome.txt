@@ -1,0 +1,55 @@
+=== JUDGE-WIRING BOARD: the x12 MAIN schedule re-judged through the Kotlin recipe path (board set hash c0d3f708cbc3930e, 9123 matches) ===
+  Kotlin db experiment_results\judge_wiring\board\kotlin_c0d3f708cbc3930e.db | run_meta: judge grok-4-1-fast-non-reasoning | recipe STACK-v2 | max_tokens 8192 | temperature omitted | kit 4ac924b429a578eee308997a307523d455e91cca7169aee167f35919300e504b | fingerprint e8c7edbc45f50a24 | set c0d3f708cbc3930e | started 2026-09-16T17:19:36 | resumed 2026-09-16T17:20:13
+  comparison arm: GROK-CALIB experiment_results\x12_crossdomain\grok_calib.db (Python rejudge_reasoning.call_judge_full, judge grok-4-1-fast-non-reasoning, max_tokens 8192, temperature omitted) | kit of record 4ac924b429a578eee308997a307523d455e91cca7169aee167f35919300e504b
+  set 9123 = every GROK-CALIB match with a reference in the kit; 19 GROK-CALIB matches EXCLUDED by construction (no reference; the Kotlin path skips them: match_ids [104, 179, 682, 1988, 2456, 2540, 3360, 3621, 3774, 4277, 4702, 5596, 5683, 5962, 6166, 6267, 6951, 7700, 7829]; qids [871, 898, 1392, 1795, 1984, 3780, 4983, 4988, 6033, 11164])
+  GROK-CALIB's readings on the 19 excluded (judged WITHOUT a reference block; not part of any Kotlin board): 104 q6033 gemini-3.1-pro_5-shots vs gpt-4o-2024-08-06 -> gemini-3.1-pro_5-shots; 179 q871 gemini-3.1-pro_5-shots vs iask_pro -> gemini-3.1-pro_5-shots; 682 q898 Yi-6b-Chat vs gemini-3.1-pro_5-shots -> gemini-3.1-pro_5-shots; 1988 q3780 Meta-Llama-3_1-70B-Instruct vs gpt-4o-2024-08-06 -> gpt-4o-2024-08-06; 2456 q4983 Llama-2-13b-hf vs gpt-4o-2024-08-06 -> gpt-4o-2024-08-06; 2540 q4988 Llama-2-7b-hf vs gpt-4o-2024-08-06 -> gpt-4o-2024-08-06; 3360 q1392 Qwen1.5-72B-Chat vs deepseek-chat-v2_5 -> TIE; 3621 q1795 Yi-6b-Chat vs deepseek-chat-v2_5 -> Yi-6b-Chat; 3774 q6033 Llama-2-7b-hf vs deepseek-chat-v2_5 -> deepseek-chat-v2_5; 4277 q11164 Llama-2-13b-hf vs Meta-Llama-3_1-70B-Instruct -> Meta-Llama-3_1-70B-Instruct; 4702 q1984 Llama-2-7b-hf vs Qwen1.5-72B-Chat -> Qwen1.5-72B-Chat; 5596 q4983 Llama-2-7b-hf vs Yi-6b-Chat -> Llama-2-7b-hf; 5683 q4988 Llama-2-13b-hf vs Llama-2-7b-hf -> TIE flip; 5962 q898 arx_0314 vs iask_pro -> TIE flip; 6166 q871 deepseek-chat-v2_5 vs gpt-4o-2024-08-06 -> gpt-4o-2024-08-06; 6267 q4988 gemini-3.1-pro_5-shots vs iask_pro -> TIE flip; 6951 q1795 Qwen1.5-72B-Chat vs deepseek-chat-v2_5 -> deepseek-chat-v2_5; 7700 q6033 Meta-Llama-3_1-8B vs Qwen1.5-72B-Chat -> Qwen1.5-72B-Chat; 7829 q4983 Meta-Llama-3_1-70B-Instruct vs c4ai-command-r-v01 -> TIE flip
+  Kotlin cache: 9123 of 9123 (complete)
+  outcome-of-record gate (registered hash + BOARD_DIR/kotlin_<hash>.db + judge_calls 2 rows/verdict + single fingerprint = run_meta): PASS
+  payload sha equality (Kotlin posted bytes == the bytes GROK-CALIB posted, both orders): 9123/9123
+
+=== (a) the board of record: question-clustered Bradley-Terry (rejudge_grok.mm_fit) over the 12 models on the Kotlin verdicts ===
+  9106 valid verdicts over 2801 judged questions | rho vs key accuracy over those judged questions 0.9930, 95% CI [0.9720, 0.9930] (question-resampled bootstrap B=1000, seed 42, key fixed) | rho vs pool key accuracy (3,445; ARENA-V2's comparator) 0.9860
+  GROK-CALIB on the same 9123 matches: rho vs judged-question key accuracy 0.9930 | Spearman between the two boards' theta 1.0000
+  top-4 (ungated convention: top-4 board fit on the 1865 top-cluster matches): gemini-3.1-pro_5-shots > iask_pro > arx_0314 > gpt-4o-2024-08-06 | key order over judged questions gemini-3.1-pro_5-shots > arx_0314 > iask_pro > gpt-4o-2024-08-06 -> 1 violations | key order over the pool gemini-3.1-pro_5-shots > arx_0314 > iask_pro > gpt-4o-2024-08-06 -> 1 violations | from the 12-model global fit: gemini-3.1-pro_5-shots > iask_pro > arx_0314 > gpt-4o-2024-08-06 (1)
+  key-decidable accuracy: convention A (TIE / INVALID / non-terminated wrong) 0.852 (n=4495) | convention B (committed only) 0.917 (n=4177) | decidable tie rate 0.069
+  tie rate 0.221 | flip rate 0.159 (valid n=9106) | invalid 17 of 9123 | finish_reason over 18246 calls: {'stop': 18243, 'content_filter': 1, 'length': 2} | matches touched by NON_TERMINATED: 3
+  model                         theta(K)   theta(GC)  key(jdg) key(pool)
+  gemini-3.1-pro_5-shots          +2.015      +2.000     0.912     0.913
+  iask_pro                        +1.933      +1.971     0.817     0.817
+  arx_0314                        +1.487      +1.489     0.833     0.834
+  gpt-4o-2024-08-06               +1.372      +1.337     0.750     0.750
+  deepseek-chat-v2_5              +0.600      +0.621     0.651     0.657
+  Meta-Llama-3_1-70B-Instruct     -0.048      -0.049     0.628     0.630
+  Qwen1.5-72B-Chat                -0.139      -0.201     0.476     0.474
+  c4ai-command-r-v01              -0.862      -0.876     0.370     0.363
+  Meta-Llama-3_1-8B               -1.221      -1.191     0.370     0.371
+  Yi-6b-Chat                      -1.356      -1.359     0.275     0.271
+  Llama-2-13b-hf                  -1.717      -1.689     0.240     0.235
+  Llama-2-7b-hf                   -2.066      -2.053     0.184     0.178
+
+=== (b) match for match against GROK-CALIB (item 25's readout; the two arms received the same bytes) ===
+  paired 9123 of 9123 cached
+  Kotlin finish_reason over 18246 calls: {'stop': 18243, 'content_filter': 1, 'length': 2} | matches touched by the NON_TERMINATED rule: 3 (the GROK-CALIB cache had no such rule; expected 0 at 8192)
+  invalid: Kotlin 17 | GROK-CALIB 11
+  raw 3-way agreement (winner identical incl. TIE/INVALID): 0.896 | tie rate Kotlin 0.221 vs GROK-CALIB 0.219 | flip rate Kotlin 0.159 vs GROK-CALIB 0.154 (valid n=9095)
+  key-decidable paired matches: 4495
+  convention A (TIE / INVALID / non-terminated wrong): Kotlin 0.852 (n=4495) vs GROK-CALIB 0.848 (n=4495) | delta +0.4pp  95% CI [-0.2, +1.0]pp (question-clustered bootstrap) | McNemar discordant 110:93 p=0.2614 (full key-decidable set, n=4495) -> OK
+  convention B (committed verdicts only):        Kotlin 0.917 (n=4177) vs GROK-CALIB 0.916 (n=4166) | delta +0.2pp  95% CI [-0.2, +0.6]pp (question-clustered bootstrap) | McNemar discordant 110:93 p=0.2614 (full key-decidable set, n=4495) -> OK
+                                                 McNemar discordant 2:3 p=1.0000 (both arms committed, n=4040 of 4495 key-decidable)
+  test-retest floor of the deployed judge on byte-identical prompts: 0.057 (DECOMP); a paired delta inside +/-1.9pp is within that floor
+
+=== (c) calibration board for the Kotlin path: systematic_budget's helpers on the Kotlin cache (as GROK-CALIB's --analyze) ===
+  unparsed on the schedule (INVALID in either order + missing): 17 of 9123 overall (0.2%) | 8 of 4495 key-decidable (0.2%) | guard 5% | (the 19 excluded reference-less matches are not on the Kotlin schedule: 0.2% of GROK-CALIB's 9142)
+
+=== FRAMEWORK item 26 criteria (helpers from systematic_budget; full table in board_systematic_budget.txt) ===
+  [key gap >= 0.02 (the derivation's population)] edges 890 (established 810) | b0 -3.4050 b1 +3.0576 | established-label refit b1 +2.0451, delta-dev vs b1=0: 2.26 -> NOT identified
+      LOAO at 0.975: called 669 of 890 edges (utility 75.2% -> PASS; criterion (2), denominator = all edges of the population) | called/raw-called 669/739 = 90.5% (non-deciding) | wrong 2 (established 1) | nominal 1.00 -> UNDETERMINED (power rule: nominal < 3)
+      prediction b1 in [1.72, 7.87]: HELD (established-label b1 +2.045)
+  [unfiltered (the adopted denominator)] edges 918 (established 810) | b0 -3.4079 b1 +3.2659 | established-label refit b1 +2.0451, delta-dev vs b1=0: 2.26 -> NOT identified
+      LOAO at 0.975: called 661 of 918 edges (utility 72.0% -> PASS; criterion (2), denominator = all edges of the population) | called/raw-called 661/745 = 88.7% (non-deciding) | wrong 1 (established 1) | nominal 1.10 -> UNDETERMINED (power rule: nominal < 3)
+      prediction b1 in [1.72, 7.87]: HELD (established-label b1 +2.045)
+  Consequence if b1 is identified and utility passes: ORDERED-JUDGED becomes available for the shipped judge; otherwise fallback stays.
+  widener readout written to experiment_results\judge_wiring\board_systematic_budget.txt
+
+  JUDGE-WIRING-BOARD REGISTERED: DESCRIPTIVE - the Kotlin cache is the board of record for the production path (item 25's consequence); no pass/fail on the board itself
+  pairing line (item 25's criterion reused, |delta| <= 1.9pp under conventions A and B, Kotlin vs GROK-CALIB): INSIDE under both

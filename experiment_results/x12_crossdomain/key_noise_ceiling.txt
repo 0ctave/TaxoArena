@@ -1,0 +1,91 @@
+=== KEY-NOISE-CEILING: is the arena's direction-agreement with the key at the key's own split-half ceiling? ===
+  build: systematic_budget.build() (mistral_build.pkl) | 920 edges, 891 with key gap >= 0.02 | 14 anchors | 12 models
+  KEY DENOMINATOR: the anchor's JUDGED questions (anchor_qs, 2811 in total, 119-304 per anchor); halves, key
+  direction and McNemar all use this set. 40 halvings, random.Random(42), disjoint halves.
+  arena direction-agreement = share of raw-certificate calls (c_raw >= 0.975) whose direction matches the
+  key's full-anchor direction. wrong counts printed as wrong(McNemar-established at 5%).
+  SUPPORT MATCHING: raw ceiling = half-support self-agreement; SB ceiling = Spearman-Brown on phi = 2a-1
+  (profile_reliability.sb), mapped back to a rate. THE PRIMARY USES THE SB-ADJUSTED CEILING. Both shown.
+  The ceiling is measured on the same edges the arena rate is measured on (the called edges).
+
+  DATA CHECK: (question, model) keys missing on the judged set: 34 of 33732; McNemar-established edges:
+  809 of 920 (all gaps), 809 of 891 (gap >= 0.02; SYSTEMATIC-BUDGET printed 809 of 891). wrong-direction edges:
+  44(26) on the 891, 60(26) on the 920 (registration: 44, of which 18 not established).
+
+  halvings with a tied key on a half (excluded for that edge): 555 of 36800 edge-halvings (1.51%)
+
+=== (i)/(ii) OVERALL, population = 891 edges with key gap >= 0.02 (the registration's 44-wrong population) ===
+  edge set                          n     wrong    arena  ceil raw   ceil SB   gap raw    gap SB  SB(rate)
+  ALL edges (uncalled too)        891     8(4)   0.9892    0.9852    0.9925   +0.39pp   -0.33pp    0.9926
+  called, all                     739     8(4)   0.9892    0.9942    0.9971   -0.50pp   -0.79pp    0.9971
+  ESTABLISHED (uncalled too)      809     4(4)   0.9944    0.9996    0.9998   -0.52pp   -0.54pp    0.9998
+  called, established             712     4(4)   0.9944    0.9997    0.9999   -0.54pp   -0.55pp    0.9999
+  (arena is always measured on the called members of the row's set; on the two 'called' rows the ceiling
+   is on exactly those edges = the support-matched comparison. 'SB(rate)' = sb() on the raw rate directly.)
+
+=== sensitivity: population = all 920 edges with any key gap (SYSTEMATIC-BUDGET's honest denominator) ===
+  edge set                          n     wrong    arena  ceil raw   ceil SB   gap raw    gap SB  SB(rate)
+  ALL edges (uncalled too)        920    11(4)   0.9853    0.9606    0.9795   +2.47pp   +0.58pp    0.9799
+  called, all                     748    11(4)   0.9853    0.9860    0.9929   -0.07pp   -0.76pp    0.9930
+  ESTABLISHED (uncalled too)      809     4(4)   0.9944    0.9996    0.9998   -0.52pp   -0.54pp    0.9998
+  called, established             712     4(4)   0.9944    0.9997    0.9999   -0.54pp   -0.55pp    0.9999
+  (arena is always measured on the called members of the row's set; on the two 'called' rows the ceiling
+   is on exactly those edges = the support-matched comparison. 'SB(rate)' = sb() on the raw rate directly.)
+
+  halving noise on the ceiling (SD of the per-halving aggregate over 40 halvings): called-all 0.0024, called-established 0.0006
+  per-edge SB-adjusted mean (edges below chance clipped to 0.5): called-all 0.9960, called-established 0.9999
+  arena SE if the 739 called edges were independent: 0.0038 (they are not - ~66 pairs share 14 anchors)
+  leave-one-anchor-out jackknife on gap SB (established): -0.55pp, SE 0.43pp, 95% [-1.40, +0.30]pp
+  leave-one-anchor-out jackknife on gap SB (all): -0.79pp, SE 0.51pp, 95% [-1.78, +0.20]pp
+
+=== (3) PER ANCHOR (population gap >= 0.02; 'at ceiling' = arena >= SB ceiling - 2pp on called, established) ===
+  anchor              qs | called   wrong   arena  ceilraw   ceilSB    gapSB |  c.est   wrong   arena  ceilraw   ceilSB    gapSB | verdict
+  Biology            181 |     56    0(0)  1.0000   0.9977   0.9989   +0.11pp |     54    0(0)  1.0000   0.9995   0.9998   +0.02pp | at ceiling [1 edge = 1.9pp]
+  Business           174 |     46    0(0)  1.0000   0.9994   0.9997   +0.03pp |     45    0(0)  1.0000   1.0000   1.0000   +0.00pp | at ceiling [1 edge = 2.2pp]
+  Chemistry          269 |     59    1(0)  0.9831   0.9905   0.9952   -1.22pp |     56    0(0)  1.0000   1.0000   1.0000   +0.00pp | at ceiling [1 edge = 1.8pp]
+  Computer science   162 |     53    0(0)  1.0000   1.0000   1.0000   +0.00pp |     53    0(0)  1.0000   1.0000   1.0000   +0.00pp | at ceiling [1 edge = 1.9pp]
+  Economics          178 |     51    0(0)  1.0000   0.9985   0.9992   +0.08pp |     51    0(0)  1.0000   0.9985   0.9992   +0.08pp | at ceiling [1 edge = 2.0pp]
+  Engineering        162 |     51    0(0)  1.0000   0.9910   0.9955   +0.45pp |     48    0(0)  1.0000   0.9989   0.9995   +0.05pp | at ceiling [1 edge = 2.1pp]
+  Health             129 |     47    0(0)  1.0000   0.9983   0.9992   +0.08pp |     45    0(0)  1.0000   1.0000   1.0000   +0.00pp | at ceiling [1 edge = 2.2pp]
+  History            119 |     51    2(0)  0.9608   0.9826   0.9912   -3.04pp |     46    0(0)  1.0000   1.0000   1.0000   +0.00pp | at ceiling [1 edge = 2.2pp]
+  Law                271 |     58    4(3)  0.9310   0.9811   0.9904   -5.93pp |     54    3(3)  0.9444   1.0000   1.0000   -5.56pp | BELOW >5pp [1 edge = 1.9pp]
+  Math               304 |     59    0(0)  1.0000   0.9981   0.9991   +0.09pp |     58    0(0)  1.0000   1.0000   1.0000   +0.00pp | at ceiling [1 edge = 1.7pp]
+  Other              211 |     52    1(1)  0.9808   0.9918   0.9959   -1.51pp |     50    1(1)  0.9800   1.0000   1.0000   -2.00pp | at ceiling - ON THE 2pp BOUNDARY [1 edge = 2.0pp]
+  Philosophy         132 |     43    0(0)  1.0000   1.0000   1.0000   +0.00pp |     43    0(0)  1.0000   1.0000   1.0000   +0.00pp | at ceiling [1 edge = 2.3pp]
+  Physics            259 |     61    0(0)  1.0000   0.9942   0.9971   +0.29pp |     58    0(0)  1.0000   1.0000   1.0000   +0.00pp | at ceiling [1 edge = 1.7pp]
+  Psychology         260 |     52    0(0)  1.0000   0.9979   0.9990   +0.10pp |     51    0(0)  1.0000   0.9995   0.9998   +0.02pp | at ceiling [1 edge = 2.0pp]
+  NOTE: with ~50 established calls per anchor one wrong edge moves the arena by ~2pp, so a per-anchor
+  'below by 2-5pp' is one or two edges and is reported as such, not as a powered per-anchor finding.
+
+=== the called edges the key says are backwards (population gap >= 0.02), with the key's own split-half rate ===
+  anchor           pair                                           gap  McNemar    est  keyhalf a     c_raw
+  Chemistry        arx_0314 vs iask_pro                        0.0219   0.3833     no      0.895    1.0000
+  History          Qwen1.5-72B-Chat vs deepseek-chat-v2_5      0.0336   0.6271     no      0.567    1.0000
+  History          arx_0314 vs gpt-4o-2024-08-06               0.0420   0.2266     no      0.818    0.9767
+  Law              Meta-Llama-3_1-70B- vs Qwen1.5-72B-Chat     0.1107   0.0018    yes      1.000    1.0000
+  Law              Meta-Llama-3_1-70B- vs deepseek-chat-v2_5   0.1070   0.0015    yes      1.000    1.0000
+  Law              arx_0314 vs gpt-4o-2024-08-06               0.1107   0.0001    yes      1.000    0.9867
+  Law              arx_0314 vs iask_pro                        0.0318   0.1214     no      0.825    1.0000
+  Other            gemini-3.1-pro_5-sh vs iask_pro             0.0683   0.0161    yes      1.000    1.0000
+
+=== REGISTERED CRITERIA ===
+  (1) PRIMARY, established called edges (n=712, wrong 4(4)): arena 0.9944 vs ceiling SB 0.9999 (raw 0.9997) ->
+      gap -0.55pp (SB, PRIMARY) / -0.54pp (raw half-support) / -0.55pp (sb on the rate) -> PASS
+  (2) ALL called edges (n=739, wrong 8(4)): arena 0.9892 vs ceiling SB 0.9971 (raw 0.9942) ->
+      gap -0.79pp (SB) / -0.50pp (raw) / -0.79pp (sb on the rate); registered prediction 3-5pp below -> FAIL (prediction not met)
+      label-noise share of the all-edge error as a number: 1 - ceiling SB = 0.29pp of key self-disagreement against
+      an arena error of 1.08pp on the same edges
+  (3) PER ANCHOR (established called, SB ceiling): at ceiling: Biology, Business, Chemistry, Computer science, Economics, Engineering, Health, History, Math, Other, Philosophy, Physics, Psychology
+      below by more than 2pp: Law
+      exactly ON the 2pp boundary (one wrong established call in 50; counted 'within' on the literal wording): Other
+      registered prediction 'below it on Law and History': FAIL (Law gap -5.56pp, History gap +0.00pp)
+
+  sensitivity, 920-edge population: established gap SB -0.55pp (arena 0.9944, ceiling 0.9999); all-edge gap SB -0.76pp (arena 0.9853, ceiling 0.9929)
+
+  CAVEAT ON THE INSTRUMENT (recorded, not used to change the registered test): the arena and the key are both
+  evaluated on the SAME full-anchor questions, so question-sampling noise is shared between them; a judge whose
+  verdicts reproduced the key per question would agree with it 100%, above any split-half 'ceiling'. The
+  split-half rate bounds agreement with an INDEPENDENT measurement of the same latent gap, not with a judge on
+  the same questions. An arena at or above the ceiling is therefore consistent with the judge line being
+  bounded by the key AND with the ceiling simply not being a bound; the test cannot separate these.
+  elapsed 0s

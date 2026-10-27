@@ -1,0 +1,30 @@
+=== (A) DATASET: do the frontier models differ on enough questions to be separable at all? ===
+key accuracy on the pool: gemini-3.1-p 0.913 | arx_0314 0.834 | iask_pro 0.817 | gpt-4o-2024- 0.750
+
+model A       model B        differ   A wins   B wins  win rate        SE   key gap / resolvable?
+gemini-3.1-pr arx_0314          398      333       65     0.837     0.019   +0.079  YES
+gemini-3.1-pr iask_pro          475      400       75     0.842     0.017   +0.096  YES
+gemini-3.1-pr gpt-4o-2024-0     680      615       65     0.904     0.011   +0.163  YES
+arx_0314      iask_pro          301      179      122     0.595     0.028   +0.017  YES
+arx_0314      gpt-4o-2024-0     502      392      110     0.781     0.018   +0.084  YES
+iask_pro      gpt-4o-2024-0     493      359      134     0.728     0.020   +0.067  YES
+
+  reading: 'differ' is the only evidence any judge can use on that pair; a win rate within 2 SE of
+  0.500 means the pool itself cannot separate the two models, whatever the judge does.
+
+=== (B) DILUTION: refit the top-4 board on DECIDABLE matches only ===
+  top-4 matches judged by both formats: 598 | of which key-decidable: 265 (44%)
+  pairwise   all matches     n= 598 | gemini-3.1-p > iask_pro > arx_0314 > gpt-4o-2024- (1 violations)
+  pairwise   decidable only  n= 265 | gemini-3.1-p > iask_pro > arx_0314 > gpt-4o-2024- (1 violations) | accuracy on these 0.721
+  pointwise  all matches     n= 598 | gemini-3.1-p > arx_0314 > iask_pro > gpt-4o-2024- (0 violations)
+  pointwise  decidable only  n= 265 | arx_0314 > gemini-3.1-p > iask_pro > gpt-4o-2024- (1 violations) | accuracy on these 0.649
+
+  key order: gemini-3.1-p > arx_0314 > iask_pro > gpt-4o-2024-
+
+=== MECHANISM: the 333 NON-decidable top-4 pairs, where the key says the two answers are equally (in)correct ===
+  pairwise   declares a winner on 172 of 333 (52%), ties on 48%
+     spurious net wins per model: iask_pro +34 (in 173), gemini-3.1-p +21 (in 158), gpt-4o-2024- -11 (in 153), arx_0314 -44 (in 182)
+     of those winners, the LONGER answer won 125/172 (73%)
+  pointwise  declares a winner on 103 of 333 (31%), ties on 69%
+     spurious net wins per model: gemini-3.1-p +18 (in 158), iask_pro +0 (in 173), gpt-4o-2024- -6 (in 153), arx_0314 -12 (in 182)
+     of those winners, the LONGER answer won 57/103 (55%)

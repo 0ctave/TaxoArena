@@ -1,0 +1,150 @@
+{
+ "id": "ROUTE-SOURCE-NULL",
+ "title": "ROUTE-SOURCE-NULL: AF-U's routing gain against a 6-cell source policy (D_S) and 200 random within-source cell sets at AF-U's per-source size profile (RWS) on the union routing data (zero calls; REGISTERED 2026-10-04)",
+ "question": "How much of U1's +1.52pp is beyond source identity?",
+ "kind": "zero-call",
+ "state": "UNDETERMINED",
+ "registration": {
+  "commit": "the commit that writes it (parent bd5ca001)",
+  "program_lines": "docs/judge_v2_program.md L24265-L24276",
+  "program_lines_as_of": "the commit that writes them, parent bd5ca001, re-grepped",
+  "date": "2026-10-04",
+  "provenance": "docs/literature/2026-10-04_testing_logic_review.md (bd5ca001) section 3; the author's Go (docs/agents/plans/2026-10-04_W1_W2_schedule.md (be8e54d3))"
+ },
+ "script": {
+  "path": "tools/analysis/route_source_null.py",
+  "sha16": "blob:9fc280effe0d1cc3ca6f32a01d9f175d80d0b2d6 (LF)",
+  "commit": "c9b982d9 (branch zero-call-route-readouts; merged b0525292)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_route_readouts.md",
+  "commit": "b0525292",
+  "blob": "54b99df4 (LF)",
+  "verdict": "READY under C1-C5"
+ },
+ "go": "the author's Go for zero-call windows (2026-10-04)",
+ "run": {
+  "outcome_file": "experiment_results/archv2/route_source_null/outcome.txt (write-once; never committed); backup E:/TaxoArena_backup_2026-10-04_route_trio/route_source_null/outcome.txt (SHA256SUMS.txt)",
+  "outcome_sha256": "2ae71b01f9bf4462bb286ab13f472359fe57da4a3f3ec5106b3339014fcd8575",
+  "outcome_commit": "run from main after 0e34eb56 (never committed)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "pv2_1575de61bb20e977 (B0-2 pool check rc 0; read-only views, sha256 before = after)",
+  "date": "2026-10-04",
+  "concurrency": "concurrency with GRANULARITY-GT (and another agent's tree_like --mutants): all zero-call CPU readers, no construction or site null (rule 7 not engaged); view sha256 before = after = pins; ruled non-affecting by the review"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_route_trio.md",
+  "commit": "b5ed5e96",
+  "blob": "a8e4f5fc (LF)",
+  "verdict": "VALID"
+ },
+ "criteria": [
+  {
+   "id": "RS1",
+   "text": "DECIDING: ABOVE-SOURCE iff D_S = G_AF - G_SRC has its 95% two-stage interval wholly > 0 AND G_AF > RWS p97.5; SOURCE-EXPLAINED iff G_AF inside the RWS central 95% band AND D_S's interval contains 0; UNDETERMINED otherwise. Verdict line: DESCRIPTIVE-ONLY for ABOVE-SOURCE at the prediction (DEFF 2.867 measured U2; SE 0.44pp; MDE80 1.23pp)",
+   "result": "UNDETERMINED",
+   "value": "D_S +0.51pp (+0.00508), two-stage 95% [-0.67, +1.68]; G_AF +1.52pp ABOVE RWS p97.5 +0.49pp (band [-0.80, +0.49], median -0.12, 200 draws); rule 8: ABOVE-SOURCE REFUTED; realised SE 0.599pp, DEFF 1.847, n_eff 3,198, MDE80 1.68pp",
+   "denominator": "5,907 EVAL items / 5,404 components (Kish 1.311); 200 RWS draws"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "G_SRC +1.2pp [+0.4, +2.0]; D_S +0.3pp [-0.6, +1.2] [C2: NOT SCORED (G_SRC +1.01pp, D_S +0.51pp seen pre-registration)]",
+   "result": "n/a",
+   "value": "NOT SCORED: C2 seen data (R-RS-P1); outcome file prints G_SRC +1.02pp, D_S +0.51pp 'HELD', not of record",
+   "denominator": "union EVAL 5,907 items / 5,404 components"
+  },
+  {
+   "id": "P2",
+   "text": "RS1: ABOVE-SOURCE 0.15, SOURCE-EXPLAINED 0.45, UNDETERMINED 0.40",
+   "result": "FAILED",
+   "value": "UNDETERMINED occurred (p 0.40; modal outcome SOURCE-EXPLAINED 0.45); Brier 0.5850; C2 disclosure",
+   "denominator": "union EVAL 5,907 items / 5,404 components"
+  },
+  {
+   "id": "P3",
+   "text": "median G_RWS +0.8pp [0.0, +1.6]",
+   "result": "FAILED",
+   "value": "median G_RWS -0.12pp outside [0.0, +1.6]",
+   "denominator": "200 RWS draws"
+  }
+ ],
+ "falsifier": {
+  "text": "F-RS fires iff RS1 SOURCE-EXPLAINED: '+1.52pp' rewritten as source identity; memo v3's SQ1 [LF] routing claim withdrawn.",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "D_S": "+0.51pp (+0.00508), two-stage 95% [-0.67, +1.68]; SE 0.599pp (registered 0.44pp), DEFF 1.847, n_eff 3,198, MDE80 1.68pp; 5,907 / 5,404",
+  "G_AF": "+1.52pp [+0.14, +2.91] (identity reproduced)",
+  "RWS_band": "p2.5 -0.80pp, median -0.12pp, p97.5 +0.49pp, max +0.66pp (200 draws; MC SE of p97.5 0.00058); profile 183 blocks, not the registered 123 (R-RWS); own-leaf variant p97.5 +0.643pp, max +0.863pp",
+  "G_SRC": "+1.02pp [-0.20, +2.23] (descriptive)",
+  "G_declared_minus_G_SRC": "+1.66pp [+0.71, +2.60] (descriptive; [DECL], cross)",
+  "C1_cross_source": "191 of 5,907 EVAL items filed to another source's leaf (MMLU_PRO 128, MATH 51, GPQA 12); acc AF 0.4450 vs SRC 0.4921 on them; without them D_S +0.682pp approx [-0.52, +1.88], UNDETERMINED unchanged",
+  "kish": "1.311 (Support (a)'s 1.09 is the plain mean; R-SUP)"
+ },
+ "sentence_of_record": "ROUTE-SOURCE-NULL (2026-10-04, 0 calls) — VALID; RS1 UNDETERMINED, F-RS not fired. On the content-closed v2 union split (5,907 EVAL items / 5,404 components), AF-U's [SC] cells route +0.51pp above a 6-cell source policy, two-stage 95% [-0.67, +1.68] (realised SE 0.60pp, 1.36x the registered 0.44pp; DEFF 1.85; MDE80 1.68pp), so ABOVE-SOURCE is refuted at this support; G_AF +1.52pp lies above the 97.5th percentile (+0.49pp) of 200 random within-source cell sets (profile 183 blocks, not the registered 123; the own-leaf variant leaves it above). P1 NOT SCORED (seen data).",
+ "chips": [
+  "REGISTERED 2026-10-04, BEFORE ANY CODE; not built",
+  "VALID (POST-RUN b5ed5e96): RS1 UNDETERMINED (D_S +0.51pp [&minus;0.67, +1.68]; G_AF ABOVE RWS p97.5); ABOVE-SOURCE REFUTED (RULE 8); F-RS NOT FIRED",
+  "P1 NOT SCORED (SEEN DATA); RWS 183 BLOCKS, NOT THE REGISTERED 123 (OWN-LEAF VARIANT UNCHANGED); SE 1.36&times; REGISTERED; [SC], NEVER LABEL-FREE"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-04",
+   "by": "registrar (pre-data; READY_route_readouts)",
+   "text": "C1 D-4 cross-source filing (223 / 6,139; favours SOURCE-EXPLAINED; post-run count on 5,907); C2 seen data (G_SRC +1.01pp, D_S +0.51pp, G_decl - G_SRC +1.66pp, G_K): P1 NOT SCORED, ABOVE-SOURCE needs SE <= 0.26pp; D3 _VOID untested."
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (POSTRUN b5ed5e96)",
+   "text": "outcome recorded; duties applied: R-RS-P1, R-KN-HEAD, R-KN-TS, R-KI1 (HIGH), R-RWS (183 vs 123 blocks), R-SUP (realised SE; Kish 1.311); concurrency with GRANULARITY-GT disclosed (non-affecting). docs/judge_v2_program.md L24457-L24470 (section \"## ROUTE-SOURCE-NULL (2026-10-04, 0 calls) — VALID (POSTRUN b5ed5e96) ...\"; _as_of the commit that writes it, parent 4572dbd4, re-grepped); OUTCOME brackets on the registration lines."
+  }
+ ],
+ "does_not_show": [
+  "that AF-U's cells route above source (interval contains 0)",
+  "that source explains the gain (G_AF above the RWS band)",
+  "a label-free gain ([SC] throughout)",
+  "other corpora, rosters or draws",
+  "judged decisions"
+ ],
+ "ledger": {
+  "row_id": "ROUTE-SOURCE-NULL",
+  "version": "v385 (2026-10-04: OUTCOME bracket, NULL + WARN chips) | v382 (2026-10-04: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "UNION-AF-ROUTE"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none (no judge, rubric, reference, frontier, temperature or LR)"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "minutes",
+  "agent_hours": "about 3 h",
+  "reads_pool": true
+ },
+ "outputs": "never committed: stored on E: with SHA256SUMS.txt; temp on E: via scratch_dir",
+ "sources": [
+  "docs/judge_v2_program.md L24265-L24276 (_as_of the commit that writes it, parent bd5ca001, re-grepped)",
+  "docs/literature/2026-10-04_testing_logic_review.md (bd5ca001)",
+  "docs/agents/plans/2026-10-04_W1_W2_schedule.md (be8e54d3)",
+  "docs/reviews/POSTRUN_route_trio.md (b5ed5e96; blob a8e4f5fc, LF)",
+  "docs/judge_v2_program.md L24457-L24470 (section \"## ROUTE-SOURCE-NULL (2026-10-04, 0 calls) — VALID (POSTRUN b5ed5e96) ...\"; _as_of the commit that writes it, parent 4572dbd4, re-grepped)",
+  "E:/TaxoArena_backup_2026-10-04_route_trio/SHA256SUMS.txt"
+ ],
+ "last_update": "2026-10-04",
+ "plain_description": {
+  "sq": "SQ1 Use",
+  "what": "On the combined clean pool, compares the routing gain of the anchor-free tree's cells with two baselines. One simply routes by dataset (6 cells). The other uses 200 random cell sets of the same sizes drawn inside each dataset.",
+  "why": "It asks how much of the tree's +1.5-point routing gain comes from just knowing which dataset a question came from.",
+  "information": "It separates gain from real structure from gain that only reflects the dataset label. Result: UNDETERMINED. The tree's cells beat dataset-only routing by +0.5 points, but the interval includes zero, so \"better than dataset routing\" is not shown at this sample size. The gain is above what random cells of the same size give, so the dataset alone does not explain it either. The cells are source-conditioned (they use the dataset label), so this is not a label-free gain.",
+  "written": "2026-10-07"
+ }
+}

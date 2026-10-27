@@ -1,0 +1,19 @@
+union tree mc6_s42: 147 leaves (dim 512) | 21606 of 21606 questions embedded and routed
+CLEAN: reserved side pinned to paeec37aa28063c75, 1946 of 6481 kept (30.0%)
+split: train 15125 / reserved 1946 | leaves with >= 20 train questions: 147 of 147 | anchors routed: 52
+routed anchor == designed (source/domain): 0.770 | routed source == true source: 0.901
+cross-source routing (true -> routed, top 6): [(('MMLU_PRO', 'MATH'), 93), (('MMLU_PRO', 'GPQA'), 39), (('GPQA', 'MMLU_PRO'), 21), (('MMLU_PRO', 'BBH'), 12), (('MATH', 'MMLU_PRO'), 9), (('IFEVAL', 'MMLU_PRO'), 8)]
+  best single                0.540 ± 0.012
+  routed by source           0.583 ± 0.010
+  routed by source/domain    0.593 ± 0.011
+  routed by taxonomy leaf    0.582 ± 0.011
+  oracle                     0.902 ± 0.006
+  leaf minus domain: -0.011 ± 0.007 -> not resolved (within 2 SE)
+
+per source: domain-routed vs leaf-routed on the reserved side
+  BBH          n=  540 | by domain 0.761 | by leaf 0.767 (+0.006) | leaves used 25
+  GPQA         n=  114 | by domain 0.386 | by leaf 0.333 (-0.053) | leaves used 22
+  IFEVAL       n=   55 | by domain 0.909 | by leaf 0.855 (-0.055) | leaves used 12
+  MATH         n=  116 | by domain 0.302 | by leaf 0.267 (-0.034) | leaves used 21
+  MMLU_PRO     n= 1048 | by domain 0.542 | by leaf 0.531 (-0.011) | leaves used 119
+  MUSR         n=   73 | by domain 0.630 | by leaf 0.630 (+0.000) | leaves used 3

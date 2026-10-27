@@ -1,0 +1,51 @@
+=== ESCALATE-LLAMA-LAW PILOT 12: J1-R (grok-4-1-fast-reasoning, cap 8192, temperature omitted) vs Mistral STACK-v2, proxy for the shipped grok recipe judge (JUDGE-SWAP p=1.0) on identical matches ===
+  pool p2dca21ab5f4ef3ae | cell-by anchor | judged 12 matches | comparator stack_v2_promptv2_x12all.db (Mistral STACK-v2, proxy for the shipped grok recipe judge (JUDGE-SWAP p=1.0))
+  rubric source: frozen tree 20260727_042523_Headless_Run_Auto_ge (reserved split p8a29d8f3ff75aa55): 168 of the run's 250 questions are on its train side, the comparator's bareq512 anchor rubric is clean; confound directional for J1-R, bounded +-2pp
+  producing script sha256 bf5258297c3ae7aac80153a00f280369136fa1e04d53cdd73b578d1fbccface6 | started 2026-09-16 01:52:47 | resumes 0 | report written 2026-09-16 01:53:41
+  coverage: 12 cached of 12 judgeable in the pilot scope (population 12, no reference for 0: match ids -) | missing 0
+  finish_reason over 24 calls: {'stop': 24} | mean completion tokens 254
+  guard [treatment]: key-decidable 2 | unparsed or non-terminated 0 + missing from cache 0 (0.0%) -> OK
+  guard [control]: key-decidable 1 | unparsed or non-terminated 0 + missing from cache 0 (0.0%) -> OK
+  guard [pooled]: key-decidable 3 | unparsed or non-terminated 0 + missing from cache 0 (0.0%) -> OK
+  TREATMENT: 2 paired key-decidable matches | J1-R ties 0.000 | STACK-v2 ties 0.000 | NOTE key-decidable n=2 differs from the registered n=85; the registered threshold still decides
+      A (ties wrong   ) n=  2 | J1-R 1.000 vs STACK-v2 1.000 (+0.000) | 0:0 McNemar p=1.0000 | MDE: DECIDING 0.136 (registered) | a priori d=0.20 at this n 0.886 | observed d=0.00 -> nan (non-deciding)
+      B (ties excluded) n=  2 | J1-R 1.000 vs STACK-v2 1.000 (+0.000) | 0:0 McNemar p=1.0000 | MDE: DECIDING 0.136 (registered) | a priori d=0.20 at this n 0.886 | observed d=0.00 -> nan (non-deciding)
+      stratum clean (in p8a29d8f3ff75aa55):    0 key-decidable, 0 paired
+          A (ties wrong): n=0
+          B (ties excluded): n=0
+      stratum train-side of the frozen tree:   2 key-decidable, 2 paired
+          A (ties wrong   ) n=  2 | J1-R 1.000 vs STACK-v2 1.000 (+0.000) | 0:0 McNemar p=1.0000 | MDE: a priori d=0.20 at this n 0.886 | observed d=0.00 -> nan (non-deciding)
+          B (ties excluded) n=  2 | J1-R 1.000 vs STACK-v2 1.000 (+0.000) | 0:0 McNemar p=1.0000 | MDE: a priori d=0.20 at this n 0.886 | observed d=0.00 -> nan (non-deciding)
+  CONTROL: 1 paired key-decidable matches | J1-R ties 0.000 | STACK-v2 ties 1.000 | NOTE key-decidable n=1 differs from the registered n=80; the registered threshold still decides
+      A (ties wrong   ) n=  1 | J1-R 0.000 vs STACK-v2 0.000 (+0.000) | 0:0 McNemar p=1.0000 | MDE: DECIDING 0.140 (registered) | a priori d=0.20 at this n 1.253 | observed d=0.00 -> nan (non-deciding)
+      B (ties excluded): n=0
+      stratum clean (in p8a29d8f3ff75aa55):    0 key-decidable, 0 paired
+          A (ties wrong): n=0
+          B (ties excluded): n=0
+      stratum train-side of the frozen tree:   1 key-decidable, 1 paired
+          A (ties wrong   ) n=  1 | J1-R 0.000 vs STACK-v2 0.000 (+0.000) | 0:0 McNemar p=1.0000 | MDE: a priori d=0.20 at this n 1.253 | observed d=0.00 -> nan (non-deciding)
+          B (ties excluded): n=0
+  POOLED: 3 paired key-decidable matches | J1-R ties 0.000 | STACK-v2 ties 0.333
+      A (ties wrong   ) n=  3 | J1-R 0.667 vs STACK-v2 0.667 (+0.000) | 0:0 McNemar p=1.0000 | MDE: a priori d=0.20 at this n 0.723 | observed d=0.00 -> nan (non-deciding)
+      B (ties excluded) n=  2 | J1-R 1.000 vs STACK-v2 1.000 (+0.000) | 0:0 McNemar p=1.0000 | MDE: a priori d=0.20 at this n 0.886 | observed d=0.00 -> nan (non-deciding)
+      stratum clean (in p8a29d8f3ff75aa55):    0 key-decidable, 0 paired
+          A (ties wrong): n=0
+          B (ties excluded): n=0
+      stratum train-side of the frozen tree:   3 key-decidable, 3 paired
+          A (ties wrong   ) n=  3 | J1-R 0.667 vs STACK-v2 0.667 (+0.000) | 0:0 McNemar p=1.0000 | MDE: a priori d=0.20 at this n 0.723 | observed d=0.00 -> nan (non-deciding)
+          B (ties excluded) n=  2 | J1-R 1.000 vs STACK-v2 1.000 (+0.000) | 0:0 McNemar p=1.0000 | MDE: a priori d=0.20 at this n 0.886 | observed d=0.00 -> nan (non-deciding)
+  conv A: treatment gain +0.000 > deciding MDE 0.136 (observed-d MDE nan, non-deciding)        FAIL
+  conv A: control shows no significant fall (+0.000, p=1.000; deciding MDE 0.140)              OK
+  conv B: treatment gain +0.000 > deciding MDE 0.136 (observed-d MDE nan, non-deciding)        FAIL
+  conv B: control shows no significant fall (+nan, p=nan; deciding MDE 0.140)                  OK
+  INCOMPLETE: no registered verdict (pilot of 12 matches; the criterion would currently read FAIL, not of record).
+  secondary [treatment] J1-R vs grok recipe (stack_v2_promptv2_grok.db), 0 paired matches, UNDERPOWERED (non-deciding):
+      A (ties wrong): n=0
+      B (ties excluded): n=0
+  secondary [control] J1-R vs grok recipe (stack_v2_promptv2_grok.db), 0 paired matches, UNDERPOWERED (non-deciding):
+      A (ties wrong): n=0
+      B (ties excluded): n=0
+  secondary [pooled] J1-R vs grok recipe (stack_v2_promptv2_grok.db), 0 paired matches, UNDERPOWERED (non-deciding):
+      A (ties wrong): n=0
+      B (ties excluded): n=0
+  side readout: 2 matches also in the ledger's J1-R cache | verdict agreement 1.000 (J1-R test-retest, same prompts)

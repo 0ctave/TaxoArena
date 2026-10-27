@@ -1,0 +1,426 @@
+reserved_pool_id=p2dca21ab5f4ef3ae
+  tree bareq512_s42 snapshot 20260909_212117_Headless_Run_Auto_ge | 158 nodes, 87 leaves, 3445 routed pool questions, 14 anchors
+  cache MISTRAL-X12  experiment_results\x12_crossdomain\stack_v2_promptv2_x12all.db | 9142 rows (pinned 9142) | INVALID 0 | finish columns no | rule-10 reclassified 0
+  cache X20          experiment_results\x12_crossdomain\stack_v2_promptv2_x20.db | 12394 rows (pinned 12394) | INVALID 0 | finish columns no | rule-10 reclassified 0
+  cache GROK-CALIB   experiment_results\x12_crossdomain\grok_calib.db | 9142 rows (pinned 9142) | INVALID 12 | finish columns yes | rule-10 reclassified 1
+  cache KOTLIN       experiment_results\judge_wiring\board\kotlin_c0d3f708cbc3930e.db | 9123 rows (pinned 9123) | INVALID 17 | finish columns yes | rule-10 reclassified 0
+  judged questions: x12 2811 | x20 2646 (not in x12: 0) | grok 2811 (delta x12: 0) | kotlin 2801 (delta x12: 0); matches kotlin not in x12: 0
+  anchor column check MISTRAL-X12  0 rows disagree with anchor_fn(route[qid]) on bareq512_s42
+  anchor column check X20          0 rows disagree with anchor_fn(route[qid]) on bareq512_s42
+  anchor column check GROK-CALIB   0 rows disagree with anchor_fn(route[qid]) on bareq512_s42
+  anchor column check KOTLIN       0 rows disagree with anchor_fn(route[qid]) on bareq512_s42
+  difficulty instrument: keyed roster 46 models (Meta-Llama-3-70B-Instruct excluded; 20 contestants on the merged board, 26 outside models for the secondary instrument) | per-question denominator min 44 / median 46 / max 46 over 2811 judged questions | 0 judged questions without any key row
+  OPTIONS-key join eval_results -> mmlu_pro on the 2811 judged questions: 1:1 2688 | multi 3 | none 120 | gt_answer == mmlu_pro.answer on 2681 of 2688 matched
+=== TOPIC-DIFFICULTY readout (zero judge calls) | tree bareq512_s42 | pool p2dca21ab5f4ef3ae | B 300 | perms 200 | certificate 0.975 raw | 2026-09-17 19:41 ===
+  conventions: A = ties / INVALID / non-terminated wrong on key-decidable; B = committed verdicts only; wrong(established) by exact McNemar on the stratum's judged questions;
+  power rule: nominal < 3 -> UNDETERMINED; a stratum under 20 key-decidable matches prints counts and no rate.
+
+--- arm MISTRAL-X12 (9142 verdicts, 12 models) ---
+  cell                                     terc   nq    nm  ndec | accA   accB  | tie_dec tie_all inv | ref%  accA|ref+ accA|ref- | beta_len (se)   n    | called wrong(est) nominal status
+  Biology                                  easy   61   162    21 |  100.0  100.0 |    0.0   14.8    0.0 |  100.0  100.0    n/a | +1.807 (0.471)   138 |  36   2(0)   0.08 UNDETERMINED (nominal < 3)
+  Biology                                  mid    60   249   126 |   96.0   99.2 |    3.2   13.7    0.0 |  100.0   96.0    n/a | +0.659 (0.209)   215 |  49   0(0)   0.13 UNDETERMINED (nominal < 3)
+  Biology                                  hard   60   275   151 |   80.8   86.5 |    6.6   20.4    0.0 |   80.8   91.0   37.9 | -0.021 (0.092)   219 |  47   1(0)   0.06 UNDETERMINED (nominal < 3)
+  Biology                                  all   181   686   298 |   88.6   93.0 |    4.7   16.6    0.0 |   90.3   94.1   37.9 | +0.165 (0.074)   572 | (whole cell, for reference)
+  Business                                 easy   58    82    35 |   94.3   94.3 |    0.0   26.8    0.0 |  100.0   94.3    n/a | -0.175 (0.862)    60 |  36   0(0)   0.15 UNDETERMINED (nominal < 3)
+  Business                                 mid    58   105    56 |   87.5   96.1 |    8.9   29.5    0.0 |   91.1   94.1    n/a | +2.763 (1.191)    74 |  39   1(0)   0.14 UNDETERMINED (nominal < 3)
+  Business                                 hard   58   108    66 |   89.4   95.2 |    6.1   22.2    0.0 |   93.9   90.3    n/a | -0.144 (0.572)    84 |  34   1(0)   0.08 UNDETERMINED (nominal < 3)
+  Business                                 all   174   295   157 |   89.8   95.3 |    5.7   26.1    0.0 |   94.3   92.6    n/a | +0.452 (0.386)   218 | (whole cell, for reference)
+  Chemistry                                easy   90   275   134 |   95.5   99.2 |    3.7   26.2    0.0 |   99.3   95.5    n/a | -0.183 (0.181)   203 |  50   0(0)   0.10 UNDETERMINED (nominal < 3)
+  Chemistry                                mid    90   232   132 |   90.9   95.2 |    4.5   20.3    0.0 |   98.5   92.3    n/a | +0.230 (0.165)   185 |  52   3(1)   0.11 UNDETERMINED (nominal < 3)
+  Chemistry                                hard   89   246   121 |   75.2   85.0 |   11.6   20.7    0.0 |   78.5   86.3   34.6 | +0.285 (0.109)   195 |  47   2(0)   0.05 UNDETERMINED (nominal < 3)
+  Chemistry                                all   269   753   387 |   87.6   93.6 |    6.5   22.6    0.0 |   92.5   91.9   34.5 | +0.174 (0.079)   583 | (whole cell, for reference)
+  Computer science                         easy   54   159    66 |   97.0   98.5 |    1.5   18.9    0.0 |   97.0   98.4    n/a | +0.494 (0.190)   129 |  39   0(0)   0.10 UNDETERMINED (nominal < 3)
+  Computer science                         mid    54   223   119 |   84.9   92.7 |    8.4   17.9    0.0 |   91.6   89.0    n/a | +0.224 (0.148)   183 |  46   1(0)   0.06 UNDETERMINED (nominal < 3)
+  Computer science                         hard   54   244   117 |   75.2   88.9 |   15.4   23.4    0.0 |   78.6   89.1   24.0 | +0.102 (0.101)   187 |  47   0(0)   0.09 UNDETERMINED (nominal < 3)
+  Computer science                         all   162   626   302 |   83.8   92.7 |    9.6   20.3    0.0 |   87.7   91.3   29.7 | +0.180 (0.079)   499 | (whole cell, for reference)
+  Economics                                easy   60   136    26 |  100.0  100.0 |    0.0   27.9    0.0 |  100.0  100.0    n/a | +0.558 (0.319)    98 |  37   2(0)   0.12 UNDETERMINED (nominal < 3)
+  Economics                                mid    59   186   102 |   96.1   99.0 |    2.9   17.7    0.0 |   98.0   97.0    n/a | +3.288 (1.085)   153 |  48   1(0)   0.06 UNDETERMINED (nominal < 3)
+  Economics                                hard   59   261   167 |   87.4   93.0 |    6.0   19.5    0.0 |   86.2   96.5   30.4 | +0.704 (0.297)   210 |  45   0(0)   0.14 UNDETERMINED (nominal < 3)
+  Economics                                all   178   583   295 |   91.5   95.7 |    4.4   20.9    0.0 |   91.5   97.0   32.0 | +0.869 (0.230)   461 | (whole cell, for reference)
+  Engineering                              easy   54   142    72 |   84.7   92.4 |    8.3   21.8    0.0 |   95.8   88.4    n/a | -0.002 (0.128)   111 |  40   1(0)   0.08 UNDETERMINED (nominal < 3)
+  Engineering                              mid    54   153    84 |   82.1   92.0 |   10.7   26.8    0.0 |   85.7   90.3    n/a | +0.193 (0.149)   112 |  46   0(0)   0.17 UNDETERMINED (nominal < 3)
+  Engineering                              hard   54   104    36 |   58.3   80.8 |   27.8   34.6    0.0 |   47.2    n/a    n/a | +0.405 (0.176)    68 |  29   1(0)   0.15 UNDETERMINED (nominal < 3)
+  Engineering                              all   162   399   192 |   78.6   90.4 |   13.0   27.1    0.0 |   82.3   88.6   32.4 | +0.145 (0.082)   291 | (whole cell, for reference)
+  Health                                   easy   43   149    40 |   87.5   89.7 |    2.5   18.1    0.0 |   95.0   92.1    n/a | +0.402 (0.178)   122 |  42   0(0)   0.04 UNDETERMINED (nominal < 3)
+  Health                                   mid    43   158    82 |   95.1   96.3 |    1.2   12.7    0.0 |   96.2   98.7    n/a | +0.508 (0.178)   138 |  41   0(0)   0.06 UNDETERMINED (nominal < 3)
+  Health                                   hard   43   203    94 |   70.2   81.5 |   13.8   26.6    0.0 |   63.8   91.7   32.4 | +0.737 (0.334)   149 |  47   0(0)   0.07 UNDETERMINED (nominal < 3)
+  Health                                   all   129   510   216 |   82.9   89.1 |    6.9   19.8    0.0 |   81.8   94.9   28.2 | +0.385 (0.095)   409 | (whole cell, for reference)
+  History                                  easy   40   105    28 |   96.4   96.4 |    0.0   22.9    0.0 |  100.0   96.4    n/a | +2.351 (0.839)    81 |  30   0(0)   0.09 UNDETERMINED (nominal < 3)
+  History                                  mid    40   127    84 |   69.0   82.9 |   16.7   18.9    0.0 |   73.2   88.3   22.7 | +1.412 (0.497)   103 |  37   0(0)   0.04 UNDETERMINED (nominal < 3)
+  History                                  hard   39   150    78 |   57.7   62.5 |    7.7   12.7    0.0 |   48.7   97.3   17.9 | +1.044 (0.341)   131 |  36   2(0)   0.09 UNDETERMINED (nominal < 3)
+  History                                  all   119   382   190 |   68.4   76.5 |   10.5   17.5    0.0 |   67.2   92.8   19.7 | +1.363 (0.258)   315 | (whole cell, for reference)
+  Law                                      easy   91   182   109 |   92.7   95.3 |    2.8   11.5    0.0 |   95.3   94.1    n/a | +0.208 (0.283)   161 |  47   0(0)   0.07 UNDETERMINED (nominal < 3)
+  Law                                      mid    90   206   133 |   78.2   84.6 |    7.5   15.0    0.0 |   86.2   89.3    n/a | +1.598 (0.408)   175 |  46   0(0)   0.12 UNDETERMINED (nominal < 3)
+  Law                                      hard   90   213    77 |   74.0   87.7 |   15.6   16.9    0.0 |   58.4   95.6   43.8 | +1.350 (0.329)   177 |  43   7(1)   0.14 UNDETERMINED (nominal < 3)
+  Law                                      all   271   601   319 |   82.1   89.1 |    7.8   14.6    0.0 |   82.5   92.3   34.5 | +0.836 (0.186)   513 | (whole cell, for reference)
+  Math                                     easy  102   367   161 |   96.3   98.7 |    2.5   33.8    0.0 |  100.0   96.3    n/a | +0.183 (0.189)   243 |  52   0(0)   0.06 UNDETERMINED (nominal < 3)
+  Math                                     mid   101   409   241 |   91.7   96.9 |    5.4   24.4    0.0 |   97.5   92.8    n/a | +0.131 (0.142)   309 |  50   0(0)   0.03 UNDETERMINED (nominal < 3)
+  Math                                     hard  101   453   254 |   87.8   93.7 |    6.3   22.1    0.0 |   90.6   95.2   16.7 | +0.264 (0.099)   353 |  50   0(0)   0.06 UNDETERMINED (nominal < 3)
+  Math                                     all   304  1229   656 |   91.3   96.1 |    5.0   26.4    0.0 |   95.4   94.6   23.3 | +0.190 (0.069)   905 | (whole cell, for reference)
+  Other                                    easy   71   216    53 |   96.2  100.0 |    3.8   27.3    0.0 |  100.0   96.2    n/a | +6.765 (1.639)   157 |  42   4(0)   0.13 UNDETERMINED (nominal < 3)
+  Other                                    mid    70   257   159 |   89.3   96.6 |    7.5   15.2    0.0 |   91.8   92.5    n/a | +0.363 (0.154)   218 |  48   1(0)   0.10 UNDETERMINED (nominal < 3)
+  Other                                    hard   70   308   151 |   74.8   80.1 |    6.6   19.5    0.0 |   62.9   94.7   41.1 | +1.082 (0.260)   248 |  38   1(0)   0.10 UNDETERMINED (nominal < 3)
+  Other                                    all   211   781   363 |   84.3   90.3 |    6.6   20.2    0.0 |   81.0   93.9   43.5 | +1.098 (0.199)   623 | (whole cell, for reference)
+  Philosophy                               easy   44    95    34 |   94.1   97.0 |    2.9   20.0    0.0 |   97.0   96.9    n/a | +3.395 (1.029)    76 |  36   0(0)   0.14 UNDETERMINED (nominal < 3)
+  Philosophy                               mid    44   114    80 |   83.8   94.4 |   11.2   17.5    0.0 |   85.0   91.2    n/a | +4.419 (1.329)    94 |  36   0(0)   0.07 UNDETERMINED (nominal < 3)
+  Philosophy                               hard   44   133    63 |   66.7   84.0 |   20.6   26.3    0.0 |   63.5   82.5   39.1 | +2.243 (0.681)    98 |  33   0(0)   0.06 UNDETERMINED (nominal < 3)
+  Philosophy                               all   132   342   177 |   79.7   91.6 |   13.0   21.6    0.0 |   79.5   90.0   38.9 | +2.974 (0.495)   268 | (whole cell, for reference)
+  Physics                                  easy   87   307   142 |   91.5   96.3 |    4.9   23.1    0.0 |   98.6   92.9    n/a | +1.524 (0.500)   236 |  52   1(0)   0.05 UNDETERMINED (nominal < 3)
+  Physics                                  mid    86   438   246 |   89.4   95.2 |    6.1   20.3    0.0 |   98.4   90.1    n/a | +0.321 (0.123)   349 |  55   0(0)   0.06 UNDETERMINED (nominal < 3)
+  Physics                                  hard   86   404   213 |   79.3   87.1 |    8.9   17.1    0.0 |   88.7   83.6   45.8 | +0.147 (0.085)   335 |  52   0(0)   0.06 UNDETERMINED (nominal < 3)
+  Physics                                  all   259  1149   601 |   86.4   92.7 |    6.8   19.9    0.0 |   95.0   88.6   43.3 | +0.269 (0.071)   920 | (whole cell, for reference)
+  Psychology                               easy   87   208    34 |   97.1  100.0 |    2.9   26.0    0.0 |  100.0   97.1    n/a | +3.832 (1.003)   154 |  42   2(0)   0.04 UNDETERMINED (nominal < 3)
+  Psychology                               mid    87   256   146 |   92.5   96.4 |    4.1   12.1    0.0 |   91.1   95.5    n/a | +3.444 (0.764)   225 |  49   0(0)   0.09 UNDETERMINED (nominal < 3)
+  Psychology                               hard   86   342   174 |   67.8   77.1 |   12.1   19.6    0.0 |   60.9   93.4   27.9 | +0.723 (0.221)   275 |  41   0(0)   0.12 UNDETERMINED (nominal < 3)
+  Psychology                               all   260   806   354 |   80.8   87.7 |    7.9   18.9    0.0 |   77.1   94.9   33.3 | +1.381 (0.201)   654 | (whole cell, for reference)
+  POOLED over the 14 anchors (each question's tercile within its own anchor):
+    easy nq  942 nm  2585 ndec   955 | accA   93.9 accB   97.1 | tie_dec    3.2 tie_all   23.8 inv    0.0 | ref%   98.3 accA|ref+   95.0 accA|ref-    n/a | beta_len +0.415 (0.063) n 1969
+    mid  nq  936 nm  3113 ndec  1790 | accA   88.4 accB   94.6 | tie_dec    6.5 tie_all   18.6 inv    0.0 | ref%   93.2 accA|ref+   92.5 accA|ref-   34.4 | beta_len +0.404 (0.049) n 2533
+    hard nq  933 nm  3444 ndec  1762 | accA   77.2 accB   85.8 | tie_dec   10.0 tie_all   20.8 inv    0.0 | ref%   75.8 accA|ref+   91.2 accA|ref-   33.1 | beta_len +0.249 (0.036) n 2729
+    CONTRAST hard - easy, accuracy A (key-decidable): easy 0.939 (n 955) hard 0.772 (n 1762) diff -16.7pp, question-clustered bootstrap 95% [-20.2, -13.7]pp
+    CONTRAST hard - easy, tie rate (key-decidable): easy 0.032 (n 955) hard 0.100 (n 1762) diff +6.7pp, question-clustered bootstrap 95% [+4.6, +8.5]pp
+    CONTRAST beta_len hard - easy: +0.2485 - +0.4149 = -0.1664 per 1k chars, z -2.30 (independent strata)
+  ORDER per anchor: Spearman(easy, hard) [question-bootstrap 95%] | within-cell permutation null p5 / p50 (n) p | key's own rho(easy, hard) | rho(judge, key) easy/mid/hard | rho(e,m) rho(m,h)
+    Biology           rho +0.916 [+0.766, +0.965] (12 models) | null p5 +0.867 p50 +0.944 (200) p 0.313 within | key +0.821 | j-k +0.814 / +0.989 / +0.944 | +0.881 +0.958
+    Business          rho +0.587 [+0.273, +0.790] (12 models) | null p5 +0.720 p50 +0.867 (200) p 0.010 BELOW | key +0.802 | j-k +0.942 / +0.898 / +0.662 | +0.874 +0.727
+    Chemistry         rho +0.937 [+0.811, +0.972] (12 models) | null p5 +0.916 p50 +0.958 (200) p 0.209 within | key +0.935 | j-k +0.951 / +0.900 / +0.932 | +0.951 +0.951
+    Computer science  rho +0.888 [+0.713, +0.923] (12 models) | null p5 +0.860 p50 +0.916 (200) p 0.239 within | key +0.929 | j-k +0.922 / +0.930 / +0.972 | +0.944 +0.916
+    Economics         rho +0.909 [+0.703, +0.941] (12 models) | null p5 +0.818 p50 +0.909 (200) p 0.537 within | key +0.864 | j-k +0.842 / +0.970 / +0.960 | +0.895 +0.846
+    Engineering       rho +0.916 [+0.685, +0.955] (12 models) | null p5 +0.811 p50 +0.923 (200) p 0.473 within | key +0.812 | j-k +0.937 / +0.918 / +0.790 | +0.902 +0.881
+    Health            rho +0.727 [+0.538, +0.839] (12 models) | null p5 +0.797 p50 +0.902 (200) p 0.015 BELOW | key +0.866 | j-k +0.820 / +0.891 / +0.942 | +0.860 +0.839
+    History           rho +0.846 [+0.611, +0.948] (12 models) | null p5 +0.818 p50 +0.909 (200) p 0.124 within | key +0.875 | j-k +0.847 / +0.882 / +0.751 | +0.909 +0.895
+    Law               rho +0.937 [+0.752, +0.962] (12 models) | null p5 +0.873 p50 +0.951 (200) p 0.408 within | key +0.626 | j-k +0.956 / +0.921 / +0.586 | +0.944 +0.979
+    Math              rho +0.958 [+0.867, +0.986] (12 models) | null p5 +0.937 p50 +0.972 (200) p 0.318 within | key +0.954 | j-k +0.947 / +0.965 / +0.965 | +0.986 +0.979
+    Other             rho +0.944 [+0.671, +0.944] (12 models) | null p5 +0.832 p50 +0.923 (200) p 0.736 within | key +0.686 | j-k +0.832 / +0.960 / +0.886 | +0.930 +0.944
+    Philosophy        rho +0.881 [+0.675, +0.930] (12 models) | null p5 +0.692 p50 +0.825 (200) p 0.771 within | key +0.761 | j-k +0.876 / +0.839 / +0.908 | +0.825 +0.825
+    Physics           rho +0.951 [+0.828, +0.972] (12 models) | null p5 +0.944 p50 +0.979 (200) p 0.080 within | key +0.942 | j-k +0.951 / +0.960 / +0.946 | +0.958 +0.972
+    Psychology        rho +0.783 [+0.647, +0.909] (12 models) | null p5 +0.825 p50 +0.916 (200) p 0.015 BELOW | key +0.735 | j-k +0.788 / +0.925 / +0.926 | +0.839 +0.909
+    summary: 3 of 14 anchors BELOW the permutation null's p5 | median rho(easy, hard) judge +0.913, key +0.843
+
+--- arm MISTRAL-MERGED (21536 verdicts, 20 models) ---
+  cell                                     terc   nq    nm  ndec | accA   accB  | tie_dec tie_all inv | ref%  accA|ref+ accA|ref- | beta_len (se)   n    | called wrong(est) nominal status
+  Biology                                  easy   61   454    44 |  100.0  100.0 |    0.0   19.4    0.0 |  100.0  100.0    n/a | +2.212 (0.265)   366 |  99   3(0)   0.15 UNDETERMINED (nominal < 3)
+  Biology                                  mid    60   583   270 |   95.9   99.2 |    3.3   14.4    0.0 |  100.0   95.9    n/a | +1.156 (0.222)   499 | 133   1(0)   0.25 UNDETERMINED (nominal < 3)
+  Biology                                  hard   60   568   259 |   82.2   88.8 |    7.3   19.5    0.0 |   85.7   90.1   35.1 | +0.152 (0.068)   457 | 137   3(0)   0.23 UNDETERMINED (nominal < 3)
+  Biology                                  all   181  1605   573 |   90.1   94.7 |    4.9   17.6    0.0 |   93.5   93.8   35.1 | +0.515 (0.067)  1322 | (whole cell, for reference)
+  Business                                 easy   58   216    71 |   90.1   94.1 |    4.2   28.7    0.0 |  100.0   90.1    n/a | +1.707 (0.463)   154 | 117   5(0)   0.27 UNDETERMINED (nominal < 3)
+  Business                                 mid    58   255   130 |   93.1   98.4 |    5.4   28.6    0.0 |   93.8   96.7    n/a | +1.588 (0.631)   182 | 115   0(0)   0.21 UNDETERMINED (nominal < 3)
+  Business                                 hard   58   224   112 |   90.2   97.1 |    7.1   25.0    0.0 |   95.5   90.7    n/a | +0.213 (0.226)   168 | 100   1(0)   0.24 UNDETERMINED (nominal < 3)
+  Business                                 all   174   695   313 |   91.4   96.9 |    5.8   27.5    0.0 |   95.8   93.0    n/a | +0.883 (0.247)   504 | (whole cell, for reference)
+  Chemistry                                easy   90   687   302 |   96.4   99.7 |    3.3   25.5    0.0 |   99.7   96.3    n/a | +0.421 (0.183)   512 | 140   0(0)   0.18 UNDETERMINED (nominal < 3)
+  Chemistry                                mid    90   554   287 |   91.6   96.7 |    5.2   21.3    0.0 |   98.6   92.6    n/a | +0.075 (0.092)   436 | 142   3(1)   0.17 UNDETERMINED (nominal < 3)
+  Chemistry                                hard   89   513   211 |   75.4   88.8 |   15.2   24.4    0.0 |   77.7   83.5   46.8 | +0.350 (0.092)   388 | 132   5(0)   0.18 UNDETERMINED (nominal < 3)
+  Chemistry                                all   269  1754   800 |   89.1   96.0 |    7.1   23.8    0.0 |   93.5   92.1   46.2 | +0.253 (0.061)  1336 | (whole cell, for reference)
+  Computer science                         easy   54   421   125 |   95.2   97.5 |    2.4   21.1    0.0 |   96.0   95.8    n/a | +1.608 (0.284)   332 | 125   4(0)   0.21 UNDETERMINED (nominal < 3)
+  Computer science                         mid    54   533   271 |   87.5   93.3 |    6.3   19.1    0.0 |   95.2   89.9    n/a | +0.429 (0.100)   431 | 134   1(0)   0.17 UNDETERMINED (nominal < 3)
+  Computer science                         hard   54   536   209 |   77.0   89.4 |   13.9   24.1    0.0 |   80.4   88.7   29.3 | +0.190 (0.074)   407 | 126   8(0)   0.22 UNDETERMINED (nominal < 3)
+  Computer science                         all   162  1490   605 |   85.5   93.0 |    8.1   21.5    0.0 |   90.2   90.8   35.6 | +0.392 (0.060)  1170 | (whole cell, for reference)
+  Economics                                easy   60   403    66 |   95.5   98.4 |    3.0   24.8    0.0 |  100.0   95.5    n/a | +1.616 (0.237)   303 | 106   5(0)   0.13 UNDETERMINED (nominal < 3)
+  Economics                                mid    59   459   204 |   96.6   99.5 |    2.9   19.2    0.0 |   98.5   97.0    n/a | +2.526 (0.377)   371 | 137   3(0)   0.20 UNDETERMINED (nominal < 3)
+  Economics                                hard   59   532   282 |   87.6   93.6 |    6.4   22.6    0.0 |   89.4   94.4   30.0 | +1.224 (0.223)   412 | 131   1(0)   0.20 UNDETERMINED (nominal < 3)
+  Economics                                all   178  1394   552 |   91.8   96.4 |    4.7   22.1    0.0 |   94.0   95.6   33.3 | +1.656 (0.147)  1086 | (whole cell, for reference)
+  Engineering                              easy   54   361   144 |   88.9   93.4 |    4.9   23.0    0.0 |   96.5   92.1    n/a | +0.240 (0.111)   278 | 120   4(0)   0.24 UNDETERMINED (nominal < 3)
+  Engineering                              mid    54   342   176 |   82.4   91.2 |    9.7   25.1    0.0 |   84.7   91.3   33.3 | +0.514 (0.148)   256 | 134   0(0)   0.28 UNDETERMINED (nominal < 3)
+  Engineering                              hard   54   233    63 |   63.5   76.9 |   17.5   30.0    0.0 |   47.6   86.7   42.4 | +0.718 (0.189)   163 |  83   3(0)   0.42 UNDETERMINED (nominal < 3)
+  Engineering                              all   162   936   383 |   81.7   89.9 |    9.1   25.5    0.0 |   83.0   91.2   35.4 | +0.482 (0.093)   697 | (whole cell, for reference)
+  Health                                   easy   43   376    77 |   87.0   91.8 |    5.2   21.3    0.0 |   94.8   91.8    n/a | +0.979 (0.208)   296 | 110   3(0)   0.18 UNDETERMINED (nominal < 3)
+  Health                                   mid    43   373   175 |   94.3   95.4 |    1.1   15.8    0.0 |   95.3   98.8    n/a | +0.732 (0.144)   314 | 124   3(0)   0.30 UNDETERMINED (nominal < 3)
+  Health                                   hard   43   461   192 |   75.0   84.2 |   10.9   24.1    0.0 |   64.6   94.4   39.7 | +1.813 (0.238)   350 | 125   2(0)   0.36 UNDETERMINED (nominal < 3)
+  Health                                   all   129  1210   444 |   84.7   90.2 |    6.1   20.7    0.0 |   81.9   95.8   33.8 | +1.132 (0.124)   960 | (whole cell, for reference)
+  History                                  easy   40   293    64 |   95.3   98.4 |    3.1   22.2    0.0 |  100.0   95.3    n/a | +4.306 (0.685)   228 | 110   5(0)   0.18 UNDETERMINED (nominal < 3)
+  History                                  mid    40   302   162 |   76.5   86.7 |   11.7   18.5    0.0 |   77.4   91.9   30.6 | +2.347 (0.350)   246 | 119   2(0)   0.22 UNDETERMINED (nominal < 3)
+  History                                  hard   39   305   124 |   62.9   69.0 |    8.9   15.4    0.0 |   54.9   95.5   21.8 | +1.689 (0.276)   258 | 113   7(0)   0.28 UNDETERMINED (nominal < 3)
+  History                                  all   119   900   350 |   75.1   82.7 |    9.1   18.7    0.0 |   73.6   93.7   25.3 | +2.274 (0.199)   732 | (whole cell, for reference)
+  Law                                      easy   91   469   206 |   92.2   96.0 |    3.9   15.4    0.0 |   96.5   93.8    n/a | +1.430 (0.226)   397 | 133   2(1)   0.16 UNDETERMINED (nominal < 3)
+  Law                                      mid    90   486   262 |   82.4   89.3 |    7.6   19.5    0.0 |   88.0   90.7   22.6 | +1.274 (0.206)   391 | 137   8(1)   0.18 UNDETERMINED (nominal < 3)
+  Law                                      hard   90   470   131 |   75.6   86.1 |   12.2   19.1    0.0 |   59.5   93.6   49.1 | +1.284 (0.174)   380 | 124  25(3)   0.16 UNDETERMINED (nominal < 3)
+  Law                                      all   271  1425   599 |   84.3   91.0 |    7.3   18.0    0.0 |   84.6   92.4   40.7 | +1.335 (0.114)  1168 | (whole cell, for reference)
+  Math                                     easy  102   904   326 |   96.9   99.1 |    2.1   35.7    0.0 |  100.0   96.9    n/a | +0.552 (0.127)   581 | 139   1(0)   0.12 UNDETERMINED (nominal < 3)
+  Math                                     mid   101   999   531 |   91.0   95.6 |    4.9   23.5    0.0 |   97.7   91.7    n/a | +0.417 (0.102)   764 | 153   2(0)   0.15 UNDETERMINED (nominal < 3)
+  Math                                     hard  101   978   474 |   86.9   93.8 |    7.4   26.6    0.0 |   91.4   92.6   26.8 | +0.342 (0.077)   718 | 146   6(0)   0.13 UNDETERMINED (nominal < 3)
+  Math                                     all   304  2881  1331 |   91.0   95.9 |    5.1   28.4    0.0 |   96.0   93.3   34.0 | +0.367 (0.053)  2063 | (whole cell, for reference)
+  Other                                    easy   71   553   115 |   93.9   99.1 |    5.2   23.0    0.0 |   99.1   93.9    n/a | +4.313 (0.508)   426 | 120  13(0)   0.21 UNDETERMINED (nominal < 3)
+  Other                                    mid    70   596   320 |   90.3   96.3 |    6.2   16.1    0.0 |   91.6   95.2   37.0 | +1.310 (0.232)   500 | 138   5(0)   0.23 UNDETERMINED (nominal < 3)
+  Other                                    hard   70   649   261 |   72.8   79.5 |    8.4   23.3    0.0 |   65.1   92.4   36.3 | +1.517 (0.181)   498 | 120   3(2)   0.31 UNDETERMINED (nominal < 3)
+  Other                                    all   211  1798   696 |   84.3   90.6 |    6.9   20.8    0.0 |   82.9   94.1   37.0 | +1.951 (0.137)  1424 | (whole cell, for reference)
+  Philosophy                               easy   44   234    58 |   91.4   94.6 |    3.4   26.5    0.0 |   94.6   96.2    n/a | +2.179 (0.366)   172 | 107   8(0)   0.14 UNDETERMINED (nominal < 3)
+  Philosophy                               mid    44   261   151 |   84.1   94.1 |   10.6   22.6    0.0 |   80.8   91.0   55.2 | +3.623 (0.642)   202 | 101   3(0)   0.25 UNDETERMINED (nominal < 3)
+  Philosophy                               hard   44   289    92 |   70.7   83.3 |   15.2   28.0    0.0 |   62.0   84.2   48.6 | +2.421 (0.371)   208 | 103   9(0)   0.14 UNDETERMINED (nominal < 3)
+  Philosophy                               all   132   784   301 |   81.4   91.1 |   10.6   25.8    0.0 |   77.6   90.5   50.7 | +2.553 (0.240)   582 | (whole cell, for reference)
+  Physics                                  easy   87   789   313 |   91.4   95.7 |    4.5   23.2    0.0 |   98.4   92.9    n/a | +3.662 (0.413)   606 | 152   5(0)   0.14 UNDETERMINED (nominal < 3)
+  Physics                                  mid    86  1056   560 |   92.0   96.1 |    4.3   21.7    0.0 |   98.0   92.3    n/a | +0.449 (0.091)   827 | 152   3(0)   0.20 UNDETERMINED (nominal < 3)
+  Physics                                  hard   86   885   360 |   80.8   89.8 |   10.0   21.2    0.0 |   89.7   84.8   45.9 | +0.261 (0.064)   697 | 142   4(2)   0.20 UNDETERMINED (nominal < 3)
+  Physics                                  all   259  2730  1233 |   88.6   94.2 |    6.0   22.0    0.0 |   95.7   90.4   47.2 | +0.484 (0.058)  2130 | (whole cell, for reference)
+  Psychology                               easy   87   604    68 |   97.1   98.5 |    1.5   26.7    0.0 |  100.0   97.1    n/a | +4.999 (0.527)   443 | 107   3(0)   0.09 UNDETERMINED (nominal < 3)
+  Psychology                               mid    87   618   283 |   91.9   94.9 |    3.2   13.8    0.0 |   89.4   96.8   50.0 | +4.386 (0.469)   533 | 131   4(0)   0.22 UNDETERMINED (nominal < 3)
+  Psychology                               hard   86   712   286 |   67.1   77.1 |   12.9   23.0    0.0 |   61.9   91.0   28.4 | +1.455 (0.160)   548 | 116   5(1)   0.27 UNDETERMINED (nominal < 3)
+  Psychology                               all   260  1934   637 |   81.3   87.8 |    7.4   21.2    0.0 |   78.2   94.8   33.1 | +2.603 (0.149)  1524 | (whole cell, for reference)
+  leaf:n00000030                           easy   41   127    58 |   98.3   98.3 |    0.0   19.7    0.0 |   98.2   98.2    n/a | +0.554 (0.284)   102 |  96   0(0)   0.45 UNDETERMINED (nominal < 3)
+  leaf:n00000030                           mid    41   115    63 |   96.8   98.4 |    1.6   17.4    0.0 |  100.0   96.8    n/a | +0.025 (0.171)    95 | 100   1(0)   0.37 UNDETERMINED (nominal < 3)
+  leaf:n00000030                           hard   40    96    36 |   77.8   90.3 |   13.9   28.1    0.0 |   77.8   89.3    n/a | +1.165 (0.469)    69 |  69   2(0)   0.46 UNDETERMINED (nominal < 3)
+  leaf:n00000030                           all   122   338   157 |   93.0   96.7 |    3.8   21.3    0.0 |   94.2   95.9    n/a | +0.274 (0.125)   266 | (whole cell, for reference)
+  leaf:n00000033                           easy   15   130    25 |  100.0  100.0 |    0.0   25.4    0.0 |  100.0  100.0    n/a | +4.814 (1.199)    97 |  74   1(0)   0.27 UNDETERMINED (nominal < 3)
+  leaf:n00000033                           mid    15   115    58 |   74.1   84.3 |   12.1   22.6    0.0 |   58.6  100.0   37.5 | +3.135 (0.777)    89 | 100   7(1)   0.40 UNDETERMINED (nominal < 3)
+  leaf:n00000033                           hard   15   133    58 |   77.6   84.9 |    8.6   15.8    0.0 |   77.6   93.3    n/a | +1.691 (0.427)   112 |  66   3(0)   0.35 UNDETERMINED (nominal < 3)
+  leaf:n00000033                           all    45   378   141 |   80.1   87.6 |    8.5   21.2    0.0 |   73.8   97.1   32.4 | +2.620 (0.373)   298 | (whole cell, for reference)
+  leaf:n00000037                           easy   31   105    44 |   72.7   82.1 |   11.4   22.9    0.0 |   84.1   83.8    n/a | +2.095 (0.543)    81 |  75   4(1)   0.39 UNDETERMINED (nominal < 3)
+  leaf:n00000037                           mid    30    76    42 |   71.4   81.1 |   11.9   25.0    0.0 |   69.0   75.9    n/a | +0.222 (0.195)    57 |  67   3(1)   0.38 UNDETERMINED (nominal < 3)
+  leaf:n00000037                           hard   30    85    24 |   58.3    n/a |   25.0   38.8    0.0 |   41.7    n/a    n/a | +0.720 (0.286)    52 |  52   0(0)   0.36 UNDETERMINED (nominal < 3)
+  leaf:n00000037                           all    91   266   110 |   69.1   80.9 |   14.5   28.6    0.0 |   69.1   80.3   44.1 | +0.852 (0.186)   190 | (whole cell, for reference)
+  leaf:n00000077                           easy   20   127    22 |   95.5   95.5 |    0.0   25.2    0.0 |  100.0   95.5    n/a | +5.830 (1.502)    95 |  74   4(0)   0.25 UNDETERMINED (nominal < 3)
+  leaf:n00000077                           mid    20   151    88 |   92.0   98.8 |    6.8   13.9    0.0 |   96.6   94.1    n/a | +0.562 (0.189)   130 | 103   1(0)   0.40 UNDETERMINED (nominal < 3)
+  leaf:n00000077                           hard   20   137    62 |   72.6   80.4 |    9.7   19.0    0.0 |   69.4   97.7    n/a | +2.446 (0.541)   111 |  60   3(0)   0.38 UNDETERMINED (nominal < 3)
+  leaf:n00000077                           all    60   415   172 |   85.5   91.9 |    7.0   19.0    0.0 |   87.2   95.3   18.2 | +1.439 (0.228)   336 | (whole cell, for reference)
+  leaf:n00000079                           easy   18   115    47 |   87.2   91.1 |    4.3   14.8    0.0 |   91.5   95.3    n/a | +2.626 (0.742)    98 |  65   3(0)   0.29 UNDETERMINED (nominal < 3)
+  leaf:n00000079                           mid    18   128    67 |   77.6   89.7 |   13.4   26.6    0.0 |   64.2   86.0   62.5 | +2.540 (0.722)    94 |  80   5(0)   0.39 UNDETERMINED (nominal < 3)
+  leaf:n00000079                           hard   17   141    49 |   71.4   77.8 |    8.2   27.7    0.0 |   38.8    n/a   56.7 | +1.286 (0.440)   102 |  31   1(0)   0.25 UNDETERMINED (nominal < 3)
+  leaf:n00000079                           all    53   384   163 |   78.5   86.5 |    9.2   23.4    0.0 |   64.4   91.4   55.2 | +1.908 (0.330)   294 | (whole cell, for reference)
+  leaf:n00000105                           easy   22   116    21 |   90.5    n/a |    9.5   25.0    0.0 |  100.0   90.5    n/a | +5.873 (1.657)    87 |  78   0(0)   0.18 UNDETERMINED (nominal < 3)
+  leaf:n00000105                           mid    22   112    54 |   81.5   88.0 |    7.4   17.0    0.0 |   77.8   95.2    n/a | +3.935 (0.978)    93 |  98  10(0)   0.50 UNDETERMINED (nominal < 3)
+  leaf:n00000105                           hard   21   125    54 |   72.2   81.2 |   11.1   21.6    0.0 |   74.1   85.0    n/a | +1.780 (0.423)    98 |  74   0(0)   0.55 UNDETERMINED (nominal < 3)
+  leaf:n00000105                           all    65   353   129 |   79.1   87.2 |    9.3   21.2    0.0 |   79.8   90.3   34.6 | +2.824 (0.365)   278 | (whole cell, for reference)
+  leaf:n00000128                           easy   17   140    57 |   96.5  100.0 |    3.5   15.0    0.0 |  100.0   96.5    n/a | +7.193 (2.342)   119 |  90   2(0)   0.33 UNDETERMINED (nominal < 3)
+  leaf:n00000128                           mid    17   158    88 |   85.2   88.2 |    3.4   12.7    0.0 |   88.6   94.9    n/a | +2.058 (0.452)   138 |  89   3(0)   0.29 UNDETERMINED (nominal < 3)
+  leaf:n00000128                           hard   16   129    24 |   58.3    n/a |   20.8   20.2    0.0 |   45.8    n/a    n/a | +1.095 (0.290)   103 |  86   9(0)   0.23 UNDETERMINED (nominal < 3)
+  leaf:n00000128                           all    50   427   169 |   85.2   90.6 |    5.9   15.7    0.0 |   86.4   94.5   26.1 | +1.921 (0.245)   360 | (whole cell, for reference)
+  leaf:n00000151                           easy   17   112    56 |   87.5   90.7 |    3.6   24.1    0.0 |   78.6   95.5    n/a | +0.568 (0.300)    85 |  91   2(0)   0.50 UNDETERMINED (nominal < 3)
+  leaf:n00000151                           mid    16   111    60 |   93.3   98.2 |    5.0   26.1    0.0 |  100.0   93.3    n/a | -0.060 (0.256)    82 |  79   0(0)   0.35 UNDETERMINED (nominal < 3)
+  leaf:n00000151                           hard   16    96    44 |   81.8   94.7 |   13.6   33.3    0.0 |   95.5   85.7    n/a | +0.174 (0.225)    64 |  59   3(0)   0.20 UNDETERMINED (nominal < 3)
+  leaf:n00000151                           all    49   319   160 |   88.1   94.6 |    6.9   27.6    0.0 |   91.2   91.8    n/a | +0.176 (0.121)   231 | (whole cell, for reference)
+  leaf:n00000157                           easy   16   133    68 |   94.1   98.5 |    4.4   21.1    0.0 |  100.0   94.1    n/a | +5.383 (1.690)   105 | 113   1(0)   0.29 UNDETERMINED (nominal < 3)
+  leaf:n00000157                           mid    15   149    83 |   89.2   97.4 |    8.4   18.8    0.0 |  100.0   89.2    n/a | +1.713 (0.507)   121 |  92   0(0)   0.36 UNDETERMINED (nominal < 3)
+  leaf:n00000157                           hard   15   139    46 |   73.9   82.9 |   10.9   19.4    0.0 |   87.0   85.0    n/a | +0.285 (0.200)   112 |  98   9(0)   0.36 UNDETERMINED (nominal < 3)
+  leaf:n00000157                           all    46   421   197 |   87.3   94.5 |    7.6   19.7    0.0 |   97.0   90.1    n/a | +0.855 (0.210)   338 | (whole cell, for reference)
+  leaf:n00000188                           easy   15    75    37 |   89.2   94.3 |    5.4   12.0    0.0 |   94.6   91.4    n/a | +0.795 (0.363)    66 |  68   2(0)   0.38 UNDETERMINED (nominal < 3)
+  leaf:n00000188                           mid    15    87    49 |   83.7   89.1 |    6.1   20.7    0.0 |   95.9   87.2    n/a | +2.276 (0.727)    69 |  73   0(0)   0.61 UNDETERMINED (nominal < 3)
+  leaf:n00000188                           hard   15    72    23 |   78.3   85.7 |    8.7   18.1    0.0 |   60.9    n/a    n/a | +1.810 (0.571)    59 |  52   2(0)   0.41 UNDETERMINED (nominal < 3)
+  leaf:n00000188                           all    45   234   109 |   84.4   90.2 |    6.4   17.1    0.0 |   88.1   89.6    n/a | +1.417 (0.296)   194 | (whole cell, for reference)
+  leaf:n00000189                           easy   16    83    41 |   92.7   92.7 |    0.0   15.7    0.0 |   92.7   94.7    n/a | +2.313 (0.734)    70 |  70   3(0)   0.31 UNDETERMINED (nominal < 3)
+  leaf:n00000189                           mid    16    83    46 |   82.6   90.5 |    8.7   21.7    0.0 |   89.1   90.2    n/a | +1.482 (0.565)    65 |  62   2(0)   0.32 UNDETERMINED (nominal < 3)
+  leaf:n00000189                           hard   15    82    26 |   76.9   83.3 |    7.7   12.2    0.0 |   65.4    n/a    n/a | +1.173 (0.387)    72 |  50  15(0)   0.38 UNDETERMINED (nominal < 3)
+  leaf:n00000189                           all    47   248   113 |   85.0   89.7 |    5.3   16.5    0.0 |   85.0   92.7    n/a | +1.512 (0.289)   207 | (whole cell, for reference)
+  leaf:n00000220                           easy   20    93    44 |   93.2   95.3 |    2.3   15.1    0.0 |   97.5   97.4    n/a | +2.446 (0.669)    79 |  77   0(0)   0.37 UNDETERMINED (nominal < 3)
+  leaf:n00000220                           mid    20    93    47 |   89.4   97.7 |    8.5   22.6    0.0 |   91.3   90.5    n/a | +0.063 (0.174)    72 |  90   6(1)   0.41 UNDETERMINED (nominal < 3)
+  leaf:n00000220                           hard   20    86    28 |   78.6   91.7 |   14.3   24.4    0.0 |   67.9    n/a    n/a | +0.953 (0.400)    65 |  65   9(0)   0.39 UNDETERMINED (nominal < 3)
+  leaf:n00000220                           all    60   272   119 |   88.2   95.5 |    7.6   20.6    0.0 |   87.7   94.0    n/a | +0.859 (0.248)   216 | (whole cell, for reference)
+  leaf:n00000221                           easy   23    80    29 |   89.7   96.3 |    6.9   18.8    0.0 |   96.4   92.6    n/a | -0.133 (0.215)    65 |  79   2(0)   0.50 UNDETERMINED (nominal < 3)
+  leaf:n00000221                           mid    23    82    37 |   64.9   80.0 |   18.9   24.4    0.0 |   71.4   80.0    n/a | +1.067 (0.417)    62 |  89   2(0)   0.33 UNDETERMINED (nominal < 3)
+  leaf:n00000221                           hard   23    82    23 |   78.3   90.0 |   13.0   22.0    0.0 |   43.5    n/a    n/a | +2.675 (0.787)    64 |  63   0(0)   0.36 UNDETERMINED (nominal < 3)
+  leaf:n00000221                           all    69   244    89 |   76.4   88.3 |   13.5   21.7    0.0 |   72.1   88.7   45.8 | +0.875 (0.238)   191 | (whole cell, for reference)
+  POOLED over the 14 anchors (each question's tercile within its own anchor):
+    easy nq  942 nm  6764 ndec  1979 | accA   93.8 accB   97.2 | tie_dec    3.5 tie_all   24.7 inv    0.0 | ref%   98.4 accA|ref+   94.8 accA|ref-   35.5 | beta_len +1.525 (0.067) n 5094
+    mid  nq  936 nm  7417 ndec  3782 | accA   89.9 accB   95.1 | tie_dec    5.5 tie_all   19.8 inv    0.0 | ref%   93.7 accA|ref+   93.4 accA|ref-   39.3 | beta_len +0.730 (0.044) n 5952
+    hard nq  933 nm  7355 ndec  3056 | accA   78.3 accB   87.1 | tie_dec   10.1 tie_all   23.2 inv    0.0 | ref%   77.7 accA|ref+   90.3 accA|ref-   36.4 | beta_len +0.556 (0.035) n 5652
+    CONTRAST hard - easy, accuracy A (key-decidable): easy 0.938 (n 1979) hard 0.783 (n 3056) diff -15.5pp, question-clustered bootstrap 95% [-18.5, -12.4]pp
+    CONTRAST hard - easy, tie rate (key-decidable): easy 0.035 (n 1979) hard 0.101 (n 3056) diff +6.6pp, question-clustered bootstrap 95% [+5.0, +8.3]pp
+    CONTRAST beta_len hard - easy: +0.5563 - +1.5249 = -0.9686 per 1k chars, z -12.86 (independent strata)
+  ORDER per anchor: Spearman(easy, hard) [question-bootstrap 95%] | within-cell permutation null p5 / p50 (n) p | key's own rho(easy, hard) | rho(judge, key) easy/mid/hard | rho(e,m) rho(m,h)
+    Biology           rho +0.893 [+0.804, +0.932] (20 models) | null p5 +0.869 p50 +0.926 (200) p 0.139 within | key +0.817 | j-k +0.787 / +0.971 / +0.932 | +0.869 +0.898
+    Business          rho +0.762 [+0.628, +0.849] (20 models) | null p5 +0.824 p50 +0.890 (200) p 0.010 BELOW | key +0.802 | j-k +0.871 / +0.932 / +0.816 | +0.895 +0.839
+    Chemistry         rho +0.931 [+0.848, +0.950] (20 models) | null p5 +0.926 p50 +0.959 (200) p 0.085 within | key +0.888 | j-k +0.962 / +0.915 / +0.915 | +0.923 +0.952
+    Computer science  rho +0.899 [+0.784, +0.936] (20 models) | null p5 +0.904 p50 +0.941 (200) p 0.045 BELOW | key +0.864 | j-k +0.863 / +0.957 / +0.888 | +0.941 +0.932
+    Economics         rho +0.869 [+0.756, +0.899] (20 models) | null p5 +0.871 p50 +0.928 (200) p 0.045 BELOW | key +0.877 | j-k +0.840 / +0.946 / +0.937 | +0.916 +0.862
+    Engineering       rho +0.949 [+0.690, +0.932] (20 models) | null p5 +0.857 p50 +0.926 (200) p 0.871 within | key +0.763 | j-k +0.923 / +0.965 / +0.833 | +0.928 +0.911
+    Health            rho +0.869 [+0.686, +0.897] (20 models) | null p5 +0.836 p50 +0.889 (200) p 0.303 within | key +0.797 | j-k +0.782 / +0.907 / +0.933 | +0.833 +0.859
+    History           rho +0.898 [+0.749, +0.929] (20 models) | null p5 +0.872 p50 +0.924 (200) p 0.209 within | key +0.824 | j-k +0.853 / +0.859 / +0.780 | +0.908 +0.896
+    Law               rho +0.935 [+0.832, +0.944] (20 models) | null p5 +0.907 p50 +0.943 (200) p 0.428 within | key +0.611 | j-k +0.934 / +0.891 / +0.621 | +0.949 +0.955
+    Math              rho +0.944 [+0.874, +0.966] (20 models) | null p5 +0.949 p50 +0.970 (200) p 0.040 BELOW | key +0.915 | j-k +0.938 / +0.968 / +0.907 | +0.947 +0.985
+    Other             rho +0.928 [+0.780, +0.944] (20 models) | null p5 +0.881 p50 +0.930 (200) p 0.498 within | key +0.701 | j-k +0.727 / +0.930 / +0.893 | +0.898 +0.952
+    Philosophy        rho +0.836 [+0.732, +0.904] (20 models) | null p5 +0.762 p50 +0.839 (200) p 0.478 within | key +0.756 | j-k +0.827 / +0.836 / +0.740 | +0.832 +0.753
+    Physics           rho +0.964 [+0.888, +0.978] (20 models) | null p5 +0.958 p50 +0.976 (200) p 0.154 within | key +0.928 | j-k +0.958 / +0.971 / +0.884 | +0.974 +0.974
+    Psychology        rho +0.835 [+0.736, +0.904] (20 models) | null p5 +0.854 p50 +0.904 (200) p 0.020 BELOW | key +0.645 | j-k +0.764 / +0.885 / +0.828 | +0.839 +0.920
+    summary: 5 of 14 anchors BELOW the permutation null's p5 | median rho(easy, hard) judge +0.898, key +0.809
+
+--- arm GROK-CALIB (9142 verdicts, 12 models) ---
+  cell                                     terc   nq    nm  ndec | accA   accB  | tie_dec tie_all inv | ref%  accA|ref+ accA|ref- | beta_len (se)   n    | called wrong(est) nominal status
+  Biology                                  easy   61   162    21 |  100.0  100.0 |    0.0   27.2    0.0 |  100.0  100.0    n/a | +3.637 (0.994)   118 |  42   2(0)   0.10 UNDETERMINED (nominal < 3)
+  Biology                                  mid    60   249   126 |   92.9   99.2 |    6.3   18.9    0.0 |  100.0   92.9    n/a | +0.548 (0.203)   202 |  50   0(0)   0.12 UNDETERMINED (nominal < 3)
+  Biology                                  hard   60   275   151 |   84.1   90.7 |    7.3   22.2    0.0 |   80.8   94.3   41.4 | -0.057 (0.112)   214 |  41   0(0)   0.05 UNDETERMINED (nominal < 3)
+  Biology                                  all   181   686   298 |   88.9   95.0 |    6.4   22.2    0.0 |   90.3   94.1   41.4 | +0.145 (0.084)   534 | (whole cell, for reference)
+  Business                                 easy   58    82    35 |   82.9   93.5 |   11.4   32.9    0.0 |  100.0   82.9    n/a | -0.466 (0.921)    55 |  35   0(0)   0.18 UNDETERMINED (nominal < 3)
+  Business                                 mid    58   105    56 |   83.9   94.0 |   10.7   33.3    0.0 |   91.1   92.2    n/a | +0.178 (0.736)    70 |  35   1(0)   0.08 UNDETERMINED (nominal < 3)
+  Business                                 hard   58   108    66 |   92.4   95.3 |    3.0   16.7    0.0 |   93.9   93.5    n/a | +0.630 (0.602)    90 |  31   0(0)   0.11 UNDETERMINED (nominal < 3)
+  Business                                 all   174   295   157 |   87.3   94.5 |    7.6   27.1    0.0 |   94.3   90.5    n/a | +0.235 (0.387)   215 | (whole cell, for reference)
+  Chemistry                                easy   90   275   134 |   95.5   97.7 |    2.2   33.1    0.0 |   99.3   95.5    n/a | +0.107 (0.185)   184 |  46   0(0)   0.08 UNDETERMINED (nominal < 3)
+  Chemistry                                mid    90   232   132 |   84.1   94.1 |   10.6   23.7    0.0 |   98.5   85.4    n/a | +0.118 (0.128)   177 |  48   1(0)   0.09 UNDETERMINED (nominal < 3)
+  Chemistry                                hard   89   246   121 |   74.4   84.9 |   12.4   20.3    0.0 |   78.5   86.3   30.8 | +0.324 (0.112)   196 |  43   1(0)   0.05 UNDETERMINED (nominal < 3)
+  Chemistry                                all   269   753   387 |   85.0   92.7 |    8.3   26.0    0.0 |   92.5   89.4   31.0 | +0.210 (0.072)   557 | (whole cell, for reference)
+  Computer science                         easy   54   159    66 |   97.0  100.0 |    3.0   18.2    0.0 |   97.0   98.4    n/a | +5.399 (1.768)   130 |  40   0(0)   0.06 UNDETERMINED (nominal < 3)
+  Computer science                         mid    54   223   119 |   79.8   88.8 |    9.3   20.7    0.4 |   91.6   86.2    n/a | +0.179 (0.136)   176 |  45   0(0)   0.12 UNDETERMINED (nominal < 3)
+  Computer science                         hard   54   244   117 |   78.6   86.8 |    8.6   19.3    0.4 |   78.6   91.3   32.0 | +0.083 (0.107)   196 |  44   0(0)   0.14 UNDETERMINED (nominal < 3)
+  Computer science                         all   162   626   302 |   83.1   90.6 |    7.7   19.6    0.3 |   87.7   90.9   27.0 | +0.167 (0.077)   502 | (whole cell, for reference)
+  Economics                                easy   60   136    26 |   92.3  100.0 |    7.7   30.1    0.0 |  100.0   92.3    n/a | +0.447 (0.271)    95 |  37   1(0)   0.10 UNDETERMINED (nominal < 3)
+  Economics                                mid    59   186   102 |   98.0   99.0 |    1.0   19.4    0.0 |   98.0  100.0    n/a | +4.497 (1.492)   150 |  47   0(0)   0.02 UNDETERMINED (nominal < 3)
+  Economics                                hard   59   261   167 |   87.4   93.0 |    6.0   15.8    0.4 |   86.2   95.8   34.8 | +0.621 (0.275)   219 |  43   0(0)   0.08 UNDETERMINED (nominal < 3)
+  Economics                                all   178   583   295 |   91.5   95.7 |    4.4   20.3    0.2 |   91.5   97.0   32.0 | +0.755 (0.219)   464 | (whole cell, for reference)
+  Engineering                              easy   54   142    72 |   83.3   88.2 |    5.6   22.5    0.0 |   95.8   87.0    n/a | +0.082 (0.079)   110 |  41   1(0)   0.06 UNDETERMINED (nominal < 3)
+  Engineering                              mid    54   153    84 |   84.5   93.4 |    9.5   22.2    0.0 |   85.7   90.3    n/a | +0.213 (0.144)   119 |  43   0(0)   0.13 UNDETERMINED (nominal < 3)
+  Engineering                              hard   54   104    36 |   52.8   73.1 |   27.8   30.8    0.0 |   47.2    n/a    n/a | +0.422 (0.177)    72 |  20   2(0)   0.16 UNDETERMINED (nominal < 3)
+  Engineering                              all   162   399   192 |   78.1   88.2 |   11.5   24.6    0.0 |   82.3   87.3   35.3 | +0.170 (0.076)   301 | (whole cell, for reference)
+  Health                                   easy   43   149    40 |   90.0   94.7 |    2.6   16.2    0.7 |   95.0   94.7    n/a | +0.410 (0.218)   124 |  46   0(0)   0.10 UNDETERMINED (nominal < 3)
+  Health                                   mid    43   158    82 |   96.3   96.3 |    0.0   13.9    0.0 |   96.2  100.0    n/a | +0.487 (0.178)   136 |  43   0(0)   0.12 UNDETERMINED (nominal < 3)
+  Health                                   hard   43   203    94 |   67.0   75.0 |    9.7   20.3    0.5 |   63.8   93.3   20.6 | +1.409 (0.358)   161 |  35   0(0)   0.05 UNDETERMINED (nominal < 3)
+  Health                                   all   129   510   216 |   82.4   87.3 |    4.7   17.1    0.4 |   81.8   96.6   17.9 | +0.365 (0.095)   421 | (whole cell, for reference)
+  History                                  easy   40   105    28 |   96.4   96.4 |    0.0   23.8    0.0 |  100.0   96.4    n/a | +3.383 (1.265)    80 |  30   0(0)   0.10 UNDETERMINED (nominal < 3)
+  History                                  mid    40   127    84 |   72.6   80.3 |    9.5   15.0    0.0 |   73.2   96.7    9.1 | +0.674 (0.353)   108 |  33   0(0)   0.06 UNDETERMINED (nominal < 3)
+  History                                  hard   39   150    78 |   57.7   62.5 |    7.7   15.3    0.0 |   48.7   97.3   23.1 | +0.531 (0.257)   127 |  35   3(0)   0.01 UNDETERMINED (nominal < 3)
+  History                                  all   119   382   190 |   70.0   75.6 |    7.4   17.5    0.0 |   67.2   96.8   18.0 | +0.818 (0.199)   315 | (whole cell, for reference)
+  Law                                      easy   91   182   109 |   91.7   96.2 |    4.6   12.6    0.0 |   95.3   96.1    n/a | +0.588 (0.211)   159 |  46   0(0)   0.05 UNDETERMINED (nominal < 3)
+  Law                                      mid    90   206   133 |   84.2   88.2 |    4.5   18.0    0.0 |   86.2   97.3    n/a | +1.465 (0.413)   169 |  39   0(0)   0.09 UNDETERMINED (nominal < 3)
+  Law                                      hard   90   213    77 |   74.0   83.8 |   11.7   17.8    0.0 |   58.4   97.8   40.6 | +0.582 (0.237)   175 |  44   7(1)   0.11 UNDETERMINED (nominal < 3)
+  Law                                      all   271   601   319 |   84.3   90.0 |    6.3   16.3    0.0 |   82.5   96.9   27.3 | +0.776 (0.182)   503 | (whole cell, for reference)
+  Math                                     easy  102   367   161 |   94.4   99.3 |    5.0   38.1    0.0 |  100.0   94.4    n/a | +0.259 (0.222)   227 |  53   0(0)   0.08 UNDETERMINED (nominal < 3)
+  Math                                     mid   101   409   241 |   91.3   97.8 |    6.6   26.7    0.0 |   97.5   92.8    n/a | +0.196 (0.149)   300 |  53   0(0)   0.05 UNDETERMINED (nominal < 3)
+  Math                                     hard  101   453   254 |   85.4   91.9 |    6.3   20.4    0.7 |   90.6   92.2   20.8 | +0.312 (0.097)   358 |  51   0(0)   0.07 UNDETERMINED (nominal < 3)
+  Math                                     all   304  1229   656 |   89.8   95.9 |    6.1   27.8    0.2 |   95.4   93.0   23.3 | +0.252 (0.070)   885 | (whole cell, for reference)
+  Other                                    easy   71   216    53 |   94.3  100.0 |    3.8   23.3    0.5 |  100.0   94.3    n/a | +6.351 (1.641)   165 |  45   5(0)   0.12 UNDETERMINED (nominal < 3)
+  Other                                    mid    70   257   159 |   89.9   97.3 |    7.0   15.6    0.4 |   91.8   95.9    n/a | +0.318 (0.162)   216 |  44   1(0)   0.17 UNDETERMINED (nominal < 3)
+  Other                                    hard   70   308   151 |   71.5   80.0 |   10.6   23.7    0.0 |   62.9   94.7   32.1 | +1.018 (0.271)   235 |  32   0(0)   0.00 UNDETERMINED (nominal < 3)
+  Other                                    all   211   781   363 |   82.9   90.7 |    8.0   20.9    0.3 |   81.0   95.2   30.4 | +0.909 (0.199)   616 | (whole cell, for reference)
+  Philosophy                               easy   44    95    34 |   88.2   96.8 |    8.8   25.3    0.0 |   97.0   90.6    n/a | +3.319 (1.032)    71 |  40   0(0)   0.17 UNDETERMINED (nominal < 3)
+  Philosophy                               mid    44   114    80 |   82.5   91.7 |   10.0   15.8    0.0 |   85.0   92.6    n/a | +0.936 (0.530)    96 |  34   0(0)   0.11 UNDETERMINED (nominal < 3)
+  Philosophy                               hard   44   133    63 |   74.6   87.0 |   14.3   21.2    0.8 |   63.5   95.0   39.1 | +0.967 (0.449)   104 |  31   0(0)   0.10 UNDETERMINED (nominal < 3)
+  Philosophy                               all   132   342   177 |   80.8   91.1 |   11.3   20.5    0.3 |   79.5   92.9   33.3 | +1.472 (0.313)   271 | (whole cell, for reference)
+  Physics                                  easy   87   307   142 |   96.5   98.6 |    2.1   24.4    0.0 |   98.6   97.9    n/a | +1.241 (0.343)   232 |  51   1(0)   0.08 UNDETERMINED (nominal < 3)
+  Physics                                  mid    86   438   246 |   89.4   94.0 |    4.9   21.9    0.0 |   98.4   90.5    n/a | +0.321 (0.116)   342 |  53   0(0)   0.05 UNDETERMINED (nominal < 3)
+  Physics                                  hard   86   404   213 |   77.0   89.6 |   14.1   21.3    0.0 |   88.7   82.0   37.5 | +0.136 (0.086)   318 |  52   0(0)   0.07 UNDETERMINED (nominal < 3)
+  Physics                                  all   259  1149   601 |   86.7   93.7 |    7.5   22.4    0.0 |   95.0   89.5   33.3 | +0.258 (0.071)   892 | (whole cell, for reference)
+  Psychology                               easy   87   208    34 |  100.0  100.0 |    0.0   15.9    0.0 |  100.0  100.0    n/a | +3.956 (0.966)   175 |  42   1(0)   0.09 UNDETERMINED (nominal < 3)
+  Psychology                               mid    87   256   146 |   89.7   97.0 |    7.5   15.2    0.0 |   91.1   95.5    n/a | +2.971 (0.716)   217 |  48   1(0)   0.10 UNDETERMINED (nominal < 3)
+  Psychology                               hard   86   342   174 |   68.4   75.3 |    8.7   23.8    0.3 |   60.9   95.3   26.5 | +0.538 (0.215)   260 |  41   0(0)   0.14 UNDETERMINED (nominal < 3)
+  Psychology                               all   260   806   354 |   80.2   86.9 |    7.4   19.0    0.1 |   77.1   96.0   27.2 | +1.167 (0.190)   652 | (whole cell, for reference)
+  POOLED over the 14 anchors (each question's tercile within its own anchor):
+    easy nq  942 nm  2585 ndec   955 | accA   93.4 accB   97.4 | tie_dec    3.9 tie_all   25.5 inv    0.1 | ref%   98.3 accA|ref+   94.8 accA|ref-    n/a | beta_len +0.505 (0.066) n 1925
+    mid  nq  936 nm  3113 ndec  1790 | accA   87.9 accB   94.3 | tie_dec    6.7 tie_all   20.3 inv    0.1 | ref%   93.2 accA|ref+   93.0 accA|ref-   18.9 | beta_len +0.339 (0.047) n 2478
+    hard nq  933 nm  3444 ndec  1762 | accA   76.9 accB   85.3 | tie_dec    9.6 tie_all   20.7 inv    0.2 | ref%   75.8 accA|ref+   91.6 accA|ref-   31.2 | beta_len +0.237 (0.037) n 2725
+    CONTRAST hard - easy, accuracy A (key-decidable): easy 0.934 (n 955) hard 0.769 (n 1762) diff -16.5pp, question-clustered bootstrap 95% [-19.7, -13.6]pp
+    CONTRAST hard - easy, tie rate (key-decidable): easy 0.039 (n 953) hard 0.096 (n 1757) diff +5.7pp, question-clustered bootstrap 95% [+3.8, +7.7]pp
+    CONTRAST beta_len hard - easy: +0.2370 - +0.5055 = -0.2684 per 1k chars, z -3.54 (independent strata)
+  ORDER per anchor: Spearman(easy, hard) [question-bootstrap 95%] | within-cell permutation null p5 / p50 (n) p | key's own rho(easy, hard) | rho(judge, key) easy/mid/hard | rho(e,m) rho(m,h)
+    Biology           rho +0.930 [+0.738, +0.951] (12 models) | null p5 +0.867 p50 +0.937 (200) p 0.398 within | key +0.821 | j-k +0.770 / +0.989 / +0.930 | +0.902 +0.902
+    Business          rho +0.713 [+0.364, +0.818] (12 models) | null p5 +0.713 p50 +0.867 (200) p 0.065 within | key +0.802 | j-k +0.956 / +0.895 / +0.648 | +0.923 +0.741
+    Chemistry         rho +0.944 [+0.776, +0.965] (12 models) | null p5 +0.895 p50 +0.958 (200) p 0.353 within | key +0.935 | j-k +0.979 / +0.914 / +0.918 | +0.972 +0.951
+    Computer science  rho +0.909 [+0.699, +0.958] (12 models) | null p5 +0.860 p50 +0.937 (200) p 0.284 within | key +0.929 | j-k +0.905 / +0.965 / +0.975 | +0.958 +0.979
+    Economics         rho +0.909 [+0.720, +0.948] (12 models) | null p5 +0.818 p50 +0.909 (200) p 0.542 within | key +0.864 | j-k +0.863 / +0.942 / +0.981 | +0.895 +0.881
+    Engineering       rho +0.937 [+0.548, +0.934] (12 models) | null p5 +0.790 p50 +0.909 (200) p 0.781 within | key +0.812 | j-k +0.937 / +0.918 / +0.826 | +0.930 +0.888
+    Health            rho +0.755 [+0.594, +0.916] (12 models) | null p5 +0.762 p50 +0.895 (200) p 0.055 BELOW | key +0.866 | j-k +0.809 / +0.891 / +0.967 | +0.804 +0.860
+    History           rho +0.846 [+0.472, +0.885] (12 models) | null p5 +0.755 p50 +0.874 (200) p 0.383 within | key +0.875 | j-k +0.829 / +0.892 / +0.839 | +0.706 +0.839
+    Law               rho +0.972 [+0.825, +0.979] (12 models) | null p5 +0.832 p50 +0.930 (200) p 0.945 within | key +0.626 | j-k +0.960 / +0.820 / +0.632 | +0.867 +0.916
+    Math              rho +0.965 [+0.863, +0.986] (12 models) | null p5 +0.923 p50 +0.965 (200) p 0.512 within | key +0.954 | j-k +0.958 / +0.972 / +0.965 | +0.965 +0.965
+    Other             rho +0.839 [+0.517, +0.916] (12 models) | null p5 +0.797 p50 +0.888 (200) p 0.184 within | key +0.686 | j-k +0.790 / +0.946 / +0.816 | +0.909 +0.902
+    Philosophy        rho +0.741 [+0.507, +0.867] (12 models) | null p5 +0.650 p50 +0.815 (200) p 0.224 within | key +0.761 | j-k +0.858 / +0.930 / +0.859 | +0.909 +0.867
+    Physics           rho +0.958 [+0.839, +0.976] (12 models) | null p5 +0.944 p50 +0.972 (200) p 0.254 within | key +0.942 | j-k +0.958 / +0.935 / +0.960 | +0.930 +0.958
+    Psychology        rho +0.825 [+0.643, +0.916] (12 models) | null p5 +0.839 p50 +0.923 (200) p 0.035 BELOW | key +0.735 | j-k +0.870 / +0.928 / +0.926 | +0.923 +0.944
+    summary: 2 of 14 anchors BELOW the permutation null's p5 | median rho(easy, hard) judge +0.909, key +0.843
+
+--- arm KOTLIN (9123 verdicts, 12 models) ---
+  cell                                     terc   nq    nm  ndec | accA   accB  | tie_dec tie_all inv | ref%  accA|ref+ accA|ref- | beta_len (se)   n    | called wrong(est) nominal status
+  Biology                                  easy   61   162    21 |  100.0  100.0 |    0.0   21.6    0.0 |  100.0  100.0    n/a | +2.363 (0.648)   127 |  37   1(0)   0.10 UNDETERMINED (nominal < 3)
+  Biology                                  mid    60   249   126 |   92.1   97.5 |    5.6   21.3    0.0 |  100.0   92.1    n/a | +0.473 (0.174)   196 |  49   0(0)   0.05 UNDETERMINED (nominal < 3)
+  Biology                                  hard   60   275   151 |   84.1   91.4 |    7.9   22.2    0.0 |   80.8   94.3   41.4 | -0.046 (0.102)   214 |  47   1(0)   0.15 UNDETERMINED (nominal < 3)
+  Biology                                  all   181   686   298 |   88.6   94.6 |    6.4   21.7    0.0 |   90.3   93.7   41.4 | +0.135 (0.081)   537 | (whole cell, for reference)
+  Business                                 easy   58    82    35 |   82.9   93.5 |   11.4   32.9    0.0 |  100.0   82.9    n/a | -0.479 (0.925)    55 |  34   0(0)   0.20 UNDETERMINED (nominal < 3)
+  Business                                 mid    58   105    56 |   85.7   96.0 |   10.7   30.5    0.0 |   91.1   92.2    n/a | +2.636 (1.189)    73 |  35   0(0)   0.09 UNDETERMINED (nominal < 3)
+  Business                                 hard   58   108    66 |   90.9   95.2 |    3.1   17.9    1.9 |   93.9   91.9    n/a | +0.370 (0.624)    87 |  34   0(0)   0.06 UNDETERMINED (nominal < 3)
+  Business                                 all   174   295   157 |   87.3   95.1 |    7.7   26.6    0.7 |   94.3   89.9    n/a | +0.617 (0.408)   215 | (whole cell, for reference)
+  Chemistry                                easy   89   274   134 |   95.5   99.2 |    3.0   31.1    0.4 |   99.3   95.5    n/a | +0.112 (0.207)   188 |  48   0(0)   0.13 UNDETERMINED (nominal < 3)
+  Chemistry                                mid    90   232   132 |   87.9   95.1 |    7.6   22.8    0.0 |   98.5   89.2    n/a | +0.098 (0.121)   179 |  50   1(0)   0.08 UNDETERMINED (nominal < 3)
+  Chemistry                                hard   89   246   121 |   77.7   86.2 |    9.9   19.7    0.8 |   78.5   90.5   30.8 | +0.453 (0.135)   196 |  44   0(0)   0.10 UNDETERMINED (nominal < 3)
+  Chemistry                                all   268   752   387 |   87.3   93.9 |    6.7   24.8    0.4 |   92.5   91.9   31.0 | +0.242 (0.078)   563 | (whole cell, for reference)
+  Computer science                         easy   54   159    66 |   95.5  100.0 |    4.5   22.6    0.0 |   97.0   96.9    n/a | +5.621 (1.823)   123 |  39   0(0)   0.11 UNDETERMINED (nominal < 3)
+  Computer science                         mid    54   223   119 |   79.8   91.3 |   12.6   25.6    0.0 |   91.6   86.2    n/a | +0.197 (0.144)   166 |  43   0(0)   0.03 UNDETERMINED (nominal < 3)
+  Computer science                         hard   54   244   117 |   78.6   86.0 |    7.8   18.1    0.4 |   78.6   91.3   32.0 | +0.133 (0.102)   199 |  44   0(0)   0.09 UNDETERMINED (nominal < 3)
+  Computer science                         all   162   626   302 |   82.8   91.2 |    9.0   21.9    0.2 |   87.7   90.6   27.0 | +0.195 (0.076)   488 | (whole cell, for reference)
+  Economics                                easy   60   136    26 |   92.3  100.0 |    7.7   27.2    0.0 |  100.0   92.3    n/a | +3.302 (1.080)    99 |  37   2(0)   0.08 UNDETERMINED (nominal < 3)
+  Economics                                mid    59   186   102 |   98.0   99.0 |    1.0   19.9    0.0 |   98.0  100.0    n/a | +6.576 (2.442)   149 |  47   0(0)   0.07 UNDETERMINED (nominal < 3)
+  Economics                                hard   59   261   167 |   88.6   94.9 |    6.6   17.2    0.0 |   86.2   96.5   39.1 | +0.424 (0.237)   216 |  46   0(0)   0.08 UNDETERMINED (nominal < 3)
+  Economics                                all   178   583   295 |   92.2   96.8 |    4.7   20.4    0.0 |   91.5   97.4   36.0 | +1.162 (0.291)   464 | (whole cell, for reference)
+  Engineering                              easy   54   142    72 |   83.3   89.6 |    5.6   23.4    0.7 |   95.8   87.0    n/a | +0.079 (0.080)   108 |  39   0(0)   0.05 UNDETERMINED (nominal < 3)
+  Engineering                              mid    54   153    84 |   83.3   93.3 |   10.7   22.9    0.0 |   85.7   90.3    n/a | +0.211 (0.150)   118 |  44   0(0)   0.10 UNDETERMINED (nominal < 3)
+  Engineering                              hard   54   104    36 |   55.6   74.1 |   25.0   27.9    0.0 |   47.2    n/a    n/a | +0.211 (0.149)    75 |  14   0(0)   0.07 UNDETERMINED (nominal < 3)
+  Engineering                              all   162   399   192 |   78.1   88.8 |   11.5   24.4    0.3 |   82.3   88.0   32.4 | +0.127 (0.067)   301 | (whole cell, for reference)
+  Health                                   easy   43   149    40 |   87.5   94.6 |    7.5   20.3    0.7 |   95.0   92.1    n/a | +0.446 (0.196)   118 |  43   0(0)   0.11 UNDETERMINED (nominal < 3)
+  Health                                   mid    42   155    80 |   92.5   96.1 |    2.5   14.9    0.6 |   96.2   96.1    n/a | +0.513 (0.192)   131 |  43   0(0)   0.12 UNDETERMINED (nominal < 3)
+  Health                                   hard   43   203    94 |   67.0   75.0 |   10.6   21.8    0.5 |   63.8   93.3   20.6 | +0.533 (0.269)   158 |  39   0(0)   0.12 UNDETERMINED (nominal < 3)
+  Health                                   all   128   507   214 |   80.4   86.9 |    7.0   19.2    0.6 |   81.8   94.3   17.9 | +0.339 (0.097)   407 | (whole cell, for reference)
+  History                                  easy   40   105    28 |   96.4   96.4 |    0.0   26.7    0.0 |  100.0   96.4    n/a | +3.461 (1.253)    77 |  32   0(0)   0.12 UNDETERMINED (nominal < 3)
+  History                                  mid    39   124    82 |   75.6   80.5 |    6.1   12.9    0.0 |   73.2   98.3   13.6 | +0.543 (0.351)   108 |  36   0(0)   0.11 UNDETERMINED (nominal < 3)
+  History                                  hard   38   147    76 |   59.2   61.6 |    3.9   15.6    0.0 |   48.7   97.3   23.1 | +0.761 (0.282)   124 |  35   2(0)   0.01 UNDETERMINED (nominal < 3)
+  History                                  all   117   376   186 |   72.0   75.3 |    4.3   17.8    0.0 |   67.2   97.6   19.7 | +0.946 (0.210)   309 | (whole cell, for reference)
+  Law                                      easy   90   180   107 |   91.6   98.0 |    6.5   15.0    0.0 |   95.3   95.1    n/a | +0.760 (0.230)   153 |  48   0(0)   0.09 UNDETERMINED (nominal < 3)
+  Law                                      mid    87   201   130 |   84.6   88.7 |    4.6   15.0    0.5 |   86.2   96.4    n/a | +1.489 (0.416)   170 |  37   1(0)   0.04 UNDETERMINED (nominal < 3)
+  Law                                      hard   89   212    77 |   76.6   84.3 |    9.1   21.2    0.0 |   58.4   95.6   50.0 | +0.582 (0.258)   167 |  45   8(1)   0.08 UNDETERMINED (nominal < 3)
+  Law                                      all   266   593   314 |   85.0   90.8 |    6.4   17.2    0.2 |   82.5   95.8   34.5 | +0.830 (0.196)   490 | (whole cell, for reference)
+  Math                                     easy  102   367   161 |   95.7   99.4 |    2.5   39.7    0.5 |  100.0   95.7    n/a | +0.205 (0.256)   220 |  51   0(0)   0.03 UNDETERMINED (nominal < 3)
+  Math                                     mid   101   409   241 |   90.0   96.9 |    7.1   24.8    0.2 |   97.5   91.1    n/a | +0.126 (0.135)   307 |  52   0(0)   0.02 UNDETERMINED (nominal < 3)
+  Math                                     hard  101   453   254 |   87.4   92.1 |    5.1   20.1    0.0 |   90.6   93.9   25.0 | +0.285 (0.097)   362 |  51   0(0)   0.01 UNDETERMINED (nominal < 3)
+  Math                                     all   304  1229   656 |   90.4   95.6 |    5.2   27.5    0.2 |   95.4   93.3   30.0 | +0.198 (0.068)   889 | (whole cell, for reference)
+  Other                                    easy   71   216    53 |   96.2  100.0 |    3.8   27.3    0.0 |  100.0   96.2    n/a | +6.484 (1.685)   157 |  47   4(0)   0.17 UNDETERMINED (nominal < 3)
+  Other                                    mid    70   257   159 |   90.6   98.0 |    7.5   16.0    0.4 |   91.8   96.6    n/a | +0.284 (0.190)   215 |  41   0(0)   0.09 UNDETERMINED (nominal < 3)
+  Other                                    hard   70   308   151 |   70.2   80.3 |   12.6   23.1    0.0 |   62.9   94.7   28.6 | +1.092 (0.268)   237 |  38   1(0)   0.10 UNDETERMINED (nominal < 3)
+  Other                                    all   211   781   363 |   82.9   91.2 |    9.1   21.9    0.1 |   81.0   95.9   27.5 | +0.900 (0.193)   609 | (whole cell, for reference)
+  Philosophy                               easy   43    94    33 |   90.9   96.8 |    6.1   24.5    0.0 |   97.0   93.8    n/a | +4.797 (1.745)    71 |  35   0(0)   0.11 UNDETERMINED (nominal < 3)
+  Philosophy                               mid    44   114    80 |   82.5   91.7 |   10.0   17.5    0.0 |   85.0   94.1    n/a | +3.539 (0.978)    94 |  34   0(0)   0.08 UNDETERMINED (nominal < 3)
+  Philosophy                               hard   44   133    63 |   74.6   88.7 |   15.9   24.8    0.0 |   63.5   92.5   43.5 | +1.054 (0.477)   100 |  33   0(0)   0.11 UNDETERMINED (nominal < 3)
+  Philosophy                               all   131   341   176 |   81.2   91.7 |   11.4   22.3    0.0 |   79.5   93.6   33.3 | +2.286 (0.408)   265 | (whole cell, for reference)
+  Physics                                  easy   87   307   142 |   95.1   98.5 |    3.5   23.5    0.0 |   98.6   96.4    n/a | +1.343 (0.372)   235 |  49   0(0)   0.02 UNDETERMINED (nominal < 3)
+  Physics                                  mid    86   438   246 |   89.4   94.0 |    4.9   21.9    0.0 |   98.4   90.1    n/a | +0.317 (0.117)   342 |  54   1(0)   0.10 UNDETERMINED (nominal < 3)
+  Physics                                  hard   86   404   213 |   78.9   87.0 |    9.4   17.6    0.2 |   88.7   84.1   37.5 | +0.159 (0.084)   332 |  48   0(0)   0.05 UNDETERMINED (nominal < 3)
+  Physics                                  all   259  1149   601 |   87.0   92.7 |    6.2   20.8    0.1 |   95.0   89.7   36.7 | +0.273 (0.070)   909 | (whole cell, for reference)
+  Psychology                               easy   87   208    34 |  100.0  100.0 |    0.0   18.8    0.0 |  100.0  100.0    n/a | +5.232 (1.261)   169 |  40   1(0)   0.07 UNDETERMINED (nominal < 3)
+  Psychology                               mid    87   256   146 |   92.5   96.4 |    4.1   14.1    0.0 |   91.1   97.0    n/a | +2.363 (0.590)   220 |  48   1(0)   0.06 UNDETERMINED (nominal < 3)
+  Psychology                               hard   86   342   174 |   67.8   75.6 |    9.8   23.8    0.3 |   60.9   95.3   25.0 | +0.926 (0.245)   260 |  37   0(0)   0.08 UNDETERMINED (nominal < 3)
+  Psychology                               all   260   806   354 |   81.1   87.0 |    6.5   19.4    0.1 |   77.1   96.7   28.4 | +1.458 (0.208)   649 | (whole cell, for reference)
+  POOLED over the 14 anchors (each question's tercile within its own anchor):
+    easy nq  939 nm  2581 ndec   952 | accA   93.4 accB   97.9 | tie_dec    4.2 tie_all   26.2 inv    0.2 | ref%   98.3 accA|ref+   94.7 accA|ref-    n/a | beta_len +0.558 (0.067) n 1900
+    mid  nq  931 nm  3102 ndec  1783 | accA   88.2 accB   94.4 | tie_dec    6.5 tie_all   20.3 inv    0.1 | ref%   93.2 accA|ref+   93.0 accA|ref-   23.0 | beta_len +0.345 (0.050) n 2468
+    hard nq  931 nm  3440 ndec  1760 | accA   77.8 accB   85.4 | tie_dec    8.8 tie_all   20.5 inv    0.2 | ref%   75.8 accA|ref+   92.4 accA|ref-   31.9 | beta_len +0.238 (0.036) n 2727
+    CONTRAST hard - easy, accuracy A (key-decidable): easy 0.934 (n 952) hard 0.778 (n 1760) diff -15.6pp, question-clustered bootstrap 95% [-18.4, -11.9]pp
+    CONTRAST hard - easy, tie rate (key-decidable): easy 0.042 (n 948) hard 0.088 (n 1757) diff +4.5pp, question-clustered bootstrap 95% [+2.6, +6.6]pp
+    CONTRAST beta_len hard - easy: +0.2378 - +0.5578 = -0.3199 per 1k chars, z -4.19 (independent strata)
+  ORDER per anchor: Spearman(easy, hard) [question-bootstrap 95%] | within-cell permutation null p5 / p50 (n) p | key's own rho(easy, hard) | rho(judge, key) easy/mid/hard | rho(e,m) rho(m,h)
+    Biology           rho +0.916 [+0.734, +0.951] (12 models) | null p5 +0.860 p50 +0.941 (200) p 0.333 within | key +0.821 | j-k +0.806 / +0.989 / +0.951 | +0.895 +0.923
+    Business          rho +0.594 [+0.381, +0.818] (12 models) | null p5 +0.748 p50 +0.881 (200) p 0.005 BELOW | key +0.802 | j-k +0.942 / +0.898 / +0.683 | +0.881 +0.846
+    Chemistry         rho +0.937 [+0.783, +0.962] (12 models) | null p5 +0.909 p50 +0.958 (200) p 0.308 within | key +0.935 | j-k +0.979 / +0.925 / +0.918 | +0.986 +0.951
+    Computer science  rho +0.909 [+0.594, +0.944] (12 models) | null p5 +0.867 p50 +0.927 (200) p 0.353 within | key +0.929 | j-k +0.891 / +0.937 / +0.958 | +0.944 +0.951
+    Economics         rho +0.909 [+0.752, +0.930] (12 models) | null p5 +0.853 p50 +0.930 (200) p 0.284 within | key +0.864 | j-k +0.849 / +0.970 / +0.970 | +0.916 +0.937
+    Engineering       rho +0.881 [+0.499, +0.944] (12 models) | null p5 +0.783 p50 +0.902 (200) p 0.348 within | key +0.812 | j-k +0.944 / +0.911 / +0.758 | +0.916 +0.909
+    Health            rho +0.741 [+0.587, +0.871] (12 models) | null p5 +0.762 p50 +0.881 (200) p 0.045 BELOW | key +0.866 | j-k +0.845 / +0.940 / +0.949 | +0.923 +0.874
+    History           rho +0.860 [+0.444, +0.874] (12 models) | null p5 +0.734 p50 +0.867 (200) p 0.488 within | key +0.910 | j-k +0.855 / +0.901 / +0.828 | +0.797 +0.811
+    Law               rho +0.965 [+0.818, +0.979] (12 models) | null p5 +0.867 p50 +0.944 (200) p 0.786 within | key +0.626 | j-k +0.953 / +0.902 / +0.632 | +0.930 +0.972
+    Math              rho +0.951 [+0.846, +0.979] (12 models) | null p5 +0.937 p50 +0.965 (200) p 0.204 within | key +0.954 | j-k +0.947 / +0.965 / +0.972 | +0.965 +0.986
+    Other             rho +0.930 [+0.640, +0.944] (12 models) | null p5 +0.804 p50 +0.902 (200) p 0.701 within | key +0.686 | j-k +0.847 / +0.946 / +0.823 | +0.867 +0.923
+    Philosophy        rho +0.720 [+0.468, +0.867] (12 models) | null p5 +0.671 p50 +0.839 (200) p 0.129 within | key +0.752 | j-k +0.892 / +0.916 / +0.936 | +0.867 +0.818
+    Physics           rho +0.902 [+0.811, +0.972] (12 models) | null p5 +0.937 p50 +0.972 (200) p 0.005 BELOW | key +0.942 | j-k +0.937 / +0.935 / +0.935 | +0.902 +0.923
+    Psychology        rho +0.832 [+0.615, +0.916] (12 models) | null p5 +0.846 p50 +0.923 (200) p 0.025 BELOW | key +0.735 | j-k +0.842 / +0.921 / +0.909 | +0.888 +0.958
+    summary: 4 of 14 anchors BELOW the permutation null's p5 | median rho(easy, hard) judge +0.906, key +0.843
+
+--- residue (KTD-CHECK: four established wrong-direction edges, all Meta-Llama-3_1-70B-Instruct under-rated) by tercile on MISTRAL-MERGED ---
+  per tercile: matches | key-decidable | key gives Meta-Llama-3_1 | judge gives it on those | judge gives the opponent on those (= wrong direction) | ties on those
+  Law         Meta-Llama-3_1-70B-Instruct vs gpt-4o-mini          easy 1|0|0|0|0|0  mid 0|0|0|0|0|0  hard 1|0|0|0|0|0
+  Law         Meta-Llama-3_1-70B-Instruct vs deepseek-chat-v2_5   easy 6|2|1|1|0|0  mid 5|4|2|0|1|1  hard 6|0|0|0|0|0
+  Law         Meta-Llama-3_1-70B-Instruct vs Qwen1.5-72B-Chat     easy 7|6|4|3|1|0  mid 12|9|5|2|3|0  hard 5|1|0|0|0|0
+  Philosophy  Meta-Llama-3_1-70B-Instruct vs gpt-4o-mini          easy 0|0|0|0|0|0  mid 2|0|0|0|0|0  hard 2|0|0|0|0|0
+  pooled      four named edges (support-limited)                      easy 14|8|5|4|1|0  mid 19|13|7|2|4|1  hard 14|1|0|0|0|0
+  Law         Meta-Llama-3_1-70B-Instruct vs every opponent       easy 48|27|20|19|1|0  mid 57|30|15|7|5|3  hard 44|6|0|0|0|0
+  Philosophy  Meta-Llama-3_1-70B-Instruct vs every opponent       easy 29|12|11|10|0|1  mid 38|26|17|15|0|2  hard 32|7|3|3|0|0
+  pooled      Meta-Llama-3_1 vs every opponent, Law + Philosophy (C5 block) easy 77|39|31|29|1|1  mid 95|56|32|22|5|5  hard 76|13|3|3|0|0
+  Meta-Llama-3_1-70B-Instruct on the stratum boards of MISTRAL-MERGED: judge rank / key rank (of n models), established wrong-direction edges naming it:
+    Law         easy 11/7 (of 20) wrong(est) vs [gpt-4o-mini] | mid 14/8 (of 20) wrong(est) vs [deepseek-chat-] | hard 11/8 (of 20) wrong(est) vs []
+    Philosophy  easy 9/8 (of 20) wrong(est) vs [] | mid 9/7 (of 20) wrong(est) vs [] | hard 10/7 (of 20) wrong(est) vs []
+
+--- instrument ---
+  Spearman(difficulty, key-free plurality agreement of the roster's predicted letters) over 2811 judged questions: +0.785 (the deployable proxy candidate)
+  Spearman(primary instrument 46-model roster, secondary instrument 26 outside models) over 2811 questions: +0.986
+  OPTIONS-key join fidelity on the judged questions: 1:1 2688 | multi 3 | none 120 | gt_answer == mmlu_pro.answer on 2681
+
+--- registered criteria (scored on MISTRAL-MERGED; the other arms are the replication) ---
+  C1 accuracy A hard - easy (pooled over anchors) -15.5pp [-18.5, -12.4]: HELD (criterion: the interval excludes 0 on the negative side)
+  C2 tie rate hard - easy (key-decidable, pooled) +6.6pp [+5.0, +8.3]: HELD (criterion: the interval excludes 0 on the positive side)
+  C3 beta_len larger on hard than easy: z -12.86: FAILED (criterion: z >= 1.96)
+  C4 easy-vs-hard order below the within-cell permutation null in 5 of 14 anchors (median rho judge +0.898, key +0.809): FAILED (criterion: >= 7 of 14)
+  C5 residue wrong-direction rate (Meta-Llama-3_1 vs every opponent, Law + Philosophy, on pairs the key gives to it) per tercile: easy    3.2 (n 31) | mid   15.6 (n 32) | hard    0.0 (n 3)
+     hardest supported (mid) - easiest supported (easy) = +12.4pp: HELD (criterion: >= 10pp; the residue is a harder-stratum effect)
+  replication arms: MISTRAL-X12: accA diff -16.7pp [-20.2, -13.7], order below null 3/14 | GROK-CALIB: accA diff -16.5pp [-19.7, -13.6], order below null 2/14 | KOTLIN: accA diff -15.6pp [-18.4, -11.9], order below null 4/14
+  FALSIFIER (per-cell boards are difficulty-invariant): NOT TRIGGERED
+  elapsed 406 s

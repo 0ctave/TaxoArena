@@ -1,0 +1,232 @@
+{
+  "id": "G17-CANARY",
+  "title": "G17-CANARY (RP21): the v2 recipe's within-session and epoch retest floor on a frozen 300-match v2 canary drawn from the K46 store, plus the v1 canary's epoch 3 (judged; 900 matches / 1,800 calls in two legs on two posting days; REGISTERED)",
+  "question": "(a) v2 leg: how often does the v2 recipe, as ARCH-V2-PILOT-K46 posted it, give a different combined dual-order verdict when the same request body is posted again (d_r within one session; d_e across time against the K46 cache)? (b) v1 leg: does the v1 frozen canary (set 50af669ac6997f9f) hold its alarm at epoch 3 (pass 5, >= 2 weeks after passes 3/4)?",
+  "kind": "judged",
+  "state": "paused",
+  "registration": {
+    "commit": "the commit that writes this record (parent 96d6ca1e)",
+    "program_lines": "docs/judge_v2_program.md L22762-L22784",
+    "program_lines_as_of": "the commit that writes it, parent 96d6ca1e, re-grepped",
+    "date": "2026-10-01",
+    "heading": "## Registered 2026-10-01 (before any code or call) — G17-CANARY (RP21): the v2 recipe's within-session and epoch retest floor on a frozen 300-match v2 canary ...",
+    "provenance": "docs/agents/plans/2026-10-02_rp21_rp20_drafts.md (41cd5cbd) section '## 1. RP21 G17-CANARY: registration text (for the registrar)', registered as drafted, both legs; the brief's 'v2 leg 300 matches / 600 calls' is per pass (two passes: 600 / 1,200)"
+  },
+  "script": {
+    "path": "tools/analysis/k46_repost.py (v2 leg) + tools/analysis/canary_baseline.py --pass 5 (v1 epoch 3)",
+    "sha16": "k46_repost.py sha256-lf16:66df284f606838bd (blob:e7eb8e952cea985441b758da832ca9ba41078bc0, LF); canary_baseline.py sha256-lf16:5db7b3f4df19389a (blob:fbceff8dae5215659afd04aef8f7f717d43fb1bc, LF; worktree sha256-crlf16:fc5f649bff90b1cc)",
+    "commit": "3679bae4 (merge by path of k46-repost fb1430d8 and canary-pass5 e1a307f2)",
+    "v2_leg_as_run": "tools/analysis/k46_repost.py blob:8c5ce9db5f7cf39577264e222450a3e1f599eae6 (sha256-lf16:dd8152585fd7f0d7, LF of record; main working tree sha256-crlf16:06eccdf43ed00ddb), merged 2b6591bb (k46-repost2 30f86150)"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_paid_prereqs.md",
+    "commit": "89b50493",
+    "scope": "v1 leg (pass 5): READY for the dry-run from main under C-E3-1 and --go under C-E3-1..4 (date-gated 2026-10-08; gate file READY_canary_epoch3.md owed, C-E3-2). v2 leg (k46_repost.py): dry-runs READY; --go NOT READY until C-K1..C-K7 (gate file READY_k46_repost.md after the C-K1 delta and its review)",
+    "v2_leg": {
+      "file": "docs/reviews/READY_k46_repost.md (gate file; READY-WITH-CONDITIONS C-K8, C-K9, C-E3-3)",
+      "commit": "80d9bedf (evidence docs/reviews/READY_k46_repost2_e1configs.md); merged 2b6591bb; lint lines inserted 2026-10-01 by the registrar (D2), transport_check (c) PASS"
+    }
+  },
+  "go": "n/a (900 matches < 4,000; day placement: neither leg posts on an RP20 day, the orchestrator's brief, plan Amendment 34)",
+  "run": {
+    "outcome_file": "experiment_results/archv2/k46_repost/g17_v2_canary_outcome.txt (blob:ace0fb958cd0111e61134872b8db4b77454cef2e, sha256-lf16:71c47d8124cdddb6, LF)",
+    "outcome_commit": "f8530b54",
+    "calls": "1,200 of 1,260 (v2 leg; day ledger 24 + 576 + 24 + 576, experiment_results/day_calls_2026-10-01.json)",
+    "cce": 0,
+    "pool": "pv2_41dbd3dbcd399df0 (v2 split, draw 5a3e756; content-closed under CK-CLOSE-v2 with the residual disclosed); K46 store sha256 44724d25aa8653b4... before = after",
+    "date": "2026-10-01",
+    "caches_uncommitted": "k46_repost_canary_v21.db sha256 e24df0c5187e1f6458a27b6440a1515f49867a0bef61bea4fe7cb644f799ad3d; k46_repost_canary_v22.db sha256 f2db9fa04408f65aaa54bc84dab998afa7dcf53922f112a923a64208490399f7; backup experiment_results/_backup/rp21_v2_20261001/ (equal; same physical disk)",
+    "leg": "v2 only; v1 leg (pass 5) not run"
+  },
+  "review": {
+    "file": "docs/reviews/POSTRUN_rp21_v2.md",
+    "commit": "cb40d39e",
+    "verdict": "VALID (C0 (a)-(f) PASS re-derived; C1-v2 HELD, DESCRIPTIVE-ONLY; W1-W6; D1-D4 LOW)"
+  },
+  "criteria": [
+    {
+      "id": "C0",
+      "text": "VALIDITY first: set hash and order sha reproduced; K46 store sha256 equal before/after; payload_sha256 equality on 1,200 of 1,200 v2 rows; fingerprint azure:grok-4-1-fast-non-reasoning on every call; v2-2 within 2 h of v2-1; pilots pass the truncation guard; v1 passes 1-4 pins and floors 26/21/28 of 300 reproduced; failure -> that leg UNDETERMINED BY VALIDITY",
+      "result": "HELD",
+      "value": "v2 leg: (a)-(f) PASS: set 10e027fe046e2a07 / order 4fa3bc0e23ce2025; store equal; 1,200 of 1,200 bodies byte-identical; 1,200 of 1,200 azure:grok-4-1-fast-non-reasoning (D3 LOW: no system_fingerprint column; provider label + response_model read); v2-2 13 s after v2-1; pilots 0/12 unusable twice. v1 leg: OPEN",
+      "denominator": "all rows of each leg"
+    },
+    {
+      "id": "C1-v2",
+      "text": "DECIDING v2 (FLOOR-ADMISSIBLE; the INTERVAL decides): d_r(v2) = share of the 300 whose combined verdict differs v2-1 vs v2-2, convention A; HELD iff 95% upper bound <= 0.15; FAILED iff 95% lower bound > 0.15; UNDETERMINED otherwise",
+      "result": "HELD",
+      "value": "HELD (DESCRIPTIVE-ONLY per the registered Support (f)); d_r(v2) = 30/300 = 0.100; 95% NORMAL [0.0658, 0.1342] (component-clustered bootstrap SE 0.0174; B 2,000, seed 42); 90% [0.0713, 0.1287] printed beside, decides nothing; convention B 30/300",
+      "denominator": "300 matches in 300 CK-CLOSE components (Kish 1.00)"
+    },
+    {
+      "id": "C2-v2",
+      "text": "DESCRIPTIVE: d_e(v2) (K46 vs v2-1), Delta = d_e - d_r paired, reversals, TIE share per pass, strata",
+      "result": "n/a",
+      "value": "DESCRIPTIVE (schema result n/a): d_e(v2) 32/300 = 0.1067 (95% NORMAL [0.0720, 0.1413], SE 0.0177); Delta +0.0067 (95% [-0.0325, +0.0458]); reversals 1 / 0; TIE share 0.1933 / 0.1900 / 0.2167; strata d_r NONE 22/208, ONE 8/92 (7/81 + 1/11), health 11/150, math 19/150",
+      "denominator": "300 matches"
+    },
+    {
+      "id": "C3-v2",
+      "text": "rule fixed now, live from v2 epoch 2: v2 floor of record = d_e(v2); alarm bar = d_e + 3 x SE(d_e) at n 300, one-sided, point decides; not live this epoch",
+      "result": "n/a",
+      "value": "DESCRIPTIVE (schema result n/a): rule fixed, not live: v2 floor of record d_e(v2) = 0.1067; alarm bar 0.1597 (bootstrap SE 0.0177; analytic 0.1601 beside)",
+      "denominator": "300 matches"
+    },
+    {
+      "id": "C1-v1",
+      "text": "DECIDING v1 (THE ALARM; the POINT decides, no interval clause): d53 = share differing pass 3 vs pass 5; ALARM iff d53 >= 0.138; fires Amendment 4 trigger (3)",
+      "result": "n/a",
+      "value": "OPEN (schema result n/a): pass 5 not run (not before 2026-10-08)",
+      "denominator": "300 matches over 279 questions ([P-FAM], id-disjoint)"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "d_r(v2) = 0.10 [0.07, 0.14]; C1-v2 HELD 0.55 / UNDETERMINED 0.38 / FAILED 0.07",
+      "result": "HELD",
+      "value": "0.1000 in [0.07, 0.14]; C1-v2 HELD (p 0.55)",
+      "denominator": "300"
+    },
+    {
+      "id": "P2",
+      "text": "d_e(v2) = 0.11 [0.07, 0.15]; Delta = +0.01 [-0.04, +0.06]",
+      "result": "HELD",
+      "value": "d_e 0.1067 in [0.07, 0.15]; Delta +0.0067 in [-0.04, +0.06]",
+      "denominator": "300"
+    },
+    {
+      "id": "P3",
+      "text": "reversals 0 [0, 2] in each v2 pair",
+      "result": "HELD",
+      "value": "reversals 1 / 0 in [0, 2]",
+      "denominator": "300"
+    },
+    {
+      "id": "P4",
+      "text": "NONE stratum d_r exceeds ONE's by +0.03 [-0.03, +0.08] (descriptive)",
+      "result": "HELD",
+      "value": "NONE - ONE d_r = +0.0188 in [-0.03, +0.08] (descriptive)",
+      "denominator": "300"
+    },
+    {
+      "id": "P5",
+      "text": "d53 = 0.085 [0.05, 0.125]; C1-v1 NO ALARM 0.92",
+      "result": "n/a",
+      "value": "OPEN (schema result n/a): pass 5 not run",
+      "denominator": "300"
+    },
+    {
+      "id": "P6",
+      "text": "fingerprint on 1,800 of 1,800; unusable 0 [0, 3] per leg",
+      "result": "n/a",
+      "value": "OPEN (schema result n/a): v2 half: 1,200 of 1,200 fingerprinted, unusable 0; whole (1,800) OPEN until pass 5",
+      "denominator": "1,800 calls"
+    }
+  ],
+  "falsifier": {
+    "text": "C1-v2 FAILED: RP20's C1 is under 0.70 power at delta 4pp; RP20 re-registered pre-data before it posts (delta raised or DESCRIPTIVE-ONLY); RP19's planning discordance re-priced. C1-v1 ALARM: fires Amendment 4 trigger (3); overturns 'the deployed judge's verdict floor is stable since 2026-09-22'; every judged number after pass 4 flagged for re-read by insertion.",
+    "fired": false,
+    "status": "C1-v2 FAILED: NOT FIRED (RP20 not re-registered); C1-v1 ALARM: open"
+  },
+  "numbers_of_record": {
+    "support_C1_v2": "300 in 300 components, Kish 1.00; DEFF 1.169 MEASURED on the v1 canary (CANARY-EPOCH2-RUNG; 1.08-1.29), transported; n_eff 256.6; SE at d_r 0.10 = sqrt(0.10 x 0.90 / 300) x sqrt(1.169) = 0.01873; MDE80 0.0524 vs bar 0.15 (distance 0.05)",
+    "verdict_line_C1_v2": "HELD DESCRIPTIVE-ONLY at the prediction (break-even true d_r about 0.098); FAILED SCOREABLE against true d_r >= 0.203",
+    "structural_C1_v2": "frozen 300-set bounds precision at any number of passes; scoreable HELD at 0.10 needs about 330 matches, at 0.12 about 1,075 (new registration)",
+    "bar_derivation": "0.15 = discordance at which RP20 C1 TOST (delta 4pp, 1,258, DEFF 1.885) falls below 0.70 power: SE 0.040/(1.645+1.036) = 0.01492; p = 0.01492^2 x 1,258 / 1.885 = 0.1486",
+    "support_C1_v1": "300 over 279 questions; DEFF 1.169 measured; n_eff 256.6; SE = sqrt(0.087 x 0.913 / 300) x sqrt(1.169) = 0.01759; MDE80 0.0493; distance 0.051: SCOREABLE (thin, 0.2pp)",
+    "support_C2": "Delta SE <= 0.037 (triangle inequality), MDE <= 0.105; DESCRIPTIVE-ONLY",
+    "counts": "v2 leg 600 matches / 1,200 calls (ceiling 1,260); v1 epoch-3 leg 300 / 600 (ceiling 630; not before 2026-10-08); total 900 / 1,800 (ceiling 1,890)",
+    "d_r_v2": "30/300 = 0.100; 95% NORMAL [0.0658, 0.1342]; component-clustered bootstrap SE 0.0174 (B 2,000, seed 42; seeds 43-62 0.0169-0.0179); 300 matches in 300 CK-CLOSE components",
+    "support_as_run_C1_v2": "DEFF 1.00 by construction (one match per component); the printed 1.053 is bootstrap noise (D1 LOW); n_eff 300; MDE80 0.0485 (analytic SE 0.01732); HELD stays DESCRIPTIVE-ONLY per the registered Support (f), not promoted",
+    "d_e_v2": "32/300 = 0.1067; 95% NORMAL [0.0720, 0.1413], SE 0.0177 (descriptive; v2 floor of record under C3, not live)",
+    "alarm_bar_v2": "0.1597 = 0.1067 + 3 x 0.0177 (bootstrap SE; analytic 0.1601 beside); not live this epoch",
+    "calls_v2_leg": "1,200 of 1,260 (2026-10-01)"
+  },
+  "sentence_of_record": "C1-v2 HELD (DESCRIPTIVE-ONLY per the registered Support (f)); d_r(v2) = 30/300 = 0.100, 95% NORMAL [0.0658, 0.1342] (component-clustered bootstrap SE 0.0174), on 300 matches in 300 CK-CLOSE components of pool pv2_41dbd3dbcd399df0 (content-closed under CK-CLOSE-v2 with the residual disclosed) [a within-session retest floor measurement of the v2 recipe, not fidelity; DEFF 1.00 by construction, the printed 1.053 is bootstrap noise; P5 and P6 open until pass 5]",
+  "chips": [
+    "v2 leg: C1-v2 HELD (DESCRIPTIVE-ONLY per Support (f)) [ok]",
+    "v1 leg: pass 5 READY (C-E3-1..4), not before 2026-10-08; P5, P6 OPEN [plan]"
+  ],
+  "brackets": [
+    {
+      "date": "2026-10-01",
+      "by": "registrar (orchestrator's ruling; READY_paid_prereqs R1-R5, R7)",
+      "text": "C1-v2 interval form NORMAL (percentile beside; both_agree not adopted); pool pin = store run_meta pool_id + store sha256 44724d25... + eval-view sha e35b7518 (pool_guard cannot verify pv2); v0 reference-correct flag read at --analyze-canary, not with the set; agreement with the reference side NOT BUILT (DESCRIPTIVE); ceilings 1,260 / 630 enforced in the posting scripts, not in accepted_tests_ledger.py; pass 5 not before 2026-10-08, on its own day, never an RP20 day. docs/judge_v2_program.md L22846-L22854 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data) — READY_paid_prereqs 89b50493 and merge 3679bae4: ...\"; _as_of the commit that writes it, parent 3679bae4, re-grepped)"
+    },
+    {
+      "date": "2026-10-01",
+      "by": "registrar (POSTRUN_rp21_v2 cb40d39e, W1-W6, D1-D4)",
+      "text": "v2-leg outcome recorded: VALID; C1-v2 HELD DESCRIPTIVE-ONLY; RP20 order gate OPEN; D2: two lint lines inserted into READY_k46_repost.md, transport_check (c) PASS (rc 0); D4: READY_k46_repost2_e1configs.md #13 '(SCOREABLE)' corrected by insertion; D1 (DEFF print) owed before RP20 --analyze; D3 disclosed. docs/judge_v2_program.md L22862-L22879 (section \"## G17-CANARY (2026-10-01, 1,200 calls) — v2 leg VALID (docs/reviews/POSTRUN_rp21_v2.md, cb40d39e): C1-v2 HELD (DESCRIPTIVE-ONLY per the registered Support (f)); ...\"; _as_of the commit that writes it, parent 4ef4faad, re-grepped)"
+    },
+    {
+      "date": "2026-10-02",
+      "by": "registrar (READY_k46_deff.md, 0c34ebf1)",
+      "text": "k46_repost.py DEFF fix (k46-deff e0669e57; blob:4159d62eb62c6705de0132da9f336d9df365dcc0, sha256-lf16 58f621dc4582616b LF) READY for --analyze only (docs/reviews/READY_k46_deff.md, 0c34ebf1). M-1: merge by path only after RP20 and its ONE leg have posted (gate admits --go only for dd8152585fd7f0d7). M-2: MDE80 quoted from the bootstrap SE (RP21 0.0488). L-1: analytic DEFF named \"plug-in\" at 3 decimals. RP21 v2 re-analysed: DEFF 1.000 (plug-in), SE 0.0174, 95% [0.0658, 0.1342], C1-v2 HELD unchanged. docs/judge_v2_program.md L23062-L23068 (section \"## Registrar's record 2026-10-02 (insertion only; zero calls; nothing run; pre-data) — G13-BREAKDOWN READY review ...\"; _as_of the commit that writes it, parent 7e6858eb, re-grepped)"
+    },
+    {
+      "date": "2026-10-04",
+      "by": "registrar (consistency check 2026-10-04; zero calls)",
+      "text": "state running -> paused: not running (docs/agents/plans/2026-10-04_queue_rerank.md (002f20b8)); v1 leg pass 5 READY, not before 2026-10-08."
+    }
+  ],
+  "does_not_show": [
+    "fidelity or accuracy of either recipe",
+    "that the K46 recipe's NONE branch is sound (RP20)",
+    "drift beyond about 10 days (v2) or 2 weeks (v1)",
+    "any v1 number as content-closed evidence ([P-FAM])",
+    "a floor for anchors other than health / math, or k other than 37",
+    "a scoreable rung contrast (C2 bounded by the frozen set)",
+    "(v2 leg outcome) a scoreable floor: the HELD is descriptive-only",
+    "(v2 leg outcome) the v2 floor of record (d_e is fixed as the rule, live from the v2 epoch 2)",
+    "(v2 leg outcome) anything about the v1 canary (pass 5 open)"
+  ],
+  "ledger": {
+    "row_id": "G17-CANARY",
+    "version": "v336 (2026-10-01: v2-leg outcome; chips C1-v2 HELD (DESCRIPTIVE-ONLY per Support (f)) [ok], v1 leg pass 5 READY [plan])"
+  },
+  "depends_on": [
+    "CANARY-EPOCH2-RUNG",
+    "CANARY-BASELINE",
+    "ARCH-V2-PILOT-K46",
+    "K46-KEY-READ",
+    "READY-TEMPLATE-TRANSPORT"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "value": false,
+    "text": "closes nothing; CONTEXT §5 lines not touched"
+  },
+  "cost": {
+    "calls": 1800,
+    "cce": 0,
+    "ceiling": 1890,
+    "matches": 900,
+    "wall": "about 25 min (v2) + 15 min (v1) at 12.76 calls/min serial"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L22762-L22784 (section \"## Registered 2026-10-01 (before any code or call) — G17-CANARY (RP21): ...\"; _as_of the commit that writes it, parent 96d6ca1e, re-grepped)",
+    "docs/agents/plans/2026-10-02_rp21_rp20_drafts.md §0, §1 (41cd5cbd)",
+    "section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data) — RP21 and RP20 counts drift bracketed (HIGH); ...\" (docs/judge_v2_program.md L22812-L22818)",
+    "docs/reviews/READY_canary_analyze_fix_delta.md (c6ee6155) C3",
+    "docs/plan_2026-09-15.md Amendment 34 (day placement)",
+    "docs/reviews/READY_paid_prereqs.md (89b50493)",
+    "docs/judge_v2_program.md L22846-L22854 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data) — READY_paid_prereqs 89b50493 and merge 3679bae4: ...\"; _as_of the commit that writes it, parent 3679bae4, re-grepped)",
+    "docs/judge_v2_program.md L22862-L22879 (section \"## G17-CANARY (2026-10-01, 1,200 calls) — v2 leg VALID (docs/reviews/POSTRUN_rp21_v2.md, cb40d39e): C1-v2 HELD (DESCRIPTIVE-ONLY per the registered Support (f)); ...\"; _as_of the commit that writes it, parent 4ef4faad, re-grepped)",
+    "docs/reviews/POSTRUN_rp21_v2.md (cb40d39e)",
+    "experiment_results/archv2/k46_repost/g17_v2_canary_outcome.txt (f8530b54)",
+    "experiment_results/archv2/k46_repost/rp21_v2_runlog.txt (f8530b54)",
+    "docs/reviews/READY_k46_repost.md, READY_k46_repost2_e1configs.md (80d9bedf)",
+    "docs/reviews/READY_k46_deff.md (0c34ebf1)"
+  ],
+  "last_update": "2026-10-04",
+  "state_note": "v2 leg done (VALID, reviewed, scored); v1 leg (pass 5) READY under C-E3-1..4, not before 2026-10-08, own day; C1-v1, P5, P6 (whole) open",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Re-posts the exact same 300 judge requests of the new (v2) judge recipe and counts how often the combined verdict changes. A second leg will re-run the older v1 canary set about two weeks later to check for drift. About 1,800 calls are planned in total: 1,200 for the v2 leg (done) and 600 for the v1 leg (pending, not before 2026-10-08).",
+    "why": "It sets the judge's own noise floor, so that later changes in verdicts can be told apart from random judge wobble or drift over time.",
+    "information": "A low, stable retest rate means verdict changes above it are real; a high one means the judge is noisy. Result so far (paused): the v2 leg is done, and verdicts change on 10% of re-posted matches (about 7% to 13%). This is descriptive only and is a noise floor, not accuracy. The v1 epoch-3 leg and the drift-over-time comparison are still pending.",
+    "written": "2026-10-07"
+  }
+}

@@ -1,0 +1,95 @@
+{
+ "id": "FRESH-RULES-SIM",
+ "title": "FRESH-RULES-SIM: fresh-item rules A (frozen cells + assignment functions) and B (rebuild every arm) for BZ-AXIS-CONFIRM-FRESH, built and checked on a WORK pseudo-fresh split (exploratory)",
+ "question": "On a MATH WORK pseudo-fresh split, are rules A and B built as the registrar defined them, and what cell growth, SE_cell, f, rho and D(n) do they give for the BZ-AXIS-CONFIRM-FRESH power plan (with the A-vs-B readout)?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "none (exploratory, not registered); plan benchzoom docs/fresh-rules.md committed 2800aae before every statistic (POSTRUN row 1)",
+  "program_lines": "docs/judge_v2_program.md section \"## Registrar's record 2026-10-26 (insertion only; zero calls; nothing run) — BZ-AXIS-CONFIRM-FRESH draft amended per D-2026-10-26-1: ...\" L25708-L25724 (_as_of c3aada22) paragraph FRESH-RULES-SIM; outcome recorded in docs/judge_v2_program.md section \"## Registrar's record 2026-10-27 (insertion only; zero calls; nothing run) — FRESH-RULES-SIM (POSTRUN 8bebb4ee) and TAU-GRID (POSTRUN 6f16a31c) recorded done ...\" L25726-L25734 (_as_of the commit that writes it, parent c3aada22, re-grepped)",
+  "date": "2026-10-26"
+ },
+ "script": {
+  "path": "benchzoom examples/fresh-rules.py",
+  "sha16": "blob:659bb759 (run of record at 449e95a; git blob LF = sha256-lf16:9b4b6aa5e928804e); addendum blob:7251775f at 6e5ecc4 (sha256-lf16:a0cdbef228b9e78f; bootA2 / bootB2, --analyze-boot2); tip blob:f525a403 (sha256-lf16:a9c746264f179e73; docstring paragraph + one header label, [P2]); working tree 0 CR bytes, no CRLF rendering (POSTRUN)",
+  "commit": "benchzoom fresh-rules 8d8d824..f3b16fb, merged master 35b2724"
+ },
+ "ready": null,
+ "go": "D-2026-10-26-1 (\"yes to 1 and 3, build the variant both ways\"; a8990e4b) item (1): \"checked on a WORK pseudo-fresh simulation\"",
+ "run": {
+  "outcome_file": "E:/benchzoom_demo/followups/fresh-rules (summary.txt sha256 e99cf6a5..., SHA256SUMS 5f84e29c... 19/19; summary_boot2.txt b86cfe68..., SHA256SUMS_boot2 6/6; splits.json d994dd06...; backup 236/236 OK per POSTRUN)",
+  "outcome_commit": "outputs not committed",
+  "calls": 0,
+  "cce": 0,
+  "pool": "MATH WORK rows only (2,949 items; text of all 4,914 items); 5 pseudo-fresh splits of 885 items; vault_reads 0 in every part JSON, builds model_responses_read False (POSTRUN)",
+  "date": "2026-10-26"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_FRESH-RULES-SIM.md",
+  "commit": "8bebb4ee",
+  "verdict": "OUTCOME CONFIRMED (exploratory), every number and word reproduces; MERGEABLE; W3/W4 n* and W2 CONSTANT REFUTED as planning inputs (H1); rule-A leakage mutants R7/R8 survive (H2); M1 SUBSTITUTED (clustered form)"
+ },
+ "criteria": [],
+ "predictions": [],
+ "falsifier": {
+  "text": "none (exploratory)",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "table at n 885 (phi 1.00), rule A / rule B": "C1(V0) -0.010 (0.022) / -0.016 (0.017); C1(K) +0.012 (0.032) / +0.035 (0.043); C1(N) +0.455 (0.129) / +0.050 (0.037); D_K -0.022 (0.028) / -0.052 (0.036); D_N -0.464 (0.130) / -0.067 (0.035); G(N|L2+V0) +0.478 (0.134) / +0.060 (0.039); G(V0|L2+N) -0.010 (0.012) / -0.015 (0.009) (x 1e-3 nats per cell; benchzoom docs/fresh-rules.md, POSTRUN row 6)",
+  "W1": "A AND B DISAGREE on N, N512: D_AB(N) +0.4045 (0.1308), D_AB(N512) +0.3832 (0.1245), 0/5 splits within 1 SE; V0 +0.0066 (0.0199), 2/5 within 1 SE; K -0.0233 (0.0285), 4/5; ARI 0.743 / 0.743 (POSTRUN row 7; L3: agreement of near-zero gains is not agreement at the planned n; at 885 A-vs-B on N measures pool size, licence 4)",
+  "W2-W4 (planning words)": "carried only with the words 'transport SE understated x1.7-x4.1 at n 2,949 (POSTRUN_FRESH-RULES-SIM row 9)': W2 DEFF CONSTANT IN n for 7 of 10, GROWS for D_K (Q 1.53 A / 1.83 B), SHRINKS for D_N under B (0.65); W3 / W4 all SCOREABLE; REFUTED as planning inputs (H1): at the sim's own n = 2,949 point DEFF grows with n for every contrast beyond 885",
+  "transported vs measured SE at n 2,949 (rule B, from 885)": "D_K 0.0321 vs 0.0553 (x1.72); D_N 0.0192 vs 0.0658 (x3.43); G(N|L2+V0) 0.0215 vs 0.0611 (x2.85); G(V0|L2+N) 0.0071 vs 0.0152 (x2.14); P meter 0.0093 vs 0.0316 (x3.41); P cell 0.0139 vs 0.0570 (x4.10) (POSTRUN row 9)",
+  "cell growth": "c 0.007439 per item (OLS 4.38 + 0.006423 x) vs 36/4,914 = 0.007326 (+1.5%); range 4,029-4,914 items, so 7,863 is a 1.6x extrapolation (POSTRUN row 11, licence 1)",
+  "rho, clustered form (B / A vs WORK)": "P 0.0255 / 0.0293 vs 0.0279; G(V0|L2+N) 0.0188 / 0.0130 vs 0.0152; D_K 0.0332 / 0.0199 vs 0.0171; kNN contrasts ~0 vs WORK 0.0059 (D_N) / 0.0096 (POSTRUN licence 2)",
+  "D_N cell factor at WORK scale": "f 1.215 (V0-leaf; DEFF 1.48, rho 0.00589), measured on the repro part (= FLAT-COMPARE per item, n 2,949); clustered form (SUBSTITUTED for the declared SE_cell) (M1); replaces the draft's stand-in 1.82; under the draft transport (SE_W 0.05419, distance 0.25): MDE80 at n 2,949 0.206 (cell growth) / 0.220 (fixed 36), floor 0.126, n* 1,873-2,055 with the caveat that n* below 2,949 is not licensed (POSTRUN 'Does not license' 1 and 3)",
+  "resampling f, grouped inner folds (split 0)": "A 2.11 / 1.02 / 0.94 / 3.78 / 1.82; B 1.95 / 1.13 / 0.99 / 4.83 / 1.87 (D_K, D_N, G(N|L2+V0), G(V0|L2+N), P) (POSTRUN row 10)",
+  "rule-B rebuild wall-clock": "~245 s per replicate build + ~52 s harness (6 workers) (POSTRUN licence 5)"
+ },
+ "sentence_of_record": "On a MATH WORK pseudo-fresh simulation (5 splits of 885 items; WORK rows only; 0 LLM calls) rules A and B were built as the registrar defined them; V0's leaf count grows about in proportion to the items it is built on (c 0.007439 vs 0.007326), and D_N's WORK cell factor is 1.215 (clustered form, SUBSTITUTED for the declared SE_cell) [EXPLORATORY, adjudicates nothing; POSTRUN 8bebb4ee: W3/W4 n* and 'DEFF CONSTANT IN n' are not planning inputs, transport SE understated x1.7-x4.1 at n 2,949 (row 9); rule-A leakage guards owed (H2)]",
+ "chips": [],
+ "brackets": [
+  {
+   "date": "2026-10-27",
+   "by": "registrar",
+   "text": "H1 (POSTRUN 8bebb4ee): W3/W4 n* and W2's CONSTANT words do not enter the BZ-AXIS-CONFIRM-FRESH Support; W2-W4 carried only with 'transport SE understated x1.7-x4.1 at n 2,949 (POSTRUN_FRESH-RULES-SIM row 9)'; n* stays owed"
+  },
+  {
+   "date": "2026-10-27",
+   "by": "registrar",
+   "text": "H2 (POSTRUN 8bebb4ee): rule-A leakage mutants R7 (pool parent reads B0's fresh-text leaves) and R8 (rule-A tree on old + fresh text) survive the selftest; guard defects, not outcome defects (row 3 count checks clean); fix owed before any reuse of the rule-A code in a READY: queue item BZ-GUARDS-FRESH-TAU"
+  },
+  {
+   "date": "2026-10-27",
+   "by": "registrar",
+   "text": "M1 (POSTRUN 8bebb4ee): every transported factor is the clustered form; any copy is labelled 'clustered form (SUBSTITUTED for the declared SE_cell)'. L1: G(V0|L2+N) grouped f_boot2 is 3.78 (A) / 4.83 (B), not '4-5'"
+  }
+ ],
+ "does_not_show": [
+  "any n* of W3/W4 (sizes for the fresh registration)",
+  "that DEFF is constant in n (W2 compares 221 vs 885 only)",
+  "D_N's f from the simulation (0.96-1.03); the WORK-scale 1.215 is the clustered form, not the declared resampling SE_cell",
+  "the draft's predicted points at fresh n: every partition gain under B is about 0 at 885",
+  "that the rule-A code refuses leakage at runtime (H2)",
+  "any vault or reserved statement"
+ ],
+ "ledger": null,
+ "depends_on": [
+  "FLAT-COMPARE",
+  "BZ-TREE-VARIANTS-WORK"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "nothing"
+ },
+ "sources": [
+  "docs/reviews/POSTRUN_FRESH-RULES-SIM.md (8bebb4ee)",
+  "benchzoom docs/fresh-rules.md at master 35b2724 (plan 2800aae, [P1] 73401db, outcome paragraph [P2] f3b16fb)",
+  "docs/agents/author_decisions/2026-10-26.md (a8990e4b)",
+  "docs/judge_v2_program.md section \"## Registrar's record 2026-10-26 (insertion only; zero calls; nothing run) — BZ-AXIS-CONFIRM-FRESH draft amended per D-2026-10-26-1: ...\" L25708-L25724 (_as_of c3aada22)",
+  "docs/judge_v2_program.md section \"## Registrar's record 2026-10-27 (insertion only; zero calls; nothing run) — FRESH-RULES-SIM (POSTRUN 8bebb4ee) and TAU-GRID (POSTRUN 6f16a31c) recorded done ...\" L25726-L25734 (_as_of the commit that writes it, parent c3aada22, re-grepped)"
+ ],
+ "last_update": "2026-10-27 (registrar: record created, exploratory, no ledger row; D-2026-10-27-2 item 0 batch)"
+}

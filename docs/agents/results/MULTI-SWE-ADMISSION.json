@@ -1,0 +1,266 @@
+{
+  "id": "MULTI-SWE-ADMISSION",
+  "title": "MULTI-SWE-ADMISSION (cheap variant): does Multi-SWE-bench_trajs carry at least one (language x repo) stratum with >= 120 EVAL instances under the admission rules, and does the MSWE-agent scaffold carry a recoverable cap (rule (c))? (zero LLM calls; network + ingest only; the second application of AGENT-CORPUS-ADMISSION's rule set)",
+  "question": "Under AGENT-CORPUS-ADMISSION's rule set (a)-(e), applied to ByteDance-Seed/Multi-SWE-bench_trajs (HF, CC0-1.0) with only the per-instance report.json files (all scaffolds) and the MSWE-agent trajectories downloaded: is there >= 1 (language, repo) stratum with >= 120 EVAL instances under the by-family_id (= repo) split of split_side tier (b) norm-v1 (C1); is the MSWE-agent iteration / step cap recoverable from the trajectory metadata or exit status on >= 95% of its episodes (C2); what is the largest complete (scaffold, model) roster per stratum (C3); strict D_c per stratum printed; do the corpus counts (460 Python + 1,632 non-Python; seven per-language counts) reproduce (P)?",
+  "kind": "engineering",
+  "state": "done",
+  "registration": {
+    "commit": "b97da18",
+    "program_lines": "docs/judge_v2_program.md L9801-L9918 at b97da18 (registered 2026-09-22 before any code or call) = L9804-L9921 at 5da9690 (two later registrations inserted above it) = L9804-L9925 after the four pre-run brackets of this commit; = L9804-L9927 after the two POST-RUN brackets of the outcome commit (cap at L9874, join at L9883); the outcome section sits at L10520-L10722",
+    "date": "2026-09-22",
+    "program_lines_as_of": "the outcome commit (registration L9804-L9927 with brackets B1 L9841, B3 L9847, B2 L9873, the post-run cap bracket L9874, B4 L9894 and the post-run join bracket L9883; outcome section L10520-L10722)",
+    "heading": "## Registered 2026-09-22 (before any code or call) — MULTI-SWE-ADMISSION (cheap variant): does Multi-SWE-bench_trajs carry at least one (language x repo) stratum with >= 120 EVAL instances under the admission rules, and does the MSWE-agent scaffold carry a recoverable cap (rule (c))? (zero LLM calls; network + ingest only; the second application of AGENT-CORPUS-ADMISSION's rule set; the author's word of 2026-09-22, \"start the Multi-SWE cheap variant\"; plan Amendment 7; lead docs/agents/leads/2026-09-18_agent_corpora.md §1.3; bill docs/agents/plans/2026-09-19_queue_bills.md item 5)"
+  },
+  "script": {
+    "path": "tools/ingest/multiswe_ingest.py (--selftest; --fetch [--dry-run]; --dry-run (parse only); --ingest; --readout; the registration's --download / --build accepted as aliases of --fetch / --ingest, bracket B1); writes experiment_results/agent/multiswe_result_2026-09-22.db once, then experiment_results/agent/multiswe_admission.txt + multiswe_admission_strata.csv + experiment_configs/reserved_pool_frozen_multiswe_<id>.json once",
+    "sha16": "f809534526088272 (LF sha256 f809534526088272572928452904ccb81e56c28b375381c70ae0cf449bed685e, the value the script prints on line 2 and writes into meta.script_sha and the outcome header; blob 9ee941144c55d3c126dbc3ae4613bfa62d5f9929; CRLF on this checkout; verified by the registrar: git hash-object == git ls-tree HEAD, git diff --stat HEAD empty, sed 's/\\r$//' | sha256sum)",
+    "commit": "0642f46 (engine-coder)"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_multiswe_admission.md",
+    "commit": "5da9690",
+    "verdict": "READY, on six conditions",
+    "conditions": [
+      "1. B1-B4 committed to docs/judge_v2_program.md by insertion BEFORE --fetch (DONE in this commit: L9841 B1, L9847 B3, L9873 B2, L9893 B4)",
+      "2. --fetch prints GitHub multi-swe-bench/experiments @ 6a7d5566f62fa76f4192302cf763051b98e4facc and HF ByteDance-Seed/Multi-SWE-bench_trajs @ 9180bb0c633e4580fc8f74629ac6a47b8582543f and 'TOTAL to fetch: 962 files, 1273187350 bytes'; anything else = STOP (a moved head needs a re-READY of the new plan)",
+      "3. the parse --dry-run enumeration is read BEFORE --ingest: any status string mapping to UNKNOWN (other than <exit_status absent>) -> extend the three token tuples, commit by path, record the diff + new LF sha under B2; if UNKNOWN is 0 the sha of record stays f8095345...685e",
+      "4. --readout header shows script_sha == db_script_sha, corpus=multiswe_trajs_9180bb0c633e and the pool id; the three outputs and the pool json committed by path, never git add -A",
+      "5. the outcome's resolved_mismatch row is read under B1 (descriptive), C2 under B2 (both readings), P3 / P4 under B4",
+      "6. zero LLM calls throughout; no construction touched (the script reads no pool; it may run beside anything)"
+    ],
+    "selftest": "--selftest exit 0, 'selftest OK': 12 tasks / 3 repos on EVAL, TRAIN, GATE; planted TERMINATED / CAP_HIT / ERROR / UNKNOWN recovered; C2 33/36 FAILED at 0.95 (archive-present 21/24); D_c 12/36; C1 FAILED at 120, HELD at 4; C3 rosters 5/4/5; pool id == pool_guard.compute_pool_id; write-once and partial-download guards fire; dry-run writes nothing (READY 5da9690)",
+    "listing_pins_at_review": "GitHub main head 6a7d5566f62fa76f4192302cf763051b98e4facc (4,175 blobs); HF revision 9180bb0c633e4580fc8f74629ac6a47b8582543f (321 files, 319 zips); plan 962 files / 1,273,187,350 bytes = 866 GitHub files (29.61 MB) + 96 MSWE-agent-class zips (1,243.6 MB); NOT fetched: 299 all_preds.jsonl (1,010.5 MB), 194 other-scaffold zips (2,855.3 MB). Observed at the READY's --fetch --dry-run; of record only when --fetch writes github_pin.json / hf_pin.json (condition 2)",
+    "nothing_written_by_review": "find experiment_results/agent experiment_configs -maxdepth 2 -type f identical before and after --selftest / --fetch --dry-run / --dry-run / --readout; no multiswe_* artefact exists (registrar re-verified by ls before this commit)"
+  },
+  "go": "n/a (0 LLM calls, 0 cce; network + ingest); the author's word 2026-09-22 'start the Multi-SWE cheap variant' (plan Amendment 7; answers question 6: cheap variant now, the full ingest conditional on C1 HELD in its own later registration); the .gitignore call on experiment_results/agent stays the author's (storage untracked; never git add -A)",
+  "run": {
+    "outcome_file": "experiment_results/agent/multiswe_admission.txt (216 lines, sha256 4cc6715c916841a1946d12fe7861a1b1d0919dcf431460f743172ff534789e1a); beside it experiment_results/agent/multiswe_admission_strata.csv (51 data rows, sha256 8a7bee129cbec2c3e16f3280ec49a3d9eaa03ab8feedbe2666770162fc9e8288) and experiment_configs/reserved_pool_frozen_multiswe_p79fb71114b5c67c2.json (sha256 8b18e924337a81b6264b5538f86ce1703cda11aed412ab828f2c18528345ec8a)",
+    "outcome_commit": "b26bae9 (3 files, 692 insertions, 0 deletions; the DB experiment_results/agent/multiswe_result_2026-09-22.db, 27,705,344 B, and the raw download experiment_results/agent/multiswe_raw/2026-09-22/, 1.2 GB / 962 files, are UNTRACKED and not ignored)",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p79fb71114b5c67c2 (this run's own EVAL export: 16 keys / 390 ids; recomputed by the reviewer with pool_guard.compute_pool_id over the file; declared in NO config, registered in no registry, read by no tree). No pool of record was read: p2dca21ab5f4ef3ae and paeec37aa28063c75 untouched; no DB of record opened",
+    "date": "2026-09-22 (12:27-12:40; --fetch 9m43s)",
+    "pins": "GitHub multi-swe-bench/experiments @ 6a7d5566f62fa76f4192302cf763051b98e4facc; HF ByteDance-Seed/Multi-SWE-bench_trajs @ 9180bb0c633e4580fc8f74629ac6a47b8582543f; 962 files / 1,273,187,350 bytes fetched (866 GitHub files 29,609,525 B + 96 HF zips 1,243,577,825 B; every HF sha256 == its LFS upstream sha, 96/96; MANIFEST 962 rows); corpus=multiswe_trajs_9180bb0c633e; script_sha == db_script_sha = f809534526088272...685e (the token tuples were NOT extended: --dry-run UNKNOWN 0)",
+    "sequence": "--selftest exit 0; --fetch --dry-run exit 0 (condition 2 pins matched); git check-ignore -v recorded (*.zip .gitignore:141; !experiment_results/**/*.db .gitignore:145); --fetch exit 0 (962 fetched / 0 present); parse --dry-run exit 0 (8 exit-status strings, UNKNOWN 0: condition 3 met, sha unchanged); --ingest exit 0 (ingest_complete=1); --readout exit 0"
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-22_multiswe_admission_post.md",
+    "commit": "5ba264c",
+    "verdict": "READY for the outcome section WITH brackets on the cap, the join and the hazard summary; NOT READY to be cited as 'cap UNSTAMPED / CAP_HIT 0' or with the printed python D_c rows unbracketed. Every printed figure CONFIRMED to the digit, recomputed from the RAW results.json / index.json / 96 zips (DB opened mode=ro only, zero calls): the C1 table and h on all 51 strata, the C2 enumeration and both recoveries, C3 rosters 36-41, D_c pooled and per stratum with intervals, P, the predictions, the pool id, the 64 hazards, the commit hygiene. Two substantive findings (defects 1 and 2, both HIGH, both bracketed into the programme) and one MEDIUM (the .txt carries none of the 64 hazards, summarised into the outcome section).",
+    "previous": "READY docs/reviews/READY_multiswe_admission.md (5da9690, zero calls, six conditions, brackets B1-B4)"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "STRATUM SUPPORT: table of every (language, repo) stratum with instance count, side under split_side tier (b) norm-v1 by family_id = repo (EVAL iff h < 300 of 1000; a stratum is wholly EVAL or wholly not) and EVAL count; HELD iff >= 1 stratum has >= 120 EVAL instances. Registrar's addition: the instance-within-repo split table printed beside, DESCRIPTIVE, never scored.",
+      "result": "FAILED",
+      "value": "0 strata with >= 120 EVAL instances. 51 (language, repo) strata (TRAIN 28 / GATE 7 / EVAL 16); 390 EVAL instances over the 16 EVAL strata (sympy 75, vuejs/core 48, sphinx 44, matplotlib 34, scikit-learn 32, astropy 22, tracing 21, github-readme-stats 19, pytest 19, jackson-core 18, go-zero 15, nushell 14, fd 14, requests 8, bytes 5, darkreader 2); h recomputed by hand on all 51 by the reviewer, equal on all 51. Descriptive instance-within-repo column: 1 stratum would clear 120 (go/cli/cli 131 of 397). LOW (review defect 6): only five repos hold >= 120 instances (go/cli 397 h 690, javascript/svelte 272 h 653, python/django 231 h 811, typescript/material-ui 174 h 807, rust/clap 132 h 582) and all five hash TRAIN; P(none EVAL) = 0.7^5 = 0.168, so C1 is overturned BY THE PIN, not by the corpus's size.",
+      "denominator": "2,132 instances in 51 (language, repo) strata | the union of instance ids over all agents' report.json files per language; strata = (language, repo) [CORRECTED 2026-09-22 by bracket B1 (L9841): 'report.json' reads 'a checker row = membership in any list of the submission's results/results.json' (reading rule mswe_check_v1: resolved iff in 'resolved'; unresolved iff in 'unresolved_ids'; DECIDED = completed_ids = resolved | unresolved; empty_error_patch_ids / incomplete_ids / submitted-only NOT decided); the corpus of record carries no per-instance report.json for any 2025 submission]"
+    },
+    {
+      "id": "C2",
+      "text": "CAP RECOVERY for MSWE-agent (rule (c)): the iteration / step cap read from the trajectory metadata or exit status on >= 95% of MSWE-agent episodes; exit statuses enumerated with counts; the cap declared as a number (UNSTAMPED with the reason if absent); proxy mswe_term_v1 (submitted -> TERMINATED; cap class -> CAP_HIT; missing / error -> ERROR; unmapped -> UNKNOWN, not recovered) fixed before any count. HELD iff recovered >= 0.95. [CORRECTED 2026-09-22 by bracket B2 (L9873): the MSWE-agent CLASS = scaffold key in {mswe-agent, swe-agent}; the archive-less java/20260327_MSWE-Agent_CodeArts-MiniMax-M2.5 (125 episodes) is ERROR under the literal rule; C2 HELD iff BOTH printed readings >= 0.95: (i) literal over every class episode with a checker row AND (ii) recovered over the class episodes whose agent has a trajectory archive]",
+      "result": "HELD",
+      "value": "recovered 25,709 / 25,709 = 1.0000 (literal rule, archive absence = ERROR) AND 25,584 / 25,584 = 1.0000 (conditional on an archive present); both readings >= 0.95 as bracket B2 requires. Enumeration, 6 distinct trajectory strings + 2 script markers: submitted 14,095 -> TERMINATED; submitted (exit_error) 6,825 -> ERROR; <trajectory missing> 2,935 -> ERROR; exit_format 627 -> ERROR; submitted (exit_format) 408 -> ERROR; early_exit 387 -> ERROR; exit_error 307 -> ERROR; <no archive for agent> 125 -> ERROR. Classes printed: TERMINATED 14,095, CAP_HIT 0, ERROR 11,614, UNKNOWN 0. Cap printed 'DECLARED: UNSTAMPED', empirical max steps 51 over 22,649 joined episodes. [CORRECTED 2026-09-22 by the post-run review (5ba264c, defect 1, HIGH): the cap is NOT unstamped - every one of the 7,297 exit_error / submitted (exit_error) trajectories in the zips ends at exactly 51 entries with api_calls 50 and 'Exceed maximum number of steps: 50' (0 exit_error without it, 0 other status at 51, none above 50), so the MSWE-agent cap is 50 STEPS; under the registered CLASS definitions TERMINATED 14,095, CAP_HIT 7,132 of 25,709 = 27.7%, ERROR 4,482, UNKNOWN 0. mswe_term_v1 as fixed before the count reads the status vocabulary and maps the cap to ERROR, so C2's recovered 1.0000 and every scored figure stand; rule (c) is MET on this scaffold and a next registration fixes mswe_term_v2 from the step-count pile-up BEFORE any count.]",
+      "denominator": "25,709 MSWE-agent-class episodes with a checker row (25,584 under an agent with a trajectory archive) | every (instance, MSWE-agent agent) episode with a report.json [CORRECTED 2026-09-22 by bracket B1 (L9841): 'report.json' reads 'a checker row = membership in any list of the submission's results/results.json' (reading rule mswe_check_v1: resolved iff in 'resolved'; unresolved iff in 'unresolved_ids'; DECIDED = completed_ids = resolved | unresolved; empty_error_patch_ids / incomplete_ids / submitted-only NOT decided); the corpus of record carries no per-instance report.json for any 2025 submission]"
+    },
+    {
+      "id": "C3",
+      "text": "ROSTER COMPLETENESS per stratum: the number of (scaffold, model) agents with a report.json on every instance of the stratum and the largest complete roster (agents listed); HELD iff every stratum that clears C1 has a complete roster of >= 3 agents (the rule set's minimum, L5914). [CORRECTED 2026-09-22 by bracket B1 (L9841): an 'episode' is a checker row = membership in ANY results.json list, so the roster counts an agent on an instance where its patch was empty or incomplete]",
+      "result": "FAILED",
+      "value": "FAILED by construction: the criterion reads 'every stratum that clears C1', and C1 clears 0 strata, so it is vacuous and the readout printed FAILED. The roster figures of record: largest complete roster per stratum min 36 / max 41 over the 51 strata; per language, agents with a checker row on every instance: c 36, c++ 37, go 36, java 38, javascript 36, python 36, rust 36, typescript 37 (>= 3 many times over).",
+      "denominator": "per stratum: all instances of the stratum; agents = (scaffold, model) | per stratum: all instances of the stratum; agents = (scaffold, model) over all batches [CORRECTED 2026-09-22 by bracket B1 (L9841): 'report.json' reads 'a checker row = membership in any list of the submission's results/results.json' (reading rule mswe_check_v1: resolved iff in 'resolved'; unresolved iff in 'unresolved_ids'; DECIDED = completed_ids = resolved | unresolved; empty_error_patch_ids / incomplete_ids / submitted-only NOT decided); the corpus of record carries no per-instance report.json for any 2025 submission]"
+    },
+    {
+      "id": "D_c",
+      "text": "strict D_c per stratum as AGENT-CORPUS-ADMISSION (b) defines it: (TERMINATED and checker-decided) / ALL episodes of the stratum, Wilson 95%, on the MSWE-agent episodes; MopenHands / MagentLess UNSTAMPED (no trajectory in this variant), printed UNDETERMINED with the resolved share beside. PRINTED, not scored. [CORRECTED 2026-09-22 by bracket B1 (L9841): the outcome's resolved_mismatch row is a vacuous-format comparison (report.json's f2p_tests / p2p_tests are observed transition sets, not the required sets), DESCRIPTIVE, not the registered F2P / P2P assertion; results.json is the checker; the alternative 'empty patch = decided fail' is printed beside D_c, descriptive, never scored]",
+      "result": "DELIVERED",
+      "value": "PRINTED, never scored. Pooled strict D_c (MSWE-agent class) 12,113 / 25,709 = 0.4712 [0.4651, 0.4773] Wilson 95%; alternative 'empty patch = decided fail' (descriptive, B1) 14,095 / 25,709 = 0.5483. Sample strata: ponyc 473/984 = 0.481, cli/cli 3,146/4,764 = 0.660, django 784/2,772 = 0.283, sympy 270/900 = 0.300, astropy 113/264 = 0.428, vuejs/core 160/576 = 0.278, clap 632/1,584 = 0.399, logstash 365/493 = 0.740, cpp-httplib 11/12 = 0.917. MopenHands / MagentLess printed UNDETERMINED (UNSTAMPED) with the resolved share beside. [CORRECTED 2026-09-22 by the post-run review (5ba264c, defect 2, HIGH for the D_c rows, none for any verdict): 1,486 python trajectories of the three 20250426 SWE-agent agents do not join (`org_-repo-pr.traj` vs `org__repo-pr`; 494/494/498 members; all 1,500 python episodes of those agents ingested as <trajectory missing> -> ERROR). Joined: pooled 12,792 / 25,709 = 0.4976; django 1,097/2,772 = 0.396; sympy 0.378; astropy 0.606; python all repos 0.4177 (0.3045); python EVAL 7-repo cell 0.3283 -> 0.4448. Non-python unaffected; no criterion and no prediction moves; the next ingest aliases the member name.]",
+      "denominator": "all MSWE-agent-class episodes of the stratum | MSWE-agent episodes per stratum [CORRECTED 2026-09-22 by bracket B1 (L9841): 'report.json' reads 'a checker row = membership in any list of the submission's results/results.json' (reading rule mswe_check_v1: resolved iff in 'resolved'; unresolved iff in 'unresolved_ids'; DECIDED = completed_ids = resolved | unresolved; empty_error_patch_ids / incomplete_ids / submitted-only NOT decided); the corpus of record carries no per-instance report.json for any 2025 submission]"
+    },
+    {
+      "id": "P",
+      "text": "REPRODUCTION of the corpus counts from the union of report.json ids: 2,092 = 460 Python + 1,632 non-Python; Java 128, TypeScript 224, JavaScript 356, Go 428, Rust 239, C 128, C++ 129; HELD iff all eight reproduce exactly (deviations printed per language with the ids in excess / missing).",
+      "result": "FAILED",
+      "value": "FAILED on python alone: c 128, c++ 129, go 428, java 128, javascript 356, rust 239, typescript 224 exact against the paper's Table (ours-not-in-index 0 and index-not-ours 0 on all eight); python 500 vs paper 460 = DEVIATION +40; total 2,132 (paper 2,092), non-python 1,632 exact. Under bracket B4 the python universe on the GitHub index is SWE-bench Verified's 500 ids and '460' is one submission's completed count, so the deviation is a reproduction FINDING; the criterion is scored FAILED as written.",
+      "denominator": "eight per-language counts, union of results.json ids per language | eight counts (paper Table via survey §1.3) [CORRECTED 2026-09-22 by bracket B1 (L9841): 'report.json' reads 'a checker row = membership in any list of the submission's results/results.json' (reading rule mswe_check_v1: resolved iff in 'resolved'; unresolved iff in 'unresolved_ids'; DECIDED = completed_ids = resolved | unresolved; empty_error_patch_ids / incomplete_ids / submitted-only NOT decided); the corpus of record carries no per-instance report.json for any 2025 submission]"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "(lead, survey §1.3 / bill item 5) 2-4 strata with >= 120 EVAL instances",
+      "result": "FAILED",
+      "value": "0 strata with >= 120 EVAL instances (predicted 2-4)",
+      "denominator": "(language, repo) strata"
+    },
+    {
+      "id": "P1'",
+      "text": "(registrar's blind addition) 0-2 strata under the by-repo split (the lead's 2-4 assumes ~30% of every stratum EVAL); P1 scored as written",
+      "result": "HELD",
+      "value": "0 strata (predicted 0-2 under the by-repo split)",
+      "denominator": "(language, repo) strata"
+    },
+    {
+      "id": "P2",
+      "text": "(lead) C2 HELD: cap recovery >= 0.95 on MSWE-agent episodes; 3-8 distinct exit-status strings enumerated",
+      "result": "HELD",
+      "value": "C2 HELD (1.0000 on both readings) and 6 distinct exit-status strings (predicted 3-8)",
+      "denominator": "MSWE-agent episodes"
+    },
+    {
+      "id": "P3",
+      "text": "(lead) rosters unequal across strata; the largest complete roster per non-Python stratum in [9, 27] agents (20250329 batch: 9 models x 3 scaffolds); the 20250514 MagentLess / MopenHands batches (3 models each) incomplete on at least one stratum [CLARIFIED 2026-09-22 by bracket B4 (L9893): the '20250514 MagentLess / MopenHands batches' are identified by model (Doubao-1.5-thinking, Gemini-2.5-Pro, Llama-4-Maverick under magentless / mopenhands; GitHub 20250426, HF 20250514); 'per non-Python stratum' scored per (language, repo) stratum as written; the per-language largest complete roster computed from the DB by the post-run reviewer as descriptive]",
+      "result": "FAILED",
+      "value": "largest complete roster per stratum 36-41, outside [9, 27] on every stratum (the corpus carries 12 models x 3 scaffolds plus the two 2026 CodeArts submissions, not the lead's 9); the second clause holds (the six later magentless / mopenhands agents are incomplete). LOW (review defect 4): the printed 'misses python/django/django' is the FIRST of an all-python miss - each of the six misses all 12 python strata (python names those scaffolds Agentless / OpenHands, unaliased by the registration's own rule) and 0 non-python strata",
+      "denominator": "per stratum"
+    },
+    {
+      "id": "P4",
+      "text": "the eight counts of (P) reproduce exactly [CLARIFIED 2026-09-22 by bracket B4 (L9893): scored as written; the READY notes from the listing that evaluation/python/verified/index.json carries 500 ids (SWE-bench Verified) and that '460' is one submission's completed count, so a python deviation of +40 is expected and is a reproduction finding, not a re-registration]",
+      "result": "FAILED",
+      "value": "python 500 vs 460 (+40); the other seven exact",
+      "denominator": "eight counts"
+    },
+    {
+      "id": "P5",
+      "text": "(registrar's blind addition, descriptive) pooled strict D_c over MSWE-agent episodes 0.80-0.95; CAP_HIT the larger of CAP_HIT / ERROR",
+      "result": "FAILED",
+      "value": "pooled strict D_c 0.4712, outside [0.80, 0.95]; CAP_HIT 0 vs ERROR 11,614 as scored. Clause 2 HOLDS under the review's cap reading (CAP_HIT 7,132 > ERROR 4,482), which does not change the score",
+      "denominator": "all MSWE-agent episodes"
+    }
+  ],
+  "falsifier": {
+    "text": "C1 FAILED (no stratum >= 120 EVAL instances): agents stay DESCRIPTION-ONLY on this corpus as on BFCL, MopenHands / MagentLess trajectories are never downloaded, and the survey's 'the only surveyed corpus that can carry an agent PROFILE cell' (§1.3; bill item 5 value line) is overturned for the by-repo split; overturns no BFCL number and nothing judged. C2 FAILED (< 0.95 recovered) overturns the survey's (c) reading 'MSWE-agent trajs carry exit status' for this release. UNDETERMINED is an outcome: a stratum between 0 and 120 EVAL is admitted for description only.",
+    "fired": true,
+    "outcome": "FIRED on C1. Agents stay DESCRIPTION-ONLY on this corpus as on BFCL; the MopenHands / MagentLess trajectories were never downloaded; the survey's 'the only surveyed corpus that can carry an agent PROFILE cell' is OVERTURNED FOR THE BY-REPO SPLIT (bracketed in docs/agents/plans/2026-09-18_reframing_and_next.md L174 and docs/agents/leads/2026-09-18_agent_corpora.md L122 in the same commit). No BFCL number and nothing judged is touched. C2 was NOT falsified (1.0000 >= 0.95 on both readings); with the cap bracket rule (c) is MET on the MSWE-agent scaffold. UNDETERMINED as registered: 16 strata carry between 1 and 119 EVAL instances (390 instances over 16 repos), admitted for description only."
+  },
+  "numbers_of_record": {
+    "corpus_expected": "from the survey §1.3 (paper arXiv 2504.02605): 1,632 non-Python instances (Java 128, TypeScript 224, JavaScript 356, Go 428, Rust 239, C 128, C++ 129) + 460 Python; 3 scaffolds (MagentLess, MSWE-agent, MopenHands) x 9 models in the 20250329 batch, plus SWE-agent Gemini-2.5-pro / Llama-4-maverick / Doubao-thinking-1.5 and 20250514 MagentLess / MopenHands x 3 models; 4.73 GB total; licence CC0-1.0",
+    "split_rule": "split_side tier (b), norm-v1: h = uint64(sha256('norm-v1' || family_id)) mod 1000; EVAL iff h < 300; GATE [300, 400); TRAIN otherwise; family_id = repo ('org/repo'); EVAL ids exported write-once as experiment_configs/reserved_pool_frozen_multiswe_<pool id>.json, declared in no config [CLARIFIED 2026-09-22 by bracket B3 (L9847): '||' is split_side.side_hash's concatenation with the U+001F FIELD_SEP, h = uint64(first 8 bytes of sha256('norm-v1' U+001F family_id)) mod 1000, as SPLIT-FUNCTION-IMPL's vectors pin it and as the BFCL pool was computed; the pool file holds {'MULTISWE/<language>/<org>__<repo>': [pr, ...]}, its id pool_guard.compute_pool_id over that map = ReservedPool.canonicalLine for an unknown source prefix]",
+    "consequence_if_C1_HELD": "the judged pass is priced at FRAMEWORK L219's 1,530 matches per cell per epoch = 3,060 cce per cell; >= 3 cells crosses the 4,000-match rule and needs the author's go; its own later registration with the full ingest, the artefact cap and the item-19 probe",
+    "downloaded": "962 files / 1,273,187,350 bytes at the two pins (866 GitHub files 29,609,525 B + 96 HF zips 1,243,577,825 B), untracked under experiment_results/agent/multiswe_raw/2026-09-22/; DB experiment_results/agent/multiswe_result_2026-09-22.db 27,705,344 B, untracked and NOT ignored",
+    "checker_rule": "mswe_check_v1 (bracket B1, L9841; fixed in the script header and meta.checker_rule before any count): resolved iff instance_id in 'resolved'; unresolved iff in 'unresolved_ids'; DECIDED iff resolved or unresolved (= completed_ids, asserted per file); empty_error_patch_ids / incomplete_ids / submitted-only NOT decided",
+    "listing_pins_expected": "GitHub 6a7d5566f62fa76f4192302cf763051b98e4facc / HF 9180bb0c633e4580fc8f74629ac6a47b8582543f; 962 files / 1,273,187,350 bytes; 97 MSWE-agent-class submissions on GitHub vs 96 HF zips (orphan java/20260327_MSWE-Agent_CodeArts-MiniMax-M2.5, 125 episodes); 24 batch-date flags (3 models x 8 languages) + 1 alias (doubao-thinking-1.5 -> doubao-1.5-thinking); 255 report.json, all under the two 2026 CodeArts-Agent c / c++ submissions (READY 5da9690; NOT of record until --fetch writes the pin files)",
+    "c1": "51 (language, repo) strata (TRAIN 28 / GATE 7 / EVAL 16); 390 EVAL instances; 0 strata >= 120 EVAL instances; descriptive instance-within-repo column 1 (go/cli/cli 131 of 397); the five repos >= 120 instances (cli 397, svelte 272, django 231, material-ui 174, clap 132) all TRAIN, P = 0.7^5 = 0.168",
+    "c2": "recovered 25,709 / 25,709 = 1.0000 (literal) and 25,584 / 25,584 = 1.0000 (archive present); 6 exit-status strings; classes as printed TERMINATED 14,095 / CAP_HIT 0 / ERROR 11,614 / UNKNOWN 0",
+    "cap_of_record": "50 STEPS (MSWE-agent scaffold, this release), recovered from every trajectory by the post-run review: 7,297 of the 24,135 .traj members in the 96 zips end at exactly 51 entries with api_calls 50 and 'Exceed maximum number of steps: 50'; on the 22,649 joined episodes 7,132 of 25,709 = 27.7%. Under the registered class definitions TERMINATED 14,095 / CAP_HIT 7,132 / ERROR 4,482 / UNKNOWN 0. No cost cap (model_stats.total_cost 0.0 on all 24,135). Printed in the outcome file as 'cap DECLARED: UNSTAMPED' under mswe_term_v1; corrected by bracket, scored figures unchanged",
+    "c3": "largest complete roster per stratum min 36 / max 41 over 51 strata; per language c 36, c++ 37, go 36, java 38, javascript 36, python 36, rust 36, typescript 37",
+    "d_c_pooled": "12,113 / 25,709 = 0.4712 [0.4651, 0.4773] as printed; 12,792 / 25,709 = 0.4976 with the member-name join corrected (review defect 2); alternative 'empty patch = decided fail' 14,095 / 25,709 = 0.5483 (descriptive); the unregistered 'submitted (...) as TERMINATED' reading 18,264 / 25,709 = 0.7104 (0.7429 joined), read by nobody",
+    "p": "2,132 instances (paper 2,092): c 128, c++ 129, go 428, java 128, javascript 356, python 500 (paper 460, +40 = SWE-bench Verified's universe), rust 239, typescript 224; non-python 1,632 exact",
+    "corpus_at_ingest": "82 agents (25 of the MSWE-agent class {mswe-agent, swe-agent}), 2,132 tasks, 78,430 episodes, 64 hazards",
+    "hazards": "64 = 3 metadata-only python MopenHands directories + 33 results.json count-vs-id mismatches + 24 batch-date flags (3 models x 8 languages, GitHub 20250426 vs HF 20250329, joined by MODEL_ALIASES, never merged) + 1 java orphan (20260327_MSWE-Agent_CodeArts-MiniMax-M2.5, 125 episodes, no archive, ERROR under the literal rule) + 3 unjoined zips (the python 20250426 SWE-agent archives, 494/494/498 members). resolved_mismatch 60 of the 255 existing report.json rows (c 24, c++ 36), DESCRIPTIVE under bracket B1, absent from the .txt (review defect 3); summarised into the programme outcome section",
+    "pool_export": "p79fb71114b5c67c2, 16 keys / 390 EVAL ids, key 'MULTISWE/<language>/<org>__<repo>'; recomputed by the reviewer with pool_guard.compute_pool_id over the committed file; declared in NO config, registered in no registry, read by no tree",
+    "language_cell_descriptive": "UNREGISTERED and DESCRIPTIVE (the review's answer to the orchestrator's question; registers nothing). EVAL by language: python 234 (7 repos), rust 54 (4), typescript 50 (2), javascript 19 (1), java 18 (1), go 15 (1), c 0, c++ 0; only python clears 120. 36 agents (12 SWE-agent, 12 Agentless, 12 OpenHands) carry a checker row on all 234. It would NOT be the registered stratum (a third unit, needs its own registration); not exchangeable at n = 234 (sympy 32% of the cell; per-repo resolved share 0.136 sphinx to 0.437 scikit-learn over the 36 agents pooled; per-agent design effect on resolved over the 7 repos median 2.75, max 7.71, min 1.00, so effective n ~85, worst ~30, under the 120 the support rule assumes for SE 0.15; the interval would have to be repo-clustered); not a judged cell (strict D_c on the cell 922 / 2,808 = 0.3283 [0.3112, 0.3459] as ingested, 1,249 / 2,808 = 0.4448 joined, 0.4772 / 0.6214 under the unregistered submitted-as-TERMINATED reading, every reading far under the 0.95 enforcement clause, so REFUSED for judged rows and kept for checker-built rows on terminated episodes only; per-agent strict D_c 0.256-0.641 for the nine joined SWE-agent models, 0 for the three unjoined); not Multi-SWE's own material (python = SWE-bench Verified's 500 ids, bracket B4); not comparable across scaffolds (MopenHands / MagentLess termination UNSTAMPED here)"
+  },
+  "sentence_of_record": "MULTI-SWE-ADMISSION (cheap variant, 2026-09-22, 0 calls): C1 FAILED - 51 (language, repo) strata, 16 EVAL-side, 390 EVAL instances, 0 strata >= 120 [the five repos >= 120 (cli 397, svelte 272, django 231, material-ui 174, clap 132) all hash TRAIN under norm-v1; P = 0.168] - so agents stay DESCRIPTION-ONLY on this corpus under the by-repo split and the survey's 'only surveyed corpus that can carry an agent PROFILE cell' is overturned for that split; the descriptive instance-within-repo split would clear 120 once (go/cli/cli 131), not registered. C2 HELD 25,709 / 25,709 = 1.0000 on both readings (6 exit-status strings, UNKNOWN 0) [the cap is NOT unstamped: every `exit_error` / `submitted (exit_error)` trajectory (7,132 of 22,649 joined; 7,297 of 24,135 in the zips) ends at entry 51 with 'Exceed maximum number of steps: 50', so the MSWE-agent cap is 50 steps and CAP_HIT under the registered cap class is 7,132 (27.7%), ERROR 4,482; mswe_term_v1 as fixed before the count maps it to ERROR and the scored figures stand as registered]. C3 FAILED by construction (0 C1 strata; complete rosters 36-41). Pooled strict D_c 12,113 / 25,709 = 0.4712 [0.4651, 0.4773], printed not scored [1,486 python trajectories of the three 20250426 SWE-agent agents unjoined by `org_-repo` vs `org__repo`; joined 12,792 / 25,709 = 0.4976; python EVAL cell 0.3283 -> 0.4448]. P FAILED: seven languages exact, python 500 (= SWE-bench Verified) vs paper 460. P1 FAILED, P1' HELD, P2 HELD, P3 FAILED, P4 FAILED, P5 FAILED (clause 2 holds under the cap reading). resolved_mismatch 60 / 255 descriptive (B1). Pool p79fb71114b5c67c2 (16 keys / 390 ids) declared nowhere.",
+  "chips": [
+    "C1 FAILED (0 OF 16 EVAL STRATA >= 120; 5 CANDIDATE REPOS ALL TRAIN BY HASH)",
+    "DESCRIPTION-ONLY (BY-REPO SPLIT)",
+    "C2 HELD 1.0000",
+    "CAP = 50 STEPS, RECOVERED (SCORED 0 CAP_HIT UNDER THE STRING MAP)",
+    "C3 FAILED-BY-CONSTRUCTION",
+    "D_c 0.4712 PRINTED (0.4976 JOINED; JOIN DEFECT)",
+    "P FAILED (PYTHON 500 = SWE-BENCH VERIFIED)",
+    "P1 F / P1' H / P2 H / P3 F / P4 F / P5 F",
+    "0 CALLS",
+    "POOL p79fb71114b5c67c2 UNREGISTERED"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-22",
+      "by": "the MULTI-SWE-ADMISSION READY (docs/reviews/READY_multiswe_admission.md, 5da9690), bracket B1, inserted by the registrar at zero calls BEFORE --fetch at docs/judge_v2_program.md L9841",
+      "text": "[CORRECTED 2026-09-22 by the MULTI-SWE-ADMISSION READY (5da9690; bracket B1; pre-run, from the two listings at GitHub 6a7d5566 / HF 9180bb0c, zero calls), inserted BEFORE --fetch: the corpus of record carries NO per-instance report.json for any 2025 submission (the 255 that exist sit under the two 2026 CodeArts-Agent c / c++ submissions, an UNSTAMPED scaffold); the checker's verdict for every submission is the id lists of evaluation/<language>/verified/<dir>/results/results.json. Reading rule of record mswe_check_v1 (fixed in the script header and meta.checker_rule before any count): resolved iff instance_id in \"resolved\"; unresolved iff in \"unresolved_ids\"; checker-DECIDED iff resolved or unresolved (= completed_ids, asserted per file); empty_error_patch_ids / incomplete_ids / an id only in submitted_ids are NOT decided; the alternative \"empty patch = decided fail\" is printed beside D_c, descriptive, never scored. Every \"report.json\" in the denominators of C1, C2, C3, D_c, P and the hygiene clause reads \"a checker row = membership in any list of the submission's results.json\" (C3's roster therefore counts an agent on an instance where its patch was empty or incomplete). The registered F2P / PASS_TO_PASS rule is NOT computable from report.json in this corpus: its f2p_tests / p2p_tests are the OBSERVED fail-to-pass / pass-to-pass transition sets of the fix run, not the instance's required sets (2 of 8 sampled 2026 reports read \"resolved\" under the rule with an empty observed f2p set while results.json says unresolved); the outcome's resolved_mismatch row is therefore a vacuous-format comparison, DESCRIPTIVE, not the registered assertion, and results.json is the checker. Modes --download / --build are the script's --fetch / --ingest (aliases accepted).]"
+    },
+    {
+      "date": "2026-09-22",
+      "by": "the MULTI-SWE-ADMISSION READY (docs/reviews/READY_multiswe_admission.md, 5da9690), bracket B2, inserted by the registrar at zero calls BEFORE --fetch at docs/judge_v2_program.md L9873",
+      "text": "[CORRECTED 2026-09-22 by the MULTI-SWE-ADMISSION READY (5da9690; bracket B2), inserted BEFORE --fetch: the MSWE-agent CLASS is scaffold key in {mswe-agent, swe-agent} (the python uploads name it SWE-agent); on the pins above 97 class submissions exist on GitHub and 96 trajectory zips on HF; the one without any trajectory in the corpus of record is java/20260327_MSWE-Agent_CodeArts-MiniMax-M2.5 (125 episodes), ERROR under the literal \"absence counted as ERROR\" rule. Because ERROR is a recovered class, the literal rule certifies an archive-less submission at 100% recovered; C2 is therefore HELD iff BOTH printed readings are >= 0.95: (i) the literal rule over every class episode with a checker row (scored as registered) AND (ii) recovered over the class episodes whose agent has a trajectory archive (printed beside). The 24 batch-date differences (GitHub 20250426 vs HF 20250329 for Doubao-1.5-thinking = HF \"Doubao-thinking-1.5\", Gemini-2.5-Pro, Llama-4-Maverick, in all eight languages) are flagged per (language, agent) and joined by the alias table MODEL_ALIASES = {doubao-thinking-1.5: doubao-1.5-thinking} plus casefold, the batch date carried as provenance, never merged into two agents. Any extension of CAP_TOKENS / ERROR_TOKENS / TERMINATED_TOKENS after the --dry-run enumeration is a committed edit to those three tuples only, its diff and new LF sha recorded here before --ingest; the DB's meta.script_sha must equal the readout's.]"
+    },
+    {
+      "date": "2026-09-22",
+      "by": "the MULTI-SWE-ADMISSION READY (docs/reviews/READY_multiswe_admission.md, 5da9690), bracket B3, inserted by the registrar at zero calls BEFORE --fetch at docs/judge_v2_program.md L9847",
+      "text": "[CORRECTED 2026-09-22 by the MULTI-SWE-ADMISSION READY (5da9690; bracket B3; drafted CLARIFIED), inserted BEFORE --fetch: \"||\" is split_side.side_hash's concatenation with the U+001F FIELD_SEP, h = uint64(first 8 bytes of sha256(\"norm-v1\" U+001F family_id)) mod 1000, exactly as SPLIT-FUNCTION-IMPL's vectors pin it and as the BFCL pool was computed; the selftest recomputes it by hand. The pool file holds {\"MULTISWE/<language>/<org>__<repo>\": [pr, ...]} (the instance id is <org>__<repo>-<pr>); its id is pool_guard.compute_pool_id over that map, identical to ReservedPool.canonicalLine for an unknown source prefix.]"
+    },
+    {
+      "date": "2026-09-22",
+      "by": "the MULTI-SWE-ADMISSION READY (docs/reviews/READY_multiswe_admission.md, 5da9690), bracket B4, inserted by the registrar at zero calls BEFORE --fetch at docs/judge_v2_program.md L9893",
+      "text": "[CORRECTED 2026-09-22 by the MULTI-SWE-ADMISSION READY (5da9690; bracket B4; drafted CLARIFIED; pre-run; no prediction changed), inserted BEFORE --fetch: P3's \"20250514 MagentLess / MopenHands batches\" are identified by model (Doubao-1.5-thinking, Gemini-2.5-Pro, Llama-4-Maverick under scaffold key magentless / mopenhands; on GitHub they sit under 20250426, on HF under 20250514); P3's \"per non-Python stratum\" is scored per (language, repo) stratum as written, the per-language largest complete roster computed from the DB by the post-run reviewer as descriptive. P4 is scored as written; the READY notes from the listing that evaluation/python/verified/index.json carries 500 ids (SWE-bench Verified) and that \"460\" is one submission's completed count, so a python deviation of +40 is expected and is a reproduction finding, not a re-registration.]"
+    },
+    {
+      "date": "2026-09-22",
+      "by": "the MULTI-SWE-ADMISSION post-run review (docs/reviews/2026-09-22_multiswe_admission_post.md, 5ba264c; defect 1, HIGH), inserted by the registrar at zero calls into the programme outcome section (C2 block) and after the registration's C2 / rule (c) bracket B2 (docs/judge_v2_program.md L9874)",
+      "text": "[CORRECTED 2026-09-22 by the MULTI-SWE-ADMISSION post-run review (5ba264c; defect 1, HIGH; zero calls, recomputed from the 24,135 .traj members of the 96 zips): the cap of this criterion's rule (c) is NOT unstamped on the MSWE-agent scaffold. The literal claim 'no cap KEY in info' holds, but every one of the 7,297 exit_error / submitted (exit_error) trajectories ends at exactly 51 entries with api_calls 50 and the last step 'exit due to runtime error: [...] Exceed maximum number of steps: 50' (0 exit_error without it, 0 other status at 51, none above 50), so the cap is 50 STEPS and recoverable from every trajectory (no cost cap: model_stats.total_cost 0.0 on all 24,135). Under the registered CLASS definitions TERMINATED 14,095, CAP_HIT 7,132 of 25,709 = 27.7%, ERROR 4,482, UNKNOWN 0; mswe_term_v1 as fixed before the count reads the status vocabulary and maps the cap to ERROR, so C2's recovered 1.0000 and every scored figure stand as registered. Rule (c) is MET on this scaffold; a next registration fixes mswe_term_v2 with the cap class read from the STEP-COUNT pile-up BEFORE any count, and rule (c) at admission requires that check beside the status map on every corpus (FRAMEWORK L236 guard 10, bracketed in the same commit). This outcome is never to be cited as 'cap UNSTAMPED / CAP_HIT 0' without this bracket.]"
+    },
+    {
+      "date": "2026-09-22",
+      "by": "the MULTI-SWE-ADMISSION post-run review (5ba264c; defect 2, HIGH for the D_c rows, none for any verdict), inserted by the registrar at zero calls into the programme outcome section (D_c block) and after the registration's D_c block (docs/judge_v2_program.md L9883)",
+      "text": "[CORRECTED 2026-09-22 by the MULTI-SWE-ADMISSION post-run review (5ba264c; defect 2): the printed D_c rows on the python strata are UNDERSTATED by a member-name join defect. The three python 20250426 SWE-agent zips name every member `org_-repo-pr.traj` where results.json and the other 93 zips use `org__repo-pr`; 494 / 494 / 498 = 1,486 members miss the join and all 1,500 python episodes of those three agents were ingested as <trajectory missing> -> ERROR. Joined: pooled strict D_c 12,792 / 25,709 = 0.4976 (printed 0.4712); django 1,097/2,772 = 0.396 (0.283); sympy 0.378 (0.300); astropy 0.606 (0.428); python over all repos 0.4177 (0.3045); the python EVAL 7-repo cell 0.3283 -> 0.4448. Non-python rows unaffected. D_c is PRINTED, not scored, so no criterion and no prediction moves; the next ingest aliases the member name as a versioned normaliser change.]"
+    },
+    {
+      "date": "2026-09-23",
+      "by": "CORRECTIONS_2026-09-23 (registrar)",
+      "text": "[CORRECTED 2026-09-23 by the registrar (line pointer only, zero calls; measurement, not a change of record): registration.program_lines names docs/judge_v2_program.md L9801; at HEAD the heading \"## Registered 2026-09-22 (before any code or call) — MULTI-SWE-ADMISSION (cheap variant): does Multi-SWE-bench_trajs carry at least one (lan ...\" stands at L9858, +57. This drift is NOT the four one-line brackets of cd83eac (which move this pointer by only +4): it PRE-DATES tonight and is the ordinary cost of correcting by insertion INSIDE the registration this pointer names. Verified by sed -n '9858p' docs/judge_v2_program.md at this commit; found by the pointer audit recorded in the programme's \"## Line-shift map, appended 2026-09-23\" section. The recorded span and any corrected span already carried elsewhere in this record are left standing, not rewritten.]"
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on CONTENT-DISJOINT-SPLIT-AUDIT (review 1df2cf1; insertion only, zero calls)",
+      "text": "D4: Multi-SWE's 'no cross-side twins' is VACUOUS as a content statement: its content_key is stem_key over the instance id (2,132 / 2,132). The guarantee is REPO-FAMILY CLOSURE (0 of 51 repos span sides). Within-RES support: 390 instances in 16 repos, family sum(n^2)/n = 37.76 at rho = 1 (an upper bound; n_eff about 10 at it); print it beside every Multi-SWE statistic."
+    }
+  ],
+  "does_not_show": [
+    "no agent capability number and nothing judged (0 LLM calls; no tree, no routing, no reference, no verdict, no rubric)",
+    "no MopenHands / MagentLess / Agentless / OpenHands termination class (their trajectories were never downloaded), therefore no cross-scaffold D_c and no cross-scaffold comparison",
+    "no per-trajectory and no per-agent rank; no profile cell on this corpus at any stratification under the by-repo split",
+    "the falsifier concerns the PINNED SPLIT FUNCTION on five repos (P = 0.168), not the corpus's information content; re-drawing the pin to get another answer would be a new registration with its own reason",
+    "the instance-within-repo column is descriptive and registers nothing; the language-level python cell is UNREGISTERED and would be checker-built-only, repo-clustered (effective n ~85) and a SWE-bench Verified cell",
+    "the printed python D_c rows are understated until the join bracket is read (review defect 2); D_c was never scored",
+    "the cap of 50 steps is a property of the MSWE-agent scaffold in this release, stamped by no field of the corpus but recoverable from every trajectory; it says nothing about MopenHands or MagentLess",
+    "nothing here admits the corpus for judged use; the full ingest (4.73 GB, the other two normalisers, the per-episode artefact cap, the item-19 probe) remains unregistered",
+    "the registered F2P / P2P resolved rule is not computable from this corpus's report.json (bracket B1): the resolved_mismatch row (60 / 255) is descriptive, never the registered assertion"
+  ],
+  "ledger": {
+    "row_id": "MULTI-SWE-ADMISSION (section-7 row, newest first: inserted before CANARY-BASELINE-PASS2)",
+    "version": "v121"
+  },
+  "depends_on": [
+    "AGENT-CORPUS-ADMISSION",
+    "SPLIT-FUNCTION-IMPL",
+    "CHECKER-ANSWER-INGEST",
+    "STAGE3-MATH-CAPFREE",
+    "JUDGE-FINISH-AUDIT",
+    "MC-E2E",
+    "MC-LEAF",
+    "PROFILE-TREE-ROBUST",
+    "KEY-SUBANCHOR-SCALE",
+    "GEN-ARENA"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L9801-L9918 (registration b97da18): question, corpus of record, cheap variant, ingest, split rule, C1 / C2 / C3 / D_c / P, P1-P5, falsifier, hygiene, cost and consequence, prior results",
+    "docs/agents/leads/2026-09-18_agent_corpora.md §1.3 (the corpus counts, scaffolds, models, licence, size, the (c) '?' reading) and §2 (family = repo; the instance-within-repo alternative)",
+    "docs/agents/plans/2026-09-19_queue_bills.md item 5 (the cheapest variant: report.json + MSWE-agent trajs; 0 cce; 1-2 h builder time; 3,060 cce per cell judged pass)",
+    "docs/judge_v2_program.md L5857-L5985 (AGENT-CORPUS-ADMISSION rule set (a)-(e); L5914 >= 3 agents) and L6938-L7033 (the BFCL pilot: D12, D13, open items (1)-(3))",
+    "tools/analysis/split_side.py (NORMALISER_VERSION norm-v1; SIDE_MODULUS 1000, EVAL_UPPER 300, GATE 300-400)",
+    "docs/agents/queue.json item MULTISWE-INGEST (registered at b97da18)",
+    "docs/reviews/READY_multiswe_admission.md (5da9690): the script identity (blob 9ee94114, LF sha f8095345...685e), the selftest figures, the listing pins, deviations 1-2, defects 1-12, brackets B1-B4 verbatim, the six conditions and the operator's command sequence",
+    "docs/judge_v2_program.md L9841 (B1), L9847 (B3), L9873 (B2), L9893 (B4): the four pre-run brackets as inserted (this commit; verbatim from the READY, header carrying 5da9690 and the bracket id)",
+    "tools/ingest/multiswe_ingest.py at 0642f46 (registrar-verified sha)",
+    "docs/reviews/2026-09-22_multiswe_admission_post.md (5ba264c): every per-claim recomputation, the two HIGH defects, the hazard list, the sentence of record, the chips, the language-cell paragraph, the BFCL bearing, the does-not-show list",
+    "experiment_results/agent/multiswe_admission.txt (b26bae9): the header and pins, the C1 / C2 / C3 / D_c / P blocks, the prediction scores, the falsifier line, the UNDETERMINED strata and the pool export",
+    "experiment_results/agent/multiswe_admission_strata.csv (b26bae9): the 51 strata with n, h, side, EVAL counts, rosters and D_c",
+    "docs/judge_v2_program.md L10520-L10722 (this commit): the outcome section; L9874 and L9883 the two post-run brackets on the registration's rule (c) / C2 and D_c",
+    "docs/design/FRAMEWORK.md L236 (guard 10: the step-count pile-up check) and L269 (agent corpora description-only; the language cell unregistered), bracketed by insertion in this commit",
+    "the run-operator's report of b26bae9 (the command sequence, exit codes, byte counts and the check-ignore result)"
+  ],
+  "last_update": "2026-09-23",
+  "plain_description": {
+    "sq": "SQ1 Use",
+    "what": "Checks whether the Multi-SWE-bench agent trajectories contain any language-and-repository group with at least 120 evaluation tasks under the split rules, and whether the agent's step cap can be recovered. Data download only, no LLM calls.",
+    "why": "It decides whether this agent corpus can support a per-cell agent profile or only a description.",
+    "information": "A group of 120 or more would allow an agent profile cell. Result: done. No group reaches 120 on the evaluation side (all large repos fell on the training side), so agents stay description-only on this corpus under this split. The step cap was fully recovered: 50 steps. There are no agent capability numbers and no cross-scaffold comparison.",
+    "written": "2026-10-07"
+  }
+}

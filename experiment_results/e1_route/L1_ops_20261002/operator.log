@@ -1,0 +1,136 @@
+== Fri Oct  2 03:35:23     2026 C-E1R-1
+python.exe                   47204 Console                    1   119ÿ036 Ko
+-rw-r--r-- 1 octav 197609 804462592 Sep 23 14:33 embeddings_cache.db
+-rw-r--r-- 1 octav 197609     32768 Oct  1 09:11 embeddings_cache.db-shm
+-rw-r--r-- 1 octav 197609         0 Sep 23 14:33 embeddings_cache.db-wal
+-rw-r--r-- 1 octav 197609  38023168 Sep 29 11:52 embeddings_cache_embeddinggemma_latest.db
+-rw-r--r-- 1 octav 197609     32768 Sep 30 10:55 embeddings_cache_embeddinggemma_latest.db-shm
+-rw-r--r-- 1 octav 197609         0 Sep 30 10:55 embeddings_cache_embeddinggemma_latest.db-wal
+-rw-r--r-- 1 octav 197609  59899904 Sep 27 16:25 embeddings_cache_nomic-embed-text_latest.db
+-rw-r--r-- 1 octav 197609     32768 Sep 30 10:55 embeddings_cache_nomic-embed-text_latest.db-shm
+-rw-r--r-- 1 octav 197609         0 Sep 30 10:55 embeddings_cache_nomic-embed-text_latest.db-wal
+-- sha256 before
+52229e1ebfdda76ebaed3e461eeee80ae654dfb35ac480eb9cb9868bb0269769 *embeddings_cache.db
+3e9ce57772160749e0b5ea0267713286ca4109444d5a6b676e877a5b0501df29 *embeddings_cache_embeddinggemma_latest.db
+53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95 *embeddings_cache_nomic-embed-text_latest.db
+renamed 'embeddings_cache.db-wal' -> 'experiment_results/_backup/sidecars_20261002_e1route/embeddings_cache.db-wal'
+renamed 'embeddings_cache_embeddinggemma_latest.db-wal' -> 'experiment_results/_backup/sidecars_20261002_e1route/embeddings_cache_embeddinggemma_latest.db-wal'
+renamed 'embeddings_cache_nomic-embed-text_latest.db-wal' -> 'experiment_results/_backup/sidecars_20261002_e1route/embeddings_cache_nomic-embed-text_latest.db-wal'
+renamed 'embeddings_cache.db-shm' -> 'experiment_results/_backup/sidecars_20261002_e1route/embeddings_cache.db-shm'
+renamed 'embeddings_cache_embeddinggemma_latest.db-shm' -> 'experiment_results/_backup/sidecars_20261002_e1route/embeddings_cache_embeddinggemma_latest.db-shm'
+renamed 'embeddings_cache_nomic-embed-text_latest.db-shm' -> 'experiment_results/_backup/sidecars_20261002_e1route/embeddings_cache_nomic-embed-text_latest.db-shm'
+-- sha256 after move
+52229e1ebfdda76ebaed3e461eeee80ae654dfb35ac480eb9cb9868bb0269769 *embeddings_cache.db
+3e9ce57772160749e0b5ea0267713286ca4109444d5a6b676e877a5b0501df29 *embeddings_cache_embeddinggemma_latest.db
+53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95 *embeddings_cache_nomic-embed-text_latest.db
+-rw-r--r-- 1 octav 197609 804462592 Sep 23 14:33 embeddings_cache.db
+-rw-r--r-- 1 octav 197609  38023168 Sep 29 11:52 embeddings_cache_embeddinggemma_latest.db
+-rw-r--r-- 1 octav 197609  59899904 Sep 27 16:25 embeddings_cache_nomic-embed-text_latest.db
+
+experiment_results/_backup/sidecars_20261002_e1route:
+total 108
+drwxr-xr-x 1 octav 197609     0 Oct  2 03:35 ./
+drwxr-xr-x 1 octav 197609     0 Oct  2 03:35 ../
+-rw-r--r-- 1 octav 197609 32768 Oct  1 09:11 embeddings_cache.db-shm
+-rw-r--r-- 1 octav 197609     0 Sep 23 14:33 embeddings_cache.db-wal
+-rw-r--r-- 1 octav 197609 32768 Sep 30 10:55 embeddings_cache_embeddinggemma_latest.db-shm
+-rw-r--r-- 1 octav 197609     0 Sep 30 10:55 embeddings_cache_embeddinggemma_latest.db-wal
+-rw-r--r-- 1 octav 197609 32768 Sep 30 10:55 embeddings_cache_nomic-embed-text_latest.db-shm
+-rw-r--r-- 1 octav 197609     0 Sep 30 10:55 embeddings_cache_nomic-embed-text_latest.db-wal
+== Fri Oct  2 03:35:49     2026 selftest
+  ok   admitted: the working copy is given, mutated, kept; P unchanged
+  ok   C1: the unmutated scratch copy admitted, a one-byte mutant refused before copy and launch
+  ok   C2: a protected file written by the JVM -> PIN BREACH rc 2
+  ok   C2: a sidecar or a main-cache row -> PIN BREACH
+  ok   C2 L2: 9 of 9 protected targets refused before launch; a path under the DIR too
+  ok   mutant 4: the JVM is given the working path, never the DIR's
+  ok   dry-run and the fresh-run rule; arm set
+  ok   a JVM failure passes its rc after the re-hash
+  ok   (ii) a copy off the pin refused; both main-cache views printed
+  ok   B-E1-1: a sidecar beside any of the 9 hashed files refused (3 kinds x 9 sites x run/dry-run = 54)
+  ok   B-E1-1: probe P-E1a (pre-existing -wal/-shm, a WAL-tail write) refused before launch
+  ok   B-E1-1: view() records sidecar size and sha256
+  ok   B-E1-2: outputDir of record / missing / non-fresh refused; the L1 TOML admitted, 2 keys off af_clean_s42
+  ok   C-E1-3: data root != JVM cwd refused
+  ok   C-E1-4: code blobs 2073d131 / 7868e858 enforced
+[E1-ROUTE] selftest: 15 / 15 passed
+rc=0
+== dry-run
+[E1-ROUTE] (C-E1-3) data root = JVM cwd Z:\FAC\TUBerlin\THESIS\TaxoArena; (C-E1-4) code pins {"embedder_arms.py": "2073d1315981a30464037913b85ce2bf8838aa00", "embedder_cross_flat.py": "7868e8589fee107b15d3c535966b840cd648f771"}
+[E1-ROUTE] arm nomic_raw; DIR file under test Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\embedder_cross\embeddings_cache_nomic-embed-text_latest.db; java PIDs before: []
+[EMB-ARMS] registrar pin: arm nomic_raw sha256 53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95 == embedder_cross_arm_pins.json
+[E1-ROUTE] (i) pin: sha256 53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95 == the registrar's pin
+[E1-ROUTE] (B-E1-2) config experiment_configs/e1_route/L1_short_af_clean_s42.toml outputDir Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results/e1_route/L1_short (fresh; outside every object of record); ranking DB Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\e1_route_work\20261002_033551_nomic_raw\ratings_e1route.db
+[E1-ROUTE] (B-E1-1) no -wal / -shm / -journal beside any of the 9 hashed files
+[E1-ROUTE] (iv) model nomic-embed-text:latest (pinned digest 0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f); JVM threads 12
+[E1-ROUTE] P before DIR/nomic_raw                                53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95
+[E1-ROUTE] P before DIR/nomic_card                               90754dfd95849cf23ee3698a8523a17ea6e3ec3d32fc7516c78534c36301e414
+[E1-ROUTE] P before DIR/gemma_raw                                28f2e3a41e77312ff5c92d798b95e6ea2acdb8b6591b2eab1c677fa1d5367867
+[E1-ROUTE] P before DIR/gemma_card                               24820836f7266c08958438c1d4a0116d38416113c7602499420f7e0ca65b4e93
+[E1-ROUTE] P before source/embeddings_cache_nomic-embed-text_latest.db 53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95
+[E1-ROUTE] P before source/embeddings_cache_embeddinggemma_latest.db 3e9ce57772160749e0b5ea0267713286ca4109444d5a6b676e877a5b0501df29
+[E1-ROUTE] P before main/embeddings_cache.db                     52229e1ebfdda76ebaed3e461eeee80ae654dfb35ac480eb9cb9868bb0269769; tables {"queries": "cdeca05e573e257810a329d394e28de6611614b65f8019c20aa521049312c081", "reserved_pool_meta": "ABSENT"}
+[E1-ROUTE] P before frozen/snapshots_frozen.db                   3f7f5e9a470baba3a66d0dbc870bf772739ae60cc415615b0c4f54e0f4793e4e
+[E1-ROUTE] P before DIR-under-test                               53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95
+[E1-ROUTE] DRY RUN: pin and target checks passed; nothing copied, nothing launched; command: Z:\FAC\TUBerlin\THESIS\TaxoArena\gradlew.bat bootRun --console=plain --offline -PjvmThreads=12 -Dtaxoarena.embeddingCacheFile=Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\e1_route_work\20261002_033551_nomic_raw\embeddings_cache_nomic-embed-text_latest.db -Dtaxoadapt.llm.embedding-model=nomic-embed-text:latest -Dtaxoarena.embeddingCacheSourceSha256=53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95 -Dranking.db.path=Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\e1_route_work\20261002_033551_nomic_raw\ratings_e1route.db --args=--config experiment_configs/e1_route/L1_short_af_clean_s42.toml
+rc=0
+53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95 *C:/Users/octav/AppData/Local/Temp/claude/Z--FAC-TUBerlin-THESIS-TaxoArena/7c10e5cb-d16b-4a0e-864a-f3a6151d835b/scratchpad/e1l1/embeddings_cache_nomic-embed-text_latest.db
+== Fri Oct  2 03:36:05     2026 L1 launch
+rc=0
+== Fri Oct  2 03:38:25     2026 C-E1R-3
+'gradlew.bat' n'est pas reconnu en tant que commande interne
+ou externe, un programme ex‚cutable ou un fichier de commandes.
+rc=1
+
+
+ProcessId   : 50100
+CommandLine : C:\Users\octav\.jdks\graalvm-jdk-21.0.6\bin\java.exe --add-opens=java.base/java.util=ALL-UNNAMED 
+              --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED 
+              --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED 
+              --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED 
+              --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED 
+              --add-opens=java.base/java.nio.charset=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED 
+              --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED -Xmx4096M -Dfile.encoding=UTF-8 
+              -Duser.country=FR -Duser.language=fr -Duser.variant -cp C:\Users\octav\.gradle\wrapper\dists\gradle-8.10-
+              bin\deqhafrv1ntovfmgh0nh3npr9\gradle-8.10\lib\gradle-daemon-main-8.10.jar -javaagent:C:\Users\octav\.grad
+              le\wrapper\dists\gradle-8.10-bin\deqhafrv1ntovfmgh0nh3npr9\gradle-8.10\lib\agents\gradle-instrumentation-
+              agent-8.10.jar org.gradle.launcher.daemon.bootstrap.GradleDaemon 8.10
+
+ProcessId   : 48952
+CommandLine : C:\Users\octav\.jdks\graalvm-jdk-21.0.6\bin\java -cp C:\Users\octav\.gradle\caches\modules-2\files-2.1\or
+              g.jetbrains.kotlin\kotlin-compiler-embeddable\2.1.10\ee3e5c806617c52ce167bdf96933efef9593853e\kotlin-comp
+              iler-embeddable-2.1.10.jar;C:\Users\octav\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib\2.1.10\kotlin
+              -stdlib-2.1.10.jar;C:\Users\octav\.m2\repository\org\jetbrains\kotlin\kotlin-script-runtime\2.1.10\kotlin
+              -script-runtime-2.1.10.jar;C:\Users\octav\.gradle\caches\modules-2\files-2.1\org.jetbrains.kotlin\kotlin-
+              reflect\2.1.10\b6dfc50c112d7cd89b350fef16d810c77acae209\kotlin-reflect-2.1.10.jar;C:\Users\octav\.gradle\
+              caches\modules-2\files-2.1\org.jetbrains.kotlin\kotlin-daemon-embeddable\2.1.10\58b88d47cdc057f09a8ea603e
+              ce5fd1993c7cb64\kotlin-daemon-embeddable-2.1.10.jar;C:\Users\octav\.m2\repository\org\jetbrains\intellij\
+              deps\trove4j\1.0.20200330\trove4j-1.0.20200330.jar;C:\Users\octav\.gradle\caches\modules-2\files-2.1\org.
+              jetbrains.kotlinx\kotlinx-coroutines-core-jvm\1.8.1\bb0e192bd7c2b6b8217440d36e9758e377e450\kotlinx-corout
+              ines-core-jvm-1.8.1.jar;C:\Users\octav\.m2\repository\org\jetbrains\annotations\13.0\annotations-13.0.jar
+               -Djava.awt.headless=true -Djava.rmi.server.hostname=127.0.0.1 -Xmx4096M -XX:ReservedCodeCacheSize=320m 
+              -Dkotlin.environment.keepalive -ea -XX:+UseCodeCacheFlushing -XX:+UseParallelGC -Dkotlin.daemon.initiator
+              .marker.file=C:\Users\octav\AppData\Local\Temp\kotlin-compiler-in-taxoarena-12488140074091238588.alive 
+              --add-exports java.base/sun.nio.ch=ALL-UNNAMED org.jetbrains.kotlin.daemon.KotlinCompileDaemon 
+              --daemon-runFilesPath C:\Users\octav\AppData\Local\kotlin\daemon --daemon-autoshutdownIdleSeconds=7200 
+              --daemon-compilerClasspath C:\Users\octav\.gradle\caches\modules-2\files-2.1\org.jetbrains.kotlin\kotlin-
+              compiler-embeddable\2.1.10\ee3e5c806617c52ce167bdf96933efef9593853e\kotlin-compiler-embeddable-2.1.10.jar
+              ;C:\Users\octav\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib\2.1.10\kotlin-stdlib-2.1.10.jar;C:\User
+              s\octav\.m2\repository\org\jetbrains\kotlin\kotlin-script-runtime\2.1.10\kotlin-script-runtime-2.1.10.jar
+              ;C:\Users\octav\.gradle\caches\modules-2\files-2.1\org.jetbrains.kotlin\kotlin-reflect\2.1.10\b6dfc50c112
+              d7cd89b350fef16d810c77acae209\kotlin-reflect-2.1.10.jar;C:\Users\octav\.gradle\caches\modules-2\files-2.1
+              \org.jetbrains.kotlin\kotlin-daemon-embeddable\2.1.10\58b88d47cdc057f09a8ea603ece5fd1993c7cb64\kotlin-dae
+              mon-embeddable-2.1.10.jar;C:\Users\octav\.m2\repository\org\jetbrains\intellij\deps\trove4j\1.0.20200330\
+              trove4j-1.0.20200330.jar;C:\Users\octav\.gradle\caches\modules-2\files-2.1\org.jetbrains.kotlinx\kotlinx-
+              coroutines-core-jvm\1.8.1\bb0e192bd7c2b6b8217440d36e9758e377e450\kotlinx-coroutines-core-jvm-1.8.1.jar;C:
+              \Users\octav\.m2\repository\org\jetbrains\annotations\13.0\annotations-13.0.jar
+
+
+
+-- kill leftover L1 JVMs by PID (both listed by the launcher as java PIDs after; before was [])
+Op‚ration r‚ussieÿ: le processus avec PID 48952 a ‚t‚ termin‚.
+Op‚ration r‚ussieÿ: le processus avec PID 50100 a ‚t‚ termin‚.
+no java
+52229e1ebfdda76ebaed3e461eeee80ae654dfb35ac480eb9cb9868bb0269769 *embeddings_cache.db
+3e9ce57772160749e0b5ea0267713286ca4109444d5a6b676e877a5b0501df29 *embeddings_cache_embeddinggemma_latest.db
+53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95 *embeddings_cache_nomic-embed-text_latest.db

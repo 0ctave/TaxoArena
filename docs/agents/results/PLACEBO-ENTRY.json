@@ -1,0 +1,122 @@
+{
+  "id": "PLACEBO-ENTRY",
+  "title": "PLACEBO-ENTRY: does the ARENA-13 protocol inflate whoever enters through it, and is the +0.045 residue real at all? (arm A zero calls; arm B 1,192 calls)",
+  "question": "Arm A: refit the twelve on their answer-disagreeing subset; arm B: re-enter gemini (already on the board, original traces, no REGEN) through the ARENA-13 protocol: 4 opponents x 150, disagreement-filtered, leave-out ensemble reference, dual order; both boards centred on the other eleven; registered: gemini's theta gains >= +0.045 with a CI excluding zero.",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "1fdceee",
+    "program_lines": "docs/judge_v2_program.md L1670-L1699 (registration) and L1734-L1786 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-14 (before any call) — PLACEBO-ENTRY: does the ARENA-13 PROTOCOL inflate whoever enters through it?",
+    "outcome_heading": [
+      "L1734: - **PLACEBO-ENTRY OUTCOME (2026-09-14): the hypothesis is NOT CONFIRMED, the free precursor that supported it"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "tools/analysis/placebo_entry.py",
+    "sha16": "aef949d40bbeb7ed (at a03ae63)",
+    "commit": "a03ae63"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (1,192 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/placebo_outcome.txt",
+    "outcome_commit": "7ce80d4",
+    "calls": 1192,
+    "cce": "not stated",
+    "pool": "gemini vs 4 opponents x 150, disagreement-filtered",
+    "date": "2026-09-14"
+  },
+  "review": {
+    "file": "the ledger audit (same hour, 2026-09-14): the first version compared the protocol's four-opponent theta against gemini's ELEVEN-opponent x12 theta and read +0.013; matched, the sign flips to -0.043",
+    "commit": "7ce80d4",
+    "verdict": "NOT CONFIRMED (delta -0.043 [-0.196, +0.109], under-powered); QUESTION DISSOLVED by the free check (4): the residue's CI includes zero; methodological rule adopted"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "gemini's theta gains >= +0.045 with a CI excluding zero",
+      "result": "FAILED",
+      "value": "arm B delta -0.043 [-0.196, +0.109] against the MATCHED four-opponent baseline; POWER: CI half-width 0.152 against a +0.045 bar, so this arm could not have confirmed the hypothesis even if true: NOT CONFIRMED is absence of evidence; the amendment rule that would have blamed trace style is WITHDRAWN, not applied",
+      "denominator": "gemini vs 4 opponents, 1,192 calls"
+    },
+    {
+      "id": "arm A",
+      "text": "refit the twelve on the answer-disagreeing subset",
+      "result": "DELIVERED",
+      "value": "filtering widens the theta scale 13% (SD 1.785 vs 1.574) and moves top models +0.17..+0.37 from the centre: looked supportive; reconciled with arm B because arm A refits EVERY model on filtered evidence (a global rescaling) while arm B changes ONE model's edges against four",
+      "denominator": "12 models"
+    },
+    {
+      "id": "(4)",
+      "text": "free check: the newcomer's dual-order theta gap to gemini",
+      "result": "DELIVERED",
+      "value": "+0.045 with a bootstrap CI of [-0.068, +0.186]: includes zero; there is no residue to explain; quality-not-in-the-key and trace style are withdrawn as questions",
+      "denominator": "the 13-model dual-order board"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "METHODOLOGICAL RULE ADOPTED: every rank-based pass/fail criterion needs a resolution check (a CI on the quantity that sets the rank) before a FAIL can be read as mis-ranking; applies retrospectively to ARENA-V2-X20's top-6 clause and to any future LADDER-INSERT; the second cheap proxy that day to overstate an effect after POSITION-DECOMP's 7x imputation error"
+  },
+  "numbers_of_record": {
+    "arm_B": "delta -0.043 [-0.196, +0.109] (matched); first version +0.013 (mismatched, corrected)",
+    "power": "CI half-width 0.152 vs +0.045 bar",
+    "arm_A": "SD 1.785 vs 1.574 (+13%); top models +0.17..+0.37",
+    "residue": "+0.045 [-0.068, +0.186]"
+  },
+  "sentence_of_record": "PLACEBO-ENTRY (2026-09-14, 1,192 calls): arm A looked supportive (filtering widens the theta scale 13%); arm B NOT CONFIRMED, delta -0.043 [-0.196, +0.109] against the matched four-opponent baseline (CORRECTION, ledger audit, same hour: the first version compared against gemini's eleven-opponent x12 theta and read +0.013; the sign flips once matched); power: CI half-width 0.152 against a +0.045 bar, so NOT CONFIRMED is absence of evidence and the amendment rule is WITHDRAWN, not applied; (4) the free check that settles the line: the newcomer's dual-order theta gap to gemini is +0.045 with CI [-0.068, +0.186], it includes zero, there is no residue to explain. METHODOLOGICAL RULE ADOPTED: every rank-based pass/fail criterion needs a resolution check before a FAIL can be read as mis-ranking.",
+  "chips": [
+    "NOT CONFIRMED",
+    "QUESTION DISSOLVED"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-14",
+      "by": "the ledger audit (same hour; in the observed cell)",
+      "text": "the first version compared the protocol's four-opponent theta against gemini's ELEVEN-opponent x12 theta and read +0.013, two different quantities; matched, delta -0.043 [-0.196, +0.109]."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "protocol inflation (under-powered: absence of evidence)",
+    "a real +0.045 residue (CI includes zero)"
+  ],
+  "ledger": {
+    "row_id": "PLACEBO-ENTRY",
+    "version": "v70 (95228cd); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "ARENA-13",
+    "POSITION-FULL",
+    "ARENA-V2-X20",
+    "PLACEMENT-CEILING"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L1670-L1699 and L1734-L1786 (1fdceee / 7ce80d4)",
+    "experiment_results/x12_crossdomain/placebo_outcome.txt (7ce80d4)",
+    "docs/test_ledger.html row PLACEBO-ENTRY (v70): chips verbatim, observed cell, evidence",
+    "script sha16 = sha256 of tools/analysis/placebo_entry.py at a03ae63 (first commit), first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Asks whether the protocol for adding a new model to the arena inflates the newcomer's score, and whether a small +0.045 advantage seen earlier is real. One arm uses existing data, the other 1,192 judge calls.",
+    "why": "It checks that the leaderboard is fair to models that join later.",
+    "information": "Inflation would mean the entry protocol biases rankings. Result: not confirmed, but the test was under-powered, so this is absence of evidence. The +0.045 gap's interval includes zero, so there is no residue to explain. It led to a rule: any rank-based pass/fail needs a resolution check first. A later ruling classes this run's judged data as history.",
+    "written": "2026-10-07"
+  }
+}

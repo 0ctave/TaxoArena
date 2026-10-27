@@ -1,0 +1,87 @@
+# H9 COUNTERFACTUAL SWEEP, ARM 1: corpus-seed perturbation at the FROZEN operating
+# point — PRE-REGISTERED (2026-09-07, committed before any arm runs).
+#
+# WHY. The frozen artifact (20260727_042523, built by freeze_mcs55.toml, seed 42)
+# is ONE draw of the 70/30 corpus split. At mcs=30 the seed alone moved leaf counts
+# 63-104 while held-out accuracy stayed 74.4 +/- 0.4; this arm measures that
+# variance floor AT the frozen config (mcs=55, bar=0.025, z=2.0). Every other H9
+# arm is judged against this arm's spread.
+#
+# ARMS: seeds {137, 2048, 7, 31337} (42 = the frozen run itself, already on disk).
+# ONLY the seed differs from freeze_mcs55.toml; labeling/judge-induction/final
+# metrics are OFF (stability metrics need structure + routing only, no LLM calls).
+#
+# REGISTERED CLAIMS, frozen here (adjudicated by the stability metrics computed
+# across the five runs; any other pattern reported as-is):
+#   (alpha) held-out routing Top-1 accuracy is INVARIANT to construction
+#           perturbations that move the leaf count by up to +/-25%: max spread
+#           of Top-1 across the 5 runs < 2.5 percentage points.
+#   (beta)  anchor-level structure is stable while leaf-level identity is not:
+#           per-anchor question-mass share shifts < 5pp on every anchor in every
+#           run, WHILE leaf-level ARI vs the frozen artifact < 0.9 in at least
+#           one run (i.e. leaves genuinely move).
+# Metrics: ARI/NMI of hard leaf assignments vs frozen (shared train corpus),
+# anchor purity drift, leaf count/depth distribution, held-out routing agreement
+# + Top-1 with Wilson CI, Hungarian mu-matching (cos >= 0.95 matched fraction),
+# certificate status + stop reason + cycle-detector count.
+#
+# OPS: one seed per process; fresh outputDir and -Dranking.db.path per run; the
+# frozen artifact and snapshots are never modified (new snapshot ids only).
+#
+datasetType   = "MMLU_PRO"
+
+models        = [
+    "gpt-4o-2024-08-06",
+    "claude-3-5-sonnet-20241022",
+    "gemini-1.5-pro-002",
+    "deepseek-chat-v2_5",
+    "Meta-Llama-3_1-70B-Instruct",
+    "Qwen1.5-72B-Chat",
+    "gpt-4o-mini",
+    "claude-3-5-haiku-20241022",
+    "Mixtral-8x7B-Instruct-v0.1",
+    "c4ai-command-r-v01",
+    "Qwen1.5-14B-Chat",
+    "Meta-Llama-3_1-8B-Instruct",
+    "gemini-1.5-flash-002",
+    "Llama-2-70b-hf",
+    "Llama-2-13b-hf"
+]
+
+category      = ""
+queryLimit    = 0
+outputDir     = "experiment_results/h9_seed31337"
+testRatio     = 0.3
+seed          = 31337
+
+runPipeline        = true
+runBenchmark       = false
+runTrickle         = true
+runBaselines       = false
+enableFinalMetrics = false
+enableLabeling     = false
+judgeInduction     = false
+
+dagMode = "DAG_MAX"
+
+maxDepth              = 8
+minClusterSize        = 55
+proposalSeparationBar = 0.025
+tau                   = 1e-6
+acceptanceZ           = 2.0
+enableRefitGate       = false
+
+membershipFloor       = 0.25
+routingBeamGamma      = 0.2
+descentMargin         = 0.12
+
+effectiveSupportFloor = 2.0
+defaultKappaPrior     = 10.0
+
+numIterations         = 50
+maxLeafAssignments    = 5
+
+fusionSimilarityThreshold = 0.90
+enableGtWarmStart         = false
+
+enableProfiling           = true

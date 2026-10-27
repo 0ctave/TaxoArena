@@ -1,0 +1,233 @@
+{
+  "id": "VFC-FIXES-2",
+  "title": "VFC-FIXES-2: vote_frame_cert.py D1-D5 of review 9d3e261 plus R-1..R-9 of VFC-RX-RULING (and D5 in position_index_all.py); worktree-only build, delta READY (i), merge by path; reuse gated on (ii)/(iii)",
+  "question": "Does vote_frame_cert.py (with position_index_all.py's D5) implement D1-D5 of the READY review 9d3e261 and R-1..R-9 of VFC-RX-RULING, each executed by a selftest fixture with a killed mutant (delta check (i)), so that it may merge; and, before any reuse, does it re-derive the certificate of record and the two importers' outcomes with only the expected diffs (delta checks (ii) and (iii))?",
+  "kind": "engineering",
+  "state": "done",
+  "state_qualifier": "done = part (i) READY and MERGED at f76a93b; REUSE of vote_frame_cert.py GATED on (ii) and (iii) (queue item VFC-FIXES-2-DELTA-II-III, blocked) [2026-09-26: harness v4 READY and pinned (818cfa3b66ba8b3a, ea68f47); (ii)/(iii) blocked on P3 (E3) only; P4 met 2a340dd] [2026-09-26: (ii) PASS and (iii) PASS (post-run review ef045a1 VALID); P3 MET; THE REUSE GATE IS LIFTED: REUSE LICENSED: vote_frame_cert.py blob:1a3d0bb5 / sha256-lf16:b45b75db7d98103e by VOTE-FRAME-CERT, POSITION-INDEX-ALL and TIE-MECHANICS (consumers position_index_all.py bcbaf609 / 9c78d485f37f442a, tie_mechanics.py 7f88d2ac / d6a1a0409a0fc06e); any edit to the 15-module closure voids it; certificate c731836 NOT re-issued; VFC_PIN_LF 72ceddfe stands; V-C5 in force]",
+  "registration": {
+    "commit": "no registration of its own: scope set by the review 9d3e261 (defects D1-D5) and the VFC-RX-RULING record (f1e9e68, v259)",
+    "program_lines": "docs/judge_v2_program.md L15566-L15584 (DEFECTS line L15582) and L17171-L17328 (sections 5-6; EFFECT OF RECORD L17321, L17324)",
+    "program_lines_as_of": "re-grepped at f76a93b",
+    "date": "2026-09-24 (queued) / 2026-09-25 (scope + unblock)"
+  },
+  "script": {
+    "path": "tools/analysis/vote_frame_cert.py and tools/analysis/position_index_all.py (merged on main at f76a93b by path from a9d8d7d)",
+    "sha16": "tools/analysis/vote_frame_cert.py blob:1a3d0bb5576b5c18c15c42e3ee8da09967303dca / sha256-lf16:b45b75db7d98103e / sha256-crlf16:3b44739e161d0d86 (working tree CRLF); tools/analysis/position_index_all.py blob:bcbaf609bf9ee959e45daef7fbd50810e164a696 / sha256-lf16:9c78d485f37f442a / sha256-crlf16:50bb9285e9068f0b (working tree CRLF); VFC_PIN_LF 72ceddfe919a982e at position_index_all.py L179 unchanged",
+    "commit": "f76a93b (merge); build commits 00775fc -> 930ccc7 (READY'd) -> a9d8d7d (R2-L1)",
+    "ready_build_pin": "930ccc7: vote_frame_cert.py blob:c99fb126ea813328e9909dc4ce1ed5123e1fece0 / sha256-lf16:211112d41eed0b77 / sha256-crlf16:ec3e9a34f042068f (the pin the READY f387d58 certified; SUPERSEDED as the pin of the file on main by 1a3d0bb5 / b45b75db7d98103e; the diff 930ccc7 -> a9d8d7d is +9/-8 inside selftest() only, instrument logic identical)",
+    "superseded_on_main": "vote_frame_cert.py blob:aab89f37 / sha256-lf16:a985eff263414fd9 (0c66174); position_index_all.py blob:9c2ae419 / sha256-lf16:8939144e5ce87636",
+    "delta_harness_v4": "experiment_results/vfc_fixes_2/harness/rerun_vf4.py blob:8db1d2e740bd127b2bf18e81c7e35ae306cc65f4 / sha256-lf16:818cfa3b66ba8b3a / sha256-crlf16:66a2ed54862eab15 (28,577 bytes LF; main working tree CRLF), driver test_rerun_vf4.py blob:8f0240f7e622941f6cb8860cc9628840fa7b8fe8 / sha256-lf16:b958e495193ce54c, transcripts/SUMMARY.txt blob:6ca2ec817cf965c3581126b8ff5bca4f33a90473 / sha256-lf16:ad0453249d4779ca; branch vfc-harness-v4 bf8e76c -> 5385c17 (RV4-1..RV4-3), merged by path at ea68f47 (121 files, blobs equal to 5385c17); SUPERSEDED, never pinned: bf8e76c rerun_vf4.py blob:32c8f7ff / sha256-lf16:a9fea8d20cf5446f"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_vfc_fixes_2.md (blob:21e385e884de0620005456d27b3b1d9e5f530652; LF sha256 8c411f5f9e36ce877d2689939e7389f2a6fafafe9c7e5441bfbfe6eed77ff4b6)",
+    "commit": "f387d58 (round 2: READY (part i) for build 930ccc7); round 1 a3da968: NOT READY (part i)"
+  },
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "docs/judge_v2_program.md L20127-L20162 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — VFC-FIXES-2 PART (i) READY (f387d58, build 930ccc7, after NOT READY a3da968); ...\"), _as_of the commit that writes it, parent f76a93b, re-grepped (the merge record; engineering, no outcome file under experiment_results)",
+    "outcome_commit": "f76a93b (the merge, by the orchestrator); the record: the commit that writes it (parent f76a93b)",
+    "calls": 0,
+    "cce": 0,
+    "pool": "n/a (no DB opened)",
+    "date": "2026-09-25",
+    "pre_merge_checks": "RELAYED by the orchestrator, not re-run or read by the registrar: clean worktree at main with the 2 paths, python and -O, LF and CRLF: vote_frame_cert 472/0, position_index_all 55/0 (+1 INFO), tie_mechanics 29/0, judge_v2 selftest 174, archv2_pilot 282/0; worktree removed",
+    "r2l1_confirmation": "RELAYED (engine-coder): the reviewer's unmodified rv2/rmut.py + rmut2.py on the LF archive of a9d8d7d: 29 KILLED-BY-CHECK, 0 KILLED-BY-EXCEPTION, 0 SURVIVED; f1_secondary_on_inf_only KILLED-BY-CHECK under python and -O (driver vf2/r2l1_run.py found; console output, no log)",
+    "delta_ii_iii": {
+      "outcome_file": "docs/judge_v2_program.md L20558-L20593 (section \"## VFC-FIXES-2 (ii)/(iii) (2026-09-26, 0 calls) — VALID (post-run review ef045a1): (ii) PASS, (iii) PASS; P3 MET ...\"; _as_of the commit that writes it, parent c400c30, re-grepped) (scratch outputs archived at Z:\\FAC\\TUBerlin\\THESIS\\TaxoArena_data\\evidence_2026-09-25\\vfc_ii_iii\\; no output of record written)",
+      "outcome_commit": "none (the run wrote only scratch; the review ef045a1 and this record)",
+      "calls": 0,
+      "cce": 0,
+      "pool": "n/a (62 caches read-only; [PRE]/[POST] unchanged)",
+      "date": "2026-09-26 (E3 00:07-00:09; legs 00:33:58-00:34:28)"
+    }
+  },
+  "review": {
+    "file": "docs/reviews/READY_vfc_fixes_2.md",
+    "commit": "f387d58",
+    "verdict": "READY (part i) for build 930ccc7 (round 2); NOT READY (part i) at 00775fc (round 1, a3da968); conditions on the next steps: R2-M1 before (ii); R2.5 routing of '' labels; (ii)/(iii) run as written after the pilot's outcome",
+    "delta_ii_iii": {
+      "file": "docs/reviews/POSTRUN_vfc_ii_iii.md (ef045a1; blob:f472aba63fecff11de867a8e154a20ea0ecd10d2)",
+      "commit": "ef045a1",
+      "verdict": "VALID: (ii) PASS, (iii) PASS; reuse licensed subject to the registrar's record; defects PR-1..PR-3 LOW, PR-4 INFO"
+    }
+  },
+  "criteria": [
+    {
+      "id": "(i)",
+      "text": "delta check (i) of the VFC-RX-RULING section 5: the selftest (a)-(f) PASS under python and -O, with mutants killed",
+      "result": "HELD",
+      "value": "READY (part i) f387d58 on 930ccc7: 472/0, 55/0 +1 INFO, 29/0 (python and -O); reviewer mutants 28 by check + 1 by exception (R2-L1, fixed at a9d8d7d: 29 by check, relayed), 0 survived; builder's 44: 41 by check + 3 designed refusals",
+      "denominator": "29 reviewer mutants + 1 control (rmut2_out.txt 'TOTAL 30' counts the control); 44 builder mutants"
+    },
+    {
+      "id": "(ii)",
+      "text": "delta check (ii): a zero-write re-derivation of the certificate in scratch differing from c731836 + the C3 disclosure ONLY in the R2.6 expected diffs",
+      "result": "HELD",
+      "value": "PASS: score-vfc rc 0, exactly the 17 expected diffs of R2.6-b2 section 3, 0 findings (record 404 lines, new 402); C3 _backup UNCERTIFIABLE (RX) -> CERTIFIED-CONTESTANT 387 / 387 (the only cache and unit move); six E-COMB secondaries UNCERTIFIABLE (R6) at 111/1024, 187/1048, 182/993, 140/972, 29/279, 36/288 on contestant-name labels, 0 ''; classes 54/5/0/0/1/2; reason (6) 0; OTHER line retired; [PRE]/[POST] 62/62 unchanged; REFUSED 0 [previously: NOT RUN: owed; gated on R2-M1 and the OPEN build/pin ruling]",
+      "denominator": "62 recorded caches (62 distinct paths); 404 record lines"
+    },
+    {
+      "id": "(iii)",
+      "text": "delta check (iii): POSITION-INDEX-ALL re-derives byte-identically except L2; TIE-MECHANICS with 0 differing lines; the R-8 refusal does not fire",
+      "result": "HELD",
+      "value": "PASS: score-pia rc 0, exactly L2 (8939144e5ce87636 / 6f6694eac5a176f8 -> 9c78d485f37f442a twice), L3 unmoved (entered 50, excluded 12), [FRAME] REFUSED 0; score-tm rc 0, exactly L14 (= TM_L14_NEW), the [POOL] line p2dca21ab5f4ef3ae unmoved, [FRAME] REFUSED 0 (R-8 did not fire) [previously: NOT RUN: owed]",
+      "denominator": "2 outcome files of record (bb1578ca, a2df609d)"
+    },
+    {
+      "id": "S6-(1)",
+      "text": "section 6 (1): fresh worktree off main at or after 5ff5e73; nothing on main until the pilot and INDUCE-RUBRIC-3 close; merge by pathspec then ancestry checks",
+      "result": "HELD",
+      "value": "base f1e9e68 (5ff5e73 ancestor, rc 0); code reached main only at f76a93b by path; f3e7dc3 ancestor of f76a93b rc 0; a9d8d7d not an ancestor rc 1 (by path); NOTE: docs-only review commits a3da968 / f387d58 landed on main during the pilot",
+      "denominator": "commits f1e9e68..a9d8d7d (3) and f76a93b"
+    },
+    {
+      "id": "S6-(2)",
+      "text": "section 6 (2): no real-data --run or --dry-run; selftest on temp fixtures only",
+      "result": "HELD",
+      "value": "as stated by the READY (no DB under experiment_results opened); outputs of record unchanged",
+      "denominator": "the READY's evidence"
+    },
+    {
+      "id": "S6-(3)",
+      "text": "section 6 (3): only vote_frame_cert.py and (D5) position_index_all.py; nothing under judge_v2/ or data_v2/",
+      "result": "HELD",
+      "value": "f76a93b = 2 paths; judge_v2/data_v2 count 0",
+      "denominator": "paths of f76a93b and of f1e9e68..a9d8d7d"
+    },
+    {
+      "id": "S6-(4)",
+      "text": "section 6 (4): __pycache__ in the worktree; no new certificate; VFC_PIN_LF stays 72ceddfe",
+      "result": "HELD",
+      "value": "outputs of record 8db4403f / 5ec19826 / bb1578ca / a2df609d unchanged; VFC_PIN_LF 72ceddfe919a982e at L179; __pycache__ not verifiable from git (relayed)",
+      "denominator": "4 outputs of record + 1 constant"
+    },
+    {
+      "id": "S6-(5)",
+      "text": "section 6 (5): the merge waits for the pilot and INDUCE-RUBRIC-3 to close",
+      "result": "HELD",
+      "value": "INDUCE-RUBRIC-3 outcome c09440e 04:47:08; K46 outcome 38ec2f3 15:25:43; merge f76a93b 19:42:38",
+      "denominator": "3 commit times"
+    },
+    {
+      "id": "P3 (precondition)",
+      "text": "E3 on the bytes reused: the four selftest transcripts on the LF archive of f76a93b, hashed; the vfc leg's printed [E3] log sha256 equals the step-3 sha",
+      "result": "HELD",
+      "value": "E3 transcripts (sha256 of the file bytes as captured, CRLF on disk): python ad6aa8d0ef5b5073ae4ba748bc14b083cb9e271f03028c50d17a8ef7daf80888 (472 / 0), -O 7de8842ca2f12b46b660ae2a0c6aeec9c735e4423bd190f374047fecbb25e063 (472 / 0), pia e20271bd5bba66be8afeb062446a2e9e8e425373c8de4f1f04c8924b0b5a6033 (55 / 0 + 1 INFO), tm 0ce4cbcdff45fbf38af66f4d05ad51161a1fc1b7a0298aa4aa02b6b4b3aaa19d (29 / 0); the vfc leg's [E3] sha = ad6aa8d0... (registrar re-checked on the archive): the E3 tie holds",
+      "denominator": "4 transcripts; 1 leg [E3] line"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none registered (engineering); the READY's rule: any surviving mutant or an unfixed F1-F7 -> NOT READY; for reuse: any diff outside R2.6's expected list in (ii)/(iii) is a FINDING, never an expected diff",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "selftests_READY_930ccc7": "vote_frame_cert 472/0, position_index_all 55/0 (+1 INFO), tie_mechanics 29/0; python and -O; LF archive (READY f387d58 R2.2)",
+    "reviewer_mutants_READY": "28 KILLED-BY-CHECK, 1 KILLED-BY-EXCEPTION (f1_secondary_on_inf_only, R2-L1), 0 SURVIVED of 29 mutants + 1 control (rv2/rmut2_out.txt 'TOTAL 30'; the review writes '30 mutants')",
+    "reviewer_mutants_after_R2L1": "29 KILLED-BY-CHECK, 0 KILLED-BY-EXCEPTION, 0 SURVIVED (relayed, engine-coder; a9d8d7d LF archive; python and -O)",
+    "builder_mutants": "44: 41 by check (40 + 1 adapted), 3 by designed SystemExit refusals, 0 survived (read by the reviewer, not re-run)",
+    "pre_merge_tests": "472/0, 55/0 (+1 INFO), 29/0; judge_v2 174; archv2_pilot 282/0; python and -O, LF and CRLF (relayed)",
+    "pin_merged_vote_frame_cert": "blob:1a3d0bb5576b5c18c15c42e3ee8da09967303dca / sha256-lf16:b45b75db7d98103e / sha256-crlf16:3b44739e161d0d86",
+    "pin_merged_position_index_all": "blob:bcbaf609bf9ee959e45daef7fbd50810e164a696 / sha256-lf16:9c78d485f37f442a / sha256-crlf16:50bb9285e9068f0b",
+    "pin_READY_build_vote_frame_cert": "930ccc7 blob:c99fb126ea813328e9909dc4ce1ed5123e1fece0 / sha256-lf16:211112d41eed0b77 / sha256-crlf16:ec3e9a34f042068f",
+    "VFC_PIN_LF": "72ceddfe919a982e (unchanged; position_index_all.py L179 at f76a93b)",
+    "harness_scratch": "vf2/rerun_vf3.py sha256 5b2de8a394f7ef5ea65a5c4c49cb70aefa992c1e728e5c581680d81010fd2170 (LF, 0 CR, 15,177 B; R2-M1 fix; from sha256-lf16 721c16e43f0342f2); NOT committed; variant C and re-pin NOT recorded",
+    "pin_for_ii_iii": "vote_frame_cert.py at f76a93b blob:1a3d0bb5576b5c18c15c42e3ee8da09967303dca / sha256-lf16:b45b75db7d98103e (sha256-crlf16:3b44739e161d0d86, the main working tree only; printed by no leg); position_index_all.py sha256-lf16:9c78d485f37f442a; tie_mechanics.py sha256-lf16:d6a1a0409a0fc06e (source: docs/reviews/RULING_vfc_ii_iii_pin.md at 93cc7de (blob:7858fa2ac2f31df5fc0e4c349f609bffa1821a03; file bytes LF = the LF of record, sha256 087685415c0e67539a5d53ac3ecbaa5e48bcd407bf67b61cf0d749bcc15b1088))",
+    "delta_ii_iii_cost": "about 10-27 CPU-min (UNMEASURED estimate), 0 calls, one rule-7 window of about 45 min; 62 caches, 614.0 MB (source: the ruling, section 6)",
+    "delta_ii": "score-vfc rc 0, 17 of 17 expected diffs, 0 findings; classes 54 / 5 / 0 / 0 / 1 / 2 (record 54 / 4 / 0 / 0 / 2 / 2) over 62 caches",
+    "delta_ii_secondaries_R6": "n resolved of m informative: 111/1024, 187/1048, 182/993, 140/972, 29/279, 36/288; unresolvable 913 / 861 / 811 / 832 / 250 / 252, all contestant names, 0 ''",
+    "delta_ii_C3": "_backup/newcomer_placement_steps_2026-09-19_complete.db UNCERTIFIABLE (RX) -> CERTIFIED-CONTESTANT, order-1 387 / 387, order-2 380 contestant, unresolvable 767 -> 0",
+    "delta_iii": "pia rc 0, L2 only; tm rc 0, L14 only, [POOL] unmoved",
+    "E3": "E3 transcripts (sha256 of the file bytes as captured, CRLF on disk): python ad6aa8d0ef5b5073ae4ba748bc14b083cb9e271f03028c50d17a8ef7daf80888 (472 / 0), -O 7de8842ca2f12b46b660ae2a0c6aeec9c735e4423bd190f374047fecbb25e063 (472 / 0), pia e20271bd5bba66be8afeb062446a2e9e8e425373c8de4f1f04c8924b0b5a6033 (55 / 0 + 1 INFO), tm 0ce4cbcdff45fbf38af66f4d05ad51161a1fc1b7a0298aa4aa02b6b4b3aaa19d (29 / 0); the vfc leg's [E3] sha = ad6aa8d0... (registrar re-checked on the archive): the E3 tie holds",
+    "leg_walls": "vfc 9 s, pia 5 s, tm 15 s (window CLEAR 00:33:58; the ruling's 5-15 min estimate was unmeasured)"
+  },
+  "sentence_of_record": "VFC-FIXES-2 (2026-09-25, zero calls): MERGED, REUSE GATED ON (ii)/(iii): part (i) READY (f387d58, build 930ccc7, after NOT READY a3da968; F1-F7 fixed; selftests 472/0, 55/0 +1 INFO, 29/0 under python and -O; reviewer mutants 28 by check, 1 by exception, 0 survived) plus the R2-L1 selftest-only fix a9d8d7d (confirmed by execution, relayed: 29 by check, 0 by exception, 0 survived), MERGED on main at f76a93b by path (vote_frame_cert.py blob:1a3d0bb5 / sha256-lf16:b45b75db7d98103e, the new pin of record; position_index_all.py blob:bcbaf609 / 9c78d485f37f442a; VFC_PIN_LF 72ceddfe unchanged; no new certificate). [REUSE GATED: VOTE-FRAME-CERT, POSITION-INDEX-ALL and TIE-MECHANICS may not reuse vote_frame_cert.py until (ii) and (iii) are shown; the R2-M1 harness fix is unrecorded and the build/pin for (ii)/(iii) is an OPEN ruling.] [LIFTED 2026-09-26 by VFC-FIXES-2 (ii)/(iii) (post-run review ef045a1, VALID): (ii) PASS (the 17 expected diffs only; C3 _backup -> CERTIFIED-CONTESTANT; the six E-COMB secondaries UNCERTIFIABLE (R6) on contestant-name labels, descriptive only) and (iii) PASS (pia L2 only; tm L14 only, [POOL] unmoved); REUSE LICENSED: vote_frame_cert.py blob:1a3d0bb5 / sha256-lf16:b45b75db7d98103e by VOTE-FRAME-CERT, POSITION-INDEX-ALL and TIE-MECHANICS (consumers position_index_all.py bcbaf609 / 9c78d485f37f442a, tie_mechanics.py 7f88d2ac / d6a1a0409a0fc06e); any edit to the 15-module closure voids it; certificate c731836 NOT re-issued; VFC_PIN_LF 72ceddfe stands; V-C5 in force.]",
+  "chips": [],
+  "chips_note": "no row of its own in docs/test_ledger.html (as VFC-NAME-PROFILE-BY-CONTENT, VFC-DC-PRIME); recorded at v289 as brackets in rows VOTE-FRAME-CERT, POSITION-INDEX-ALL, TIE-MECHANICS; no chip changed",
+  "brackets": [
+    {
+      "date": "2026-09-25",
+      "by": "registrar (zero calls; insertion only)",
+      "text": "PART (i) READY f387d58 (build 930ccc7; after NOT READY a3da968); R2-L1 fix a9d8d7d confirmed by execution (relayed); MERGED at f76a93b by path (2 paths; no 3-way merge; main had not changed either path since f1e9e68); section 6 (1)-(5) MET; new pin of record vote_frame_cert.py 1a3d0bb5 / b45b75db7d98103e; REUSE GATED on (ii)/(iii); OPEN: the build/pin for (ii)/(iii) (930ccc7 as written, or re-issued against a9d8d7d / f76a93b: expected-diff L1 then b45b75db7d98103e / 3b44739e161d0d86), a reviewer's or the research-lead's ruling. docs/judge_v2_program.md L20127-L20162 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — VFC-FIXES-2 PART (i) READY (f387d58, build 930ccc7, after NOT READY a3da968); ...\"), _as_of the commit that writes it, parent f76a93b, re-grepped."
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (VFC-FIXES-2 (ii)/(iii) build / pin ruling; zero calls; insertion only; before any leg)",
+      "text": "RULING RECORDED at docs/judge_v2_program.md L20391-L20431 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run; BEFORE any leg of (ii) / (iii)) — VFC-FIXES-2 (ii)/(iii) BUILD / PIN RULING RECORDED: (b2), R2.6 RE-ISSUED AS R2.6-b2 ...\"; _as_of the commit that writes it, parent 55a6ce1, re-grepped) from docs/reviews/RULING_vfc_ii_iii_pin.md at 93cc7de (blob:7858fa2ac2f31df5fc0e4c349f609bffa1821a03; file bytes LF = the LF of record, sha256 087685415c0e67539a5d53ac3ecbaa5e48bcd407bf67b61cf0d749bcc15b1088): (b2) against f76a93b; every --expect-lf -> b45b75db7d98103e; R2.6-b2 expected diffs (vfc L1 b45b75db twice; pia L2 9c78d485 twice; tm exactly L14 4a18124878801487 -> d6a1a0409a0fc06e); the reviewer's own READY f387d58 defective: RP-1 HIGH (tm '0 differing lines' unreachable, rc 3 under b1 and b2), RP-2 / RP-3 / RP-4 MEDIUM (CRLF halves; scorers accept any sha; E3 passed not executed), RP-5 LOW (keep branch worktree-agent-ad89ebf95e36802f5), RP-6 LOW (script_shas mislabel, documented); preconditions P1-P5; cost about 10-27 CPU-min, 0 calls, one rule-7 window of about 45 min; the pin decision CLOSED; R2-M1 open until harness v4 is pinned; reuse still gated; ledger v294"
+    },
+    {
+      "date": "2026-09-26",
+      "by": "registrar (VFC-FIXES-2 (ii)/(iii) harness v4 READY + merge; zero calls; insertion only; before any leg)",
+      "text": "HARNESS v4 READY RECORDED at docs/judge_v2_program.md L20433-L20476 (section \"## Registrar's record 2026-09-26 (insertion only; zero calls; nothing run; BEFORE any leg of (ii) / (iii)) — VFC-FIXES-2 (ii)/(iii) HARNESS v4 READY ...\"; _as_of the commit that writes it, parent 2a340dd, re-grepped) from docs/reviews/READY_vfc_harness_v4.md at e256c23 (blob:043000412cc7adf0dd11cff77ee52d04711e23e6; LF, sha256-lf16:c70087b9592a9a77): NOT READY at bf8e76c; READY on the one-defect delta RV4-1, confirmed by a driver re-run (no re-review). RV4-1 MEDIUM fail-open (the legs and score-vfc took the vote_frame_cert pin from --expect-lf; proved with the 930ccc7 probe: 211112d41eed0b77 + 930ccc7's selftest log passed C-ii-1/H3/E3, score-vfc rc 0) FIXED at 5385c17 (refuse unless --expect-lf == PIN_LF b45b75db7d98103e; probes now rc 2; MRV4-1-pin killed); RV4-2 LOW FIXED (commonpath); RV4-3 LOW FIXED (cases + mutants R1-R4 killed). Rulings (a)-(e) all KEPT; prep REQUIRED. Merged by path at ea68f47 (parent e256c23; 121 files under experiment_results/vfc_fixes_2/harness/, blobs equal to 5385c17). Pin rerun_vf4.py blob:8db1d2e7 / sha256-lf16:818cfa3b66ba8b3a / sha256-crlf16:66a2ed54862eab15. Driver: builder 62/62 cases, 29/29 mutants killed (2 equivalent, not run); orchestrator's independent re-run (scratchpad v4verify_orch\\) 62/62, 29/29, rc 0 (relayed; case and mutant lines equal the builder's). P1 (R2-M1) MET (S-vfc-C-v4 rc 3; R1-M1-window killed): open decision CLOSED; P2 MET; P5 MET; P4 MET (arena-specialist 2a340dd: '' is NOT NULL, R6; an all-'' R6 move is an ordinary R6 finding and (ii) is scored; any '' is also an F5 finding; census 0 ''); ONLY P3 REMAINS (E3 steps 1-3, run-operator, after the current CPU jobs). E3 limit: form not provenance; procedural tie by the step-3 archive hash and the registrar's sha equality check. Reuse still gated; nothing of record moves; ledger v295"
+    },
+    {
+      "date": "2026-09-26",
+      "by": "registrar (delta (ii)/(iii) outcome; zero calls; insertion only)",
+      "text": "(ii)/(iii) RESULT recorded at docs/judge_v2_program.md L20558-L20593 (section \"## VFC-FIXES-2 (ii)/(iii) (2026-09-26, 0 calls) — VALID (post-run review ef045a1): (ii) PASS, (iii) PASS; P3 MET ...\"; _as_of the commit that writes it, parent c400c30, re-grepped), from docs/reviews/POSTRUN_vfc_ii_iii.md (ef045a1; blob:f472aba63fecff11de867a8e154a20ea0ecd10d2): VALID; (ii) PASS, (iii) PASS; P3 MET (E3 transcripts (sha256 of the file bytes as captured, CRLF on disk): python ad6aa8d0ef5b5073ae4ba748bc14b083cb9e271f03028c50d17a8ef7daf80888 (472 / 0), -O 7de8842ca2f12b46b660ae2a0c6aeec9c735e4423bd190f374047fecbb25e063 (472 / 0), pia e20271bd5bba66be8afeb062446a2e9e8e425373c8de4f1f04c8924b0b5a6033 (55 / 0 + 1 INFO), tm 0ce4cbcdff45fbf38af66f4d05ad51161a1fc1b7a0298aa4aa02b6b4b3aaa19d (29 / 0); the vfc leg's [E3] sha = ad6aa8d0... (registrar re-checked on the archive): the E3 tie holds); THE REUSE GATE IS LIFTED: REUSE LICENSED: vote_frame_cert.py blob:1a3d0bb5 / sha256-lf16:b45b75db7d98103e by VOTE-FRAME-CERT, POSITION-INDEX-ALL and TIE-MECHANICS (consumers position_index_all.py bcbaf609 / 9c78d485f37f442a, tie_mechanics.py 7f88d2ac / d6a1a0409a0fc06e); any edit to the 15-module closure voids it; certificate c731836 NOT re-issued; VFC_PIN_LF 72ceddfe stands; V-C5 in force. Certificate: a bracket on the VOTE-FRAME-CERT outcome (L14612, L14618) instead of a re-issue: under b45b75db the _backup copy reads CERTIFIED-CONTESTANT, the six E-COMB secondaries UNCERTIFIABLE (R6), descriptive only, reason (6) 0, the OTHER line retired; P4 prints 1 and stays HELD, PARTLY; consumers unaffected, read from source, not shown by running them. Defects PR-1 LOW (score-vfc should require all 17 expected changes by count), PR-2 LOW (secondary class and labels not in the F1 readout; '' should be a finding), PR-3 LOW (W3 a constant echo), PR-4 INFO (legs 9 / 5 / 15 s); queue VFC-HARNESS-V5-HARDENING added (PR-1, PR-2). RP-5 / C2: the orchestrator tagged vfc-fixes-2-part-i-930ccc7 (930ccc762d34) and vfc-fixes-2-a9d8d7d (a9d8d7df88d1) on 2026-09-26 (lightweight tags, verified to resolve); worktree branch worktree-agent-ad89ebf95e36802f5 may be removed after this record (not removed by the registrar). C4: evidence archived by the orchestrator at Z:\\FAC\\TUBerlin\\THESIS\\TaxoArena_data\\evidence_2026-09-25\\vfc_ii_iii\\ (662 files) and ...\\pr_vfc\\ (652); the 25 required files re-verified by the registrar (sha256[:16] = the review's table), 5 cmp-equal to the scratch. Queue VFC-FIXES-2-DELTA-II-III -> done. Ledger v297."
+    }
+  ],
+  "open_decisions": [
+    "BUILD/PIN FOR (ii)/(iii): R2.6 archives 930ccc7 with --expect-lf 211112d41eed0b77; main carries b45b75db7d98103e. Run exactly as written on 930ccc7, or re-issue against a9d8d7d or f76a93b (expected-diff L1 -> b45b75db7d98103e / 3b44739e161d0d86; every --expect-lf -> b45b75db7d98103e; (iii) unaffected). Owner: a reviewer or the research-lead. NOT decided. [CLOSED 2026-09-25 by the adversarial-reviewer's RULING (docs/reviews/RULING_vfc_ii_iii_pin.md at 93cc7de (blob:7858fa2ac2f31df5fc0e4c349f609bffa1821a03; file bytes LF = the LF of record, sha256 087685415c0e67539a5d53ac3ecbaa5e48bcd407bf67b61cf0d749bcc15b1088)), recorded at docs/judge_v2_program.md L20391-L20431 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run; BEFORE any leg of (ii) / (iii)) — VFC-FIXES-2 (ii)/(iii) BUILD / PIN RULING RECORDED: (b2), R2.6 RE-ISSUED AS R2.6-b2 ...\"; _as_of the commit that writes it, parent 55a6ce1, re-grepped): (b2) against the MERGE COMMIT f76a93b (not 930ccc7, not a9d8d7d); pin vote_frame_cert.py blob:1a3d0bb5 / sha256-lf16:b45b75db7d98103e; every --expect-lf -> b45b75db7d98103e; R2.6-b2 replaces R2.6 for (ii) and (iii). The framed CRLF halves are REFUTED: (ii) L1 prints 'of the LF bytes b45b75db7d98103e (of the CRLF rendering b45b75db7d98103e)' (3b44739e161d0d86 never appears); (iii) pia L2 prints 9c78d485f37f442a twice; tie_mechanics has exactly one expected diff, L14 4a18124878801487 -> d6a1a0409a0fc06e; (iii) is pinned through its import of vote_frame_cert.py.]",
+    "R2-M1: the scorer fix is in scratch only (vf2/rerun_vf3.py 5b2de8a3...); variant C must give rc 3 and the harness must be re-pinned, both to be recorded before (ii) is scored [2026-09-25, docs/judge_v2_program.md L20391-L20431 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run; BEFORE any leg of (ii) / (iii)) — VFC-FIXES-2 (ii)/(iii) BUILD / PIN RULING RECORDED: (b2), R2.6 RE-ISSUED AS R2.6-b2 ...\"; _as_of the commit that writes it, parent 55a6ce1, re-grepped): variant C gave rc 3 ON HARNESS v3 5b2de8a3 (the reviewer's text-only execution; A rc 0, D rc 3, H rc 3; transcripts scratchpad rul/score_*.out); DISCHARGED FOR v3 ONLY. Harness v4 (H1-H3) is REQUIRED and its pin is of record; R2-M1 STAYS OPEN until v4 is committed, pinned (three kinds) and its variant runs recorded (P1-P2).] [CLOSED 2026-09-26, docs/judge_v2_program.md L20433-L20476 (section \"## Registrar's record 2026-09-26 (insertion only; zero calls; nothing run; BEFORE any leg of (ii) / (iii)) — VFC-FIXES-2 (ii)/(iii) HARNESS v4 READY ...\"; _as_of the commit that writes it, parent 2a340dd, re-grepped): variant C gives rc 3 ON HARNESS v4 (case S-vfc-C-v4, builder's transcripts/SUMMARY.txt and the orchestrator's independent re-run) and reverting the R2-M1 window is KILLED (mutant R1-M1-window); harness v4 committed and pinned (rerun_vf4.py blob:8db1d2e740bd127b2bf18e81c7e35ae306cc65f4 / sha256-lf16:818cfa3b66ba8b3a / sha256-crlf16:66a2ed54862eab15, merged by path at ea68f47).]",
+    "PRECONDITIONS before any leg of (ii) / (iii) (the ruling's section 5): P1 R2-M1 for v4 (OPEN); P2 harness v4 built, verified, committed by pathspec outside tools/ and src/, pinned (OPEN; being built in worktree vfc-harness-v4); P3 E3 selftests on the LF archive of f76a93b, four transcripts hashed (vfc 472/0 python and -O; pia 55/0 +1 INFO; tm 29/0) (OPEN); P4 the arena-specialist named owner of the '' NULL question (NAMED by the registrar's record; acknowledgement not on record); P5 the ruling recorded (MET, docs/judge_v2_program.md L20391-L20431 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run; BEFORE any leg of (ii) / (iii)) — VFC-FIXES-2 (ii)/(iii) BUILD / PIN RULING RECORDED: (b2), R2.6 RE-ISSUED AS R2.6-b2 ...\"; _as_of the commit that writes it, parent 55a6ce1, re-grepped)). UNDETERMINED risk: the tie_mechanics record eb6fc9c predates pool_guard d30c19e; a moving pool-guard line is a FINDING. Keep branch worktree-agent-ad89ebf95e36802f5 until the delta is recorded (RP-5). [2026-09-26, docs/judge_v2_program.md L20433-L20476 (section \"## Registrar's record 2026-09-26 (insertion only; zero calls; nothing run; BEFORE any leg of (ii) / (iii)) — VFC-FIXES-2 (ii)/(iii) HARNESS v4 READY ...\"; _as_of the commit that writes it, parent 2a340dd, re-grepped): P1 MET (S-vfc-C-v4 rc 3 on v4; R1-M1-window killed); P2 MET (harness v4 READY e256c23 on the RV4-1 delta 5385c17, merged by path at ea68f47, 121 files, pinned blob:8db1d2e7 / sha256-lf16:818cfa3b66ba8b3a / sha256-crlf16:66a2ed54862eab15; a9fea8d20cf5446f SUPERSEDED, never pinned); P4 MET (the arena-specialist's acknowledgement and pre-data ruling, docs/reviews/P4_vfc_empty_label_ownership.md at 2a340dd: R-P4-1 '' is NOT NULL, a unit with '' on its deciding tally is UNCERTIFIABLE (R6); R-P4-2 an all-'' R6 move is an ordinary R6 finding and (ii) is scored; R-P4-3 any '' is also an F5-freeze finding; census 0 '' on the 67 units / 62 caches of record and in the 88 other files with a vote-type column); P5 MET by that record; P3 OPEN, the ONLY remaining precondition (E3 steps 1-3 of the review's section 5, run-operator, after the current CPU jobs). E3 limit: the --e3-log check proves form, not provenance; the registrar checks the leg's printed [E3] log sha256 equals the step-3 sha of e3_vfc_py.txt. Step list of record: the review's section 5 steps 1-5; <S> must not start with Z:\\FAC\\TUBerlin\\THESIS\\TaxoArena.]",
+    "[2026-09-26 registrar: P3 MET (E3 transcripts (sha256 of the file bytes as captured, CRLF on disk): python ad6aa8d0ef5b5073ae4ba748bc14b083cb9e271f03028c50d17a8ef7daf80888 (472 / 0), -O 7de8842ca2f12b46b660ae2a0c6aeec9c735e4423bd190f374047fecbb25e063 (472 / 0), pia e20271bd5bba66be8afeb062446a2e9e8e425373c8de4f1f04c8924b0b5a6033 (55 / 0 + 1 INFO), tm 0ce4cbcdff45fbf38af66f4d05ad51161a1fc1b7a0298aa4aa02b6b4b3aaa19d (29 / 0); the vfc leg's [E3] sha = ad6aa8d0... (registrar re-checked on the archive): the E3 tie holds); P1-P5 ALL MET; the legs ran 00:33:58-00:34:28 (vfc 9 s, pia 5 s, tm 15 s); (ii) and (iii) PASS; nothing open for the delta. docs/judge_v2_program.md L20558-L20593 (section \"## VFC-FIXES-2 (ii)/(iii) (2026-09-26, 0 calls) — VALID (post-run review ef045a1): (ii) PASS, (iii) PASS; P3 MET ...\"; _as_of the commit that writes it, parent c400c30, re-grepped)]"
+  ],
+  "does_not_show": [
+    "(ii) or (iii): no re-derived certificate, index or tie readout on the merged instrument",
+    "whether any unit of record moves to R6 under F1 or on '' labels (R2.5 routing to the arena-specialist first)",
+    "that the R2-M1 scorer fix works (variant C not recorded; harness not committed)",
+    "the pre-merge test counts and the R2-L1 mutant counts as executed by the registrar (relayed; no log read)",
+    "__pycache__ placement (not verifiable from git)",
+    "that no dynamic-rebinding route beyond the 16 vectors fixtured or probed exists (V-C5 stays in force)",
+    "[2026-09-26 (ii)/(iii)] that no instrument swallowed an audit refusal silently (the transcripts show none; the byte checks show nothing of record changed)",
+    "[2026-09-26 (ii)/(iii)] consumer behaviour on a RE-ISSUED certificate ((iii) ran against the certificate of record)",
+    "[2026-09-26 (ii)/(iii)] the closure of V-C5 or VFC-FIXES-2 D1 / D2 (V-C5 stays in force)",
+    "[2026-09-26 (ii)/(iii)] a re-execution of the selftests or the legs by the reviewer (counts recounted from the pinned transcripts)"
+  ],
+  "ledger": {
+    "row_id": "none of its own (brackets in rows VOTE-FRAME-CERT, POSITION-INDEX-ALL, TIE-MECHANICS)",
+    "version": "v297 (2026-09-26: (ii)/(iii) PASS, reuse licensed: brackets in rows VOTE-FRAME-CERT, POSITION-INDEX-ALL, TIE-MECHANICS; no chip change) | v289 (2026-09-25: part (i) READY + merge f76a93b + reuse gated; brackets in three observed cells; no chip change; audit OK) | v294 (2026-09-25: the (ii)/(iii) build / pin ruling (b2) recorded; a bracket in row VOTE-FRAME-CERT's observed cell; no chip change) | v295 (2026-09-26: harness v4 READY + merge ea68f47 + pin 818cfa3b66ba8b3a recorded; P1/P2/P4/P5 met, P3 open; a bracket in row VOTE-FRAME-CERT's observed cell; no chip change)"
+  },
+  "depends_on": [
+    "VFC-RX-RULING",
+    "VOTE-FRAME-CERT",
+    "ARCH-V2-PILOT-K46 (F5; merge after its outcome)",
+    "ARCH-V2-INDUCE-RUBRIC-3 (merge after it closes)"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes the code debt of 9d3e261 D1-D5 and VFC-RX-RULING R-1..R-9 (part (i)) and the delta checks (ii)/(iii) (2026-09-26): the reuse gate is lifted on the pinned closure; closes no line of CONTEXT.md section 5; V-C5 stays in force"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L20127-L20162 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — VFC-FIXES-2 PART (i) READY (f387d58, build 930ccc7, after NOT READY a3da968); ...\"), _as_of the commit that writes it, parent f76a93b, re-grepped",
+    "docs/judge_v2_program.md L17171-L17328 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls) — VFC-RX-RULING: the arena-specialist's ruling on RX ...\"), _as_of 971fd0b, re-grepped at f76a93b",
+    "docs/judge_v2_program.md L15566-L15584 (section \"## Registrar's record 2026-09-24 (insertion only; zero calls) — vote_frame_cert FIXES: READY-WITH-CONDITIONS C1-C5, MERGEABLE (review 9d3e261 at 97d830c); ...\"), re-grepped at f76a93b",
+    "docs/judge_v2_program.md L19459-L19538 point 10 (F5 LIFTED; section \"## ARCH-V2-PILOT-K46 (2026-09-25, ...) — VALID (post-run review 7d5816e) ...\")",
+    "docs/reviews/READY_vfc_fixes_2.md at f387d58 (rounds 2 and 1)",
+    "git: f76a93b, a9d8d7d, 930ccc7, 00775fc, f1e9e68, f3e7dc3 (blobs, diffs, ancestry re-derived by the registrar)",
+    "session scratchpad rv2/rmut2_out.txt (read), vf2/r2l1_run.py (read), vf2/rerun_vf3.py (hashed)",
+    "the orchestrator's relay (pre-merge tests; R2-L1 confirmation)",
+    "docs/reviews/RULING_vfc_ii_iii_pin.md at 93cc7de (blob:7858fa2ac2f31df5fc0e4c349f609bffa1821a03; file bytes LF = the LF of record, sha256 087685415c0e67539a5d53ac3ecbaa5e48bcd407bf67b61cf0d749bcc15b1088)",
+    "docs/judge_v2_program.md L20391-L20431 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run; BEFORE any leg of (ii) / (iii)) — VFC-FIXES-2 (ii)/(iii) BUILD / PIN RULING RECORDED: (b2), R2.6 RE-ISSUED AS R2.6-b2 ...\"; _as_of the commit that writes it, parent 55a6ce1, re-grepped)",
+    "docs/judge_v2_program.md L20433-L20476 (section \"## Registrar's record 2026-09-26 (insertion only; zero calls; nothing run; BEFORE any leg of (ii) / (iii)) — VFC-FIXES-2 (ii)/(iii) HARNESS v4 READY ...\"; _as_of the commit that writes it, parent 2a340dd, re-grepped)",
+    "docs/reviews/READY_vfc_harness_v4.md at e256c23 (blob:043000412cc7adf0dd11cff77ee52d04711e23e6; LF, sha256-lf16:c70087b9592a9a77)",
+    "git: bf8e76c, 5385c17, ea68f47, e256c23 (blobs, trees, ancestry re-derived by the registrar)",
+    "experiment_results/vfc_fixes_2/harness/transcripts/SUMMARY.txt at ea68f47 (read); session scratchpad v4verify_orch/tr/SUMMARY.txt (read; sha256-16 862c8a18cec499dc)",
+    "the orchestrator's relay (re-run rc 0)",
+    "docs/reviews/P4_vfc_empty_label_ownership.md at 2a340dd (arena-specialist; blob:36cf10aae4c47b7bc28525e168736cc2cce74baf; LF, sha256-lf16:7c025f75942778a9)",
+    "docs/judge_v2_program.md L20558-L20593 (section \"## VFC-FIXES-2 (ii)/(iii) (2026-09-26, 0 calls) — VALID (post-run review ef045a1): (ii) PASS, (iii) PASS; P3 MET ...\"; _as_of the commit that writes it, parent c400c30, re-grepped)",
+    "docs/reviews/POSTRUN_vfc_ii_iii.md (ef045a1; blob:f472aba63fecff11de867a8e154a20ea0ecd10d2)",
+    "Z:\\FAC\\TUBerlin\\THESIS\\TaxoArena_data\\evidence_2026-09-25\\vfc_ii_iii\\ (662 files; 25 required re-verified by the registrar)"
+  ],
+  "last_update": "2026-09-26 (registrar: (ii) PASS, (iii) PASS (post-run review ef045a1 VALID); P3 MET; reuse gate LIFTED; certificate c731836 not re-issued; ledger v297)",
+  "plain_description": {
+    "sq": "Engineering/infrastructure",
+    "what": "Fixes and re-reviews the vote-certification script (and one helper), with self-tests and deliberately broken copies (mutants) to show each fix is exercised. It then re-derives the existing certificate and two dependent results to check that only the expected differences appear. No calls.",
+    "why": "Several results reuse this instrument. It had to be correct before reuse.",
+    "information": "Clean passes license reuse. Any unexpected difference would be a finding. Result: done. The fixes were merged after all mutants were killed. The re-derivation checks passed with only the expected differences, so reuse by three dependent tests is licensed. The certificate was not re-issued.",
+    "written": "2026-10-07"
+  }
+}

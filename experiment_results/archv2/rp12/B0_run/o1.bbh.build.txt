@@ -1,0 +1,921 @@
+[o1/bbh] start 2026-10-01T08:08:48+02:00 cmd: ./gradlew.bat bootRun --console=plain --offline -PjvmThreads=12 --args="--config experiment_configs/rp12/o1/bbh.toml"
+Configuration on demand is an incubating feature.
+Calculating task graph as no cached configuration is available for tasks: bootRun --args=--config experiment_configs/rp12/o1/bbh.toml
+> Task :checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :processResources UP-TO-DATE
+> Task :compileKotlin UP-TO-DATE
+> Task :compileJava NO-SOURCE
+> Task :classes UP-TO-DATE
+> Task :resolveMainClassName UP-TO-DATE
+> Task :processAot UP-TO-DATE
+> Task :processAotResources UP-TO-DATE
+> Task :compileAotKotlin NO-SOURCE
+> Task :compileAotJava UP-TO-DATE
+> Task :aotClasses UP-TO-DATE
+
+> Task :bootRun
+[BOOT] TaxoAdapt starting � pid=32032, java=21.0.6, jar=file:/Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/rp12-b0-run/build/classes/kotlin/main/
+[THREAD-CAP] requested=12 availableProcessors=12 heapEstimate=n/a budget=16.94GB
+[BOOT] corpusDbPath from TOML: taxoadapt.eval.db-path=multicorpus_cache_v1.db
+Page de codes active�: 65001
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+08:08:51.622 [INFO ] EmbeddingCache - SQLite Embedding, GMM & Query Cache initialized successfully.
+08:08:51.633 [INFO ] ModelEvalStore - ModelEvalStore schema ready.
+08:08:51.636 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+08:08:51.654 [WARN ] ArcConfig - LLM provider is AZURE but AZURE_AI_ENDPOINT/AZURE_AI_API_KEY are blank. Create a root-level .env (see .env.example) or export these variables. Falling back to the Ollama chat model at http://localhost:11434 so the application can still start.
+08:08:51.686 [INFO ] LLMClient - [ARENA-PACING] request pacing at 4.0 req/s, semaphore capacity 4
+08:08:51.695 [INFO ] RankingService - SQLite Agent Ratings V2, Match History, and Bradley-Terry schema initialized.
+08:08:51.724 [INFO ] HeadlessRunner - Starting Headless Benchmark Mode with config: experiment_configs/rp12/o1/bbh.toml
+08:08:51.750 [INFO ] RatingsDbGuard - [DB-GUARD] ratings database 'ratings.db' is not tracked; safe to write
+08:08:51.768 [INFO ] HeadlessRunner - Loaded CLI Configuration: HeadlessCliConfig(snapshotId=unsaved, models=[DeepSeek-R1-Distill-Llama-8B, DeepSeek-R1-Distill-Qwen-32B, Falcon3-10B-Instruct, Llama-3.1-70B-Instruct, Llama-3.2-3B-Instruct, Llama-3.3-70B-Instruct, Mistral-Small-Instruct-2409, Mixtral-8x7B-Instruct-v0.1, OLMo-2-1124-7B-Instruct, Phi-3.5-mini-instruct, Qwen2.5-32B-Instruct, Qwen2.5-72B-Instruct, Qwen2.5-7B-Instruct, Qwen2.5-Coder-7B-Instruct, Qwen2.5-Math-7B-Instruct, Yi-1.5-34B-Chat-16K, c4ai-command-r-plus-08-2024, internlm2_5-20b-chat], queryLimit=0, category=null, confidenceGate=0.65, parallelism=6, questionsPerRound=12, reservedOnly=true, resumeBenchmark=false, profileMode=false, profileSeTarget=0.15, profileStrataFile=null, maxQueryReuse=2147483647, matchFilter=none, tau=1.0E-6, enableFinalMetrics=true, adaptiveBarFile=null, embeddingSliceDim=512, splitDropTopPcs=0, splitWhiten=false, proposalMemo=null, conditions=[MAIN, ORACLE, GENERIC_JUDGE, RANDOM_SCHEDULER], outputDir=experiment_results/archv2/rp12/o1/bbh, testRatio=0.3, seed=42, seeds=[], splitSeed=null, constructionOrderShuffleSeed=1, anchorFree=false, proposalAcceptMultiplier=null, reservedPoolFile=null, v2PoolFile=experiment_configs/engine_pool_pv2_1575de61bb20e977.json, unionRoutingItemKey=false, v2ForeignMembers=[], pool=pv2_1575de61bb20e977, acknowledgedEvalMembers=[], regenerateSplit=false, runPipeline=true, maxDepth=8, minClusterSize=55, proposalSeparationBar=0.0145, membershipFloor=0.25, routingBeamGamma=0.2, descentMargin=0.12, acceptanceZ=2.0, marginalEps=null, maxK=null, excludeFromAnchoring=[], expectedWithheldQueries=null, enableRefitGate=false, defaultKappaPrior=10.0, enableLabeling=false, judgeInduction=false, datasetType=null, corpora=[BBH], corpusDbPath=multicorpus_cache_v1.db, unionSnapshots=[], unionRootRouting=descent, runBenchmark=false, runTrickle=true, domains=[], enableStableQuestionIds=null, enableResidualRouting=null, enableResidualSplitGate=null, fusionSimilarityThreshold=0.9, effectiveSupportFloor=2.0, numIterations=50, runBaselines=false, enableGtWarmStart=false, maxLeafAssignments=5, dagMode=DAG_MAX, enableProfiling=true, judgeSeesOptions=null, judgeOptionMode=null, judgeRecipe=null, judgeRecipeKit=null, judgeRecipeModel=null, judgeRecipeMaxTokens=null, judgeRecipeTemperature=null)
+08:08:51.768 [WARN ] HeadlessRunner - [H9-ORDER] construction-order shuffle ACTIVE, seed=1 (debug arm; the DAG is NOT the production path)
+08:08:51.769 [INFO ] HeadlessRunner - [SLICE] embedding slice width = 512, split PCA dropTop=0 whiten=false
+08:08:51.769 [INFO ] HeadlessRunner - [CORPUS] corpora=[BBH] corpusDbPath=multicorpus_cache_v1.db
+08:08:51.769 [INFO ] HeadlessRunner - [JUDGE-RECIPE] disabled: judge = Mistral-Large-3 on the langchain4j path (byte-identical to the board of record)
+08:08:51.856 [INFO ] Diagnostics - [DIAG] diagnostics bundle open at Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\o1\bbh\seed_42\diagnostics
+08:08:51.856 [INFO ] HeadlessRunner - ==================================================
+08:08:51.856 [INFO ] HeadlessRunner - STARTING PIPELINE AND EVALUATION WITH SEED: 42
+08:08:51.856 [INFO ] HeadlessRunner - ==================================================
+08:08:51.856 [INFO ] HeadlessRunner - Headless pipeline execution enabled. Starting DAG generation pipeline...
+08:08:51.858 [INFO ] HeadlessRunner - Loading dataset for domains: []
+08:08:51.898 [INFO ] LeaderboardCorpus - Loaded 5761 BBH queries across 24 domain(s) from multicorpus_cache_v1.db
+08:08:51.903 [INFO ] DatasetFetcher - [CORPUS] merged 1 source(s): BBH=24 domain(s)/5761 queries -> 24 domain key(s), 5761 queries
+08:08:52.033 [WARN ] HeadlessRunner - [SPLIT-V2] the split is taken AS GIVEN from experiment_configs/engine_pool_pv2_1575de61bb20e977.json (pv2_1575de61bb20e977, CK-CLOSE-v2); seed, testRatio and reservedPoolFile are not used for the split
+08:08:52.252 [WARN ] DatasetFetcher - [SPLIT-V2] namespaced pool file: this build loaded [BBH] of [BBH, GPQA, IFEVAL, MATH, MMLU_PRO, MUSR]; one-to-one checked on those
+08:08:52.270 [INFO ] DatasetFetcher - [POOL] recorded pc6bf56283b637368 (v2 pool pv2_1575de61bb20e977, 2286 judgeable ids; sentinels excluded); nothing activated
+08:08:52.272 [WARN ] DatasetFetcher - [SPLIT-V2] split taken as given from pv2_1575de61bb20e977 (CK-CLOSE-v2, engine pool file sha256(LF) 79d48f4b36434a55): 3475 train / 2286 reserved (eval 6466, gate 566, sentinels 0); one-to-one TRAIN and RESERVED hold; 0 TRAIN rows share a stem key with the 8186 global reserved keys; legacy id-list pool pc6bf56283b637368 (READY_rp12_et D-1: it holds EVAL + GATE ids, never an EVAL pool)
+08:08:52.275 [WARN ] HeadlessRunner - [TRAIN-ONLY] global reserved keys installed: 8186 (pv2_1575de61bb20e977, all corpora, sentinels included); build stamp recorded
+08:08:52.293 [INFO ] HeadlessRunner - [POOL] recorded pc6bf56283b637368 (seed=42, gate=566, closedByContent=0); nothing activated
+08:08:52.294 [INFO ] HeadlessRunner - Running GMM splitting and trickle routing pipeline...
+08:08:52.297 [INFO ] Engine - Starting Taxonomy Adaptation: BBH
+08:08:52.298 [INFO ] Engine - 
+┌── TAXONOMY CONFIGURATION PARAMETERS ─────────────────────
+│ Execution Settings:
+│   - Dataset Type:         AG_NEWS
+│   - Corpora:              [BBH]
+│   - Num Iterations:       50
+│   - Early Stopping:       true
+│   - Labeling:             false
+│   - Selected Domains:     [All]
+│   - Split Dataset:        true
+│   - Test Split Ratio:     0.3
+├── LLM & Embedding Models:
+│   - LLM Provider:         AZURE
+│   - Embedding Provider:   OLLAMA
+│   - Embedding Model:      qwen3-embedding:latest
+│   - Judge Model:          Mistral-Large-3
+│   - Labeling Model:       Mistral-Large-3
+│   - Max Judge Generality: 1
+├── Advanced Mathematical Formalism Controls:
+│   - DAG Mode:             DAG_MAX
+│   - Max Depth:            8
+│   - Min Cluster Size:     55
+│   - Separation Bar:       0.0145
+│   - Slice Dim / PCA:      512 / dropTop=0 whiten=false
+│   - Lexicographic Tau:    1.0E-6
+│   - Order Shuffle Seed:   1 (H9-REM debug arm)
+│   - Membership Floor:     0.25
+│   - Routing Beam Gamma:   0.2
+│   - Descent Margin:       0.12
+│   - Fusion Sim Threshold: 0.9
+│   - Eff Support Floor:    2.0
+│   - Default Kappa Prior:  10.0
+└──────────────────────────────────────────────────────────
+08:08:52.299 [WARN ] Engine - [H9-ORDER] construction-order shuffle ACTIVE, seed=1 (H9-REM debug arm; this DAG is NOT the production path)
+08:08:52.299 [INFO ] Engine - Phase 1: Precomputing Embeddings...
+08:08:52.399 [INFO ] EmbeddingCache - All 3474 requested embeddings are already cached on disk.
+08:08:52.400 [INFO ] Engine - Dimension check passed: model=4096 dims, minRequired=512 (maxDepth=8)
+08:08:52.406 [INFO ] Engine - Bootstrap: Seeding GMMs with 100% ground-truth data...
+08:08:52.407 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+08:08:52.685 [INFO ] Fitter - [FITTER] Fitting complete (2 depths, 25 nodes)
+08:08:52.688 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 422.8299     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 450.2987     | 422.8299     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+08:08:52.690 [INFO ] Engine - Initial DAG Structure (Before Statistical Fitting)
+08:08:52.696 [INFO ] Operations - 
+┌── TAXONOMY DAG HIERARCHY ───────────────────────────────
+│ BBH [q_dir=0, q_rec=3474, mass=3474.0 - Parent/Residual] (vMF kappa: 422.830)
+│ ├── BBH/tracking_shuffled_objects_five_objects [q_dir=156, q_rec=156, mass=156.0 - Leaf] (vMF kappa: 474.925)
+│ ├── BBH/tracking_shuffled_objects_seven_objects [q_dir=160, q_rec=160, mass=160.0 - Leaf] (vMF kappa: 490.886)
+│ ├── BBH/sports_understanding [q_dir=150, q_rec=149, mass=149.0 - Leaf] (vMF kappa: 276.627)
+│ ├── BBH/temporal_sequences [q_dir=150, q_rec=150, mass=150.0 - Leaf] (vMF kappa: 409.062)
+│ ├── BBH/hyperbaton [q_dir=150, q_rec=150, mass=150.0 - Leaf] (vMF kappa: 451.447)
+│ ├── BBH/logical_deduction_five_objects [q_dir=170, q_rec=170, mass=170.0 - Leaf] (vMF kappa: 359.412)
+│ ├── BBH/formal_fallacies [q_dir=150, q_rec=150, mass=150.0 - Leaf] (vMF kappa: 273.964)
+│ ├── BBH/geometric_shapes [q_dir=150, q_rec=150, mass=150.0 - Leaf] (vMF kappa: 1234.480)
+│ ├── BBH/date_understanding [q_dir=142, q_rec=142, mass=142.0 - Leaf] (vMF kappa: 289.903)
+│ ├── BBH/disambiguation_qa [q_dir=148, q_rec=148, mass=148.0 - Leaf] (vMF kappa: 308.666)
+│ ├── BBH/boolean_expressions [q_dir=150, q_rec=150, mass=150.0 - Leaf] (vMF kappa: 1195.976)
+│ ├── BBH/tracking_shuffled_objects_three_objects [q_dir=151, q_rec=151, mass=151.0 - Leaf] (vMF kappa: 538.140)
+│ ├── BBH/causal_judgement [q_dir=103, q_rec=103, mass=103.0 - Leaf] (vMF kappa: 301.570)
+│ ├── BBH/web_of_lies [q_dir=150, q_rec=150, mass=150.0 - Leaf] (vMF kappa: 427.184)
+│ ├── BBH/logical_deduction_three_objects [q_dir=145, q_rec=145, mass=145.0 - Leaf] (vMF kappa: 343.256)
+│ ├── BBH/movie_recommendation [q_dir=150, q_rec=150, mass=150.0 - Leaf] (vMF kappa: 308.229)
+│ ├── BBH/logical_deduction_seven_objects [q_dir=155, q_rec=155, mass=155.0 - Leaf] (vMF kappa: 334.870)
+│ ├── BBH/snarks [q_dir=107, q_rec=107, mass=107.0 - Leaf] (vMF kappa: 307.572)
+│ ├── BBH/ruin_names [q_dir=150, q_rec=150, mass=150.0 - Leaf] (vMF kappa: 333.669)
+│ ├── BBH/salient_translation_error_detection [q_dir=150, q_rec=150, mass=150.0 - Leaf] (vMF kappa: 348.028)
+│ ├── BBH/penguins_in_a_table [q_dir=88, q_rec=88, mass=88.0 - Leaf] (vMF kappa: 383.620)
+│ ├── BBH/reasoning_about_colored_objects [q_dir=150, q_rec=150, mass=150.0 - Leaf] (vMF kappa: 332.521)
+│ ├── BBH/navigate [q_dir=150, q_rec=150, mass=150.0 - Leaf] (vMF kappa: 798.097)
+│ └── BBH/object_counting [q_dir=150, q_rec=150, mass=150.0 - Leaf] (vMF kappa: 285.064)
+└─────────────────────────────────────────────────────────
+08:08:52.696 [INFO ] Engine - STARTING EVOLUTION ITERATION 1
+08:08:53.047 [INFO ] Splitter - Split 'BBH/salient_translation_error_detection' (q=150, k=2, sep=0.042, routed=[71, 79], converged=true) -> Spawning 2 children
+08:08:53.141 [INFO ] Splitter - Split 'BBH/salient_translation_error_detection' (q=150, k=2, sep=0.042, routed=[71, 79], converged=true) -> Spawning 2 children
+08:08:53.290 [INFO ] Operations - [DJ-SE] GROW 'BBH/salient_translation_error_detection' dJ=1.473e-03 SE_dJ=1.613e-04 z=9.13 dV=2
+08:08:53.292 [INFO ] Operations - [GROW ACCEPTED] 'BBH/salient_translation_error_detection' Delta J = 0.001473, Delta V = 2
+08:08:53.823 [INFO ] Splitter - Split 'BBH/object_counting' (q=150, k=2, sep=0.170, routed=[69, 81], converged=true) -> Spawning 2 children
+08:08:53.900 [INFO ] Operations - [DJ-SE] GROW 'BBH/object_counting' dJ=5.819e-03 SE_dJ=2.169e-04 z=26.83 dV=2
+08:08:53.900 [INFO ] Operations - [GROW ACCEPTED] 'BBH/object_counting' Delta J = 0.005819, Delta V = 2
+08:08:54.033 [INFO ] Splitter - Split 'BBH/boolean_expressions' (q=150, k=2, sep=0.121, routed=[77, 73], converged=true) -> Spawning 2 children
+08:08:54.071 [INFO ] Operations - [DJ-SE] GROW 'BBH/boolean_expressions' dJ=-6.316e-03 SE_dJ=1.072e-04 z=-58.91 dV=2
+08:08:54.072 [INFO ] Operations - [GROW REJECTED] 'BBH/boolean_expressions' Delta J = -0.006316, Delta V = 2. Reverting.
+08:08:54.080 [INFO ] Splitter - Split 'BBH/boolean_expressions' (q=150, k=2, sep=0.121, routed=[77, 73], converged=true) -> Spawning 2 children
+08:08:54.118 [INFO ] Operations - [DJ-SE] GROW 'BBH/boolean_expressions' dJ=-6.316e-03 SE_dJ=1.072e-04 z=-58.91 dV=2
+08:08:54.118 [INFO ] Operations - [GROW REJECTED] 'BBH/boolean_expressions' Delta J = -0.006316, Delta V = 2. Reverting.
+08:08:54.125 [INFO ] Splitter - Split 'BBH/boolean_expressions' (q=150, k=2, sep=0.121, routed=[77, 73], converged=true) -> Spawning 2 children
+08:08:54.168 [INFO ] Operations - [DJ-SE] GROW 'BBH/boolean_expressions' dJ=-6.316e-03 SE_dJ=1.072e-04 z=-58.91 dV=2
+08:08:54.168 [INFO ] Operations - [GROW REJECTED] 'BBH/boolean_expressions' Delta J = -0.006316, Delta V = 2. Reverting.
+08:08:54.293 [INFO ] Splitter - Split 'BBH/date_understanding' (q=142, k=2, sep=0.079, routed=[86, 56], converged=true) -> Spawning 2 children
+08:08:54.331 [INFO ] Operations - [DJ-SE] GROW 'BBH/date_understanding' dJ=3.797e-03 SE_dJ=2.270e-04 z=16.73 dV=2
+08:08:54.331 [INFO ] Operations - [GROW ACCEPTED] 'BBH/date_understanding' Delta J = 0.003797, Delta V = 2
+08:08:54.461 [INFO ] Splitter - Split 'BBH/ruin_names' (q=150, k=2, sep=0.020, routed=[67, 83], converged=true) -> Spawning 2 children
+08:08:54.497 [INFO ] Operations - [DJ-SE] GROW 'BBH/ruin_names' dJ=2.103e-03 SE_dJ=1.231e-04 z=17.08 dV=2
+08:08:54.498 [INFO ] Operations - [GROW ACCEPTED] 'BBH/ruin_names' Delta J = 0.002103, Delta V = 2
+08:08:54.757 [INFO ] Splitter - Split 'BBH/sports_understanding' (q=149, k=2, sep=0.048, routed=[61, 88], converged=true) -> Spawning 2 children
+08:08:54.798 [INFO ] Operations - [DJ-SE] GROW 'BBH/sports_understanding' dJ=5.069e-03 SE_dJ=2.328e-04 z=21.77 dV=2
+08:08:54.798 [INFO ] Operations - [GROW ACCEPTED] 'BBH/sports_understanding' Delta J = 0.005069, Delta V = 2
+08:08:55.063 [INFO ] Splitter - Split 'BBH/formal_fallacies' (q=150, k=2, sep=0.150, routed=[91, 59], converged=true) -> Spawning 2 children
+08:08:55.101 [INFO ] Operations - [DJ-SE] GROW 'BBH/formal_fallacies' dJ=7.120e-03 SE_dJ=3.416e-04 z=20.84 dV=2
+08:08:55.101 [INFO ] Operations - [GROW ACCEPTED] 'BBH/formal_fallacies' Delta J = 0.007120, Delta V = 2
+08:08:55.230 [INFO ] Splitter - Split 'BBH/movie_recommendation' (q=150, k=2, sep=0.088, routed=[70, 80], converged=true) -> Spawning 2 children
+08:08:55.267 [INFO ] Operations - [DJ-SE] GROW 'BBH/movie_recommendation' dJ=4.679e-03 SE_dJ=2.581e-04 z=18.13 dV=2
+08:08:55.267 [INFO ] Operations - [GROW ACCEPTED] 'BBH/movie_recommendation' Delta J = 0.004679, Delta V = 2
+08:08:55.399 [INFO ] Splitter - Split 'BBH/hyperbaton' (q=150, k=2, sep=0.028, routed=[78, 72], converged=true) -> Spawning 2 children
+08:08:55.439 [INFO ] Operations - [DJ-SE] GROW 'BBH/hyperbaton' dJ=-6.752e-04 SE_dJ=1.067e-04 z=-6.33 dV=2
+08:08:55.439 [INFO ] Operations - [GROW REJECTED] 'BBH/hyperbaton' Delta J = -0.000675, Delta V = 2. Reverting.
+08:08:55.442 [INFO ] Splitter - Split 'BBH/hyperbaton' (q=150, k=2, sep=0.028, routed=[78, 72], converged=true) -> Spawning 2 children
+08:08:55.479 [INFO ] Operations - [DJ-SE] GROW 'BBH/hyperbaton' dJ=-6.752e-04 SE_dJ=1.067e-04 z=-6.33 dV=2
+08:08:55.480 [INFO ] Operations - [GROW REJECTED] 'BBH/hyperbaton' Delta J = -0.000675, Delta V = 2. Reverting.
+08:08:55.482 [INFO ] Splitter - Split 'BBH/hyperbaton' (q=150, k=2, sep=0.028, routed=[78, 72], converged=true) -> Spawning 2 children
+08:08:55.521 [INFO ] Operations - [DJ-SE] GROW 'BBH/hyperbaton' dJ=-6.752e-04 SE_dJ=1.067e-04 z=-6.33 dV=2
+08:08:55.521 [INFO ] Operations - [GROW REJECTED] 'BBH/hyperbaton' Delta J = -0.000675, Delta V = 2. Reverting.
+08:08:55.653 [INFO ] Splitter - Split 'BBH/web_of_lies' (q=150, k=2, sep=0.037, routed=[60, 90], converged=true) -> Spawning 2 children
+08:08:55.690 [INFO ] Operations - [DJ-SE] GROW 'BBH/web_of_lies' dJ=1.132e-05 SE_dJ=1.344e-04 z=0.08 dV=2
+08:08:55.691 [INFO ] Operations - [GROW REJECTED] 'BBH/web_of_lies' Delta J = 0.000011, Delta V = 2. Reverting.
+08:08:55.694 [INFO ] Splitter - Split 'BBH/web_of_lies' (q=150, k=2, sep=0.037, routed=[60, 90], converged=true) -> Spawning 2 children
+08:08:55.732 [INFO ] Operations - [DJ-SE] GROW 'BBH/web_of_lies' dJ=1.132e-05 SE_dJ=1.344e-04 z=0.08 dV=2
+08:08:55.733 [INFO ] Operations - [GROW REJECTED] 'BBH/web_of_lies' Delta J = 0.000011, Delta V = 2. Reverting.
+08:08:55.736 [INFO ] Splitter - Split 'BBH/web_of_lies' (q=150, k=2, sep=0.037, routed=[60, 90], converged=true) -> Spawning 2 children
+08:08:55.772 [INFO ] Operations - [DJ-SE] GROW 'BBH/web_of_lies' dJ=1.132e-05 SE_dJ=1.344e-04 z=0.08 dV=2
+08:08:55.773 [INFO ] Operations - [GROW REJECTED] 'BBH/web_of_lies' Delta J = 0.000011, Delta V = 2. Reverting.
+08:08:55.901 [INFO ] Splitter - Split 'BBH/navigate' (q=150, k=2, sep=0.181, routed=[75, 75], converged=true) -> Spawning 2 children
+08:08:55.937 [INFO ] Operations - [DJ-SE] GROW 'BBH/navigate' dJ=-4.223e-03 SE_dJ=1.084e-04 z=-38.94 dV=2
+08:08:55.937 [INFO ] Operations - [GROW REJECTED] 'BBH/navigate' Delta J = -0.004223, Delta V = 2. Reverting.
+08:08:55.940 [INFO ] Splitter - Split 'BBH/navigate' (q=150, k=2, sep=0.181, routed=[75, 75], converged=true) -> Spawning 2 children
+08:08:55.974 [INFO ] Operations - [DJ-SE] GROW 'BBH/navigate' dJ=-4.223e-03 SE_dJ=1.084e-04 z=-38.94 dV=2
+08:08:55.974 [INFO ] Operations - [GROW REJECTED] 'BBH/navigate' Delta J = -0.004223, Delta V = 2. Reverting.
+08:08:55.976 [INFO ] Splitter - Split 'BBH/navigate' (q=150, k=2, sep=0.181, routed=[75, 75], converged=true) -> Spawning 2 children
+08:08:56.008 [INFO ] Operations - [DJ-SE] GROW 'BBH/navigate' dJ=-4.223e-03 SE_dJ=1.084e-04 z=-38.94 dV=2
+08:08:56.009 [INFO ] Operations - [GROW REJECTED] 'BBH/navigate' Delta J = -0.004223, Delta V = 2. Reverting.
+08:08:56.267 [INFO ] Splitter - Split 'BBH/disambiguation_qa' (q=148, k=2, sep=0.042, routed=[69, 79], converged=true) -> Spawning 2 children
+08:08:56.299 [INFO ] Operations - [DJ-SE] GROW 'BBH/disambiguation_qa' dJ=4.057e-03 SE_dJ=1.778e-04 z=22.81 dV=2
+08:08:56.299 [INFO ] Operations - [GROW ACCEPTED] 'BBH/disambiguation_qa' Delta J = 0.004057, Delta V = 2
+08:08:56.426 [INFO ] Splitter - Split 'BBH/temporal_sequences' (q=150, k=2, sep=0.051, routed=[85, 65], converged=true) -> Spawning 2 children
+08:08:56.459 [INFO ] Operations - [DJ-SE] GROW 'BBH/temporal_sequences' dJ=7.423e-04 SE_dJ=1.171e-04 z=6.34 dV=2
+08:08:56.459 [INFO ] Operations - [GROW ACCEPTED] 'BBH/temporal_sequences' Delta J = 0.000742, Delta V = 2
+08:08:56.729 [INFO ] Splitter - Split 'BBH/logical_deduction_five_objects' (q=170, k=2, sep=0.198, routed=[72, 98], converged=true) -> Spawning 2 children
+08:08:56.761 [INFO ] Operations - [DJ-SE] GROW 'BBH/logical_deduction_five_objects' dJ=6.946e-03 SE_dJ=2.332e-04 z=29.78 dV=2
+08:08:56.762 [INFO ] Operations - [GROW ACCEPTED] 'BBH/logical_deduction_five_objects' Delta J = 0.006946, Delta V = 2
+08:08:57.155 [INFO ] Splitter - Split 'BBH/tracking_shuffled_objects_seven_objects' (q=159, k=2, sep=0.235, routed=[100, 59], converged=true) -> Spawning 2 children
+08:08:57.189 [INFO ] Operations - [DJ-SE] GROW 'BBH/tracking_shuffled_objects_seven_objects' dJ=1.515e-03 SE_dJ=1.488e-04 z=10.18 dV=2
+08:08:57.189 [INFO ] Operations - [GROW ACCEPTED] 'BBH/tracking_shuffled_objects_seven_objects' Delta J = 0.001515, Delta V = 2
+08:08:57.217 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+08:08:57.477 [INFO ] Fitter - [FIT-μ]  iter=1: mean_MLE_drift=1.000, oscillating_nodes=0/47, earlyout_rate=1.00
+08:08:57.479 [INFO ] Fitter - [FIT-κ]  iter=1: prior_dominated=16/47 (34.0%), median_kfinal=308.23, median_alpha=0.37
+08:08:57.479 [INFO ] Fitter - [FITTER] Fitting complete (3 depths, 47 nodes)
+08:08:57.480 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 422.8299     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 450.2403     | 422.8299     | 0               | 0.0000             | 0.0000            
+│ 2     | 291.3288     | 334.5840     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+08:08:57.484 [INFO ] Engine - [REFIT-DELTA] Iteration 1 | 0.000e+00 (M-step inert, as expected)
+08:08:57.485 [INFO ] Engine - [J-TRACK] Iteration 1 | J_after_trickle: 0.582826 (Trickle Delta: 0.000000) | J_after_edits: 0.626157 (Edits Delta: 0.043331)
+08:08:57.485 [INFO ] Engine - [MU-GAP] Iteration 1 | internal nodes=12 cos(mu_v, resultant) min=0.9978 p10=0.9979 median=0.9998 max=1.0000
+08:08:57.642 [INFO ] Engine - [J-RESOLUTION] Iteration 1 | J=0.626157 SE_boot=4.809e-03 (B=200) | tau=1.000e-06 SE/tau=4809.2 | 2*SE=9.618e-03
+08:08:57.642 [INFO ] Engine - Iteration 1 completed in 4945ms.
+08:08:57.643 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 47 (35 leaves, 12 internal) | Total Mass: 3474.00 ===
+08:08:57.691 [INFO ] Engine - === DAG after iteration 1 ===
+08:08:57.698 [INFO ] Operations - 
+┌── TAXONOMY HIERARCHY ───────────────────────────────────
+│ BBH [q_dir=0, q_rec=3474, mass=3474.0, Parent] (kappa: 422.8)
+│ ├── BBH/tracking_shuffled_objects_five_objects [q_dir=161, q_rec=161, mass=158.9, Leaf] (kappa: 476.6)
+│ ├── BBH/tracking_shuffled_objects_seven_objects [q_dir=0, q_rec=159, mass=157.1, Parent] (kappa: 487.8)
+│ │   ├── Emergent Concept #48 [q_dir=59, q_rec=59, mass=57.1, Leaf] (kappa: 454.9)
+│ │   └── Emergent Concept #47 [q_dir=100, q_rec=100, mass=100.0, Leaf] (kappa: 499.2)
+│ ├── BBH/sports_understanding [q_dir=0, q_rec=149, mass=149.0, Parent] (kappa: 276.6)
+│ │   ├── Emergent Concept #17 [q_dir=61, q_rec=61, mass=61.0, Leaf] (kappa: 247.3)
+│ │   └── Emergent Concept #18 [q_dir=88, q_rec=88, mass=88.0, Leaf] (kappa: 218.4)
+│ ├── BBH/temporal_sequences [q_dir=0, q_rec=150, mass=150.0, Parent] (kappa: 409.1)
+│ │   ├── Emergent Concept #43 [q_dir=88, q_rec=88, mass=86.1, Leaf] (kappa: 344.0)
+│ │   └── Emergent Concept #44 [q_dir=65, q_rec=65, mass=63.9, Leaf] (kappa: 357.2)
+│ ├── BBH/hyperbaton [q_dir=150, q_rec=150, mass=150.0, Leaf] (kappa: 451.4)
+│ ├── BBH/logical_deduction_five_objects [q_dir=0, q_rec=170, mass=170.0, Parent] (kappa: 359.4)
+│ │   ├── Emergent Concept #46 [q_dir=98, q_rec=98, mass=98.0, Leaf] (kappa: 291.2)
+│ │   └── Emergent Concept #45 [q_dir=72, q_rec=72, mass=72.0, Leaf] (kappa: 352.8)
+│ ├── BBH/formal_fallacies [q_dir=0, q_rec=150, mass=150.0, Parent] (kappa: 274.0)
+│ │   ├── Emergent Concept #19 [q_dir=91, q_rec=91, mass=91.0, Leaf] (kappa: 227.6)
+│ │   └── Emergent Concept #20 [q_dir=59, q_rec=59, mass=59.0, Leaf] (kappa: 254.0)
+│ ├── BBH/geometric_shapes [q_dir=150, q_rec=150, mass=150.0, Leaf] (kappa: 1234.5)
+│ ├── BBH/date_understanding [q_dir=0, q_rec=142, mass=142.0, Parent] (kappa: 289.9)
+│ │   ├── Emergent Concept #14 [q_dir=56, q_rec=56, mass=55.1, Leaf] (kappa: 274.7)
+│ │   └── Emergent Concept #13 [q_dir=89, q_rec=89, mass=86.9, Leaf] (kappa: 241.0)
+│ ├── BBH/disambiguation_qa [q_dir=0, q_rec=148, mass=148.0, Parent] (kappa: 308.7)
+│ │   ├── Emergent Concept #41 [q_dir=69, q_rec=69, mass=68.6, Leaf] (kappa: 264.7)
+│ │   └── Emergent Concept #42 [q_dir=80, q_rec=80, mass=79.4, Leaf] (kappa: 246.1)
+│ ├── BBH/boolean_expressions [q_dir=150, q_rec=150, mass=150.0, Leaf] (kappa: 1196.0)
+│ ├── BBH/tracking_shuffled_objects_three_objects [q_dir=151, q_rec=151, mass=151.0, Leaf] (kappa: 538.1)
+│ ├── BBH/causal_judgement [q_dir=103, q_rec=103, mass=103.0, Leaf] (kappa: 301.6)
+│ ├── BBH/web_of_lies [q_dir=150, q_rec=150, mass=150.0, Leaf] (kappa: 427.2)
+│ ├── BBH/logical_deduction_three_objects [q_dir=145, q_rec=145, mass=145.0, Leaf] (kappa: 343.3)
+│ ├── BBH/movie_recommendation [q_dir=0, q_rec=150, mass=150.0, Parent] (kappa: 308.2)
+│ │   ├── Emergent Concept #21 [q_dir=71, q_rec=71, mass=70.4, Leaf] (kappa: 267.7)
+│ │   └── Emergent Concept #22 [q_dir=80, q_rec=80, mass=79.6, Leaf] (kappa: 247.8)
+│ ├── BBH/logical_deduction_seven_objects [q_dir=155, q_rec=155, mass=155.0, Leaf] (kappa: 334.9)
+│ ├── BBH/snarks [q_dir=107, q_rec=107, mass=107.0, Leaf] (kappa: 307.6)
+│ ├── BBH/ruin_names [q_dir=0, q_rec=150, mass=150.0, Parent] (kappa: 333.7)
+│ │   ├── Emergent Concept #15 [q_dir=68, q_rec=68, mass=67.1, Leaf] (kappa: 286.3)
+│ │   └── Emergent Concept #16 [q_dir=84, q_rec=84, mass=82.9, Leaf] (kappa: 265.3)
+│ ├── BBH/salient_translation_error_detection [q_dir=0, q_rec=150, mass=150.0, Parent] (kappa: 348.0)
+│ │   ├── Emergent Concept #3 [q_dir=72, q_rec=72, mass=71.3, Leaf] (kappa: 299.8)
+│ │   └── Emergent Concept #4 [q_dir=79, q_rec=79, mass=78.7, Leaf] (kappa: 277.8)
+│ ├── BBH/penguins_in_a_table [q_dir=88, q_rec=88, mass=88.0, Leaf] (kappa: 383.6)
+│ ├── BBH/reasoning_about_colored_objects [q_dir=150, q_rec=150, mass=150.0, Leaf] (kappa: 332.5)
+│ ├── BBH/navigate [q_dir=150, q_rec=150, mass=150.0, Leaf] (kappa: 798.1)
+│ └── BBH/object_counting [q_dir=0, q_rec=150, mass=150.0, Parent] (kappa: 285.1)
+│     ├── Emergent Concept #6 [q_dir=81, q_rec=81, mass=81.0, Leaf] (kappa: 234.6)
+│     └── Emergent Concept #5 [q_dir=69, q_rec=69, mass=69.0, Leaf] (kappa: 256.8)
+└─────────────────────────────────────────────────────────
+08:08:57.699 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 1) ===
+08:08:57.700 [INFO ] Engine - GROW: 53 attempted (11 accepted, 12 rejected, 30 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+08:08:57.702 [INFO ] Engine - [CONVERGENCE] Iteration 1 | GED converged=false | J stationary=false (streak 0/5, editsDelta=4.333e-02, trickleDelta=0.000e+00)
+08:08:57.704 [INFO ] Engine - STARTING EVOLUTION ITERATION 2
+08:08:57.865 [INFO ] Splitter - Split 'BBH/boolean_expressions' (q=150, k=2, sep=0.121, routed=[77, 73], converged=true) -> Spawning 2 children
+08:08:57.882 [INFO ] Splitter - Split 'BBH/boolean_expressions' (q=150, k=2, sep=0.121, routed=[77, 73], converged=true) -> Spawning 2 children
+08:08:57.914 [INFO ] Operations - [DJ-SE] GROW 'BBH/boolean_expressions' dJ=-6.937e-03 SE_dJ=1.304e-04 z=-53.20 dV=2
+08:08:57.915 [INFO ] Operations - [GROW REJECTED] 'BBH/boolean_expressions' Delta J = -0.006937, Delta V = 2. Reverting.
+08:08:57.917 [INFO ] Splitter - Split 'BBH/boolean_expressions' (q=150, k=2, sep=0.121, routed=[77, 73], converged=true) -> Spawning 2 children
+08:08:57.952 [INFO ] Operations - [DJ-SE] GROW 'BBH/boolean_expressions' dJ=-6.937e-03 SE_dJ=1.304e-04 z=-53.20 dV=2
+08:08:57.953 [INFO ] Operations - [GROW REJECTED] 'BBH/boolean_expressions' Delta J = -0.006937, Delta V = 2. Reverting.
+08:08:57.955 [INFO ] Splitter - Split 'BBH/boolean_expressions' (q=150, k=2, sep=0.121, routed=[77, 73], converged=true) -> Spawning 2 children
+08:08:57.987 [INFO ] Operations - [DJ-SE] GROW 'BBH/boolean_expressions' dJ=-6.937e-03 SE_dJ=1.304e-04 z=-53.20 dV=2
+08:08:57.987 [INFO ] Operations - [GROW REJECTED] 'BBH/boolean_expressions' Delta J = -0.006937, Delta V = 2. Reverting.
+08:08:58.517 [INFO ] Splitter - Split 'BBH/hyperbaton' (q=150, k=2, sep=0.028, routed=[78, 72], converged=true) -> Spawning 2 children
+08:08:58.550 [INFO ] Operations - [DJ-SE] GROW 'BBH/hyperbaton' dJ=-3.622e-04 SE_dJ=1.186e-04 z=-3.05 dV=2
+08:08:58.550 [INFO ] Operations - [GROW REJECTED] 'BBH/hyperbaton' Delta J = -0.000362, Delta V = 2. Reverting.
+08:08:58.552 [INFO ] Splitter - Split 'BBH/hyperbaton' (q=150, k=2, sep=0.028, routed=[78, 72], converged=true) -> Spawning 2 children
+08:08:58.582 [INFO ] Operations - [DJ-SE] GROW 'BBH/hyperbaton' dJ=-3.622e-04 SE_dJ=1.186e-04 z=-3.05 dV=2
+08:08:58.583 [INFO ] Operations - [GROW REJECTED] 'BBH/hyperbaton' Delta J = -0.000362, Delta V = 2. Reverting.
+08:08:58.585 [INFO ] Splitter - Split 'BBH/hyperbaton' (q=150, k=2, sep=0.028, routed=[78, 72], converged=true) -> Spawning 2 children
+08:08:58.614 [INFO ] Operations - [DJ-SE] GROW 'BBH/hyperbaton' dJ=-3.622e-04 SE_dJ=1.186e-04 z=-3.05 dV=2
+08:08:58.614 [INFO ] Operations - [GROW REJECTED] 'BBH/hyperbaton' Delta J = -0.000362, Delta V = 2. Reverting.
+08:08:58.742 [INFO ] Splitter - Split 'BBH/web_of_lies' (q=150, k=2, sep=0.037, routed=[60, 90], converged=true) -> Spawning 2 children
+08:08:58.775 [INFO ] Operations - [DJ-SE] GROW 'BBH/web_of_lies' dJ=3.957e-04 SE_dJ=1.545e-04 z=2.56 dV=2
+08:08:58.775 [INFO ] Operations - [GROW ACCEPTED] 'BBH/web_of_lies' Delta J = 0.000396, Delta V = 2
+08:08:59.155 [INFO ] Splitter - Split 'BBH/navigate' (q=150, k=2, sep=0.181, routed=[75, 75], converged=true) -> Spawning 2 children
+08:08:59.187 [INFO ] Operations - [DJ-SE] GROW 'BBH/navigate' dJ=-4.478e-03 SE_dJ=1.235e-04 z=-36.26 dV=2
+08:08:59.187 [INFO ] Operations - [GROW REJECTED] 'BBH/navigate' Delta J = -0.004478, Delta V = 2. Reverting.
+08:08:59.188 [INFO ] Splitter - Split 'BBH/navigate' (q=150, k=2, sep=0.181, routed=[75, 75], converged=true) -> Spawning 2 children
+08:08:59.219 [INFO ] Operations - [DJ-SE] GROW 'BBH/navigate' dJ=-4.478e-03 SE_dJ=1.235e-04 z=-36.26 dV=2
+08:08:59.219 [INFO ] Operations - [GROW REJECTED] 'BBH/navigate' Delta J = -0.004478, Delta V = 2. Reverting.
+08:08:59.221 [INFO ] Splitter - Split 'BBH/navigate' (q=150, k=2, sep=0.181, routed=[75, 75], converged=true) -> Spawning 2 children
+08:08:59.254 [INFO ] Operations - [DJ-SE] GROW 'BBH/navigate' dJ=-4.478e-03 SE_dJ=1.235e-04 z=-36.26 dV=2
+08:08:59.254 [INFO ] Operations - [GROW REJECTED] 'BBH/navigate' Delta J = -0.004478, Delta V = 2. Reverting.
+08:08:59.399 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+08:08:59.597 [INFO ] Fitter - [FIT-μ]  iter=2: mean_MLE_drift=1.000, oscillating_nodes=0/49, earlyout_rate=1.00
+08:08:59.597 [INFO ] Fitter - [FIT-κ]  iter=2: prior_dominated=17/49 (34.7%), median_kfinal=308.67, median_alpha=0.39
+08:08:59.597 [INFO ] Fitter - [FITTER] Fitting complete (3 depths, 49 nodes)
+08:08:59.599 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 422.8299     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 450.2403     | 422.8299     | 0               | 0.0000             | 0.0000            
+│ 2     | 297.9556     | 342.3007     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+08:08:59.602 [INFO ] Engine - [REFIT-DELTA] Iteration 2 | 0.000e+00 (M-step inert, as expected)
+08:08:59.602 [INFO ] Engine - [J-TRACK] Iteration 2 | J_after_trickle: 0.626157 (Trickle Delta: 0.000000) | J_after_edits: 0.626553 (Edits Delta: 0.000396)
+08:08:59.602 [INFO ] Engine - [MU-GAP] Iteration 2 | internal nodes=13 cos(mu_v, resultant) min=0.9978 p10=0.9979 median=0.9997 max=1.0000
+08:08:59.647 [INFO ] Engine - [J-RESOLUTION] Iteration 2 | J=0.626553 SE_boot=4.957e-03 (B=200) | tau=1.000e-06 SE/tau=4957.4 | 2*SE=9.915e-03
+08:08:59.647 [INFO ] Engine - Iteration 2 completed in 1943ms.
+08:08:59.647 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 49 (36 leaves, 13 internal) | Total Mass: 3474.00 ===
+08:08:59.684 [INFO ] Engine - === DAG Changes in iteration 2 ===
+08:08:59.687 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│ "BBH" (Parent, q=0/3474)
+│ └── [MUTATED] "BBH/web_of_lies" (Parent, kappa: 427.2, q=0/150) -> type changed: Leaf -> Parent
+│     ├── [ADDED] "Emergent Concept #63" (Leaf, kappa: 389.5, q=60/60)
+│     └── [ADDED] "Emergent Concept #64" (Leaf, kappa: 352.2, q=91/91)
+└──────────────────────────────────────────────────────────
+08:08:59.687 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 2) ===
+08:08:59.687 [INFO ] Engine - GROW: 139 attempted (1 accepted, 9 rejected, 129 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+08:08:59.687 [INFO ] Stabilizer - GED Analysis (Iter 2): +2/-0 nodes, +2/-0 relations.
+08:08:59.689 [INFO ] Engine - [CONVERGENCE] Iteration 2 | GED converged=false | J stationary=false (streak 0/5, editsDelta=3.957e-04, trickleDelta=4.310e-08)
+08:08:59.689 [INFO ] Engine - STARTING EVOLUTION ITERATION 3
+08:08:59.979 [INFO ] Splitter - Split 'BBH/boolean_expressions' (q=150, k=2, sep=0.121, routed=[77, 73], converged=true) -> Spawning 2 children
+08:08:59.996 [INFO ] Splitter - Split 'BBH/boolean_expressions' (q=150, k=2, sep=0.121, routed=[77, 73], converged=true) -> Spawning 2 children
+08:09:00.028 [INFO ] Operations - [DJ-SE] GROW 'BBH/boolean_expressions' dJ=-7.132e-03 SE_dJ=1.341e-04 z=-53.16 dV=2
+08:09:00.029 [INFO ] Operations - [GROW REJECTED] 'BBH/boolean_expressions' Delta J = -0.007132, Delta V = 2. Reverting.
+08:09:00.030 [INFO ] Splitter - Split 'BBH/boolean_expressions' (q=150, k=2, sep=0.121, routed=[77, 73], converged=true) -> Spawning 2 children
+08:09:00.062 [INFO ] Operations - [DJ-SE] GROW 'BBH/boolean_expressions' dJ=-7.132e-03 SE_dJ=1.341e-04 z=-53.16 dV=2
+08:09:00.062 [INFO ] Operations - [GROW REJECTED] 'BBH/boolean_expressions' Delta J = -0.007132, Delta V = 2. Reverting.
+08:09:00.064 [INFO ] Splitter - Split 'BBH/boolean_expressions' (q=150, k=2, sep=0.121, routed=[77, 73], converged=true) -> Spawning 2 children
+08:09:00.094 [INFO ] Operations - [DJ-SE] GROW 'BBH/boolean_expressions' dJ=-7.132e-03 SE_dJ=1.341e-04 z=-53.16 dV=2
+08:09:00.095 [INFO ] Operations - [GROW REJECTED] 'BBH/boolean_expressions' Delta J = -0.007132, Delta V = 2. Reverting.
+08:09:00.358 [INFO ] Splitter - Split 'BBH/navigate' (q=150, k=2, sep=0.181, routed=[75, 75], converged=true) -> Spawning 2 children
+08:09:00.389 [INFO ] Operations - [DJ-SE] GROW 'BBH/navigate' dJ=-4.478e-03 SE_dJ=1.235e-04 z=-36.26 dV=2
+08:09:00.389 [INFO ] Operations - [GROW REJECTED] 'BBH/navigate' Delta J = -0.004478, Delta V = 2. Reverting.
+08:09:00.390 [INFO ] Splitter - Split 'BBH/navigate' (q=150, k=2, sep=0.181, routed=[75, 75], converged=true) -> Spawning 2 children
+08:09:00.422 [INFO ] Operations - [DJ-SE] GROW 'BBH/navigate' dJ=-4.478e-03 SE_dJ=1.235e-04 z=-36.26 dV=2
+08:09:00.422 [INFO ] Operations - [GROW REJECTED] 'BBH/navigate' Delta J = -0.004478, Delta V = 2. Reverting.
+08:09:00.423 [INFO ] Splitter - Split 'BBH/navigate' (q=150, k=2, sep=0.181, routed=[75, 75], converged=true) -> Spawning 2 children
+08:09:00.454 [INFO ] Operations - [DJ-SE] GROW 'BBH/navigate' dJ=-4.478e-03 SE_dJ=1.235e-04 z=-36.26 dV=2
+08:09:00.454 [INFO ] Operations - [GROW REJECTED] 'BBH/navigate' Delta J = -0.004478, Delta V = 2. Reverting.
+08:09:00.711 [INFO ] Splitter - Split 'BBH/hyperbaton' (q=150, k=2, sep=0.028, routed=[78, 72], converged=true) -> Spawning 2 children
+08:09:00.743 [INFO ] Operations - [DJ-SE] GROW 'BBH/hyperbaton' dJ=-3.607e-04 SE_dJ=1.219e-04 z=-2.96 dV=2
+08:09:00.743 [INFO ] Operations - [GROW REJECTED] 'BBH/hyperbaton' Delta J = -0.000361, Delta V = 2. Reverting.
+08:09:00.745 [INFO ] Splitter - Split 'BBH/hyperbaton' (q=150, k=2, sep=0.028, routed=[78, 72], converged=true) -> Spawning 2 children
+08:09:00.775 [INFO ] Operations - [DJ-SE] GROW 'BBH/hyperbaton' dJ=-3.607e-04 SE_dJ=1.219e-04 z=-2.96 dV=2
+08:09:00.775 [INFO ] Operations - [GROW REJECTED] 'BBH/hyperbaton' Delta J = -0.000361, Delta V = 2. Reverting.
+08:09:00.777 [INFO ] Splitter - Split 'BBH/hyperbaton' (q=150, k=2, sep=0.028, routed=[78, 72], converged=true) -> Spawning 2 children
+08:09:00.810 [INFO ] Operations - [DJ-SE] GROW 'BBH/hyperbaton' dJ=-3.607e-04 SE_dJ=1.219e-04 z=-2.96 dV=2
+08:09:00.810 [INFO ] Operations - [GROW REJECTED] 'BBH/hyperbaton' Delta J = -0.000361, Delta V = 2. Reverting.
+08:09:01.073 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+08:09:01.097 [INFO ] Fitter - [FIT-μ]  iter=3: mean_MLE_drift=1.000, oscillating_nodes=0/49, earlyout_rate=1.00
+08:09:01.097 [INFO ] Fitter - [FIT-κ]  iter=3: prior_dominated=17/49 (34.7%), median_kfinal=308.67, median_alpha=0.39
+08:09:01.097 [INFO ] Fitter - [FITTER] Fitting complete (3 depths, 49 nodes)
+08:09:01.098 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 422.8299     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 450.2403     | 422.8299     | 0               | 0.0000             | 0.0000            
+│ 2     | 297.9556     | 342.3007     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+08:09:01.101 [INFO ] Engine - [REFIT-DELTA] Iteration 3 | 0.000e+00 (M-step inert, as expected)
+08:09:01.101 [INFO ] Engine - [J-TRACK] Iteration 3 | J_after_trickle: 0.626553 (Trickle Delta: 0.000000) | J_after_edits: 0.626553 (Edits Delta: 0.000000)
+08:09:01.101 [INFO ] Engine - [MU-GAP] Iteration 3 | internal nodes=13 cos(mu_v, resultant) min=0.9978 p10=0.9979 median=0.9997 max=1.0000
+08:09:01.142 [INFO ] Engine - [J-RESOLUTION] Iteration 3 | J=0.626553 SE_boot=4.957e-03 (B=200) | tau=1.000e-06 SE/tau=4957.4 | 2*SE=9.915e-03
+08:09:01.142 [INFO ] Engine - Iteration 3 completed in 1453ms.
+08:09:01.142 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 49 (36 leaves, 13 internal) | Total Mass: 3474.00 ===
+08:09:01.159 [INFO ] Engine - === DAG Changes in iteration 3 ===
+08:09:01.160 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│   (No structural changes in this iteration)
+└──────────────────────────────────────────────────────────
+08:09:01.160 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 3) ===
+08:09:01.160 [INFO ] Engine - GROW: 147 attempted (0 accepted, 9 rejected, 138 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+08:09:01.160 [INFO ] Stabilizer - GED Analysis (Iter 3): +0/-0 nodes, +0/-0 relations.
+08:09:01.161 [INFO ] Engine - [CONVERGENCE] Iteration 3 | GED converged=false | J stationary=true (streak 1/5, editsDelta=0.000e+00, trickleDelta=1.707e-11)
+08:09:01.161 [INFO ] Engine - STARTING EVOLUTION ITERATION 4
+08:09:01.702 [INFO ] Splitter - Split 'BBH/boolean_expressions' (q=150, k=2, sep=0.121, routed=[77, 73], converged=true) -> Spawning 2 children
+08:09:01.718 [INFO ] Splitter - Split 'BBH/boolean_expressions' (q=150, k=2, sep=0.121, routed=[77, 73], converged=true) -> Spawning 2 children
+08:09:01.747 [INFO ] Operations - [DJ-SE] GROW 'BBH/boolean_expressions' dJ=-7.132e-03 SE_dJ=1.341e-04 z=-53.16 dV=2
+08:09:01.748 [INFO ] Operations - [GROW REJECTED] 'BBH/boolean_expressions' Delta J = -0.007132, Delta V = 2. Reverting.
+08:09:01.750 [INFO ] Splitter - Split 'BBH/boolean_expressions' (q=150, k=2, sep=0.121, routed=[77, 73], converged=true) -> Spawning 2 children
+08:09:01.779 [INFO ] Operations - [DJ-SE] GROW 'BBH/boolean_expressions' dJ=-7.132e-03 SE_dJ=1.341e-04 z=-53.16 dV=2
+08:09:01.780 [INFO ] Operations - [GROW REJECTED] 'BBH/boolean_expressions' Delta J = -0.007132, Delta V = 2. Reverting.
+08:09:01.782 [INFO ] Splitter - Split 'BBH/boolean_expressions' (q=150, k=2, sep=0.121, routed=[77, 73], converged=true) -> Spawning 2 children
+08:09:01.812 [INFO ] Operations - [DJ-SE] GROW 'BBH/boolean_expressions' dJ=-7.132e-03 SE_dJ=1.341e-04 z=-53.16 dV=2
+08:09:01.812 [INFO ] Operations - [GROW REJECTED] 'BBH/boolean_expressions' Delta J = -0.007132, Delta V = 2. Reverting.
+08:09:02.199 [INFO ] Splitter - Split 'BBH/hyperbaton' (q=150, k=2, sep=0.028, routed=[78, 72], converged=true) -> Spawning 2 children
+08:09:02.230 [INFO ] Operations - [DJ-SE] GROW 'BBH/hyperbaton' dJ=-3.607e-04 SE_dJ=1.219e-04 z=-2.96 dV=2
+08:09:02.230 [INFO ] Operations - [GROW REJECTED] 'BBH/hyperbaton' Delta J = -0.000361, Delta V = 2. Reverting.
+08:09:02.232 [INFO ] Splitter - Split 'BBH/hyperbaton' (q=150, k=2, sep=0.028, routed=[78, 72], converged=true) -> Spawning 2 children
+08:09:02.263 [INFO ] Operations - [DJ-SE] GROW 'BBH/hyperbaton' dJ=-3.607e-04 SE_dJ=1.219e-04 z=-2.96 dV=2
+08:09:02.263 [INFO ] Operations - [GROW REJECTED] 'BBH/hyperbaton' Delta J = -0.000361, Delta V = 2. Reverting.
+08:09:02.265 [INFO ] Splitter - Split 'BBH/hyperbaton' (q=150, k=2, sep=0.028, routed=[78, 72], converged=true) -> Spawning 2 children
+08:09:02.297 [INFO ] Operations - [DJ-SE] GROW 'BBH/hyperbaton' dJ=-3.607e-04 SE_dJ=1.219e-04 z=-2.96 dV=2
+08:09:02.297 [INFO ] Operations - [GROW REJECTED] 'BBH/hyperbaton' Delta J = -0.000361, Delta V = 2. Reverting.
+08:09:02.426 [INFO ] Splitter - Split 'BBH/navigate' (q=150, k=2, sep=0.181, routed=[75, 75], converged=true) -> Spawning 2 children
+08:09:02.458 [INFO ] Operations - [DJ-SE] GROW 'BBH/navigate' dJ=-4.478e-03 SE_dJ=1.235e-04 z=-36.26 dV=2
+08:09:02.458 [INFO ] Operations - [GROW REJECTED] 'BBH/navigate' Delta J = -0.004478, Delta V = 2. Reverting.
+08:09:02.459 [INFO ] Splitter - Split 'BBH/navigate' (q=150, k=2, sep=0.181, routed=[75, 75], converged=true) -> Spawning 2 children
+08:09:02.489 [INFO ] Operations - [DJ-SE] GROW 'BBH/navigate' dJ=-4.478e-03 SE_dJ=1.235e-04 z=-36.26 dV=2
+08:09:02.489 [INFO ] Operations - [GROW REJECTED] 'BBH/navigate' Delta J = -0.004478, Delta V = 2. Reverting.
+08:09:02.490 [INFO ] Splitter - Split 'BBH/navigate' (q=150, k=2, sep=0.181, routed=[75, 75], converged=true) -> Spawning 2 children
+08:09:02.519 [INFO ] Operations - [DJ-SE] GROW 'BBH/navigate' dJ=-4.478e-03 SE_dJ=1.235e-04 z=-36.26 dV=2
+08:09:02.519 [INFO ] Operations - [GROW REJECTED] 'BBH/navigate' Delta J = -0.004478, Delta V = 2. Reverting.
+08:09:02.666 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+08:09:02.671 [INFO ] Fitter - [FIT-μ]  iter=4: mean_MLE_drift=1.000, oscillating_nodes=0/49, earlyout_rate=1.00
+08:09:02.672 [INFO ] Fitter - [FIT-κ]  iter=4: prior_dominated=17/49 (34.7%), median_kfinal=308.67, median_alpha=0.39
+08:09:02.672 [INFO ] Fitter - [FITTER] Fitting complete (3 depths, 49 nodes)
+08:09:02.673 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 422.8299     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 450.2403     | 422.8299     | 0               | 0.0000             | 0.0000            
+│ 2     | 297.9556     | 342.3007     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+08:09:02.676 [INFO ] Engine - [REFIT-DELTA] Iteration 4 | 0.000e+00 (M-step inert, as expected)
+08:09:02.676 [INFO ] Engine - [J-TRACK] Iteration 4 | J_after_trickle: 0.626553 (Trickle Delta: 0.000000) | J_after_edits: 0.626553 (Edits Delta: 0.000000)
+08:09:02.676 [INFO ] Engine - [MU-GAP] Iteration 4 | internal nodes=13 cos(mu_v, resultant) min=0.9978 p10=0.9979 median=0.9997 max=1.0000
+08:09:02.719 [INFO ] Engine - [J-RESOLUTION] Iteration 4 | J=0.626553 SE_boot=4.957e-03 (B=200) | tau=1.000e-06 SE/tau=4957.4 | 2*SE=9.915e-03
+08:09:02.719 [INFO ] Engine - Iteration 4 completed in 1558ms.
+08:09:02.719 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 49 (36 leaves, 13 internal) | Total Mass: 3474.00 ===
+08:09:02.732 [INFO ] Engine - === DAG Changes in iteration 4 ===
+08:09:02.733 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│   (No structural changes in this iteration)
+└──────────────────────────────────────────────────────────
+08:09:02.733 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 4) ===
+08:09:02.733 [INFO ] Engine - GROW: 147 attempted (0 accepted, 9 rejected, 138 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+08:09:02.733 [INFO ] Stabilizer - GED Analysis (Iter 4): +0/-0 nodes, +0/-0 relations.
+08:09:02.733 [INFO ] Engine - [CONVERGENCE] Iteration 4 | GED converged=false | J stationary=true (streak 2/5, editsDelta=0.000e+00, trickleDelta=2.129e-13)
+08:09:02.734 [INFO ] Engine - STARTING EVOLUTION ITERATION 5
+08:09:02.882 [INFO ] Splitter - Split 'BBH/navigate' (q=150, k=2, sep=0.181, routed=[75, 75], converged=true) -> Spawning 2 children
+08:09:02.897 [INFO ] Splitter - Split 'BBH/navigate' (q=150, k=2, sep=0.181, routed=[75, 75], converged=true) -> Spawning 2 children
+08:09:02.926 [INFO ] Operations - [DJ-SE] GROW 'BBH/navigate' dJ=-4.478e-03 SE_dJ=1.235e-04 z=-36.26 dV=2
+08:09:02.926 [INFO ] Operations - [GROW REJECTED] 'BBH/navigate' Delta J = -0.004478, Delta V = 2. Reverting.
+08:09:02.928 [INFO ] Splitter - Split 'BBH/navigate' (q=150, k=2, sep=0.181, routed=[75, 75], converged=true) -> Spawning 2 children
+08:09:02.956 [INFO ] Operations - [DJ-SE] GROW 'BBH/navigate' dJ=-4.478e-03 SE_dJ=1.235e-04 z=-36.26 dV=2
+08:09:02.957 [INFO ] Operations - [GROW REJECTED] 'BBH/navigate' Delta J = -0.004478, Delta V = 2. Reverting.
+08:09:02.958 [INFO ] Splitter - Split 'BBH/navigate' (q=150, k=2, sep=0.181, routed=[75, 75], converged=true) -> Spawning 2 children
+08:09:02.988 [INFO ] Operations - [DJ-SE] GROW 'BBH/navigate' dJ=-4.478e-03 SE_dJ=1.235e-04 z=-36.26 dV=2
+08:09:02.988 [INFO ] Operations - [GROW REJECTED] 'BBH/navigate' Delta J = -0.004478, Delta V = 2. Reverting.
+08:09:03.250 [INFO ] Splitter - Split 'BBH/hyperbaton' (q=150, k=2, sep=0.028, routed=[78, 72], converged=true) -> Spawning 2 children
+08:09:03.280 [INFO ] Operations - [DJ-SE] GROW 'BBH/hyperbaton' dJ=-3.607e-04 SE_dJ=1.219e-04 z=-2.96 dV=2
+08:09:03.280 [INFO ] Operations - [GROW REJECTED] 'BBH/hyperbaton' Delta J = -0.000361, Delta V = 2. Reverting.
+08:09:03.282 [INFO ] Splitter - Split 'BBH/hyperbaton' (q=150, k=2, sep=0.028, routed=[78, 72], converged=true) -> Spawning 2 children
+08:09:03.311 [INFO ] Operations - [DJ-SE] GROW 'BBH/hyperbaton' dJ=-3.607e-04 SE_dJ=1.219e-04 z=-2.96 dV=2
+08:09:03.312 [INFO ] Operations - [GROW REJECTED] 'BBH/hyperbaton' Delta J = -0.000361, Delta V = 2. Reverting.
+08:09:03.313 [INFO ] Splitter - Split 'BBH/hyperbaton' (q=150, k=2, sep=0.028, routed=[78, 72], converged=true) -> Spawning 2 children
+08:09:03.342 [INFO ] Operations - [DJ-SE] GROW 'BBH/hyperbaton' dJ=-3.607e-04 SE_dJ=1.219e-04 z=-2.96 dV=2
+08:09:03.343 [INFO ] Operations - [GROW REJECTED] 'BBH/hyperbaton' Delta J = -0.000361, Delta V = 2. Reverting.
+08:09:03.849 [INFO ] Splitter - Split 'BBH/boolean_expressions' (q=150, k=2, sep=0.121, routed=[77, 73], converged=true) -> Spawning 2 children
+08:09:03.880 [INFO ] Operations - [DJ-SE] GROW 'BBH/boolean_expressions' dJ=-7.132e-03 SE_dJ=1.341e-04 z=-53.16 dV=2
+08:09:03.880 [INFO ] Operations - [GROW REJECTED] 'BBH/boolean_expressions' Delta J = -0.007132, Delta V = 2. Reverting.
+08:09:03.882 [INFO ] Splitter - Split 'BBH/boolean_expressions' (q=150, k=2, sep=0.121, routed=[77, 73], converged=true) -> Spawning 2 children
+08:09:03.910 [INFO ] Operations - [DJ-SE] GROW 'BBH/boolean_expressions' dJ=-7.132e-03 SE_dJ=1.341e-04 z=-53.16 dV=2
+08:09:03.911 [INFO ] Operations - [GROW REJECTED] 'BBH/boolean_expressions' Delta J = -0.007132, Delta V = 2. Reverting.
+08:09:03.913 [INFO ] Splitter - Split 'BBH/boolean_expressions' (q=150, k=2, sep=0.121, routed=[77, 73], converged=true) -> Spawning 2 children
+08:09:03.942 [INFO ] Operations - [DJ-SE] GROW 'BBH/boolean_expressions' dJ=-7.132e-03 SE_dJ=1.341e-04 z=-53.16 dV=2
+08:09:03.942 [INFO ] Operations - [GROW REJECTED] 'BBH/boolean_expressions' Delta J = -0.007132, Delta V = 2. Reverting.
+08:09:04.211 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+08:09:04.217 [INFO ] Fitter - [FIT-μ]  iter=5: mean_MLE_drift=1.000, oscillating_nodes=0/49, earlyout_rate=1.00
+08:09:04.218 [INFO ] Fitter - [FIT-κ]  iter=5: prior_dominated=17/49 (34.7%), median_kfinal=308.67, median_alpha=0.39
+08:09:04.218 [INFO ] Fitter - [FITTER] Fitting complete (3 depths, 49 nodes)
+08:09:04.219 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 422.8299     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 450.2403     | 422.8299     | 0               | 0.0000             | 0.0000            
+│ 2     | 297.9556     | 342.3007     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+08:09:04.222 [INFO ] Engine - [REFIT-DELTA] Iteration 5 | 0.000e+00 (M-step inert, as expected)
+08:09:04.222 [INFO ] Engine - [J-TRACK] Iteration 5 | J_after_trickle: 0.626553 (Trickle Delta: -0.000000) | J_after_edits: 0.626553 (Edits Delta: 0.000000)
+08:09:04.222 [INFO ] Engine - [MU-GAP] Iteration 5 | internal nodes=13 cos(mu_v, resultant) min=0.9978 p10=0.9979 median=0.9997 max=1.0000
+08:09:04.262 [INFO ] Engine - [J-RESOLUTION] Iteration 5 | J=0.626553 SE_boot=4.957e-03 (B=200) | tau=1.000e-06 SE/tau=4957.4 | 2*SE=9.915e-03
+08:09:04.262 [INFO ] Engine - Iteration 5 completed in 1528ms.
+08:09:04.262 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 49 (36 leaves, 13 internal) | Total Mass: 3474.00 ===
+08:09:04.275 [INFO ] Engine - === DAG Changes in iteration 5 ===
+08:09:04.275 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│   (No structural changes in this iteration)
+└──────────────────────────────────────────────────────────
+08:09:04.276 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 5) ===
+08:09:04.276 [INFO ] Engine - GROW: 147 attempted (0 accepted, 9 rejected, 138 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+08:09:04.276 [INFO ] Stabilizer - GED Analysis (Iter 5): +0/-0 nodes, +0/-0 relations.
+08:09:04.276 [INFO ] Engine - [CONVERGENCE] Iteration 5 | GED converged=false | J stationary=true (streak 3/5, editsDelta=0.000e+00, trickleDelta=-6.661e-16)
+08:09:04.276 [INFO ] Engine - STARTING EVOLUTION ITERATION 6
+08:09:04.424 [INFO ] Splitter - Split 'BBH/boolean_expressions' (q=150, k=2, sep=0.121, routed=[77, 73], converged=true) -> Spawning 2 children
+08:09:04.438 [INFO ] Splitter - Split 'BBH/boolean_expressions' (q=150, k=2, sep=0.121, routed=[77, 73], converged=true) -> Spawning 2 children
+08:09:04.467 [INFO ] Operations - [DJ-SE] GROW 'BBH/boolean_expressions' dJ=-7.132e-03 SE_dJ=1.341e-04 z=-53.16 dV=2
+08:09:04.467 [INFO ] Operations - [GROW REJECTED] 'BBH/boolean_expressions' Delta J = -0.007132, Delta V = 2. Reverting.
+08:09:04.470 [INFO ] Splitter - Split 'BBH/boolean_expressions' (q=150, k=2, sep=0.121, routed=[77, 73], converged=true) -> Spawning 2 children
+08:09:04.501 [INFO ] Operations - [DJ-SE] GROW 'BBH/boolean_expressions' dJ=-7.132e-03 SE_dJ=1.341e-04 z=-53.16 dV=2
+08:09:04.501 [INFO ] Operations - [GROW REJECTED] 'BBH/boolean_expressions' Delta J = -0.007132, Delta V = 2. Reverting.
+08:09:04.503 [INFO ] Splitter - Split 'BBH/boolean_expressions' (q=150, k=2, sep=0.121, routed=[77, 73], converged=true) -> Spawning 2 children
+08:09:04.532 [INFO ] Operations - [DJ-SE] GROW 'BBH/boolean_expressions' dJ=-7.132e-03 SE_dJ=1.341e-04 z=-53.16 dV=2
+08:09:04.532 [INFO ] Operations - [GROW REJECTED] 'BBH/boolean_expressions' Delta J = -0.007132, Delta V = 2. Reverting.
+08:09:04.917 [INFO ] Splitter - Split 'BBH/navigate' (q=150, k=2, sep=0.181, routed=[75, 75], converged=true) -> Spawning 2 children
+08:09:04.947 [INFO ] Operations - [DJ-SE] GROW 'BBH/navigate' dJ=-4.478e-03 SE_dJ=1.235e-04 z=-36.26 dV=2
+08:09:04.947 [INFO ] Operations - [GROW REJECTED] 'BBH/navigate' Delta J = -0.004478, Delta V = 2. Reverting.
+08:09:04.948 [INFO ] Splitter - Split 'BBH/navigate' (q=150, k=2, sep=0.181, routed=[75, 75], converged=true) -> Spawning 2 children
+08:09:04.978 [INFO ] Operations - [DJ-SE] GROW 'BBH/navigate' dJ=-4.478e-03 SE_dJ=1.235e-04 z=-36.26 dV=2
+08:09:04.979 [INFO ] Operations - [GROW REJECTED] 'BBH/navigate' Delta J = -0.004478, Delta V = 2. Reverting.
+08:09:04.980 [INFO ] Splitter - Split 'BBH/navigate' (q=150, k=2, sep=0.181, routed=[75, 75], converged=true) -> Spawning 2 children
+08:09:05.008 [INFO ] Operations - [DJ-SE] GROW 'BBH/navigate' dJ=-4.478e-03 SE_dJ=1.235e-04 z=-36.26 dV=2
+08:09:05.009 [INFO ] Operations - [GROW REJECTED] 'BBH/navigate' Delta J = -0.004478, Delta V = 2. Reverting.
+08:09:05.519 [INFO ] Splitter - Split 'BBH/hyperbaton' (q=150, k=2, sep=0.028, routed=[78, 72], converged=true) -> Spawning 2 children
+08:09:05.550 [INFO ] Operations - [DJ-SE] GROW 'BBH/hyperbaton' dJ=-3.607e-04 SE_dJ=1.219e-04 z=-2.96 dV=2
+08:09:05.550 [INFO ] Operations - [GROW REJECTED] 'BBH/hyperbaton' Delta J = -0.000361, Delta V = 2. Reverting.
+08:09:05.552 [INFO ] Splitter - Split 'BBH/hyperbaton' (q=150, k=2, sep=0.028, routed=[78, 72], converged=true) -> Spawning 2 children
+08:09:05.583 [INFO ] Operations - [DJ-SE] GROW 'BBH/hyperbaton' dJ=-3.607e-04 SE_dJ=1.219e-04 z=-2.96 dV=2
+08:09:05.583 [INFO ] Operations - [GROW REJECTED] 'BBH/hyperbaton' Delta J = -0.000361, Delta V = 2. Reverting.
+08:09:05.585 [INFO ] Splitter - Split 'BBH/hyperbaton' (q=150, k=2, sep=0.028, routed=[78, 72], converged=true) -> Spawning 2 children
+08:09:05.615 [INFO ] Operations - [DJ-SE] GROW 'BBH/hyperbaton' dJ=-3.607e-04 SE_dJ=1.219e-04 z=-2.96 dV=2
+08:09:05.615 [INFO ] Operations - [GROW REJECTED] 'BBH/hyperbaton' Delta J = -0.000361, Delta V = 2. Reverting.
+08:09:05.749 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+08:09:05.756 [INFO ] Fitter - [FIT-μ]  iter=6: mean_MLE_drift=1.000, oscillating_nodes=0/49, earlyout_rate=1.00
+08:09:05.756 [INFO ] Fitter - [FIT-κ]  iter=6: prior_dominated=17/49 (34.7%), median_kfinal=308.67, median_alpha=0.39
+08:09:05.756 [INFO ] Fitter - [FITTER] Fitting complete (3 depths, 49 nodes)
+08:09:05.757 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 422.8299     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 450.2403     | 422.8299     | 0               | 0.0000             | 0.0000            
+│ 2     | 297.9556     | 342.3007     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+08:09:05.760 [INFO ] Engine - [REFIT-DELTA] Iteration 6 | 0.000e+00 (M-step inert, as expected)
+08:09:05.760 [INFO ] Engine - [J-TRACK] Iteration 6 | J_after_trickle: 0.626553 (Trickle Delta: 0.000000) | J_after_edits: 0.626553 (Edits Delta: 0.000000)
+08:09:05.760 [INFO ] Engine - [MU-GAP] Iteration 6 | internal nodes=13 cos(mu_v, resultant) min=0.9978 p10=0.9979 median=0.9997 max=1.0000
+08:09:05.803 [INFO ] Engine - [J-RESOLUTION] Iteration 6 | J=0.626553 SE_boot=4.957e-03 (B=200) | tau=1.000e-06 SE/tau=4957.4 | 2*SE=9.915e-03
+08:09:05.803 [INFO ] Engine - Iteration 6 completed in 1527ms.
+08:09:05.804 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 49 (36 leaves, 13 internal) | Total Mass: 3474.00 ===
+08:09:05.814 [INFO ] Engine - === DAG Changes in iteration 6 ===
+08:09:05.815 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│   (No structural changes in this iteration)
+└──────────────────────────────────────────────────────────
+08:09:05.815 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 6) ===
+08:09:05.815 [INFO ] Engine - GROW: 147 attempted (0 accepted, 9 rejected, 138 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+08:09:05.816 [INFO ] Stabilizer - GED Analysis (Iter 6): +0/-0 nodes, +0/-0 relations.
+08:09:05.816 [INFO ] Engine - [CONVERGENCE] Iteration 6 | GED converged=false | J stationary=true (streak 4/5, editsDelta=0.000e+00, trickleDelta=0.000e+00)
+08:09:05.816 [INFO ] Engine - STARTING EVOLUTION ITERATION 7
+08:09:06.098 [INFO ] Splitter - Split 'BBH/navigate' (q=150, k=2, sep=0.181, routed=[75, 75], converged=true) -> Spawning 2 children
+08:09:06.112 [INFO ] Splitter - Split 'BBH/navigate' (q=150, k=2, sep=0.181, routed=[75, 75], converged=true) -> Spawning 2 children
+08:09:06.141 [INFO ] Operations - [DJ-SE] GROW 'BBH/navigate' dJ=-4.478e-03 SE_dJ=1.235e-04 z=-36.26 dV=2
+08:09:06.141 [INFO ] Operations - [GROW REJECTED] 'BBH/navigate' Delta J = -0.004478, Delta V = 2. Reverting.
+08:09:06.142 [INFO ] Splitter - Split 'BBH/navigate' (q=150, k=2, sep=0.181, routed=[75, 75], converged=true) -> Spawning 2 children
+08:09:06.171 [INFO ] Operations - [DJ-SE] GROW 'BBH/navigate' dJ=-4.478e-03 SE_dJ=1.235e-04 z=-36.26 dV=2
+08:09:06.171 [INFO ] Operations - [GROW REJECTED] 'BBH/navigate' Delta J = -0.004478, Delta V = 2. Reverting.
+08:09:06.172 [INFO ] Splitter - Split 'BBH/navigate' (q=150, k=2, sep=0.181, routed=[75, 75], converged=true) -> Spawning 2 children
+08:09:06.204 [INFO ] Operations - [DJ-SE] GROW 'BBH/navigate' dJ=-4.478e-03 SE_dJ=1.235e-04 z=-36.26 dV=2
+08:09:06.204 [INFO ] Operations - [GROW REJECTED] 'BBH/navigate' Delta J = -0.004478, Delta V = 2. Reverting.
+08:09:06.718 [INFO ] Splitter - Split 'BBH/hyperbaton' (q=150, k=2, sep=0.028, routed=[78, 72], converged=true) -> Spawning 2 children
+08:09:06.748 [INFO ] Operations - [DJ-SE] GROW 'BBH/hyperbaton' dJ=-3.607e-04 SE_dJ=1.219e-04 z=-2.96 dV=2
+08:09:06.748 [INFO ] Operations - [GROW REJECTED] 'BBH/hyperbaton' Delta J = -0.000361, Delta V = 2. Reverting.
+08:09:06.750 [INFO ] Splitter - Split 'BBH/hyperbaton' (q=150, k=2, sep=0.028, routed=[78, 72], converged=true) -> Spawning 2 children
+08:09:06.779 [INFO ] Operations - [DJ-SE] GROW 'BBH/hyperbaton' dJ=-3.607e-04 SE_dJ=1.219e-04 z=-2.96 dV=2
+08:09:06.779 [INFO ] Operations - [GROW REJECTED] 'BBH/hyperbaton' Delta J = -0.000361, Delta V = 2. Reverting.
+08:09:06.782 [INFO ] Splitter - Split 'BBH/hyperbaton' (q=150, k=2, sep=0.028, routed=[78, 72], converged=true) -> Spawning 2 children
+08:09:06.812 [INFO ] Operations - [DJ-SE] GROW 'BBH/hyperbaton' dJ=-3.607e-04 SE_dJ=1.219e-04 z=-2.96 dV=2
+08:09:06.812 [INFO ] Operations - [GROW REJECTED] 'BBH/hyperbaton' Delta J = -0.000361, Delta V = 2. Reverting.
+08:09:06.939 [INFO ] Splitter - Split 'BBH/boolean_expressions' (q=150, k=2, sep=0.121, routed=[77, 73], converged=true) -> Spawning 2 children
+08:09:06.968 [INFO ] Operations - [DJ-SE] GROW 'BBH/boolean_expressions' dJ=-7.132e-03 SE_dJ=1.341e-04 z=-53.16 dV=2
+08:09:06.968 [INFO ] Operations - [GROW REJECTED] 'BBH/boolean_expressions' Delta J = -0.007132, Delta V = 2. Reverting.
+08:09:06.970 [INFO ] Splitter - Split 'BBH/boolean_expressions' (q=150, k=2, sep=0.121, routed=[77, 73], converged=true) -> Spawning 2 children
+08:09:07.000 [INFO ] Operations - [DJ-SE] GROW 'BBH/boolean_expressions' dJ=-7.132e-03 SE_dJ=1.341e-04 z=-53.16 dV=2
+08:09:07.000 [INFO ] Operations - [GROW REJECTED] 'BBH/boolean_expressions' Delta J = -0.007132, Delta V = 2. Reverting.
+08:09:07.002 [INFO ] Splitter - Split 'BBH/boolean_expressions' (q=150, k=2, sep=0.121, routed=[77, 73], converged=true) -> Spawning 2 children
+08:09:07.032 [INFO ] Operations - [DJ-SE] GROW 'BBH/boolean_expressions' dJ=-7.132e-03 SE_dJ=1.341e-04 z=-53.16 dV=2
+08:09:07.032 [INFO ] Operations - [GROW REJECTED] 'BBH/boolean_expressions' Delta J = -0.007132, Delta V = 2. Reverting.
+08:09:07.290 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+08:09:07.296 [INFO ] Fitter - [FIT-μ]  iter=7: mean_MLE_drift=1.000, oscillating_nodes=0/49, earlyout_rate=1.00
+08:09:07.296 [INFO ] Fitter - [FIT-κ]  iter=7: prior_dominated=17/49 (34.7%), median_kfinal=308.67, median_alpha=0.39
+08:09:07.296 [INFO ] Fitter - [FITTER] Fitting complete (3 depths, 49 nodes)
+08:09:07.298 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 422.8299     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 450.2403     | 422.8299     | 0               | 0.0000             | 0.0000            
+│ 2     | 297.9556     | 342.3007     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+08:09:07.301 [INFO ] Engine - [REFIT-DELTA] Iteration 7 | 0.000e+00 (M-step inert, as expected)
+08:09:07.301 [INFO ] Engine - [J-TRACK] Iteration 7 | J_after_trickle: 0.626553 (Trickle Delta: 0.000000) | J_after_edits: 0.626553 (Edits Delta: 0.000000)
+08:09:07.301 [INFO ] Engine - [MU-GAP] Iteration 7 | internal nodes=13 cos(mu_v, resultant) min=0.9978 p10=0.9979 median=0.9997 max=1.0000
+08:09:07.347 [INFO ] Engine - [J-RESOLUTION] Iteration 7 | J=0.626553 SE_boot=4.957e-03 (B=200) | tau=1.000e-06 SE/tau=4957.4 | 2*SE=9.915e-03
+08:09:07.347 [INFO ] Engine - Iteration 7 completed in 1531ms.
+08:09:07.347 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 49 (36 leaves, 13 internal) | Total Mass: 3474.00 ===
+08:09:07.358 [INFO ] Engine - === DAG Changes in iteration 7 ===
+08:09:07.358 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│   (No structural changes in this iteration)
+└──────────────────────────────────────────────────────────
+08:09:07.358 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 7) ===
+08:09:07.358 [INFO ] Engine - GROW: 147 attempted (0 accepted, 9 rejected, 138 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+08:09:07.359 [INFO ] Stabilizer - GED Analysis (Iter 7): +0/-0 nodes, +0/-0 relations.
+08:09:07.359 [INFO ] Engine - [CONVERGENCE] Iteration 7 | GED converged=false | J stationary=true (streak 5/5, editsDelta=0.000e+00, trickleDelta=0.000e+00)
+08:09:07.359 [INFO ] Engine - Early stopping triggered in iteration 7 due to convergence (J stationarity).
+08:09:07.361 [INFO ] Engine - [FIXED-POINT] iteration=7 editsDelta=0.000e+00 trickleDelta=0.000e+00 maxMuDelta=0.000e+00 maxKappaRel=7.316e-13 tol=1.000e-06 certified=true
+08:09:07.361 [INFO ] Engine - === STARTING FINALIZATION PHASE ===
+08:09:07.361 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+08:09:07.369 [INFO ] Fitter - [FITTER] Fitting complete (3 depths, 49 nodes)
+08:09:07.370 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 422.8299     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 450.2403     | 422.8299     | 0               | 0.0000             | 0.0000            
+│ 2     | 297.9556     | 342.3007     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+08:09:07.370 [INFO ] Engine - Finalization phase completed in 9ms.
+08:09:07.370 [INFO ] Engine - --- 50-Iteration Evolution Completed ---
+08:09:07.374 [INFO ] Operations - 
+┌── TAXONOMY DAG HIERARCHY ───────────────────────────────
+│ BBH [q_dir=0, q_rec=3474, mass=3474.0 - Parent/Residual] (vMF kappa: 422.830)
+│ ├── BBH/tracking_shuffled_objects_five_objects [q_dir=161, q_rec=161, mass=158.9 - Leaf] (vMF kappa: 476.611)
+│ ├── BBH/tracking_shuffled_objects_seven_objects [q_dir=0, q_rec=159, mass=157.1 - Parent/Residual] (vMF kappa: 487.799)
+│ │   ├── Emergent Concept #48 [q_dir=59, q_rec=59, mass=57.1 - Leaf] (vMF kappa: 454.856)
+│ │   └── Emergent Concept #47 [q_dir=100, q_rec=100, mass=100.0 - Leaf] (vMF kappa: 499.236)
+│ ├── BBH/sports_understanding [q_dir=0, q_rec=149, mass=149.0 - Parent/Residual] (vMF kappa: 276.627)
+│ │   ├── Emergent Concept #17 [q_dir=61, q_rec=61, mass=61.0 - Leaf] (vMF kappa: 247.332)
+│ │   └── Emergent Concept #18 [q_dir=88, q_rec=88, mass=88.0 - Leaf] (vMF kappa: 218.382)
+│ ├── BBH/temporal_sequences [q_dir=0, q_rec=150, mass=150.0 - Parent/Residual] (vMF kappa: 409.062)
+│ │   ├── Emergent Concept #43 [q_dir=88, q_rec=88, mass=86.1 - Leaf] (vMF kappa: 344.029)
+│ │   └── Emergent Concept #44 [q_dir=65, q_rec=65, mass=63.9 - Leaf] (vMF kappa: 357.228)
+│ ├── BBH/hyperbaton [q_dir=150, q_rec=150, mass=150.0 - Leaf] (vMF kappa: 451.447)
+│ ├── BBH/logical_deduction_five_objects [q_dir=0, q_rec=170, mass=170.0 - Parent/Residual] (vMF kappa: 359.412)
+│ │   ├── Emergent Concept #46 [q_dir=98, q_rec=98, mass=98.0 - Leaf] (vMF kappa: 291.195)
+│ │   └── Emergent Concept #45 [q_dir=72, q_rec=72, mass=72.0 - Leaf] (vMF kappa: 352.818)
+│ ├── BBH/formal_fallacies [q_dir=0, q_rec=150, mass=150.0 - Parent/Residual] (vMF kappa: 273.964)
+│ │   ├── Emergent Concept #19 [q_dir=91, q_rec=91, mass=91.0 - Leaf] (vMF kappa: 227.614)
+│ │   └── Emergent Concept #20 [q_dir=59, q_rec=59, mass=59.0 - Leaf] (vMF kappa: 253.983)
+│ ├── BBH/geometric_shapes [q_dir=150, q_rec=150, mass=150.0 - Leaf] (vMF kappa: 1234.480)
+│ ├── BBH/date_understanding [q_dir=0, q_rec=142, mass=142.0 - Parent/Residual] (vMF kappa: 289.903)
+│ │   ├── Emergent Concept #14 [q_dir=56, q_rec=56, mass=55.1 - Leaf] (vMF kappa: 274.699)
+│ │   └── Emergent Concept #13 [q_dir=89, q_rec=89, mass=86.9 - Leaf] (vMF kappa: 240.961)
+│ ├── BBH/disambiguation_qa [q_dir=0, q_rec=148, mass=148.0 - Parent/Residual] (vMF kappa: 308.666)
+│ │   ├── Emergent Concept #41 [q_dir=69, q_rec=69, mass=68.6 - Leaf] (vMF kappa: 264.706)
+│ │   └── Emergent Concept #42 [q_dir=80, q_rec=80, mass=79.4 - Leaf] (vMF kappa: 246.079)
+│ ├── BBH/boolean_expressions [q_dir=150, q_rec=150, mass=150.0 - Leaf] (vMF kappa: 1195.976)
+│ ├── BBH/tracking_shuffled_objects_three_objects [q_dir=151, q_rec=151, mass=151.0 - Leaf] (vMF kappa: 538.140)
+│ ├── BBH/causal_judgement [q_dir=103, q_rec=103, mass=103.0 - Leaf] (vMF kappa: 301.570)
+│ ├── BBH/web_of_lies [q_dir=0, q_rec=150, mass=150.0 - Parent/Residual] (vMF kappa: 427.184)
+│ │   ├── Emergent Concept #63 [q_dir=60, q_rec=60, mass=59.7 - Leaf] (vMF kappa: 389.478)
+│ │   └── Emergent Concept #64 [q_dir=91, q_rec=91, mass=90.3 - Leaf] (vMF kappa: 352.231)
+│ ├── BBH/logical_deduction_three_objects [q_dir=145, q_rec=145, mass=145.0 - Leaf] (vMF kappa: 343.256)
+│ ├── BBH/movie_recommendation [q_dir=0, q_rec=150, mass=150.0 - Parent/Residual] (vMF kappa: 308.229)
+│ │   ├── Emergent Concept #21 [q_dir=71, q_rec=71, mass=70.4 - Leaf] (vMF kappa: 267.652)
+│ │   └── Emergent Concept #22 [q_dir=80, q_rec=80, mass=79.6 - Leaf] (vMF kappa: 247.804)
+│ ├── BBH/logical_deduction_seven_objects [q_dir=155, q_rec=155, mass=155.0 - Leaf] (vMF kappa: 334.870)
+│ ├── BBH/snarks [q_dir=107, q_rec=107, mass=107.0 - Leaf] (vMF kappa: 307.572)
+│ ├── BBH/ruin_names [q_dir=0, q_rec=150, mass=150.0 - Parent/Residual] (vMF kappa: 333.669)
+│ │   ├── Emergent Concept #15 [q_dir=68, q_rec=68, mass=67.1 - Leaf] (vMF kappa: 286.341)
+│ │   └── Emergent Concept #16 [q_dir=84, q_rec=84, mass=82.9 - Leaf] (vMF kappa: 265.254)
+│ ├── BBH/salient_translation_error_detection [q_dir=0, q_rec=150, mass=150.0 - Parent/Residual] (vMF kappa: 348.028)
+│ │   ├── Emergent Concept #3 [q_dir=72, q_rec=72, mass=71.3 - Leaf] (vMF kappa: 299.841)
+│ │   └── Emergent Concept #4 [q_dir=79, q_rec=79, mass=78.7 - Leaf] (vMF kappa: 277.780)
+│ ├── BBH/penguins_in_a_table [q_dir=88, q_rec=88, mass=88.0 - Leaf] (vMF kappa: 383.620)
+│ ├── BBH/reasoning_about_colored_objects [q_dir=150, q_rec=150, mass=150.0 - Leaf] (vMF kappa: 332.521)
+│ ├── BBH/navigate [q_dir=150, q_rec=150, mass=150.0 - Leaf] (vMF kappa: 798.097)
+│ └── BBH/object_counting [q_dir=0, q_rec=150, mass=150.0 - Parent/Residual] (vMF kappa: 285.064)
+│     ├── Emergent Concept #6 [q_dir=81, q_rec=81, mass=81.0 - Leaf] (vMF kappa: 234.606)
+│     └── Emergent Concept #5 [q_dir=69, q_rec=69, mass=69.0 - Leaf] (vMF kappa: 256.830)
+└─────────────────────────────────────────────────────────
+08:09:07.376 [INFO ] Engine - 
+========================================================================================================
+                               DAG PERFORMANCE REPORT & INSTRUMENTATION                                 
+========================================================================================================
+Top-Level Roll-Up:
+  Construction     :     14 384 ms (100,0%)
+  Arena/Bench      :          0 ms (  0,0%)
+  Persistence      :          0 ms (  0,0%)
+  Other            :          0 ms (  0,0%)
+  TOTAL TIME       :     14 384 ms (100.0%)
+========================================================================================================
+
+Section: CONSTRUCTION DETAILS
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| Phase / Operation                           | Calls | Total(ms) | Avg(ms) | p50(ms) | p95(ms) |     Count |    Unit/s |  Shr |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| phase4_split                                |     7 |     13385 |  1912,1 |    1461 |    4485 |         7 |       0,5 | 93,1% |
+| phase2_refit                                |     7 |       521 |    74,4 |       9 |     263 |         7 |      13,4 | 3,6% |
+| phase2_bootstrap                            |     1 |       286 |   286,0 |     286 |     286 |         1 |       3,5 | 2,0% |
+| phase1_precompute                           |     1 |       101 |   101,0 |     101 |     101 |     3 474 |  34 396,0 | 0,7% |
+| phase3_trickle                              |     7 |        48 |     6,9 |       8 |       9 |    24 318 | 506 625,0 | 0,3% |
+| phase5_optimize                             |     7 |        43 |     6,1 |       4 |      17 |         7 |     162,8 | 0,3% |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+
+Construction Per-Iteration Step Times:
+  Iter  1:  4 765 ms  [phase4_split=4485ms, phase5_optimize=17ms, phase2_refit=263ms, phase3_trickle=0ms]
+  Iter  2:  1 888 ms  [phase5_optimize=5ms, phase4_split=1674ms, phase2_refit=200ms, phase3_trickle=9ms]
+  Iter  3:  1 404 ms  [phase5_optimize=4ms, phase4_split=1367ms, phase2_refit=25ms, phase3_trickle=8ms]
+  Iter  4:  1 507 ms  [phase5_optimize=6ms, phase4_split=1485ms, phase3_trickle=8ms, phase2_refit=8ms]
+  Iter  5:  1 480 ms  [phase5_optimize=4ms, phase4_split=1461ms, phase3_trickle=7ms, phase2_refit=8ms]
+  Iter  6:  1 476 ms  [phase5_optimize=4ms, phase4_split=1456ms, phase3_trickle=8ms, phase2_refit=8ms]
+  Iter  7:  1 477 ms  [phase5_optimize=3ms, phase4_split=1457ms, phase3_trickle=8ms, phase2_refit=9ms]
+========================================================================================================
+
+08:09:07.578 [INFO ] AdditionalMetrics - [CALIB]  ECE=0.0006, reliability_bins={[0.9,1.0]:1.00/1.00, [0.7,0.8]:0.70/1.00, [0.6,0.7]:0.67/0.50, [0.5,0.6]:0.52/0.00}
+08:09:07.579 [INFO ] Metrics - 
+┌── TAXONOMY CONFIGURATION PARAMETERS ─────────────────────
+│ Execution Settings:
+│   - Dataset Type:         AG_NEWS
+│   - Corpora:              [BBH]
+│   - Num Iterations:       50
+│   - Early Stopping:       true
+│   - Labeling:             false
+│   - Selected Domains:     [All]
+│   - Split Dataset:        true
+│   - Test Split Ratio:     0.3
+├── LLM & Embedding Models:
+│   - LLM Provider:         AZURE
+│   - Embedding Provider:   OLLAMA
+│   - Embedding Model:      qwen3-embedding:latest
+│   - Judge Model:          Mistral-Large-3
+│   - Labeling Model:       Mistral-Large-3
+│   - Max Judge Generality: 1
+├── Advanced Mathematical Formalism Controls:
+│   - DAG Mode:             DAG_MAX
+│   - Max Depth:            8
+│   - Min Cluster Size:     55
+│   - Separation Bar:       0.0145
+│   - Slice Dim / PCA:      512 / dropTop=0 whiten=false
+│   - Lexicographic Tau:    1.0E-6
+│   - Order Shuffle Seed:   1 (H9-REM debug arm)
+│   - Membership Floor:     0.25
+│   - Routing Beam Gamma:   0.2
+│   - Descent Margin:       0.12
+│   - Fusion Sim Threshold: 0.9
+│   - Eff Support Floor:    2.0
+│   - Default Kappa Prior:  10.0
+└──────────────────────────────────────────────────────────
+| TAXONOMY ARCHITECTURAL METRICS
++----------------------------------------------------------
+| Topology Stats:
+|   Total Nodes:         49
+|   Leaf Nodes:          36
+|   Cross-Domain Nodes:  0
+|   Bridge Node Ratio:   0.00%
+|   Max Depth:           2
+|   Avg Leaf Depth:      1.67
++----------------------------------------------------------
+| Assignment Stats:
+|   Unique Queries:      3474
+|   Median Nodes/Query:  1.00
+|   Residual Queries:    0
+|   Avg Match Count:     1.00 leaves/query
++----------------------------------------------------------
+| Structural & Semantic Diagnostics:
+|   Residual Ratio:      0.00%
+|   Max Concentration:   4.63%
+|   Tree Equilibrium:    81.10%
+|   Contamination:       0.14%
+|   vMF κ by depth:
+|     Depth 1: 558.180
+|     Depth 2: 297.956
++----------------------------------------------------------
+| External Validation & Geometric Metrics:
+|   NMI:                 0.9986
+|   ARI:                 0.9981
+|   Dendrogram Purity:   0.9973
+|   Weighted Leaf Purity:0.9986
+|   Edge F1 vs Gold:     0.9996
+|   Spherical Silhouette:0.3087
+|   Ancestor Correct:    0.9997
+|   Leaf Entropy:        3.5258 nats
++----------------------------------------------------------
+
+08:09:07.703 [INFO ] HeadlessRunner - [TRAIN-ONLY] after construction: 0 EVAL texts among the tree's members (2283 keys checked)
+08:09:07.703 [INFO ] HeadlessRunner - Saving generated DAG snapshot to database...
+08:09:07.703 [INFO ] Persistence - Saving taxonomy DAG with Vector-Offloading to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\temp_graph_save.tmp...
+08:09:08.294 [INFO ] Persistence - Saved 49 nodes successfully (offloaded structure to SQL).
+08:09:08.377 [WARN ] AdditionalMetrics - computeRoutingECE: empty ground truth — returning 0.0 (GT plumbing absent)
+08:09:08.386 [INFO ] SnapshotManager - [POOL-PIN] snapshot stores this run's own reserved pool pc6bf56283b637368
+08:09:08.482 [INFO ] SnapshotManager - [TRAIN-ONLY] saveSnapshot: 0 EVAL texts among the tree's members (2283 pool texts checked)
+08:09:08.507 [INFO ] SnapshotManager - Successfully created and saved snapshot to DB: 20261001_080907_Headless_Run_Auto_ge
+08:09:08.507 [INFO ] HeadlessRunner - Successfully generated and saved snapshot. Snapshot ID: 20261001_080907_Headless_Run_Auto_ge
+08:09:08.507 [INFO ] HeadlessRunner - Active graph node set: n00000001
+08:09:08.508 [INFO ] HeadlessRunner - Bridge Nodes CSV written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\o1\bbh\seed_42\validation\bridge_nodes.csv
+08:09:08.508 [INFO ] HeadlessRunner - Bridge Residuals CSV written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\o1\bbh\seed_42\validation\bridge_residuals.csv
+08:09:08.541 [INFO ] LeaderboardCorpus - Loaded 5761 BBH queries across 24 domain(s) from multicorpus_cache_v1.db
+08:09:08.542 [INFO ] DatasetFetcher - [CORPUS] merged 1 source(s): BBH=24 domain(s)/5761 queries -> 24 domain key(s), 5761 queries
+08:09:08.545 [INFO ] HeadlessRunner - ========================================
+08:09:08.545 [INFO ] HeadlessRunner - RUNNING TRICKLE VALIDATION: MAIN
+08:09:08.545 [INFO ] HeadlessRunner - ========================================
+08:09:08.547 [INFO ] HeadlessRunner - Starting Headless Batch Trickle Validation for MAIN...
+08:09:08.547 [INFO ] HeadlessRunner - Graph validity CSV for MAIN written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\o1\bbh\seed_42\validation\MAIN_graph_validity.csv
+08:09:08.642 [INFO ] AdditionalMetrics - [CALIB]  ECE=0.0006, reliability_bins={[0.9,1.0]:1.00/1.00, [0.7,0.8]:0.70/1.00, [0.6,0.7]:0.67/0.50, [0.5,0.6]:0.52/0.00}
+08:09:08.643 [INFO ] HeadlessRunner - Taxonomy quality CSV for MAIN written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\o1\bbh\seed_42\validation\MAIN_taxonomy_quality.csv
+08:09:08.643 [INFO ] HeadlessRunner - Bridge quality CSV for MAIN written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\o1\bbh\seed_42\validation\MAIN_bridge_quality.csv
+08:09:08.647 [INFO ] HeadlessRunner - Loaded 3490 ground-truth categories directly from DAG queries.
+08:09:08.650 [INFO ] HeadlessRunner - Backfilled 0 categories from local cache. Total mapping keys: 3474
+08:09:08.662 [INFO ] HeadlessRunner - Indexed leaves: 36 / 36 leaves tagged with a domain.
+08:09:08.664 [INFO ] HeadlessRunner - Routing 2286 test queries...
+08:09:09.879 [INFO ] AdditionalMetrics - [CALIB]  ECE=0.0072, reliability_bins={[0.9,1.0]:1.00/1.00, [0.7,0.8]:0.72/1.00, [0.6,0.7]:0.65/0.95, [0.5,0.6]:0.55/1.00}
+08:09:09.880 [INFO ] BatchTrickleEvaluator - [ROUTE]  posterior_sum≈1.0000, membership_depth_corr=-0.1758, multi_leaf_rate=0.0210, dist={1:0.98, 2:0.02}
+08:09:09.880 [INFO ] BatchTrickleEvaluator - Held-out residual rate: 0.00%
+08:09:09.881 [INFO ] HeadlessRunner - Batch Trickle Results (MAIN):
+08:09:09.881 [INFO ] HeadlessRunner -   - Total Queries: 2286
+08:09:09.881 [INFO ] HeadlessRunner -   - Top-1 Accuracy: 99,96% (95% Wilson CI: [99,75%, 99,99%])
+08:09:09.882 [INFO ] HeadlessRunner -   - Any-Match Accuracy: 100,00%
+08:09:09.882 [INFO ] HeadlessRunner -   - Mean Leaf Purity: 99,97%
+08:09:09.882 [INFO ] HeadlessRunner -   - Expected Calibration Error (ECE): 0,0072
+08:09:09.882 [INFO ] HeadlessRunner -   - Macro F1: 99,95%
+08:09:09.882 [INFO ] HeadlessRunner -   - Avg Match Count (Eval): 1,02 leaves/query
+08:09:09.882 [INFO ] HeadlessRunner -   - Median Nodes/Query (Eval): 1,00
+08:09:09.882 [INFO ] HeadlessRunner - Held-out residual rate: 0.00%
+08:09:09.882 [INFO ] HeadlessRunner - 
+Per-Domain Trickle Results (MAIN):
+----------------------------------------------------------------------
+Domain                    | Support | Precision |   Recall |       F1
+----------------------------------------------------------------------
+BBH/date_understanding    |     108 |    100,0% |   100,0% |   100,0%
+BBH/logical_deduction_thr |     105 |    100,0% |   100,0% |   100,0%
+BBH/disambiguation_qa     |     102 |    100,0% |   100,0% |   100,0%
+BBH/temporal_sequences    |     100 |    100,0% |   100,0% |   100,0%
+BBH/hyperbaton            |     100 |    100,0% |   100,0% |   100,0%
+BBH/reasoning_about_color |     100 |    100,0% |   100,0% |   100,0%
+BBH/object_counting       |     100 |    100,0% |   100,0% |   100,0%
+BBH/boolean_expressions   |     100 |    100,0% |   100,0% |   100,0%
+BBH/geometric_shapes      |     100 |    100,0% |   100,0% |   100,0%
+BBH/formal_fallacies      |     100 |    100,0% |   100,0% |   100,0%
+BBH/web_of_lies           |     100 |    100,0% |   100,0% |   100,0%
+BBH/movie_recommendation  |     100 |    100,0% |   100,0% |   100,0%
+BBH/sports_understanding  |     100 |    100,0% |   100,0% |   100,0%
+BBH/navigate              |     100 |    100,0% |   100,0% |   100,0%
+BBH/salient_translation_e |     100 |    100,0% |   100,0% |   100,0%
+BBH/ruin_names            |     100 |    100,0% |   100,0% |   100,0%
+BBH/tracking_shuffled_obj |      99 |    100,0% |   100,0% |   100,0%
+BBH/logical_deduction_sev |      95 |    100,0% |   100,0% |   100,0%
+BBH/tracking_shuffled_obj |      94 |     98,9% |   100,0% |    99,5%
+BBH/tracking_shuffled_obj |      90 |    100,0% |    98,9% |    99,4%
+BBH/causal_judgement      |      84 |    100,0% |   100,0% |   100,0%
+BBH/logical_deduction_fiv |      80 |    100,0% |   100,0% |   100,0%
+BBH/snarks                |      71 |    100,0% |   100,0% |   100,0%
+BBH/penguins_in_a_table   |      58 |    100,0% |   100,0% |   100,0%
+======================================================================
+
+08:09:09.883 [INFO ] HeadlessRunner - Trickle validation results written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\o1\bbh\seed_42\validation\MAIN_trickle_validation_results.csv
+08:09:09.952 [INFO ] HeadlessRunner - Nearest-Centroid Routing Results (MAIN):
+08:09:09.952 [INFO ] HeadlessRunner -   - Total Evaluated: 2286
+08:09:09.952 [INFO ] HeadlessRunner -   - Top-1 Accuracy: 96,85%
+08:09:09.952 [INFO ] HeadlessRunner -   - Top-3 Accuracy: 100,00%
+08:09:09.953 [INFO ] HeadlessRunner -   - Top-5 Accuracy: 100,00%
+08:09:09.953 [INFO ] HeadlessRunner -   - Top-10 Accuracy: 100,00%
+08:09:09.953 [INFO ] HeadlessRunner - Centroid routing results written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\o1\bbh\seed_42\validation\MAIN_centroid_routing_results.csv
+08:09:10.974 [INFO ] HeadlessRunner - Migration flow matrix written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\o1\bbh\seed_42\validation\MAIN_migration_flow_matrix.csv
+08:09:12.029 [INFO ] HeadlessRunner - Held-out leaf support CSV written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\o1\bbh\seed_42\validation\MAIN_heldout_leaf_support.csv
+08:09:12.031 [INFO ] HeadlessRunner - Held-out leaf support (MAIN): leaves=36, top1 min=29 median=58.5 max=105, leaves with <12 held-out top-1 queries: 0
+08:09:12.037 [INFO ] HeadlessRunner - Routing calibration CSV written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\o1\bbh\seed_42\validation\MAIN_routing_calibration.csv
+08:09:12.160 [INFO ] AdditionalMetrics - [CALIB]  ECE=0.0006, reliability_bins={[0.9,1.0]:1.00/1.00, [0.7,0.8]:0.70/1.00, [0.6,0.7]:0.67/0.50, [0.5,0.6]:0.52/0.00}
+08:09:14.316 [INFO ] HeadlessRunner - Appended condition MAIN results to ledger at Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\o1\bbh\tuning_ledger.csv
+08:09:14.318 [INFO ] HeadlessRunner - Performance report JSON written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\o1\bbh\seed_42\performance_report.json
+08:09:14.318 [INFO ] HeadlessRunner - 
+========================================================================================================
+                               DAG PERFORMANCE REPORT & INSTRUMENTATION                                 
+========================================================================================================
+Top-Level Roll-Up:
+  Construction     :     14 598 ms ( 68,9%)
+  Arena/Bench      :      5 771 ms ( 27,3%)
+  Persistence      :        804 ms (  3,8%)
+  Other            :          0 ms (  0,0%)
+  TOTAL TIME       :     21 173 ms (100.0%)
+========================================================================================================
+
+Section: CONSTRUCTION DETAILS
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| Phase / Operation                           | Calls | Total(ms) | Avg(ms) | p50(ms) | p95(ms) |     Count |    Unit/s |  Shr |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| phase4_split                                |     7 |     13385 |  1912,1 |    1461 |    4485 |         7 |       0,5 | 63,2% |
+| phase2_refit                                |     7 |       521 |    74,4 |       9 |     263 |         7 |      13,4 | 2,5% |
+| phase2_bootstrap                            |     1 |       286 |   286,0 |     286 |     286 |         1 |       3,5 | 1,4% |
+| finalization.generate_report                |     2 |       214 |   107,0 |     122 |     122 |         2 |       9,3 | 1,0% |
+| phase1_precompute                           |     1 |       101 |   101,0 |     101 |     101 |     3 474 |  34 396,0 | 0,5% |
+| phase3_trickle                              |     7 |        48 |     6,9 |       8 |       9 |    24 318 | 506 625,0 | 0,2% |
+| phase5_optimize                             |     7 |        43 |     6,1 |       4 |      17 |         7 |     162,8 | 0,2% |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+
+Section: ARENA/BENCHMARK DETAILS
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| Phase / Operation                           | Calls | Total(ms) | Avg(ms) | p50(ms) | p95(ms) |     Count |    Unit/s |  Shr |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| validation.MAIN                             |     1 |      5771 |  5771,0 |    5771 |    5771 |     2 286 |     396,1 | 27,3% |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+
+Section: PERSISTENCE DETAILS
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| Phase / Operation                           | Calls | Total(ms) | Avg(ms) | p50(ms) | p95(ms) |     Count |    Unit/s |  Shr |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| snapshot_save                               |     1 |       804 |   804,0 |     804 |     804 |         1 |       1,2 | 3,8% |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+
+Construction Per-Iteration Step Times:
+  Iter  1:  4 765 ms  [phase4_split=4485ms, phase5_optimize=17ms, phase2_refit=263ms, phase3_trickle=0ms]
+  Iter  2:  1 888 ms  [phase5_optimize=5ms, phase4_split=1674ms, phase2_refit=200ms, phase3_trickle=9ms]
+  Iter  3:  1 404 ms  [phase5_optimize=4ms, phase4_split=1367ms, phase2_refit=25ms, phase3_trickle=8ms]
+  Iter  4:  1 507 ms  [phase5_optimize=6ms, phase4_split=1485ms, phase3_trickle=8ms, phase2_refit=8ms]
+  Iter  5:  1 480 ms  [phase5_optimize=4ms, phase4_split=1461ms, phase3_trickle=7ms, phase2_refit=8ms]
+  Iter  6:  1 476 ms  [phase5_optimize=4ms, phase4_split=1456ms, phase3_trickle=8ms, phase2_refit=8ms]
+  Iter  7:  1 477 ms  [phase5_optimize=3ms, phase4_split=1457ms, phase3_trickle=8ms, phase2_refit=9ms]
+========================================================================================================
+
+08:09:14.324 [INFO ] Diagnostics - [DIAG] diagnostics bundle closed (completed) at Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\o1\bbh\seed_42\diagnostics
+08:09:14.324 [INFO ] HeadlessRunner - Headless Benchmark finished successfully.
+08:09:14.325 [INFO ] ModelEvalStore - SQLite evaluation store database connection closed cleanly via shutdown hook.
+08:09:14.325 [INFO ] DatasetFetcher - SQLite dataset fetcher database connection closed cleanly via shutdown hook.
+08:09:14.325 [INFO ] RankingService - SQLite database connection closed cleanly via shutdown hook.
+08:09:14.336 [INFO ] SnapshotManager - SQLite snapshot database connection closed cleanly via shutdown hook.
+
+BUILD SUCCESSFUL in 26s
+7 actionable tasks: 1 executed, 6 up-to-date
+Configuration cache entry stored.
+[o1/bbh] end 2026-10-01T08:09:15+02:00 rc=0 wall_s=27

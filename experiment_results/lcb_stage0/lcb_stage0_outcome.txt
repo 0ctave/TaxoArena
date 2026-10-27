@@ -1,0 +1,71 @@
+LCB-STAGE0-INTERACTION outcome (docs/judge_v2_program.md L17702-L17982; the pre-data amendment L18102-L18373). ZERO LLM calls.
+pool: p94b63cd78524813b (the GATE export; stage 0 has no pool of record); scored_minus_eval = 0
+VERDICT: STOP (clean negative; the line ends on this corpus): no model x region interaction of about >= 0.2 logit SD beyond difficulty slope and input format (80% power of G1 on the synthetic calibration at the real roster, K = 3-4), i.e. fewer than about 2-7 model pairs with a true 10pp reversal. Never 'no interaction'.
+tree = format: no
+TREE: snapshot 20260925_121944_Headless_Run_Auto_ge; dag_snapshots.jsonl sha256 1fa662d53469e1c6a5c906892953da07cc57bcfc29fd7a9f4672647f8a388f78 (last line 03cec1f37f2e767f17350154ee124f5fcd1c41875e9198cbaaa33ac8953c050f); snapshot graph sha256 c2031e13727c523ac399c04c253e10b6a40038bc0eaaecd13552df17b7ecbfc1; snapshots.db sha256 af75292a57e65738d2b2b6d1b02f1f822f363f6d385dae4100e52fe10e0f2005; build embeddings_cache.db sha256 ea4220391c43d9bd9e1253b0cc1aec2098af888af92fe63c189f0c0c69ee01b6; site-null CSV sha256 5db716c2eaf0e0803a5073604d58ea0c7cfd38cdbb108030ee951b9171eff8f5 (its snapshot_id checked equal to the tree's).
+INPUTS (sha256): texts DB 5f8ae5d8acbfa4dcf97cf6fb329cc51af4cb7c108be4299b52fc01838cf689be; TRAIN + GATE outcome DB 7ac912737b40afec6423692985c2db7bed4325676f8a8e66d4941f95cc4f392e; split_side.tsv f0a694b268eb8ed7cebf671c9779de1ea65851d008abfe7e819ec77b90e64317; split_manifest.json ab350c1300d5afac95cd6693d4c689d4d46f9b1f5a724cde6c664af27fcb5196; ingest_texts_manifest.json 4d3b4633645139ad7020e16ea83316186bfa755d45e5d195caf11e43237b1b84; ingest_outcomes_manifest.json 5d09cc53b92e24c90cfcb6f5ebe12fa663ad4cbf03b58b69c32c232b43031916; construction_manifest.json b720d91225c93c5219f655c73dceb3e9dacd0196aac1d9fedae85dd3b3ad32b4.
+
+DENOMINATOR: 548 INFORMATIVE TRAIN problems (0 < sum_m ybar < M; all-pass 61, all-fail 21, of 630 TRAIN) x M = 26 eligible models (n=1/t=0.2: 13, n=1/t=0.4: 1, n=1/t=0.6: 2, n=10/t=0.2: 6, n=10/t=0.6: 3, n=4/t=0.6: 1); cells 14248; cluster = the CK-CLOSE-v2 family (words: id-disjoint only until R4).
+TRAIN-ONLY: 630 distinct leaf queryIds, all resolved: 630 TRAIN texts, 0 GATE / EVAL texts, 0 unresolved.
+ROUTING: TRAIN routed-vs-member agreement 608 / 630 = 0.965 (routed = the leaf of max cosine); GATE / EVAL texts among leaf members: 0.
+REGIONS (P6): K = 3; TRAIN per region [264, 229, 137] (informative [238, 208, 102]); GATE per region [48, 36, 27]; merges [['n00000026', '57', 'n00000008'], ['n00000020', '65', 'n00000010'], ['n00000009', '100', 'n00000004']]; mean Rasch difficulty per region ['2.246', '0.568', '3.078'].
+NULL FIT OF RECORD (marginal rank-1, 41-node Gauss-Hermite, prior SD 1.0 on log s): converged yes (max |grad| 9.49e-07 < 1e-6 and every |a|, s <= 50), 198 EM iterations, max s 4.232. Joint fit (DIAGNOSTIC, never decides): converged yes, p_T 0.0195.
+FIT PATH primary (TRAIN): exact-curvature M-step engaged: no (converged yes, 198 EM iterations).
+FIT PATH Delta-D (null + g_mk): exact-curvature M-step engaged: no (converged yes, 352 EM iterations).
+FIT PATH S1: exact-curvature M-step engaged: no (converged yes, 207 EM iterations).
+FIT PATH S2: exact-curvature M-step engaged: no (converged yes, 48 EM iterations).
+FIT PATH S3: exact-curvature M-step engaged: no (converged yes, 207 EM iterations).
+FIT PATH GATE (R-REP): exact-curvature M-step engaged: no (converged yes, 143 EM iterations).
+G1: T = 96.689 at the family-majority labelling (own-region T 100.057; 3 split families of 510), p_T = 0.0300 over B = 2000 family-block permutations within 10 format x dhat-quintile strata -> G1 FAILS (bar p_T <= 0.01).
+  beside: T under Rasch 108.862 (own 113.891), p 0.0750; Delta-D (marginal base, ridge 0.5) 116.776 (converged True).
+G2: X2 = 1 pairs with a reversal at legs max(0.05, 2 SE) (own-region 2; null median 1.0), p_X2 = 0.7101 -> G2 FAILS (bar p_X2 <= 0.05).
+  beside: X1 3 (own 2; p 0.3223, null median 2.0); X2 over the 36 pairs of two n = 10 models 0 (p 1.0000); X2 without frontier-frontier pairs (normal-CI frontier) 0 (p 1.0000). Reversal pairs (X2): [('O3-Mini-2025-01-31 (High)', 'XBai-o4-medium')].
+SUPPORT: M >= 20: holds; K >= 2: holds; every region >= 130 TRAIN problems: holds; informative TRAIN >= 400: holds; measured family DEFF <= 1.3 or recomputation done: holds; every D6 assertion passes: holds; rank-1 fit converged: holds. Measured family DEFF median 1.011 (q90 1.045, max 1.152 over 325 model pairs; Kish upper bound 1.241); n_eff = 542.2; median pair-difference variance v = 0.1834; MDE80 at the measured DEFF, K = 3: 12.6pp.
+RECOMPUTATION AT THE MEASURED DEFF 1.011 (n = 548 informative TRAIN problems, K = 3): (i) the single-contrast class (two n = 10 models: 9 models, 36 pairs, median v 0.1765) MDE80 12.4pp -> DESCRIPTIVE-ONLY (SCOREABLE iff K <= 4 and MDE80 < 10pp); (ii) the median pair (v 0.1834) MDE80 12.6pp. Recomputation done: yes (the support block reads it).
+SENSITIVITY Z1: p_T 0.0225, p_X2 0.7786 on 548 informative problems.
+SENSITIVITY Z2: p_T 0.9700, p_X2 0.7646 on 548 informative problems.
+SENSITIVITY S1: p_T 0.0095, p_X2 0.1729 on 517 informative problems (M 26).
+SENSITIVITY S2: p_T 0.7716, p_X2 1.0000 on 385 informative problems (M 6).
+SENSITIVITY S3: p_T 0.0325, p_X2 0.7021 on 548 informative problems (M 26).
+R-REP (GATE annotation, power as registered at M ~35): r_rep 0.384, one-sided p 0.2104 -> annotation only (no GO).
+COMPARATORS (DESCRIPTIVE; common null: dhat quintiles only): tree z 7.35, excess per df 1.1625; C-FD (K 6) z 3.66, excess 0.4878; C-KM (seeds 0-4) z ['5.77', '5.69', '6.26', '4.67', '5.17'], excess ['0.9483', '0.9320', '1.0118', '0.7732', '0.8483'].
+BOARD region 0 (n00000004; 238 informative TRAIN problems, 229 families; DESCRIPTIVE, family bootstrap B 2000): top O3 (High) (bootstrap stability 0.72; the registered null reference: 47% of null cells reach 0.80); frontier BAND (bootstrap CIs overlapping the best's) ['DeepSeek-R1-0528', 'EXAONE-4.0-32B', 'Gemini-2.5-Pro-03-25', 'Gemini-2.5-Pro-05-06', 'Gemini-2.5-Pro-06-05', 'Grok-3-Mini (High)', 'O3 (High)', 'O3-Mini-2025-01-31 (High)', 'O4-Mini (High)', 'Qwen3-235B-A22B'].
+BOARD region 1 (n00000010; 208 informative TRAIN problems, 187 families; DESCRIPTIVE, family bootstrap B 2000): top O4-Mini (High) (bootstrap stability 0.75; the registered null reference: 47% of null cells reach 0.80); frontier BAND (bootstrap CIs overlapping the best's) ['DeepSeek-R1-0528', 'Gemini-2.5-Pro-03-25', 'Gemini-2.5-Pro-05-06', 'Gemini-2.5-Pro-06-05', 'O3 (High)', 'O4-Mini (High)', 'OpenReasoning-Nemotron-32B'].
+BOARD region 2 (n00000011; 102 informative TRAIN problems, 97 families; DESCRIPTIVE, family bootstrap B 2000): top O4-Mini (High) (bootstrap stability 0.39; the registered null reference: 47% of null cells reach 0.80); frontier BAND (bootstrap CIs overlapping the best's) ['Claude-Opus-4 (Thinking)', 'DeepSeek-R1-0528', 'EXAONE-4.0-32B', 'Gemini-2.5-Flash-04-17', 'Gemini-2.5-Flash-05-20', 'Gemini-2.5-Pro-03-25', 'Gemini-2.5-Pro-05-06', 'Gemini-2.5-Pro-06-05', 'Grok-3-Mini (High)', 'O3 (High)', 'O3-Mini-2025-01-31 (High)', 'O4-Mini (High)', 'OpenCodeReasoning-Nemotron-1.1-32B', 'OpenReasoning-Nemotron-32B', 'Qwen3-235B-A22B', 'XBai-o4-medium'].
+
+PREDICTIONS (scored even when a criterion passes):
+  Q1 (P 0.75) the depth-1 split of the tree = input format at >= 90% purity: HELD
+  Q2 (P 0.70) K in {3, 4, 5}: HELD
+  Q2 (P 0.10) the TREE=FORMAT outcome (scored on the structural condition): FAILED
+  Q3 (P 0.75) G1 passes under the rank-1 null (the amended marginal fit): FAILED
+  Q3 (P 0.90) T would pass under the Rasch null: FAILED
+  Q4 (P 0.45) G2 passes: FAILED
+  Q4 (P 0.40) joint GO: FAILED
+  Q4 (P 0.45) STOP or STOP-SUB-PRACTICAL: HELD
+  Q4 (P 0.15) UNDETERMINED or TREE=FORMAT: FAILED
+  Q5 (P 0.50) given GO, R-REP replicates (scored only given GO): UNDETERMINED
+  Q6 (P 0.45) the tree's excess per df lies above the C-FD point: HELD
+  Q6 (P 0.50) the tree's excess per df lies above the median C-KM seed: HELD
+  Q7 (P 0.60) the tree's root certifies against its site null: FAILED
+  Q8 (P 0.85) measured family DEFF <= 1.1: HELD
+FALSIFIERS:
+  F1 STOP (G1 fails with support): overturns the premise of the specialised-vs-generic-judge line on LiveCodeBench; the judged stage is NOT registered on LCB: FIRED
+  F2 STOP-SUB-PRACTICAL: overturns the judged stage's costing premise (a 10pp DiD on some model pair and region pair); a re-costing needs its own registration and the author's go: NOT FIRED
+  F3 a G1 pass that vanishes under Z1: the interaction is read as a contest-date (contamination) artefact: NOT FIRED
+  F4 Rasch passes, rank-1 fails: the interaction on LCB is difficulty slope, not branches: NOT FIRED
+
+DISCLOSURES:
+  - EVAL VALUES AT INGEST (READY D8): ingest.py --outcomes reads every side's graded lists, EVAL included, for two things only: the D6 assertion pass@1 == mean(graded_list) (it can only abort) and the (vii) matrix leg, which hashes each roster model's FULL graded matrix and drops the lexicographically later model of an identical pair. That roster decision is informed by EVAL values, on exact identity only; no EVAL value enters any statistic here.
+  - THE ONE-SHOT DRAW GUARD'S LIMIT (READY D8 / R1): draw.py refuses the registered seed when experiment_results/lcb_stage0/manifests/split_manifest.json exists IN THE CHECKOUT IT RUNS FROM; another checkout could run it again. The draw is byte-deterministic given the texts DB and the seed, so a second run reproduces the committed split and cannot re-draw it.
+  - THE EXACT-CURVATURE M-STEP (SAFE_AFTER = 1000; READY Deviation 1, ACCEPTABLE): it changes only the Newton curvature after 1,000 EM iterations, never the objective, the gradient or the convergence rule. It engaged in 1 of the ruling's 3,850 synthetic worlds (identical outcome) and in 3 of the 6 dry-run fixture fits; the FIT PATH lines above print it for every fit object here, with the reference path beside.
+  - The (vii) matrix leg dropped at ingest: no model.
+
+WHAT THIS RESULT DOES NOT SHOW (registration section 12, verbatim):
+- Anything about a judge, specialised or generic; any judged accuracy; that a specialised judge would beat the generic one on any region.
+- Anything about EVAL, whose outcomes are never read; transfer of any TRAIN interaction to EVAL, to another roster or to another corpus.
+- That the regions are topics. A GO says the model x region structure exceeds difficulty slope and input format; higher-rank model x problem structure aligned with the regions passes whether or not it is topical.
+- That the tree beats format x difficulty or k-means: those readings are descriptive only, and powerless at the relevant sizes.
+- Any frontier order, any per-question rank, or any single model-pair x region-pair contrast outside the scoreable class (K <= 4, two n = 10 models).
+- That the interaction is free of contamination. Z1 is a proxy (contest-date halves), not a per-model cutoff, and LCB’s own release_date field is unusable.
+- Anything about LCB’s graders. The key is the upstream graded_list, accepted as-is; the pass-without-code rows are disclosed and sensitivity-tested, not re-executed.
+- A clean negative in the absolute. A STOP is bounded by the stated power (~0.2 logit SD); it never means "no interaction".

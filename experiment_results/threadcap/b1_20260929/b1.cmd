@@ -1,0 +1,1 @@
+CMD ./gradlew --offline --no-daemon --no-build-cache siteNull --console=plain -PjvmThreads=12 -PnullReps=24 -DsnapshotId=20260917_161817_Headless_Run_Auto_ge -DsliceDim=512 -DdropTop=0 -Dwhiten=false -DoutCsv=experiment_results/threadcap/b1_20260929/b1_sitenull_j12_r24.csv

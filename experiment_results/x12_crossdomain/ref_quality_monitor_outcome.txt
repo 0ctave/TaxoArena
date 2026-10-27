@@ -1,0 +1,140 @@
+reserved_pool_id=p2dca21ab5f4ef3ae
+=== REF-QUALITY-MONITOR (registered 2026-09-17, commit 62c4084, docs/judge_v2_program.md L5522-L5584; zero judge calls; a MONITOR, never a gate) ===
+  tree bareq512_s42 snapshot 20260909_212117_Headless_Run_Auto_ge | 3445 routed pool questions | 14 anchors
+  cache X12        experiment_results\x12_crossdomain\stack_v2_promptv2_x12all.db | 9142 rows (pinned 9142) | INVALID column 0 | rule-10 reclassified 0 | valid 9142 | questions 2811 | ref graded (ref_correct >= 0) 9123
+  cache GROK-CALIB experiment_results\x12_crossdomain\grok_calib.db | 9142 rows (pinned 9142) | INVALID column 11 | rule-10 reclassified 1 | valid 9130 | questions 2811 | ref graded (ref_correct >= 0) 9123
+  cache KOTLIN     experiment_results\judge_wiring\board\kotlin_c0d3f708cbc3930e.db | 9123 rows (pinned 9123) | INVALID column 17 | rule-10 reclassified 0 | valid 9106 | questions 2801 | ref graded (ref_correct >= 0) 0
+  cache X20        experiment_results\x12_crossdomain\stack_v2_promptv2_x20.db | 12394 rows (pinned 12394) | INVALID column 0 | rule-10 reclassified 0 | valid 12394 | questions 2646 | ref graded (ref_correct >= 0) 12375
+  KOTLIN ref_correct joined from X12 by match_id: 9123 of 9123 | ref_letter disagreements before the join 0 | GROK-CALIB ref_correct == X12 ref_correct on 9142 of 9142 shared matches
+  reference-less matches (ref_correct = -1; excluded from every reference rate): X12 19, GROK-CALIB 19, KOTLIN 0, X20 19
+  anchor column check: every row of every cache equals anchor_fn(route[qid]) on bareq512_s42
+  key: roster 46 models (Meta-Llama-3-70B-Instruct excluded) | OPTIONS-key join eval_results -> mmlu_pro on the 2811 judged questions: 1:1 2688 | multi 3 | none 120 | gt_answer == mmlu_pro.answer on 2681 of 2688
+  hygiene X12        ref_correct column vs (ref_letter == eval gt_answer): 21 matches on 5 questions disagree (the column is the kit's grade, the one TOPIC-DIFFICULTY read; used as is)
+  hygiene GROK-CALIB ref_correct column vs (ref_letter == eval gt_answer): 21 matches on 5 questions disagree (the column is the kit's grade, the one TOPIC-DIFFICULTY read; used as is)
+  hygiene KOTLIN     ref_correct column vs (ref_letter == eval gt_answer): 21 matches on 5 questions disagree (the column is the kit's grade, the one TOPIC-DIFFICULTY read; used as is)
+  hygiene X20        ref_correct column vs (ref_letter == eval gt_answer): 30 matches on 5 questions disagree (the column is the kit's grade, the one TOPIC-DIFFICULTY read; used as is)
+  contestants: X12 12, GROK-CALIB 12, KOTLIN 12, X20 20 | x20 pairs 124, of which shared with x12 0 (x20 is a different SCHEDULE on the same questions)
+  DENOMINATOR HAZARD (stated before any number): X12, GROK-CALIB and KOTLIN judge the same matches under one reference vintage; their per-anchor reference rates are identical up to the 19 dropped matches. The 56 cells carry 14 + 14 (x20) independent reference readings and four judge draws of accuracy; 'cache' varies the judge draw, not the reference. Both readings are scored.
+
+=== (1) per (anchor, cache) cells: n key-decidable | reference-correct rate (match level; question level) | accuracy A | B | A within ref-correct | A within ref-wrong | INVALID rate | tie rate on decidable ===
+  anchor            cache        ndec      ref    ref_q    accA    accB  A|refok  A|refwr    inv    tie
+  Biology           X12           298    0.903    0.923   0.886   0.930    0.941    0.379  0.000  0.047
+  Biology           GROK-CALIB    298    0.903    0.923   0.889   0.950    0.941    0.414  0.000  0.064
+  Biology           KOTLIN        298    0.903    0.923   0.886   0.946    0.937    0.414  0.000  0.064
+  Biology           X20           275    0.971    0.928   0.916   0.966    0.936        -  0.000  0.051
+  Business          X12           157    0.943    0.960   0.898   0.953    0.926        -  0.000  0.057
+  Business          GROK-CALIB    157    0.943    0.960   0.873   0.945    0.905        -  0.000  0.076
+  Business          KOTLIN        157    0.943    0.960   0.873   0.951    0.899        -  0.007  0.076
+  Business          X20           156    0.974    0.958   0.929   0.986    0.934        -  0.000  0.058
+  Chemistry         X12           387    0.925    0.877   0.876   0.936    0.919    0.345  0.000  0.065
+  Chemistry         GROK-CALIB    387    0.925    0.877   0.850   0.927    0.894    0.310  0.000  0.083
+  Chemistry         KOTLIN        387    0.925    0.877   0.873   0.939    0.919    0.310  0.004  0.067
+  Chemistry         X20           413    0.944    0.874   0.906   0.982    0.923    0.609  0.000  0.077
+  Computer science  X12           302    0.877    0.889   0.838   0.927    0.913    0.297  0.000  0.096
+  Computer science  GROK-CALIB    302    0.877    0.889   0.831   0.906    0.909    0.270  0.003  0.076
+  Computer science  KOTLIN        302    0.877    0.889   0.828   0.912    0.906    0.270  0.002  0.089
+  Computer science  X20           303    0.927    0.893   0.871   0.933    0.904    0.455  0.000  0.066
+  Economics         X12           295    0.915    0.927   0.915   0.957    0.970    0.320  0.000  0.044
+  Economics         GROK-CALIB    295    0.915    0.927   0.915   0.957    0.970    0.320  0.002  0.044
+  Economics         KOTLIN        295    0.915    0.927   0.922   0.968    0.974    0.360  0.000  0.047
+  Economics         X20           257    0.969    0.931   0.922   0.971    0.940        -  0.000  0.051
+  Engineering       X12           192    0.823    0.735   0.786   0.904    0.886    0.324  0.000  0.130
+  Engineering       GROK-CALIB    192    0.823    0.735   0.781   0.882    0.873    0.353  0.000  0.115
+  Engineering       KOTLIN        192    0.823    0.735   0.781   0.888    0.880    0.324  0.003  0.115
+  Engineering       X20           191    0.838    0.743   0.848   0.895    0.938    0.387  0.000  0.052
+  Health            X12           216    0.818    0.859   0.829   0.891    0.949    0.282  0.000  0.069
+  Health            GROK-CALIB    216    0.818    0.859   0.824   0.873    0.966    0.179  0.004  0.046
+  Health            KOTLIN        214    0.818    0.859   0.804   0.869    0.943    0.179  0.006  0.070
+  Health            X20           228    0.819    0.855   0.864   0.912    0.968    0.390  0.000  0.053
+  History           X12           190    0.672    0.735   0.684   0.765    0.928    0.197  0.000  0.105
+  History           GROK-CALIB    190    0.672    0.735   0.700   0.756    0.968    0.180  0.000  0.074
+  History           KOTLIN        186    0.672    0.735   0.720   0.753    0.976    0.197  0.000  0.043
+  History           X20           160    0.811    0.735   0.831   0.899    0.946    0.367  0.000  0.075
+  Law               X12           319    0.825    0.748   0.821   0.891    0.923    0.345  0.000  0.078
+  Law               GROK-CALIB    319    0.825    0.748   0.843   0.900    0.969    0.273  0.000  0.063
+  Law               KOTLIN        314    0.825    0.748   0.850   0.908    0.958    0.345  0.002  0.064
+  Law               X20           280    0.870    0.753   0.868   0.931    0.925    0.500  0.000  0.068
+  Math              X12           656    0.954    0.951   0.913   0.961    0.946    0.233  0.000  0.050
+  Math              GROK-CALIB    656    0.954    0.951   0.898   0.959    0.930    0.233  0.002  0.061
+  Math              KOTLIN        656    0.954    0.951   0.904   0.956    0.933    0.300  0.002  0.052
+  Math              X20           675    0.966    0.950   0.907   0.956    0.922    0.478  0.000  0.052
+  Other             X12           363    0.810    0.777   0.843   0.903    0.939    0.435  0.000  0.066
+  Other             GROK-CALIB    363    0.810    0.777   0.829   0.907    0.952    0.304  0.003  0.080
+  Other             KOTLIN        363    0.810    0.777   0.829   0.912    0.959    0.275  0.001  0.091
+  Other             X20           333    0.850    0.770   0.844   0.909    0.943    0.280  0.000  0.072
+  Philosophy        X12           177    0.795    0.794   0.797   0.916    0.900    0.389  0.000  0.130
+  Philosophy        GROK-CALIB    177    0.795    0.794   0.808   0.911    0.929    0.333  0.003  0.113
+  Philosophy        KOTLIN        176    0.795    0.794   0.812   0.917    0.936    0.333  0.000  0.114
+  Philosophy        X20           124    0.748    0.779   0.839   0.904    0.913    0.645  0.000  0.073
+  Physics           X12           601    0.950    0.915   0.864   0.927    0.886    0.433  0.000  0.068
+  Physics           GROK-CALIB    601    0.950    0.915   0.867   0.937    0.895    0.333  0.000  0.075
+  Physics           KOTLIN        601    0.950    0.915   0.870   0.927    0.897    0.367  0.001  0.062
+  Physics           X20           632    0.964    0.914   0.907   0.957    0.921    0.522  0.000  0.052
+  Psychology        X12           354    0.771    0.808   0.808   0.877    0.949    0.333  0.000  0.079
+  Psychology        GROK-CALIB    354    0.771    0.808   0.802   0.869    0.960    0.272  0.001  0.073
+  Psychology        KOTLIN        354    0.771    0.808   0.811   0.870    0.967    0.284  0.001  0.065
+  Psychology        X20           283    0.795    0.808   0.820   0.879    0.947    0.328  0.000  0.067
+
+=== (2) Spearman(reference-correct rate, accuracy) with a question bootstrap (questions resampled within anchor, one resample shared by the four caches, B=300) ===
+  56-cell reading, accA: Spearman +0.857 (n=56 cells) | 95% percentile interval [+0.646, +0.899]
+    per cache X12        14-cell Spearman +0.824 (n=14) | [+0.648, +0.943]
+    per cache GROK-CALIB 14-cell Spearman +0.859 (n=14) | [+0.495, +0.925]
+    per cache KOTLIN     14-cell Spearman +0.807 (n=14) | [+0.556, +0.934]
+    per cache X20        14-cell Spearman +0.965 (n=14) | [+0.560, +0.952]
+  56-cell reading, accB: Spearman +0.864 (n=56 cells) | 95% percentile interval [+0.675, +0.905]
+    per cache X12        14-cell Spearman +0.877 (n=14) | [+0.578, +0.930]
+    per cache GROK-CALIB 14-cell Spearman +0.820 (n=14) | [+0.596, +0.934]
+    per cache KOTLIN     14-cell Spearman +0.811 (n=14) | [+0.547, +0.930]
+    per cache X20        14-cell Spearman +0.895 (n=14) | [+0.631, +0.934]
+  per anchor across the 4 caches (descriptive, n = 4; three of the four reference readings are the same number):
+    Biology           ref rates 0.903/0.903/0.903/0.971 | accA 0.886/0.889/0.886/0.916 | Spearman 0.816
+    Business          ref rates 0.943/0.943/0.943/0.974 | accA 0.898/0.873/0.873/0.929 | Spearman 0.816
+    Chemistry         ref rates 0.925/0.925/0.925/0.944 | accA 0.876/0.850/0.873/0.906 | Spearman 0.775
+    Computer science  ref rates 0.877/0.877/0.877/0.927 | accA 0.838/0.831/0.828/0.871 | Spearman 0.775
+    Economics         ref rates 0.915/0.915/0.915/0.969 | accA 0.915/0.915/0.922/0.922 | Spearman 0.816
+    Engineering       ref rates 0.823/0.823/0.823/0.838 | accA 0.786/0.781/0.781/0.848 | Spearman 0.816
+    Health            ref rates 0.818/0.818/0.818/0.819 | accA 0.829/0.824/0.804/0.864 | Spearman 0.775
+    History           ref rates 0.672/0.672/0.672/0.811 | accA 0.684/0.700/0.720/0.831 | Spearman 0.775
+    Law               ref rates 0.825/0.825/0.825/0.870 | accA 0.821/0.843/0.850/0.868 | Spearman 0.775
+    Math              ref rates 0.954/0.954/0.954/0.966 | accA 0.913/0.898/0.904/0.907 | Spearman 0.258
+    Other             ref rates 0.810/0.810/0.810/0.850 | accA 0.843/0.829/0.829/0.844 | Spearman 0.816
+    Philosophy        ref rates 0.795/0.795/0.795/0.748 | accA 0.797/0.808/0.812/0.839 | Spearman -0.775
+    Physics           ref rates 0.950/0.950/0.950/0.964 | accA 0.864/0.867/0.870/0.907 | Spearman 0.775
+    Psychology        ref rates 0.771/0.771/0.771/0.795 | accA 0.808/0.802/0.811/0.820 | Spearman 0.775
+
+=== (3) residual: accuracy A within reference-correct per cell against the reference rate ===
+  accuracy A within reference-correct: range 0.103 (0.873-0.976, 56 cells) | accuracy A overall: range 0.245 (0.684-0.929) | ratio 0.418
+  Spearman(reference rate, accuracy A within reference-correct) over 56 cells: -0.357 [-0.556, -0.014] (a confounded monitor shows the judge's own residual tracking the reference rate)
+    per cache X12        -0.086 (n=14)
+    per cache GROK-CALIB -0.398 (n=14)
+    per cache KOTLIN     -0.565 (n=14)
+    per cache X20        -0.288 (n=14)
+
+=== (4) criteria, predictions, falsifier (primary) ===
+  (C1) Spearman(reference-correct rate, accuracy A) across the 14 x 4 cells +0.857 >= 0.8: HELD
+       per-cache 14-cell X12        +0.824 >= 0.8: HELD
+       per-cache 14-cell GROK-CALIB +0.859 >= 0.8: HELD
+       per-cache 14-cell KOTLIN     +0.807 >= 0.8: HELD
+       per-cache 14-cell X20        +0.965 >= 0.8: HELD
+       convention B beside: 56-cell +0.864 | per cache X12 +0.877, GROK-CALIB +0.820, KOTLIN +0.811, X20 +0.895
+  prediction: C1 HELD: HELD | the judge lens's finer 0.85-0.95: inside (+0.857)
+  prediction (registrar): range ratio < 0.5: HELD (0.418)
+  FALSIFIER C1 Spearman < 0.5 on the 56-cell reading AND on every per-cache 14-cell reading: not triggered
+  consequence if C1 holds: FRAMEWORK Stage 9 may name the reference-correct rate on keyed audit mass as the per-cell MONITOR read each epoch (beside the canary and arm B); it changes no board, no certificate, no fit; never a gate
+
+=== DIFFICULTY-PROXY-WIDENER (secondary; registered expecting UNDETERMINED) on the x12 MAIN edges ===
+  edges 920 unfiltered / 891 filtered (gap >= 0.02) | established 809 | events (wrong-direction established) 26 | P per edge: mean 0.629, range 0.487-0.776 | Spearman(A, P) over established +0.432
+  identification profile of P: 178 distinct values (3 dp) over 809 established edges | between-anchor sd 0.0814 vs mean within-anchor sd 0.0077 (P is an ANCHOR-level covariate up to the pairs' prediction coverage: ~14 effective values, so b2 competes with b0 across 14 cells)
+  vectorised nll == systematic_budget.nll at b2 = 0 within 7.8e-14
+  A-only fit on established labels: b0 -2.6463 b1 +2.1430 nll 61.843 | A + P fit: b0 -1.4087 b1 +2.2221 b2 -1.9828 nll 61.472 | delta-deviance of b2 = 0: 0.74 vs 3.84 -> NOT identified
+  profile likelihood of b2 (deviance above the minimum; grid step 0.5): -12.0:10.7 -11.5:10.6 -11.0:10.5 -10.5:10.3 -10.0:10.2 -9.5:9.2 -9.0:8.2 -8.5:7.2 -8.0:6.3 -7.5:5.4 -7.0:4.6 -6.5:3.8 -6.0:3.0 -5.5:2.4 -5.0:1.8 -4.5:1.2 -4.0:0.8 -3.5:0.5 -3.0:0.2 -2.5:0.1 -2.0:0.0 -1.5:0.0 -1.0:0.2 -0.5:0.4 +0.0:0.7 +0.5:1.1 +1.0:1.6 +1.5:2.0 +2.0:2.5 +2.5:2.9 +3.0:3.1 +3.5:3.3 +4.0:3.3 +4.5:3.3 +5.0:3.2 +5.5:24.6 +6.0:24.6 +6.5:24.6 +7.0:24.6 +7.5:24.6 +8.0:24.6 +8.5:24.6 +9.0:24.6 +9.5:24.6 +10.0:24.6 +10.5:24.6 +11.0:24.6 +11.5:24.6 +12.0:24.6
+  b2 profile interval at 3.84: [-6.5, +5.0] on the grid (closed)
+  LOAO at 0.975 (folds fitted on the established edges of the other 13 anchors; evaluated on every edge):
+  A + P widener at 0.975                       called  675 of 920 (utility 73.4%) | wrong 7 (established 4) | nominal 1.04 -> UNDETERMINED (power rule: nominal < 3)
+  A-only widener at MATCHED utility (t = 0.9759) called  675 of 920 (utility 73.4%) | wrong 5 (established 3) | nominal 1.07 -> UNDETERMINED (power rule: nominal < 3)
+  A-only widener at 0.975 (unmatched, beside)  called  676 of 920 (utility 73.5%) | wrong 5 (established 3) | nominal 1.09 -> UNDETERMINED (power rule: nominal < 3)
+  power: parametric simulation at b2 = -1.983 (the in-sample fit; b0, b1 at their fits) on the 809 established edges, 1000 label sets: P(delta-deviance >= 3.84) = 0.145 (mean events 27.8)
+  (C2, secondary) established wrong calls at matched utility: A + P 4 vs A-only 3 | b2 identified: no -> UNDETERMINED (b2 not identified; nominal < 3)
+  prediction: C2 UNDETERMINED (26-40 events; events here 26): HELD
+  the proxy leg falsifies nothing at this event count; a HELD C2 licenses only a registration of the two-covariate widener on a larger established population, never a gate; no key enters P
+  runtime 80 s

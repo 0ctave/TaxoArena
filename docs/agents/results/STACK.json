@@ -1,0 +1,156 @@
+{
+  "id": "STACK",
+  "title": "STACK: the assembled judge v2, end-to-end (~4k Mistral calls)",
+  "question": "production template + reasoning reference (J2-R) + v1 mechanics (J3-R failed its primary) + the ANCHOR rubric of the clean bareq512_s42 tree + dual order + confidence; R3's 1,980 matches, Mistral, one session. All must hold: (1) all-decidable accuracy >= 0.849 - 1pp; (2) top cluster >= 0.665 - 2pp; (3) top-4 board from the 600 top-cluster matches <= 1 key-order violation; (4) decidable tie rate <= 15%; (5) flip rate <= 12.8%; (6) long-wrong preference on short-correct top-cluster pairs < v1's. [CORRECTED 2026-09-23: wrong object; the anchor rubrics are the frozen tree's ladder (0 exact / 14 norm-only twins)]",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "1e8203c lineage (the 'New registered tests' block; STACK section at L65)",
+    "program_lines": "docs/judge_v2_program.md L65-L75 (registration) and L148-L165 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "### STACK — the assembled judge v2, end-to-end (~4k Mistral calls)",
+    "outcome_heading": [
+      "L148: - **STACK (2026-09-10 02:10): 5 of 6 checks pass; REGISTERED FAIL on the board check.** 1,974 judged"
+    ],
+    "date": "2026-09-09"
+  },
+  "script": {
+    "path": "tools/analysis/stack_judge.py",
+    "sha16": "e9ec2996385aafd8 (at 55a24c7)",
+    "commit": "55a24c7"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (~4k Mistral calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/stack_outcome.txt",
+    "outcome_commit": "e4eed23",
+    "calls": "~4k (1,974 judged, dual order)",
+    "cce": "not stated",
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-10",
+    "other_files": [
+      "experiment_results/x12_crossdomain/stack_v2.db (cache)",
+      "stack_v2.log"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/)",
+    "commit": "e4eed23",
+    "verdict": "5/6; BOARD CHECK FAIL (registered fail on (3)); STACK-v2 registered on it"
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "all-decidable accuracy >= 0.839",
+      "result": "HELD",
+      "value": "0.843",
+      "denominator": "944 key-decidable"
+    },
+    {
+      "id": "(2)",
+      "text": "top cluster >= 0.645",
+      "result": "HELD",
+      "value": "0.662",
+      "denominator": "top-cluster decidable"
+    },
+    {
+      "id": "(3)",
+      "text": "top-4 board on the top-cluster matches <= 1 violation",
+      "result": "FAILED",
+      "value": "iask > gemini > arx > gpt-4o on 599 matches, 2 violations (limit 1)",
+      "denominator": "599 top-cluster matches"
+    },
+    {
+      "id": "(4)",
+      "text": "decidable ties <= 15%",
+      "result": "HELD",
+      "value": "6.2%",
+      "denominator": "944"
+    },
+    {
+      "id": "(5)",
+      "text": "flip rate <= 12.8%",
+      "result": "HELD",
+      "value": "12.3%",
+      "denominator": "1,974"
+    },
+    {
+      "id": "(6)",
+      "text": "long-wrong preference < v1's 0.293",
+      "result": "HELD",
+      "value": "0.270",
+      "denominator": "short-correct top-cluster pairs"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "passes (1)-(5); (6) only if v2 mechanics enter",
+      "result": "FAILED",
+      "value": "(3) failed; (6) passed without v2 mechanics",
+      "denominator": "six checks"
+    }
+  ],
+  "falsifier": {
+    "text": "all six must hold",
+    "fired": true,
+    "note": "REGISTERED FAIL on the board check; vs production v1 +7.1pp (85:18, p < 1e-4); vs J2-R (leaf rubric) -0.6pp n.s. => anchor rubric = leaf rubric under the reference; exploratory: the >= 0.95-confidence board (n = 117) is gemini-first with 1 violation"
+  },
+  "numbers_of_record": {
+    "accuracy": "0.843 (944 decidable); top cluster 0.662; ties 6.2%; flips 12.3%; long-wrong 0.270 vs 0.293",
+    "board": "iask > gemini > arx > gpt-4o, 2 violations (599 matches)",
+    "paired": "vs production v1 +7.1pp (85:18, p < 1e-4); vs J2-R -0.6pp n.s."
+  },
+  "sentence_of_record": "STACK (2026-09-10, ~4k calls): 5 of 6 checks pass; REGISTERED FAIL on the board check: 1,974 judged, 944 decidable: accuracy 0.843, top cluster 0.662, ties 6.2%, flips 12.3%, long-wrong preference 0.270 vs 0.293, but the board on 599 top-cluster matches reads iask > gemini > arx > gpt-4o, 2 violations (limit 1); vs production v1 +7.1pp (85:18, p < 1e-4); vs J2-R -0.6pp n.s., so the anchor rubric equals the leaf rubric under the reference. STACK-v2 registered.",
+  "chips": [
+    "5/6 · BOARD CHECK FAIL"
+  ],
+  "does_not_show": [
+    "a key-ordered top with v1 mechanics"
+  ],
+  "ledger": {
+    "row_id": "STACK",
+    "version": "v22 (849fb17); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "J2-R",
+    "J3-R",
+    "STACK-v2"
+  ],
+  "supersedes": null,
+  "superseded_by": "STACK-v2",
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L65-L75 and L148-L165",
+    "experiment_results/x12_crossdomain/stack_outcome.txt (e4eed23)",
+    "docs/test_ledger.html row STACK (v22): chips verbatim, observed cell, evidence",
+    "script sha16 = sha256 of tools/analysis/stack_judge.py at 55a24c7, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "brackets": [
+    {
+      "date": "2026-09-23",
+      "by": "CORRECTIONS_2026-09-23 (registrar)",
+      "text": "[CORRECTED 2026-09-23 by the registrar: run-time script version not recorded. script.sha16 e9ec2996385aafd8 is the LF sha256 of tools/analysis/stack_judge.py at 55a24c7, its first commit, and is an identity. Bounding evidence, named for what it is: the cache of record experiment_results/x12_crossdomain/stack_v2.db has a working-copy mtime of 2026-09-10 02:01, three minutes before the next commit of the script (83d2484, 02:04:33, sha16 bc16651d483a4a03), and the outcome is timed 02:10; so the posted bytes are 55a24c7's or an uncommitted intermediate between 00:51 and 02:01. stack_judge.py writes no script sha into its cache, so this cannot be closed from the record.] [Added on the coordinator's ruling, 2026-09-23: this is a FIXED DEFECT OF AN ERA, not a lapse of bookkeeping. tools/analysis/stack_judge.py of 2026-09-10 writes no meta table, no script sha and no per-row provenance, so no run of it can ever be pinned; the instruments of the 2026-09-16 window onward do write their own identity into the cache — grok_calib.py stores meta.script_sha256_16 and adds script_sha256_16_relaunch if the file changes between resumes (L191, L200-L203), canary_baseline.py the same in run_meta (L316-L317), bfcl_judged_pilot.py script_sha256_16_lf with a mismatch check (L925, L933, L940), and ifeval_response_oracle.py likewise. That is exactly why C5-1 could be settled from GROK-CALIB's cache and this one cannot be settled at all.]"
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the SPLIT-FOLLOWUPS review 8ebfa7a (insertion only, zero calls)",
+      "text": "WRONG OBJECT: CORRECTED 2026-09-23 by the SPLIT-FOLLOWUPS review (8ebfa7a): WRONG OBJECT and ID-ONLY. The 14 STACK-v2 anchor rubrics (rubric_ladder.db kind='anchor', ts 2026-09-07 23:54 to 09-08 00:09; ladder sha 4412f923 = the kit's) PREDATE bareq512_s42: rubric_ladder.py (f03cb30) induced them from TRAIN-side mmlu_pro texts assigned to the FROZEN tree 20260727_042523's leaf centroids, withholding p2dca by exact text, capped at 150 per anchor (seed 556). Their corpora hold 0 EXACT and 14 NORM-V1-ONLY twins of p2dca judged questions (Health 8, Law 4, Other 1, Philosophy 1; 5 in the 1,020 CLEAN; 45 before the cap). The STACK-v2 boards (x12, x20, GROK-CALIB, Kotlin c0d3f708, RECIPE-GROK) use 212117 only for routing and the anchor map. See docs/judge_v2_program.md L14455-L14487 (SPLIT-FOLLOWUPS)."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "The full new judge was run end to end on about 2,000 matches. It combines a production template, a reasoning model's reference answer, a subject-level rubric, judging in both orders, and confidence scores. Six pass/fail checks were set in advance.",
+    "why": "It tests whether the assembled cheap judge is good enough to be adopted as the production judge.",
+    "information": "Passing would let the design be adopted. Any failed check marks a remaining weakness. Result: done. 5 of 6 checks pass: accuracy 0.843, a large gain over the old judge (+7 points), and fewer ties, flips and length bias. The ranking check failed: two order errors among the top 4 models, against 1 allowed. The design was still registered as the next version (STACK-v2). Later ruled history rather than evidence, because it ran on the older question pool.",
+    "written": "2026-10-07"
+  }
+}

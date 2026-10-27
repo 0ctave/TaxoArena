@@ -1,0 +1,252 @@
+{
+  "id": "PLACEMENT-STEPS",
+  "title": "PLACEMENT-STEPS: does one further bisection step per separable tier remove exactly the separable tiers from the two recorded newcomer bands (sonnet 7 -> the structural floor of 4; gpt-4o-mini 3 -> 2)?",
+  "question": "Four steps of 100 filtered dual-order matches (sonnet vs deepseek-chat-v2_5 t5, vs claude-3-5-haiku t6, vs Qwen1.5-110B t7 as a positive control; gpt-4o-mini vs deepseek t5), certified under PRIMARY with A / B beside: do the (iii) tiers leave the bands, and is (22) reachable for the mid-board newcomer?",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "20cb7b6",
+    "program_lines": "docs/judge_v2_program.md L8392-L8550; pre-run bracket 1da84e7 L8752-L8759 (nine readings); reading (3) corrected by insertion at L8759 (9a88330, before --analyze); reading (7) count bracketed at L8759 (this commit, review defect 5); outcome section L9285-L9418 (this commit)",
+    "date": "2026-09-19"
+  },
+  "script": {
+    "path": "tools/analysis/placement_steps.py",
+    "sha16": "bb150a1facb590ce (working-tree CRLF, the value pinned in run_meta; git blob bac60e96125a6986 LF; first-pass sha 1e22373a4a858dc1 = 4c7cd8b CRLF)",
+    "commit": "a616826"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_placement_steps.md (second pass; first pass NOT READY at 1e22373a4a858dc1)",
+    "commit": "44c8519"
+  },
+  "go": "plan Amendment 6 item 5 (400 matches = 800 judge calls, 0 solves; under the 4,000-match rule); ARM-B NO ALARM gate EARNED (2693665)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/newcomer_placement_steps_outcome.txt",
+    "outcome_commit": "4129587",
+    "calls": 800,
+    "cce": 800,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-19",
+    "other_files": [
+      "experiment_results/x12_crossdomain/newcomer_placement_steps_bands.csv (4129587)",
+      "experiment_results/x12_crossdomain/newcomer_placement_steps_PILOT.txt (4129587; 24 of 800 / 12 of 400, 0 unusable, written 14:51:52)",
+      "experiment_results/x12_crossdomain/newcomer_placement_steps.db (4129587; sha256[:16] 292fdf095f527ce1; 800 rows)"
+    ],
+    "sequence": "pilot 24 calls (mids 90000000..90000011, 14:49:58-14:50:12) -> run 776 calls (14:52:17-15:00:10) -> --analyze at --draws 2000 (15:00:42); 776/776 ok + 24 = 800; finish_reason stop 800/800; max_tokens 8192 x 800; temperature omitted (run_meta)"
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-19_placement_steps_post.md",
+    "commit": "94afe65",
+    "verdict": "numbers CONFIRMED to the digit and the draw; sentence of record PERMITTED with the bracket; outcome record complete once defect 1's label bracket and defect 2's reading qualifier are appended by insertion (done in the programme's outcome section)"
+  },
+  "criteria": [
+    {
+      "id": "C0",
+      "text": "GATE: the four recorded certificates per newcomer replay to PLACEMENT-CEILING's values and the bands re-read 7 / 3 before any new edge enters",
+      "result": "HELD",
+      "value": "sonnet 0.910 2000/0, 0.505 1069/851, 0.225 0/2000, 0.510 1153/758; gpt-4o-mini 0.710 2000/0, 0.170 0/2000, 0.595 1964/29, 0.360 1/1998; bands 7 / 3 (replayed to the draw)",
+      "denominator": "the recorded newcomer_placement.db (mode=ro; sha 755a1f4f2a6411c5), 8 certificates, 2,000 draws seed 42"
+    },
+    {
+      "id": "C1",
+      "text": "SONNET (iii) -> 0: after the three steps every tier-5 / 6 / 7 incumbent's tier is BOUNDED or the incumbent is certified above sonnet (joins as ii* / (i), never dropped); (iii-a) + (iii-b) + (iii-c) = 0",
+      "result": "HELD",
+      "value": "66:17 (17 ties) / 78:11 (11) / 92:3 (5); shares 0.745 (sd 0.038) / 0.835 (0.034) / 0.945 (0.020), draws above 0.5 2000/2000 each, 0 below; sonnet certified ABOVE deepseek t5, haiku t6, Qwen1.5-110B t7 at 0.975; B 0.795 (n 83) / 0.876 (89) / 0.968 (95), 2000/0 each; (iii-a)+(iii-b)+(iii-c) = 0; 3/3 under PRIMARY, A, B",
+      "denominator": "3 steps x 100 fixed filtered matches; 2,000 bootstrap draws seed 42; PRIMARY (ties 1/2, unusable excluded)"
+    },
+    {
+      "id": "C2",
+      "text": "SONNET BAND = THE STRUCTURAL FLOOR: (i) + (ii) = 4 tiers [t1..t4], EXCLUSIVE width 4 (inclusive printed beside); a member certified above sonnet joins as ii* and C2 then FAILS",
+      "result": "HELD",
+      "value": "(i)+(ii) tiers [1, 2, 3, 4]; EXCLUSIVE width 4 (registered 4); INCLUSIVE 1..5 = 5, own tier 3 contained; classes ii 3 / i 1; t1 by certificate (gemini above 0.225), t2 never judged (frontier), t3 key tie (arx_3, gap 0.002; unseparated 0.510), t4 unseparated (gpt-4o 0.505): the floor is structural by rule",
+      "denominator": "14 key tiers at 0.017 over the 2,811 judged questions; 7 sonnet anchors"
+    },
+    {
+      "id": "C3",
+      "text": "GPT-4O-MINI: after the deepseek step (iii-b) = 0; (22) read on the INCLUSIVE interval: deepseek certified ABOVE the newcomer -> t5..t6, own tier contained -> MET (key-consistent); newcomer certified above deepseek -> t4..t5, own t6 NOT contained -> NOT MET (key-contradicted); unseparated -> t4..t6 -> NOT MET",
+      "result": "HELD",
+      "value": "VACUOUS BY CONSTRUCTION (review defect 6): 31:52 (17 ties) on 100, share 0.395 (sd 0.045), draws 16 above / 1974 below / 10 at -> deepseek certified ABOVE gpt-4o-mini at 0.975 (B 0.373 n 83, 15/1985); (iii-b) 0; deepseek joins as ii*; exclusive [4, 5, 6] width 3; INCLUSIVE 5..6 = 2, own tier 6 contained -> (22) MET ON THE INCLUSIVE READING ONLY (review defect 2); direction key-consistent and key-established, McNemar 312:256 p 0.021 (review defect 1: the outcome's KEY-CONTRADICTED label is wrong in fact)",
+      "denominator": "100 fixed filtered matches; 2,000 draws seed 42; PRIMARY; 5 gpt-4o-mini anchors"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "(plan) sonnet (iii) 3 -> 0; band 4 [4, 5] (exclusive 4, inclusive 5)",
+      "result": "HELD",
+      "value": "(iii) 0, exclusive 4, inclusive 5",
+      "denominator": "3 steps"
+    },
+    {
+      "id": "P2",
+      "text": "(plan) gpt-4o-mini band 2 or 3 (deepseek inside the key's SE ~0.013: a coin flip)",
+      "result": "HELD",
+      "value": "exclusive 3; VACUOUS (review defect 6: '2 or 3' cannot fail under the ii* rule; not a held prediction of substance)",
+      "denominator": "1 step"
+    },
+    {
+      "id": "P3",
+      "text": "(registrar) sonnet's win share vs deepseek in [0.60, 0.75], vs haiku in [0.65, 0.80], vs Qwen1.5-110B in [0.75, 0.90]",
+      "result": "FAILED",
+      "value": "0.745 in band, 0.835 > 0.80, 0.945 > 0.90 (2 of 3 above the band)",
+      "denominator": "100 matches each"
+    },
+    {
+      "id": "P4",
+      "text": "(registrar) each of sonnet's three steps certifies at 0.975 with >= 1,900 of 2,000 draws on the same side (the literal 1,900 = 0.95 x B = 2,000: --analyze at the default draws)",
+      "result": "HELD",
+      "value": "2000/0, 2000/0, 2000/0 of 2,000 draws (analyze at the default --draws 2000)",
+      "denominator": "2,000 bootstrap draws"
+    },
+    {
+      "id": "P5",
+      "text": "(registrar) gpt-4o-mini vs deepseek share in [0.45, 0.60]; P(certified) 0.5, no direction",
+      "result": "FAILED",
+      "value": "0.395, outside [0.45, 0.60]; certified (deepseek above), P(certified) was recorded 0.5",
+      "denominator": "100 matches"
+    },
+    {
+      "id": "P6",
+      "text": "(registrar) tie rate under PRIMARY on the 400 new matches in [0.20, 0.30]",
+      "result": "FAILED",
+      "value": "50/400 = 0.125 (per step 17 / 11 / 5 / 17); FAILED ON A MIS-ANCHORED BAND (review defect 3): the stated basis NEWCOMER-PLACEMENT-LIVE reads 126/799 = 0.158 (sonnet 53/399 = 0.133, gpt-4o-mini 73/400 = 0.182), the band [0.20, 0.30] was drawn from the canary (0.280 / 0.220); mechanism: ties are both-wrong (key-tied) ties, steps 32/99 = 0.323 key-tied vs 18/301 = 0.060 key-decidable, record 75/244 = 0.307 vs 51/555 = 0.092; the draw never reads the key",
+      "denominator": "400 matches"
+    },
+    {
+      "id": "P7",
+      "text": "(registrar) unusable rows <= 2 of 400",
+      "result": "HELD",
+      "value": "0 of 400 unusable",
+      "denominator": "400 matches"
+    },
+    {
+      "id": "P8",
+      "text": "(registrar) sonnet's MIXED-FIT position moves by < 0.10 theta (secondary, extrapolated; scale caveat)",
+      "result": "FAILED",
+      "value": "+1.421 -> +1.610, |delta| 0.189 (own MM fit +1.455 -> +1.644, delta +0.189 identical; gpt-4o-mini +0.706 -> +0.583); SECONDARY, EXTRAPOLATED, never the verdict",
+      "denominator": "20-model board"
+    }
+  ],
+  "falsifier": {
+    "text": "F1: sonnet's band > 4 on the (i) + (ii) + (iii) reading after the three steps (at least one tier-5 / 6 / 7 incumbent UNSEPARATED at 100 filtered matches); overturns the plan's R5 'steps do not cure it' and NEWCOMER-PLACEMENT-LIVE's 'the width comes from where the bisection lands' for the (iii) tiers (the shortfall is then judge-side); the t7 step is a positive control (unseparated there = instrument failure, reading (6)) OUTCOME: not fired; no tier-5 / 6 / 7 incumbent unseparated, the power column empty; t7 positive control HELD (0.945).",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "schedule_of_record": "question-id hash 2f8cbeefca20ed6b; step 1 sonnet vs deepseek-chat-v2_5 (t5) 1,038 - 235 = 803 eligible -> 100 (kd 70); step 2 sonnet vs claude-3-5-haiku (t6) 1,098 - 237 = 861 -> 100 (79); step 3 sonnet vs Qwen1.5-110B (t7) 1,395 - 234 = 1,161 -> 100 (82); step 4 gpt-4o-mini vs deepseek (t5) 1,099 - 236 = 863 -> 100 (70); 400 matches, 800 calls",
+    "instrument": "STACK-v2 recipe, grok-4-1-fast-non-reasoning, cap 8192, temperature omitted, dual order TIE on flip, cached grok-reasoning reference (mode=ro), first payload sonnet vs deepseek q 10277 fwd (block sha 71e4a19a4d40822b...); as run: provider azure:grok-4-1-fast-non-reasoning x 800, finish_reason {stop: 800}, max_tokens {8192: 800}, completion tokens 194..466, temperature omitted (run_meta; wire body not stored)",
+    "gates": "STEPS_GO=6 + READY tracked and clean + ref_remint_outcome.txt line 2 'ALARM STATE: NO ALARM' (2693665, sha256 7485f00f...56aa)",
+    "calls": "800 / 800 (pilot 24 + run 776); 400 / 400 matches both orders; unusable 0 / 400 (0.0%); no re-post by count (800 rows, 800 distinct ts; response ids not persisted)",
+    "sonnet_steps": "vs deepseek-chat-v2_5 (t5) 66:17 ties 17, share 0.745 sd 0.038, 2000/0; vs claude-3-5-haiku-20241022 (t6) 78:11 ties 11, 0.835 sd 0.034, 2000/0; vs Qwen1.5-110B (t7, positive control) 92:3 ties 5, 0.945 sd 0.020, 2000/0; each on 100 fixed matches, B = 2,000 seed 42; B convention 0.795 (n 83) / 0.876 (89) / 0.968 (95), 2000/0 each",
+    "sonnet_band": "exclusive [1, 2, 3, 4] width 4; inclusive 1..5 = 5 (own tier 3 contained); classes ii 3 / i 1; (iii-a)+(iii-b)+(iii-c) = 0; MIXED-FIT theta +1.421 -> +1.610 (delta +0.189; 399 + 300 protocol edges; extrapolated)",
+    "gpt4omini_step": "vs deepseek-chat-v2_5 (t5) 31:52 ties 17, share 0.395 sd 0.045, draws above 16 / below 1974 / at 10 -> deepseek ABOVE gpt-4o-mini at 0.975 (opposite draws 26); B 0.373 (n 83) 15/1985; seed-stable 1973-1984 of 2000 below (seeds 1 / 7 / 123 / 2024 / 99999, review)",
+    "gpt4omini_band": "exclusive [4, 5, 6] width 3 (classes ii 1 / ii* 1 / i 1); inclusive 5..6 = 2, own tier 6 contained -> (22) MET on the inclusive reading only; MIXED-FIT theta +0.706 -> +0.583 (delta -0.123; extrapolated)",
+    "key_direction_deepseek_vs_gpt4omini": "key 0.651 > 0.631; exact McNemar deepseek:gpt-4o-mini 312:256 p 0.021 on the 2,811 judged questions (395:311 p 0.002 on the pool of 3,445): key-established; gpt-4o-mini vs haiku 313:306 p 0.81 (a true key tie) (review claim 19)",
+    "tie_rate": "50 / 400 = 0.125 (per step 17 / 11 / 5 / 17); key-tied 32/99 = 0.323 vs key-decidable 18/301 = 0.060; NEWCOMER-PLACEMENT-LIVE's filtered matches 126/799 = 0.158 (review defect 3)",
+    "cross_step_reuse": "300 sonnet rows, 279 distinct questions: 19 questions in two steps + 1 in all three = 21 duplicate rows, 20 reused questions; overlap with the recorded 364 / 367 questions 0 (review defect 5)",
+    "wrong_established": "not applicable (no established edge claimed between a newcomer and a frontier model)"
+  },
+  "sentence_of_record": "\"placement cost is 400 + 100 per separable tier per newcomer; the residual is the structural floor (i) + (ii); criterion (22) is reachable for mid-board newcomers only\" PERMITTED (C1 AND C2 HELD, both reproduced), only with: [sonnet: (iii) 3 -> 0 at 0.745 / 0.835 / 0.945, each 2000/2000 at 0.975; residual [t1..t4] = exclusive 4 / inclusive 1..5 = 5, of which t1 by certificate (gemini above), t3 by key tie (arx_3), t4 by an unseparated judgment (gpt-4o 0.505) and t2 by NEVER-JUDGED frontier membership (the closed frontier line): the floor is structural by rule, not by measurement. gpt-4o-mini: deepseek certified ABOVE at 0.395 (1974/2000), key-consistent and key-established (McNemar 312:256 p=0.021); (22) MET on the INCLUSIVE interval t5..t6 only (pre-run reading (3) as corrected at L8759); the registered exclusive width is 3, unchanged, because deepseek joins as ii*; the outcome's \"KEY-CONTRADICTED\" label is wrong, the label of record is key-consistent. t7 = positive control HELD (0.945). Two newcomers, one per class: priced, not replicated; \"only\" is the registration's floor argument, not a second mid-board newcomer.]",
+  "chips": [
+    "PLACEMENT COST 400 + 100 PER SEPARABLE TIER (PRICED, NOT REPLICATED)",
+    "C0 HELD (REPLAY TO THE DRAW)",
+    "C1 HELD (iii) 3 -> 0, 0.745 / 0.835 / 0.945, 2000/2000 EACH",
+    "C2 HELD EXCLUSIVE 4 / INCLUSIVE 5 (t2 NEVER JUDGED: FLOOR BY RULE)",
+    "C3 HELD (VACUOUS BY CONSTRUCTION)",
+    "(22) MET INCLUSIVE 5..6 ONLY, EXCLUSIVE 3 UNCHANGED",
+    "deepseek > gpt-4o-mini 0.395 KEY-ESTABLISHED (p 0.021), LABEL \"KEY-CONTRADICTED\" WRONG",
+    "t7 POSITIVE CONTROL HELD",
+    "F1 NOT FIRED",
+    "P1 P4 P7 HELD",
+    "P2 VACUOUS",
+    "P3 FAILED (2 OF 3 ABOVE BAND)",
+    "P5 FAILED (0.395)",
+    "P6 FAILED ON A MIS-ANCHORED BAND (RECORD 0.158, NOT 0.25; TIES ARE BOTH-WRONG TIES 0.32 vs 0.06)",
+    "P8 FAILED +0.189 (OWN FIT +0.189)",
+    "800/800, 0 UNUSABLE, NO RE-POST BY COUNT",
+    "RESPONSE IDS NOT PERSISTED (PROCESS)",
+    "BRACKET 9a88330 14:55 PRECEDES --analyze 15:00:42",
+    "READY 44c8519 CONDITIONS MET, SHA bb150a1facb590ce UNCHANGED",
+    "SENTENCE OF RECORD PERMITTED WITH BRACKET"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-19",
+      "by": "PLACEMENT-STEPS pre-run review (1da84e7, before the first call)",
+      "text": "nine decided readings: seeded-shuffle draw; schedule hash 2f8cbeefca20ed6b; EXCLUSIVE = band minus certificate-bounded (iii) tiers; (22) on the INCLUSIVE interval; a member certified above the newcomer joins as ii* / (i) and C2 then FAILS; shipped MatchFilter rule; t7 kept as a positive control; cross-step reuse allowed as in the record (21 of 300); pilot = first 12 match ids; nothing posted until ARM-B reads NO ALARM."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "PLACEMENT-STEPS second READY (44c8519, defect 1), appended before --analyze at L8759",
+      "text": "reading (3)'s deepseek directions were swapped in transcription: newcomer certified ABOVE deepseek -> t4..t5, own t6 NOT contained -> (22) NOT MET (key-contradicted); deepseek certified ABOVE the newcomer -> t5..t6, own contained -> (22) MET (key-consistent, 0.651 > 0.631); the script (selftest g2/g3, analyze L588) is right. Script sha bb150a1facb590ce (working-tree CRLF; blob bac60e96125a6986 LF). Defects 2-4 are print-side conditions (ii* 'why' label by key relation; the t7 positive-control line read from P4; P4's literal 1,900 = 0.95 x 2,000 draws)."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "PLACEMENT-STEPS post-run review defect 1 (docs/reviews/2026-09-19_placement_steps_post.md, 94afe65), programme outcome section",
+      "text": "the outcome file's ii* label for gpt-4o-mini's tier 5, 'KEY-CONTRADICTED: deepseek-chat-v2_5 certified ABOVE the newcomer' (outcome L110 / L118 / L126; bands.csv row tier_class ii*), is wrong in fact: deepseek 0.651 > gpt-4o-mini 0.631, exact McNemar 312:256 p 0.021 (2,811 judged; 395:311 p 0.002 on the pool): key-consistent and key-established. The label of record is 'key-consistent' (READY 44c8519 print-side defect 2); the outcome file and the csv are not rewritten; no HELD / FAILED reads the label."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "PLACEMENT-STEPS post-run review defect 2 (94afe65), programme outcome section",
+      "text": "'(22) MET' is of record on the INCLUSIVE reading only (pre-run reading (3) as corrected at L8759, t5..t6 width 2, own tier contained). On the registration's literal C3 words ('EXCLUSIVE width 2 or 3; (22) MET iff the width is 2') it reads NOT MET: the exclusive width is 3, unchanged, because the ii* rule makes a member certified ABOVE the newcomer widen the exclusive band, never narrow it. The plan's 'gpt-4o-mini 3 -> 2' holds only on the inclusive interval; every sentence carrying (22) MET names the reading."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "PLACEMENT-STEPS post-run review defect 5 (94afe65), programme L8759 reading (7)",
+      "text": "'21 of sonnet's 300 new-step questions appear in two steps' miscounts: 19 in two steps and 1 in all three; 21 is the duplicate-row count (300 rows, 279 distinct), 20 the reused questions; overlap with the recorded 364 / 367 questions 0. No number of record reads it."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "PLACEMENT-STEPS post-run review defect 3 (94afe65), programme outcome section (P6)",
+      "text": "P6's band [0.20, 0.30] was drawn from the canary (0.280 / 0.220), not from its stated basis NEWCOMER-PLACEMENT-LIVE (126/799 = 0.158): P6 FAILED on a mis-anchored band; the ties are both-wrong (key-tied) ties (0.323 vs 0.060); the draw never reads the key; 0.125 is the record's own 0.133 for sonnet-class pairs. Bears on no criterion."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "PLACEMENT-STEPS (FRAMEWORK L15 / L189 / L211 brackets, this commit)",
+      "text": "placement cost is 400 + 100 per separable tier per newcomer (sonnet 400 + 300 -> exclusive band 4 = the structural floor (i) + (ii), inclusive 1..5; gpt-4o-mini 400 + 100 -> inclusive t5..t6, (22) MET on the inclusive reading only, exclusive 3 unchanged); the residual is the structural floor; (22) reachable for mid-board newcomers only, on the inclusive reading; two newcomers priced, not replicated."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "any order inside [t1..t4] (the frontier unread; t2 never judged)",
+    "anything about Meta-Llama-3.1-70B (never judged) or gpt-4o-mini vs sonnet (D5: never an anchor)",
+    "that (22) is reachable on the registered EXCLUSIVE width for any newcomer (it is met for neither)",
+    "that '400 + 100 per separable tier' generalises beyond these two newcomers (priced, not replicated: one newcomer per class)",
+    "a judged tier map",
+    "wrong(established) (none claimed)",
+    "anything about a tie rate of 0.25 (the record never had it)",
+    "the wire body per row (not stored) or the response ids of successful calls (not persisted)",
+    "a placement of gpt-4o-mini narrower than 3 tiers on the exclusive reading"
+  ],
+  "ledger": {
+    "row_id": "PLACEMENT-STEPS",
+    "version": "v117; [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "PLACEMENT-CEILING",
+    "NEWCOMER-PLACEMENT-LIVE",
+    "ARM-B-VINTAGE",
+    "FILTER-BOARD"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "experiment_results/x12_crossdomain/newcomer_placement_steps_outcome.txt (4129587): C0-C3 and P1-P8 as printed, step counts, shares, sd, draws, bands, classes, MIXED-FIT theta, cache header",
+    "experiment_results/x12_crossdomain/newcomer_placement_steps_bands.csv (4129587): per-incumbent tier_class rows",
+    "docs/reviews/2026-09-19_placement_steps_post.md (94afe65): CONFIRMED statuses, B-convention shares, C0 draws, seed stability, McNemar key direction, tie-rate decomposition, reuse counts, timeline, defects 1-8, sentence of record with bracket, chips, does-not-show",
+    "docs/judge_v2_program.md §PLACEMENT-STEPS registration L8392-L8550 (20cb7b6), pre-run bracket L8752-L8759 (1da84e7, 9a88330, this commit), outcome section L9285-L9418 (this commit); docs/design/FRAMEWORK.md L15 / L189 / L211 brackets (this commit)",
+    "docs/reviews/READY_placement_steps.md (44c8519): script sha renderings, conditions",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ4 Price",
+    "what": "Paid run. Four steps of 100 filtered matches each (both answer orders) placed two newcomer models (sonnet, gpt-4o-mini) against chosen existing models, with one known-easy comparison as a positive control.",
+    "why": "It asks how much it costs to place a new model on the leaderboard, and whether extra targeted matches narrow its uncertain band down to the unavoidable minimum.",
+    "information": "It gives a price for adding a model (matches per newcomer) and shows where narrowing stops. Result: done. Both criteria held: each extra step separated the targeted tier, and the positive control worked. Cost is about 400 + 100 matches per separable tier. The remaining band is a structural floor set by the rules, not by measurement. Only two newcomers were tested, so this is priced, not replicated. Note: older question pool, ruled 'history, not evidence'.",
+    "written": "2026-10-07"
+  }
+}

@@ -1,0 +1,81 @@
+=== KEY-SUBANCHOR-SCALE: is sub-anchor structure dead for taxonomy reasons or data reasons? ===
+  key-only test; models 12 (ARENA12); reserved pool of record p2dca21ab5f4ef3ae (3445 questions flagged)
+  questions keyed for all 12 models: 11900
+
+=== DATA CHECK (before any stratum is read): recovering the full keyed set per tree ===
+  bareq512_s42: snapshot 20260909_212117_Headless_Run_Auto_ge | 158 nodes, 87 leaves
+    queryIds propagation: internal nodes carrying queryIds = 0 (all ids sit on leaves; the leaf IS the deepest node)
+    leaf entries 8782 | distinct hashes 8278 | in >1 leaf 499 (weights per hash sum to {1.0: 8278}; exact ties 0) -> primary = max weight
+    hash -> question id by text join: ambiguous, DROPPED 339; ambiguous, identical key vectors (choice cannot matter) 129; ambiguous, one non-reserved candidate 61; hash collision on one qid, DROPPED 51; no eval question with this text 7; unique text 7742
+    train side recovered 7881 questions (7797 keyed for all 12) | train-side category == leaf anchor (mmlu_pro category by text): 5868 of 7881
+    reserved routing 3445 questions (3408 keyed) | train & reserved = 0 (must be 0) | train & routing = 0 (must be 0)
+    FULL KEYED SET: 11205 questions | 87 leaves used | mean 128.8 q/leaf
+  abt2d512_s42: snapshot 20260909_220440_Headless_Run_Auto_ge | 67 nodes, 47 leaves
+    queryIds propagation: internal nodes carrying queryIds = 0 (all ids sit on leaves; the leaf IS the deepest node)
+    leaf entries 8891 | distinct hashes 8278 | in >1 leaf 604 (weights per hash sum to {1.0: 8278}; exact ties 0) -> primary = max weight
+    hash -> question id by text join: ambiguous, DROPPED 339; ambiguous, identical key vectors (choice cannot matter) 129; ambiguous, one non-reserved candidate 61; hash collision on one qid, DROPPED 51; no eval question with this text 7; unique text 7742
+    train side recovered 7881 questions (7797 keyed for all 12) | train-side category == leaf anchor (mmlu_pro category by text): 5861 of 7881
+    reserved routing 3445 questions (3408 keyed) | train & reserved = 0 (must be 0) | train & routing = 0 (must be 0)
+    FULL KEYED SET: 11205 questions | 47 leaves used | mean 238.4 q/leaf
+  OVERLAP between trees: 11205 questions in both full keyed sets (7797 train-side, 3408 reserved) | only in bareq512_s42: 0 | only in abt2d512_s42: 0
+  anchor agreement between trees on the common set: 11168 of 11205 (0.9967); demeaning uses bareq512_s42's anchor (R3)
+  native cell sizes on the common set: bareq512_s42 87 leaves, mean 128.8 q/leaf, 87 leaves >= 25 | abt2d512_s42 47 leaves, mean 238.4, 47 >= 25
+  (registration expected ~10,900 questions and ~125 / ~230 q/leaf)
+
+=== FULL SIZE: observed (model, anchor)-demeaned cross-tree r of the KEY profile, by Jaccard tercile ===
+  profiled cells: bareq512_s42 87 (mean 128.8 q) | abt2d512_s42 47 (mean 238.4 q) | pairs 134460 over 11205 questions
+  stratum                                 n_q  overlap  observed | pipeline-faithful null (R4): med / 95th | fixed-strata null: med / 95th   
+  most changed third (lowest overlap)    3735    0.107   +0.0828 |  -0.0008 /  +0.0237 (200 reps)          |  +0.0036 /  +0.0131 (200 reps)
+  middle third                           3735    0.243   +0.3730 |  +0.0051 /  +0.0656 (200 reps)          |  +0.0044 /  +0.0175 (200 reps)
+  least changed third (highest overlap)   3735    0.502   +0.8186 |  +0.0134 /  +0.0775 (200 reps)          |  +0.0045 /  +0.0164 (200 reps)
+  all profiled questions                11205        -   +0.4332 |  +0.0039 /  +0.0115 (200 reps)
+  the null's OWN most-changed third has mean company overlap 0.070 (observed 0.107): the within-anchor shuffle keeps the
+  shared-question share of the two cells' accuracies at the same level, so a null-clearing r is not shared data.
+  (PROFILE-TREE-ROBUST (6) on the 2,811 reserved questions alone read the same statistic at -0.0711 on the most-changed third)
+  sensitivity, demeaning by abt2d512_s42's anchor instead: most-changed third r = +0.0846 | all +0.4349
+
+  BRIDGE (decomposition, not a criterion): the same pipeline on the reserved keyed questions alone and on the train side alone,
+  each with its own 200-rep pipeline-faithful null. The reserved-only line is the PROFILE-TREE-ROBUST (6) instrument on the
+  keyed reserved set (3408 questions there vs 2,811 with verdicts). Its terciles are its own, so it is not the full-size low third.
+  reserved only    n= 3408 | cells 75 (42 q) / 43 (77 q) | most-changed third r -0.0189 (overlap 0.115) vs null med -0.0051 / 95th +0.0329 | mid +0.3183 high +0.8228 all +0.3735
+  train side only  n= 7797 | cells 87 (90 q) / 47 (166 q) | most-changed third r +0.0805 (overlap 0.108) vs null med +0.0020 / 95th +0.0269 | mid +0.4737 high +0.7286 all +0.4263
+
+=== (1) PRIMARY: most-changed third at full size vs its within-anchor null 95th pct ===
+  observed r = +0.0828 | pipeline-faithful null median -0.0008, 95th pct +0.0237 (200 reps) | fixed-strata null 95th +0.0131
+  positive AND clears the null 95th (pipeline-faithful null, the primary): YES | on the fixed-strata null: YES
+  -> FALSIFIER FIRES: a positive, null-clearing r on the most-changed third at full size REOPENS sub-anchor as a DATA question.
+     The registered prediction (still negative or null) FAILED.
+
+=== (2) TREND of the most-changed-third r with cell size ===
+  R5: uniform subsample of the common set at each fraction, whole pipeline rerun (25-question floor included),
+  5 draws per fraction, 40 null reps per draw (pooled). Observed = mean over draws [min, max].
+  frac       n_q   cellsA  q/cellA   cellsB  q/cellB | r low: mean [min,max]    | null low: med / 95th     | r all (mean)    
+  1.00     11205     87.0    128.8     47.0    238.4 | +0.0828 [+0.0828,+0.0828] |  -0.0008 /  +0.0237 (200) |  +0.4332
+  0.50      5602     87.0     64.4     47.0    119.2 | +0.0691 [+0.0374,+0.1082] |  -0.0016 /  +0.0281 (200) |  +0.3990
+  0.25      2093     60.8     36.9     38.2     67.7 | +0.0607 [-0.0886,+0.2277] |  -0.0102 /  +0.0296 (200) |  +0.4046
+  middle / least-changed thirds (mean over draws): frac 1.00: mid +0.3730 high +0.8186 | frac 0.50: mid +0.3912 high +0.7688 | frac 0.25: mid +0.3980 high +0.7072
+
+  SECONDARY TREND (R5): the full-size profiled cells held fixed, each cell thinned to the fraction (no floor reapplied),
+  observed most-changed-third r on the FULL-SIZE tercile membership, 5 draws; no null (reported for the trend shape only).
+  frac 0.50: q/cellA 64.0 q/cellB 118.5 | r low = +0.0684 [+0.0322, +0.1117]
+  frac 0.25: q/cellA 32.5 q/cellB 60.1 | r low = +0.0356 [+0.0107, +0.0472]
+  frac 1.00: q/cellA 128.8 q/cellB 238.4 | r low = +0.0828
+
+  TREND READ: r(most-changed third) at cell sizes 184, 92, 52 (mean of the two trees' q/cell) = +0.0828, +0.0691, +0.0607
+  least-squares on log2(cell size): slope +0.0122 per doubling, intercept -0.0095
+  sizes at which r is positive AND clears its null 95th: [1.0, 0.5, 0.25] | inside the null or negative: none
+  the whole movement of r across a 4x range of cell size is 0.0220; the null's own median-to-95th spread is up to 0.0398
+
+=== (3) Is the extrapolated 900-1,500 questions-per-leaf requirement on the trend line? (reading R6) ===
+  at  900 q/leaf: log-linear extrapolation r = +0.1103 | Spearman-Brown growth from the full-size point (184 q, r +0.0828) = +0.3066
+  at 1500 q/leaf: log-linear extrapolation r = +0.1193 | Spearman-Brown growth from the full-size point (184 q, r +0.0828) = +0.4243
+  bar for 'on the trend line': positive slope AND extrapolated r >= 0.70 somewhere in 900-1,500 -> NO
+  the log-linear line reaches 0.70 at about >1e9 questions per leaf (205565781540947x the 1,500 upper end of the requirement)
+  READ: r is positive and null-clearing at full size; the log-linear line does NOT reach the 0.70 bar inside 900-1,500.
+
+=== VERDICTS (registered criteria) ===
+  (1) PRIMARY  most-changed third, full size: r +0.0828 vs null 95th +0.0237 -> FALSIFIER FIRES (positive, null-clearing): sub-anchor reopens as a data question
+  (2) TREND    r low at frac 0.25 / 0.50 / 1.00 = +0.0607 / +0.0691 / +0.0828 (null 95th +0.0296 / +0.0281 / +0.0237); slope +0.0122 per doubling
+  (3) 900-1,500 on the trend line: NO
+  McNemar rule (R7): this test scores no judge direction, so it carries no wrong-direction count; key denominator per cell =
+  the cell's questions keyed for all 12 ARENA12 models (11205 in the common set).

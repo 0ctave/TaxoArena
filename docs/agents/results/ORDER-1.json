@@ -1,0 +1,102 @@
+{
+  "id": "ORDER-1",
+  "title": "ORDER-1: is single-order judging a free cost halving? (from ARENA-V2's cache; zero calls)",
+  "question": "Order-1 only / order-2 only / dual on ARENA-V2's 9,142 verdicts: accuracy, rho, the top-cluster board; both single orders must read acc >= dual - 1pp, violations <= dual's, rho >= dual - 0.005.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "5b14962",
+    "program_lines": "docs/judge_v2_program.md L506-L514 (registration) and L521-L533 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-10 21:05 (before running) — ORDER-1: single-order judging from the ARENA-V2 cache (zero calls)",
+    "outcome_heading": [
+      "L521: - **ORDER-1 (2026-09-10 21:10): FAIL — single-order judging is not a free cost halving.** From ARENA-V2's ..."
+    ],
+    "date": "2026-09-10"
+  },
+  "script": {
+    "path": "n/a (free check / probe; scratch script, no script of record; the output file is the record)",
+    "sha16": "n/a",
+    "commit": "4dfa56c"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/order1_outcome.txt",
+    "outcome_commit": "4dfa56c",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-10"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the model_b confound disclosed in the outcome",
+    "commit": "4dfa56c",
+    "verdict": "FAIL: dual stays"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "both single orders: acc >= dual - 1pp, violations <= dual's, rho >= dual - 0.005",
+      "result": "FAILED",
+      "value": "dual 0.852 / rho 0.972 / 1 violation; order-1 0.881 / 0.958 / 2 violations (iask first); order-2 0.887 / 0.986 / 1: the accuracy gain of a single order is the ties-wrong convention (dual abstains on 7.2% of decidable pairs); the board depends on which order is kept",
+      "denominator": "9,142 ARENA-V2 verdicts"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "confound disclosed: model_b wins ~70% in both orders (the scheduler writes the stronger model as B), so second-shown-wins is not a position metric on this schedule; closed line: single order (CONTEXT.md section 5: ORDER-1, SELECTIVE-ORDER)"
+  },
+  "numbers_of_record": {
+    "dual": "0.852 / 0.972 / 1",
+    "order_1": "0.881 / 0.958 / 2 (iask first)",
+    "order_2": "0.887 / 0.986 / 1",
+    "abstention": "dual abstains on 7.2% of decidable pairs"
+  },
+  "sentence_of_record": "ORDER-1 (2026-09-10, zero calls): FAIL: single-order judging is not a free cost halving. Dual 0.852 / rho 0.972 / 1 violation; order-1 0.881 / 0.958 / 2 violations (iask first); order-2 0.887 / 0.986 / 1; the accuracy gain of a single order is the ties-wrong convention (dual abstains on 7.2% of decidable pairs) and the board depends on which order is kept, so dual stays. Confound disclosed: model_b wins ~70% in both orders (the scheduler writes the stronger model as B), so second-shown-wins is not a position metric on this schedule.",
+  "chips": [
+    "FAIL"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a position metric on this schedule (model_b confound)"
+  ],
+  "ledger": {
+    "row_id": "ORDER-1",
+    "version": "v43 (4dfa56c); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "ARENA-V2",
+    "POSITION-FULL",
+    "SELECTIVE-ORDER"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "single order (CONTEXT.md section 5: ORDER-1, SELECTIVE-ORDER); dual order is mandatory (plan Amendment 1)"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L506-L533 (5b14962 / 4dfa56c)",
+    "experiment_results/x12_crossdomain/order1_outcome.txt (4dfa56c)",
+    "docs/test_ledger.html row ORDER-1 (v43): chips verbatim, evidence (order1_outcome.txt, 5b14962)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ4 Price",
+    "what": "Using about 9,100 stored verdicts, keeping only one of the two answer orderings the judge sees (A then B, or B then A) instead of both, and comparing accuracy, ranking agreement and leaderboard.",
+    "why": "Judging each pair in only one order would halve cost, if it were free.",
+    "information": "Result (no new calls): it fails. Single order looks more accurate only because the dual-order judge abstains on ties. The leaderboard changes depending on which order is kept, so both orders stay. A scheduling confound (the stronger model is usually shown second) means this is not a measure of position bias. It is on older judged data now ruled history.",
+    "written": "2026-10-07"
+  }
+}

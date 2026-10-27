@@ -1,0 +1,291 @@
+{
+  "id": "CANARY-EPOCH2-RUNG",
+  "title": "CANARY-EPOCH2-RUNG: epoch-2 alarm and the within-session rung on the frozen 300-match canary (1,200 calls)",
+  "question": "Does the frozen canary's retest floor hold at epoch 2 (the registered alarm at 0.138), and what is the within-session per-match retest floor on the same 300 matches?",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "fad9ea2 (the registration commit; it adds this record, the programme section and plan Amendment 12, and precedes all code and every call)",
+    "program_lines": "docs/judge_v2_program.md L14931-L14970",
+    "program_lines_as_of": "fad9ea2",
+    "heading": "## Registered 2026-09-23 (before any code or call) — CANARY-EPOCH2-RUNG: epoch-2 alarm and the within-session rung on the frozen 300-match canary (1,200 calls)",
+    "date": "2026-09-23"
+  },
+  "script": {
+    "path": "tools/analysis/canary_baseline.py (merged ca3072d from 9e345f5; ceiling 1,260)",
+    "sha16": "tools/analysis/canary_baseline.py blob:71d3f308c9b19d452e2276a1f0bbb230efaefb25 / sha256-lf16:32236c62be50038c; tools/analysis/accepted_tests_ledger.py blob:4e9db106c2ebeaea8674b2a5a6227f1d9b838ccf / sha256-lf16:47008504f09aa473",
+    "commit": "ca3072d"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_canary_epoch2_rung.md",
+    "commit": "04104f4",
+    "verdict": "READY-WITH-CONDITIONS at 1138e45 (7b102ad's D1, D2 lifted; D3-D8 fixed); merged 53089de",
+    "script": "canary_baseline.py blob:6642a91db120eaed866b6f39ba723d40fadfad22 / sha256-lf16:96d27df4561a2fe3; canary_baseline_selftest.py blob:abf72936422ddbf26a8f57eeb65f3af2078cdb59 / sha256-lf16:8efbb91f7c750cf4",
+    "conditions": "1. Merge to main by path, byte-identical to the pins above: canary_baseline.py blob:6642a91d / sha256-lf16 96d27df4561a2fe3 and canary_baseline_selftest.py blob:abf72936 / sha256-lf16 8efbb91f7c750cf4. accepted_tests_ledger.py is already on main at blob:7fb20f64.\n2. **Only after TRACE-TRUNCATION's last launch has returned** (the one-poster rule; M6d and the ledger lock): from main, `--dry-run --pass 3` reproduces anchor 3501e6aef27aad68 and order 20b51354c05c5ad4, [PIN] UNCHANGED, pre-flight would GO, and [ACCOUNT] (iii) = 4,060 + TRACE's posted calls as read from its cache and ledger + 600 <= 14,000.\n3. Sequence, never interleaved with a readout:\n   - `--pass 3 --pilot 12 --go`, the guard read, then `--pass 3 --run --go`.\n   - Immediately, `--pass 4 --pilot 12 --go` and `--pass 4 --run --go`. The FIRST pass-4 launch must fall within 7,200 s of pass 3's last row.\n   - `--analyze-epoch2` ONLY when pass 4 holds 300 rows. Or, if pass 4 was not started in the window, `--analyze-epoch2 --no-rung`. Or, if pass 4 is abandoned (a fingerprint stop, a failed pilot), only after the run-operator records the reason in the run log (D10).\n   - Never `-O`, `--override-guard`, another `--maxtok` or `--temperature`.\n4. An errored pilot match fails the pilot's guard (D6). If the pilot is relaunched, the run-operator records the first launch's error count from its \"done:\" line: the relaunch cannot see it, and the ledger keeps it.\n5. The outcome's ACCOUNTING line is read against the day ledger after both tests have finished (the dry-run's 4,660 excludes TRACE by construction). The post-run reviewer runs the full-payload scan over the stored bodies and re-measures the DEFF from the caches' own cluster sizes (Kish 1.160).\n6. Queued, not blocking: D10 (the `--rung-abandoned` guard), ACCEPTED-LEDGER-LOCK.",
+    "record": "docs/judge_v2_program.md L15391-L15411"
+  },
+  "go": "the author's acceptance of 2026-09-23, verbatim: \"the paid tests are fine I accept them\" (relayed by the coordinator; docs/plan_2026-09-15.md Amendment 12); below the 4,000-match rule; if the run falls past the night of 2026-09-23, the acceptance authorises it on its own under its ceiling [2026-09-24: ceiling raised to 1,248 by the author (Amendment 16)]",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/canary_epoch2_outcome.txt blob:d85c5afb2fb8d6950eae813a0520cfb7a1ff13b4 / sha256-lf16:ebe51313a25ccf33 (a1d27e9)",
+    "outcome_commit": "a1d27e9",
+    "date": "2026-09-24",
+    "calls": 1252
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-24_canary_epoch2_post.md",
+    "commit": "71222a7",
+    "verdict": "NUMBERS CONFIRMED; recordable with three insertions (D1 P6 wording, D3 pilot guard, D4 non-adjacent reversals); no BLOCKER"
+  },
+  "criteria": [
+    {
+      "id": "C0",
+      "text": "VALIDITY first: set hash and the 26/300 floor reproduced; every call fingerprinted azure:grok-4-1-fast-non-reasoning; pass 4 <= 2 h after pass 3; truncation guard",
+      "result": "HELD",
+      "value": "PASS (1,200 fingerprinted, finish stop, unusable 0); D3: the pass-3 pilot's first launch refused by its guard (match 4653, HTTP 429), passed on relaunch",
+      "denominator": "300 matches"
+    },
+    {
+      "id": "C1",
+      "text": "THE ALARM: ALARM iff d32 >= 0.138 (the point decides); fires Amendment 4 trigger (3) [RULED 2026-09-24: decided under CONVENTION A (all 300; an unusable verdict counts as a difference from a usable one), B printed beside; if they disagree on the ALARM both are recorded and A decides (docs/judge_v2_program.md L15188-L15206)]",
+      "result": "HELD",
+      "value": "NO ALARM: d32 21/300 = 0.0700 vs 0.138, both conventions",
+      "denominator": "300 frozen matches, 279 questions"
+    },
+    {
+      "id": "C2",
+      "text": "THE RUNG, DESCRIPTIVE-ONLY: d43 (same session) and Delta = d32 - d43 with intervals",
+      "result": "n/a",
+      "value": "DESCRIPTIVE: d43 0.0933 [0.060, 0.127]; Delta -0.0233 [-0.057, +0.010], contains 0 at 220/220 seeds; integrated [-0.0559, +0.0092]",
+      "denominator": "300 matches"
+    },
+    {
+      "id": "C3",
+      "text": "REVERSALS counted in (2, 3) and (3, 4)",
+      "result": "HELD",
+      "value": "0/218 (2,3), 0/210 (3,4) adjacent; D4 descriptive: 2 matches reverse between non-adjacent passes (8320, 7954)",
+      "denominator": "matches decisive in both passes"
+    },
+    {
+      "id": "C4",
+      "text": "the three-pair pooled line beside 0.116 at n = 900, descriptive",
+      "result": "n/a",
+      "value": "DESCRIPTIVE: 75/900 = 0.083 beside 0.116",
+      "denominator": "900 match-pairs"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "d32 = 0.087 [0.050, 0.125]",
+      "result": "HELD",
+      "value": "0.0700 in [0.050, 0.125]",
+      "denominator": "300"
+    },
+    {
+      "id": "P2",
+      "text": "C1 NO ALARM",
+      "result": "HELD",
+      "value": "NO ALARM",
+      "denominator": "300"
+    },
+    {
+      "id": "P3",
+      "text": "d43 = 0.080 [0.045, 0.120]",
+      "result": "HELD",
+      "value": "0.0933 in [0.045, 0.120]",
+      "denominator": "300"
+    },
+    {
+      "id": "P4",
+      "text": "Delta = +0.007 [-0.040, +0.050]",
+      "result": "HELD",
+      "value": "-0.0233 in [-0.040, +0.050]",
+      "denominator": "300"
+    },
+    {
+      "id": "P5",
+      "text": "reversals 0 [0, 2] in each pair",
+      "result": "HELD",
+      "value": "0 / 0 adjacent",
+      "denominator": "decisive-both matches"
+    },
+    {
+      "id": "P6",
+      "text": "fingerprint 1,200 / 1,200; INVALID or unusable 0 [0, 3] [SCORING RULED 2026-09-24 (docs/judge_v2_program.md L15779-L15786): on the cached verdict-bearing calls (2 x 600 vs 1,200), not calls posted; both printed: \"P6 HELD/FAILED: fingerprint on X of 1,200 verdict-bearing calls (cached, 2 x 600 rows), foreign none; unusable U; POSTED N calls (day ledger), of which N − 1,200 errored (HTTP 429 / transport) with no verdict and no fingerprint, under the amended ceiling 1,248 (CANARY-EPOCH2-RUNG-CEILING-1).\"]",
+      "result": "HELD",
+      "value": "fingerprint 1,200 / 1,200 verdict-bearing; unusable 0; POSTED 1,252 calls (day ledger); 52 without a cached verdict = 34 HTTP 429 (after 6 attempts each inside call_judge_full) + 18 order-1 calls answered HTTP 200 and discarded because their match's order-2 call failed (fingerprint checked in flight, not recorded); under the amended ceiling 1,260 (CEILING-2).",
+      "denominator": "1,200 calls"
+    }
+  ],
+  "falsifier": {
+    "text": "C1 ALARM (d32 >= 0.138) fires Amendment 4 trigger (3) and overturns the standing stable-floor reading since 2026-09-22 (judged numbers after pass 2 flagged for re-read); P3 fails if d43 < 0.045 or > 0.120; P5 fails on >= 3 reversals in either pair.",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "d32": "21/300 = 0.0700 [0.039, 0.101] (seed 42); integrated SE 0.0160; bar 0.138",
+    "d43": "28/300 = 0.0933 [0.060, 0.127]",
+    "delta": "-0.0233 [-0.057, +0.010] (seed 42); integrated [-0.0559, +0.0092]; contains 0 at every seed",
+    "pairwise": "(1,2) 0.087, (1,3) 0.093, (1,4) 0.067, (2,3) 0.070, (2,4) 0.087, (3,4) 0.093; exchangeable p = 0.20",
+    "changing_matches": "43 of 300; 146 of 149 disagreements involve a TIE",
+    "support": "Kish 1.160 (279 q), DEFF 1.169 (1.08-1.29 across seeds), n_eff 256.6, MDE 0.0446",
+    "calls": "1,252 posted (52 without cached verdict = 34 HTTP 429 + 18 discarded HTTP-200 order-1 calls); 1,200 verdict-bearing"
+  },
+  "sentence_of_record": "On the frozen 300-match canary, epoch 2 reads NO ALARM (d32 21/300 = 0.070 against the 0.138 bar, under both conventions). The same-session rung disagrees on 28/300 = 0.093 [0.060, 0.127], and Δ = −0.023 [−0.057, +0.010] contains zero at every bootstrap seed. The six pairwise disagreements over four passes (0.067–0.093) show no elapsed-time gradient, and the pass labels are exchangeable within match (p = 0.20). At this resolution, the canary measures retest noise and no drift. [run a1d27e9 (passes 3 and 4; caches d8ad315 / a1d27e9), review 71222a7, 1,252 calls posted (the 1,260 ceiling, CEILING-2); denominators: the frozen 300-match set (279 questions, Kish 1.160), 1,200 verdict-bearing calls (2 x 600 rows); d32 spans about 50 h (pass 2 on 09-22, pass 3 on 09-24), not a week]",
+  "chips": [
+    "C0 PASS",
+    "RUNG VALID (start 1,093 s, last row 5,744 s, window 7,200 s)",
+    "C1 NO ALARM 0.0700 (A = B)",
+    "C2 DESCRIPTIVE d43 0.0933 [0.060, 0.127], Δ −0.0233 [−0.057, +0.010], Δ contains 0 at 220/220 seeds",
+    "C3 0/218, 0/210 adjacent (non-adjacent 1/212, 1/214, 1/214: 2 matches)",
+    "C4 75/900 = 0.083 (descriptive)",
+    "P1–P6 HELD",
+    "FALSIFIER NOT FIRED",
+    "P6 CORRECTED WORDING (D1)"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-24",
+      "by": "registrar",
+      "text": "Built at f0112d1. Rulings: pass 4's own pilot inside the 2 h window (ceiling unchanged); convention B drops pairs unusable in either pass; C1 decided under convention A. Accounting: the posting-date ledger; guard checks 1,200, the 4,000-match rule and 4,060 + both tests' calls <= 14,000. docs/judge_v2_program.md L15188-L15206."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar",
+      "text": "Dry-runs: pass 3 pre-flight GO (26/300 reproduces); pass 4 refuses until pass 3 completes; anchor 3501e6aef27aad68, order 20b51354c05c5ad4; accounting 4,660 / 14,000; 8 immutable connects; caches unchanged. docs/judge_v2_program.md L15302-L15318."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (READY 7b102ad)",
+      "text": "NOT READY: D1 HIGH, D2 MEDIUM; stays on its branch; the accounting guard (larger of cache and ledger) confirmed. docs/judge_v2_program.md L15320-L15339."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (delta READY 04104f4; merge 53089de)",
+      "text": "READY-WITH-CONDITIONS; merged 53089de; runs only after TRACE-TRUNCATION's last launch; rulings: refusal after the outcome is correct under ruling 6; M6d needs no fix; D10 (MEDIUM) covered by condition 3, guard queued; ACCEPTED-LEDGER-LOCK queued. docs/judge_v2_program.md L15391-L15411."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (the author's decision, relayed)",
+      "text": "Ceiling 1,200 -> 1,248 (budget only); delta READY owed before pass 4; fallback --no-rung. docs/judge_v2_program.md L15764-L15770."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (delta READY 2 af1946a; merge adce865)",
+      "text": "Ceiling 1,248 merged (lf16 ccc145d0009e1a65); P6 scoring ruled; pass 4 launching. docs/judge_v2_program.md L15779-L15786."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (the author's decision, relayed)",
+      "text": "Ceiling 1,248 -> 1,260 (CEILING-2); passes 3 and 4 RAN (pass 4 297 / 300); outcome not yet written. docs/judge_v2_program.md L15843-L15848."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (delta READY 3 613da05; merge ca3072d)",
+      "text": "Ceiling 1,260 merged (lf16 32236c62be50038c); ONE resume for 8720, 879, 9136; no third amendment. docs/judge_v2_program.md L15864-L15868."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (the coordinator's relay)",
+      "text": "RAN and completed (a1d27e9; 1,252 calls); review pending; no outcome recorded. docs/judge_v2_program.md L15870-L15880."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (run a1d27e9; review 71222a7)",
+      "text": "OUTCOME recorded: NO ALARM; retest noise, no drift; D1 P6 wording corrected at L15784; D3 and D4 recorded. docs/judge_v2_program.md L15882-L15907."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "It does not show that the judge is free of drift smaller than ~4.5 pp (the MDE). Drift that moves the same unstable matches in the same way as noise is indistinguishable here.",
+    "It does not show that C2 tests anything. C2 is DESCRIPTIVE-ONLY by registration and bounded by the frozen set; Δ's sign is not established at any seed.",
+    "It does not show that decisive verdicts never reverse (D4).",
+    "It does not show that the 52 excess calls all failed (D1), or that the posted count equals HTTP requests (D2).",
+    "It does not show convention sensitivity (D9), or the fingerprints of the 18 discarded HTTP-200 calls beyond the in-flight check (D1).",
+    "It does not show a floor for any other set, judge, prompt, or the per-call retest rate (DECOMP's 5.7% is a different quantity).",
+    "It does not show a pooled alarm rule: C4 is descriptive, and its pooling is not registered.",
+    "drift on any set other than the frozen 300",
+    "a scoreable within-session vs week-apart contrast (C2 is descriptive)",
+    "reference-vintage drift (arm B, a separate obligation)"
+  ],
+  "ledger": {
+    "row_id": "CANARY-EPOCH2-RUNG",
+    "version": "v229 (adjudicated; chips replaced; audit OK); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "CANARY-BASELINE",
+    "TIE-MECHANICS"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing and reopens nothing (closed lines checked in the registration)"
+  },
+  "support": "300 matches / 279 questions, Kish 1.14; DEFF 1.09 MEASURED on this set's own pass 1 / 2 pair; n_eff 275.2; SE sqrt(0.087 x 0.913 / 300) x sqrt(1.09) = 0.0170 (match-level, = the recorded measured SE); C2 SE <= 0.034 by the triangle inequality (no independence); MDE C1 4.8pp, C2 <= 9.5pp; C1 SCOREABLE (0.051 > 0.048, thin), C2 DESCRIPTIVE-ONLY; structural: C2 bounded by the frozen set at any number of passes. docs/judge_v2_program.md L14931-L14970",
+  "sources": [
+    "docs/judge_v2_program.md L14931-L14970",
+    "docs/plan_2026-09-15.md Amendment 12",
+    "the coordinator's relay of the author's acceptance (2026-09-23)",
+    "docs/judge_v2_program.md L15188-L15206",
+    "docs/judge_v2_program.md L15302-L15318",
+    "docs/judge_v2_program.md L15320-L15339",
+    "docs/reviews/READY_canary_epoch2_rung.md (04104f4); docs/judge_v2_program.md L15391-L15411",
+    "docs/judge_v2_program.md L15764-L15770",
+    "docs/judge_v2_program.md L15779-L15786",
+    "docs/judge_v2_program.md L15843-L15848",
+    "docs/judge_v2_program.md L15864-L15868",
+    "docs/judge_v2_program.md L15870-L15880",
+    "docs/judge_v2_program.md L15882-L15907",
+    "docs/reviews/2026-09-24_canary_epoch2_post.md (71222a7)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "ready_history": [
+    {
+      "file": "docs/reviews/READY_canary_epoch2_rung.md",
+      "commit": "7b102ad",
+      "verdict": "NOT READY (canary_baseline.py sha256-lf16 e1ed7466917bd8fb): D1 HIGH a partial pass 4 blocks the C1 outcome (breaks ruling 6); D2 MEDIUM the 2 h window measured from 'now'",
+      "record": "docs/judge_v2_program.md L15320-L15339"
+    },
+    {
+      "date": "2026-09-24",
+      "file": "docs/reviews/READY_canary_epoch2_rung.md",
+      "commit": "af1946a",
+      "verdict": "READY-WITH-CONDITIONS for lf16 ccc145d0009e1a65 (ceiling-only diff; payload AST-identical; 600/600 bodies identical; dry-run GO 1,222 of 1,248)"
+    },
+    {
+      "date": "2026-09-24",
+      "file": "docs/reviews/READY_canary_epoch2_rung.md",
+      "commit": "613da05",
+      "verdict": "READY-WITH-CONDITIONS for lf16 32236c62be50038c (ceiling 1,260 only; payload AST-unchanged; resume 1,246 + 6 = 1,252 of 1,260); ONE resume; no third amendment: out of room -> close with 297, rung INVALID, C2 UNDETERMINED BY VALIDITY"
+    }
+  ],
+  "amendments": [
+    {
+      "date": "2026-09-24",
+      "record": "docs/judge_v2_program.md L15764-L15770",
+      "text": "CANARY-EPOCH2-RUNG-CEILING-1 (author's decision, plan Amendment 16): EPOCH2_CEILING 1,200 -> 1,248 (22 HTTP 429 retries in pass 3: 622 vs 600); budget only; short delta READY; fallback --analyze-epoch2 --no-rung (C2 UNDETERMINED)."
+    },
+    {
+      "date": "2026-09-24",
+      "record": "docs/judge_v2_program.md L15779-L15786",
+      "text": "P6 ruling: P6 scored on the cached verdict-bearing calls (2 x 600 vs the registered 1,200), not calls posted; the outcome prints both in the ruled form; errored calls are not unusable verdicts. E1: 26 calls of retry room; no further ceiling raise without a new amendment."
+    },
+    {
+      "date": "2026-09-24",
+      "record": "docs/judge_v2_program.md L15843-L15848",
+      "text": "CANARY-EPOCH2-RUNG-CEILING-2 (author's decision, plan Amendment 17): EPOCH2_CEILING 1,248 -> 1,260 (20 HTTP 429 retries in pass 4; 1,246 posted; 297 / 300, missing 8720, 879, 9136); budget only; short delta READY."
+    }
+  ],
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Re-judges a frozen set of 300 matches about two days later and again in the same session (1,200 calls). It counts how often the judge's verdict changes.",
+    "why": "It checks whether the judge drifts over time beyond its normal retest noise, which would undermine every comparison made with it.",
+    "information": "A disagreement rate above 0.138 would raise the drift alarm and flag later judged numbers for re-reading. Result: no alarm. Verdicts changed on 7% of matches after about two days and on 9.3% within the same session, with no time trend. At this resolution the canary measures retest noise and finds no drift. Drift smaller than about 4.5 points cannot be ruled out. The frozen match set comes from the older question pool, which was later ruled history rather than evidence.",
+    "written": "2026-10-07"
+  }
+}

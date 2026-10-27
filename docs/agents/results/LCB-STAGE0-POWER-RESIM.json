@@ -1,0 +1,202 @@
+{
+  "id": "LCB-STAGE0-POWER-RESIM",
+  "title": "LCB-STAGE0-POWER-RESIM: G1's power at the MEASURED LCB stage-0 design (plug-in null on the real TRAIN data, iid interaction on the real K = 3 regions, 400 worlds per tau in {0, 0.15, 0.20, 0.25, 0.30}); licenses or replaces the STOP sentence's power words (zero calls; DONE, VALID: C1 FAILED, F1 FIRES)",
+  "question": "At the measured design of LCB-STAGE0-INTERACTION, what is G1's power at tau 0.15 / 0.20 / 0.25 / 0.30 logit SD, and does the STOP sentence's 'about >= 0.2 logit SD ... (80% power)' hold?",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "the commit that writes this record (parent c09c0ac)",
+    "program_lines": "docs/judge_v2_program.md L22208-L22228",
+    "program_lines_as_of": "the commit that writes them, parent c09c0ac, re-grepped",
+    "date": "2026-09-30",
+    "heading": "## Registered 2026-09-30 (before any code or call) — LCB-STAGE0-POWER-RESIM: at the MEASURED design of LCB-STAGE0-INTERACTION ...",
+    "queued": "2026-09-25 (the FOLLOW-UP QUEUED line of the LCB-STAGE0-INTERACTION outcome, L19796, now bracketed REGISTERED)"
+  },
+  "script": {
+    "path": "tools/analysis/lcb_power_resim.py",
+    "sha16": "blob:8622ff95661f35214791752b9469088aca090432 / sha256-lf16:25da71cdec382bef (LF of record; worktree LF; READY_backfill '## Pins')",
+    "commit": "35e5cce (merged by path 2f080e0)"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_backfill_2026-09-30.md",
+    "commit": "b938c14",
+    "at": "35e5cce (merged by path 2f080e0)",
+    "verdict": "READY under C-LR-1..4 (C-LR-1 tag-root lcb-build-2 clean; C-LR-2 --run only if dry-run rc 0 AND projected wall x 1.5 <= 60 min; C-LR-3 test gap LOW; C-LR-4 one heavy process)",
+    "source": "READY_backfill_2026-09-30.md '## VERDICT' and '## Defects and conditions'"
+  },
+  "go": "n/a (0 calls, 0 cce; no author decision)",
+  "run": {
+    "outcome_file": "experiment_results/lcb_stage0/power_resim/lcb_power_resim_outcome.txt (blob:fdb1637624439bea7a4a03c01b3b2533bbf1953e, LF of record, 0 CR)",
+    "outcome_commit": "b880c44",
+    "calls": 0,
+    "cce": 0,
+    "pool": "none (TRAIN of the LCB outcome of record, tag 3bcc9ab; EVAL never opened)",
+    "date": "2026-10-01",
+    "script": "lcb_power_resim.py blob:8622ff95661f35214791752b9469088aca090432; 50 s at 20 processes"
+  },
+  "review": {
+    "file": "docs/reviews/POSTRUN_gold_slotswap_lcb.md",
+    "commit": "207d800e",
+    "verdict": "VALID: C0 PASS; C1 FAILED; F1 FIRES; under W-L1, W-L2; L1-L4 reproduced; LOW defect LR-P1 (disclose only)"
+  },
+  "criteria": [
+    {
+      "id": "C0",
+      "text": "VALIDITY (VOIDS): identity gate reproduces T 96.689, p_T 0.0300 exactly; size at tau 0 <= 12 of 400; fit refusals > 20 of 400 at any tau VOID that tau",
+      "result": "HELD",
+      "value": "PASS: identity REPRODUCED; size at tau 0 = 3 of 400 (bar <= 12); fit refusals 0 at every tau (reviewed 207d800e)",
+      "denominator": "400 worlds per tau"
+    },
+    {
+      "id": "C1",
+      "text": "THE POWER WORDS (the INTERVAL decides): power(0.20) = share of 400 worlds with p_T <= 0.01, Wilson 95%: HELD iff lower >= 0.80 (>= 336 of 400); FAILED iff upper < 0.80 (<= 304 of 400); UNDETERMINED otherwise",
+      "result": "FAILED",
+      "value": "power(0.20) 0.2225 (89 of 400), Wilson 95% [0.1845, 0.2658] < 0.80 (the interval decides; reviewed 207d800e); robustness (review): all 58 borderline worlds rejecting would give 147 of 400 < 304",
+      "denominator": "400 independent tau-0.20 worlds (DEFF 1.0 by construction)"
+    },
+    {
+      "id": "C2",
+      "text": "tau80 (DESCRIPTIVE): smallest grid tau with Wilson lower >= 0.80 ('> 0.30' if none); power and interval at every tau; mean true-10pp-reversal pair count at tau80",
+      "result": "n/a",
+      "value": "DESCRIPTIVE: tau80 > 0.30; power 0.0075 [0.0026, 0.0218] / 0.0600 [0.0406, 0.0877] / 0.2225 [0.1845, 0.2658] / 0.3800 [0.3338, 0.4285] / 0.6600 [0.6123, 0.7047] at tau 0 / 0.15 / 0.20 / 0.25 / 0.30; mean true 10pp-reversal pairs 0.00-0.01",
+      "denominator": "400 worlds per tau"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "power(0.20) = 0.70 (80% [0.50, 0.88])",
+      "result": "FAILED",
+      "value": "0.2225 outside [0.50, 0.88] (outcome b880c44; reviewed 207d800e)",
+      "denominator": ""
+    },
+    {
+      "id": "P2",
+      "text": "power(0.15) = 0.42 (80% [0.22, 0.62])",
+      "result": "FAILED",
+      "value": "0.0600 outside [0.22, 0.62] (outcome b880c44; reviewed 207d800e)",
+      "denominator": ""
+    },
+    {
+      "id": "P3",
+      "text": "power(0.25) = 0.88 (80% [0.72, 0.97])",
+      "result": "FAILED",
+      "value": "0.3800 outside [0.72, 0.97] (outcome b880c44; reviewed 207d800e)",
+      "denominator": ""
+    },
+    {
+      "id": "P4",
+      "text": "size at tau 0 = 0.010 (80% [0.003, 0.025])",
+      "result": "HELD",
+      "value": "0.0075 in [0.003, 0.025] (outcome b880c44; reviewed 207d800e)",
+      "denominator": ""
+    },
+    {
+      "id": "P5",
+      "text": "C1: HELD 0.25, FAILED 0.45, UNDETERMINED 0.30",
+      "result": "HELD",
+      "value": "C1 FAILED (the event given p 0.45 occurred; modal category) (outcome b880c44; reviewed 207d800e)",
+      "denominator": ""
+    },
+    {
+      "id": "P6",
+      "text": "tau80 = 0.25 with 0.45 (0.20: 0.25; 0.30: 0.20; > 0.30: 0.10)",
+      "result": "FAILED",
+      "value": "tau80 > 0.30 (p 0.10), not 0.25 (outcome b880c44; reviewed 207d800e)",
+      "denominator": ""
+    }
+  ],
+  "falsifier": {
+    "text": "F1 fires iff C1 FAILED: overturns the STOP sentence's power clause ('about >= 0.2 logit SD ... (80% power of G1 on the synthetic calibration at the real roster, K = 3-4), i.e. fewer than about 2-7 model pairs with a true 10pp reversal'), re-bracketed with tau80; never the STOP, G1's FAIL, LCB's F1 or the closed line. [OUTCOME 2026-10-01: F1 (fires iff C1 FAILED): FIRED; the STOP sentence's power clause re-bracketed 'tau80 > 0.30'; the STOP, G1's FAIL, LCB's F1 and the closed line stand; post-run review owed] [REVIEWED 2026-10-01 (207d800e): F1 FIRED, VALID; W-L1 power words; W-L2 the '2-7 model pairs' clause VOID]",
+    "fired": true
+  },
+  "numbers_of_record": {
+    "measured_design": "548 informative TRAIN x 26 models; DEFF 1.011; v median pair 0.1834, single-contrast class 0.1765 (synthetic 0.0675); regions informative 238 / 208 / 102; by format 235+3 / 206+2 / 101+1 (post-run review f222c28)",
+    "stated_power": "G1 alone 0.91-0.99 at tau 0.20, 0.55-0.75 at tau 0.15; GO 0.57-0.85 at tau 0.20 (synthetic; the build ruling)",
+    "power_0.20": "0.2225 (89 of 400), Wilson 95% [0.1845, 0.2658] (reviewed 207d800e)",
+    "tau80": "> 0.30 (power 0.6600 [0.6123, 0.7047] at 0.30; reviewed 207d800e)",
+    "size_tau0": "0.0075 (3 of 400), Wilson [0.0026, 0.0218] (reviewed 207d800e)",
+    "mean true 10pp-reversal pairs": "0.00 at tau <= 0.25, 0.01 at 0.30; max 1 pair in any world (review W-L2): the '2-7 pairs' translation is void"
+  },
+  "sentence_of_record": "At the measured design of LCB-STAGE0-INTERACTION, G1's power is 0.22 [0.18, 0.27] at 0.20 logit SD and 0.66 [0.61, 0.70] at 0.30; tau80 > 0.30 (measured design, plug-in null, iid interactions on the fixed real regions; 400 worlds per tau). [C1 FAILED, F1 FIRES: the STOP sentence's power clause is re-bracketed; G1's FAIL is uninformative about interactions up to at least 0.30 logit SD; 'no interaction' is never written; the 'fewer than about 2-7 model pairs with a true 10pp reversal' translation is void (mean true reversal count 0.00-0.01); the STOP, G1's FAIL, LCB's F1 and the closed line stand; W-L1, W-L2, review 207d800e]",
+  "chips": [
+    "READY (b938c14; MERGED 2f080e0; C-LR-1..4); NOT RUN (zero calls) [plan]",
+    "VALID (207d800e), RUN b880c44 (0 CALLS): C0 PASS; C1 FAILED (POWER(0.20) 0.2225 [0.1845, 0.2658], 400 WORLDS); F1 FIRES: tau80 &gt; 0.30; &ldquo;2&ndash;7 REVERSAL PAIRS&rdquo; CLAUSE VOID; STOP STANDS [warn]"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-25",
+      "by": "registrar (queue entry; zero calls)",
+      "text": "QUEUED (drafted, priced, not scheduled) from the post-run review's D2 option (f222c28), at the coordinator's instruction; it can change the STOP's power words, never its verdict"
+    },
+    {
+      "date": "2026-09-30",
+      "by": "registrar (registration; zero calls)",
+      "text": "REGISTERED (drafted -> registered) on the orchestrator's brief; grid tau {0, 0.15, 0.20, 0.25, 0.30} x 400 worlds; not a pool reader; NOT beside a construction or site null; it can change the STOP's power words, never its verdict."
+    },
+    {
+      "date": "2026-10-01",
+      "by": "registrar",
+      "text": "BUILT 35e5cce; READY_backfill b938c14 READY under C-LR-1..4; merged by path 2f080e0. State registered -> READY. docs/judge_v2_program.md L22230-L22240 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data) — INTENT-TRANSFER-S0 embedding DBs pinned (f4ad285); ...\"; _as_of the commit that writes it, parent f4ad285, re-grepped)"
+    },
+    {
+      "date": "2026-10-01",
+      "by": "the registrar (the orchestrator's brief; insertion only; zero calls)",
+      "text": "OUTCOME appended UNREVIEWED (post-run review owed, batched with the next review): C0 PASS, C1 FAILED, F1 FIRES; LCB-STAGE0-INTERACTION item 3 re-bracketed 'tau80 > 0.30'. State READY -> run-unreviewed. docs/judge_v2_program.md L22281-L22290 (section \"## LCB-STAGE0-POWER-RESIM (2026-10-01, 0 calls) — run-unreviewed (post-run review OWED, batched with the next review): ...\"; _as_of the commit that writes it, parent e7348f3, re-grepped)"
+    },
+    {
+      "date": "2026-10-01",
+      "by": "the registrar (post-run review 207d800e; insertion only)",
+      "text": "REVIEWED: VALID; C0 PASS, C1 FAILED, F1 FIRES confirmed; W-L1 power words of record; W-L2 the '2-7 reversal pairs' clause void, bracketed into LCB-STAGE0-INTERACTION item 3; LR-P1 LOW disclosed. The unreviewed chip replaced. State run-unreviewed -> done. docs/judge_v2_program.md L22472-L22481 (section \"## LCB-STAGE0-POWER-RESIM (2026-10-01, 0 calls) — VALID (post-run review docs/reviews/POSTRUN_gold_slotswap_lcb.md, 207d800e): C0 ...\"; _as_of the commit that writes it, parent 12ceb48c, re-grepped)"
+    }
+  ],
+  "does_not_show": [
+    "power under the two-group structure (not run; C1 conservative for it)",
+    "the true power (the plug-in null is fitted on the same TRAIN data)",
+    "anything about EVAL, GATE, other rosters, trees or corpora",
+    "that there is no interaction (never written)",
+    "power at any other region structure",
+    "a reopening of the LCB judged stage"
+  ],
+  "ledger": {
+    "row_id": "LCB-STAGE0-POWER-RESIM",
+    "version": "v324 (2026-10-01: reviewed outcome bracket; chip replaced, VALID 207d800e) | v321 (2026-10-01: outcome bracket and chip, unreviewed) | v320 (2026-10-01: bracket and chip, registrar's record) | v319 (2026-09-30: new row, PLAN chip) | before: named in the LCB-STAGE0-INTERACTION bracket at v282"
+  },
+  "depends_on": [
+    "LCB-STAGE0-INTERACTION (done)"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing; reopens nothing (a power statement, not a re-test)"
+  },
+  "cost": {
+    "calls_expected": 0,
+    "cce_expected": 0,
+    "calls_max": 0,
+    "cce_max": 0,
+    "machine": "2,000 worlds at <= ~10 s each (the analysis of record's whole run took 10 s): <= 5.6 CPU-h on one core, ~17 min at 20 processes (unsourced per world; a 10-world dry run prints it; the operator refuses a projected wall > 60 min); supersedes the provisional 3 tau x 400 price",
+    "agent": "research-lead / arena-specialist ~1 h (registration) + builder ~1-2 h (reusing the build ruling's calibration harness) + a READY",
+    "source": "registrar's estimate from the measured analysis wall time; the experiment-manager's to confirm with the cost-estimator"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L22208-L22228 (section \"## Registered 2026-09-30 (before any code or call) — LCB-STAGE0-POWER-RESIM: at the MEASURED design of LCB-STAGE0-INTERACTION ...\"; _as_of the commit that writes it, parent c09c0ac, re-grepped)",
+    "docs/judge_v2_program.md L22172-L22180 (section \"## Registrar's record 2026-09-30 (insertion only; zero calls; nothing run; pre-data) — the author's 15-hour request and the schedule's research checkpoints A/B/C (c09c0ac); ...\"; _as_of the commit that writes it, parent c09c0ac, re-grepped)",
+    "docs/judge_v2_program.md L19732-L19800 (section \"## LCB-STAGE0-INTERACTION (2026-09-25, 0 calls; outcome 3bcc9ab on branch lcb-build-2, post-run review f222c28) — VALID; STOP AS REGISTERED ...\"; _as_of the commit that writes it, parent ab8aee9, re-grepped)",
+    "docs/reviews/POSTRUN_lcb_stage0.md at f222c28 (blob:6cf6b01f8db8bd8ff5eeb375ee1bf2e82f4282a4; file bytes LF, equal): D2, Q6",
+    "docs/judge_v2_program.md L22230-L22240 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data) — INTENT-TRANSFER-S0 embedding DBs pinned (f4ad285); ...\"; _as_of the commit that writes it, parent f4ad285, re-grepped)",
+    "docs/judge_v2_program.md L22281-L22290 (section \"## LCB-STAGE0-POWER-RESIM (2026-10-01, 0 calls) — run-unreviewed (post-run review OWED, batched with the next review): ...\"; _as_of the commit that writes it, parent e7348f3, re-grepped)",
+    "docs/reviews/POSTRUN_gold_slotswap_lcb.md (207d800e)",
+    "docs/judge_v2_program.md L22472-L22481 (section \"## LCB-STAGE0-POWER-RESIM (2026-10-01, 0 calls) — VALID (post-run review docs/reviews/POSTRUN_gold_slotswap_lcb.md, 207d800e): C0 ...\"; _as_of the commit that writes it, parent 12ceb48c, re-grepped)"
+  ],
+  "last_update": "2026-09-30 (registrar: E1-ROUTE and LCB-STAGE0-POWER-RESIM registered; F-E1 added pre-data; EVAL-METRIC-DETERMINISM registration found complete; the author's 15h request and checkpoints A/B/C (plan Amendment 30); ledger v319); 2026-10-01 (registrar: READY_backfill b938c14 READY under C-LR-1..4; merged 2f080e0; state READY; ledger v320); 2026-10-01 (registrar: outcome b880c44 recorded unreviewed; state run-unreviewed; ledger v321); 2026-10-01 (registrar: VALID by 207d800e; done; ledger v324)",
+  "support": "(a) 400 independent worlds at tau 0.20, Kish 1; (b) DEFF 1.0 declared by construction (MC p-value SE 0.0022 at the bar, B 2,000); (c) n_eff 400; (d) SE sqrt(0.80 x 0.20 / 400) = 0.020; (e) MDE80 2.80 x 0.020 = 0.056; (f) |0.70 - 0.80| = 0.10 > 0.056: C1 SCOREABLE, C2 DESCRIPTIVE-ONLY; (g) reachable; power is under the plug-in null with iid interactions on the fixed real regions (qualifier carried)",
+  "plain_description": {
+    "sq": "SQ1 Use",
+    "what": "Simulation (no calls) on the real LiveCodeBench stage-0 design: if model rankings truly differed between regions by a given amount, how often would the test have detected it?",
+    "why": "An earlier test found no region-dependent ranking and stopped; this checks whether that test was strong enough for its 'no effect' to mean anything.",
+    "information": "High power would make the earlier null informative; low power makes it uninformative. Result: done; power was only 22% at 0.20 and 66% at 0.30 logit SD, so the earlier null says nothing about effects up to at least 0.30; the stop decision stands but 'no interaction' must never be written.",
+    "written": "2026-10-07"
+  }
+}

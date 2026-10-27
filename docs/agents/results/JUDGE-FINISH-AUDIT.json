@@ -1,0 +1,110 @@
+{
+  "id": "JUDGE-FINISH-AUDIT",
+  "title": "JUDGE-FINISH-AUDIT: FRAMEWORK item 19 / process rule 10: which caches of record can tell NON_TERMINATED from wrong, and does the shared judge module carry provenance? (zero calls)",
+  "question": "Route every judge call through the _full path; count finish_reason == length and unparsed verdicts per cell on the existing caches (58 caches, 64 verdict-like tables, 158,268 rows, opened immutable); make rejudge_reasoning.call_judge_full return the provider response id and turn an HTTP 400 content-filter refusal into an empty content with finish_reason content_filter. The per-model max_tokens probe (50 calls per judge model) is a separate launch, not run here.",
+  "kind": "engineering",
+  "state": "done",
+  "registration": {
+    "commit": "eaf1dbf",
+    "program_lines": "registered BY REFERENCE at docs/judge_v2_program.md (lines as of 5dc8a06) L3603-L3611 (eaf1dbf, 2026-09-15: the 26 FRAMEWORK tests, docs/design/FRAMEWORK.md 'Tests to register before shipping' at 8d77f7b); FRAMEWORK L372 item 19 ('Criterion: no cell above 5%. 0 calls on caches; the probe is 50 calls per judge model'); docs/plan_2026-09-15.md L34 / L61 (item 19's judge-call routing as Block 4 engineering); the landed record is the commit 2976bc4 message and the ledger row; NO dedicated programme section exists (see inconsistencies)",
+    "date": "2026-09-15",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-15 (before any run) — BY REFERENCE: the 26 tests in docs/design/FRAMEWORK.md \"Tests to register before shipping\" (commit 8d77f7b), with the criteria, predictions and call counts stated there, schedu",
+    "outcome_heading": null
+  },
+  "script": {
+    "path": "tools/analysis/judge_finish_audit.py (with rejudge_reasoning.py's call_judge_full change)",
+    "sha16": "7a22368a8b8579bd",
+    "commit": "2976bc4"
+  },
+  "ready": null,
+  "go": "n/a (0 calls on caches; the 50-call probe not launched)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/judge_finish_audit.txt",
+    "outcome_commit": "2976bc4",
+    "calls": 0,
+    "cce": 0,
+    "pool": "n/a (an audit over every verdict cache under experiment_results, opened immutable)",
+    "date": "2026-09-16",
+    "other_files": [
+      "tools/analysis/rejudge_reasoning.py (call_judge_full: response id in the message dict; content-filter 400 -> empty content, finish_reason content_filter; other HTTP errors still raised; tuple arity unchanged)",
+      "monkeypatch tests for the refusal, other-400, 429 and 200 paths"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); 'checked by an independent agent' (ledger design cell) is the check of record",
+    "commit": "2976bc4",
+    "verdict": "51 of 58 caches cannot distinguish NON_TERMINATED from wrong; module fixed, provenance forward"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "registered audit readout: per cache finish_reason, invalid, empty-content, max_tokens and response-id availability (FRAMEWORK item 19's 'no cell above 5%' is read where finish_reason exists)",
+      "result": "DELIVERED",
+      "value": "finish_reason present in 7 of 58 caches (13,536 rows, 8.6% of rows: the two Kimi 32k solves, canary, escalation, newcomer, no-rubric, GROK-CALIB); pooled finish over those stop 24,286 / length 73 / blank 1 / content_filter 1; max_tokens recorded in 5 of 58; provider response id in 0 of 58; raw text in 56 of 58 (rubric_contrast and rubric_swap without); every board of record (x12 MAIN, x20, R2, R3 and the whole rubric line) is in the 51 whose 'invalid' rows and empty raw text are the only truncation proxies (the limit FRAMEWORK rule 10 states)",
+      "denominator": "58 caches, 64 verdict-like tables, 158,268 rows"
+    },
+    {
+      "id": "C2",
+      "text": "the shared judge module carries provenance forward: response id returned; content-filter refusals cached as unusable rows instead of vanishing",
+      "result": "HELD",
+      "value": "rejudge_reasoning.call_judge_full returns the provider response id in its message dict and turns an HTTP 400 content-filter refusal into empty content with finish_reason content_filter; every caller compiles; the four Block 2 scripts' local wrappers stay as harmless no-ops",
+      "denominator": "the module and its callers"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none registered (an audit plus a module fix; FRAMEWORK item 19's 5% criterion applies per cell where finish_reason exists)",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "audit": "58 caches / 64 tables / 158,268 rows; finish_reason in 7 of 58 (13,536 rows, 8.6%); pooled finish stop 24,286 / length 73 / blank 1 / content_filter 1; max_tokens in 5 of 58; response id in 0 of 58; raw text in 56 of 58",
+    "consequence": "refusals are cached as unusable rows instead of vanishing (the class that lost 4389 and 6528 in ARENA-V2 and stalled a newcomer step on 2026-09-16); CONTEXT rule 9 / 10 lineage"
+  },
+  "sentence_of_record": "JUDGE-FINISH-AUDIT (2026-09-16, zero calls): 51 of 58 caches cannot distinguish NON_TERMINATED from wrong; finish_reason is present in 7 of 58 (13,536 rows, 8.6%: the two Kimi 32k solves, canary, escalation, newcomer, no-rubric, GROK-CALIB), max_tokens in 5, a provider response id in 0, raw text in 56. Every board of record is in the 51: their 'invalid' rows and empty raw text are the only truncation proxies, which is the limit FRAMEWORK rule 10 states. Forward: rejudge_reasoning.call_judge_full returns the provider response id and caches a content-filter 400 as an unusable row with finish_reason content_filter, never re-posted.",
+  "chips": [
+    "51 OF 58 CACHES CANNOT DISTINGUISH NON_TERMINATED FROM WRONG",
+    "MODULE FIXED, PROVENANCE FORWARD"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: fixture pointer (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM pointer 2026-09-27: ENGINEERING FIXTURE use (voice 4 of the ruling): the code-reproduction / byte-identity verdict stands as a fixture; the judged agreement numbers on its family caches are p2dca judged family — history, not evidence (RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "the per-model max_tokens probe (50 calls per judge model; a separate launch, not run)",
+    "a per-cell finish_reason == length rate on the 51 caches without the column"
+  ],
+  "ledger": {
+    "row_id": "JUDGE-FINISH-AUDIT",
+    "version": "v105 (eece8b0); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "ARENA-V2",
+    "REF-QUAL-KIMI",
+    "CANARY-BASELINE",
+    "GROK-CALIB"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md (lines as of 5dc8a06) L3603-L3611 (by-reference registration eaf1dbf); docs/design/FRAMEWORK.md L372 item 19; docs/plan_2026-09-15.md L34 / L61",
+    "experiment_results/x12_crossdomain/judge_finish_audit.txt (2976bc4): the audit header and per-cache table (every number above)",
+    "commit 2976bc4 message ('JUDGE-FINISH-AUDIT: refusals handled ...'): the module change",
+    "docs/test_ledger.html row JUDGE-FINISH-AUDIT (v105 eece8b0): chips verbatim, design and observed cells, evidence (judge_finish_audit.py, rejudge_reasoning.py, the outcome file, 2976bc4)",
+    "script sha16 = sha256 of tools/analysis/judge_finish_audit.py at 2976bc4 (its only commit), first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' lines (grep -n them regardless of line drift); line numbers are as of programme HEAD 5dc8a06",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "Engineering/infrastructure",
+    "what": "Checks 58 stored judge-verdict caches (about 158,000 rows) for whether they record why a judge answer ended: finished normally, cut off by the length limit, or blocked by a content filter. It also fixes the shared judge-call code to keep provider IDs and store refusals. No judge calls.",
+    "why": "A cut-off judge answer can look like a wrong verdict. The thesis needs to know whether its stored results can tell the two apart.",
+    "information": "This shows which results can be checked for truncation, and it prevents silent data loss in future runs. Result: only 7 of 58 caches record the finish reason. All main boards are among the 51 that cannot tell a cut-off from a wrong answer, apart from crude proxies. Future calls now record provider IDs and store refusals as unusable rows. The per-model length probe was not run.",
+    "written": "2026-10-07"
+  }
+}

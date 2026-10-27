@@ -1,0 +1,130 @@
+{
+  "id": "POSITION-DECOMP",
+  "title": "POSITION-DECOMP: how much of the ARENA-13 over-ranking is the slot the model sat in? (596 calls)",
+  "question": "ARENA-13 arm A's 600 frontier matches re-judged with the OPPONENT presented first, same judge, ensemble reference, rubric and mechanics; the 299 byte-identical-prompt matches carry DECOMP's 5.7% noise floor, so position = flip - noise on the same questions; (1) position above the noise floor; (2) paired direction; (3) dual-order board; (4) amendment rule: theta below gemini's => attribute (1) to single order.",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "1dbb895",
+    "program_lines": "docs/judge_v2_program.md L1404-L1427 (registration) and L1503-L1530 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-14 (before any call) — POSITION-DECOMP: how much of ARENA-13 (1) is the slot the model sat in?",
+    "outcome_heading": [
+      "L1503: - **POSITION-DECOMP OUTCOME (2026-09-14): position is real, systematic and worth 13.5pp, and it accounts for"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "tools/analysis/position_decomp.py",
+    "sha16": "95bf53ed6a3aceb2 (at 9cc9853)",
+    "commit": "9cc9853"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (596 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/positiondecomp_outcome.txt",
+    "outcome_commit": "9cc9853",
+    "calls": 596,
+    "cce": "not stated",
+    "pool": "ARENA-13 arm A's 600 frontier matches",
+    "date": "2026-09-14"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); POSITION-FULL (2026-09-14) refuted the unregistered sensitivity (5) (imputation wrong by 7x)",
+    "commit": "18bcc5f",
+    "verdict": "(1) (2) MEASURED (position 0.067 above the 0.057 floor; -13.5pp direction); (4) FAILS BY 0.087; practical rule: incremental extension must be DUAL ORDER"
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "position above the noise floor",
+      "result": "HELD",
+      "value": "flip between orders 0.124, test-retest noise 0.057, position 0.067 [+0.030, +0.107]: the 13.9% flip rate quoted since FLIP-PROV is about 6pp position on 6pp stochasticity; over all 600 the flip rate is 0.182",
+      "denominator": "299 byte-identical matches; 600 frontier"
+    },
+    {
+      "id": "(2)",
+      "text": "paired direction",
+      "result": "HELD",
+      "value": "the new contestant wins 0.695 presented FIRST vs 0.560 SECOND, -13.5pp, 91 of 101 discordant matches flipping the same way, p = 1.7e-17",
+      "denominator": "101 discordant of 600"
+    },
+    {
+      "id": "(3)",
+      "text": "dual-order board",
+      "result": "DELIVERED",
+      "value": "its lead over gemini falls +0.301 -> +0.087 theta (71% position) but it still places 1st",
+      "denominator": "13-model board"
+    },
+    {
+      "id": "(4)",
+      "text": "theta below gemini's => attribute (1) to single order",
+      "result": "FAILED",
+      "value": "still 1st by +0.087: a FAIL of my own criterion",
+      "denominator": "board"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none beyond the criteria",
+    "fired": false,
+    "note": "(5) SENSITIVITY, unregistered, REFUTED by POSITION-FULL: imputing reversed verdicts for the 1,200 cross-tier matches put the newcomer 2nd in 100% of 200 draws (median gap -0.326); the measured gap is +0.045; right sign, wrong size by 7x"
+  },
+  "numbers_of_record": {
+    "position": "flip 0.124; noise 0.057; position 0.067 [+0.030, +0.107]; all-600 flip 0.182",
+    "direction": "0.695 first vs 0.560 second, -13.5pp, 91/101, p 1.7e-17",
+    "gap": "+0.301 -> +0.087 theta (71% position)",
+    "imputation": "forecast -0.326 / 2nd in 100% of draws; realised +0.045"
+  },
+  "sentence_of_record": "POSITION-DECOMP (2026-09-14, 596 calls): the first clean separation: flip between orders 0.124, test-retest noise 0.057, position 0.067 [+0.030, +0.107], so the 13.9% flip rate quoted since FLIP-PROV is about 6pp position on 6pp stochasticity; directional: the new contestant wins 0.695 presented FIRST vs 0.560 SECOND (-13.5pp, 91 of 101 discordant matches, p = 1.7e-17); its lead over gemini falls +0.301 -> +0.087 theta (71% position) but it still places 1st, so (4) FAILS by 0.087; the unregistered imputation (5) was refuted by POSITION-FULL (right sign, wrong size by 7x). Practical rule regardless: incremental arena extension must be DUAL ORDER; the single-order economy that kept ARENA-13 at 1,800 calls was false.",
+  "chips": [
+    "(1)(2) MEASURED",
+    "(4) FAILS BY 0.087"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-14",
+      "by": "POSITION-FULL",
+      "text": "the (5) imputation forecast -0.326 and 2nd place in 100% of draws; realised +0.045: right sign, wrong size by 7x, because transition rates vary with contestedness; report such forecasts as sign-only."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a newcomer below gemini after balancing the frontier (still 1st by +0.087; PLACEBO-ENTRY: unresolved)",
+    "a calibrated imputation for cross-tier matches"
+  ],
+  "ledger": {
+    "row_id": "POSITION-DECOMP",
+    "version": "v70 (9cc9853); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "ARENA-13",
+    "DECOMP",
+    "FLIP-PROV",
+    "POSITION-FULL",
+    "PLACEBO-ENTRY"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L1404-L1427 and L1503-L1530 (1dbb895 / 9cc9853)",
+    "experiment_results/x12_crossdomain/positiondecomp_outcome.txt (9cc9853)",
+    "docs/test_ledger.html row POSITION-DECOMP (v70): chips verbatim, observed cell, evidence",
+    "script sha16 = sha256 of tools/analysis/position_decomp.py at 9cc9853, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Re-judges 600 frontier matches with the two answers in swapped order. It uses repeats of identical prompts to separate how much verdict flipping is due to answer position and how much is plain judge noise. Uses 596 judge calls.",
+    "why": "A new model seemed over-ranked in an earlier arena, and the question was whether presentation order (position bias) caused it.",
+    "information": "Position bias above noise would mean arenas must judge both orders. Result: about half the 12% flip rate is position (about 7 points) and half is noise (about 6 points). The newcomer wins 70% when shown first vs 56% when shown second. Its lead shrinks a lot but it still ranks first. Practical rule: new arena extensions must judge both orders. Ruled history rather than evidence (older question pool).",
+    "written": "2026-10-07"
+  }
+}

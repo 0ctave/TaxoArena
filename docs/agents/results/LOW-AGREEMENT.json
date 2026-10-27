@@ -1,0 +1,141 @@
+{
+  "id": "LOW-AGREEMENT",
+  "title": "LOW-AGREEMENT: what predicts the errors the fitted budget is blind to? (zero calls)",
+  "question": "SYSTEMATIC-BUDGET leaves three wrong calls standing out of fold; the registration read them as LOW agreement. Split the 891 edges at the median agreement and, within the low half, compare wrong-direction against correct edges on every predictor available WITHOUT the key at inference (bootstrap SD, |m|, raw confidence, support, cell tie rate, cell disagreement rate, mean absolute trace-length difference); a predictor works if its CI excludes zero AND it survives a logistic already containing agreement.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "81bfdab",
+    "program_lines": "docs/judge_v2_program.md L2763-L2789",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-14 (before any run, ZERO calls) — LOW-AGREEMENT: what predicts the errors the budget is blind to?",
+    "outcome_heading": [
+      "L2829: - **LOW-AGREEMENT (2026-09-14, zero calls): my registered PREMISE was wrong, and correcting it vindicates the ...** (first run; predictor substituted, C-7)",
+      "L3099: ## REVIEW of the 2026-09-14/15 session (2026-09-15, zero calls) — three headline conclusions are artefacts",
+      "L3215: - **LOW-AGREEMENT, CORRECTED (2026-09-15, zero calls): the registered predictor FAILED and the reported one was the label in disguise. The budget's shape survives on established labels; the top-band drama does not.**"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "tools/analysis/low_agreement.py",
+    "sha16": "e6f799d9834000b7 (at the first-run commit 2b583e3; corrected rerun 4ec8f18)",
+    "commit": "2b583e3 (rerun 4ec8f18; later 13f2142)"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/low_agreement.txt",
+    "outcome_commit": "010713b",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-14 / corrected 2026-09-15"
+  },
+  "review": {
+    "file": "docs/review_session_2026-09-14.md (ba12200; programme L3099): LOW-AGREEMENT 'reported a SUBSTITUTED predictor as the registered prediction holding, and its effect is the label's sign' (C-7); corrected rerun with a key-anchored predictor and McNemar counts at 010713b",
+    "commit": "ba12200",
+    "verdict": "the registered predictor FAILED; the reported one was the label in disguise; DESCRIPTIVE on six events; the budget's shape survives on established labels"
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "PRIMARY: a predictor works if the wrong-minus-correct difference on LOW-agreement edges has a bootstrap CI excluding zero AND survives a logistic already containing agreement",
+      "result": "FAILED",
+      "value": "|length difference| (the REGISTERED predictor) -0.127 [-0.354, +0.088] FAILED; 'length advantage of the ARENA's pick' -0.799 [-0.995, -0.581] is NOT A PREDICTOR (it equals +len_key on right edges and -len_key on wrong ones: its sign IS the label); length advantage of the KEY's pick -0.122 [-0.334, +0.081] null (logistic z -0.7); what survives conditioning on agreement is |mean theta gap| (z -2.9), raw confidence (z -4.8) and marginally the cell tie rate (z +1.8), the first two being what the certificate already thresholds on",
+      "denominator": "the low-agreement half of 891 edges: 6 wrong (4 established)"
+    },
+    {
+      "id": "(2)",
+      "text": "what a two-channel budget would do to the three surviving wrong calls",
+      "result": "n/a",
+      "value": "no second channel is supported (no predictor passed (1)); the premise itself was wrong: the three survivors (0.475, 0.476, 0.605) are ABOVE the 891-edge median agreement 0.441, low only relative to arx/iask at 0.880",
+      "denominator": "n/a"
+    },
+    {
+      "id": "(3)",
+      "text": "the count of wrong edges in the low-agreement half",
+      "result": "DELIVERED",
+      "value": "6 wrong, 4 established (high half 38, 22); wrong rate by agreement band all(established): 0.00-0.35 5(3) of 328 = 1.5% / 0.9%; 0.35-0.45 1(1) of 129; 0.45-0.55 4(3) of 137; 0.55-0.65 2(1) of 109; 0.65-0.80 12(10) of 120 = 10.0% / 8.3%; 0.80-1.00 20(8) of 68 = 29.4% / 11.8%: on established labels the rate still rises with agreement, so widening with agreement remains the right shape; the '29.4% top band' is 11.8% once the 12 key-indeterminate pairs are removed",
+      "denominator": "891 edges by agreement band"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "trace-length difference is the one that works",
+      "result": "FAILED",
+      "value": "-0.127 [-0.354, +0.088]",
+      "denominator": "low half, 6 events"
+    },
+    {
+      "id": "P2",
+      "text": "roughly 20 wrong edges in the low-agreement half (thin; a null must be reported UNDERPOWERED)",
+      "result": "FAILED",
+      "value": "6 wrong (4 established): thinner than predicted; DESCRIPTIVE",
+      "denominator": "low half"
+    }
+  ],
+  "falsifier": {
+    "text": "none registered beyond (1)-(3)",
+    "fired": false,
+    "note": "the first run's mechanism sentence 'the arena is unreliable when it picks the tighter model' is withdrawn (it described the outcome coded as a predictor); DESCRIPTIVE is the only label that stands"
+  },
+  "numbers_of_record": {
+    "band_table": "0.00-0.35 5(3)/328; 0.35-0.45 1(1)/129; 0.45-0.55 4(3)/137; 0.55-0.65 2(1)/109; 0.65-0.80 12(10)/120; 0.80-1.00 20(8)/68",
+    "predictors_low_half": "|length diff| -0.127 [-0.354, +0.088]; arena-pick length advantage -0.799 [-0.995, -0.581] (= the label); key-pick length advantage -0.122 [-0.334, +0.081]",
+    "survivors_conditioned_on_agreement": "|mean theta gap| z -2.9; raw confidence z -4.8; cell tie rate z +1.8 (marginal)",
+    "premise": "the three surviving wrong calls (0.475, 0.476, 0.605) are above the median 0.441; 38 of the 44 wrong edges in the upper half"
+  },
+  "sentence_of_record": "LOW-AGREEMENT, CORRECTED (2026-09-15, zero calls): the registered predictor (|trace-length difference|) FAILED (-0.127 [-0.354, +0.088]) and the reported one ('length advantage of the arena's pick') was the label in disguise (+len_key on right edges, -len_key on wrong ones; key-anchored it is -0.122 [-0.334, +0.081], z -0.7); the registered premise was wrong (the three surviving wrong calls sit ABOVE the median agreement); on established labels the wrong rate still rises with agreement (0.9 -> 8.3 -> 11.8%), so the widener's shape stands, but the '29.4% above 0.80' was 8 established of 20. No second channel is supported, on six events: DESCRIPTIVE.",
+  "chips": [
+    "PREMISE WAS WRONG",
+    "REGISTERED PREDICTOR FAILED",
+    "REPORTED ONE WAS SUBSTITUTED (C-7)",
+    "DESCRIPTIVE (6 events)"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-15",
+      "by": "the adversarial REVIEW (ba12200) and the corrected rerun (programme L3215, 010713b; ledger v95 observed cell [CORRECTED 2026-09-15, rerun] and [CORRECTED 2026-09-15])",
+      "text": "the registration named the mean ABSOLUTE trace-length difference; it FAILED; the signed 'length advantage of the arena's pick' was added to the script after registration and is not a predictor (its sign is the label); the mechanism sentence is withdrawn; section (2) said 'three' and printed two; the 'quintiles 1-3 clean' reading holds over the 665 CALLED edges, not the 891; the 'PREDICTED CHANNEL HELD' chip and the C-7 omission corrected in the ledger."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a second widener channel (none supported on six events)",
+    "that the budget's residual errors are low-agreement errors (the premise was wrong)"
+  ],
+  "ledger": {
+    "row_id": "LOW-AGREEMENT",
+    "version": "v95 (row added v88 at 875df2c; [UNDER CORRECTION] v92; [CORRECTED 2026-09-15, rerun] v95 at 010713b); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "SYSTEMATIC-BUDGET",
+    "SYSTEMATIC-SIGNAL",
+    "FRONTIER"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L2763-L2789 (registration 81bfdab); L2829-L2862 (first run 2b583e3); L3215-L3237 (corrected rerun 010713b)",
+    "docs/review_session_2026-09-14.md (ba12200)",
+    "experiment_results/x12_crossdomain/low_agreement.txt (010713b)",
+    "docs/test_ledger.html row LOW-AGREEMENT (v88 -> v95): chips verbatim, observed cell, evidence (low_agreement.py, 81bfdab, 2b583e3)",
+    "script sha16 = sha256 of tools/analysis/low_agreement.py at 2b583e3, first 16 hex (identity, computed by the registrar 2026-09-22; the corrected rerun's script is at 4ec8f18)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (rubric_v2_design.md / multi_corpus_design.md lines as of their last commits named in sources)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "It looked at the judge's remaining errors that the fitted uncertainty budget misses. Several signals available without the answer key were tested as predictors, including trace-length difference and confidence. No calls were made.",
+    "why": "It looks for a second warning signal for when the arena's call is wrong.",
+    "information": "A working predictor would let the uncertainty margin flag more errors. Result: done, descriptive, after a correction. The registered predictor failed. A reported one turned out to be the outcome in disguise. The premise was also wrong: the errors were not low-agreement ones. No second warning channel is supported; there were only six events. Older p2dca data family: history, not evidence.",
+    "written": "2026-10-07"
+  }
+}

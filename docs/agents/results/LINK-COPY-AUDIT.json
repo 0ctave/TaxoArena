@@ -1,0 +1,85 @@
+{
+  "id": "LINK-COPY-AUDIT",
+  "title": "LINK-COPY-AUDIT: did any judged readout use the LINKED mmlu_pro row instead of the JUDGED eval row?",
+  "question": "Which judged readouts used the linked row's options or answer instead of the judged row's (D3 of 1df2cf1)?",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "6f24e04 (queued by the registrar from CONTENT-DISJOINT-SPLIT-AUDIT; a zero-call follow-up, no registered criteria)",
+    "program_lines": "docs/judge_v2_program.md L14455-L14487",
+    "date": "2026-09-23"
+  },
+  "script": {
+    "path": "the data-steward's scripts in the session scratchpad split_followups/; the reviewer's in split_followups_review/",
+    "sha16": "n/a (scratch scripts)",
+    "commit": null
+  },
+  "ready": null,
+  "go": "n/a (zero calls)",
+  "run": {
+    "outcome_file": "session scratchpad split_followups/ and the programme section L14455-L14487",
+    "outcome_commit": "8ebfa7a (the review)",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae; union paeec37aa28063c75",
+    "date": "2026-09-23"
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-23_split_followups_review.md",
+    "commit": "8ebfa7a",
+    "verdict": "RECORDABLE WITH CONDITIONS",
+    "blob": "blob:ca657708c4cbd149208eb7ad5b5a52483c31f84c"
+  },
+  "criteria": [],
+  "predictions": [],
+  "falsifier": {
+    "text": "none registered",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "verdict": "the link hazard NEVER REACHED A SCORER: the checker (answers.gt = the gpt-4o eval row's gt, 3,432 / 3,432), the Kotlin arena (eval_results row) and k_reconcile (category; 0 of 3,445 differ) read the judged row or the category",
+    "composition": "54 = 31 construction copies (= D1's 31) + 20 sentinels + 3 others; answer text differs on 19; option set on 52; letter on 43; NORM-V1 comparison (raw bytes 195 / 157)",
+    "cause": "last-writer-wins text map, ModelEvalLoader.fetchMmlProRowIdsAndSet L287-L312",
+    "low": "bare GROUP BY question_id in 5 scripts is a diagnostic only; 'ref_correct != correct on 9,123 rows' is an artefact (ref_correct = -1 by design)"
+  },
+  "sentence_of_record": "SPLIT-FOLLOWUPS (2026-09-23, zero calls; data steward, independently recomputed by the adversarial reviewer): the tree of record bareq512_s42 is snapshot 20260909_212117, which was LLM-labelled and rubric-induced. Induction withheld the pool of record by exact text, so 28 p2dca questions still had a norm-v1 twin, with its key, in a leaf's induction corpus, and 26 twin texts were in the leaf labelling prompts; route (b) therefore applies to the RUBRIC-512 family. The STACK-v2 anchor rubrics are not bareq512's: the ladder induced them from the frozen tree's centroids on 2026-09-07, and 14 norm-v1 twins of judged questions (0 exact) sit in their corpora. The link hazard never reached a scorer: the checker, the Kotlin arena and k_reconcile read the judged eval row or the category, which agrees on all 3,445, and its 54 mismatches are 31 construction copies (D1's 31), 20 sentinels and 3 others, caused by a last-writer-wins text map. The union tree and its six grafts ran no labelling and no induction.",
+  "chips": [
+    "DESCRIPTIVE"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the SPLIT-FOLLOWUPS review 8ebfa7a (insertion only, zero calls)",
+      "text": "Recorded on review 8ebfa7a (blob:ca657708c4cbd149208eb7ad5b5a52483c31f84c)."
+    }
+  ],
+  "does_not_show": [
+    "that the check is exhaustive (the scorers were spot-checked, not every script)",
+    "anything about raw-byte option identity (the comparison is norm-v1)"
+  ],
+  "ledger": {
+    "row_id": "SPLIT-FOLLOWUPS",
+    "version": "v163 (2026-09-23; one section-7 row for the three follow-ups)"
+  },
+  "depends_on": [
+    "CONTENT-DISJOINT-SPLIT-AUDIT"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing"
+  },
+  "sources": [
+    "docs/reviews/2026-09-23_split_followups_review.md (8ebfa7a, blob:ca657708c4cbd149208eb7ad5b5a52483c31f84c)",
+    "session scratchpad split_followups/ and split_followups_review/"
+  ],
+  "last_update": "2026-09-23",
+  "plain_description": {
+    "sq": "Data hygiene",
+    "what": "Audits whether any judged readout accidentally used the linked MMLU-Pro dataset row instead of the evaluation row that was actually judged. It also traces text twins into tree labelling and rubric-writing inputs. No calls.",
+    "why": "A mismatch between the judged question and the scored row would corrupt accuracy and agreement numbers.",
+    "information": "No hazard means scorers are safe. A hazard would require re-scoring. Result: done. The link hazard never reached a scorer (scorers read the judged row, which agrees on all 3,445). But the tree of record was LLM-labelled and rubric-induced, and 28 judged questions had a near-twin in a leaf's rubric-writing corpus. Scorers were spot-checked, not exhaustively.",
+    "written": "2026-10-07"
+  }
+}

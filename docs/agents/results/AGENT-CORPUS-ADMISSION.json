@@ -1,0 +1,217 @@
+{
+  "id": "AGENT-CORPUS-ADMISSION",
+  "title": "AGENT-CORPUS-ADMISSION: which agent corpus may enter the pipeline, under what rule set, and does the BFCL-Result 2025-12-16 multi_turn archive pass the zero-call pilot? (plan A10; the rule set (a)-(e) and its first application)",
+  "question": "Before any agent corpus is judged, the record needs (1) a rule set under which a corpus is ADMITTED, refused or admitted for description only, verified by command on ingested tables ((a) split, (b) checker output table, (c) termination as a class, (d) the judged artefact under a declared cap, (e) designed stratum), and (2) a first application: a zero-call pilot on the BFCL-Result 2025-12-16 multi_turn archive deciding which strata may carry JUDGED cells and which are PREDICTIVE-ONLY. The pilot judges nothing and ranks nothing.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "9cbd5ab",
+    "program_lines": "docs/judge_v2_program.md L5857-L5984 (no pre-run bracket) [re-lined 2026-09-22: batch-1 lines were read at 9c1f37b-era HEAD and shifted by +2 by later insertions]",
+    "program_lines_as_of": "6aa2a0d",
+    "heading": "## Registered 2026-09-18 (before any code or call) — AGENT-CORPUS-ADMISSION: which agent corpus may enter the pipeline, under what rule set, and does the BFCL-Result multi_turn archive pass the pilot? (zero calls; plan A10 / night schedule lane 2 and lane 5; lead docs/agents/leads/2026-09-17_judge_loop2.md §2; corpus survey docs/agents/leads/2026-09-18_agent_corpora.md §1.5)",
+    "outcome_heading": [
+      "L6938: ## AGENT-CORPUS-ADMISSION pilot (2026-09-18, zero LLM calls) — BFCL-Result 2025-12-16 multi_turn, 8 FC agents x 800 tasks = 6,400 episodes, 300-episode draw (se"
+    ],
+    "date": "2026-09-18"
+  },
+  "script": {
+    "path": "tools/analysis/agent_admission_pilot.py (the pilot; with tools/ingest/bfcl_ingest.py at 0acd8e4, sha16 7b3a9a1d2d4e8b67)",
+    "sha16": "7108cac91869dc88 (as printed in the outcome section L6935; the LF sha256 of the file at 33593af is 798c03c2d0a83887)",
+    "commit": "33593af"
+  },
+  "ready": null,
+  "go": "n/a (0 LLM calls; network ingest only; nothing judged scheduled)",
+  "run": {
+    "outcome_file": "experiment_results/agent/bfcl_admission_pilot.txt",
+    "outcome_commit": "2ccd646",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2035adddedd1becb (BFCL EVAL side, 228 ids; experiment_configs/reserved_pool_frozen_bfcl_p2035adddedd1becb.json, 2ccd646); no DB of record opened",
+    "date": "2026-09-18",
+    "other_files": [
+      "experiment_results/agent/bfcl_admission_pilot_draw.csv (300 rows, 33593af)",
+      "experiment_results/agent/bfcl_admission_pilot_labels.csv (50, 2ccd646)",
+      "experiment_results/agent/bfcl_admission_pilot_labels_TEMPLATE.csv",
+      "experiment_results/agent/bfcl_admission_pilot_run.log",
+      "experiment_results/agent/bfcl_result_2025-12-16.db (18.8 MB) and bfcl_raw/2025-12-16/ (355 MB): untracked, not ignored (the author's .gitignore call)"
+    ]
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-18_night_batch.md section AGENT-CORPUS-ADMISSION pilot",
+    "commit": "17a4434 (file last at 074eb3d)",
+    "verdict": "numbers CONFIRMED; D9 HIGH: C1 (d) scored on the wrong clause, the substantive gap is the undeclared artefact cap, C1 stays FAILED for the cap; D10: strict D_c is the terminated share on this corpus and the lone PASS-AT-POINT rests on the pre-fixed reading that counts 55/300 empty-turn failures as decided; D11: P1 FAILED on an unregistered tie-break; D12: '0 straddling' true by construction; D13 (process): DB and raw archive untracked and not ignored"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "parts (a)-(e) verified by command on the ingested tables; a part that cannot be verified is FAILED and the corpus is not admitted as-is",
+      "result": "FAILED",
+      "value": "(a) VERIFIED: 0 side mismatches of 800, 0 straddling families of 200 (true by construction, D12), 57 EVAL tasks per stratum, pool p2035adddedd1becb over 228 EVAL ids written write-once; (b) VERIFIED: checker table sha 7373a7768f474b16...bffe3cc913 over 6,400 rows, 4 checker-decided error types, 2 harness outcomes; (c) VERIFIED: bfcl_term_v1 per agent x stratum, every agent 800 (Llama-3.3-70B TERM 526 / CAP 267 / ERR 7; Qwen3-32B 764 / 13 / 23; the other six 785-799); (d) FAILED: artefact re-read for 299 of 300 drawn (1 inference_error row: an ERROR-class row of 31 / 6,400, admitted by rule (c), not a corpus defect: D9), length chars median 1,812 / p95 9,691 / max 28,798, est. tokens (chars / 4) median 453 / p95 2,422 / max 7,199, per-episode cap NOT DECLARED, fingerprint / provider / response id UNSTAMPED; (e) VERIFIED: 4 strata x 200 tasks",
+      "denominator": "8 agents x 800 tasks = 6,400 episodes; 300 drawn"
+    },
+    {
+      "id": "C2",
+      "text": "strict D_c (TERMINATED and checker-decided over ALL drawn episodes) per stratum with Wilson 95% on the 300-episode pilot, and pooled; PASS-AT-POINT (>= 0.95 at the point) or PREDICTIVE-ONLY per stratum",
+      "result": "DELIVERED",
+      "value": "base 72/75 = 0.9600 [0.8889, 0.9863] PASS-AT-POINT; miss_func 71/75 = 0.9467 [0.8707, 0.9791], miss_param 70/75 = 0.9333 [0.8532, 0.9712], long_context 70/75 = 0.9333 PREDICTIVE-ONLY; pooled 283/300 = 0.9433 [0.9111, 0.9643]; full table (descriptive) 0.9537 / 0.9481 / 0.9481 / 0.9413 over 1,600 each, 0.9478 over 6,400. READING-DEPENDENT (D10): strict D_c IS the terminated share on this corpus; 55/300 drawn episodes are empty_turn_model_response failures counted as DECIDED per the pre-fixed reading; excluded, 0.813 / 0.693 / 0.773 / 0.773 and no stratum passes; both printed",
+      "denominator": "75 drawn episodes per stratum (seed 42), 300 pooled"
+    },
+    {
+      "id": "C3",
+      "text": "cap-hit share per agent (drawn episodes) and ERROR share",
+      "result": "DELIVERED",
+      "value": "every agent 0 of its draw except DeepSeek 1/37 = 0.027 [0.00, 0.14] cap-hit and Llama-3.3-70B 15/37 = 0.405 [0.26, 0.57] cap-hit, 1/37 error, 21/37 = 0.568 terminated; per stratum cap-hit 3 / 4 / 5 / 4 of 75, error 0 / 0 / 0 / 1; pooled 16/300 = 0.053 cap, 1/300 error, terminated 283/300 = 0.943 (a readout, no bar)",
+      "denominator": "37-39 drawn episodes per agent"
+    },
+    {
+      "id": "C4",
+      "text": "the 50-row hand-label reproduction >= 0.98 (49 of 50 or better)",
+      "result": "HELD",
+      "value": "50/50 = 1.0000 [0.9286, 1.0000], disagreements none (labels written 03:18 before the pilot 03:20; weak by design: the labeller reads the same machine-written score files)",
+      "denominator": "50 hand labels, seed 42, stratified over the 4 categories"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "(lead) strict D_c < 0.95 at the point in at least 2 of the 4 strata, long_context the lowest",
+      "result": "FAILED",
+      "value": "below-bar strata 3; miss_param and long_context tie at 70/75 (an unregistered tie-break, D11); long_context IS lowest on the full table at 0.9413; under 'among the lowest' it would hold; scored as written",
+      "denominator": "4 strata x 75 drawn"
+    },
+    {
+      "id": "P2",
+      "text": "(lead, plan A10 by analogy with MATH's 12-19% cap-hit rows) the median agent's cap-hit share on its full 800 lies in [0.12, 0.19]",
+      "result": "FAILED",
+      "value": "per agent 0.0187, 0.0163, 0.0025, 0.0037, 0.0000, 0.0025, 0.0013, 0.3337; median 0.0031; bimodal: Llama-3.3-70B carries 267 of 303 CAP_HITs (an agent property, not a corpus property)",
+      "denominator": "8 agents x 800"
+    },
+    {
+      "id": "P3",
+      "text": "(lead) judged cells PREDICTIVE-ONLY on day one in at least one stratum",
+      "result": "HELD",
+      "value": "three (miss_func, miss_param, long_context)",
+      "denominator": "4 strata"
+    },
+    {
+      "id": "P4",
+      "text": "(lead) checker-built rows publishable on terminated episodes in all 4 strata (terminated share >= 0.60 per stratum)",
+      "result": "HELD",
+      "value": "0.960 / 0.947 / 0.933 / 0.933",
+      "denominator": "4 strata x 75 drawn"
+    },
+    {
+      "id": "P5",
+      "text": "(registrar's blind addition) C4 HELD (a failure there is an ingest bug, not a corpus property)",
+      "result": "HELD",
+      "value": "50/50",
+      "denominator": "50 labels"
+    }
+  ],
+  "falsifier": {
+    "text": "of the admission test itself: a corpus that passes (a)-(e) and the pilot and whose FIRST judged pilot is refused by the truncation guard (> 5% unparsed or non-terminated on the deciding subset), or whose full-run strict D_c falls below 0.95 in a stratum that passed the pilot: the pilot was not predictive and the test is amended by insertion before any further spend; it overturns the rule set's claim that a 300-episode pilot at 0.95-at-point predicts judgeability, not any BFCL number",
+    "fired": false,
+    "note": "NOT TRIGGERABLE at this stage (nothing judged exists or is scheduled); early warning on the archive: none"
+  },
+  "numbers_of_record": {
+    "corpus": "BFCL-Result archive sha 6830ed13035c0cfee9aa7a9a0ffed70f10b3dd50 (gorilla 9d8416a96d1d69975493f1b6d60ff07d12a1726a), date folder 2025-12-16, multi_turn: 800 tasks = 4 categories x 200; 8 FC agents (DeepSeek-V3.2-Exp-FC, Qwen_Qwen3-32B-FC, Salesforce_Llama-xLAM-2-70b-fc-r, claude-sonnet-4-5-20250929-FC, gemini-2.5-flash-FC, gpt-5.2-2025-12-11-FC, grok-4-1-fast-reasoning-FC, meta-llama_Llama-3.3-70B-Instruct-FC); excluded for missing files: none; 6,400 episodes",
+    "split": "sides per category 57 EVAL / 25 GATE / 118 TRAIN (reviewer); pool p2035adddedd1becb over 228 EVAL ids; 0 mismatches of 800; 0 straddling families of 200 (by construction: tier_b hashes family_id)",
+    "termination_classes_full_table": "Llama-3.3-70B TERM 526 / CAP 267 / ERR 7 (0.657 terminated); Qwen3-32B 764 / 13 / 23; the other six 785-799 terminated of 800",
+    "strict_Dc_draw": "base 72/75 = 0.9600 [0.8889, 0.9863]; miss_func 71/75 = 0.9467 [0.8707, 0.9791]; miss_param 70/75 = 0.9333 [0.8532, 0.9712]; long_context 70/75 = 0.9333 [0.8532, 0.9712]; pooled 283/300 = 0.9433 [0.9111, 0.9643]",
+    "strict_Dc_full_table": "0.9537 / 0.9481 / 0.9481 / 0.9413 over 1,600 each; 0.9478 over 6,400",
+    "strict_Dc_excluding_empty_turn": "0.813 / 0.693 / 0.773 / 0.773 (55/300 drawn episodes are empty_turn_model_response failures); no stratum passes under that reading",
+    "artefact_lengths": "299 of 300 drawn with an artefact; chars min 453 / p5 737 / median 1,812 / p95 9,691 / max 28,798; est. tokens (chars / 4, no tokenizer) median 453 / p95 2,422 / max 7,199; per-episode cap NOT DECLARED",
+    "cap_hit_per_agent_draw": "DeepSeek 1/37 = 0.027; Llama-3.3-70B 15/37 = 0.405 [0.26, 0.57] (terminated 21/37 = 0.568); every other agent 0; pooled 16/300 cap, 1/300 error",
+    "cap_hit_per_agent_full_800": "0.0187, 0.0163, 0.0025, 0.0037, 0.0000, 0.0025, 0.0013, 0.3337; median 0.0031; Llama-3.3-70B 267 of 303 CAP_HITs",
+    "hazards": "H1 bfcl_term_v1 vs the harness force-quit marker disagree on 6 of 6,400; H2 marker cap-hits checker-evaluated 13 of 297, 0 passed",
+    "support": "57 EVAL tasks per stratum = 57 families; pooling the four gives 228 ids, effective support 57: all four strata DESCRIPTION-ONLY, no profile cell at any stratification",
+    "author_owes": "(1) the agent list (grok-4-1-fast-reasoning-FC is a contestant while the deployed judge is grok-4-1-fast-non-reasoning: a self-preference hazard no test covers); (2) the per-episode artefact cap in tokens; (3) the .gitignore decision on the DB and raw archive"
+  },
+  "sentence_of_record": "AGENT-CORPUS-ADMISSION pilot on BFCL-Result 2025-12-16 multi_turn, 8 agents x 800, 300-episode draw: (a)(b)(c)(e) VERIFIED; (d) FAILED because the per-episode artefact cap is not declared (the author's number); the single artefact-less drawn episode is an ERROR-class row (31/6,400), a class the rule admits, not a corpus defect. Strict D_c (which on this corpus equals the terminated share; the checker never abstains) base 72/75 = 0.960 PASS-AT-POINT, miss_func 0.947, miss_param 0.933, long_context 0.933 PREDICTIVE-ONLY; 55/300 drawn episodes are empty-turn failures counted as decided per the pre-fixed reading (excluded: 0.81 / 0.69 / 0.77 / 0.77, no stratum passes). P1 FAILED on a tie (miss_param = long_context 70/75; long_context lowest on the full table); P2 FAILED (median cap-hit 0.3%; Llama-3.3-70B 33% carries 267/303); P3, P4, C4 HELD; hazards H1 6/6,400, H2 13/297. All four strata are description-only (57 EVAL tasks each, 57 families in all); the corpus is NOT ADMITTED AS-IS until the cap is declared and the agent list confirmed.",
+  "chips": [
+    "C1 FAILED (CAP UNDECLARED; ERROR-EPISODE READING A WORDING DEFECT)",
+    "C2 BASE PASS-AT-POINT (READING-DEPENDENT), 3 x PREDICTIVE-ONLY",
+    "C4 HELD 50/50",
+    "P1 FAILED ON A TIE",
+    "P2 FAILED (CAP-HIT 0.3%)",
+    "P3 HELD",
+    "P4 HELD",
+    "DESCRIPTION-ONLY x4 (57 EVAL)",
+    "NOT ADMITTED AS-IS"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-18",
+      "by": "the adversarial reviewer D9 (docs/reviews/2026-09-18_night_batch.md, 17a4434), recorded in the outcome section L6957-L6960 as the reading of record",
+      "text": "the file scores (d) on the wrong clause: the artefact-less episode is an ERROR-class row (31 of 6,400), which rule (c) admits into the denominator as a class, not a corpus defect; the substantive (d) gap is the UNDECLARED per-episode artefact cap, the author's number; C1 stays FAILED, for the cap."
+    },
+    {
+      "date": "2026-09-18",
+      "by": "the adversarial reviewer D10, recorded in the outcome section L6966-L6970",
+      "text": "on this corpus strict D_c IS the terminated share (every TERMINATED episode is checker-decided; the conjunct is vacuous), and 55 of the 300 drawn episodes are empty_turn_model_response failures counted as DECIDED per the reading fixed before --run; excluded, D_c reads 0.813 / 0.693 / 0.773 / 0.773 and no stratum passes: the lone PASS-AT-POINT rests on that reading; both are printed."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "CORRECTIONS_2026-09-23 (registrar)",
+      "text": "[CORRECTED 2026-09-23 by the registrar (line pointer only, zero calls; no number, no criterion and no sentence moves): registration.program_lines names docs/judge_v2_program.md L5857, and that was exact when it was written. After commit cd83eac inserted four one-line correction brackets mid-file (hunks @@ -3911,0 / -6535,0 / -6692,0 / -6949,0 @@), the heading of record \"## Registered 2026-09-18 (before any code or call) — AGENT-CORPUS-ADMISSION: which agent corpus may enter the pipeline, under what rule set, ...\" stands at L5858, +1; the whole span shifts by the same +1. Verified at HEAD by sed -n '5858p' docs/judge_v2_program.md. The map for every such pointer is the programme's \"## Line-shift map, appended 2026-09-23\" section: +0 up to old L3911, +1 to L6535, +2 to L6692, +3 to L6949, +4 below. The recorded span is left standing beside this bracket, not rewritten.]"
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (recording the coordinator's relay; zero calls, no DB opened)",
+      "text": "BACKUP OF THE BFCL INPUTS OF RECORD: experiment_results/_backup/bfcl_2026-09-23/ holds bfcl_result_2025-12-16.db (sha256 c5eddd267623f0ff652dad1f912e3473829a8adf7c2bcae8960f229c8303399e, identical to experiment_results/agent/bfcl_result_2025-12-16.db, 18,767,872 bytes) and the full raw tree bfcl_raw_2025-12-16/ (72 of 72 files match the committed experiment_results/agent/bfcl_raw/2025-12-16/MANIFEST.txt on sha256 AND byte size, 371.2 MB; the backup's MANIFEST.txt is the CRLF working-tree rendering of the committed LF blob, identical modulo line endings). Verified by the registrar at zero calls with sha256sum and a manifest re-hash (no DB opened). Neither had a backup before; BFCL-DEGRADED-CONTROL's DC3 depends on the raw tree. No number of this record moves."
+    }
+  ],
+  "does_not_show": [
+    "any agent's capability (nothing ranked; the pass rates 0.215-0.774 are BFCL's own checker counts, description only)",
+    "any judged number",
+    "a profile cell (57 EVAL tasks per stratum)",
+    "that a 300-episode pilot at 0.95-at-point predicts judgeability (the falsifier's object; not triggerable yet)",
+    "a tokenizer count (chars / 4 only)",
+    "a trajectory reference (not admissible; plan C5)",
+    "the alternative tool-schema-only stem (not registered)"
+  ],
+  "ledger": {
+    "row_id": "AGENT-CORPUS-ADMISSION",
+    "version": "v114"
+  },
+  "depends_on": [
+    "CHECKER-ANSWER-INGEST",
+    "STAGE3-MATH-CAPFREE",
+    "STAGE3-MATH",
+    "GEN-ARENA",
+    "SPLIT-FUNCTION-IMPL",
+    "SPLIT-RATIO",
+    "MC-E2E",
+    "MC-LEAF",
+    "ORACLE-BOARD",
+    "PROFILE-TREE-ROBUST",
+    "KEY-SUBANCHOR-SCALE",
+    "JUDGE-FINISH-AUDIT",
+    "PAIR-NOREF",
+    "STACK-v2",
+    "GROK-CALIB",
+    "MATCH-FILTER",
+    "FILTER-BOARD"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L5855-L5982 (registration 9cbd5ab): the rule set (a)-(e), instrument, criteria C1-C4, the lead's predictions P1-P4 and the registrar's addition, falsifier, cost",
+    "docs/judge_v2_program.md L6932-L7026 (outcome section 'AGENT-CORPUS-ADMISSION pilot', 3dd0900): every number, scored criteria and predictions, defects D9-D13, hazards, does-not-show, the sentence of record",
+    "docs/reviews/2026-09-18_night_batch.md section AGENT-CORPUS-ADMISSION pilot (17a4434; file last at 074eb3d): CONFIRMED status, findings, sentence of record, chips, the 57/25/118 side counts",
+    "experiment_results/agent/bfcl_admission_pilot.txt (2ccd646), _draw.csv (33593af), _labels.csv (2ccd646); experiment_configs/reserved_pool_frozen_bfcl_p2035adddedd1becb.json (2ccd646)",
+    "docs/test_ledger.html row AGENT-CORPUS-ADMISSION (v114): chips verbatim, evidence cell (bfcl_ingest.py 0acd8e4, bfcl_admission_pilot.py 33593af, 9cbd5ab, 2ccd646, 17a4434, 3dd0900)",
+    "script identity: the outcome section prints 'script sha 7108cac91869dc88' for the pilot script at 33593af; the tracked path is tools/analysis/agent_admission_pilot.py (the ledger names it bfcl_admission_pilot.py); its LF sha256 at 33593af is 798c03c2d0a83887 (computed by the registrar 2026-09-20 for identity)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' lines to grep -n regardless of line drift; line numbers re-lined 2026-09-22 as of programme HEAD 6aa2a0d (shift +2 from the batch-1 reading)",
+    "experiment_results/_backup/bfcl_2026-09-23/ (backup of bfcl_result_2025-12-16.db and bfcl_raw_2025-12-16/, verified 2026-09-23)"
+  ],
+  "last_update": "2026-09-23",
+  "plain_description": {
+    "sq": "Data hygiene",
+    "what": "Writes a five-point rule set that an agent benchmark (tool-using AI agents) must pass before it may be judged, and applies it without any judge calls to one archive: 8 agents x 800 multi-turn tasks from the BFCL function-calling leaderboard (Dec 2025), using a 300-episode sample.",
+    "why": "Extending the thesis from question answering to agents needs a gate so that unusable or badly specified agent data does not enter the evaluation pipeline.",
+    "information": "A pass would let agent data enter the pipeline; a failure names exactly what is missing. Result: done; NOT admitted as-is. Four of five rules were verified, but the per-episode size cap for what the judge would read was never declared (the author's decision), and all four task groups are description-only for now (the 'base' group passed only at its point estimate); nothing was ranked or judged.",
+    "written": "2026-10-07"
+  }
+}

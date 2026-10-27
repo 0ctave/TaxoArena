@@ -1,0 +1,216 @@
+{
+  "id": "ARCH-V2-G23",
+  "title": "ARCH-V2-G23: the zero-call replay (identity; certificate A vs B; conjuncts; two-judge residue; Holm; multi-stream c~)",
+  "question": "Does the v2 code reproduce the recorded edge tables byte for byte, and is certificate B admissible over A on the record's data?",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "the commit that adds this record (after the instrument's build at 7a63e6c, before any real-data leg)",
+    "program_lines": "docs/judge_v2_program.md L15247-L15265",
+    "program_lines_as_of": "this commit",
+    "date": "2026-09-24"
+  },
+  "script": {
+    "path": "merged on main at 4381e4b by pathspec from ca84e44 (READY 5dfc825)",
+    "sha16": "tools/analysis/archv2_g23_replay.py blob:c0dc861339032041f3d871456ff5216b412ddf77 / sha256-lf16:0d07c4f20415778b; tools/analysis/archv2_arena/g23.py blob:ff6a1201db9321c4379e933f1b4c9d34e4047410 / sha256-lf16:882540d6ff955471",
+    "commit": "4381e4b"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_archv2_EA.md",
+    "commit": "5dfc825",
+    "legs": "per leg: identity, certab, conjuncts, holm, mcstreams READY; residue on merged READY-WITH-CONDITIONS F1. Running first (identity, then the other legs).",
+    "delta": {
+      "file": "docs/reviews/READY_archv2_EA.md",
+      "commit": "f8c2979",
+      "at": "17a93c7",
+      "verdict": "delta READY: v1 READY unchanged; v2 one-shot READY-WITH-CONDITIONS C1-C6; designs / (d) / (g) / stop READY-WITH-CONDITIONS C3, C4, C7 (sealed record v2 PASS token at instrument_lf16 f37145df9516b7ec); (f) + P7 and G23 residue READY",
+      "pins_17a93c7_not_merged": "tools/analysis/archv2_g22_sim.py blob:1019d61d42970dbce7a529a4b0ec5d67abc9943c / sha256-lf16:719723d3163e7f4f; tools/analysis/archv2_g23_replay.py blob:f1763bf892578d291e41bb0061ead67e7a1b53cb / sha256-lf16:8595768e18e63921; tools/analysis/archv2_arena/g22.py blob:1d1ff47b04a94a00d34634482e25a7525f43cfa1 / sha256-lf16:b7f31cd4c97db231; tools/analysis/archv2_arena/verdict_model.py blob:418d979e3ca632340f739a9449180e653932bddf / sha256-lf16:c87ef3a34e7b3a7f; tools/analysis/archv2_arena/selftest_g22_v2.py blob:bb1143cae99cfdc09d42d26b5f62ebbdef5c0ec3 / sha256-lf16:9c8d993ddc3bc09f",
+      "token_binding": "instrument_lf16 f37145df9516b7ec (11 files; recomputed by the reviewer); FROZEN from the v2 record run to the last designs / stop run (C3)"
+    }
+  },
+  "go": "n/a (0 calls); the board size it informs needs the author's go",
+  "run": {
+    "outcome_file": "experiment_results/archv2/g22_g23/G23_identity.txt blob:1f08afdfa3fe5b09fa7f6fa0870b7d51ceb4678c / sha256-lf16:faec3bce070e0ecc; experiment_results/archv2/g22_g23/G23_certab.txt blob:51d8d50f48be1be7d835a3a7e4e66db960825f2c / sha256-lf16:9ff1366a67f3ae53; experiment_results/archv2/g22_g23/G23_conjuncts.txt blob:836c8cf1687111d85f8d1cef3663355e9a7ce205 / sha256-lf16:b1ab6a4c4d027575; experiment_results/archv2/g22_g23/G23_holm.txt blob:2c19a6419eec69a2b5b949b63760b45a8df8915d / sha256-lf16:c3eb557e0e132ebb; experiment_results/archv2/g22_g23/G23_mcstreams.txt blob:d8f27f29f97e6e8e09762f5d469179037006f60f / sha256-lf16:d5ae52ee699ad48d; experiment_results/archv2/g22_g23/G23_residue_merged.txt blob:4dff33d5e324bb9775abb1bae6836354891c62b4 / sha256-lf16:72049d0cc0eb1f98",
+    "outcome_commit": "5abb79f",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-24"
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-24_archv2_g22_g23_readylegs_post.md",
+    "commit": "3ed7cbd",
+    "verdict": "identity, certab, holm ACCEPT (recomputed); conjuncts, mcstreams ACCEPT (re-run only); residue on merged ACCEPT WITH R1; nothing recorded moves"
+  },
+  "criteria": [
+    {
+      "id": "a",
+      "text": "IDENTITY gate: byte-identical edge tables and record integers with an execution witness; otherwise STOP",
+      "result": "HELD",
+      "value": "tables sha256 04754dbc..., byte-identical; every integer recomputed independently",
+      "denominator": "the record's edges"
+    },
+    {
+      "id": "b",
+      "text": "CERTAB: B admissible iff LOAO wrong(established) <= A's AND utility >= 60% of ALL edges; stability printed",
+      "result": "HELD",
+      "value": "B ADMISSIBLE on both draws: grok B 637 / 2(1) = 69.24% vs A 653 / 2(1); Kotlin B 636 / 918 = 69.28%; LOAO wrong(established) 1 <= 1",
+      "denominator": "891 grok-board edges (census)"
+    },
+    {
+      "id": "c",
+      "text": "the two ordered conjuncts; descriptive",
+      "result": "n/a",
+      "value": "DESCRIPTIVE: drop 0",
+      "denominator": "grok draw"
+    },
+    {
+      "id": "d",
+      "text": "the two-judge residue check; descriptive",
+      "result": "n/a",
+      "value": "DESCRIPTIVE: precondition 1714 / 4(4) MET; residue set {Meta-Llama-3_1-70B-Instruct}; R1 column label",
+      "denominator": "x12 on the grok board"
+    },
+    {
+      "id": "e",
+      "text": "Holm on the key partial order; descriptive",
+      "result": "n/a",
+      "value": "DESCRIPTIVE: 809 / 736 / 671; 19 edges lose establishment, 0 wrong-direction",
+      "denominator": "key order"
+    },
+    {
+      "id": "f",
+      "text": "multi-stream c~ with MC-UNRESOLVED; descriptive",
+      "result": "n/a",
+      "value": "DESCRIPTIVE: 646 / 252 / 22 of 920 (MC-UNRESOLVED 22)",
+      "denominator": "edges"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "(a) HELD (point probability 0.9)",
+      "result": "HELD",
+      "value": "identity HELD",
+      "denominator": "edges"
+    },
+    {
+      "id": "P2",
+      "text": "B utility 0.70 [0.60, 0.85]; B LOAO wrong(established) <= 7 [0, 9]",
+      "result": "HELD",
+      "value": "utility 69.2% / 69.3%; LOAO wrong(established) 1 <= A's 1",
+      "denominator": "891 edges"
+    },
+    {
+      "id": "P3",
+      "text": "cross-draw stability 0.90 [0.80, 0.97]",
+      "result": "HELD",
+      "value": "statistic undefined in the registration; Jaccard A 0.941 / B 0.938 and share-of-common-edges about 0.956, both inside [0.80, 0.97]",
+      "denominator": "ordered edges"
+    }
+  ],
+  "falsifier": {
+    "text": "(a) not HELD stops the gate and overturns the v2 arena code's reproduction claim; (b) B raising wrong(established) or below 60% utility overturns B as the v2 default.",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "identity": "edge tables sha256 04754dbc... byte-identical (grok f 891: raw 733 / 7, LOAO 667 / 2(1) / 1.11; u 920: raw 740 / 8, LOAO 653 / 2(1) / 1.24; 809 established)",
+    "certab": "grok A 653 / 2(1) 70.98%; B 637 / 2(1) 69.24%; Kotlin A 661, B 636 / 918 = 69.28%",
+    "holm": "809 -> 736 -> 671; 19 lost, 0 wrong-direction",
+    "mcstreams": "646 / 252 / 22 = 920",
+    "residue_merged": "2,538 -> widener 1,783 -> 1,714 called, 4 wrong(established); set {Meta-Llama-3_1-70B-Instruct}",
+    "p3_stability": "Jaccard A 0.941, B 0.938"
+  },
+  "sentence_of_record": "ARCH-V2 G22 / G23 READY legs, record runs at 4381e4b, independently reproduced (post-run review 2026-09-24). G23: identity HELD (tables sha256 04754dbc…, byte-identical, re-run and recomputed). Certificate B is ADMISSIBLE on both draws (utility 69.2% / 69.3%, LOAO wrong(established) 1 ≤ A's 1). P1, P2 and P3 HELD (cross-draw Jaccard 0.941 / 0.938). Holm: 809 → 736 per anchor → 671 pooled; the 19 ordered edges that lose establishment are all right-direction. MC-UNRESOLVED 22 of 920. G22 v1 validity FAILED as registered: the fresh-judge (random) mode puts f_raw_wrong at median 222.5 (central 0.99643 interval [43.9, 468.7]) against 7, and f_loao_called at median 6 [0, 384.9] against 667, with no replicate of 1,000 reaching either target (u likewise). The falsifier (a) FIRED: the registered simulator decides nothing. Design readings can re-enter only through the POST-HOC-SPECIFIED one-shot v2 (ruling 1 (ii)). P1 FAILED; P2 FAILED (merged exponent 1.88-2.02, CIs [1.78, 2.16], against 1.06 [0.80, 1.30]; the grok arm was not run); P3-P5 NOT SCORED (gated); P6 FAILED (2 of 14 anchors at D_c ≥ 0.95). P7 HELD under the post-data ruling of 97f3a1f: Meta-Llama-3_1-70B-Instruct is the unique top among merged's 4 called wrong(established) edges; the roster clause is OK on all three boards. Under the pre-data reading 'unique top on every board' it is NOT HELD (x12 and grok are one-edge ties). Merged wrong(established) overdispersion: by model χ² 53.40 on 20 models, p ≤ 0.0005 (0 of 2,000 permutations; within-anchor null p 0.0001); by anchor χ² 22.34, p 0.0465 ± 0.005 (Monte Carlo); DEFF 1.780 (ICC 0.0050, Kish m 158.3). [run 5abb79f (record runs from main at 4381e4b = ca84e44; zero judge calls), review 3ed7cbd (5 ACCEPT, 5 ACCEPT WITH; none rejected); denominators: grok 891 f / 920 u edges, 809 established, 2,811 judged questions in 14 anchors; merged 21,536 valid verdicts, 2,538 edges; R = 1,000 per validity mode; pool p2dca21ab5f4ef3ae, id-disjoint only; P7 scored under the POST-DATA ruling of 97f3a1f; the v2 one shot (e644a25) is NOT covered here]",
+  "chips": [
+    "REGISTERED 2026-09-24, BEFORE ANY REAL-DATA LEG",
+    "IDENTITY HELD",
+    "B ADMISSIBLE (BOTH DRAWS)",
+    "P1-P3 HELD",
+    "ZERO CALLS",
+    "IDENTITY FIRST; PICKS THE CERTIFICATE"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-24",
+      "by": "registrar (provisional run, relayed)",
+      "text": "RAN, PROVISIONAL until E-A's READY (instrument 4c2d2b5): see docs/judge_v2_program.md L15320-L15339. Not an outcome of record."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (READY review 5dfc825, relayed by the coordinator)",
+      "text": "READY per leg: identity, certab, conjuncts, holm, mcstreams READY; residue on merged READY-WITH-CONDITIONS F1. Running first (identity, then the other legs). docs/judge_v2_program.md L15422-L15448."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (delta READY f8c2979, relayed by the coordinator)",
+      "text": "Delta READY f8c2979 at 17a93c7: G23 residue on merged READY (failed-precondition exit 2 enforced); the other G23 legs READY unchanged. docs/judge_v2_program.md L15485-L15513."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (the coordinator's relay)",
+      "text": "G23 record legs RAN at 5abb79f (printed identity PASS); review pending; no outcome recorded. docs/judge_v2_program.md L15586-L15595."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (run 5abb79f; review 3ed7cbd)",
+      "text": "OUTCOME recorded; identity HELD; B ADMISSIBLE; P1-P3 HELD (P3's statistic undefined, both readings inside); falsifiers not fired. docs/judge_v2_program.md L15597-L15634."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: imported quantity (c) (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM (c) 2026-09-27: the certificate-B admissibility read on family edges (provenance; the identity leg is a fixture, voice 4) is a p2dca-family quantity — planning only (RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "A full independent re-run of v1 validity. Only rep0000-rep0039 of random and fixed were replayed. The FAIL is decided by the printed pct at the ends of the empirical range.",
+    "The fixed-mode u_raw_wrong miss at other seeds (it is a D9 tail event; it decides nothing).",
+    "conjuncts, mcstreams and the Kotlin certab draw recomputed with independent code. They were re-run through the instrument only (byte-identical).",
+    "Any rate-leg reading (c), (d), (e), (g), or anything about v2, which is running now at 17a93c7 and was not touched.",
+    "nu on grok_calib (not run of record).",
+    "Coverage on an EVAL side: no split is drawn. D_c here is over all questions of each category.",
+    "Any claim that the simulator is valid in any mode. retest passing reproduces verdicts it partly keeps. It is not a fresh-judge validation.",
+    "Anything about content-closed splits: bareq512_s42 is id-disjoint only.",
+    "(registered) any v2 board's rates",
+    "(registered) a frontier order"
+  ],
+  "ledger": {
+    "row_id": "ARCH-V2-G23",
+    "version": "v211 (adjudicated; chips replaced; audit OK); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "ARCH-V2-E-A",
+    "CERT-DIRECTION-STREAM",
+    "SPLIT-EXPOSURE-SENSITIVITY"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing and reopens nothing (the frontier order stays closed)"
+  },
+  "support": "a census over the recorded edges (deterministic); (a) and (b) SCOREABLE; (c)-(f) DESCRIPTIVE-ONLY; structural: says nothing about a v2 board's rates. docs/judge_v2_program.md L15247-L15265",
+  "sources": [
+    "docs/judge_v2_program.md L15247-L15265",
+    "docs/agents/results/evidence/ARCH-V2_SYNTHESIS_2026-09-23.md section 4",
+    "docs/agents/results/evidence/ARCH-V2_BUDGET_STUDY_2026-09-23.md section 5",
+    "docs/judge_v2_program.md L15320-L15339",
+    "docs/judge_v2_program.md L15422-L15448",
+    "docs/reviews/READY_archv2_EA.md (5dfc825)",
+    "docs/judge_v2_program.md L15485-L15513",
+    "docs/reviews/READY_archv2_EA.md (f8c2979)",
+    "docs/judge_v2_program.md L15586-L15595",
+    "docs/judge_v2_program.md L15597-L15634",
+    "docs/reviews/2026-09-24_archv2_g22_g23_readylegs_post.md (3ed7cbd)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "amendments": [],
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "A replay of recorded judge data through the new version-2 code (no new calls). It checks that the code reproduces the old tables of pairwise model wins byte for byte. It also checks whether a new certificate rule (B) for declaring one model better than another is acceptable in place of the old rule (A).",
+    "why": "Before trusting the new pipeline, it must reproduce the old results, and the new certificate must not certify more wrong orderings.",
+    "information": "Exact reproduction plus an acceptable rule B would let version 2 replace version 1 safely. Result: reproduction held exactly. Rule B was acceptable on both data draws (it keeps about 69% of comparisons, with no more wrong 'established' orderings than A). The ranking was stable across draws. A companion simulator meant to predict error rates failed its own validity check and decides nothing. The certificate reading rests on older judged data and is now treated as an imported quantity, not fresh evidence.",
+    "written": "2026-10-07"
+  }
+}

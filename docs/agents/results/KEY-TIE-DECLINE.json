@@ -1,0 +1,148 @@
+{
+  "id": "KEY-TIE-DECLINE",
+  "title": "KEY-TIE-DECLINE: a product rule wherever a key exists: decline any separation whose pair's key direction is not established (zero calls)",
+  "question": "Decline any separation whose pair's key direction is not established (exact McNemar p >= 0.05 on the cell's judged questions), on top of the raw certificate and on top of the widener, on x12 (891 edges), the merged pooled board (190 pairs) and the merged per-anchor edges (2,538): calls surrendered, wrong calls removed, and what remains; the rule's cost at every threshold 0.90-0.995.",
+  "kind": "zero-call",
+  "state": "UNDETERMINED",
+  "registration": {
+    "commit": "60cb7f3",
+    "program_lines": "docs/judge_v2_program.md L3312 (section) and L3329-L3339 (B. KEY-TIE-DECLINE)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-15 (before any run) — six tests from the big picture after the review. Standing rules from the review apply to all six: every wrong-direction count carries its McNemar-established count on the anchor's judged questions; UNDETERMINED is a registered outcome; the key denominator is named; nulls preserve what the question conditions on; the data object is checked before strata are read into it.",
+    "outcome_heading": [
+      "L3399: ## BIG-PICTURE TESTS A, C, D, E — outcomes (2026-09-15, zero calls). Each built by one agent from the registration at 60cb7f3 and recomputed by an independent checker; every number reproduced; verdict labels corrected by the checker where the builder's rested on an unregistered reading.",
+      "L3468: - **KEY-TIE-DECLINE (2026-09-15, zero calls): criterion (1) is UNDETERMINED by a data-object mismatch OF MY OWN MAKING; on the object that exists the rule is cheap and does exactly what it should. Falsifier does not fire.**"
+    ],
+    "date": "2026-09-15"
+  },
+  "script": {
+    "path": "tools/analysis/key_tie_decline.py",
+    "sha16": "63b1a78149e506f4",
+    "commit": "1ab53e0 (later 22e16f7 / 13f2142)"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/key_tie_decline.txt",
+    "outcome_commit": "1ab53e0",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-15"
+  },
+  "review": {
+    "file": "NOT adversarially checked at outcome time (the script was written by a builder agent whose report never returned; one format-string slot fixed, run and read by the registrar); the independent check of record is KTD-CHECK (FRAMEWORK item 1, 2026-09-16, docs/agents/results/KTD-CHECK.json)",
+    "commit": "7076615",
+    "verdict": "KTD-CHECK: PASS as registered; the integers are the record's draw; per-anchor residue 4-5 wrong over 11 seeds"
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "PRIMARY: on the merged board the decline rule removes at least 6 of the 8 within-tier wrong separations for no more than 15% of across-tier calls surrendered",
+      "result": "UNDETERMINED",
+      "value": "UNDETERMINED as written: the '8' was the SPARSE board's count, superseded by X20-MERGED (v93) hours before the registration; the board of record has 3 within-tier wrong separations at 0.95, 1 established (arx/iask); the script reproduces x20_merged's 6/7, 3(1) | 176/183, 5(4) before reading any stratum and scores on the 3 that exist: pooled raw at 0.95 removes 2 of the 3 (leaving the established arx/iask inversion) for 0.6% of across-tier calls; per-anchor raw at 0.975 removes 10 of 14 for 5.6%",
+      "denominator": "merged pooled board 190 pairs; merged per-anchor 2,538 edges; the sparse-board 8 does not exist on the board of record"
+    },
+    {
+      "id": "(2)",
+      "text": "combined with the widener on x12, the remaining wrong calls at 0.975 are all key-established (the residue is real error, not noise)",
+      "result": "HELD",
+      "value": "tautologically: the residue is established by construction of the rule; x12 widener + decline at 0.975: 651 called, 1(1) wrong (Law, Llama-3.1-70B vs Qwen1.5-72B, McNemar 59:29 p 0.0018, real measurable judge error) against the predicted 2",
+      "denominator": "891 x12 edges"
+    },
+    {
+      "id": "(3)",
+      "text": "the rule's cost in calls at every threshold 0.90-0.995",
+      "result": "DELIVERED",
+      "value": "x12 0.975: raw 739 -> 712, 8(4) -> 4(4), 23 correct surrendered; widener 665 -> 651, 2(1) -> 1(1), 13 surrendered; merged POOLED 0.95: raw 182 -> 176, 8(5) -> 5(5), within-tier 3(1) -> 1, across-tier surrendered 1 of 176 = 0.6%; widener 159 -> 155, 1(0) -> 0(0), ZERO wrong at every threshold with 138-158 called; merged PER-ANCHOR 0.975: raw 2079 -> 1943, 42(17) -> 17(17), within 14(4) -> 4, across surrendered 115 of 2048 = 5.6%; widener 1783 -> 1714, 13(4) -> 4(4), within 5(2) -> 2, across 3.4%",
+      "denominator": "full tables in the output"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "(1) holds: it removes 7 of 8 at about 10% of across-tier calls",
+      "result": "n/a",
+      "value": "NOT APPLICABLE: the 8 do not exist on the board of record",
+      "denominator": "n/a"
+    },
+    {
+      "id": "P2",
+      "text": "(2) holds with 2 remaining",
+      "result": "HELD",
+      "value": "1 remaining, better than predicted",
+      "denominator": "891 x12 edges"
+    }
+  ],
+  "falsifier": {
+    "text": "if it costs more than 25% of across-tier calls to remove the within-tier errors, the rule is too blunt for a product and the widener alone is the recommendation",
+    "fired": false,
+    "note": "0.6% pooled, 3.4-5.6% per anchor: does not fire; the composed rule (widener + key-tie decline) leaves ZERO wrong separations on the pooled board of record while calling 150 of 190 pairs; the per-anchor residue is 4 established errors of 1,714 calls (0.23%) [CORRECTED: 3 Law + 1 Philosophy, all Meta-Llama-3.1-70B-Instruct; model-anchored]"
+  },
+  "numbers_of_record": {
+    "x12_0.975": "raw 739 -> 712, 8(4) -> 4(4); widener 665 -> 651, 2(1) -> 1(1)",
+    "merged_pooled_0.95": "raw 182 -> 176, 8(5) -> 5(5), within-tier 3(1) -> 1 (arx/iask), across surrendered 0.6%; widener 159 -> 155, 1(0) -> 0(0); 0 wrong at every threshold, 138-158 called",
+    "merged_per_anchor_0.975": "raw 2079 -> 1943, 42(17) -> 17(17), within 14(4) -> 4, across 5.6%; widener 1783 -> 1714, 13(4) -> 4(4), within 5(2) -> 2, across 3.4%",
+    "residue": "4 of 1,714 (0.23%): Law Llama-3.1-70B vs Qwen1.5-72B 59:29 p 0.0018, vs deepseek-v2.5 54:25 p 0.0015, vs gpt-4o-mini 51:22 p 0.0009; Philosophy Llama-3.1-70B vs gpt-4o-mini 22:8 p 0.0161; all Meta-Llama-3.1-70B-Instruct",
+    "mcnemar_fix": "a float overflow in the shared mcnemar_edge (2.0**n above n = 1024) surfaced on the pooled board and was fixed to exact integer arithmetic; no earlier result used n above 304",
+    "KTD-CHECK_2026-09-16": "reproduced 150/190 0 wrong and 1,714/2,538 4(4) at the record's seed; per-anchor residue 4 wrong in 9 of 11 seeds and 5 in 2 (Law arx_0314 vs claude-3-5-sonnet 2.7e-5 under the 0.975 cutoff)"
+  },
+  "sentence_of_record": "KEY-TIE-DECLINE (2026-09-15, zero calls): criterion (1) is UNDETERMINED by a data-object mismatch of the registrar's own making (the '8 within-tier wrong separations' was the superseded sparse board's count; the board of record has 3, 1 established); on the object that exists the rule is cheap and does exactly what it should: pooled raw at 0.95 removes 2 of the 3 for 0.6% of across-tier calls, pooled widener + decline leaves 0 wrong at every threshold with 138-158 of 190 pairs called, per-anchor raw at 0.975 removes 10 of 14 for 5.6%, x12 widener + decline 651 called / 1(1) wrong. The falsifier (> 25% of across-tier calls) does not fire. [CORRECTED 2026-09-15 by the FRAMEWORK synthesis: the composed rule's per-anchor residue is 3 Law + 1 Philosophy, all Meta-Llama-3.1-70B-Instruct, not 'all Law'; the residue is model-anchored.] [CHECKED 2026-09-16 by KTD-CHECK: reproduced at the record's seed; 4-5 wrong per anchor over 11 seeds (0.23-0.29%).]",
+  "chips": [
+    "(1) UNDETERMINED — MY REGISTRATION USED THE SPARSE-BOARD COUNT",
+    "RULE IS CHEAP AND EXACT",
+    "FALSIFIER DOES NOT FIRE"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-15",
+      "by": "the FRAMEWORK synthesis (programme L3491-L3494 bracket; ledger observed cell [CORRECTED 2026-09-15]; verified from the cached edge table)",
+      "text": "NOT all Law: 3 Law + 1 Philosophy (Llama-3.1-70B vs Qwen1.5-72B 59:29 p 0.0018, vs deepseek-v2.5 54:25 p 0.0015, vs gpt-4o-mini 51:22 p 0.0009; Philosophy Llama-3.1-70B vs gpt-4o-mini 22:8 p 0.0161), and ALL FOUR are Meta-Llama-3.1-70B-Instruct; the residue is model-anchored, not anchor-anchored."
+    },
+    {
+      "date": "2026-09-16",
+      "by": "KTD-CHECK (FRAMEWORK item 1; ledger observed cell [CHECKED 2026-09-16], v103)",
+      "text": "reproduced 150/190 0 wrong and 1,714/2,538 4(4) at the record's seed; the per-anchor residue is 4 wrong in 9 of 11 seeds and 5 in 2 (the Law arx_0314 vs claude-3-5-sonnet edge sits 2.7e-5 under the 0.975 cutoff); the framework carries '0 wrong pooled, 4-5 wrong per anchor (0.23-0.29%)'."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "the registered (1) on the sparse-board count (the object does not exist)",
+    "an independent check at outcome time (the one of the six without one; supplied by KTD-CHECK 2026-09-16)",
+    "availability on unkeyed data (the rule needs a key; the widener stands alone there)"
+  ],
+  "ledger": {
+    "row_id": "KEY-TIE-DECLINE",
+    "version": "v103 (row added v99 at 1ab53e0; [CORRECTED 2026-09-15] by the FRAMEWORK synthesis; [CHECKED 2026-09-16] v103 by KTD-CHECK); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "X20-MERGED",
+    "SYSTEMATIC-BUDGET",
+    "TIER-HONEST-X20",
+    "KTD-CHECK"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L3312 / L3329-L3339 (B. KEY-TIE-DECLINE) (registration 60cb7f3): question, criteria, prediction, falsifier",
+    "docs/judge_v2_program.md L3468 ff. (outcome bullet, 1ab53e0): the criterion table, predictions scored, the checker's recomputation and defects",
+    "experiment_results/x12_crossdomain/key_tie_decline.txt (1ab53e0)",
+    "docs/test_ledger.html row KEY-TIE-DECLINE (v103 (row added v99 at 1ab53e0; [CORRECTED 2026-09-15] by the FRAMEWORK synthesis; [CHECKED 2026-09-16] v103 by KTD-CHECK)): chips verbatim, design / criteria / observed cells, evidence",
+    "script sha16 = sha256 of tools/analysis/key_tie_decline.py at 1ab53e0, first 16 hex (identity, computed by the registrar 2026-09-22; later edited at 13f2142 for the pool_guard change); the outcome bullet is at L3468 (1ab53e0), not inside the A/C/D/E block",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' or '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Tests a product rule: decline to declare one model better than another in a cell when the answer key itself does not clearly separate them. It is applied on three leaderboard views, and the test counts how many calls are lost and how many wrong separations are removed. No judge calls.",
+    "why": "It asks whether a simple key-based rule removes the remaining wrong 'model A beats model B' claims without giving up too many correct ones.",
+    "information": "Low cost with most errors removed would make it worth shipping. Losing more than 25% of calls would make it too blunt. Result: undetermined on the registered criterion, because the target count referred to a board that no longer exists. On the existing board the rule is cheap and works. Combined with the widener it leaves 0 wrong separations on the pooled board while still calling about 150 of 190 pairs. The per-cell residue is 4 to 5 errors in 1,714 calls depending on the random seed, all involving one model (Llama-3.1-70B). The failure condition did not fire. Older judged question family, later ruled 'history, not evidence'.",
+    "written": "2026-10-07"
+  }
+}

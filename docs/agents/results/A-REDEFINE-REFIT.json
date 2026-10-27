@@ -1,0 +1,125 @@
+{
+  "id": "A-REDEFINE-REFIT",
+  "title": "A-REDEFINE-REFIT: FRAMEWORK item 2: refit the widener with the answer-agreement predictor A redefined on the eval side; does anything move, and is b1 identified on established labels? (zero calls)",
+  "question": "Refit b0, b1 with A over the cell's eval-side questions with extracted answers instead of judged questions, on the 891 filtered and 920 any-gap x12 edge sets, LOAO under both definitions; established labels 809 / 26 wrong on both sets; 14-anchor cluster bootstrap; eval DB blank-pred audit on the 3,445 pool.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "eaf1dbf",
+    "program_lines": "docs/judge_v2_program.md L3603-L3611 (by reference; docs/design/FRAMEWORK.md L355 item 2); the Block 1 record bullet at L3675",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-15 (before any run) — BY REFERENCE: the 26 tests in docs/design/FRAMEWORK.md \"Tests to register before shipping\" (commit 8d77f7b), with the criteria, predictions and call counts stated there, scheduled in docs/plan_2026-09-15.md",
+    "outcome_heading": [
+      "L3662: ## Block 1 record (2026-09-15/16, zero calls) — FRAMEWORK items 1-12, 14-16: fourteen zero-call tests built, each adversarially checked; verdicts of record below (checker's number wins where it refutes the builder)",
+      "L3675: - **A-REDEFINE-REFIT (2026-09-15, zero calls): PASS as a consistency check; no power against the filtered-schedule bias it was registered for; FRAMEWORK L39's \"MMLU-Pro D_c 100%\" is false.**"
+    ],
+    "date": "2026-09-15"
+  },
+  "script": {
+    "path": "tools/analysis/a_redefine_refit.py",
+    "sha16": "7673847ac0da4f11",
+    "commit": "7076615"
+  },
+  "ready": null,
+  "go": "n/a (0 calls; Block 1)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/a_redefine_refit.txt",
+    "outcome_commit": "7076615",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (pool_guard.assert_pool_of_record() first; union pool paeec37aa28063c75 by explicit id where used)",
+    "date": "2026-09-15/16"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); each Block 1 test was 'adversarially checked' at build time and the checker's number wins where it refutes the builder (Block 1 record header L3662-L3663); the checker-confirmed defects are listed in the bullet",
+    "commit": "7076615",
+    "verdict": ""
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "LOAO wrong within one event and utility within 5pp, both sets",
+      "result": "HELD",
+      "value": "891: 663/3(2)/1.27/74.4% -> 661/3(2)/1.22/74.2%; 920: 646/3(2)/1.28/70.2% -> 646/3(2)/1.26/70.2%; the same three wrong edges under both definitions (CONFIRMED)",
+      "denominator": "891 filtered / 920 any-gap x12 edges"
+    },
+    {
+      "id": "C2",
+      "text": "b1 = 0 rejected on established labels, eval-side A (delta-deviance 3.84, FRAMEWORK L99/L193)",
+      "result": "HELD",
+      "value": "809 established / 26 wrong; profile delta-deviance 5.16 (judged-A 5.22) > 3.84; 14-anchor cluster bootstrap P(b1 <= 0) 0.0315-0.0367, CI includes 0: builder UNDETERMINED; checker PASS under the registered rule (4.43 on the eval-denominator established set 826/28 also passes); the bootstrap straddling 0.025 is a caveat belonging to SYSTEMATIC-BUDGET / UNFILTERED-ADOPT",
+      "denominator": "809 established edges, 26 events, 14 clusters"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "parameters move by less than their CI width",
+      "result": "HELD",
+      "value": "891 b0 -3.2326 -> -3.2172, b1 +3.3133 -> +3.2921 (0.2-0.3% of widths 4.9 / 6.2); 920 likewise; tau(0.30/0.60/0.88) inside the judged-A CIs (literal and strict readings)",
+      "denominator": "891 / 920 edges"
+    }
+  ],
+  "falsifier": {
+    "text": "none beyond the criteria (registered by reference)",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "LOAO": "891 663/3(2)/1.27/74.4% -> 661/3(2)/1.22/74.2%; 920 646/3(2)/1.28/70.2% -> 646/3(2)/1.26/70.2%",
+    "identification": "profile delta-deviance 5.16 (eval-A) / 5.22 (judged-A); eval-denominator established set 826/28: 4.43; cluster bootstrap P(b1 <= 0) 0.0315-0.0367",
+    "parameters": "b0 -3.2326 -> -3.2172, b1 +3.3133 -> +3.2921",
+    "record_correction_FRAMEWORK_L39": "the eval DB has blank preds on the pool for 7 of 12 roster models (Yi-6b 19.7%, Qwen1.5-72B 18.8%, Llama-2-7b 17.4%, Llama-2-13b 17.1%, command-r 12.2%, iask 1.7%, deepseek / gpt-4o 0.5%); pair-level D_c per anchor 0.68 (Chemistry) to 0.98, 7 of 14 anchors under the 0.95 PREDICTIVE-ONLY bar: 'MMLU-Pro D_c 100%' is false",
+    "construction_note": "under x12's uniform schedule A_eval and A_judged correlate 0.997 (median |d| 0.008), so zero deltas are guaranteed by construction; the 920 set is 920 of 924 grid edges (4 key-tied dropped in build()); runtime 212 s (cached bootstraps), not the reported 353 s"
+  },
+  "sentence_of_record": "A-REDEFINE-REFIT (2026-09-15, zero calls): PASS as a consistency check; no power against the filtered-schedule bias it was registered for (A_eval and A_judged correlate 0.997 under x12's uniform schedule, so zero deltas are guaranteed by construction: 'consistency check passed; filtered-schedule bias untested'); C2 PASS under the registered rule (delta-deviance 5.16 > 3.84; the cluster bootstrap straddling 0.025 is a caveat on the established-label fit); FRAMEWORK L39's 'MMLU-Pro D_c 100%' is false (blank preds on 7 of 12 roster models; pair-level D_c per anchor 0.68-0.98, 7 of 14 anchors under the 0.95 PREDICTIVE-ONLY bar).",
+  "chips": [
+    "PASS (CONSISTENCY CHECK)",
+    "C2 PASS UNDER THE REGISTERED RULE (checker; builder UNDETERMINED)",
+    "FRAMEWORK L39 \"MMLU-Pro D_c 100%\" IS FALSE"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-16",
+      "by": "Block 1 record corrections for LEDGER-CONSISTENCY (programme L3839; FRAMEWORK L39 bracketed at a75df45)",
+      "text": "FRAMEWORK L39: MMLU-Pro D_c is 0.68-0.98 per anchor, not 100%; to be corrected before PREDICTIVE-ONLY is applied anywhere."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "any power against the filtered-schedule bias (zero deltas by construction on the uniform x12 schedule)",
+    "a cluster-robust identification of b1 at 26 events (the bootstrap straddles 0.025)"
+  ],
+  "ledger": {
+    "row_id": "A-REDEFINE-REFIT",
+    "version": "v103 (684be03); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "SYSTEMATIC-BUDGET",
+    "UNFILTERED-ADOPT",
+    "MATCH-FILTER"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L3603-L3611 (by-reference registration eaf1dbf) and docs/design/FRAMEWORK.md L355 item 2: criterion, prediction, call count",
+    "docs/judge_v2_program.md L3675 ff. (Block 1 record bullet, 7076615): the criterion table, predictions scored, checker-confirmed defects, script and output",
+    "experiment_results/x12_crossdomain/a_redefine_refit.txt (7076615)",
+    "docs/test_ledger.html row A-REDEFINE-REFIT (v103 684be03): chips verbatim, design / criteria / observed cells, evidence",
+    "script sha16 = sha256 of tools/analysis/a_redefine_refit.py at 7076615 (its first commit), first 16 hex (identity, computed by the registrar 2026-09-22; later edited at 13f2142 for the pool_guard change)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' heading and the '- **ID (...)**' bullet line inside the Block 1 record, to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Re-fits the small model that predicts when the judge goes wrong. The predictor \"do the two answers agree?\" is now computed from the models' extracted answers on the evaluation questions instead of from the judged questions. Uses the 12-model MMLU-Pro board, with no new judge calls.",
+    "why": "Checks whether how the agreement predictor was defined could have biased the judge-error model, and whether its main slope is actually supported by the cases where the right answer is firmly known.",
+    "information": "If nothing moves, the earlier fit holds. If the numbers shift, the predictor was biased by which questions got judged. Result: passed as a consistency check only. On this evenly spread schedule the two definitions are almost identical (correlation 0.997), so the test had no power against the bias it was meant to catch, and that bias remains untested. The slope passed its registered rule but is only borderline once questions are resampled in groups by subject. It also showed that an earlier claim that MMLU-Pro is 100% decidable by the answer key was false (0.68 to 0.98 per subject). It was later ruled history rather than evidence, because it ran on the older question pool.",
+    "written": "2026-10-07"
+  }
+}

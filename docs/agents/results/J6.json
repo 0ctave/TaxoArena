@@ -1,0 +1,135 @@
+{
+  "id": "J6",
+  "title": "J6: are the rubrics just not good enough? Frontier-written and contrastive (wrong-answers-in-view) anchor rubrics vs the Mistral-induced ones (registered 2026-09-10 02:30)",
+  "question": "Induction on grok-reasoning from the clean anchor corpora +- 25 key-labelled wrong train-side answers per anchor; judged by Mistral without reference, 3 arms interleaved; PASS iff +1pp at p < 0.05 with the leakage audit clean; prediction (b) contrastive > (a) frontier-authored. [ID-ONLY 2026-09-23: the frozen tree's ladder corpora, 0 exact / 14 norm-only twins]",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "168a9f3",
+    "program_lines": "docs/judge_v2_program.md L184-L198 (registration) and L262-L276 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "### J6 — are the rubrics just not good enough? (registered 2026-09-10 02:30, before any call)",
+    "outcome_heading": [
+      "L262: - **J6 (2026-09-10 05:56): PRIMARY FAIL — the contrastive rubric is significantly WORSE; authorship"
+    ],
+    "date": "2026-09-10"
+  },
+  "script": {
+    "path": "tools/analysis/j6_rubrics.py",
+    "sha16": "eb965450f96410e0 (at 81f3fef)",
+    "commit": "81f3fef"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (induction + 5,939 jobs, 1 filtered)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/j6_outcome.txt",
+    "outcome_commit": "81f3fef",
+    "calls": "5,939 jobs (1 filtered) + induction",
+    "cce": "not stated",
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-10",
+    "other_files": [
+      "experiment_results/x12_crossdomain/rubric_j6.db (cache)"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the pool-pin audit of 2026-09-14 (programme ~L2060) found j6_rubrics.py had NO pool pin at run time (fixed after)",
+    "commit": "81f3fef",
+    "verdict": "CONTRASTIVE WORSE (p = 0.043); AUTHORSHIP NULL"
+  },
+  "criteria": [
+    {
+      "id": "PRIMARY",
+      "text": "+1pp on key-decidable at p < 0.05, leakage audit clean",
+      "result": "FAILED",
+      "value": "944 decidable: contrastive 0.761 vs Mistral-induced 0.779 (-1.8pp; 23:40; p = 0.043), quantitative anchors -2.8 (p = 0.04); frontier-authored 0.773 (-0.5, n.s.); Mistral anchor vs generic +1.5 (n.s.); leakage audit clean",
+      "denominator": "944 key-decidable R3 pairs"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "(b) contrastive > (a) frontier-authored",
+      "result": "FAILED",
+      "value": "contrastive significantly worse",
+      "denominator": "944"
+    }
+  ],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "rubric TEXT is not the lever (5th clean null, 1st significant negative): the synthesis stage compressed the failure modes into a prescriptive checklist that hurt a non-verifying judge; closed line: rubric text"
+  },
+  "numbers_of_record": {
+    "contrastive": "0.761 vs 0.779 (-1.8pp; 23:40; p = 0.043); quantitative -2.8 (p = 0.04)",
+    "frontier": "0.773 (-0.5, n.s.)",
+    "anchor_vs_generic": "+1.5 (n.s.)"
+  },
+  "sentence_of_record": "J6 (2026-09-10, ~6k jobs): 944 decidable: contrastive 0.761 vs Mistral-induced 0.779 (-1.8pp; 23:40; p = 0.043), quantitative anchors -2.8 (p = 0.04); frontier-authored 0.773 (-0.5, n.s.); Mistral anchor vs generic +1.5 (n.s.). The synthesis stage compressed the failure modes into a prescriptive checklist that hurt a non-verifying judge. Rubric TEXT is not the lever (5th clean null, 1st significant negative); the kit (RK-1) is the direct content test.",
+  "chips": [
+    "CONTRASTIVE WORSE (p=0.043) · AUTHORSHIP NULL"
+  ],
+  "does_not_show": [
+    "a rubric-authorship effect",
+    "a pool pin at run time (added after)"
+  ],
+  "ledger": {
+    "row_id": "J6",
+    "version": "v22 (849fb17); the section-6 DESIGNED entry at L305 carries a [record note 2026-09-16] pointing here [v132 2026-09-23: INCONSISTENCIES-PASS insertion in this row]; [P-FAM] bracket v307 (2026-09-27); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "RUBRIC-512-R",
+    "RK-1",
+    "STACK-v2"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "rubric text at every granularity (CONTEXT.md section 5: RUBRIC, LADDER, RUBRIC-512-R, J6, RK-1, LEAF-POWERED, STACK-NORUBRIC)"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L184-L198 and L262-L276 (168a9f3 / 81f3fef)",
+    "experiment_results/x12_crossdomain/j6_outcome.txt (81f3fef)",
+    "docs/test_ledger.html row J6 (v22): chips verbatim, observed cell, evidence",
+    "script sha16 = sha256 of tools/analysis/j6_rubrics.py at 81f3fef, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "brackets": [
+    {
+      "date": "2026-09-14",
+      "by": "the pool-pin audit (programme ~L2060-L2070; pool_guard.assert_pool_of_record added)",
+      "text": "j6_rubrics.py, rubric_kit.py and rubric_kit2.py had no pool pin at all at run time; the guard was added after the runs (the runs' pool was the pool of record by the frozen split, not by a check)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "INCONSISTENCIES-PASS (registrar, zero calls; insertion only)",
+      "text": "PIN 2026-09-23 by INCONSISTENCIES-PASS (registrar, zero calls; insertion only): NO POOL PIN AT RUN TIME. The pool-pin audit of 2026-09-14 (programme, the paragraph ending 'THREE HAD NO PIN AT ALL - j6_rubrics.py, rubric_kit.py and rubric_kit2.py') found j6_rubrics.py calling no pool guard when this ran; pool_guard.assert_pool_of_record() was added after the run. The run's pool is the pool of record p2dca21ab5f4ef3ae BY THE FROZEN SPLIT, NOT BY A CHECK. The after-the-fact check (the cache's question ids against experiment_configs/reserved_pool_frozen_p2dca.json, read-only) is OPEN and was not done in this pass. [ledger: observed cell of row J6, v132]"
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the SPLIT-FOLLOWUPS review 8ebfa7a (insertion only, zero calls)",
+      "text": "The 'clean anchor corpora' are the frozen tree's ladder corpora (not bareq512's): CORRECTED 2026-09-23 by the SPLIT-FOLLOWUPS review (8ebfa7a): WRONG OBJECT and ID-ONLY. The 14 STACK-v2 anchor rubrics (rubric_ladder.db kind='anchor', ts 2026-09-07 23:54 to 09-08 00:09; ladder sha 4412f923 = the kit's) PREDATE bareq512_s42: rubric_ladder.py (f03cb30) induced them from TRAIN-side mmlu_pro texts assigned to the FROZEN tree 20260727_042523's leaf centroids, withholding p2dca by exact text, capped at 150 per anchor (seed 556). Their corpora hold 0 EXACT and 14 NORM-V1-ONLY twins of p2dca judged questions (Health 8, Law 4, Other 1, Philosophy 1; 5 in the 1,020 CLEAN; 45 before the cap). The STACK-v2 boards (x12, x20, GROK-CALIB, Kotlin c0d3f708, RECIPE-GROK) use 212117 only for routing and the anchor map. See docs/judge_v2_program.md L14455-L14487 (SPLIT-FOLLOWUPS)."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: designed, never run (note) (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM note 2026-09-27: designed, never run; family by construction if ever run on the p2dca judged sample (RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Mistral-induced rubrics were compared with rubrics written by a frontier model and with 'contrastive' rubrics built with wrong answers in view. The Mistral judge used each one, over about 6,000 jobs.",
+    "why": "It tests whether better-written grading rubrics make the judge more accurate.",
+    "information": "A gain would make rubric authorship worth investing in. No gain would close that line. Result: done. No gain. Contrastive rubrics were slightly worse (-1.8 points, p = 0.043), and frontier-written ones were not significantly different. Rubric text is not the lever. The run had no pool check at run time; one was added afterwards. Later ruled history rather than evidence, because it ran on the older question pool.",
+    "written": "2026-10-07"
+  }
+}

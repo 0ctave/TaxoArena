@@ -1,0 +1,264 @@
+=== PROFILE-INTERVAL-ALL-UNION: do the 52 (source, domain) union strata carry a key-built profile row with a class? ===
+  registered 2026-09-17 (commit 62c4084, docs/judge_v2_program.md L5402-L5457); zero calls; key only; pool paeec37aa28063c75
+  reserved_pool_id=paeec37aa28063c75
+
+--- DATA CHECK (the object, before any stratum is read) ---
+  [ok] frozen id file reserved_pool_frozen_paeec.json: 52 keys, 6482 judgeable ids  
+  [ok] DB reserved_pool holds 8 pools; paeec37aa28063c75 (6482 rows) is the pool of record; every other id is refused by the reader (incl. pa95843d826d40ffd, 6482 rows)  
+  [ok] reader refuses pool pa95843d826d40ffd by id  
+  [ok] reserved_pool rows of paeec37aa28063c75 == frozen file (key, id) set  
+  [ok] routing CSV of record: 6482 rows, 52 keys, per-key counts == frozen file, true_source == key source (no id column: row-level identity not checkable)  
+  [ok] frozen keys agree with corpus_questions (source, domain) on every pool id (MMLU_PRO_LB <-> MMLU_PRO); the frozen key stays the stratum  (0)
+  [ok] eval_results = 388,908 rows, 21,606 questions x 18 models  ((388908, 21606, 18))
+  [ok] Meta-Llama-3-70B-Instruct absent from the roster  
+  [ok] eval_results_mathfix covers all 398 MATH pool ids x 18 models (MATH column read from MATH-FIX only)  
+  info: MATH-FIX differs from the ingested MATH rows on 1598 of 7164 pool (question, model) cells (the ingested rows are NOT read into the key)
+
+  stratum (frozen key = SOURCE/domain)               n  support
+  BBH/boolean_expressions                           75  >= 25
+  BBH/causal_judgement                              56  >= 25
+  BBH/date_understanding                            75  >= 25
+  BBH/disambiguation_qa                             75  >= 25
+  BBH/formal_fallacies                              75  >= 25
+  BBH/geometric_shapes                              75  >= 25
+  BBH/hyperbaton                                    75  >= 25
+  BBH/logical_deduction_five_objects                75  >= 25
+  BBH/logical_deduction_seven_objects               75  >= 25
+  BBH/logical_deduction_three_objects               75  >= 25
+  BBH/movie_recommendation                          75  >= 25
+  BBH/navigate                                      75  >= 25
+  BBH/object_counting                               75  >= 25
+  BBH/penguins_in_a_table                           44  >= 25
+  BBH/reasoning_about_colored_objects               75  >= 25
+  BBH/ruin_names                                    75  >= 25
+  BBH/salient_translation_error_detection           75  >= 25
+  BBH/snarks                                        53  >= 25
+  BBH/sports_understanding                          75  >= 25
+  BBH/temporal_sequences                            75  >= 25
+  BBH/tracking_shuffled_objects_five_objects        75  >= 25
+  BBH/tracking_shuffled_objects_seven_objects       75  >= 25
+  BBH/tracking_shuffled_objects_three_objects       75  >= 25
+  BBH/web_of_lies                                   75  >= 25
+  MATH/Algebra                                      92  >= 25
+  MATH/Counting & Probability                       37  >= 25
+  MATH/Geometry                                     40  >= 25
+  MATH/Intermediate Algebra                         84  >= 25
+  MATH/Number Theory                                46  >= 25
+  MATH/Prealgebra                                   58  >= 25
+  MATH/Precalculus                                  41  >= 25
+  MUSR/murder_mysteries                             75  >= 25
+  MUSR/object_placements                            77  >= 25
+  MUSR/team_allocation                              75  >= 25
+  IFEVAL/ifeval                                    162  >= 25
+  GPQA/Physics                                     150  >= 25
+  GPQA/Chemistry                                   147  >= 25
+  GPQA/Biology                                      61  >= 25
+  MMLU_PRO_LB/business                             237  >= 25
+  MMLU_PRO_LB/law                                  330  >= 25
+  MMLU_PRO_LB/psychology                           239  >= 25
+  MMLU_PRO_LB/biology                              215  >= 25
+  MMLU_PRO_LB/chemistry                            340  >= 25
+  MMLU_PRO_LB/history                              114  >= 25
+  MMLU_PRO_LB/other                                277  >= 25
+  MMLU_PRO_LB/health                               245  >= 25
+  MMLU_PRO_LB/economics                            253  >= 25
+  MMLU_PRO_LB/math                                 405  >= 25
+  MMLU_PRO_LB/physics                              390  >= 25
+  MMLU_PRO_LB/computer science                     123  >= 25
+  MMLU_PRO_LB/philosophy                           150  >= 25
+  MMLU_PRO_LB/engineering                          291  >= 25
+
+  per source (reserved-side support, expected per reserved_pool_meta):
+  [ok] MMLU_PRO_LB   3609 q over 14 strata (expected 3609 / 14)
+  [ok] BBH           1728 q over 24 strata (expected 1728 / 24)
+  [ok] MATH           398 q over  7 strata (expected 398 / 7)
+  [ok] MUSR           227 q over  3 strata (expected 227 / 3)
+  [ok] IFEVAL         162 q over  1 strata (expected 162 / 1)
+  [ok] GPQA           358 q over  3 strata (expected 358 / 3)
+  support floor: 25 reserved questions -> UNSUPPORTED; strata below it: none
+  roster (18 models): DeepSeek-R1-Distill-Llama-8B, DeepSeek-R1-Distill-Qwen-32B, Falcon3-10B-Instruct, Llama-3.1-70B-Instruct, Llama-3.2-3B-Instruct, Llama-3.3-70B-Instruct, Mistral-Small-Instruct-2409, Mixtral-8x7B-Instruct-v0.1, OLMo-2-1124-7B-Instruct, Phi-3.5-mini-instruct, Qwen2.5-32B-Instruct, Qwen2.5-72B-Instruct, Qwen2.5-7B-Instruct, Qwen2.5-Coder-7B-Instruct, Qwen2.5-Math-7B-Instruct, Yi-1.5-34B-Chat-16K, c4ai-command-r-plus-08-2024, internlm2_5-20b-chat
+  KEY DENOMINATOR: each stratum's RESERVED questions of pool paeec37aa28063c75 (n per row); key = is_correct (MATH: eval_results_mathfix).
+
+=== (C2) BOARD-LEVEL R OVER THE 52 STRATA (profile_reliability.reliability, 40 halvings, Random(7)) ===
+  per-half floor min_cell=12 so that every stratum with >= 25 reserved questions contributes; the recorded-default reading (min_cell 25 = strata >= 50 q) beside.
+  reading                            cells       r   R(SB)   halvSD  jk FIXED 95%        jk RE-HALVED 95%   
+  all strata >= 25 q (registered)       52  0.8912  0.9424   0.0048  [0.9264, 0.9585]  [0.9217, 0.9632]
+  recorded default (strata >= 50 q)     47  0.8835  0.9381   0.0072  (not read)          (not read)         
+  class of the board-level number on the lowest lower bound (for the record; the registration asks for the number): PASS
+  halvSD = SB-transformed spread of one halving around the mean r; the jackknife is leave-one-STRATUM-out, z = 1.96.
+
+=== (C3a) BOARD-LEVEL R OVER THE 6 SOURCE-LEVEL CELLS (each source's reserved questions pooled into one cell; leave-one-SOURCE-out jackknife) ===
+  6 source cells                         6  0.9584  0.9788   0.0067  [0.9642, 0.9934]  [0.9601, 0.9975]
+  source cells (reserved q): MMLU_PRO_LB 3609, BBH 1728, MATH 398, MUSR 227, IFEVAL 162, GPQA 358
+  leave-one-source-out R (fixed halvings): -BBH 0.9776, -GPQA 0.9798, -IFEVAL 0.9743, -MATH 0.9757, -MMLU_PRO_LB 0.9794, -MUSR 0.9846
+
+=== (C3b) R PER SOURCE OVER ITS OWN STRATA (demeaned within the source; leave-one-stratum-out jackknife on fixed halvings) ===
+  source       strata       q       r   R(SB)   halvSD  jk FIXED 95%       
+  MMLU_PRO_LB      14    3609  0.8958  0.9450   0.0107  [0.9081, 0.9820]
+  BBH              24    1728  0.8490  0.9184   0.0097  [0.8761, 0.9607]
+  MATH              7     398  0.8189  0.9004   0.0238  [0.8094, 0.9914]
+  MUSR              3     227  0.7523  0.8587   0.0621  [0.4938, 1.2235]
+  IFEVAL            1     162     n/a     n/a      n/a  n/a                  (undefined by construction: one stratum, model-demeaning leaves nothing to correlate)
+  GPQA              3     358  0.6890  0.8158   0.0554  [-0.4022, 2.0339]
+  (jackknife over 2-3 strata is a resolution statement, not a confidence statement; printed as registered.)
+
+=== (C1) PER-STRATUM SPLIT-HALF OF THE WITHIN-STRATUM MODEL ORDER (18 models), CLASS ON THE LOWER OF TWO LOWER BOUNDS ===
+  reading (i) PROFILE: half-vectors model-demeaned across ALL 52 strata of the board, r_s = Pearson across models inside s; the class is read here.
+  reading (ii) RAW ORDER: Spearman across models of the raw half-accuracies inside s; printed beside.
+  intervals: (A) question bootstrap inside every stratum, B = 125 x 16 halvings, percentile 2.5/97.5 RECENTRED on the point (bias printed);
+             (B) delete-one-question jackknife on the first 10 fixed halvings. Class on the LOWER of (A) and (B) lower bounds.
+  support floor 25 reserved questions -> UNSUPPORTED (counts only). Denominator per row = the stratum's reserved question count n.
+  stratum                                         n   R_prof  halvSD boot95 recentred    bias jackknife 95%     raw boot95        class (profile)     |   R_raw boot95 recentred  jackknife 95%     class (raw order)  
+  BBH/boolean_expressions                        75   0.9066  0.0365 [0.8348, 0.9572] -0.095 [0.8351, 0.9780] [0.7401, 0.8626] PASS                |  0.8551 [0.8018, 0.9018] [0.7185, 0.9917] PASS               
+  BBH/causal_judgement                           56   0.6302  0.1873 [0.4744, 0.7747] -0.173 [0.1163, 1.1441] [0.3010, 0.6013] FAIL                |  0.5168 [0.2822, 0.7175] [-0.8399, 1.8736] FAIL               
+  BBH/date_understanding                         75   0.6647  0.1028 [0.5555, 0.7656] -0.187 [0.4744, 0.8549] [0.3685, 0.5786] FAIL                |  0.8608 [0.8023, 0.9122] [0.7806, 0.9410] PASS               
+  BBH/disambiguation_qa                          75   0.8875  0.0493 [0.8064, 0.9542] -0.120 [0.7947, 0.9802] [0.6868, 0.8347] PASS                |  0.8325 [0.7748, 0.8796] [0.6995, 0.9654] PASS-WITH-INTERVAL 
+  BBH/formal_fallacies                           75   0.3733  0.2584 [0.1263, 0.5820] -0.198 [-0.0552, 0.8017] [-0.0718, 0.3839] FAIL                |  0.8648 [0.7750, 0.9379] [0.6739, 1.0556] PASS-WITH-INTERVAL 
+  BBH/geometric_shapes                           75   0.8139  0.0721 [0.7038, 0.8919] -0.163 [0.6499, 0.9779] [0.5403, 0.7284] PASS-WITH-INTERVAL  |  0.8618 [0.7895, 0.9243] [0.6951, 1.0286] PASS-WITH-INTERVAL 
+  BBH/hyperbaton                                 75   0.8100  0.0861 [0.7162, 0.8920] -0.125 [0.7061, 0.9139] [0.5917, 0.7674] PASS                |  0.9136 [0.8564, 0.9573] [0.8448, 0.9825] PASS               
+  BBH/logical_deduction_five_objects             75   0.6288  0.1205 [0.5057, 0.7309] -0.143 [0.3188, 0.9389] [0.3631, 0.5882] FAIL                |  0.9018 [0.8464, 0.9412] [0.8070, 0.9966] PASS               
+  BBH/logical_deduction_seven_objects            75   0.4557  0.1670 [0.2576, 0.6170] -0.160 [-0.0722, 0.9837] [0.0976, 0.4569] FAIL                |  0.8977 [0.8570, 0.9382] [0.8447, 0.9507] PASS               
+  BBH/logical_deduction_three_objects            75   0.7343  0.1061 [0.6394, 0.8416] -0.189 [0.5478, 0.9208] [0.4508, 0.6530] PASS-WITH-INTERVAL  |  0.9362 [0.9127, 0.9595] [0.8948, 0.9776] PASS               
+  BBH/movie_recommendation                       75   0.8772  0.0422 [0.8262, 0.9170] -0.103 [0.7902, 0.9643] [0.7236, 0.8145] PASS                |  0.9413 [0.9067, 0.9702] [0.8946, 0.9880] PASS               
+  BBH/navigate                                   75   0.8481  0.0974 [0.6539, 1.0093] -0.241 [0.5255, 1.1707] [0.4132, 0.7686] PASS-WITH-INTERVAL  |  0.9176 [0.8254, 1.0012] [0.8156, 1.0197] PASS               
+  BBH/object_counting                            75   0.8818  0.0468 [0.8254, 0.9338] -0.114 [0.7963, 0.9674] [0.7118, 0.8202] PASS                |  0.9277 [0.8917, 0.9665] [0.8564, 0.9991] PASS               
+  BBH/penguins_in_a_table                        44   0.4800  0.1846 [0.3461, 0.6159] -0.195 [0.0231, 0.9368] [0.1512, 0.4210] FAIL                |  0.8628 [0.8075, 0.9108] [0.7540, 0.9715] PASS               
+  BBH/reasoning_about_colored_objects            75   0.8932  0.0456 [0.8493, 0.9330] -0.101 [0.8305, 0.9558] [0.7484, 0.8321] PASS                |  0.9685 [0.9544, 0.9821] [0.9465, 0.9905] PASS               
+  BBH/ruin_names                                 75   0.9223  0.0265 [0.8817, 0.9536] -0.074 [0.8737, 0.9709] [0.8076, 0.8795] PASS                |  0.9572 [0.9349, 0.9725] [0.9267, 0.9877] PASS               
+  BBH/salient_translation_error_detection        75   0.7232  0.0905 [0.6344, 0.8140] -0.147 [0.5344, 0.9120] [0.4878, 0.6673] PASS-WITH-INTERVAL  |  0.9211 [0.8892, 0.9487] [0.8660, 0.9762] PASS               
+  BBH/snarks                                     53   0.4243  0.1801 [0.2759, 0.5635] -0.140 [-0.0486, 0.8972] [0.1359, 0.4234] FAIL                |  0.8304 [0.7544, 0.8972] [0.7067, 0.9542] PASS               
+  BBH/sports_understanding                       75   0.8623  0.0613 [0.7979, 0.9282] -0.100 [0.7838, 0.9408] [0.6982, 0.8285] PASS                |  0.9400 [0.9191, 0.9632] [0.9044, 0.9755] PASS               
+  BBH/temporal_sequences                         75   0.9748  0.0102 [0.9630, 0.9851] -0.028 [0.9637, 0.9860] [0.9354, 0.9575] PASS                |  0.9820 [0.9758, 0.9885] [0.9665, 0.9975] PASS               
+  BBH/tracking_shuffled_objects_five_objects     75   0.5691  0.1487 [0.4212, 0.7047] -0.156 [0.1973, 0.9409] [0.2655, 0.5490] FAIL                |  0.7879 [0.7050, 0.8636] [0.6041, 0.9718] PASS-WITH-INTERVAL 
+  BBH/tracking_shuffled_objects_seven_objects    75   0.6243  0.1536 [0.4887, 0.7491] -0.167 [0.3150, 0.9336] [0.3219, 0.5823] FAIL                |  0.7466 [0.6074, 0.8500] [0.3838, 1.1095] PASS-WITH-INTERVAL 
+  BBH/tracking_shuffled_objects_three_objects    75   0.7286  0.1201 [0.6135, 0.8503] -0.193 [0.5733, 0.8839] [0.4209, 0.6577] PASS-WITH-INTERVAL  |  0.7225 [0.5774, 0.8483] [0.3840, 1.0609] PASS-WITH-INTERVAL 
+  BBH/web_of_lies                                75   0.7428  0.1211 [0.6248, 0.8628] -0.153 [0.5495, 0.9362] [0.4714, 0.7093] PASS-WITH-INTERVAL  |  0.8530 [0.7709, 0.9407] [0.7075, 0.9986] PASS               
+  MATH/Algebra                                   92   0.9678  0.0100 [0.9558, 0.9785] -0.032 [0.9522, 0.9834] [0.9237, 0.9464] PASS                |  0.9703 [0.9594, 0.9791] [0.9510, 0.9897] PASS               
+  MATH/Counting & Probability                    37   0.9227  0.0245 [0.8928, 0.9500] -0.068 [0.8723, 0.9730] [0.8251, 0.8822] PASS                |  0.9427 [0.9201, 0.9640] [0.8946, 0.9909] PASS               
+  MATH/Geometry                                  40   0.8854  0.0435 [0.8306, 0.9328] -0.104 [0.7975, 0.9733] [0.7263, 0.8284] PASS                |  0.8947 [0.8507, 0.9331] [0.8132, 0.9762] PASS               
+  MATH/Intermediate Algebra                      84   0.9169  0.0323 [0.8821, 0.9485] -0.078 [0.8768, 0.9570] [0.8040, 0.8705] PASS                |  0.9289 [0.8950, 0.9521] [0.8874, 0.9704] PASS               
+  MATH/Number Theory                             46   0.9330  0.0235 [0.9062, 0.9629] -0.068 [0.8954, 0.9706] [0.8381, 0.8948] PASS                |  0.9456 [0.9213, 0.9689] [0.9077, 0.9835] PASS               
+  MATH/Prealgebra                                58   0.8836  0.0383 [0.8444, 0.9198] -0.093 [0.8172, 0.9499] [0.7518, 0.8272] PASS                |  0.9303 [0.9052, 0.9498] [0.8809, 0.9797] PASS               
+  MATH/Precalculus                               41   0.7887  0.0676 [0.7083, 0.8577] -0.156 [0.6628, 0.9146] [0.5520, 0.7013] PASS-WITH-INTERVAL  |  0.7840 [0.6833, 0.8667] [0.5780, 0.9900] PASS-WITH-INTERVAL 
+  MUSR/murder_mysteries                          75   0.7692  0.0770 [0.6833, 0.8622] -0.169 [0.6312, 0.9073] [0.5140, 0.6929] PASS-WITH-INTERVAL  |  0.4894 [0.2913, 0.6431] [-0.0209, 0.9998] FAIL               
+  MUSR/object_placements                         77   0.9314  0.0272 [0.8975, 0.9598] -0.059 [0.8973, 0.9655] [0.8388, 0.9011] PASS                |  0.7797 [0.6479, 0.8701] [0.5799, 0.9795] PASS-WITH-INTERVAL 
+  MUSR/team_allocation                           75   0.7794  0.0774 [0.7000, 0.8506] -0.118 [0.6583, 0.9004] [0.5818, 0.7324] PASS-WITH-INTERVAL  |  0.6367 [0.5266, 0.7327] [0.3328, 0.9406] FAIL               
+  IFEVAL/ifeval                                 162   0.9600  0.0168 [0.9472, 0.9757] -0.036 [0.9428, 0.9771] [0.9115, 0.9400] PASS                |  0.9792 [0.9705, 0.9876] [0.9631, 0.9953] PASS               
+  GPQA/Physics                                  150   0.8936  0.0462 [0.8541, 0.9351] -0.108 [0.8267, 0.9605] [0.7459, 0.8270] PASS                |  0.3056 [0.0909, 0.5014] [-0.4439, 1.0551] FAIL               
+  GPQA/Chemistry                                147   0.8890  0.0534 [0.8457, 0.9268] -0.098 [0.8143, 0.9637] [0.7480, 0.8291] PASS                |  0.2217 [0.0005, 0.4047] [-0.6188, 1.0621] FAIL               
+  GPQA/Biology                                   61   0.8422  0.0495 [0.7804, 0.9037] -0.139 [0.7604, 0.9239] [0.6409, 0.7642] PASS                |  0.8857 [0.8244, 0.9418] [0.8050, 0.9664] PASS               
+  MMLU_PRO_LB/business                          237   0.7541  0.0602 [0.6460, 0.8410] -0.180 [0.5979, 0.9102] [0.4665, 0.6614] PASS-WITH-INTERVAL  |  0.9127 [0.8648, 0.9433] [0.8512, 0.9742] PASS               
+  MMLU_PRO_LB/law                               330   0.8827  0.0453 [0.8459, 0.9190] -0.088 [0.8328, 0.9326] [0.7579, 0.8309] PASS                |  0.9351 [0.9183, 0.9547] [0.8853, 0.9849] PASS               
+  MMLU_PRO_LB/psychology                        239   0.8943  0.0296 [0.8424, 0.9291] -0.094 [0.8426, 0.9461] [0.7489, 0.8356] PASS                |  0.9573 [0.9387, 0.9717] [0.9304, 0.9843] PASS               
+  MMLU_PRO_LB/biology                           215   0.8666  0.0418 [0.8080, 0.9089] -0.105 [0.8080, 0.9253] [0.7029, 0.8038] PASS                |  0.9537 [0.9348, 0.9750] [0.9257, 0.9816] PASS               
+  MMLU_PRO_LB/chemistry                         340   0.8785  0.0445 [0.8360, 0.9184] -0.092 [0.8249, 0.9322] [0.7435, 0.8260] PASS                |  0.9328 [0.8958, 0.9553] [0.8773, 0.9883] PASS               
+  MMLU_PRO_LB/history                           114   0.7789  0.0830 [0.6976, 0.8543] -0.160 [0.6075, 0.9502] [0.5371, 0.6939] PASS-WITH-INTERVAL  |  0.9365 [0.9165, 0.9587] [0.8865, 0.9864] PASS               
+  MMLU_PRO_LB/other                             277   0.8496  0.0451 [0.7852, 0.9036] -0.142 [0.7569, 0.9424] [0.6432, 0.7615] PASS                |  0.9552 [0.9382, 0.9725] [0.9140, 0.9964] PASS               
+  MMLU_PRO_LB/health                            245   0.9317  0.0206 [0.9040, 0.9555] -0.058 [0.9038, 0.9597] [0.8457, 0.8972] PASS                |  0.9596 [0.9481, 0.9713] [0.9242, 0.9951] PASS               
+  MMLU_PRO_LB/economics                         253   0.8249  0.0632 [0.7542, 0.8846] -0.128 [0.7370, 0.9129] [0.6261, 0.7565] PASS                |  0.9683 [0.9548, 0.9822] [0.9464, 0.9902] PASS               
+  MMLU_PRO_LB/math                              405   0.9036  0.0344 [0.8690, 0.9305] -0.077 [0.8560, 0.9512] [0.7918, 0.8533] PASS                |  0.9649 [0.9467, 0.9772] [0.9404, 0.9894] PASS               
+  MMLU_PRO_LB/physics                           390   0.8844  0.0418 [0.8478, 0.9170] -0.083 [0.8353, 0.9335] [0.7648, 0.8340] PASS                |  0.9427 [0.9229, 0.9603] [0.8988, 0.9865] PASS               
+  MMLU_PRO_LB/computer science                  123   0.7119  0.0861 [0.5955, 0.8076] -0.135 [0.5377, 0.8862] [0.4606, 0.6726] PASS-WITH-INTERVAL  |  0.9414 [0.9167, 0.9662] [0.8967, 0.9860] PASS               
+  MMLU_PRO_LB/philosophy                        150   0.8382  0.0526 [0.7671, 0.9002] -0.122 [0.7490, 0.9274] [0.6451, 0.7783] PASS                |  0.9492 [0.9276, 0.9706] [0.9131, 0.9852] PASS               
+  MMLU_PRO_LB/engineering                       291   0.8490  0.0688 [0.7952, 0.8975] -0.101 [0.7831, 0.9149] [0.6943, 0.7966] PASS                |  0.9482 [0.9211, 0.9709] [0.9125, 0.9840] PASS               
+  board-level R over the strata from the same question bootstrap: raw mean 0.8893 [0.8847, 0.8935] vs point 0.9424 (bias -0.0532); recentred [0.9379, 0.9467]
+  classes over the 52 strata (profile reading): {'PASS': 31, 'FAIL': 9, 'PASS-WITH-INTERVAL': 12}
+  raw-order reading: {'PASS': 39, 'FAIL': 5, 'PASS-WITH-INTERVAL': 8}
+
+=== SUPPORT CURVE: per-stratum R_prof against reserved n (profile reading), and binned means ===
+  n=  37  MATH/Counting & Probability                  R_prof  0.9227  class PASS
+  n=  40  MATH/Geometry                                R_prof  0.8854  class PASS
+  n=  41  MATH/Precalculus                             R_prof  0.7887  class PASS-WITH-INTERVAL
+  n=  44  BBH/penguins_in_a_table                      R_prof  0.4800  class FAIL
+  n=  46  MATH/Number Theory                           R_prof  0.9330  class PASS
+  n=  53  BBH/snarks                                   R_prof  0.4243  class FAIL
+  n=  56  BBH/causal_judgement                         R_prof  0.6302  class FAIL
+  n=  58  MATH/Prealgebra                              R_prof  0.8836  class PASS
+  n=  61  GPQA/Biology                                 R_prof  0.8422  class PASS
+  n=  75  BBH/boolean_expressions                      R_prof  0.9066  class PASS
+  n=  75  BBH/date_understanding                       R_prof  0.6647  class FAIL
+  n=  75  BBH/disambiguation_qa                        R_prof  0.8875  class PASS
+  n=  75  BBH/formal_fallacies                         R_prof  0.3733  class FAIL
+  n=  75  BBH/geometric_shapes                         R_prof  0.8139  class PASS-WITH-INTERVAL
+  n=  75  BBH/hyperbaton                               R_prof  0.8100  class PASS
+  n=  75  BBH/logical_deduction_five_objects           R_prof  0.6288  class FAIL
+  n=  75  BBH/logical_deduction_seven_objects          R_prof  0.4557  class FAIL
+  n=  75  BBH/logical_deduction_three_objects          R_prof  0.7343  class PASS-WITH-INTERVAL
+  n=  75  BBH/movie_recommendation                     R_prof  0.8772  class PASS
+  n=  75  BBH/navigate                                 R_prof  0.8481  class PASS-WITH-INTERVAL
+  n=  75  BBH/object_counting                          R_prof  0.8818  class PASS
+  n=  75  BBH/reasoning_about_colored_objects          R_prof  0.8932  class PASS
+  n=  75  BBH/ruin_names                               R_prof  0.9223  class PASS
+  n=  75  BBH/salient_translation_error_detection      R_prof  0.7232  class PASS-WITH-INTERVAL
+  n=  75  BBH/sports_understanding                     R_prof  0.8623  class PASS
+  n=  75  BBH/temporal_sequences                       R_prof  0.9748  class PASS
+  n=  75  BBH/tracking_shuffled_objects_five_objects   R_prof  0.5691  class FAIL
+  n=  75  BBH/tracking_shuffled_objects_seven_objects  R_prof  0.6243  class FAIL
+  n=  75  BBH/tracking_shuffled_objects_three_objects  R_prof  0.7286  class PASS-WITH-INTERVAL
+  n=  75  BBH/web_of_lies                              R_prof  0.7428  class PASS-WITH-INTERVAL
+  n=  75  MUSR/murder_mysteries                        R_prof  0.7692  class PASS-WITH-INTERVAL
+  n=  75  MUSR/team_allocation                         R_prof  0.7794  class PASS-WITH-INTERVAL
+  n=  77  MUSR/object_placements                       R_prof  0.9314  class PASS
+  n=  84  MATH/Intermediate Algebra                    R_prof  0.9169  class PASS
+  n=  92  MATH/Algebra                                 R_prof  0.9678  class PASS
+  n= 114  MMLU_PRO_LB/history                          R_prof  0.7789  class PASS-WITH-INTERVAL
+  n= 123  MMLU_PRO_LB/computer science                 R_prof  0.7119  class PASS-WITH-INTERVAL
+  n= 147  GPQA/Chemistry                               R_prof  0.8890  class PASS
+  n= 150  GPQA/Physics                                 R_prof  0.8936  class PASS
+  n= 150  MMLU_PRO_LB/philosophy                       R_prof  0.8382  class PASS
+  n= 162  IFEVAL/ifeval                                R_prof  0.9600  class PASS
+  n= 215  MMLU_PRO_LB/biology                          R_prof  0.8666  class PASS
+  n= 237  MMLU_PRO_LB/business                         R_prof  0.7541  class PASS-WITH-INTERVAL
+  n= 239  MMLU_PRO_LB/psychology                       R_prof  0.8943  class PASS
+  n= 245  MMLU_PRO_LB/health                           R_prof  0.9317  class PASS
+  n= 253  MMLU_PRO_LB/economics                        R_prof  0.8249  class PASS
+  n= 277  MMLU_PRO_LB/other                            R_prof  0.8496  class PASS
+  n= 291  MMLU_PRO_LB/engineering                      R_prof  0.8490  class PASS
+  n= 330  MMLU_PRO_LB/law                              R_prof  0.8827  class PASS
+  n= 340  MMLU_PRO_LB/chemistry                        R_prof  0.8785  class PASS
+  n= 390  MMLU_PRO_LB/physics                          R_prof  0.8844  class PASS
+  n= 405  MMLU_PRO_LB/math                             R_prof  0.9036  class PASS
+  bin [25, 50): 5 strata, mean R_prof 0.8020, min 0.4800, max 0.9330
+  bin [50, 100): 30 strata, mean R_prof 0.7689, min 0.3733, max 0.9748
+  bin [100, 200): 6 strata, mean R_prof 0.8453, min 0.7119, max 0.9600
+  bin [200, 300): 7 strata, mean R_prof 0.8529, min 0.7541, max 0.9317
+  bin [300, inf): 4 strata, mean R_prof 0.8873, min 0.8785, max 0.9036
+
+=== (C3c) THE MMLU_PRO_LB STRATA (this test: 18-model union roster, pool paeec37aa28063c75) BESIDE PROFILE-INTERVAL-ALL's key rows
+    (merged 20-model roster, 2,811 judged questions of pool p2dca21ab5f4ef3ae, block '--- key, 20 rows ---'); roster named, NO comparison of levels claimed ===
+  stratum (18-model union key)      n   R_prof class               | PIA anchor (key, 20 rows)         q   R_prof class              
+  MMLU_PRO_LB/business            237   0.7541 PASS-WITH-INTERVAL  | Business                        174   0.8865 PASS               
+  MMLU_PRO_LB/law                 330   0.8827 PASS                | Law                             271   0.8891 PASS               
+  MMLU_PRO_LB/psychology          239   0.8943 PASS                | Psychology                      260   0.9290 PASS               
+  MMLU_PRO_LB/biology             215   0.8666 PASS                | Biology                         181   0.7866 PASS-WITH-INTERVAL 
+  MMLU_PRO_LB/chemistry           340   0.8785 PASS                | Chemistry                       269   0.9459 PASS               
+  MMLU_PRO_LB/history             114   0.7789 PASS-WITH-INTERVAL  | History                         119   0.6676 FAIL               
+  MMLU_PRO_LB/other               277   0.8496 PASS                | Other                           211   0.8591 PASS               
+  MMLU_PRO_LB/health              245   0.9317 PASS                | Health                          129   0.6480 FAIL               
+  MMLU_PRO_LB/economics           253   0.8249 PASS                | Economics                       178   0.8236 PASS               
+  MMLU_PRO_LB/math                405   0.9036 PASS                | Math                            304   0.9634 PASS               
+  MMLU_PRO_LB/physics             390   0.8844 PASS                | Physics                         259   0.8773 PASS               
+  MMLU_PRO_LB/computer science    123   0.7119 PASS-WITH-INTERVAL  | Computer science                162   0.4817 FAIL               
+  MMLU_PRO_LB/philosophy          150   0.8382 PASS                | Philosophy                      132   0.6741 FAIL               
+  MMLU_PRO_LB/engineering         291   0.8490 PASS                | Engineering                     162   0.7703 PASS-WITH-INTERVAL 
+
+=== PREDICTIONS (the plan's, recorded blind; scored exactly as registered) ===
+  P1 'MMLU-Pro-source strata PASS (scored: all 14 PASS)': 11 of 14 PASS, 3 PASS-WITH-INTERVAL, 0 FAIL, 0 UNSUPPORTED -> FAILED
+  P2 'MATH / GPQA / MuSR / IFEval strata mostly FAIL by support (scored: more than half of those 14 strata FAIL or UNSUPPORTED)': 0 of 14 FAIL or UNSUPPORTED (PASS 11, PASS-WITH-INTERVAL 3) -> FAILED
+     MATH     reserved  398 q over 7 strata: Algebra 0.9678 PASS, Counting & Probability 0.9227 PASS, Geometry 0.8854 PASS, Intermediate Algebra 0.9169 PASS, Number Theory 0.9330 PASS, Prealgebra 0.8836 PASS, Precalculus 0.7887 PASS-WITH-INTERVAL
+     GPQA     reserved  358 q over 3 strata: Physics 0.8936 PASS, Chemistry 0.8890 PASS, Biology 0.8422 PASS
+     MUSR     reserved  227 q over 3 strata: murder_mysteries 0.7692 PASS-WITH-INTERVAL, object_placements 0.9314 PASS, team_allocation 0.7794 PASS-WITH-INTERVAL
+     IFEVAL   reserved  162 q over 1 strata: ifeval 0.9600 PASS
+  BBH (no prediction registered; printed): 24 strata, {'PASS': 9, 'FAIL': 9, 'PASS-WITH-INTERVAL': 6}
+
+=== CRITERIA (in the registration's words) ===
+  (C1) 'every stratum with >= 25 reserved questions receives a class': 52 of 52 supported strata classed ({'PASS': 31, 'FAIL': 9, 'PASS-WITH-INTERVAL': 12}); 0 below the floor printed as counts -> HELD
+  (C2) 'board-level R over the 52 strata with its jackknife interval and halving SD': R = 0.9424, jk fixed [0.9264, 0.9585], re-halved [0.9217, 0.9632], halving SD 0.0048 over 52 strata -> PUBLISHED
+  (C3) 'board-level R per source (6 cells) with intervals': 6-cell reading R = 0.9788 [0.9642, 0.9934] (fixed) [0.9601, 0.9975] (re-halved); per-source-own-strata readings above; MMLU-Pro strata printed beside PROFILE-INTERVAL-ALL, rosters named -> PUBLISHED
+  FALSIFIER (a sentence, not a result): FRAMEWORK L258 'union strata have no reliability measurement at all' is now false whatever the values; bracket by insertion.
+  CONSEQUENCE of P1 FAILED: the key-built profile's reliability is shown roster- and cell-dependent at the stratum level on the 18-model union key
+     (a finding beside PROFILE-RELIABILITY's 0.9135 on the 46-model MMLU-Pro key, not a refutation of it: rosters and pools differ).
+  CONSEQUENCE for the atlas (plan A5): a key-built row per union stratum with its class; FAIL / UNSUPPORTED strata ship as counts without a profile claim.
+  McNEMAR-ESTABLISHED RULE: no wrong-direction count is produced here; nothing for systematic_budget.mcnemar_edge / established to attach to. Stated, not applied.
+  runtime 42s, zero LLM calls
+  total runtime 43s

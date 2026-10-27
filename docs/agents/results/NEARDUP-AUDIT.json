@@ -1,0 +1,161 @@
+{
+ "id": "NEARDUP-AUDIT",
+ "title": "NEARDUP-AUDIT: CK-CLOSE-v1 stem_key twins between p2dca EVAL and bareq512_s42's TRAIN members as positives: leaf blocking + cos >= 0.95 vs a plain cosine threshold, k-means blocking beside (zero calls; REGISTERED 2026-10-04)",
+ "question": "Is the tree a safe blocking index for near-duplicate audits?",
+ "kind": "zero-call",
+ "state": "UNDETERMINED",
+ "registration": {
+  "commit": "the commit that writes it (parent ed52c912)",
+  "program_lines": "docs/judge_v2_program.md L24169-L24181",
+  "program_lines_as_of": "the commit that writes them, parent ed52c912, re-grepped",
+  "date": "2026-10-04",
+  "provenance": "docs/agents/plans/2026-10-04_10h_schedule.md (ed52c912); docs/literature/2026-10-03_tree_uses.md (7812c100); the orchestrator's brief; autonomous scheduling"
+ },
+ "script": {
+  "path": "tools/analysis/neardup_audit.py",
+  "sha16": "4122ba72 (git blob, LF)",
+  "commit": "122d6fc5 (squash-applied, W-4)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_neardup_audit.md",
+  "commit": "untracked at bracket time (blob a2d297a0, LF)",
+  "verdict": "READY with conditions C-1..C-6; decision-rule blob owes a delta review"
+ },
+ "go": "autonomous-scheduling authorisation (zero calls); the author's 10-hour instruction",
+ "run": {
+  "outcome_file": "E:/TaxoArena_backup_2026-10-04_neardup_audit/neardup_audit_outcome.txt (sha256 0e47b6ed...); never committed",
+  "outcome_commit": "run from main at 122d6fc5",
+  "calls": 0,
+  "cce": 0,
+  "pool": "p2dca21ab5f4ef3ae / bareq512_s42",
+  "date": "2026-10-04"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_neardup_audit.md",
+  "commit": "45a2d100",
+  "verdict": "VALID (W-1..W-4)"
+ },
+ "criteria": [
+  {
+   "id": "ND1",
+   "text": "DECIDING (interval): BLOCK-LOSS = share of PLAIN-flagged positives (tau 0.95) that TREE-BLOCK misses; BLOCKS-WELL iff 95% upper <= 0.10; LOSES iff point > 0.10; UNDETERMINED otherwise. Verdict line: SCOREABLE (pilot DEFF 1.2 declared; SE 0.0153 at 0.03, n 150; MDE80 0.043) [2026-10-04 pre-data: bootstrap upper decides except at 0 misses (degenerate), where Clopper-Pearson decides; CP always printed]",
+   "result": "UNDETERMINED",
+   "value": "BLOCK-LOSS 0.071 (5 / 70), 95% bootstrap [0.014, 0.129], CP upper 0.159; R1-DEPENDENT: primary-leaf-only 0.114 [0.043, 0.200] reads LOSES",
+   "denominator": "70 stem_key twin pairs over 70 EVAL ids (B-1); n_dec in [37, 70]; DEFF 1.000 measured (B-4)"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "BLOCK-LOSS 0.03 [0.00, 0.08]; ND1 BLOCKS-WELL 0.65, UNDETERMINED 0.20, LOSES 0.15",
+   "result": "HELD",
+   "value": "0.071 in [0.00, 0.08]; UNDETERMINED occurred (p 0.20)",
+   "denominator": "twin pairs"
+  },
+  {
+   "id": "P2",
+   "text": "PLAIN recall at tau 0.95 0.80 [0.60, 0.95]",
+   "result": "FAILED",
+   "value": "PLAIN recall 1.000 outside [0.60, 0.95]; no stem-only tier (B-2)",
+   "denominator": "twin pairs"
+  },
+  {
+   "id": "P3",
+   "text": "comparison fraction 0.02 [0.01, 0.04] [scored on the registered unweighted mean leaf size / 8,278; EVAL-weighted beside]",
+   "result": "HELD",
+   "value": "0.0122 unweighted (registered) in [0.01, 0.04]; EVAL-weighted 0.0146 beside",
+   "denominator": "EVAL items"
+  },
+  {
+   "id": "P4",
+   "text": "KMEANS-BLOCK BLOCK-LOSS 0.03 [0.00, 0.10] (descriptive)",
+   "result": "HELD",
+   "value": "k-means 0.009 in [0.00, 0.10] (descriptive, [AN])",
+   "denominator": "twin pairs"
+  }
+ ],
+ "falsifier": {
+  "text": "F-ND fires iff ND1 LOSES: leaf blocking loses > 10% of the twins a plain threshold finds; E3 narrows to 'use plain ANN'.",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "ND1": "BLOCK-LOSS 0.071 (5 / 70), 95% cluster bootstrap [0.014, 0.129], Clopper-Pearson upper 0.159; n 70 pairs / 70 ids, DEFF 1.000, SE 0.0308, MDE80 0.086",
+  "primary_leaf_only": "0.114 [0.043, 0.200] reads LOSES (R1-dependent)",
+  "kmeans_block": "0.009 (seed mean; descriptive, [AN])",
+  "membership_vs_filing": "10.6% of TRAIN members file outside their listed leaves; 3 of the 5 misses are exact twins sharing a vector"
+ },
+ "sentence_of_record": "NEARDUP-AUDIT (2026-10-04, 0 calls) — VALID; ND1 UNDETERMINED (R1-DEPENDENT). BLOCK-LOSS 0.071 (5 of 70 PLAIN-flagged stem_key twins), 95% cluster bootstrap [0.014, 0.129] (Clopper-Pearson upper 0.159, which agrees); primary-leaf-only membership 0.114 [0.043, 0.200] reads LOSES. F-ND NOT FIRED (under R1). n 70 pairs / 70 EVAL ids, DEFF 1.000 measured, SE 0.0308, MDE80 0.086: SCOREABLE; the point sits within one MDE of the 0.10 bar. P1 HELD (0.071), P2 FAILED (PLAIN recall 1.000; no stem-only tier, B-2), P3 HELD (0.0122 unweighted; EVAL-weighted 0.0146 beside), P4 HELD (k-means 0.009, descriptive [AN]). Membership-vs-filing disagreement: 10.6% of TRAIN members file outside their listed leaves; 3 of the 5 misses are exact twins sharing a vector. [Never 'a safe blocking index' (W-1: UNDETERMINED under R1; LOSES under primary-leaf-only membership); k-means 0.009 vs tree 0.071 descriptive only (W-3); script squash-applied in 122d6fc5 (W-4).]",
+ "chips": [
+  "REGISTERED 2026-10-04, BEFORE ANY CODE; not built",
+  "VALID (POST-RUN 45a2d100): ND1 UNDETERMINED (R1-DEPENDENT); F-ND NOT FIRED",
+  "NEVER A SAFE BLOCKING INDEX: PRIMARY-LEAF-ONLY READS LOSES (0.114); k-MEANS 0.009 DESCRIPTIVE [AN]"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-04",
+   "by": "registrar (pre-data; READY_neardup_audit B-1..B-5)",
+   "text": "B-1 70 pairs / 70 ids (SE 0.0204, MDE80 0.057); B-2 stem-only tier empty; B-3 readings R1-R6; B-4 DEFF 1.000 measured; B-5 n_dec >= 37, R3 cannot fire; ND1 CP at degenerate bootstrap (not a criterion move); P3 unweighted scored. Programme L24172, L24174, L24176, L24177, L24178."
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (POSTRUN 45a2d100)",
+   "text": "outcome recorded. docs/judge_v2_program.md L24196-L24206 (section \"## NEARDUP-AUDIT (2026-10-04, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent 45a2d100)"
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (consistency check 2026-10-04; zero calls)",
+   "text": "READY pointer completed: docs/reviews/READY_neardup_audit.md committed in 47cf64e4 (blob a2d297a0, LF); delta docs/reviews/READY_neardup_audit_delta.md (122d6fc5); 'ready' kept as written."
+  }
+ ],
+ "does_not_show": [
+  "that the tree is a safe blocking index (W-1)",
+  "tree vs k-means or ANN as an index (W-3)",
+  "paraphrases",
+  "the v2 split",
+  "any decontamination verdict"
+ ],
+ "ledger": {
+  "row_id": "NEARDUP-AUDIT",
+  "version": "v377 (2026-10-04: OUTCOME bracket, NULL + WARN chips) | v375 (2026-10-04: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "CONTENT-DISJOINT-SPLIT-AUDIT"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "minutes",
+  "agent_hours": "about 1.5 h",
+  "reads_pool": true
+ },
+ "outputs": "never committed: pinned by sha256, stored / backed up on E: with SHA256SUMS.txt (the author prefers E:)",
+ "sources": [
+  "docs/judge_v2_program.md L24169-L24181 (_as_of the commit that writes it, parent ed52c912, re-grepped)",
+  "docs/agents/plans/2026-10-04_10h_schedule.md (ed52c912)",
+  "docs/reviews/READY_neardup_audit.md (blob a2d297a0, LF; reviewed neardup_audit.py blob 2c21f715 on branch neardup-audit d6e8038f; the review file was untracked when this bracket was written)",
+  "docs/reviews/POSTRUN_neardup_audit.md (45a2d100; blob 1a874b9a, LF)",
+  "docs/judge_v2_program.md L24196-L24206 (section \"## NEARDUP-AUDIT (2026-10-04, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent 45a2d100)"
+ ],
+ "last_update": "2026-10-04",
+ "label_status": "bareq512_s42 is ANCHORED [AN] and ID-ONLY; precision is a lower bound (stem_key misses paraphrases)",
+ "ready_of_record": {
+  "file": "docs/reviews/READY_neardup_audit.md",
+  "commit": "47cf64e4",
+  "blob": "a2d297a0 (LF)",
+  "note": "delta docs/reviews/READY_neardup_audit_delta.md (122d6fc5)"
+ },
+ "plain_description": {
+  "sq": "SQ3 Taxonomy",
+  "what": "No calls. Using 70 known near-duplicate pairs between held-out and training questions, the test compared two ways to find them: searching only within the same tree leaf, and a plain similarity threshold over all questions. k-means was measured alongside.",
+  "why": "It asks whether the tree can safely serve as a shortcut for finding near-duplicate questions, i.e. for contamination checks.",
+  "information": "If searching within leaves missed more than 10% of duplicates, the advice would be to use plain similarity search. Result: undetermined. Searching within leaves missed 5 of 70 (7%), but the uncertainty range reaches about 13% and the estimate sits close to the 10% bar. So the tree is not shown to be a safe index. Paraphrases and decontamination verdicts are not covered.",
+  "written": "2026-10-07"
+ }
+}

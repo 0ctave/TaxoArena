@@ -1,0 +1,61 @@
+﻿To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.10/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+Configuration on demand is an incubating feature.
+Calculating task graph as no cached configuration is available for tasks: certPositiveControl
+> Task :checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :processResources UP-TO-DATE
+> Task :processTestResources UP-TO-DATE
+> Task :compileKotlin FROM-CACHE
+> Task :compileJava NO-SOURCE
+> Task :classes UP-TO-DATE
+> Task :jar
+> Task :compileTestKotlin FROM-CACHE
+> Task :compileTestJava NO-SOURCE
+> Task :testClasses UP-TO-DATE
+
+> Task :processTestAot
+10:32:38.775 [main] INFO org.springframework.test.context.aot.TestClassScanner -- Scanning for Spring test classes in all packages in classpath roots [Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\build\classes\kotlin\test, Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\build\resources\test]
+
+> Task :processAotTestResources UP-TO-DATE
+> Task :compileAotTestKotlin NO-SOURCE
+> Task :compileAotTestJava FROM-CACHE
+> Task :aotTestClasses UP-TO-DATE
+
+> Task :certPositiveControl
+
+SeparationNullBySizeTest > certPositiveControl - declared partitions scored against their own site nulls() STANDARD_OUT
+    [THREAD-CAP] requested=12 availableProcessors=12 heapEstimate=n/a budget=5.80GB
+    [CPC] reads embeddings_cache.db (the qwen3 cache of record; -DembeddingCacheFile / -DembeddingModel refused)
+    [CPC] snapshot 20261001_094311_Headless_Run_Auto_ge root n00000001 'MMLU_PRO_LB' n=6993; sites 60; labels experiment_results\cert_positive_control\declared_labels.tsv sha256 c0a20662047c6314ee57e64f5537e66525af3471b818607a88cb4afdfe2b3aef; categories 14
+    [SEPBAR] proposalSeparationBar=0.0145 (-DsepBar '0.0145'); sliceDim=512 dropTop=0 whiten=false reps=300 minClusterSize=55
+    [THREAD-CAP] requested=12 availableProcessors=12 heapEstimate=2.15GB budget=5.80GB
+    [SITENULL-HEAP] sliceDim=512 largest site n=6993 live=12 -> peak live 2.15 GB; budget 5.80 GB
+    [EMB-GUARD] model=qwen3-embedding:latest (default (no -DembeddingCacheFile, no -DembeddingModel, no manifest reachable: the DB of record's canonical model)); cache=embeddings_cache.db; native dim expected 4096; vectors read 6993 of 6993 ids, raw dims {4096=6993}; slice width 512
+    [EMB-GUARD] vmfMu cosine over 60 sites: min 0.9976 (site n00000014 'MMLU_PRO_LB/philosophy' n=322), median 0.9996; budget 0.99 -> ADMIT
+    [EMB-GUARD]   site n00000014  n=322   found=322   cos=0.9976  MMLU_PRO_LB/philosophy
+    [EMB-GUARD]   site n00000047  n=286   found=286   cos=0.9980  Emergent Concept #32
+    [EMB-GUARD]   site n00000018  n=426   found=426   cos=0.9982  Emergent Concept #3
+    [CPC] I-1 registered form: 6 of 60 sites reproduce the persisted dasguptaDeltaNorm at 6 printed digits
+    [CPC] I-1 live leg: 60 of 60 real site populations accepted by splitSingleNode; 60 of 60 reproduce node.dasguptaDeltaNorm bit for bit
+    [CPC] I-1 gate = the LIVE leg under the registrar's bracket: docs/judge_v2_program.md L23470
+    [CPC] anchor MMLU_PRO_LB/math                         n= 770 src children  4 (pooled 291) scored k_persisted=292 (G12 292)
+    [CPC] anchor MMLU_PRO_LB/physics                      n= 765 src children  4 (pooled 459) scored k_persisted=300 (G12 300)
+    [CPC] anchor MMLU_PRO_LB/economics                    n= 483 src children  4 (pooled  78) scored k_persisted=300 (G12 300)
+    [CPC] anchor MMLU_PRO_LB/other                        n= 490 src children  2 (pooled 404) scored k_persisted=300 (G12 300)
+    [CPC] anchor MMLU_PRO_LB/health                       n= 409 src children  3 (pooled 268) scored k_persisted=300 (G12 300)
+    [CPC] anchor MMLU_PRO_LB/chemistry                    n= 778 src children  5 (pooled 269) scored k_persisted=300 (G12 300)
+    [CPC] anchor MMLU_PRO_LB/history                      n= 264 src children  3 (pooled 148) scored k_persisted= 97 (G12  97)
+    [CPC] anchor MMLU_PRO_LB/psychology                   n= 532 src children  4 (pooled 164) scored k_persisted=296 (G12 296)
+    [CPC] anchor MMLU_PRO_LB/engineering                  n= 443 src children  4 (pooled 261) scored k_persisted=249 (G12 249)
+    [CPC] anchor MMLU_PRO_LB/biology                      n= 441 src children  4 (pooled 158) scored k_persisted=300 (G12 300)
+    [CPC] anchor MMLU_PRO_LB/business                     n= 483 src children  2 (pooled 173) scored k_persisted=300 (G12 300)
+    [CPC] anchor MMLU_PRO_LB/computer science             n= 489 src children  2 (pooled 431) scored k_persisted=300 (G12 300)
+    [CPC] anchor MMLU_PRO_LB/law                          n= 564 src children  2 (pooled  42) scored k_persisted=300 (G12 300)
+    [CPC] anchor MMLU_PRO_LB/philosophy                   n= 322 src children  3 (pooled 168) scored k_persisted=300 (G12 300)
+    [CPC] I-2: n00000006 k=300 (G12 300), n00000011 k=292 (G12 292), n00000007 k=97 (G12 97) -> REPRODUCED
+    [CPC] root n=6993 declared=0.107803 k_declared=0 plain p95=0.041626 deflated dims=13 k=0 C0 p95=0.000604 (seed 20261002)
+    [CPC] wrote experiment_results\cert_positive_control\arm: identity.csv, sites.csv, replicates.csv, status.txt (COMPLETE); verdicts are the readout's
+
+BUILD SUCCESSFUL in 33m 55s
+9 actionable tasks: 3 executed, 3 from cache, 3 up-to-date
+Configuration cache entry stored.

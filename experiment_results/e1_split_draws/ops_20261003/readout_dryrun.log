@@ -1,0 +1,88 @@
+== 2026-10-03T16:59:16+02:00 step6 dry-run
+pool p2dca21ab5f4ef3ae (pool_guard.assert_pool_of_record: the IDENTITY pair's held-out; never compared with the splits)
+[THREADS] OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+[SCRIPT] tools/analysis/e1_split_draws.py blob:3318a16a / sha256-lf16:1004a8e1750f5810 / sha256-crlf16:02668b7d81080bf1
+[PIN] tools/analysis/e1_readout.py blob:88f7990c / sha256-lf16:e3494d10ebc1294b / sha256-crlf16:db5987d7ece3adce (verified)
+[PIN] tools/analysis/e1sd_split_draw.py blob:0c12e9b8 / sha256-lf16:29e725ae6198f890 / sha256-crlf16:bd599d6f0ee7b533 (verified)
+[PIN] tools/analysis/e1sd_launch.py blob:bdbb3fc6 / sha256-lf16:14228847d2040359 / sha256-crlf16:3ee345d1e035e637 (verified)
+[DATA] DATA_ROOT Z:\FAC\TUBerlin\THESIS\TaxoArena
+pool p5fb86f1075d76e34 (split e1sd1; NEVER a pool of record): RECORDED (pool_guard.assert_pool_of_record passed: id file and reserved_pool rows agree)
+SPLIT 1: held-out 3598 distinct texts / TRAIN 8171 (file blob:33ad1c55, re-derived byte-equal)
+pool p6d15d913354f256d (split e1sd2; NEVER a pool of record): RECORDED (pool_guard.assert_pool_of_record passed: id file and reserved_pool rows agree)
+SPLIT 2: held-out 3522 distinct texts / TRAIN 8247 (file blob:55231da0, re-derived byte-equal)
+pool p69d2762ac6223d93 (split e1sd3; NEVER a pool of record): RECORDED (pool_guard.assert_pool_of_record passed: id file and reserved_pool rows agree)
+SPLIT 3: held-out 3500 distinct texts / TRAIN 8269 (file blob:5ad9c86e, re-derived byte-equal)
+IDENTITY WORLD: p2dca held-out 3445, readout train 8324 (anchor_free_readout.corpus); af_clean_s42 82 leaves (snapshot 20260917_201353_Headless_Run_Auto_ge); N-raw 84 leaves (snapshot 20261002_035009_Headless_Run_Auto_ge)
+BUILD N_e1sd1: PRESENT Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\e1_split_draws\N_e1sd1\seed_42 | snapshot 20261003_164015_Headless_Run_Auto_ge (graph sha256 43effa0b45229abb) | 28 leaves | [POOL] p5fb86f1075d76e34 gate 853 closedByContent 0 | config blob:4fac964f
+BUILD Q_e1sd1: PRESENT Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\e1_split_draws\Q_e1sd1\seed_42 | snapshot 20261003_164959_Headless_Run_Auto_ge (graph sha256 4cf9ae9803cd9911) | 80 leaves | [POOL] p5fb86f1075d76e34 gate 853 closedByContent 0 | config blob:a910b359
+BUILD N_e1sd2: PRESENT Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\e1_split_draws\N_e1sd2\seed_42 | snapshot 20261003_164321_Headless_Run_Auto_ge (graph sha256 ed401d28b524c837) | 80 leaves | [POOL] p6d15d913354f256d gate 880 closedByContent 0 | config blob:4ba063c1
+BUILD Q_e1sd2: PRESENT Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\e1_split_draws\Q_e1sd2\seed_42 | snapshot 20261003_165319_Headless_Run_Auto_ge (graph sha256 f0a28baa4b632c32) | 87 leaves | [POOL] p6d15d913354f256d gate 880 closedByContent 0 | config blob:f51ee5a6
+BUILD N_e1sd3: PRESENT Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\e1_split_draws\N_e1sd3\seed_42 | snapshot 20261003_164625_Headless_Run_Auto_ge (graph sha256 42155a52454302a9) | 71 leaves | [POOL] p69d2762ac6223d93 gate 838 closedByContent 0 | config blob:00d2543e
+BUILD Q_e1sd3: PRESENT Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\e1_split_draws\Q_e1sd3\seed_42 | snapshot 20261003_165646_Headless_Run_Auto_ge (graph sha256 770780128e6852e2) | 72 leaves | [POOL] p69d2762ac6223d93 gate 838 closedByContent 0 | config blob:e5ffd8b9
+  [EMB-ARMS] arm qwen3_raw (qwen3-embedding:latest, REFERENCE): 11769 of 11769 needed texts have a vector; raw dims {4096: 11769}; native 4096
+ARM qwen3_raw (qwen3-embedding:latest, REFERENCE): file embeddings_cache.db sha256 b0e88d3a6e207bc0b368d6c32b30e89f60036944f69c6bb19f6b028c206b0113; 11769 of 11769 needed texts read by text; 0 missing
+  [EMB-ARMS] registrar pin: arm nomic_raw sha256 53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95 == embedder_cross_arm_pins.json
+  [EMB-ARMS] reader: arm nomic_raw reads the --target-dir copy Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\embedder_cross\embeddings_cache_nomic-embed-text_latest.db sha256 53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95 (== provenance == the registrar's pin; source Z:\FAC\TUBerlin\THESIS\TaxoArena\embeddings_cache_nomic-embed-text_latest.db sha256 53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95)
+  [EMB-ARMS] arm nomic_raw (nomic-embed-text:latest, PRIMARY): 11769 of 11769 needed texts have a vector; raw dims {768: 11769}; native 768
+ARM nomic_raw (nomic-embed-text:latest, PRIMARY): file experiment_results\embedder_cross\embeddings_cache_nomic-embed-text_latest.db sha256 53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95; 11769 of 11769 needed texts read by text; 0 missing
+  [EMB-GUARD] model=qwen3-embedding:latest (the E1 run manifest; text-joined view); cache=E1 af; native dim expected 4096; vectors read 8125 of 8125 ids, raw dims {4096: 8125}; slice width 256
+  [EMB-GUARD] vmfMu cosine over 69 sites: min 0.9990 (site n00000175 'Emergent Concept #174' n=248), median 0.9999; budget 0.99 -> ADMIT
+  [EMB-GUARD]   site n00000175  n=248   found=248   cos=0.9990  Emergent Concept #174
+  [EMB-GUARD]   site n00000176  n=213   found=213   cos=0.9993  Emergent Concept #175
+  [EMB-GUARD]   site n00000256  n=152   found=152   cos=0.9995  Emergent Concept #255
+[EMB-GUARD] E1 af: own qwen3_raw vectors ADMIT ([EMB-GUARD] vmfMu cosine over 69 sites: min 0.9990 (site n00000175 'Emergent Concept #174' n=248), median 0.9999; budget 0.99 -> ADMIT, leaves == graph, vmfMu max diff 5.0e-07) | DISCRIMINATORS: the other arm's vectors REFUSE (expected) ([EMB-GUARD] vmfMu cosine over 69 sites: min -0.0663 (site n00000157 'Emergent Concept #156' n=223), median 0.0132; budget 0.99 -> REFUSE); permuted member->text map REFUSE (expected) ([EMB-GUARD] vmfMu cosine over 69 sites: min 0.6573 (site n00000075 'Emergent Concept #74' n=201), median 0.8354; budget 0.99 -> REFUSE)
+  [EMB-GUARD] model=nomic-embed-text:latest (the E1 run manifest; text-joined view); cache=E1 N-raw; native dim expected 768; vectors read 8125 of 8125 ids, raw dims {768: 8125}; slice width 256
+  [EMB-GUARD] vmfMu cosine over 64 sites: min 0.9997 (site n00000052 'Emergent Concept #51' n=130), median 0.9999; budget 0.99 -> ADMIT
+  [EMB-GUARD]   site n00000052  n=130   found=130   cos=0.9997  Emergent Concept #51
+  [EMB-GUARD]   site n00000115  n=156   found=156   cos=0.9998  Emergent Concept #114
+  [EMB-GUARD]   site n00000050  n=142   found=142   cos=0.9998  Emergent Concept #49
+[EMB-GUARD] E1 N-raw: own nomic_raw vectors ADMIT ([EMB-GUARD] vmfMu cosine over 64 sites: min 0.9997 (site n00000052 'Emergent Concept #51' n=130), median 0.9999; budget 0.99 -> ADMIT, leaves == graph, vmfMu max diff 5.0e-07) | DISCRIMINATORS: the other arm's vectors REFUSE (expected) ([EMB-GUARD] vmfMu cosine over 64 sites: min -0.0645 (site n00000183 'Emergent Concept #182' n=148), median 0.0164; budget 0.99 -> REFUSE); permuted member->text map REFUSE (expected) ([EMB-GUARD] vmfMu cosine over 64 sites: min 0.8570 (site n00000199 'Emergent Concept #198' n=152), median 0.9209; budget 0.99 -> REFUSE)
+IDENTITY: E1 pair {'af': 0.7269, 'nraw': 0.6813, 'b': 327, 'c': 484, 'n': 3445} vs the record {'af': 0.7269, 'nraw': 0.6813, 'b': 327, 'c': 484, 'n': 3445} -> HELD; G_E1 -0.0456 [-0.0617, -0.0294] (the descriptive 4th point)
+  [EMB-GUARD] model=nomic-embed-text:latest (the E1 run manifest; text-joined view); cache=N_e1sd1; native dim expected 768; vectors read 8171 of 8171 ids, raw dims {768: 8171}; slice width 256
+  [EMB-GUARD] vmfMu cosine over 20 sites: min 0.9998 (site n00000004 'Emergent Concept #3' n=3133), median 1.0000; budget 0.99 -> ADMIT
+  [EMB-GUARD]   site n00000004  n=3133  found=3133  cos=0.9998  Emergent Concept #3
+  [EMB-GUARD]   site n00000017  n=1087  found=1087  cos=0.9999  Emergent Concept #16
+  [EMB-GUARD]   site n00000164  n=132   found=132   cos=0.9999  Emergent Concept #163
+[EMB-GUARD] N_e1sd1: own nomic_raw vectors ADMIT ([EMB-GUARD] vmfMu cosine over 20 sites: min 0.9998 (site n00000004 'Emergent Concept #3' n=3133), median 1.0000; budget 0.99 -> ADMIT, leaves == graph, vmfMu max diff 5.0e-07) | DISCRIMINATORS: the other arm's vectors REFUSE (expected) ([EMB-GUARD] vmfMu cosine over 20 sites: min -0.0504 (site n00000089 'Emergent Concept #88' n=252), median -0.0022; budget 0.99 -> REFUSE); permuted member->text map REFUSE (expected) ([EMB-GUARD] vmfMu cosine over 20 sites: min 0.8991 (site n00000164 'Emergent Concept #163' n=132), median 0.9436; budget 0.99 -> REFUSE)
+HYGIENE N_e1sd1: fit texts 8171; not TRAIN texts of the split 0; held-out texts in the fit 0; fit texts sharing a held-out stem_key 0 (all must be 0)
+  [EMB-GUARD] model=qwen3-embedding:latest (the E1 run manifest; text-joined view); cache=Q_e1sd1; native dim expected 4096; vectors read 8171 of 8171 ids, raw dims {4096: 8171}; slice width 256
+  [EMB-GUARD] vmfMu cosine over 70 sites: min 0.9975 (site n00000021 'Emergent Concept #20' n=894), median 0.9999; budget 0.99 -> ADMIT
+  [EMB-GUARD]   site n00000021  n=894   found=894   cos=0.9975  Emergent Concept #20
+  [EMB-GUARD]   site n00000022  n=593   found=593   cos=0.9987  Emergent Concept #21
+  [EMB-GUARD]   site n00000025  n=1135  found=1135  cos=0.9989  Emergent Concept #24
+[EMB-GUARD] Q_e1sd1: own qwen3_raw vectors ADMIT ([EMB-GUARD] vmfMu cosine over 70 sites: min 0.9975 (site n00000021 'Emergent Concept #20' n=894), median 0.9999; budget 0.99 -> ADMIT, leaves == graph, vmfMu max diff 5.0e-07) | DISCRIMINATORS: the other arm's vectors REFUSE (expected) ([EMB-GUARD] vmfMu cosine over 70 sites: min -0.0802 (site n00000260 'Emergent Concept #259' n=126), median 0.0113; budget 0.99 -> REFUSE); permuted member->text map REFUSE (expected) ([EMB-GUARD] vmfMu cosine over 70 sites: min 0.6904 (site n00000083 'Emergent Concept #82' n=170), median 0.8351; budget 0.99 -> REFUSE)
+HYGIENE Q_e1sd1: fit texts 8171; not TRAIN texts of the split 0; held-out texts in the fit 0; fit texts sharing a held-out stem_key 0 (all must be 0)
+  [EMB-GUARD] model=nomic-embed-text:latest (the E1 run manifest; text-joined view); cache=N_e1sd2; native dim expected 768; vectors read 8247 of 8247 ids, raw dims {768: 8247}; slice width 256
+  [EMB-GUARD] vmfMu cosine over 65 sites: min 0.9992 (site n00000017 'Emergent Concept #16' n=2048), median 0.9999; budget 0.99 -> ADMIT
+  [EMB-GUARD]   site n00000017  n=2048  found=2048  cos=0.9992  Emergent Concept #16
+  [EMB-GUARD]   site n00000038  n=196   found=196   cos=0.9997  Emergent Concept #37
+  [EMB-GUARD]   site n00000148  n=134   found=134   cos=0.9998  Emergent Concept #147
+[EMB-GUARD] N_e1sd2: own nomic_raw vectors ADMIT ([EMB-GUARD] vmfMu cosine over 65 sites: min 0.9992 (site n00000017 'Emergent Concept #16' n=2048), median 0.9999; budget 0.99 -> ADMIT, leaves == graph, vmfMu max diff 5.0e-07) | DISCRIMINATORS: the other arm's vectors REFUSE (expected) ([EMB-GUARD] vmfMu cosine over 65 sites: min -0.0612 (site n00000117 'Emergent Concept #116' n=137), median 0.0152; budget 0.99 -> REFUSE); permuted member->text map REFUSE (expected) ([EMB-GUARD] vmfMu cosine over 65 sites: min 0.8561 (site n00000123 'Emergent Concept #122' n=193), median 0.9137; budget 0.99 -> REFUSE)
+HYGIENE N_e1sd2: fit texts 8247; not TRAIN texts of the split 0; held-out texts in the fit 0; fit texts sharing a held-out stem_key 0 (all must be 0)
+  [EMB-GUARD] model=qwen3-embedding:latest (the E1 run manifest; text-joined view); cache=Q_e1sd2; native dim expected 4096; vectors read 8247 of 8247 ids, raw dims {4096: 8247}; slice width 256
+  [EMB-GUARD] vmfMu cosine over 70 sites: min 0.9994 (site n00000144 'Emergent Concept #143' n=147), median 0.9999; budget 0.99 -> ADMIT
+  [EMB-GUARD]   site n00000144  n=147   found=147   cos=0.9994  Emergent Concept #143
+  [EMB-GUARD]   site n00000102  n=129   found=129   cos=0.9995  Emergent Concept #101
+  [EMB-GUARD]   site n00000057  n=208   found=208   cos=0.9997  Emergent Concept #56
+[EMB-GUARD] Q_e1sd2: own qwen3_raw vectors ADMIT ([EMB-GUARD] vmfMu cosine over 70 sites: min 0.9994 (site n00000144 'Emergent Concept #143' n=147), median 0.9999; budget 0.99 -> ADMIT, leaves == graph, vmfMu max diff 5.0e-07) | DISCRIMINATORS: the other arm's vectors REFUSE (expected) ([EMB-GUARD] vmfMu cosine over 70 sites: min -0.0750 (site n00000241 'Emergent Concept #240' n=220), median 0.0150; budget 0.99 -> REFUSE); permuted member->text map REFUSE (expected) ([EMB-GUARD] vmfMu cosine over 70 sites: min 0.6124 (site n00000055 'Emergent Concept #54' n=180), median 0.8374; budget 0.99 -> REFUSE)
+HYGIENE Q_e1sd2: fit texts 8247; not TRAIN texts of the split 0; held-out texts in the fit 0; fit texts sharing a held-out stem_key 0 (all must be 0)
+  [EMB-GUARD] model=nomic-embed-text:latest (the E1 run manifest; text-joined view); cache=N_e1sd3; native dim expected 768; vectors read 8269 of 8269 ids, raw dims {768: 8269}; slice width 256
+  [EMB-GUARD] vmfMu cosine over 58 sites: min 0.9995 (site n00000018 'Emergent Concept #17' n=1791), median 0.9999; budget 0.99 -> ADMIT
+  [EMB-GUARD]   site n00000018  n=1791  found=1791  cos=0.9995  Emergent Concept #17
+  [EMB-GUARD]   site n00000094  n=145   found=145   cos=0.9995  Emergent Concept #93
+  [EMB-GUARD]   site n00000062  n=530   found=530   cos=0.9996  Emergent Concept #61
+[EMB-GUARD] N_e1sd3: own nomic_raw vectors ADMIT ([EMB-GUARD] vmfMu cosine over 58 sites: min 0.9995 (site n00000018 'Emergent Concept #17' n=1791), median 0.9999; budget 0.99 -> ADMIT, leaves == graph, vmfMu max diff 5.0e-07) | DISCRIMINATORS: the other arm's vectors REFUSE (expected) ([EMB-GUARD] vmfMu cosine over 58 sites: min -0.0662 (site n00000170 'Emergent Concept #169' n=121), median 0.0193; budget 0.99 -> REFUSE); permuted member->text map REFUSE (expected) ([EMB-GUARD] vmfMu cosine over 58 sites: min 0.8673 (site n00000170 'Emergent Concept #169' n=121), median 0.9197; budget 0.99 -> REFUSE)
+HYGIENE N_e1sd3: fit texts 8269; not TRAIN texts of the split 0; held-out texts in the fit 0; fit texts sharing a held-out stem_key 0 (all must be 0)
+  [EMB-GUARD] model=qwen3-embedding:latest (the E1 run manifest; text-joined view); cache=Q_e1sd3; native dim expected 4096; vectors read 8269 of 8269 ids, raw dims {4096: 8269}; slice width 256
+  [EMB-GUARD] vmfMu cosine over 59 sites: min 0.9973 (site n00000021 'Emergent Concept #20' n=921), median 0.9999; budget 0.99 -> ADMIT
+  [EMB-GUARD]   site n00000021  n=921   found=921   cos=0.9973  Emergent Concept #20
+  [EMB-GUARD]   site n00000026  n=1137  found=1137  cos=0.9990  Emergent Concept #25
+  [EMB-GUARD]   site n00000022  n=553   found=553   cos=0.9993  Emergent Concept #21
+[EMB-GUARD] Q_e1sd3: own qwen3_raw vectors ADMIT ([EMB-GUARD] vmfMu cosine over 59 sites: min 0.9973 (site n00000021 'Emergent Concept #20' n=921), median 0.9999; budget 0.99 -> ADMIT, leaves == graph, vmfMu max diff 5.0e-07) | DISCRIMINATORS: the other arm's vectors REFUSE (expected) ([EMB-GUARD] vmfMu cosine over 59 sites: min -0.0730 (site n00000113 'Emergent Concept #112' n=324), median 0.0121; budget 0.99 -> REFUSE); permuted member->text map REFUSE (expected) ([EMB-GUARD] vmfMu cosine over 59 sites: min 0.6850 (site n00000075 'Emergent Concept #74' n=154), median 0.8397; budget 0.99 -> REFUSE)
+HYGIENE Q_e1sd3: fit texts 8269; not TRAIN texts of the split 0; held-out texts in the fit 0; fit texts sharing a held-out stem_key 0 (all must be 0)
+PLAN split 1: N_1 vs Q_1 filing on 3598 held-out with the majority of 8171 TRAIN texts; paired Wald + exact McNemar + bootstrap
+PLAN split 2: N_2 vs Q_2 filing on 3522 held-out with the majority of 8247 TRAIN texts; paired Wald + exact McNemar + bootstrap
+PLAN split 3: N_3 vs Q_3 filing on 3500 held-out with the majority of 8269 TRAIN texts; paired Wald + exact McNemar + bootstrap
+[MODE] --dry-run: pins, pools, splits, builds, guards, hygiene, identity; NO SD1 measure; nothing written
+[E1-SPLIT-DRAWS] dry-run complete
+rc=0

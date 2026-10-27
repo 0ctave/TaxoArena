@@ -1,0 +1,155 @@
+{
+ "id": "ESCALATION-RC",
+ "title": "ESCALATION-RC: does escalating low-margin, OOS or fragile queries from the AF-U cell policy to the best single model beat random escalation on the union routing data (RC1), with a k-means comparator? (zero calls; REGISTERED 2026-10-03)",
+ "question": "Is margin / OOS escalation of the route a usable safety valve?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "the commit that writes it (parent b9b67b11)",
+  "program_lines": "docs/judge_v2_program.md L23960-L23973",
+  "program_lines_as_of": "the commit that writes them, parent b9b67b11, re-grepped",
+  "date": "2026-10-03",
+  "heading": "## Registered 2026-10-03 (before any code or call) — ESCALATION-RC: on the union routing data, does escalating low-margin, OOS or decision-fragile queries from  ...",
+  "provenance": "docs/literature/2026-10-03_tree_uses.md (7812c100) uses O-LOSO / R2; the orchestrator's brief; autonomous scheduling"
+ },
+ "script": {
+  "path": "tools/analysis/escalation_rc.py",
+  "sha16": "blob a17f... (merged 9127cbde from escalation-rc 11d66b50)",
+  "commit": "9127cbde"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_escalation_rc.md",
+  "commit": "9127cbde"
+ },
+ "go": "autonomous-scheduling authorisation (zero calls)",
+ "run": {
+  "outcome_file": "experiment_results/archv2/escalation_rc/outcome.txt (sha256 4dad8268248f63db; never committed; backup E:/TaxoArena_backup_2026-10-03_escalation_rc)...",
+  "outcome_commit": "run from main 9127cbde + 421f261f",
+  "calls": 0,
+  "cce": 0,
+  "pool": "pv2_1575de61bb20e977 (B0-2)",
+  "date": "2026-10-03"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_escalation_rc.md",
+  "commit": "482a0ac2",
+  "verdict": "VALID"
+ },
+ "criteria": [
+  {
+   "id": "RC1",
+   "text": "D_E = acc(escalation rule) - [(1 - e) acc(AF-U) + e acc(best single)]; HELD iff 95% interval > 0; FAILED iff < 0; UNDETERMINED otherwise. Verdict line: DESCRIPTIVE-ONLY at prediction (SE 0.00367, MDE80 0.0103)",
+   "result": "UNDETERMINED",
+   "value": "D_E +0.00497, two-stage 95% [-0.00004, +0.00997] (boundary case: lower end below 0 at all 10 bootstrap seeds by 0.00002-0.00025); e 0.226",
+   "denominator": "union EVAL 5,907 / 5,404; DEFF 1.595 (UNION-AF-ROUTE U1 tree arm, two-stage)"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "e 0.25 [0.15, 0.35]; D_E +0.003 [-0.003, +0.010]; RC1 HELD 0.25, UNDETERMINED 0.70, FAILED 0.05",
+   "result": "HELD",
+   "value": "e 0.226 in [0.15, 0.35]; D_E +0.00497 in [-0.003, +0.010]; UNDETERMINED (0.70) occurred",
+   "denominator": "union EVAL 5,907 / 5,404; DEFF 1.595 (UNION-AF-ROUTE U1 tree arm, two-stage)"
+  },
+  {
+   "id": "P2",
+   "text": "D_E(AF-U) - D_E(K_0) 0.000 [-0.006, +0.006] (descriptive)",
+   "result": "HELD",
+   "value": "+0.0007 in [-0.006, +0.006]",
+   "denominator": "union EVAL 5,907 / 5,404; DEFF 1.595 (UNION-AF-ROUTE U1 tree arm, two-stage)"
+  }
+ ],
+ "falsifier": {
+  "text": "F-RC fires iff RC1 FAILED: margin / OOS route escalation costs accuracy against random escalation on these cells.",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "RC1": "D_E +0.00497, two-stage 95% [-0.00004, +0.00997]; e 0.226 (5,907 / 5,404)",
+  "no_IFEVAL": "+0.00579 (one-stage, post hoc)",
+  "vs_no_escalation": "AF-U +0.15pp; K_0 -0.08pp",
+  "AF_minus_K0": "+0.0007 [-0.0055, +0.0070] (descriptive)",
+  "support": "DEFF 1.302 measured; SE 0.00255; MDE80 0.00715"
+ },
+ "sentence_of_record": "ESCALATION-RC, content-closed v2 union split, 0 calls: escalating the AF-U cell route to the best single model on low margin or OOS (GATE p20 / TPR 0.95; e 0.226 of 5,907 EVAL items / 5,404 components) beats escalating the same share at random by D_E +0.50pp, two-stage 95% [-0.004pp, +1.00pp]: RC1 UNDETERMINED, a boundary case (the lower end misses 0 by 0.00004, within the bootstrap's seed variation; -0.00002 to -0.00025 over 10 seeds; percentile [-0.09pp, +0.90pp]; below the MDE80 0.72pp). F-RC NOT FIRED. Against no escalation the rule changes accuracy by +0.15pp (AF-U) and -0.08pp (K_0): the rule avoids the cost of random escalation and buys almost no accuracy. Without IFEVAL, whose one-cell OOS leg escalates 59% of its items, D_E is +0.58pp (descriptive, one-stage; not the criterion). Source-conditioned k-means (K_0) gives +0.43pp; the difference +0.07pp [-0.55, +0.70] is descriptive and not tree-specific. P1 and P2 HELD. [Not licensed (the review's): \"escalation works\" / \"helps\" / \"a usable safety valve\" (RC1 is not HELD); \"no effect\" or \"escalation does not help\" (the interval is almost wholly positive); any HELD from the no-IFEVAL or one-stage intervals; \"tree = k-means\"; the fragility peak as a finding.]",
+ "chips": [
+  "REGISTERED 2026-10-03, BEFORE ANY CODE; not built",
+  "VALID (POST-RUN 482a0ac2): RC1 UNDETERMINED (BOUNDARY, LOWER END &minus;0.00004); F-RC NOT FIRED",
+  "NEITHER &ldquo;HELPS&rdquo; NOR &ldquo;NO EFFECT&rdquo;; +0.15pp VS NO ESCALATION; NOT TREE-SPECIFIC; STRUCTURAL LINE FALSE AS PRINTED"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-03",
+   "by": "registrar",
+   "text": "condition resolved: OOS-TREE-CELLS OT1 EQUIVALENT; OOS-based legs read as written. docs/judge_v2_program.md L23975-L23987 (section \"## OOS-TREE-CELLS (2026-10-03, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent 964511fd)"
+  },
+  {
+   "date": "2026-10-03",
+   "by": "registrar (pre-data)",
+   "text": "R2/R3/D-1 IFEVAL OOS escalation (29 of 54 GATE), with/without IFEVAL printed; D-2 K_0 not like with like on labels, comparisons descriptive; R6 fragility descriptive, rule margin OR OOS; R7 strict ends, fixed escalation set; R11 identity replaces C0; (g)/D-3 STRUCTURAL read under D_E = e x (gap_esc - gap_all). Brackets L23964, L23965, L23967, L23969."
+  },
+  {
+   "date": "2026-10-03",
+   "by": "registrar (POSTRUN 482a0ac2)",
+   "text": "outcome recorded. docs/judge_v2_program.md L24011-L24019 (section \"## ESCALATION-RC (2026-10-03, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent 482a0ac2)"
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (consistency check 2026-10-04; zero calls)",
+   "text": "the 'chips' list had drifted from the ledger row's chips (wording or replaced chips); the chips of record are the ledger's, copied verbatim into 'chips_ledger_verbatim' (ledger v379); 'chips' is kept as history."
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (status correction; zero calls)",
+   "text": "status correction (testing-logic review, docs/literature/2026-10-04_testing_logic_review.md (bd5ca001)): AF-U is federated per source (prog L22633), so it is SOURCE-CONDITIONED [SC], not label-free; 'label-free' / [LF] on AF-U reads [SC]; K_0 is [SC] too (like with like); no number or verdict moves; docs/judge_v2_program.md L24259-L24263 (registrar's record; _as_of the commit that writes it, parent bd5ca001)"
+  }
+ ],
+ "does_not_show": [
+  "escalation to a judge (closed line)",
+  "judged decisions; real traffic",
+  "a tree-specific gain",
+  "beyond the union roster and one draw"
+ ],
+ "ledger": {
+  "row_id": "ESCALATION-RC",
+  "version": "v369 (2026-10-03: OUTCOME bracket, OK + WARN chips) | v364 (2026-10-03: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "UNION-AF-ROUTE",
+  "OOS-TREE-CELLS"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; ESCALATE-LLAMA-LAW not touched (route escalation, not judge)"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "minutes",
+  "agent_hours": "about 2 h",
+  "reads_pool": true
+ },
+ "conditional_on": "OOS-TREE-CELLS OT1 (OOS legs read as written only if EQUIVALENT or TREE-BETTER) [RESOLVED 2026-10-03: OT1 EQUIVALENT (within 0.010, and below): OOS legs read as written]",
+ "outputs": "never committed: pinned, backed up to E:",
+ "sources": [
+  "docs/judge_v2_program.md L23960-L23973 (_as_of the commit that writes it, parent b9b67b11, re-grepped)",
+  "docs/literature/2026-10-03_tree_uses.md (7812c100)"
+ ],
+ "last_update": "2026-10-04",
+ "chips_ledger_verbatim": [
+  "plan: REGISTERED 2026-10-03, BEFORE ANY CODE; not built",
+  "ok: VALID (POST-RUN 482a0ac2): RC1 UNDETERMINED (BOUNDARY); F-RC NOT FIRED",
+  "warn: NEITHER “HELPS” NOR “NO EFFECT”; +0.15pp VS NO ESCALATION; NOT TREE-SPECIFIC; STRUCTURAL LINE FALSE AS PRINTED"
+ ],
+ "label_status": "AF-U [SC] (source-conditioned; federated per source), not [LF]; K_0 [SC]",
+ "plain_description": {
+  "sq": "SQ1 Use",
+  "what": "On the multi-corpus routing data, sends low-confidence or out-of-scope questions to the best single model instead of the per-cell routed model. The tree is built separately within each source benchmark, so it is source-conditioned, not fully label-free. It compares this with escalating the same share of questions at random, with a k-means version beside it. No judge calls.",
+  "why": "It checks whether route confidence (margin, out-of-scope detection) is a usable safety valve for the routing product.",
+  "information": "If confidence-based escalation beats random escalation, the router knows when it is unsure. If it loses, the confidence signal is misleading. Result: done, undetermined. It beats random escalation by +0.50pp, but the interval just touches zero (a boundary case, below the detectable effect size). Compared with no escalation it adds almost nothing (+0.15pp). It avoids the cost of random escalation but buys almost no accuracy. The failure condition did not fire.",
+  "written": "2026-10-07"
+ }
+}

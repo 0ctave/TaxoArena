@@ -1,0 +1,215 @@
+{
+  "id": "PROFILE-DEVIATION-CERT",
+  "title": "PROFILE-DEVIATION-CERT: does the (model, anchor) deviation term carry certifiable content beyond the global theta? (zero judge calls; plan A1)",
+  "question": "Every published profile row is theta_ac = theta_a + delta_ac on the anchor's own board, and the record has never published delta_ac with a certificate of its own. Does delta_ac carry certifiable content beyond theta_m, i.e. for some (model, anchor) cells may the record say 'm is certified above / below its own standing in anchor c'? The cell is the ANCHOR (sub-anchor rows closed twice).",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "62c4084",
+    "program_lines": "docs/judge_v2_program.md L5336-L5403; pre-run bracket L5588 (1534a4a): the registered delta_ac is biased by construction (null family rate 80.7-92.1% at nominal 5%); the PRIOR-MATCHED deviation delta'_ac is the reading of record for (b), (d), (e), C2-C5, P2-P4 and the falsifier; the registered reading printed beside, not scored [re-lined 2026-09-22: batch-1 lines were read at 9c1f37b-era HEAD and shifted by +2 by later insertions]",
+    "program_lines_as_of": "6aa2a0d",
+    "heading": "## Registered 2026-09-17 (before any code or call) — PROFILE-DEVIATION-CERT: does the (model, anchor) deviation term carry certifiable content beyond the global theta? (zero judge calls; plan docs/agents/plans/2026-09-17_continual_capability_profile_leads.md A1; lens docs/agents/leads/2026-09-17_arena_profile.md L1)",
+    "outcome_heading": [
+      "L5758: ## PROFILE-DEVIATION-CERT (2026-09-18, zero judge calls) — on the prior-matched reading of record (bracket 1534a4a) the judge certifies 22 of 280 (model, anchor"
+    ],
+    "date": "2026-09-17"
+  },
+  "script": {
+    "path": "tools/analysis/profile_deviation_cert.py",
+    "sha16": "a57106e4944d31d8",
+    "commit": "8924583"
+  },
+  "ready": null,
+  "go": "n/a (0 calls; ~1 CPU-hour)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/profile_deviation_cert.txt",
+    "outcome_commit": "f5e447b",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-18",
+    "other_files": [
+      "experiment_results/x12_crossdomain/profile_deviation_cert_cells.csv (280 rows, f5e447b)",
+      "experiment_results/x12_crossdomain/profile_deviation_cert_draws.npz (10.9 MB, seed 42; untracked, named)"
+    ]
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-18_profile_batch1.md section PROFILE-DEVIATION-CERT",
+    "commit": "46f44e8",
+    "verdict": "numbers CONFIRMED from the npz and CSV (max |dq| 4.4e-5; every Fisher p recomputed identical); D1 the falsifier is a COUNT rule with 1-3 events depending on the establishment rule (binomial P 0.095 vs 5%), not a significance claim; D2 the wrong-sign cells are the closed FRONTIER / verbosity residue reappearing as deviations; D3 the certified set is not key-corroborated (14/22 vs 55.7%, P 0.30)"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "key-certified share = certified key cells / 280 (20 models x 14 anchors), per anchor and overall",
+      "result": "FAILED",
+      "value": "127 of 280 = 45.4% (Fisher-established 162 of 280); per anchor (of 20) Biology 18, Business 7, Chemistry 10, Computer science 1, Economics 15, Engineering 16, Health 4, History 2, Law 16, Math 11, Other 7, Philosophy 2, Physics 6, Psychology 12; FAILED against its prediction (< 30%); C1 stands on the key alone as registered",
+      "denominator": "280 (model, anchor) cells; 2,811 judged questions; within-anchor question bootstrap B = 2,000, max-t q_cell(dev, key)"
+    },
+    {
+      "id": "C2",
+      "text": "judge-certified share = certified judge cells / 280, per anchor and overall; the certified list per model with the anchor's PROFILE-INTERVAL-ALL C2 class (FAIL anchors PREDICTIVE-ONLY)",
+      "result": "HELD",
+      "value": "22 of 280 = 7.9% on the prior-matched delta' (marginal-1.96 count 71, not of record; registered reading 82 = 29.3%, biased by construction, printed not scored; overlap 12 cells); per anchor Biology 1, Chemistry 1, History 2, Law 4, Math 5, Other 1, Philosophy 1, Physics 4, Psychology 3; 13 of 22 in Physics / Math / Law; 1 in a FAIL anchor (iask_pro / Biology, PREDICTIVE-ONLY); 12 of 22 on the 7 models with |theta_m| >= 1.5; q_cell(dev) 2.970-3.122 (median 3.039)",
+      "denominator": "280 cells; merged board 21,536 verdicts, 20 models"
+    },
+    {
+      "id": "C3",
+      "text": "wrong(established) among judge-certified deviations: judge-certified cells whose key deviation has the OPPOSITE sign and is established (exact two-sided Fisher on the in-anchor vs out-of-anchor 2 x 2, p < 0.05)",
+      "result": "FAILED",
+      "value": "wrong key sign 8 of 22; wrong(established) 3 of 22 = 13.6%: claude-3-5-sonnet-20241022 / Law (delta' +0.590 z 3.68; key -0.129, Fisher 2.5e-7), gemini-3.1-pro_5-shots / Law (+0.686 z 4.06; key -0.049, p 0.0045), arx_3 / Math (-0.385 z 4.20; key +0.051, p 0.022); 2 under Bonferroni, 1 under key max-t (checker D1); registered reading beside: wrong sign 33, established 17 of 82",
+      "denominator": "22 judge-certified cells"
+    },
+    {
+      "id": "C4",
+      "text": "variance share of delta vs theta, key and judge, with the sampling share beside",
+      "result": "DELIVERED",
+      "value": "judge 0.028 (noise-subtracted 0.018; sampling share 34.7%); key 0.181 (0.168; 8.8%); registered reading 0.073 / 0.064 (12.8%)",
+      "denominator": "280 cells"
+    },
+    {
+      "id": "C5",
+      "text": "agreement of the certified sets: share of judge-certified cells whose key deviation has the same sign, against the all-280 baseline",
+      "result": "DELIVERED",
+      "value": "14 of 22 = 63.6% vs 156 of 280 = 55.7% (P(>= 14 | 22, 0.557) = 0.30: not key-corroborated, checker D3); both-certified 10 (9 same sign), key-only 117, judge-only 12; registered reading 49 of 82 vs 140 of 280",
+      "denominator": "22 judge-certified cells; 280 baseline"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "(plan) key-certified < 30% of the 280 cells",
+      "result": "FAILED",
+      "value": "127 = 45.4%",
+      "denominator": "280 cells"
+    },
+    {
+      "id": "P2",
+      "text": "(plan) judge-certified < 15%",
+      "result": "HELD",
+      "value": "22 = 7.9% (registered reading 29.3%, printed, not scored)",
+      "denominator": "280 cells"
+    },
+    {
+      "id": "P3",
+      "text": "(plan) judge-certified cells concentrated in Physics / Math / Law (>= 50%)",
+      "result": "HELD",
+      "value": "13 of 22 = 59.1%",
+      "denominator": "22 judge-certified cells"
+    },
+    {
+      "id": "P4",
+      "text": "(plan) wrong-key-sign (established) 0-2",
+      "result": "FAILED",
+      "value": "3 under the registered establishment rule (exact Fisher p < 0.05); 2 under Bonferroni over the 8 wrong-sign tests, 1 under key max-t certification (both would be HELD; the registration fixed Fisher, so FAILED is the score and the rule-dependence is recorded)",
+      "denominator": "22 judge-certified cells"
+    },
+    {
+      "id": "P5",
+      "text": "(registrar's blind addition) if judge-certified = 0 the claim fails on SUPPORT, not through the falsifier",
+      "result": "n/a",
+      "value": "not the case (22 > 0)",
+      "denominator": "280 cells"
+    }
+  ],
+  "falsifier": {
+    "text": "judge-certified deviations with the wrong key sign (established) > 5% of those certified: overturns the claim that delta_ac carries certifiable content at this support; the (model, anchor) row stays theta_ac with its anchor class, the profile stays a re-indexed global score, and 'certified above / below its own standing' is not published for any judge-built cell; does NOT overturn the key-built rows",
+    "fired": true,
+    "note": "TRIGGERED as registered (3 of 22 = 13.6%); the checker's reading of record: a COUNT rule with 1-3 events depending on the establishment rule (binomial P(>= 3 | 22, 0.05) = 0.095), not distinguishable from 5% and not a significance claim; under the power rule (nominal < 3; expected false wrong(established) ~0.5) the rate is not identified; the atlas (plan A5) carries no per-model list of certified deviations"
+  },
+  "numbers_of_record": {
+    "run": "2026-09-18 00:48; caches mode=ro x12 9,142 + x20 12,394 = 21,536 verdicts, 20 models, 2,811 judged q, 14 anchors (anchor mismatches 0; PROFILE-INTERVAL-ALL C2 classes agree 14 / 14); B = 2,000 within-anchor question resamples, seed 42, draws cached; batched fits asserted against rj.mm_fit (max |dtheta| 3.41e-12 over 45 fits)",
+    "prior_shrinkage": "per anchor 1.16x (Math) .. 1.69x (Business), pooled 1.02x; prior-matched pooled prior 3.74 (Math) .. 15.49 (Business); slope of the deviation on theta_m over 280 cells: registered -0.2185 (r -0.761, the bias), prior-matched +0.0237 (r +0.137); prior-matched theta'_m,c slope on theta_m 0.618 (Business) .. 0.873 (Math)",
+    "q_cell": "q_cell(dev) on delta' 2.970-3.122 (median 3.039); MAXT pair-level merged q 3.43-3.80 beside; widened-q reading certifies 9 of 280 (beside)",
+    "key_certified": "127 / 280 = 45.4%; Fisher-established 162 / 280",
+    "judge_certified": "22 / 280 = 7.9% (prior-matched); marginal-1.96 71; registered reading 82 / 280 = 29.3% (biased by construction; null family rate 80.7-92.1% at nominal 5%)",
+    "certified_list_prior_matched": "Llama-2-7b Physics -0.480; Llama-3.1-70B Law -0.476; Qwen1.5-110B Math +0.446 (wrong sign); Yi-6b Chemistry -0.640, Physics -0.380; arx_0314 Physics +0.494; arx_3 History +0.527, Math -0.385 (wrong(established)); claude-3-5-haiku Math -0.635 (wrong sign), Psychology +0.539; claude-3-5-sonnet Law +0.590 (wrong(established)), Math -0.537 (wrong sign); deepseek-chat-v2_5 Law -0.469, Math +0.478, Philosophy -0.622, Psychology -0.396 (wrong sign); gemini-3.1-pro Law +0.686 (wrong(established)), Other -0.767, Physics +0.473, Psychology -0.441; gpt-4o History +0.520 (wrong sign); iask_pro Biology +0.552 (FAIL anchor, PREDICTIVE-ONLY)",
+    "wrong_established": "3 / 22 = 13.6% (Fisher); 2 (Bonferroni over 8 wrong-sign tests); 1 (key max-t: sonnet / Law); binomial P(>= 3 | 22, 0.05) = 0.095",
+    "variance_share": "judge 0.028 (0.018 noise-subtracted; sampling share 34.7%); key 0.181 (0.168; 8.8%)",
+    "sign_agreement": "14 / 22 = 63.6% vs baseline 156 / 280 = 55.7% (P 0.30)",
+    "Spearman_absZ_vs_absTheta": "-0.02 over the 280 cells (checker): no global leftover of the bias; the concentration is the top cluster (12 of 22 on 7 models with |theta_m| >= 1.5)"
+  },
+  "sentence_of_record": "PROFILE-DEVIATION-CERT (prior-matched reading of record, per the 1534a4a bracket): key-certified 127/280 = 45.4% (P1 FAILED); judge-certified 22/280 = 7.9% (P2 HELD; registered reading 82, biased by construction, printed not scored); 13/22 in Physics/Math/Law (P3 HELD); wrong(established) 3/22 = 13.6% under exact Fisher (2 under Bonferroni over the 8 wrong-sign cells, 1 under key max-t certification), P4 FAILED and the registered proportion falsifier TRIGGERED as a count rule (binomial P = 0.095 against 5%; not a significance claim). The three are top-cluster models certified above standing in Law (sonnet, gemini) and below it in Math (arx_3) against an established key sign: the frontier residue as deviations. Sign agreement of the certified set 14/22 vs 55.7% baseline (P = 0.30): the certified set is not key-corroborated. Variance share judge 0.028 vs key 0.181. No 'certified above / below its own standing' is published for any judge-built cell; the (model, anchor) row stays theta_ac with its anchor class.",
+  "chips": [
+    "P1 FAILED (KEY 127/280 = 45.4%)",
+    "P2 HELD (JUDGE 22/280 = 7.9%)",
+    "P3 HELD (13/22 IN PHYSICS/MATH/LAW)",
+    "P4 FAILED; FALSIFIER TRIGGERED AS A COUNT RULE (3/22 FISHER; 1-3 EVENTS BY RULE, P 0.095 VS 5%)",
+    "NOT KEY-CORROBORATED (14/22 SAME-SIGN VS 55.7%, P 0.30)",
+    "FRONTIER RESIDUE IN LAW / MATH",
+    "PRIOR-MATCHED READING; REGISTERED READING BIASED, PRINTED (82/280)"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-17",
+      "by": "the registrar at registration (programme L5356-L5358)",
+      "text": "the plan writes 'by McNemar against the pool mean'; McNemar needs a paired binary object and the in/out contrast has none, so the exact test on the 2 x 2 is registered and the plan's wording is recorded as an inconsistency for the author."
+    },
+    {
+      "date": "2026-09-18",
+      "by": "REVIEW, pre-run (programme L5586, 1534a4a)",
+      "text": "the registered judge deviation delta_ac = theta_ac(per-anchor MM, prior 0.5) - theta_m(pooled MM, prior 0.5) is biased by construction: the Jeffreys prior is ~190 pseudo-matches against 695-2,881 real matches per anchor but 21,536 pooled, so under the exact null delta_hat ~ -(1 - k_pool/k_anchor) * theta_m; measured slope -0.2185 (r -0.761); under a null on the real schedule 129/140 = 92.1% of anchor families carry >= 1 false certificate at nominal 5% (synthetic 80.7%). READING OF RECORD: the PRIOR-MATCHED deviation delta'_ac (pooled prior scaled by pooled / anchor matches; null family rate 2.9% real / 3.6% synthetic); the registered reading printed beside every count and not scored; (c) and C1 unchanged; a certified SIGN is preserved, a magnitude is not published; profile_deviation_cert.py amended before --run."
+    },
+    {
+      "date": "2026-09-18",
+      "by": "the adversarial reviewer D1 (docs/reviews/2026-09-18_profile_batch1.md, 46f44e8), recorded in the outcome section as the reading of record",
+      "text": "the falsifier is a COUNT rule, not a significance claim: 1-3 events depending on the establishment rule (Fisher 3 / Bonferroni 2 / key max-t 1), binomial P 0.095 against 5%; the falsifier fired as registered and the record says 'not distinguishable from 5%'."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "CORRECTIONS_2026-09-23 (registrar)",
+      "text": "[CORRECTED 2026-09-23 by the registrar (line pointer only, zero calls; no number, no criterion and no sentence moves): registration.program_lines names docs/judge_v2_program.md L5336, and that was exact when it was written. After commit cd83eac inserted four one-line correction brackets mid-file (hunks @@ -3911,0 / -6535,0 / -6692,0 / -6949,0 @@), the heading of record \"## Registered 2026-09-17 (before any code or call) — PROFILE-DEVIATION-CERT: does the (model, anchor) deviation term carry certifiable conte ...\" stands at L5337, +1; the whole span shifts by the same +1. Verified at HEAD by sed -n '5337p' docs/judge_v2_program.md. The map for every such pointer is the programme's \"## Line-shift map, appended 2026-09-23\" section: +0 up to old L3911, +1 to L6535, +2 to L6692, +3 to L6949, +4 below. The recorded span is left standing beside this bracket, not rewritten.]"
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a deviation MAGNITUDE for any cell (ROUTING-ATTENUATION ~20%; the prior-matched reading attenuates |delta'| further above |theta_m| 1.5; only a sign was ever publishable)",
+    "any sub-anchor row (closed twice)",
+    "any order among models (the frontier is closed; the wrong-sign cells are its residue, not a re-reading of it)",
+    "a routing claim (ROUTER-REGRET-MMLU stands)",
+    "that the registered reading's 82 certificates carry content (null family rate 80.7-92.1%)",
+    "whether the 22 certificates exceed what a 5% rule allows (1-3 events, not identified)",
+    "anything about x20 alone (never read alone)"
+  ],
+  "ledger": {
+    "row_id": "PROFILE-DEVIATION-CERT",
+    "version": "v113; [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "PROFILE-RELIABILITY",
+    "PROFILE-RELIABILITY-X20",
+    "ANCHOR-PROFILE-INTERVAL",
+    "PROFILE-INTERVAL-ALL",
+    "MAXT-MULTIPLICITY",
+    "K-RECONCILE",
+    "ROUTING-ATTENUATION",
+    "KTD-CHECK",
+    "BUDGET-TRANSFER",
+    "ROUTER-REGRET-MMLU"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L5334-L5401 (registration 62c4084) and the pre-run bracket L5586 (1534a4a): question, hygiene, instrument (a)-(e), criteria C1-C5, predictions, falsifier",
+    "docs/judge_v2_program.md L5756-L5853 (outcome section, f5e447b): every number, the certified list, criteria and predictions scored, the falsifier's reading, defects D1-D4, does-not-show, the sentence of record",
+    "docs/reviews/2026-09-18_profile_batch1.md section PROFILE-DEVIATION-CERT (46f44e8): CONFIRMED status, the three wrong(established) cells, D1-D3, chips",
+    "experiment_results/x12_crossdomain/profile_deviation_cert.txt and _cells.csv (f5e447b)",
+    "docs/test_ledger.html row PROFILE-DEVIATION-CERT (v113): chips verbatim, evidence (62c4084, 1534a4a, f5e447b)",
+    "script sha16 = sha256 of tools/analysis/profile_deviation_cert.py at 8924583, first 16 hex (identity, computed by the registrar 2026-09-20)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' lines to grep -n regardless of line drift; line numbers re-lined 2026-09-22 as of programme HEAD 6aa2a0d (shift +2 from the batch-1 reading)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ1 Use",
+    "what": "For each model and subject anchor, it tests whether the model's subject-specific deviation from its overall strength can be certified, using either the key or the judge. No judge calls.",
+    "why": "Per-cell profiles are only informative if \"model X is certainly better or worse than usual here\" can be stated. This checks whether such statements are supported.",
+    "information": "If the judge's certified deviations agree with the key, profiles add real per-cell content. Result: the judge certified 22 of 280 cells, but 3 of these (13.6%) have the wrong sign against an established key. That triggers the registered rule (a count rule, not a significance claim). The certified set is not confirmed by the key. No 'above or below its own standing' claim is published for any judge-built cell, and profiles stay a re-indexed global score. Older judged question family, later ruled 'history, not evidence'.",
+    "written": "2026-10-07"
+  }
+}

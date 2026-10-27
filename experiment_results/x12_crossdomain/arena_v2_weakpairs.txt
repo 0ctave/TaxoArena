@@ -1,0 +1,10 @@
+EXPLORATORY (zero calls, 2026-09-10 20:55): STACK-v2 on the full x12 schedule, the weak top-4 pairs.
+pair                    decidable  judge right when A right / when B right  ties  reference WRONG  judge right when ref wrong  wrong verdicts picking the LONGER trace
+iask vs arx_0314           101        20/34 (iask)      36/67 (arx)          18     25/101 (25%)      3/25                       20/27 (74%)  mean len iask 1473, arx 936
+iask vs gemini             155        20/31 (iask)      69/124 (gemini)      26     65/155 (42%)     11/65                       30/40 (75%)  mean len iask 1479, gemini 988
+iask vs gpt-4o             117        79/91 (iask)      11/26 (gpt-4o)       11     21/117 (18%)      3/21                       11/16 (69%)  mean len iask 1491, gpt-4o 1794
+gemini vs arx_0314         128        66/104 (gemini)   11/24 (arx)          25     61/128 (48%)     22/61                       16/26 (62%)  mean len gemini 891, arx 874
+Reading: on the pairs where the frontier models disagree, the reference solver (0.86 overall) is wrong 42-48% of the
+time, and the judge follows a wrong reference (right 11/65, 22/61, 3/25). The top-cluster residual is the reference
+ceiling on the hardest questions, not a length effect per se (the longer-trace share among wrong verdicts is confounded
+with iask being the longer model on every pair). Lead: a second, independent reference on exactly these questions.

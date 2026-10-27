@@ -1,0 +1,213 @@
+{
+ "id": "GAP-FIX-CC",
+ "title": "GAP-FIX-CC: GAP-FIX re-run, criteria words unchanged, on the three content-closed MMLU-Pro re-draw trees Q_e1sd1-3 (qwen3; deciding, GAP-SHOWN precondition) and on the nomic_raw trees N-raw (af_clean_s42 split), N_e1sd2, N_e1sd3 (second embedder; scored separately); I_R split into re-centring and passes (zero calls; REGISTERED 2026-10-08)",
+ "question": "Do five within-parent Lloyd passes close the tree's purity gap to flat vMF on content-closed re-draws and under a second embedder?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "e83b59d5",
+  "program_lines": "docs/judge_v2_program.md L25029-L25041",
+  "program_lines_as_of": "e83b59d5 (parent d8ab39fa), re-grepped",
+  "date": "2026-10-08",
+  "heading": "## Registered 2026-10-08 (before any code or call) — GAP-FIX-CC: GAP-FIX re-run with its criteria words unchanged ...",
+  "provenance": "the orchestrator's brief of 2026-10-08 (design); criteria, Support, predictions, falsifier the registrar's; docs/judge_v2_program.md L24950-L24956 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — six zero-call tests registered ...\"; _as_of the commit that writes it, parent d8ab39fa, re-grepped)"
+ },
+ "script": {
+  "path": "tools/analysis/gap_fix_cc.py",
+  "blob": "blob:b83d279082c74f8f76f4a6f0924baa59e35b286e",
+  "sha16": "sha256-lf16:b36fb63ad5df80a7",
+  "commit": "4dbb0814 (built, branch worktree-wf_fa0ebf63-18c-4)",
+  "merged": "c5f23e7a (registrar's batch, by path; parent 17c34de9)",
+  "blob_run": "blob:41aa53aab844135a037bed241e6308afe190dabe (LF, git hash-object; builder delta 886b81c7 on branch worktree-wf_11776b0c-a8a-3; merged to main by path c5e2161b, 1 file)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_gap-fix-cc_delta.md",
+  "commit": "58580670",
+  "verdict": "READY (delta) at blob 41aa53aa (886b81c7): P-1 rule as ruled; real dry-run 35 V slots, 1 replaced (Q_e1sd2 V0 seed 0 -> 5), VOID-TREE 0; D-1..D-3 owed to the record [earlier READY 3968447d superseded by the delta]"
+ },
+ "go": "the author's 2026-10-08 authorisation (relayed in the orchestrator's brief, words not supplied): register and run the zero-call batch a-f; no judged calls",
+ "run": {
+  "outcome_file": "experiment_results/gap_fix_cc/gap_fix_cc_outcome.txt (sha256 dadf3065ba5c76ee4cc5a8ebbed15ddecd667c42f64d26f61b66263a284abe05, 401 lines) and gap_fix_cc_arms.csv (sha256 c42c3a91df590b787d025d747ab1511af39a55f81487de3a3c1580923d3e427d); write-once, never committed; backup E:/TaxoArena_backup_20261009_gap_fix_cc (5/5 OK, review row 14)",
+  "outcome_commit": "outcome not committed (run from main after merge c5e2161b; --run --nomic-leg e1-guard)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "e1sd pools + p2dca (N-raw), read-only; busy rc 1 / dry-run rc 0 / busy rc 1 / run rc 0; no DB changed (review row 16: 421 files size+mtime equal)",
+  "date": "2026-10-09"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_gap-fix-cc_run2.md",
+  "commit": "38eac1c8",
+  "verdict": "VALID; independent recompute 56/56 hit counts and every interval to the digit (B 4,000 seed 7 and normal SE give the same words); GF1-CC PARTIAL; F-GFC NOT FIRED (0 of 0); GF1-N OPEN; C-1 MEDIUM wording, C-2 / C-3 LOW, D-1 LOW (file name beside 443cf9ff)"
+ },
+ "criteria": [
+  {
+   "id": "GF1",
+   "text": "per tree (GAP-FIX's words): CLOSED iff UB(D_R) >= 0 AND LB(I_R) > 0; OPEN iff UB(D_R) < 0 AND |D_R| > max(MDE80, spread_V); PARTIAL otherwise; precondition GAP-SHOWN iff UB(D_T) < 0 (else NO-GAP, not counted)",
+   "result": "HELD",
+   "value": "qwen3: Q_e1sd1 PARTIAL (D_T -0.0253 [-0.0405, -0.0105]; D_R -0.0206 [-0.0339, -0.0059]; I_R +0.0047 [-0.0047, +0.0145]; bar 0.0361); Q_e1sd2 PARTIAL (D_T -0.0278 [-0.0429, -0.0131]; D_R -0.0170 [-0.0312, -0.0020]; I_R +0.0108 [+0.0031, +0.0184]; bar 0.0216); Q_e1sd3 PARTIAL (D_T -0.0234 [-0.0361, -0.0091]; D_R -0.0186 [-0.0320, -0.0043]; I_R +0.0049 [-0.0026, +0.0117]; bar 0.0191); all GAP-SHOWN",
+   "denominator": "held-out 3,598 / 3,522 / 3,500 (twin groups 3,546 / 3,479 / 3,442; Kish m-bar 1.0295 / 1.0250 / 1.0331)"
+  },
+  {
+   "id": "GF1-CC",
+   "text": "DECIDING (qwen3): the GF1 word on >= 2 of the GAP-SHOWN trees; NOT EVALUABLE if < 2 GAP-SHOWN; MIXED otherwise. CLOSED vs not SCOREABLE (SE 0.00630, MDE80 0.0176, DEFF 1.0 measured by GAP-FIX PR-1); OPEN vs PARTIAL DESCRIPTIVE-ONLY near the bar",
+   "result": "HELD",
+   "value": "PARTIAL (CLOSED REFUTED, scoreable; OPEN vs PARTIAL DESCRIPTIVE-ONLY on 3/3); GAP-SHOWN 3 of 3; rule 8: CLOSED refuted on all 3 (UB(D_R) < 0), not resting on Q_e1sd2",
+   "denominator": "3 qwen3 trees"
+  },
+  {
+   "id": "GF1-N",
+   "text": "SCORED SECONDARY (nomic N-raw, N_e1sd2, N_e1sd3): the same rule; never joined with GF1-CC (S4); NOT RUN if the embedder gate is not met",
+   "result": "HELD",
+   "value": "OPEN (OPEN vs PARTIAL DESCRIPTIVE-ONLY on both OPEN trees, (f)): N-raw OPEN (D_R -0.0244 [-0.0369, -0.0119], bar 0.0185), N_e1sd2 CLOSED (D_R +0.0048 [-0.0077, +0.0173]; I_R +0.0202 [+0.0119, +0.0289]), N_e1sd3 OPEN (D_R -0.0286 [-0.0430, -0.0140], bar 0.0196); CLOSED REFUTED; never joined with GF1-CC; N_e1sd1 descriptive (OPEN), never counted",
+   "denominator": "3,445 / 3,522 / 3,500"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "GAP-SHOWN on 3 of 3 qwen3 trees, probability 0.55",
+   "result": "HELD",
+   "value": "GAP-SHOWN 3 of 3 (forecast 0.55); Brier 0.2025",
+   "denominator": "3 trees"
+  },
+  {
+   "id": "P2",
+   "text": "D_T per qwen3 tree -0.030 [-0.055, -0.005]",
+   "result": "HELD",
+   "value": "3/3: D_T -0.0253 / -0.0278 / -0.0234 in [-0.055, -0.005]",
+   "denominator": "per tree"
+  },
+  {
+   "id": "P3",
+   "text": "D_R per qwen3 tree -0.020 [-0.040, +0.002]",
+   "result": "HELD",
+   "value": "3/3: D_R -0.0206 / -0.0170 / -0.0186 in [-0.040, +0.002]",
+   "denominator": "per tree"
+  },
+  {
+   "id": "P4",
+   "text": "GF1-CC PARTIAL 0.45 / CLOSED 0.20 / NOT EVALUABLE 0.15 / OPEN 0.10 / MIXED 0.10",
+   "result": "HELD",
+   "value": "observed PARTIAL (modal forecast 0.45); Brier 0.3850 (5-class)",
+   "denominator": "3 trees"
+  },
+  {
+   "id": "P5",
+   "text": "I_0 > I_P at the point on >= 2 of 3 qwen3 trees, probability 0.75",
+   "result": "HELD",
+   "value": "I_0 > I_P on 2 of 3 (Q_e1sd2 +0.0065 vs +0.0043; Q_e1sd3 +0.0054 vs -0.0006; not Q_e1sd1 +0.0008 vs +0.0039); forecast 0.75, Brier 0.0625",
+   "denominator": "3 trees"
+  },
+  {
+   "id": "P6",
+   "text": "GF1-N PARTIAL 0.40 / CLOSED 0.20 / OPEN 0.15 / NOT EVALUABLE-MIXED-NOT RUN 0.25",
+   "result": "FAILED",
+   "value": "observed GF1-N OPEN (forecast 0.15; modal PARTIAL 0.40); Brier 0.9850 (4-class)",
+   "denominator": "3 nomic trees"
+  }
+ ],
+ "falsifier": {
+  "text": "F-GFC fires iff GF1-CC reads CLOSED with LB(I_P) > 0 on those trees; overturns GAP-FIX's PARTIAL (passes not shown > 0, W-2) as the general case; FLAT-MIX-MMLU's LIMITATION then bracketed [RULED 2026-10-08 by the registrar, pre-data: 'those trees' = at least 2 of the GAP-SHOWN qwen3 trees that read CLOSED (printed 'LB(I_P) > 0 on m of c'; FIRES iff m >= 2); the all-trees line is not of record]",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "GF1-CC": "PARTIAL (CLOSED REFUTED, scoreable; OPEN vs PARTIAL DESCRIPTIVE-ONLY on 3/3); GAP-SHOWN 3 of 3",
+  "D_R_Q_e1sd1": "-0.0206 [-0.0339, -0.0059] (95% twin bootstrap B 1,000), bar 0.0361 (spread_V), n 3,598",
+  "D_R_Q_e1sd2": "-0.0170 [-0.0312, -0.0020], bar 0.0216, n 3,522",
+  "D_R_Q_e1sd3": "-0.0186 [-0.0320, -0.0043], bar 0.0191 (measured MDE80; 0.0005 above |D_R|; at the registered 0.0176 the bar is 0.0183 and the tree OPEN; GF1-CC PARTIAL either way), n 3,500",
+  "D_T": "-0.0253 / -0.0278 / -0.0234, every UB < 0 (GAP-SHOWN 3/3)",
+  "F-GFC": "NOT FIRED; LB(I_P) > 0 on 0 of 0 CLOSED qwen3 trees (ruled m-of-c reading)",
+  "GF1-N": "OPEN (OPEN vs PARTIAL DESCRIPTIVE-ONLY on both OPEN trees, (f)); tree words OPEN / CLOSED / OPEN; N-raw D_R -0.0244 [-0.0369, -0.0119], N_e1sd2 +0.0048 [-0.0077, +0.0173], N_e1sd3 -0.0286 [-0.0430, -0.0140]",
+  "support_realised": "SE(D_R) 0.00680 / 0.00725 / 0.00683 vs registered 0.00630 (discordance 0.1662 / 0.1851 / 0.1631 vs 0.1388; DEFF upper bound 1.03); MDE80 0.0190 / 0.0203 / 0.0191 vs 0.0176; no word changes"
+ },
+ "sentence_of_record": "GAP-FIX-CC (2026-10-09, 0 calls) — VALID; GF1-CC PARTIAL: on the three content-closed MMLU-Pro re-draw trees (qwen3) five within-parent Lloyd passes do not close the purity gap to a flat vMF mixture at the tree's own k (D_R -0.0206 / -0.0170 / -0.0186, every 95% upper bound below 0; CLOSED REFUTED); F-GFC NOT FIRED. GF1-N (nomic, scored secondary, never joined) OPEN. [POSTRUN docs/reviews/POSTRUN_gap-fix-cc_run2.md, 38eac1c8: OPEN vs PARTIAL is DESCRIPTIVE-ONLY on all 3 qwen3 trees and on both OPEN nomic trees; Q_e1sd3 sits 0.0005 under its bar; SE(D_R) measured 0.0068-0.0073 against 0.0063 registered (discordance, not DEFF); a post-hoc refinement, nothing about the engine's construction; MMLU-Pro only.]",
+ "chips": [
+  "REGISTERED 2026-10-08, BEFORE ANY CODE",
+  "FAILED PRECONDITION (POST-RUN 443cf9ff): B6 VOID, Q_e1sd2 SEED 0; NO OUTCOME; RULING P-1 OWED",
+  "VALID (POST-RUN 38eac1c8): GF1-CC PARTIAL (CLOSED REFUTED; OPEN VS PARTIAL DESCRIPTIVE-ONLY 3/3); F-GFC NOT FIRED; GF1-N OPEN (DESCRIPTIVE-ONLY MARGIN)"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-08",
+   "by": "registrar (docs/judge_v2_program.md L25147-L25157 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — rulings GAP-FIX-CC C-1 (B-3), SI-NULL-TRIAD B1 and SIN-2; ...\"; _as_of the commit that writes it, parent 17c34de9, re-grepped))",
+   "text": "READY; tool merged to main by path, blob verified. RULING C-1 / B-3: F-GFC fires iff GF1-CC reads CLOSED AND LB(I_P) > 0 on at least 2 of the GAP-SHOWN qwen3 trees that read CLOSED (printed 'm of c', FIRES iff m >= 2); the tool's all-c FIRES line is not of record. Deviations B-1 (separate driver, gap_fix.py unchanged), B-5 (I-2 stricter precondition), B-6 (D-5 not fixed) recorded. Run with --nomic-leg e1-guard; post-run N-raw shared-stem_key count must be 0, else N-raw's GF1-N not of record (failed precondition); I-2 refusal = failed precondition."
+  },
+  {
+   "date": "2026-10-08",
+   "by": "registrar (POSTRUN 443cf9ff, VALID REFUSAL; docs/judge_v2_program.md L25205-L25211 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run) — GAP-FIX-CC and CERT-SPLIT-DIP: ...\"; _as_of the commit that writes it, parent f4dd6292, re-grepped))",
+   "text": "Failed precondition recorded; bracket appended to DATA OBJECTS AND HYGIENE of the registration (L25033). P-1 (BLOCKER): pre-data ruling owed among (a) Q_e1sd2 VOID and printed, GF1-CC on the other two; (b) a registered seed-replacement rule; (c) a fitter change by new registration. P-2 (dry-run fits V0-V4 label-free, prints OK / VOID) and P-3 (tree named in the refusal) to the builder after the ruling. C-3 does not apply (I-2 passed)."
+  },
+  {
+   "date": "2026-10-08",
+   "by": "registrar (pre-data rulings; docs/judge_v2_program.md L25212-L25219 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — rulings GAP-FIX-CC P-1 (seed replacement), the R1 twin rule ...\"; _as_of the commit that writes it, parent 8daf8220, re-grepped))",
+   "text": "RULING P-1, option (b): a B6-VOID V seed is replaced in its slot by the lowest unused seed ascending from 5 (5-9), deterministic, label-free, printed; today only Q_e1sd2 V0 (seed 0 -> seed 5 if it fits); all 5-9 VOID -> tree printed VOID-TREE and drops out under the registered GF1-CC words. Why: keeps three deciding trees, five V fits, the fitter unchanged, with no researcher choice; (a) turns '>= 2 of 3' into '2 of 2'; (c) changes the instrument (new registration). Builder delta owed (the rule, P-2 dry-run V fits OK/VOID/REPLACED, P-3 tree named), then a delta READY; no --run before it. State blocked -> registered."
+  },
+  {
+   "date": "2026-10-08",
+   "by": "registrar (D-2026-10-08)",
+   "text": "D-2026-10-08-1 (the author's words, now supplied verbatim): \"a. Certificates (recommended), b+c. Hierarchy tests (recommended), d. SCPB gate, e+f. GAP-FIX-CC and SuperGPQA\"; judged spend \"None for now (Recommended)\". The go of record is unchanged in substance. Source: docs/judge_v2_program.md L25317-L25327 (section \"## Author's decision 2026-10-08 (recorded by the registrar; zero calls; insertion only) — D-2026-10-08-1..6 ...\"; _as_of the commit that writes it, parent 5211616a, re-grepped); authority docs/agents/author_decisions/2026-10-08.md (5211616a); plan Amendment 40"
+  },
+  {
+   "date": "2026-10-09",
+   "by": "registrar (POSTRUN 38eac1c8, VALID; docs/judge_v2_program.md L25341-L25351 (section \"## GAP-FIX-CC (2026-10-09, 0 calls) — VALID (POSTRUN 38eac1c8): ...\"; _as_of the commit that writes it, parent 38eac1c8, re-grepped))",
+   "text": "READY (delta 58580670, blob 41aa53aa, merge c5e2161b) recorded; OUTCOME recorded; bracket appended to READOUTS AND CRITERIA of the registration (L25035). Words printed with the C-1 qualifiers; F-GFC scored from the ruled m-of-c line, the tool's '(B-3: ... all of them)' text is the non-record reading (C-2); measured Support beside the registered (C-3), Q_e1sd3 0.0005 under its bar disclosed. Owed, not reached: READY 58580670 D-1..D-3; the L695 print fix. registered -> READY -> run -> done."
+  }
+ ],
+ "does_not_show": [
+  "anything about the engine's construction (a post-hoc refinement)",
+  "a joined qwen3 + nomic word (S4)",
+  "OPEN vs PARTIAL as a scoreable distinction on any tree",
+  "that the passes carry the gain (I_P's interval contains 0 on Q_e1sd1 and Q_e1sd3)",
+  "af_clean_s42's qwen3 tree beyond GAP-FIX; a key-information claim (M2 not run)",
+  "a corpus other than MMLU-Pro"
+ ],
+ "ledger": {
+  "row_id": "GAP-FIX-CC",
+  "version": "v420 (2026-10-09: OUTCOME bracket; VALID ok chip beside REGISTERED and the failed-precondition chip) | v417 (2026-10-08: failed-precondition bracket; warn chip beside REGISTERED) | v414 (2026-10-08: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "GAP-FIX (instrument gap_fix.py blob 7c0691e8; words; carried D-1, D-3..D-5)",
+  "FLAT-MIX-MMLU",
+  "E1-SPLIT-DRAWS (trees)",
+  "EMBEDDER-CROSS-FLAT (N-raw)",
+  "EMBEDDER-PLUMBING (the embedder gate; state built)"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; label-free refinement on anchor-free trees; neither a re-test nor a variant of FITSET-FAITHFUL / FITSET-INTENT"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "about 1-2 h",
+  "agent_hours": "about 3 h",
+  "reads_pool": true
+ },
+ "outputs": "never committed: pinned by sha256, stored on E: with SHA256SUMS.txt; temp under E:/TaxoArena_tmp via scratch_dir",
+ "sources": [
+  "docs/judge_v2_program.md L25029-L25041 (_as_of the commit that writes it, parent d8ab39fa, re-grepped)",
+  "docs/judge_v2_program.md L24950-L24956 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — six zero-call tests registered ...\"; _as_of the commit that writes it, parent d8ab39fa, re-grepped)",
+  "docs/agents/results/GAP-FIX.json (does_not_show: the follow-up)",
+  "docs/judge_v2_program.md L25147-L25157 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — rulings GAP-FIX-CC C-1 (B-3), SI-NULL-TRIAD B1 and SIN-2; ...\"; _as_of the commit that writes it, parent 17c34de9, re-grepped)",
+  "docs/judge_v2_program.md L25205-L25211 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run) — GAP-FIX-CC and CERT-SPLIT-DIP: ...\"; _as_of the commit that writes it, parent f4dd6292, re-grepped)",
+  "docs/judge_v2_program.md L25212-L25219 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — rulings GAP-FIX-CC P-1 (seed replacement), the R1 twin rule ...\"; _as_of the commit that writes it, parent 8daf8220, re-grepped)",
+  "docs/judge_v2_program.md L25317-L25327 (section \"## Author's decision 2026-10-08 (recorded by the registrar; zero calls; insertion only) — D-2026-10-08-1..6 ...\"; _as_of the commit that writes it, parent 5211616a, re-grepped); authority docs/agents/author_decisions/2026-10-08.md (5211616a); plan Amendment 40",
+  "docs/judge_v2_program.md L25341-L25351 (section \"## GAP-FIX-CC (2026-10-09, 0 calls) — VALID (POSTRUN 38eac1c8): ...\"; _as_of the commit that writes it, parent 38eac1c8, re-grepped)",
+  "docs/reviews/POSTRUN_gap-fix-cc_run2.md (38eac1c8)",
+  "docs/reviews/READY_gap-fix-cc_delta.md (58580670)",
+  "experiment_results/gap_fix_cc/gap_fix_cc_outcome.txt (sha256 dadf3065ba5c76ee...)"
+ ],
+ "last_update": "2026-10-09",
+ "label_status": "[LF]",
+ "pilot_disclosure": "SEEN before registration, pilot role only (never evidence): E:/TaxoArena_tmp/cert_split (results.json sha256 32fcf7cd8baa1367..., VERIFIED_HEADLINE.txt 98b32054b56bde7b...), E:/TaxoArena_tmp/hier_tests (granularity_free/results.json 2fc8ba3a99b8dc54..., nesting/results.json cb5a74cf0d870081..., test3_fair_backoff/results.json 866284ca1bb5cf98..., + review dirs), E:/TaxoArena_tmp/scpb/review_v3_synthesis.md d341748f5265229d...; 2026-10-07, zero calls, TRAIN only, not committed",
+ "plain_description": {
+  "sq": "SQ3 Taxonomy",
+  "what": "Repeats the GAP-FIX test (a few nearest-centroid passes on the tree's leaves, then compare with a flat mixture) on three fresh content-closed trees and on trees built with a second embedding model. No judge calls.",
+  "why": "GAP-FIX found the gap only partly closed on one tree, mostly by re-centring; the follow-up it named is content-closed re-draws and a second embedder.",
+  "information": "Shows whether a few rounds of re-assigning items within each parent branch close the gap between the tree's leaves and a flat clustering with the same number of groups. Result: done. On all three new content-closed trees the gap shrinks but stays (about 2 percentage points of purity, clearly below zero), so the refinement does not close it; whether it is a large or a moderate gap cannot be told apart at this sample size. A second embedder gives the same picture on 2 of 3 trees.",
+  "written": "2026-10-09"
+ }
+}

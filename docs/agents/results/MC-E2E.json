@@ -1,0 +1,143 @@
+{
+  "id": "MC-E2E",
+  "title": "MC-E2E (+ MC-SEEDS): does the multi-corpus router survive when the cell must be INFERRED rather than given? (+ three-seed replication; zero calls)",
+  "question": "The same policies as MC-ROUTER applied through the taxonomy's own flatLeaf prediction over the 143 federated leaves (predicted source / source+domain / leaf) at seeds 42 / 137 / 2048, query-level bootstrap 200 resamples per seed: (1) the deployed router beats the best single model by > 2 SE in all three seeds; (2) the metadata cost (oracle-cell gain minus predicted-cell gain) per seed; (3) the across-seed spread < the within-seed SE.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "dc7d1ef",
+    "program_lines": "docs/multi_corpus_design.md L448-L463 (registration) and L464 ff. (result); the MATH-FIX re-run at L505-L530 and the CORRECTION 2026-09-14 at L602 ff. (the reserved side was not the tree's held-out pool); no programme section",
+    "program_lines_as_of": "docs/multi_corpus_design.md at 4ec8f18",
+    "heading": "## Registered 2026-09-13 (before running) — MC-E2E: the deployed router, and MC-SEEDS: its replication",
+    "outcome_heading": [
+      "docs/multi_corpus_design.md L464: ## MC-E2E + MC-SEEDS result (2026-09-13, zero calls) — the deployed router holds; its magnitude is seed-sensitive",
+      "docs/multi_corpus_design.md L602: ## CORRECTION 2026-09-14 — the reserved side of MC-E2E / MC-SEEDS was not the tree's held-out pool"
+    ],
+    "date": "2026-09-13"
+  },
+  "script": {
+    "path": "tools/analysis/multicorpus_router_e2e.py",
+    "sha16": "84c62136c711f37d (at 9865009)",
+    "commit": "9865009 (later edited: --mathfix and the clean-pool restriction; 13f2142) [ID-ONLY 2026-09-23 (CLAIMS-SWEEP-BRACKETS, registrar): pool union paeec37aa28063c75; verified by id only, not by content; reviewed twins on this pool (reviews 1df2cf1, 8ebfa7a): 471 ids / 427 texts exact, 478 / 432 norm-v1 (GPQA 288, MMLU-Pro 185, MATH 3, BBH 2); see docs/judge_v2_program.md L14280-L14340 (CONTENT-DISJOINT-SPLIT-AUDIT) and L14455-L14487 (SPLIT-FOLLOWUPS).]"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/multicorpus/router_e2e.txt",
+    "outcome_commit": "9865009",
+    "calls": 0,
+    "cce": 0,
+    "pool": "paeec37aa28063c75 (the tree's active pool; the first readout re-derived its own 0.30 split with random.Random(seed), ~70% of it training data for the taxonomy; the clean restriction keeps 1,946 / 1,973 / 1,914 questions) [ID-ONLY 2026-09-23 (CLAIMS-SWEEP-BRACKETS, registrar): pool union paeec37aa28063c75; verified by id only, not by content; reviewed twins on this pool (reviews 1df2cf1, 8ebfa7a): 471 ids / 427 texts exact, 478 / 432 norm-v1 (GPQA 288, MMLU-Pro 185, MATH 3, BBH 2); see docs/judge_v2_program.md L14280-L14340 (CONTENT-DISJOINT-SPLIT-AUDIT) and L14455-L14487 (SPLIT-FOLLOWUPS).]",
+    "date": "2026-09-13 (corrected 2026-09-14)"
+  },
+  "review": {
+    "file": "the ledger audit of 2026-09-14 (two corrections in the observed cell: the +4.1pp superseded by MATH-FIX's +2.7pp and never updated; the contaminated reserved side) and the CORRECTION section in multi_corpus_design.md L602",
+    "commit": "3535d56",
+    "verdict": "PASS (1) (2) on the clean pool (+4.37 / +2.43 / +3.34, mean +3.38); FAIL (3) seed-sensitive; 'inferring the cell costs essentially nothing' NOT evidenced as worded (clean metadata cost mean +0.71pp) [ID-ONLY 2026-09-23 (CLAIMS-SWEEP-BRACKETS, registrar): pool union paeec37aa28063c75; verified by id only, not by content; reviewed twins on this pool (reviews 1df2cf1, 8ebfa7a): 471 ids / 427 texts exact, 478 / 432 norm-v1 (GPQA 288, MMLU-Pro 185, MATH 3, BBH 2); see docs/judge_v2_program.md L14280-L14340 (CONTENT-DISJOINT-SPLIT-AUDIT) and L14455-L14487 (SPLIT-FOLLOWUPS).]"
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "the DEPLOYED router (predicted source/domain) beats best single by > 2 SE in ALL THREE seeds",
+      "result": "HELD",
+      "value": "first readout +4.9 / +3.4 / +4.1pp (SE ~0.53), superseded by MATH-FIX (+2.7pp, range +2.1 to +3.4); on the tree's own active pool (clean) +4.37 / +2.43 / +3.34pp (mean +3.38) against the contaminated +3.36 / +2.08 / +2.75 (mean +2.73): the headline was CONSERVATIVE; > 2 SE in all three seeds [ID-ONLY 2026-09-23 (CLAIMS-SWEEP-BRACKETS, registrar): pool union paeec37aa28063c75; verified by id only, not by content; reviewed twins on this pool (reviews 1df2cf1, 8ebfa7a): 471 ids / 427 texts exact, 478 / 432 norm-v1 (GPQA 288, MMLU-Pro 185, MATH 3, BBH 2); see docs/judge_v2_program.md L14280-L14340 (CONTENT-DISJOINT-SPLIT-AUDIT) and L14455-L14487 (SPLIT-FOLLOWUPS).]",
+      "denominator": "reserved side per seed; clean 1,946 / 1,973 / 1,914 questions [ID-ONLY 2026-09-23 (CLAIMS-SWEEP-BRACKETS, registrar): pool union paeec37aa28063c75; verified by id only, not by content; reviewed twins on this pool (reviews 1df2cf1, 8ebfa7a): 471 ids / 427 texts exact, 478 / 432 norm-v1 (GPQA 288, MMLU-Pro 185, MATH 3, BBH 2); see docs/judge_v2_program.md L14280-L14340 (CONTENT-DISJOINT-SPLIT-AUDIT) and L14455-L14487 (SPLIT-FOLLOWUPS).]"
+    },
+    {
+      "id": "(2)",
+      "text": "the metadata cost per seed",
+      "result": "DELIVERED",
+      "value": "first readout +0.1 / +0.9 / +0.7pp; CLEAN -0.46 / +1.22 / +1.36 (mean +0.71pp) against the contaminated -0.05 / +0.57 / +0.23: 3x larger when clean, so 'inferring the cell costs the router essentially nothing' is NOT evidenced as worded [ID-ONLY 2026-09-23 (CLAIMS-SWEEP-BRACKETS, registrar): pool union paeec37aa28063c75; verified by id only, not by content; reviewed twins on this pool (reviews 1df2cf1, 8ebfa7a): 471 ids / 427 texts exact, 478 / 432 norm-v1 (GPQA 288, MMLU-Pro 185, MATH 3, BBH 2); see docs/judge_v2_program.md L14280-L14340 (CONTENT-DISJOINT-SPLIT-AUDIT) and L14455-L14487 (SPLIT-FOLLOWUPS).]",
+      "denominator": "three seeds"
+    },
+    {
+      "id": "(3)",
+      "text": "MC-SEEDS: the across-seed spread < the within-seed SE",
+      "result": "FAILED",
+      "value": "spread 1.56pp > within-seed SE 0.53pp; quote the CLEAN +3.4pp (range +2.4 to +4.4), never one seed [CORRECTED 2026-09-23 by the registrar: 1.56pp / 0.53pp are the FIRST, CONTAMINATED, pre-MATH-FIX readout's figures (experiment_results/multicorpus/router_e2e.txt: 0.0156 vs 0.0053); the CLEAN MATH-FIX readout beside the clean +3.38pp (router_e2e_mathfix_clean.txt) prints 0.0194 vs 0.0093 = 1.94pp vs 0.93pp; (3) FAILED under both.]",
+      "denominator": "three seeds"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "deployed gain +2 to +4pp; metadata cost 1 to 2pp; across-seed spread under 1pp",
+      "result": "FAILED",
+      "value": "gain HELD on the clean pool (+3.38 mean); metadata cost below the band (+0.71 clean); spread 1.56pp FAILED [CORRECTED 2026-09-23 by the registrar: 1.56pp / 0.53pp are the FIRST, CONTAMINATED, pre-MATH-FIX readout's figures (experiment_results/multicorpus/router_e2e.txt: 0.0156 vs 0.0053); the CLEAN MATH-FIX readout beside the clean +3.38pp (router_e2e_mathfix_clean.txt) prints 0.0194 vs 0.0093 = 1.94pp vs 0.93pp; (3) FAILED under both.] [ID-ONLY 2026-09-23 (CLAIMS-SWEEP-BRACKETS, registrar): pool union paeec37aa28063c75; verified by id only, not by content; reviewed twins on this pool (reviews 1df2cf1, 8ebfa7a): 471 ids / 427 texts exact, 478 / 432 norm-v1 (GPQA 288, MMLU-Pro 185, MATH 3, BBH 2); see docs/judge_v2_program.md L14280-L14340 (CONTENT-DISJOINT-SPLIT-AUDIT) and L14455-L14487 (SPLIT-FOLLOWUPS).]",
+      "denominator": "three seeds"
+    }
+  ],
+  "falsifier": {
+    "text": "none beyond the criteria",
+    "fired": false,
+    "note": "predicted source 96.2%, source+domain 81.3%; PRED leaf 0.598 < PRED domain 0.603, as in MC-LEAF"
+  },
+  "numbers_of_record": {
+    "routing": "predicted source 96.2%; source+domain 81.3%",
+    "gain_clean": "+4.37 / +2.43 / +3.34pp, mean +3.38 (contaminated +3.36 / +2.08 / +2.75, mean +2.73; first readout +4.9 / +3.4 / +4.1; MATH-FIX +2.7 range +2.1-3.4)",
+    "metadata_cost": "clean -0.46 / +1.22 / +1.36 (mean +0.71); contaminated -0.05 / +0.57 / +0.23",
+    "spread": "1.56pp vs within-seed SE 0.53pp [CORRECTED 2026-09-23 by the registrar: 1.56pp / 0.53pp are the FIRST, CONTAMINATED, pre-MATH-FIX readout's figures (experiment_results/multicorpus/router_e2e.txt: 0.0156 vs 0.0053); the CLEAN MATH-FIX readout beside the clean +3.38pp (router_e2e_mathfix_clean.txt) prints 0.0194 vs 0.0093 = 1.94pp vs 0.93pp; (3) FAILED under both.]",
+    "spread_clean": "1.94pp vs mean within-seed SE 0.93pp (router_e2e_mathfix_clean.txt: 'across-seed spread 0.0194 vs mean within-seed SE 0.0093'); added 2026-09-23 by the registrar, copied from the outcome file"
+  },
+  "sentence_of_record": "MC-E2E (2026-09-13, zero calls; corrected 2026-09-14): the deployed router (policy by predicted source/domain through the taxonomy's own flatLeaf prediction, 96.2% source / 81.3% source+domain) beats the best single model by > 2 SE in all three seeds (clean +4.37 / +2.43 / +3.34pp, mean +3.38; quote the clean +3.4pp, never one seed); the across-seed spread (1.56pp) exceeds the within-seed SE (0.53), so (3) FAILS; two corrections: the +4.1pp first quoted was superseded by MATH-FIX (+2.7pp) and never updated, and the analysis re-derived its own 0.30 split so ~70% of the questions it scored were training data for the taxonomy routing them; restricted to the tree's own active pool the headline is CONSERVATIVE but the metadata cost is 3x larger (mean +0.71pp), so 'inferring the cell costs the router essentially nothing' is NOT evidenced as worded. [CORRECTED 2026-09-23 by the registrar: 1.56pp / 0.53pp are the FIRST, CONTAMINATED, pre-MATH-FIX readout's figures (experiment_results/multicorpus/router_e2e.txt: 0.0156 vs 0.0053); the CLEAN MATH-FIX readout beside the clean +3.38pp (router_e2e_mathfix_clean.txt) prints 0.0194 vs 0.0093 = 1.94pp vs 0.93pp; (3) FAILED under both.]",
+  "chips": [
+    "PASS (1)(2)",
+    "FAIL (3) seed-sensitive"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-14",
+      "by": "the ledger audit (observed cell 'Two corrections, 2026-09-14') and multi_corpus_design.md L602 'CORRECTION 2026-09-14 — the reserved side of MC-E2E / MC-SEEDS was not the tree's held-out pool'",
+      "text": "the +4.1pp this row quoted was superseded by MATH-FIX (+2.7pp, range +2.1-3.4) and never updated; the analysis re-derives its own 0.30 split with random.Random(seed) instead of reading the tree's held-out pool, so ~70% of the questions scored were TRAINING data for the taxonomy; restricted to the active pool paeec37aa28063c75 the deployed gain is +4.37 / +2.43 / +3.34pp (mean +3.38), criterion (1) still passes; the metadata cost is 3x larger when clean (mean +0.71pp)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the coordinator's verified record-integrity blocker A1 (insertion only, zero calls; no number of this record moves)",
+      "text": "DISCLOSED 2026-09-23 by the registrar (blocker A1, insertion only, zero calls; NO number of this record moves and nothing above is rewritten): THE UNION TREE THIS RESULT IS ROUTED ON FAILS THE TRAIN-ONLY INVARIANT. Snapshot 20260911_144214 carries 427 distinct EVAL texts among its member slots by exact text and 432 under the split function's own key norm-v1 (FRAMEWORK L229 / L373, `gradlew trainOnlyAudit`, read-only), i.e. 432 of the 6,482 paeec EVAL ids = 6.66% of the routed population were visible to construction. THE WORST-CASE BOUND, which needs no run and is a BOUND AND NOT AN ESTIMATE OF THE EFFECT (it assumes every contaminated item is correct BECAUSE of the contamination, which is the largest the effect can possibly be). UNION TREE 20260911_144214: 432 of 6,482 paeec EVAL ids = 6.66% (exact text 427). At MC-ROOT's Top-1 of 81.58% that is 5,288.0 correct, so a clean reading is at worst (5,288 - 432) / (6,482 - 432) = 4,856 / 6,050 = 80.26%: THE UNION ROUTING HEADLINE CANNOT FALL BY MORE THAN 1.32pp. MC-E2E's +3.38pp router gain and PROFILE-INTERVAL-ALL-UNION's 0.8537 are bounded by the same 6.66% share. MMLU-PRO TREE 20260910_043557: 70 of 3,445 = 2.03% (exact text 37), so AT MOST 2.03pp on any routed proportion - about 5 questions per anchor spread over the 14 bareq512_s42 anchors at 119-304 questions per anchor. THE BOUND IS A WORST CASE AND NOT AN ESTIMATE; no clean re-read was run, and whether to rebuild under content closure (0 judge calls, new snapshot ids, every routed readout moves) or to disclose at this bound is an OPEN AUTHOR DECISION registered in docs/agents/results/SPLIT-FUNCTION-IMPL.json."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar (insertion only, zero calls; on the coordinator's instruction)",
+      "text": "Criterion (3)'s figures corrected by insertion at every site: '1.56pp vs 0.53pp' are the first contaminated pre-MATH-FIX readout's (router_e2e.txt 0.0156 / 0.0053); the clean MATH-FIX readout of record prints 0.0194 / 0.0093 (1.94pp / 0.93pp); verdict (3) FAILED unchanged. Sites bracketed in the same commit: this record, the MC-E2E ledger row, FRAMEWORK L180's RESTATED bracket, docs/agents/plans/2026-09-18_reframing_and_next.md L25 (plan section 1.1(a) R2 bracket), docs/agents/leads/2026-09-17_cells.md L276, docs/agents/leads/2026-09-17_arena_profile.md L229. The contaminated pair propagated into the two R2 brackets via the restatement pack R2 (9b41986)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the post-run review 21c4fda (insertion only, zero calls)",
+      "text": "SUPERSEDED IN PART by ROUTER-CLEAN-POLICY (2f53675; review 21c4fda): on the split of record the deployed gain is +2.92pp [+1.81, +4.02] (replacing +3.38pp) and the metadata cost M = +0.17pp [-0.61, +0.95] (replacing +0.71pp; neither cost nor parity shown). The per-seed -0.46 / +1.22 / +1.36 and 'worse than the label on 2 of 3 seeds' are withdrawn as evidence (contaminated-fit split). Criterion (1)'s verdict of record stands; its magnitude is replaced."
+    }
+  ],
+  "does_not_show": [
+    "that inferring the cell costs the router essentially nothing (clean metadata cost mean +0.71pp) [ID-ONLY 2026-09-23 (CLAIMS-SWEEP-BRACKETS, registrar): pool union paeec37aa28063c75; verified by id only, not by content; reviewed twins on this pool (reviews 1df2cf1, 8ebfa7a): 471 ids / 427 texts exact, 478 / 432 norm-v1 (GPQA 288, MMLU-Pro 185, MATH 3, BBH 2); see docs/judge_v2_program.md L14280-L14340 (CONTENT-DISJOINT-SPLIT-AUDIT) and L14455-L14487 (SPLIT-FOLLOWUPS).]",
+    "a seed-stable magnitude (spread 1.56pp) [CORRECTED 2026-09-23 by the registrar: 1.56pp / 0.53pp are the FIRST, CONTAMINATED, pre-MATH-FIX readout's figures (experiment_results/multicorpus/router_e2e.txt: 0.0156 vs 0.0053); the CLEAN MATH-FIX readout beside the clean +3.38pp (router_e2e_mathfix_clean.txt) prints 0.0194 vs 0.0093 = 1.94pp vs 0.93pp; (3) FAILED under both.]",
+    "[DISCLOSED 2026-09-23 by the registrar (blocker A1, insertion only, zero calls; NO number of this record moves and nothing above is rewritten): THE UNION TREE THIS RESULT IS ROUTED ON FAILS THE TRAIN-ONLY INVARIANT. Snapshot 20260911_144214 carries 427 distinct EVAL texts among its member slots by exact text and 432 under the split function's own key norm-v1 (FRAMEWORK L229 / L373, `gradlew trainOnlyAudit`, read-only), i.e. 432 of the 6,482 paeec EVAL ids = 6.66% of the routed population were visible to construction. THE WORST-CASE BOUND, which needs no run and is a BOUND AND NOT AN ESTIMATE OF THE EFFECT (it assumes every contaminated item is correct BECAUSE of the contamination, which is the largest the effect can possibly be). UNION TREE 20260911_144214: 432 of 6,482 paeec EVAL ids = 6.66% (exact text 427). At MC-ROOT's Top-1 of 81.58% that is 5,288.0 correct, so a clean reading is at worst (5,288 - 432) / (6,482 - 432) = 4,856 / 6,050 = 80.26%: THE UNION ROUTING HEADLINE CANNOT FALL BY MORE THAN 1.32pp. MC-E2E's +3.38pp router gain and PROFILE-INTERVAL-ALL-UNION's 0.8537 are bounded by the same 6.66% share. MMLU-PRO TREE 20260910_043557: 70 of 3,445 = 2.03% (exact text 37), so AT MOST 2.03pp on any routed proportion - about 5 questions per anchor spread over the 14 bareq512_s42 anchors at 119-304 questions per anchor. THE BOUND IS A WORST CASE AND NOT AN ESTIMATE; no clean re-read was run, and whether to rebuild under content closure (0 judge calls, new snapshot ids, every routed readout moves) or to disclose at this bound is an OPEN AUTHOR DECISION registered in docs/agents/results/SPLIT-FUNCTION-IMPL.json.]"
+  ],
+  "ledger": {
+    "row_id": "MC-E2E",
+    "version": "v52 (9865009; observed cell corrected 2026-09-14 by the ledger audit) [UPDATED 2026-09-23 at ledger v130 (audit OK, 227 rows): the blocker-A1 TRAIN-ONLY disclosure, with its counts and its worst-case bound, inserted into this row's observed cell. No number in the row moves.]"
+  },
+  "depends_on": [
+    "MC-ROUTER",
+    "MC-LEAF",
+    "MATH-FIX",
+    "MC-FED"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/multi_corpus_design.md L448-L530 and L602 ff. (dc7d1ef / 9865009 / MATH-FIX / the 2026-09-14 correction)",
+    "experiment_results/multicorpus/router_e2e.txt (9865009)",
+    "docs/test_ledger.html row MC-E2E (v52; corrected 2026-09-14): chips verbatim, observed cell, evidence (multicorpus_router_e2e.py, router_e2e.txt, dc7d1ef)",
+    "script sha16 = sha256 of tools/analysis/multicorpus_router_e2e.py at 9865009, first 16 hex (identity, computed by the registrar 2026-09-22; later edited for --mathfix and the clean restriction)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "experiment_results/multicorpus/router_e2e_mathfix_clean.txt and router_e2e.txt (the (3) figures, read 2026-09-23 by the registrar)"
+  ],
+  "last_update": "2026-09-23",
+  "plain_description": {
+    "sq": "SQ1 Use",
+    "what": "Runs the multi-corpus router end to end. The question's cell is predicted by the tree instead of given, then the policy picks a model. It is compared with the best single model over three random seeds. No calls.",
+    "why": "It checks whether the routing gain survives when the cell must be inferred in practice.",
+    "information": "A gain above noise at every seed would make routing usable. Result: the router beats the best single model in all three seeds (about +3.4 points as first read). But the gain varies between seeds more than the noise level, so its size is not seed-stable. Corrections: the analysis drew its own split, so about 70% of the questions it scored had been training data for the taxonomy. A later clean re-read on the split of record gives +2.9 points [+1.8, +4.0], and the cost of inferring the cell is neither shown nor ruled out. The routing tree also had about 6.7% of the routed questions visible during construction. An early figure (+4.1) was superseded. The pool is checked by question id only, not by content.",
+    "written": "2026-10-07"
+  }
+}

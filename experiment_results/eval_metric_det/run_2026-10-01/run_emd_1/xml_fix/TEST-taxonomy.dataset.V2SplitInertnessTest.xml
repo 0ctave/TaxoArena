@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="taxonomy.dataset.V2SplitInertnessTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-01T07:10:08" hostname="HORTENSIA" time="0.318">
+  <properties/>
+  <testcase name="G4 judge induction withholds a globally reserved text only when the set is installed()" classname="taxonomy.dataset.V2SplitInertnessTest" time="0.077"/>
+  <testcase name="G3 G5 saveSnapshot - absent inputs store no stamp key and accept a globally-keyed text, installed refuses it()" classname="taxonomy.dataset.V2SplitInertnessTest" time="0.152"/>
+  <testcase name="G2 settings JSON without a stamp is byte-identical to the base golden and the stamp encodes when set()" classname="taxonomy.dataset.V2SplitInertnessTest" time="0.002"/>
+  <testcase name="G1 legacy splits are byte-identical to the base goldens and the v2 split is different and ran()" classname="taxonomy.dataset.V2SplitInertnessTest" time="0.085"/>
+  <testcase name="G3 withGlobal is the identity with nothing installed and the read counter proves it ran()" classname="taxonomy.dataset.V2SplitInertnessTest" time="0.001"/>
+  <system-out><![CDATA[09:10:08.216 [WARN ] JudgePrompts - Malformed JSON: system_prompt or rubric missing/blank. Raw input:
+{"judge_system_prompt": "p", "judge_rubric": {"criteria": ["Accuracy"], "failure_modes": []}}
+09:10:08.216 [WARN ] JudgeService - Judge JSON for 'Leaf' is malformed. Attempting LLM repair...
+09:10:08.217 [WARN ] JudgePrompts - Malformed JSON: system_prompt or rubric missing/blank. Raw input:
+{"judge_system_prompt": "p", "judge_rubric": {"criteria": ["Accuracy"], "failure_modes": []}}
+09:10:08.217 [ERROR] JudgeService - Failed to repair judge JSON for 'Leaf' after LLM assistance.
+09:10:08.217 [INFO ] JudgeService - [JUDGE-LEAK] node 'Leaf': withheld 1 of 3 region question(s) from induction (held-out split)
+09:10:08.218 [WARN ] JudgePrompts - Malformed JSON: system_prompt or rubric missing/blank. Raw input:
+{"judge_system_prompt": "p", "judge_rubric": {"criteria": ["Accuracy"], "failure_modes": []}}
+09:10:08.218 [WARN ] JudgeService - Judge JSON for 'Leaf' is malformed. Attempting LLM repair...
+09:10:08.218 [WARN ] JudgePrompts - Malformed JSON: system_prompt or rubric missing/blank. Raw input:
+{"judge_system_prompt": "p", "judge_rubric": {"criteria": ["Accuracy"], "failure_modes": []}}
+09:10:08.218 [ERROR] JudgeService - Failed to repair judge JSON for 'Leaf' after LLM assistance.
+09:10:08.257 [INFO ] ModelEvalStore - ModelEvalStore schema ready.
+09:10:08.310 [INFO ] ModelEvalStore - Reserved pool 'p8f4bf01bb608ef30' recorded: 1 question(s) across 1 domain(s); nothing activated.
+09:10:08.312 [INFO ] SnapshotManager - Test environment detected. Skipping JSON snapshot migration.
+09:10:08.312 [INFO ] Persistence - Saving taxonomy DAG with Vector-Offloading to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\emd-suite\temp_graph_save.tmp...
+09:10:08.313 [INFO ] Persistence - Saved 2 nodes successfully (offloaded structure to SQL).
+09:10:08.313 [WARN ] AdditionalMetrics - computeRoutingECE: empty ground truth — returning 0.0 (GT plumbing absent)
+09:10:08.318 [INFO ] SnapshotManager - [POOL-PIN] snapshot stores this run's own reserved pool p8f4bf01bb608ef30
+09:10:08.321 [INFO ] SnapshotManager - [TRAIN-ONLY] saveSnapshot: 0 EVAL texts among the tree's members (1 pool texts checked)
+09:10:08.333 [INFO ] SnapshotManager - Successfully created and saved snapshot to DB: 20261001_091008_legacy
+09:10:08.344 [INFO ] Persistence - Saving taxonomy DAG with Vector-Offloading to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\emd-suite\temp_graph_save.tmp...
+09:10:08.344 [INFO ] Persistence - Saved 2 nodes successfully (offloaded structure to SQL).
+09:10:08.344 [WARN ] AdditionalMetrics - computeRoutingECE: empty ground truth — returning 0.0 (GT plumbing absent)
+09:10:08.345 [INFO ] SnapshotManager - [POOL-PIN] snapshot stores this run's own reserved pool p8f4bf01bb608ef30
+09:10:08.346 [INFO ] Persistence - Saving taxonomy DAG with Vector-Offloading to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\emd-suite\temp_graph_save.tmp...
+09:10:08.347 [INFO ] Persistence - Saved 2 nodes successfully (offloaded structure to SQL).
+09:10:08.347 [WARN ] AdditionalMetrics - computeRoutingECE: empty ground truth — returning 0.0 (GT plumbing absent)
+09:10:08.347 [INFO ] SnapshotManager - [POOL-PIN] snapshot stores this run's own reserved pool p8f4bf01bb608ef30
+09:10:08.348 [INFO ] SnapshotManager - [TRAIN-ONLY] saveSnapshot: 0 EVAL texts among the tree's members (1 pool texts checked)
+09:10:08.358 [INFO ] SnapshotManager - Successfully created and saved snapshot to DB: 20261001_091008_v2clean
+09:10:08.369 [INFO ] Persistence - Saving taxonomy DAG with Vector-Offloading to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\emd-suite\temp_graph_save.tmp...
+09:10:08.370 [INFO ] Persistence - Saved 2 nodes successfully (offloaded structure to SQL).
+09:10:08.370 [WARN ] AdditionalMetrics - computeRoutingECE: empty ground truth — returning 0.0 (GT plumbing absent)
+09:10:08.408 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+09:10:08.410 [INFO ] DatasetFetcher - Train/test split from reserved file 'pinned.json': 13 train / 5 test (file lists 5 ids; 0 not present in the loaded dataset).
+09:10:08.418 [INFO ] DatasetFetcher - [POOL] recorded p122635da994f4f5b (file pinned.json, 5 judgeable ids; sentinels excluded); nothing activated
+09:10:08.425 [INFO ] DatasetFetcher - [SPLIT-CLOSURE] 2 train item(s) share their text with a test item and move to test as routing-only members (pool id unchanged)
+09:10:08.425 [INFO ] DatasetFetcher - [SPLIT-SIDE] 11 train (2 gate) / 7 test; every item's side == f(item); |gate ∩ eval| = 0; pool p122635da994f4f5b; FunctionStamp(normaliserVersion=norm-v1, keyRule=ck-v1, modulus=1000, evalUpper=300, gateLower=300, gateUpper=400, poolId=p122635da994f4f5b)
+09:10:08.426 [INFO ] DatasetFetcher - Train/test split (ratio=0.3, seed=7): 12 train / 6 test across 2 domains.
+09:10:08.426 [INFO ] DatasetFetcher - Successfully reserved 6 test queries across 2 domains to reserved_test_queries.json (5 arena-judgeable, 1 unlinked and routing-only).
+09:10:08.434 [INFO ] DatasetFetcher - [POOL] recorded p91a968fd56a5aaac (seed=7, ratio=0.3, 5 judgeable ids; sentinels excluded); nothing activated
+09:10:08.441 [INFO ] DatasetFetcher - [SPLIT-CLOSURE] 1 train item(s) share their text with a test item and move to test as routing-only members (pool id unchanged)
+09:10:08.441 [INFO ] DatasetFetcher - [SPLIT-SIDE] 11 train (1 gate) / 7 test; every item's side == f(item); |gate ∩ eval| = 0; pool p91a968fd56a5aaac; FunctionStamp(normaliserVersion=norm-v1, keyRule=ck-v1, modulus=1000, evalUpper=300, gateLower=300, gateUpper=400, poolId=p91a968fd56a5aaac)
+09:10:08.450 [INFO ] DatasetFetcher - [POOL] recorded p573b3875a75a9816 (v2 pool pv2_e128cadc0153dccd, 5 judgeable ids; sentinels excluded); nothing activated
+09:10:08.457 [WARN ] DatasetFetcher - [SPLIT-V2] split taken as given from pv2_e128cadc0153dccd (CK-CLOSE-v2, engine pool file sha256(LF) 90ac4c40ed8a5349): 5 train / 6 reserved (eval 4, gate 2, sentinels 1); one-to-one TRAIN and RESERVED hold; 0 TRAIN rows share a stem key with the 8 global reserved keys; legacy id-list pool p573b3875a75a9816 (READY_rp12_et D-1: it holds EVAL + GATE ids, never an EVAL pool)
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

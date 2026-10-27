@@ -1,0 +1,156 @@
+[POOL-PIN] pool of record p2dca21ab5f4ef3ae (pool_guard.assert_pool_of_record passed)
+REF-QUAL-GATE3-COND — correctness-conditional agreement on the Kimi JSON cache (FRAMEWORK.md item 12; zero calls)
+cache: experiment_results\judge_solve\refqual_Kimi_K2_6_json_mt32768.db
+answers 552 | terminated (finish='stop', parsed) 523 | truncated/unparsed 29 | discriminating 274/294 terminated | weak-cell 277/288 terminated
+contestants: rubric_p8.ARENA12 (12; Meta-Llama-3-70B-Instruct absent); incumbent reference grok-reasoning (judge_solve/grok-reasoning.db)
+KEY DENOMINATOR: the cache's questions in pool p2dca21ab5f4ef3ae, keyed by eval_results gt; strata are key correctness of
+  contestant and reference. No judge direction is scored, so the McNemar-established rule is vacuous for this test; the
+  exact McNemar printed on the COMMON stratum tests agreement flips between the two references on identical questions.
+READINGS: PER-REFERENCE (record's literal wording; two different both-wrong sets) and COMMON (paired; same questions).
+  PRIMARY = GAIN-COM vs FRONTIER-3, the reading hardest on the prediction (composition term removed, narrowest spread).
+  Disclosure: the first draft on disk declared GAIN-PR vs FRONTIER-3 primary before any number was read; the COMMON reading
+  was added on this run after both were seen, under the block's hardest-reading rule. Both are scored; both are printed.
+
+RECORD REPRODUCTION (marginal gate (3), terminated answers): gemini-3 +0.071 (0.858 vs 0.787, n=520); arx_0314 +0.027 (0.702 vs 0.676, n=521); iask_pro +0.016 (0.618 vs 0.602, n=502); gpt-4o-2 +0.004 (0.591 vs 0.587, n=521)
+  record says gemini +0.071 (0.858 vs 0.787), arx +0.027, iask +0.016, gpt-4o +0.004 -> REPRODUCED
+
+==============================================================================================================
+POPULATION: terminated answers (population of record)  (523 questions)
+==============================================================================================================
+Per contestant, paired denominator n; reference r in {Kimi candidate, grok-reasoning incumbent}:
+  A = marginal agreement; P(br) = both-right share; n_bw = both-wrong questions; a_bw = same wrong option | both wrong
+  contestant                       n | A_kimi  Pbr_k nbw_k  abw_k | A_grok  Pbr_g nbw_g  abw_g |      dA    dPbr dBWterm GAIN-PR
+  gemini-3.1-pro_5-shots         520 |  0.858  0.775    53  0.811 |  0.787  0.712    53  0.736 |  +0.071  +0.063  +0.008  +0.075   <- frontier (flagged)
+  arx_0314                       521 |  0.702  0.610    64  0.750 |  0.676  0.572    77  0.701 |  +0.027  +0.038  -0.012  +0.049   <- frontier
+  iask_pro                       502 |  0.618  0.536    63  0.651 |  0.602  0.502    78  0.641 |  +0.016  +0.034  -0.018  +0.010   <- frontier
+  gpt-4o-2024-08-06              521 |  0.591  0.499    70  0.686 |  0.587  0.480    93  0.602 |  +0.004  +0.019  -0.015  +0.084   <- frontier
+  Meta-Llama-3_1-70B-Instruct    523 |  0.511  0.442    67  0.537 |  0.509  0.417    87  0.552 |  +0.002  +0.025  -0.023  -0.014
+  deepseek-chat-v2_5             520 |  0.492  0.415    78  0.513 |  0.494  0.394   100  0.520 |  -0.002  +0.021  -0.023  -0.007
+  Qwen1.5-72B-Chat               414 |  0.473  0.396    69  0.464 |  0.481  0.377    84  0.512 |  -0.007  +0.019  -0.027  -0.048
+  c4ai-command-r-v01             465 |  0.348  0.305    70  0.286 |  0.363  0.292    95  0.347 |  -0.015  +0.013  -0.028  -0.062
+  Yi-6b-Chat                     426 |  0.303  0.237    75  0.373 |  0.340  0.242   102  0.412 |  -0.038  -0.005  -0.033  -0.038
+  Meta-Llama-3_1-8B              523 |  0.294  0.254    79  0.266 |  0.293  0.235   102  0.294 |  +0.002  +0.019  -0.017  -0.028
+  Llama-2-13b-hf                 428 |  0.217  0.189    67  0.179 |  0.236  0.173    89  0.303 |  -0.019  +0.016  -0.035  -0.124
+  Llama-2-7b-hf                  456 |  0.208  0.156    77  0.312 |  0.197  0.140   102  0.255 |  +0.011  +0.015  -0.004  +0.057
+  dA = dPbr + dBWterm exactly (both-right agreement is 1, mixed strata 0, on a single-key item).
+
+COMMON both-wrong stratum (c wrong, Kimi wrong, grok wrong: identical questions for both references; paired):
+  contestant                   n_com | a_kimi a_grok   GAIN | agreeK/G |   b   c McNemar p
+  gemini-3.1-pro_5-shots          44 |  0.818  0.750 +0.068 |  36/33   |   4   1    0.375   <- frontier (flagged)
+  arx_0314                        52 |  0.750  0.712 +0.038 |  39/37   |   4   2    0.688   <- frontier
+  iask_pro                        53 |  0.660  0.623 +0.038 |  35/33   |   4   2    0.688   <- frontier
+  gpt-4o-2024-08-06               60 |  0.683  0.683 +0.000 |  41/41   |   3   3    1.000   <- frontier
+  Meta-Llama-3_1-70B-Instruct     54 |  0.574  0.574 +0.000 |  31/31   |   1   1    1.000
+  deepseek-chat-v2_5              62 |  0.565  0.548 +0.016 |  35/34   |   2   1    1.000
+  Qwen1.5-72B-Chat                55 |  0.509  0.545 -0.036 |  28/30   |   0   2    0.500
+  c4ai-command-r-v01              57 |  0.316  0.316 +0.000 |  18/18   |   2   2    1.000
+  Yi-6b-Chat                      58 |  0.414  0.414 +0.000 |  24/24   |   0   0    1.000
+  Meta-Llama-3_1-8B               61 |  0.262  0.279 -0.016 |  16/17   |   1   2    1.000
+  Llama-2-13b-hf                  49 |  0.184  0.245 -0.061 |   9/12   |   1   4    0.375
+  Llama-2-7b-hf                   58 |  0.293  0.293 +0.000 |  17/17   |   1   1    1.000
+  b = c agrees with Kimi's wrong option but not grok's; c = the reverse; exact two-sided binomial on (b, c).
+
+DECOMPOSITION of gemini's marginal gain +0.071 (n=520):
+  accuracy-coupling term (change in both-right share): +0.063  (0.712 -> 0.775)
+  both-wrong term P(bw)*a_bw:                            +0.008  (0.075 -> 0.083; a_bw 0.736 on 53 -> 0.811 on 53)
+
+REGISTERED READOUT on the both-wrong stratum (gemini vs the incumbents' spread):
+  GAIN-COM  vs FRONTIER-3  gemini +0.068 | spread [+0.000, +0.038] | OUTSIDE   <- PRIMARY (hardest reading)
+  GAIN-COM  vs ROSTER-11   gemini +0.068 | spread [-0.061, +0.038] | OUTSIDE
+  GAIN-PR   vs FRONTIER-3  gemini +0.075 | spread [+0.010, +0.084] | INSIDE
+  GAIN-PR   vs ROSTER-11   gemini +0.075 | spread [-0.124, +0.084] | INSIDE
+  LEVEL     vs FRONTIER-3  gemini +0.811 | spread [+0.651, +0.750] | OUTSIDE
+  LEVEL     vs ROSTER-11   gemini +0.811 | spread [+0.179, +0.750] | OUTSIDE
+  spread members, GAIN-COM: Llama-2-13b- -0.061, Llama-2-7b-h +0.000, Meta-Llama-3 +0.000, Meta-Llama-3 -0.016, Qwen1.5-72B- -0.036, Yi-6b-Chat +0.000, arx_0314 +0.038, c4ai-command +0.000, deepseek-cha +0.016, gpt-4o-2024- +0.000, iask_pro +0.038
+  spread members, GAIN-PR : Llama-2-13b- -0.124, Llama-2-7b-h +0.057, Meta-Llama-3 -0.014, Meta-Llama-3 -0.028, Qwen1.5-72B- -0.048, Yi-6b-Chat -0.038, arx_0314 +0.049, c4ai-command -0.062, deepseek-cha -0.007, gpt-4o-2024- +0.084, iask_pro +0.010
+  spread members, LEVEL   : Llama-2-13b- +0.179, Llama-2-7b-h +0.312, Meta-Llama-3 +0.537, Meta-Llama-3 +0.266, Qwen1.5-72B- +0.464, Yi-6b-Chat +0.373, arx_0314 +0.750, c4ai-command +0.286, deepseek-cha +0.513, gpt-4o-2024- +0.686, iask_pro +0.651
+
+QUESTION BOOTSTRAP (B=2000, seed 42, 2000 usable replicates) on this population:
+  gemini GAIN-COM +0.068  95% [-0.025, +0.171] | minus FRONTIER-3 mean +0.043  95% [-0.049, +0.148] | share INSIDE: FRONTIER-3 0.408, ROSTER-11 0.500
+  gemini GAIN-PR  +0.075  95% [-0.036, +0.191] | minus FRONTIER-3 mean +0.028  95% [-0.094, +0.154] | share INSIDE: FRONTIER-3 0.531, ROSTER-11 0.674
+  gemini LEVEL    +0.811  95% [+0.695, +0.912] | minus FRONTIER-3 mean +0.116  95% [-0.011, +0.232] | share INSIDE: FRONTIER-3 0.201, ROSTER-11 0.210
+  gemini stratum sizes across replicates: n_bw(Kimi) median 53 [41, 67]; n_bw(grok) median 53 [41, 66]; n_com median 44 [32, 56]
+
+==============================================================================================================
+POPULATION: all 552 answers, truncation scored wrong-and-disagreeing (sensitivity; degenerate for agreement)  (552 questions)
+==============================================================================================================
+Per contestant, paired denominator n; reference r in {Kimi candidate, grok-reasoning incumbent}:
+  A = marginal agreement; P(br) = both-right share; n_bw = both-wrong questions; a_bw = same wrong option | both wrong
+  contestant                       n | A_kimi  Pbr_k nbw_k  abw_k | A_grok  Pbr_g nbw_g  abw_g |      dA    dPbr dBWterm GAIN-PR
+  gemini-3.1-pro_5-shots         549 |  0.812  0.734    64  0.672 |  0.761  0.690    59  0.661 |  +0.051  +0.044  +0.007  +0.011   <- frontier (flagged)
+  arx_0314                       550 |  0.665  0.578    78  0.615 |  0.656  0.556    85  0.647 |  +0.009  +0.022  -0.013  -0.032   <- frontier
+  iask_pro                       530 |  0.585  0.508    80  0.512 |  0.587  0.489    88  0.591 |  -0.002  +0.019  -0.021  -0.078   <- frontier
+  gpt-4o-2024-08-06              549 |  0.561  0.474    84  0.571 |  0.579  0.472   102  0.578 |  -0.018  +0.002  -0.020  -0.007   <- frontier
+  Meta-Llama-3_1-70B-Instruct    552 |  0.484  0.418    91  0.396 |  0.486  0.397    98  0.500 |  -0.002  +0.022  -0.024  -0.104
+  deepseek-chat-v2_5             549 |  0.466  0.393    97  0.412 |  0.477  0.383   110  0.473 |  -0.011  +0.011  -0.022  -0.060
+  Qwen1.5-72B-Chat               432 |  0.454  0.380    79  0.405 |  0.475  0.373    89  0.494 |  -0.021  +0.007  -0.028  -0.089
+  c4ai-command-r-v01             485 |  0.334  0.293    87  0.230 |  0.355  0.285   102  0.333 |  -0.021  +0.008  -0.029  -0.103
+  Yi-6b-Chat                     439 |  0.294  0.230    87  0.322 |  0.337  0.237   108  0.407 |  -0.043  -0.007  -0.036  -0.086
+  Meta-Llama-3_1-8B              552 |  0.279  0.241   100  0.210 |  0.292  0.232   114  0.289 |  -0.013  +0.009  -0.022  -0.079
+  Llama-2-13b-hf                 444 |  0.209  0.182    80  0.150 |  0.234  0.173    94  0.287 |  -0.025  +0.009  -0.034  -0.137
+  Llama-2-7b-hf                  479 |  0.198  0.148    98  0.245 |  0.190  0.134   110  0.245 |  +0.008  +0.015  -0.006  -0.001
+  dA = dPbr + dBWterm exactly (both-right agreement is 1, mixed strata 0, on a single-key item).
+
+COMMON both-wrong stratum (c wrong, Kimi wrong, grok wrong: identical questions for both references; paired):
+  contestant                   n_com | a_kimi a_grok   GAIN | agreeK/G |   b   c McNemar p
+  gemini-3.1-pro_5-shots          50 |  0.720  0.660 +0.060 |  36/33   |   4   1    0.375   <- frontier (flagged)
+  arx_0314                        60 |  0.650  0.633 +0.017 |  39/38   |   4   3    1.000   <- frontier
+  iask_pro                        63 |  0.556  0.556 +0.000 |  35/35   |   4   4    1.000   <- frontier
+  gpt-4o-2024-08-06               69 |  0.594  0.638 -0.043 |  41/44   |   3   6    0.508   <- frontier
+  Meta-Llama-3_1-70B-Instruct     65 |  0.477  0.492 -0.015 |  31/32   |   1   2    1.000
+  deepseek-chat-v2_5              72 |  0.486  0.472 +0.014 |  35/34   |   2   1    1.000
+  Qwen1.5-72B-Chat                60 |  0.467  0.517 -0.050 |  28/31   |   0   3    0.250
+  c4ai-command-r-v01              64 |  0.281  0.297 -0.016 |  18/19   |   2   3    1.000
+  Yi-6b-Chat                      64 |  0.375  0.406 -0.031 |  24/26   |   0   2    0.500
+  Meta-Llama-3_1-8B               73 |  0.219  0.274 -0.055 |  16/20   |   1   5    0.219
+  Llama-2-13b-hf                  54 |  0.167  0.222 -0.056 |   9/12   |   1   4    0.375
+  Llama-2-7b-hf                   66 |  0.258  0.273 -0.015 |  17/18   |   1   2    1.000
+  b = c agrees with Kimi's wrong option but not grok's; c = the reverse; exact two-sided binomial on (b, c).
+
+DECOMPOSITION of gemini's marginal gain +0.051 (n=549):
+  accuracy-coupling term (change in both-right share): +0.044  (0.690 -> 0.734)
+  both-wrong term P(bw)*a_bw:                            +0.007  (0.071 -> 0.078; a_bw 0.661 on 59 -> 0.672 on 64)
+
+REGISTERED READOUT on the both-wrong stratum (gemini vs the incumbents' spread):
+  GAIN-COM  vs FRONTIER-3  gemini +0.060 | spread [-0.043, +0.017] | OUTSIDE   <- PRIMARY (hardest reading)
+  GAIN-COM  vs ROSTER-11   gemini +0.060 | spread [-0.056, +0.017] | OUTSIDE
+  GAIN-PR   vs FRONTIER-3  gemini +0.011 | spread [-0.078, -0.007] | OUTSIDE
+  GAIN-PR   vs ROSTER-11   gemini +0.011 | spread [-0.137, -0.001] | OUTSIDE
+  LEVEL     vs FRONTIER-3  gemini +0.672 | spread [+0.512, +0.615] | OUTSIDE
+  LEVEL     vs ROSTER-11   gemini +0.672 | spread [+0.150, +0.615] | OUTSIDE
+  spread members, GAIN-COM: Llama-2-13b- -0.056, Llama-2-7b-h -0.015, Meta-Llama-3 -0.015, Meta-Llama-3 -0.055, Qwen1.5-72B- -0.050, Yi-6b-Chat -0.031, arx_0314 +0.017, c4ai-command -0.016, deepseek-cha +0.014, gpt-4o-2024- -0.043, iask_pro +0.000
+  spread members, GAIN-PR : Llama-2-13b- -0.137, Llama-2-7b-h -0.001, Meta-Llama-3 -0.104, Meta-Llama-3 -0.079, Qwen1.5-72B- -0.089, Yi-6b-Chat -0.086, arx_0314 -0.032, c4ai-command -0.103, deepseek-cha -0.060, gpt-4o-2024- -0.007, iask_pro -0.078
+  spread members, LEVEL   : Llama-2-13b- +0.150, Llama-2-7b-h +0.245, Meta-Llama-3 +0.396, Meta-Llama-3 +0.210, Qwen1.5-72B- +0.405, Yi-6b-Chat +0.322, arx_0314 +0.615, c4ai-command +0.230, deepseek-cha +0.412, gpt-4o-2024- +0.571, iask_pro +0.512
+
+==============================================================================================================
+VERDICT TABLE (the item registers a readout and one prediction; no bar; each row scores the prediction on that reading)
+==============================================================================================================
+  GAIN-COM  vs FRONTIER-3  gemini +0.068 in [+0.000, +0.038]: point check FAILS; re-fails in 59% of resamples   <- PRIMARY
+  GAIN-COM  vs ROSTER-11   gemini +0.068 in [-0.061, +0.038]: point check FAILS; re-fails in 50% of resamples
+  GAIN-PR   vs FRONTIER-3  gemini +0.075 in [+0.010, +0.084]: point check HOLDS; re-holds in 53% of resamples
+  GAIN-PR   vs ROSTER-11   gemini +0.075 in [-0.124, +0.084]: point check HOLDS; re-holds in 67% of resamples
+  LEVEL     vs FRONTIER-3  gemini +0.811 in [+0.651, +0.750]: point check FAILS; re-fails in 80% of resamples
+  LEVEL     vs ROSTER-11   gemini +0.811 in [+0.179, +0.750]: point check FAILS; re-fails in 79% of resamples
+
+PRIMARY (GAIN-COM vs FRONTIER-3, hardest reading): point check FAILS; gemini +0.068 (36/44 vs 33/44 on 44 common questions;
+  b=4, c=1, exact McNemar p=0.375) vs spread [+0.000, +0.038]; bootstrap 95% [-0.025, +0.171]; minus FRONTIER-3 mean [-0.049, +0.148];
+  share of resamples inside 0.408.
+LITERAL (GAIN-PR vs FRONTIER-3, the first draft's primary): point check HOLDS; gemini +0.075 vs [+0.010, +0.084]; bootstrap 95% [-0.036, +0.191];
+  share of resamples inside 0.531.
+Sensitivity (552, truncation-as-wrong): GAIN-COM/FRONTIER-3 FAILS; GAIN-COM/ROSTER-11 FAILS; GAIN-PR/FRONTIER-3 FAILS; GAIN-PR/ROSTER-11 FAILS; LEVEL/FRONTIER-3 FAILS; LEVEL/ROSTER-11 FAILS
+
+READING. (a) The registered readout is delivered as an exact decomposition, no inference: of gemini's +0.071 marginal gain,
+    +0.063 is the change in the both-right share (accuracy coupling: a more accurate reference is right together with the
+    most accurate contestant more often) and +0.008 is the both-wrong term. That is the coupling the record named: 89% of
+    the marginal gain that failed gate (3) is accounted for by Kimi being right on questions gemini is right on.
+  (b) The prediction is reading-dependent at the point. On the record's literal per-reference stratum gemini's gain +0.075 is
+    inside the frontier-3 spread by +0.008. On the common (paired) stratum, which removes the composition term, gemini's gain
+    +0.068 is OUTSIDE the frontier-3 spread [+0.000, +0.038] by +0.030 and is the largest in the roster; on the LEVEL statistic
+    gemini's both-wrong agreement with Kimi (0.811) is the highest in the roster, as it is with the incumbent (0.736).
+  (c) At this support none of the readings is a distinguishable difference: the primary gain rests on b=4 against c=1
+    (exact p=0.375); its bootstrap interval [-0.025, +0.171] and the interval of gemini minus the frontier-3 mean [-0.049, +0.148]
+    both contain zero; the primary point check re-fails in 59% of resamples and the literal one re-holds in 53%.
+    VERDICT on the prediction: FAILS at the point on the hardest reading, HOLDS at the point on the literal reading,
+    UNDETERMINED at support on every reading. The conditional form of gate (3) cannot clear or flag gemini on ~50 both-wrong
+    questions; a conditional gate needs a registered bar and a support rule before it replaces the marginal one.
+  No wrong-direction count exists in this test; the McNemar-established rule is vacuous (stated above). Zero LLM calls.

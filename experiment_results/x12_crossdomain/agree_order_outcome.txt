@@ -1,0 +1,195 @@
+pool of record: p2dca21ab5f4ef3ae
+=== AGREE-ORDER: is the reproducible non-key order of the same-answer (AGREE) matches a LENGTH, a POSITION, or a contestant-identity order? ===
+  registered 2026-09-19 (commit 5205c1d, L8065-L8222); zero calls; caches mode=ro; RUN
+
+--- DATA CHECK (the object, before any stratum is read; PROFILE-R-FILTERED's loader and filter) ---
+  x12 cache stack_v2_promptv2_x12all.db: 9142 valid verdicts (pinned 9142), 2811 judged q
+  x20 cache stack_v2_promptv2_x20.db: 12394 valid verdicts (pinned 12394), 2646 judged q; never read alone (0 verdicts on the 66 original pairs)
+  merged board: 21536 verdicts (pinned 21536), 20 models, Meta-Llama-3-70B-Instruct absent
+  pool p2dca21ab5f4ef3ae: 2811 routed + judged questions, all in the reserved pool; 14 anchors with the recorded counts
+
+--- THE FILTER (eval_results.pred of the two contestants; the shipped MatchFilter.kt rule; no key read) ---
+  non-letter / missing prediction values seen on the 20-model roster (value: rows): None: 16084
+  cache  matches    AGREE  DISAGREE UNDETERMINED | conv A kept (missing = kept) | conv B kept (missing excluded)    
+  x12       9142     3076      5276          790 |   6066 of   9142 =  66.4%       |   5276 of   8352 (both present) =  63.2%
+  x20      12394     5846      5166         1382 |   6548 of  12394 =  52.8%       |   5166 of  11012 (both present) =  46.9%
+  merged   21536                                 |  12614 of  21536 =  58.6%       |  10442 of  19364 (both present) =  53.9%
+  normalisation check: matches whose verdict differs between the shipped rule (trim, case-insensitive, whole string) and the
+  record's first-character rule: x12 0, x20 0
+  RECONCILIATION against the two prior readings (x12, 9,142):
+    AGGREGATE arm B kept 5,276 (both present and differ, first character): this script's DISAGREE count = 5276 (equal)
+    TOPIC-DIFFICULTY 34.3% same predicted letter -> 65.7% differing (~6,007): this script's AGREE share = 33.6% (same letter);
+    1 - AGREE share = 66.4% = convention A's kept share (DISAGREE + UNDETERMINED = 6066): the two prior figures differ by the
+    790 matches with a missing prediction (kept by the shipped rule, dropped by AGGREGATE's). Convention A's 6066 of 9142
+    (66.4%) is the number of record for THIS test. The 57.7% vs 65.7% gap is the missing-prediction convention; the residual
+    -0.7 pp between this script's same-letter share and TOPIC-DIFFICULTY's 34.3% (~60 matches) is NOT explained here and is
+    left for the checker (candidate: TOPIC-DIFFICULTY's match set or prediction column differs).
+    x20: same letter 47.2% (TOPIC-DIFFICULTY 48.2%, residual -1.0 pp), UNDETERMINED 1382, conv A kept 52.8%
+  KEY DENOMINATOR per anchor (judged questions; unfiltered / conv A q_distinct / conv B q_distinct; kept matches A / B):
+    Philosophy          132 /  114 (0.86) /  110 (0.83)   matches   784 /   441 (0.56) /   411 (0.52)   <- support rule: q_distinct < 120 under A
+    Psychology          260 /  201 (0.77) /  199 (0.77)   matches  1934 /   877 (0.45) /   852 (0.44)
+    Economics           178 /  145 (0.81) /  138 (0.78)   matches  1394 /   684 (0.49) /   618 (0.44)
+    Other               211 /  182 (0.86) /  182 (0.86)   matches  1798 /   909 (0.51) /   881 (0.49)
+    Business            174 /  143 (0.82) /  133 (0.76)   matches   695 /   416 (0.60) /   339 (0.49)
+    Math                304 /  295 (0.97) /  275 (0.90)   matches  2881 /  1929 (0.67) /  1306 (0.45)
+    Computer science    162 /  156 (0.96) /  149 (0.92)   matches  1490 /   895 (0.60) /   748 (0.50)
+    Law                 271 /  259 (0.96) /  257 (0.95)   matches  1425 /   993 (0.70) /   945 (0.66)
+    Health              129 /  116 (0.90) /  112 (0.87)   matches  1210 /   578 (0.48) /   547 (0.45)   <- support rule: q_distinct < 120 under A
+    Biology             181 /  138 (0.76) /  126 (0.70)   matches  1605 /   753 (0.47) /   645 (0.40)
+    History             119 /  100 (0.84) /   96 (0.81)   matches   900 /   464 (0.52) /   435 (0.48)   <- support rule: q_distinct < 120 under A
+    Chemistry           269 /  260 (0.97) /  231 (0.86)   matches  1754 /  1222 (0.70) /   778 (0.44)
+    Engineering         162 /  153 (0.94) /  146 (0.90)   matches   936 /   618 (0.66) /   493 (0.53)
+    Physics             259 /  249 (0.96) /  245 (0.95)   matches  2730 /  1835 (0.67) /  1444 (0.53)
+  (History is 119 UNFILTERED, below the 120 support rule before any filter: it reads UNDETERMINED-by-support under any filter.)
+  single-order votes loaded for x12 9142 / x20 12394 rows; every recorded winner = combine_orders(vote1, vote2_raw); cache anchor
+  column vs the routing anchor of record: 0 rows differ (the routing anchor is used)
+  lengths: len(eval_results.model_output) on the 2811 judged questions x 20 models: 56186 cells; missing per model: arx_0314 5, gemini-3.1-pro_5-shots 2, iask_pro 27
+  difficulty instrument (descriptive leg): 46-model keyed roster (Meta-Llama-3-70B-Instruct excluded), rank terciles within each anchor, 2811 questions assigned
+
+=== C0 GATE: the six counts and the AGREE-only board R (40 halvings Random(7), model-demeaned, SB) ===
+  counts x12 AGREE / DISAGREE / UNDETERMINED 3076 / 5276 / 790, x20 5846 / 5166 / 1382 vs recorded 3,076 / 5,276 / 790, 5,846 / 5,166 / 1,382: EXACT
+  AGREE-only board R = 0.6477 (r 0.4790, halving SD 0.0380, 40 halvings) vs the reviewer's 0.648: REPRODUCED (|diff| 0.0003 <= 0.005)
+  AGREE q_distinct per anchor: Philosophy 115, Psychology 245, Economics 167, Other 199, Business 126, Math 245, Computer science 147, Law 195, Health 123, Biology 160, History 110, Chemistry 181, Engineering 90, Physics 224
+  interaction-only (two-way demeaned) AGREE-only R beside: 0.6477
+  random matches of AGREE's size from the whole board (seeds 42..44): R 0.4634, 0.4788, 0.5010 (the reviewer's band 0.46-0.50)
+
+=== (L1) H3's logistic on AGREE decisive matches: verdict-for-A ~ beta_len x (len_A - len_B)/1k + both-right indicator; question-clustered SE ===
+  population                          n_dec    n_q  beta_len  SE_clust  SE_model       z  95% CI (clustered)   x2 (both-right / gtDiff coef)
+  AGREE decisive, merged               5814   1979   +2.8119    0.1569    0.0767  +17.93  [+2.504, +3.119]     -0.029 (SE 0.104)
+  AGREE decisive, x12                  1942   1287   +2.3085    0.3493    0.1496   +6.61  [+1.624, +2.993]     -0.172 (SE 0.186)
+  AGREE decisive, x20                  3872   1661   +2.7701    0.1687    0.0896  +16.42  [+2.439, +3.101]     +0.050 (SE 0.123)
+  AGREE both-right, merged             5030   1685   +2.8847    0.1700    0.0840  +16.97  [+2.551, +3.218]     
+  AGREE both-wrong, merged              784    406   +2.3921    0.3912    0.1861   +6.11  [+1.625, +3.159]     
+  DISAGREE decisive, merged (H3 spec)   9160   2345   +0.3201    0.0457    0.0234   +7.00  [+0.230, +0.410]     +2.508 (SE 0.072)
+  DISAGREE decisive, x12 (H3 spec)     4651   2033   +0.1622    0.0381    0.0290   +4.25  [+0.087, +0.237]     +2.336 (SE 0.082)
+  DISAGREE decisive, x20 (H3 spec)     4509   1839   +0.6480    0.1256    0.0539   +5.16  [+0.402, +0.894]     +2.669 (SE 0.096)
+  ALL decisive, merged (H3 spec)      16698   2769   +0.8107    0.0924    0.0265   +8.78  [+0.630, +0.992]     +2.697 (SE 0.077)
+  comparators: H3 +0.39 / 1k on all decisive matches (x12, Mistral cell arm); TOPIC-DIFFICULTY both-right composition +3.44 / +2.69 / +1.32 by tercile.
+  beta_len on AGREE decisive by anchor (descriptive, x2 = both-right):
+    Philosophy         n_dec   223 q   98 beta  +3.042 [+2.087, +3.997]
+    Psychology         n_dec   746 q  226 beta  +4.901 [+3.865, +5.937]
+    Economics          n_dec   477 q  149 beta  +2.896 [+2.274, +3.517]
+    Other              n_dec   628 q  189 beta  +3.582 [+2.870, +4.293]
+    Business           n_dec   146 q   85 beta  +1.986 [+0.668, +3.304]
+    Math               n_dec   436 q  187 beta  +1.251 [+0.398, +2.105]
+    Computer science   n_dec   403 q  132 beta  +3.457 [+2.110, +4.804]
+    Law                n_dec   299 q  150 beta  +3.567 [+2.614, +4.519]
+    Health             n_dec   447 q  112 beta  +3.707 [+2.858, +4.555]
+    Biology            n_dec   641 q  142 beta  +2.094 [+1.353, +2.834]
+    History            n_dec   326 q  102 beta  +4.517 [+3.332, +5.702]
+    Chemistry          n_dec   299 q  140 beta  +1.720 [+0.099, +3.342]
+    Engineering        n_dec   194 q   67 beta  +1.695 [+0.314, +3.076]
+    Physics            n_dec   549 q  200 beta  +2.452 [+1.181, +3.723]
+  beta_len by TOPIC-DIFFICULTY tercile (descriptive; both-right rows are the composition line's population):
+    easy  AGREE decisive +3.452 [+3.013, +3.891] (n 3027) | AGREE both-right +3.444 [+3.005, +3.882] (n 3006) | ALL both-right decisive +3.444 [+3.005, +3.882] (n 3006; TOPIC-DIFFICULTY +3.44)
+    mid   AGREE decisive +2.470 [+1.896, +3.045] (n 1753) | AGREE both-right +2.688 [+2.099, +3.277] (n 1653) | ALL both-right decisive +2.685 [+2.097, +3.273] (n 1655; TOPIC-DIFFICULTY +2.69)
+    hard  AGREE decisive +2.121 [+1.604, +2.638] (n 1034) | AGREE both-right +1.320 [+0.625, +2.015] (n 371) | ALL both-right decisive +1.320 [+0.625, +2.015] (n 371; TOPIC-DIFFICULTY +1.32)
+
+=== (L2) / (I) theta_AGREE over the 20 models (pooled BT fit on all AGREE matches; mean of the 14 per-anchor thetas beside) ===
+  PLACEBO-ENTRY's caveat: the theta SCALE under an answer-agreement selection is not the board's (the filter widened it +13%%); only Spearman is read; no position is published.
+  model                           th_AGREE th_AGR_am  th_match th_unfilt  mean_len   key_acc   n_AGR
+  iask_pro                          +1.801    +1.197    +1.067    +2.027      1287    0.8165    1209
+  claude-3-5-sonnet-20241022        +1.585    +1.138    +1.064    +1.745       832    0.7823    1066
+  gemini-3.1-pro_5-shots            +1.531    +1.021    +1.175    +1.981       867    0.9124    1209
+  gpt-4o-2024-08-06                 +1.422    +0.988    +0.630    +1.466      1466    0.7503    1218
+  arx_3                             +1.374    +0.946    +0.662    +1.549      1080    0.7844    1122
+  claude-3-5-haiku-20241022         +1.014    +0.675    +0.511    +0.814       866    0.6286    1009
+  arx_0314                          +1.006    +0.589    +0.590    +1.464       846    0.8329    1269
+  gpt-4o-mini                       +0.981    +0.591    +0.327    +0.869      1366    0.6311    1003
+  deepseek-chat-v2_5                +0.452    +0.209    +0.363    +0.526       983    0.6510    1075
+  Qwen1.5-72B-Chat                  -0.522    -0.393    -0.243    -0.302       503    0.4763     827
+  Meta-Llama-3_1-70B-Instruct       -0.608    -0.509    -0.225    -0.186       502    0.6282     995
+  c4ai-command-r-v01                -0.755    -0.519    -0.333    -1.009       368    0.3703     682
+  Qwen1.5-14B-Chat                  -0.764    -0.510    -0.521    -0.829       723    0.3508     728
+  Mixtral-8x7B-Instruct-v0.1        -0.982    -0.686    -0.514    -0.914       361    0.4166     812
+  Qwen1.5-110B                      -1.066    -0.787    -0.600    -0.783       314    0.4916     876
+  Meta-Llama-3_1-8B                 -1.193    -0.739    -0.666    -1.297       720    0.3686     719
+  Yi-6b-Chat                        -1.200    -0.748    -0.704    -1.585       425    0.2743     547
+  gemma-7b                          -1.227    -0.797    -0.759    -1.449       332    0.3131     607
+  Llama-2-13b-hf                    -1.379    -0.823    -0.872    -1.916       331    0.2394     472
+  Llama-2-7b-hf                     -1.468    -0.843    -0.951    -2.172       307    0.1836     399
+  Spearman(theta_AGREE, mean length)      = +0.8436  (anchor-mean pooling +0.8797)   [P2 bar >= 0.6]
+  Spearman(theta_AGREE, unfiltered theta) = +0.9759  (anchor-mean pooling +0.9714)
+  Spearman(theta_AGREE, key accuracy)     = +0.9263  (anchor-mean pooling +0.8977)   [P7 band [-0.35, 0.05]]
+  Spearman(theta_matched, mean length)    = +0.8226  (anchor-mean pooling +0.8301)   (if length is the mechanism the matched order loses it)
+  beside: Spearman(unfiltered theta, mean length) +0.8256; (unfiltered theta, key) +0.9654; (key, mean length) +0.7759
+  AGREE-only top-4 as a SET (no rank): {claude-3-5-sonnet-20241022, gemini-3.1-pro_5-shots, gpt-4o-2024-08-06, iask_pro}
+  key's top cluster (rj.TOP_CLUSTER):   {arx_0314, gemini-3.1-pro_5-shots, gpt-4o-2024-08-06, iask_pro}; key top-4 by accuracy on the judged questions: {arx_0314, arx_3, gemini-3.1-pro_5-shots, iask_pro}; overlap with the AGREE set 3 / 2
+
+=== (L3) length-MATCHED AGREE-only split-half R (|len_A - len_B| <= 300 chars; same instrument) ===
+  matched AGREE matches: 4054 of 8922 (45.4%); per anchor (matches / q_distinct): Philosophy 125 / 74*, Psychology 451 / 206, Economics 302 / 135, Other 429 / 172, Business 171 / 97*, Math 542 / 187, Computer science 260 / 114*, Law 151 / 102*, Health 254 / 99*, Biology 332 / 118*, History 182 / 81*, Chemistry 258 / 117*, Engineering 159 / 59*, Physics 438 / 163
+  matched AGREE-only R = 0.3275 (r 0.1958, halving SD 0.0536, 40 halvings); interaction-only 0.3275; support: UNDETERMINED-by-support (Philosophy 74, Business 97, Computer science 114, Law 102, Health 99, Biology 118, History 81, Chemistry 117, Engineering 59 below 120 q; the R is still read with the count)
+  random same-size subsample of AGREE (per anchor the matched count; seeds 42..46): R 0.3529, 0.3100, 0.3619, 0.4099, 0.3604, mean 0.3590
+  decomposition (PROFILE-R-FILTERED's reading applied to this cut): AGREE 0.648 -> matched 0.3275 = -0.3202; support (random same size) accounts for -0.2887 (90%), selection -0.0315
+
+=== (P) POSITION on AGREE vs DISAGREE matches (the two single-order votes behind the dual-order verdict; no protocol change) ===
+  cache    set            n  1st-pos  2nd-pos    union  decided      tie
+  x12      AGREE       3076   0.0163   0.0436   0.0598   0.6313   0.3687
+  x12      DISAGREE    5276   0.0078   0.0571   0.0648   0.8815   0.1185
+  x12      UNDET.       790   0.0076   0.0329   0.0405   0.8076   0.1924   (beside; not AGREE)
+  x20      AGREE       5846   0.0195   0.0494   0.0689   0.6623   0.3377
+  x20      DISAGREE    5166   0.0064   0.0505   0.0569   0.8728   0.1272
+  x20      UNDET.      1382   0.0137   0.0449   0.0586   0.7858   0.2142   (beside; not AGREE)
+  merged   AGREE       8922   0.0184   0.0474   0.0658   0.6516   0.3484
+  merged   DISAGREE   10442   0.0071   0.0538   0.0609   0.8772   0.1228
+  merged   UNDET.      2172   0.0115   0.0405   0.0520   0.7937   0.2063   (beside; not AGREE)
+  AGREE - DISAGREE (merged), question-clustered bootstrap over 2778 questions (B = 1000):
+    both favour FIRST position (the registered position-consistent share; C2 / P6)  +0.0113 [+0.0082, +0.0146]
+    both favour SECOND position                                               -0.0064 [-0.0129, +0.0004]
+    either (union)                                                            +0.0049 [-0.0022, +0.0124]
+    decided consistently for one contestant                                   -0.2256 [-0.2401, -0.2105]
+    tie rate (P5 bar >= +10pp)                                                +0.2256 [+0.2105, +0.2401]
+
+=== (D) DEVIATION-RESIDUE LEG (registered expecting UNDETERMINED): the 8 wrong-sign PROFILE-DEVIATION-CERT cells ===
+  among m's in-anchor decisive WINS (merged board): share where m's answer is strictly longer; baseline = the anchor's both-right decisive matches' longer-answer-wins share;
+  question-clustered bootstrap CI on the difference (B = 1000); UNDETERMINED below 120 distinct questions behind the wins or with a CI including 0
+  model                        anchor        delta'  wins  w_eq   q_w  longer% base_n    base%     diff 95% CI             status
+  Qwen1.5-110B                 Math          +0.446    85     0    68    0.353    399    0.742   -0.389 [-0.504, -0.251] UNDETERMINED (q_w < 120) wrong sign
+  arx_3                        Math          -0.385   128     0   101    0.844    399    0.742   +0.102 [+0.027, +0.175] UNDETERMINED (q_w < 120) wrong(established)
+  claude-3-5-haiku-20241022    Math          -0.635    80     1    64    0.725    399    0.742   -0.017 [-0.122, +0.082] UNDETERMINED (q_w < 120) wrong sign
+  claude-3-5-sonnet-20241022   Law           +0.590    89     0    68    0.809    230    0.896   -0.087 [-0.187, +0.007] UNDETERMINED (q_w < 120) wrong(established)
+  claude-3-5-sonnet-20241022   Math          -0.537   147     0   114    0.714    399    0.742   -0.028 [-0.112, +0.054] UNDETERMINED (q_w < 120) wrong sign
+  deepseek-chat-v2_5           Psychology    -0.396    95     0    79    0.895    639    0.919   -0.024 [-0.083, +0.038] UNDETERMINED (q_w < 120) wrong sign
+  gemini-3.1-pro_5-shots       Law           +0.686   136     0   108    0.691    230    0.896   -0.204 [-0.297, -0.112] UNDETERMINED (q_w < 120) wrong(established)
+  gpt-4o-2024-08-06            History       +0.520    73     0    59    0.986    262    0.901   +0.086 [+0.034, +0.134] UNDETERMINED (q_w < 120) wrong sign
+  the other 14 certified cells beside (description only; no claim about any model's standing):
+  Llama-2-7b-hf                Physics       -0.480     4     0     4    0.500    480    0.842   -0.342 [-0.855, +0.173] UNDETERMINED (q_w < 120) right sign
+  Meta-Llama-3_1-70B-Instruct  Law           -0.476    45     1    38    0.533    230    0.896   -0.362 [-0.536, -0.202] UNDETERMINED (q_w < 120) right sign
+  Yi-6b-Chat                   Chemistry     -0.640     7     0     7    0.143    269    0.825   -0.682 [-0.854, -0.334] UNDETERMINED (q_w < 120) right sign
+  Yi-6b-Chat                   Physics       -0.380    19     0    18    0.474    480    0.842   -0.368 [-0.591, -0.141] UNDETERMINED (q_w < 120) right sign
+  arx_0314                     Physics       +0.494   220     0   134    0.777    480    0.842   -0.064 [-0.131, +0.005] UNDETERMINED       right sign
+  arx_3                        History       +0.527    70     0    50    0.929    262    0.901   +0.028 [-0.034, +0.082] UNDETERMINED (q_w < 120) right sign
+  claude-3-5-haiku-20241022    Psychology    +0.539   116     0    90    0.957    639    0.919   +0.038 [-0.014, +0.082] UNDETERMINED (q_w < 120) right sign
+  deepseek-chat-v2_5           Law           -0.469    76     0    64    0.934    230    0.896   +0.039 [-0.034, +0.108] UNDETERMINED (q_w < 120) right sign
+  deepseek-chat-v2_5           Math          +0.478   176     0   128    0.807    399    0.742   +0.065 [-0.011, +0.142] UNDETERMINED       right sign
+  deepseek-chat-v2_5           Philosophy    -0.622    25     0    22    0.840    174    0.879   -0.039 [-0.192, +0.091] UNDETERMINED (q_w < 120) right sign
+  gemini-3.1-pro_5-shots       Other         -0.767   108     0    83    0.759    520    0.844   -0.085 [-0.159, -0.006] UNDETERMINED (q_w < 120) right sign
+  gemini-3.1-pro_5-shots       Physics       +0.473   232     0   152    0.759    480    0.842   -0.083 [-0.149, -0.021] DECIDABLE (longer wins less) right sign
+  gemini-3.1-pro_5-shots       Psychology    -0.441   144     0   119    0.764    639    0.919   -0.155 [-0.222, -0.094] UNDETERMINED (q_w < 120) right sign
+  iask_pro                     Biology       +0.552   145     0    93    0.834    593    0.823   +0.012 [-0.064, +0.079] UNDETERMINED (q_w < 120) FAIL anchor, PREDICTIVE-ONLY
+
+=== CRITERIA, PREDICTIONS, FALSIFIER (scored as registered; L8135-8172) ===
+  C0 GATE: AGREE-only R 0.6477 vs 0.648 to 2 dp REPRODUCED; six counts EXACT -> HELD
+  C1 LENGTH IS THE MECHANISM: (L1) beta_len AGREE decisive merged +2.8119 [+2.5044, +3.1193] >= +2.5 with CI excluding 0: yes; (L3) matched R 0.3275 < 0.50: yes -> HELD
+  C2 POSITION IS NOT: AGREE - DISAGREE first-position-consistent share +0.0113 [+0.0082, +0.0146]: HELD (point < 2pp: yes; CI includes 0: no); union reading +0.0049 [-0.0022, +0.0124]: HELD
+  C3 IDENTITY (REPORTED): Spearman(theta_AGREE, length) +0.8436, (theta_AGREE, unfiltered theta) +0.9759, (theta_AGREE, key) +0.9263; largest |rho| = unfiltered_theta (+0.9759): the order's nearest description
+  P1 (plan) beta_len AGREE decisive >= +2.5 / 1k: HELD (+2.8119)
+  P2 (plan) Spearman(theta_AGREE, mean length) >= 0.6: HELD (+0.8436; anchor-mean pooling +0.8797 -> HELD)
+  P3 (plan) matched AGREE-only R < 0.50: HELD (0.3275)
+  P4 (registrar) both-wrong beta within +-1.0 of both-right: HELD (both-right +2.885, both-wrong +2.392, diff -0.493)
+  P5 (registrar) AGREE tie rate exceeds DISAGREE by >= 10pp: HELD (+0.2256 [+0.2105, +0.2401])
+  P6 (registrar) first-position-consistent share differs by < 2pp: HELD (+0.0113)
+  P7 (registrar) Spearman(theta_AGREE, key) in [-0.35, 0.05]: FAILED (+0.9263; anchor-mean pooling +0.8977 -> FAILED)
+  P8 (registrar) (D) 0 of 8 decidable AND >= 2 of the 3 established cells with a positive point difference: FAILED (decidable 0 of 8; established positive 1 of 3)
+  FALSIFIER F1 matched AGREE-only R >= 0.60 at the point: silent (0.3275; matched support: UNDETERMINED-by-support on Philosophy, Business, Computer science, Law, Health, Biology, History, Chemistry, Engineering)
+  (D) leg: UNDETERMINED as registered (no cell clears both the 120-question rule and a CI excluding 0)
+  leakage / closed lines: no verdict re-drawn; no length control enters the recipe (H7 closed); the AGREE top-4 is a set; ARXIASK's frontier pair (DISAGREE by construction) is not re-read.
+
+=== VERDICT (the registered rule, L8145-8149; precedence stated in the docstring) ===
+  C1 HELD: the selection term of PROFILE-R-FILTERED is verbosity: the same-answer matches carry the length order (beta_len +2.812 / 1k [+2.504, +3.119] on 5814 AGREE decisive matches; length-matched AGREE-only R 0.3275 against 0.648 unmatched and 0.359 for a random same-size subsample).
+  C0 HELD | C1 HELD | C2 HELD | C3 REPORTED (unfiltered_theta) | P1 HELD | P2 HELD | P3 HELD | P4 HELD | P5 HELD | P6 HELD | P7 FAILED | P8 FAILED | F1 silent | (D) UNDETERMINED
+  KEY DENOMINATOR restated: the 8,922 AGREE matches (x12 3,076 + x20 5,846) of the 2,811 judged questions of pool p2dca21ab5f4ef3ae on the 14 bareq512_s42 anchors;
+  decisive AGREE = the non-TIE subset; the length-matched set as printed; DISAGREE = conv B's 10,442; both-right / both-wrong from eval_results.is_correct on the 20-model roster.
+  McNEMAR-ESTABLISHED RULE: no wrong-direction count is read here; stated, not applied. Both tie conventions: ties are excluded from every logistic (decisive only,
+  H3's rule) and counted as 0.5 in every BT fit (the board's rule); the tie rates themselves are printed in (P).
+  files: Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\x12_crossdomain\agree_order_outcome.txt, Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\x12_crossdomain\agree_order_cells.csv (8 rows), Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\x12_crossdomain\agree_order_models.csv (20 rows); script tools/analysis/agree_order.py

@@ -1,0 +1,65 @@
+=== TIER-RECOVERY: how cheap is a TIER partition, against the total order? ===
+  key tiers at a 0.017 gap (2 SE at n=3,445; also the arx/iask gap):
+    tier 1: gemini-3.1-pro_5-shots 0.913
+    tier 2: arx_0314 0.834, iask_pro 0.817
+    tier 3: gpt-4o-2024-08-06 0.750
+    tier 4: deepseek-chat-v2_5 0.657
+    tier 5: Meta-Llama-3_1-70B-Instruc 0.630
+    tier 6: Qwen1.5-72B-Chat 0.474
+    tier 7: Meta-Llama-3_1-8B 0.371, c4ai-command-r-v01 0.363
+    tier 8: Yi-6b-Chat 0.271
+    tier 9: Llama-2-13b-hf 0.235
+    tier 10: Llama-2-7b-hf 0.178
+
+  A 0.017 gap puts almost every model in its own tier, which is the total order again - so the
+  real question is how COARSE a tier has to be before the arena can recover it, and at what budget.
+
+  Tiering the judged board by a key-scale gap would be wrong: BT theta is a logit scale and a linear
+  rescale distorts the gaps. Instead, for each k the key implies, cut the judged board at its own
+  k-1 largest gaps - scale-free - and compare partitions.
+
+     gap     k      exact partition match         mean adjusted Rand
+                    250     1000      all      250     1000      all
+   0.017    10       0%       0%       0%    0.102    0.102   -0.029
+   0.050     8       0%       0%       0%    0.184    0.112    0.005
+   0.080     5       0%       0%       0%    0.438    0.543    0.407
+   0.120     2       4%       0%       0%    0.427    0.463    0.400
+  READ: against rho >= 0.93 in 100%% of draws at 2,000 matches and top-4 violations that never
+  reach <= 1 at any budget. A tier partition the arena recovers reliably is a product it can ship;
+  one it cannot is the ordering problem in a different costume.
+
+=== ANCHOR-VALUE: does the anchor layer earn its place in ROUTING? ===
+  3445 pool questions embedded and routed | flat-vs-deployed leaf agreement 0.835
+  category purity of the routed anchor: FLAT nearest-leaf 0.764 | DEPLOYED descent 0.753 (+0.011)
+  READ: the union build gave flatLeaf 81.6%% against descent 72.1%%. If flat matches or beats
+  descent here too - on the dataset whose own categories ARE the anchors - the anchor layer is a
+  reporting convenience, and dropping it costs nothing.
+
+=== REF-BY-CELL: does reference accuracy vary enough by cell to select on? ===
+  anchor                n grok-reasoning      mistral     better
+  Chemistry           383          0.888        0.541       grok
+  Physics             354          0.921        0.645       grok
+  Math                352          0.952        0.526       grok
+  Law                 268          0.750        0.556       grok
+  Psychology          265          0.808        0.746       grok
+  Other               241          0.772        0.735       grok
+  Engineering         227          0.744        0.568       grok
+  Biology             226          0.920        0.862       grok
+  Business            225          0.951        0.557       grok
+  Economics           224          0.933        0.803       grok
+  Computer science    210          0.895        0.759       grok
+  Health              180          0.850        0.781       grok
+  Philosophy          156          0.769        0.710       grok
+  History             121          0.727        0.718       grok
+  grok-reasoning spread across anchors: 0.224 (0.727..0.952)
+  cells where the WEAKER reference is better: 0
+  oracle per-cell reference selection: 0.8598 vs always-grok 0.8598 (+0.0000)
+
+=== TIER-ROUTER: route to a TIER, then take its cheapest member ===
+  policy                             accuracy     mean chars
+  best single                          0.9126            882
+  per-anchor best                      0.9126            882
+  per-anchor best TIER, cheapest       0.9126            882
+  tier-then-cheapest against per-anchor best: +0.0000 accuracy, 100% of the generated length
+  READ: if the accuracy loss is within a point while the cost falls materially, tier-routing is the
+  right product shape - and the frontier ordering the campaign could never resolve never has to be asked.

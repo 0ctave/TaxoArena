@@ -1,0 +1,93 @@
+{
+  "id": "SCHEDULING",
+  "title": "SCHEDULING: is the frontier unresolvable because the scheduler picks the wrong matches? (zero calls)",
+  "question": "Across the six top-4 pairs on 3,358 pool questions, compare P(key-decidable) when the two candidates' own extracted final answers DISAGREE versus when they agree: the share of decidable pairs an answer-disagreement filter retains and the share of matches it judges.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "3f13911",
+    "program_lines": "docs/judge_v2_program.md L894-L914 (a bullet; the probe that motivated MATCH-FILTER; not separately registered)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "- **SCHEDULING (2026-09-13, zero calls): the match scheduler IS the problem, and the fix needs no answer key.**",
+    "outcome_heading": [
+      "L894: the same bullet"
+    ],
+    "date": "2026-09-13"
+  },
+  "script": {
+    "path": "tools/analysis/frontier_probe.py (the probe's script; output scheduling_probe.txt)",
+    "sha16": "df6d5ddaa6dfdf2b (at 5143ef0)",
+    "commit": "5143ef0"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/scheduling_probe.txt",
+    "outcome_commit": "3f13911",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (3,358 pool questions with extractable answers; six top-4 pairs)",
+    "date": "2026-09-13"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); descriptive probe; reproduced independently in Kotlin by MATCH-FILTER's plan harness (16.9%) and on the board by FILTER-BOARD",
+    "commit": "3f13911",
+    "verdict": "CONFIRMED: 6x cheaper and de-biased"
+  },
+  "criteria": [
+    {
+      "id": "readout",
+      "text": "the share of decidable pairs retained by an answer-disagreement filter and the share of matches it judges",
+      "result": "DELIVERED",
+      "value": "answers disagree on 16.9% of top-4 question-pairs; 79.6% of those are key-decidable; where the answers agree only 0.04% are; the filter keeps 99.8% of ALL decidable pairs while judging 16.9% of matches, and never schedules the signal-free pairs on which pairwise invents winners (52%, 73% to the longer answer, +34 / -44 between arx and iask)",
+      "denominator": "six top-4 pairs x 3,358 pool questions = 20,148 question-pairs"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "needs NO answer key and no judge, only the extracted answers the arena already parses; caveat: presumes an extractable answer, so it transfers to multiple choice and verifier-shaped tasks, not to open-ended generation"
+  },
+  "numbers_of_record": {
+    "disagree_share": "16.9% of top-4 question-pairs",
+    "decidable_given_disagree": "79.6%; given agree 0.04%",
+    "retention": "99.8% of all decidable pairs at 16.9% of matches",
+    "signal_free_pairs": "pairwise invents a winner 52%, 73% to the longer answer, +34 / -44 between arx and iask"
+  },
+  "sentence_of_record": "SCHEDULING (2026-09-13, zero calls): the match scheduler IS the problem, and the fix needs no answer key: answers disagree on 16.9% of top-4 question-pairs; 79.6% of those are key-decidable; where the answers agree only 0.04% are; a scheduler filtering on answer disagreement keeps 99.8% of ALL decidable pairs while judging 16.9% of matches, and never schedules the signal-free pairs on which pairwise invents winners. It transfers to multiple choice and verifier-shaped tasks, not to open-ended generation.",
+  "chips": [
+    "CONFIRMED — 6x cheaper and de-biased"
+  ],
+  "brackets": [],
+  "does_not_show": [
+    "transfer to open-ended generation (needs an extractable answer)"
+  ],
+  "ledger": {
+    "row_id": "SCHEDULING",
+    "version": "v60 (3f13911)"
+  },
+  "depends_on": [
+    "FRONTIER",
+    "MATCH-FILTER",
+    "FILTER-BOARD"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L894-L914 (3f13911)",
+    "experiment_results/x12_crossdomain/scheduling_probe.txt (3f13911)",
+    "docs/test_ledger.html row SCHEDULING (v60): chips verbatim, evidence (scheduling_probe.txt, frontier_probe.py)",
+    "script sha16 = sha256 of tools/analysis/frontier_probe.py at 5143ef0, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)"
+  ],
+  "last_update": "2026-09-22",
+  "plain_description": {
+    "sq": "SQ4 Price",
+    "what": "No calls. For the six pairs among the top 4 models on about 3,400 questions, the test compared how often the answer key can settle a match when the two models' own final answers differ versus when they agree.",
+    "why": "It asks whether the frontier models cannot be told apart because the scheduler wastes matches on questions with no signal.",
+    "information": "If informative matches sit almost only where answers differ, judging only those cuts cost with no loss. Result: done, descriptive. Answers differ on 16.9% of question pairs. Filtering on that keeps 99.8% of all decidable pairs while judging only 16.9% of matches, with no answer key needed. This works for multiple-choice and checkable tasks, not open-ended generation.",
+    "written": "2026-10-07"
+  }
+}

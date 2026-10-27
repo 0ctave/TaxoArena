@@ -1,0 +1,21 @@
+== experiment_results\hygiene\bareq512_s42_labelfree\seed_42 vs experiment_results\hygiene\bareq512_s42_labelfree2\seed_42 ==
+  -- STRUCTURE (must be identical)
+     dag_snapshots.jsonl                           DIFFERS  first diff: (7, '{"iteration":7,"nodes":[{"id":"n00000001","label":"MMLU_PRO","depth":0,"isLeaf":false,"isBridge":false,"kappa"', '{"iteration":7,"nodes":[{"id":"n00000001","label":"MMLU_PRO","depth":0,"isLeaf":false,"isBridge":false,"kappa"')
+     diagnostics/dag_snapshots.jsonl               DIFFERS  first diff: (7, '{"iteration":7,"nodes":[{"id":"n00000001","label":"MMLU_PRO","depth":0,"isLeaf":false,"isBridge":false,"kappa"', '{"iteration":7,"nodes":[{"id":"n00000001","label":"MMLU_PRO","depth":0,"isLeaf":false,"isBridge":false,"kappa"')
+  -- EVALUATION PATH (P7 caveat)
+     diagnostics/proposals.csv                     DIFFERS  first diff: (2, '1,GROW,n00000011,Math,0.006797653,0.000273811,24.8261,2,ACCEPTED,,0', '1,GROW,n00000011,Math,0.006797653,0.000274347,24.7776,2,ACCEPTED,,0')
+     fixed_point_certificate.txt                   DIFFERS  first diff: (4, 'final iteration : 15', 'final iteration : 18')
+     diagnostics/iteration_metrics.csv             DIFFERS  first diff: (8, '7,156,86,6,0.235482,0.235482,0.000005648988,0.001335519291,8,3456,453,2,19,432,8278.000,0', '7,154,85,6,0.235316,0.235316,0.000005648988,0.001169627135,4,1626,454,1,21,432,8278.000,0')
+     diagnostics/rank_history.csv                  IDENTICAL
+     validation\MAIN_bridge_quality.csv            IDENTICAL
+     validation\MAIN_centroid_routing_results.csv  IDENTICAL
+     validation\MAIN_graph_validity.csv            IDENTICAL
+     validation\MAIN_heldout_leaf_support.csv      DIFFERS  first diff: (15, 'n00000549,Emergent Concept #534,25,28', 'n00000693,Emergent Concept #678,34,35')
+     validation\MAIN_migration_flow_matrix.csv     IDENTICAL
+     validation\MAIN_routing_calibration.csv       DIFFERS  first diff: (2, 'RoutingECE,0.19251532239138483', 'RoutingECE,0.1925152601892235')
+     validation\MAIN_routing_diagnostics.txt       DIFFERS  first diff: (217, 'Top-1 Leaf: Emergent Concept #406 (ID: n00000421) | Dominant: Economics | Conf: 1,0000', 'Top-1 Leaf: Emergent Concept #508 (ID: n00000523) | Dominant: Economics | Conf: 1,0000')
+     validation\MAIN_taxonomy_quality.csv          DIFFERS  first diff: (2, 'SeparationJ,0.2356340108197833', 'SeparationJ,0.23562815796604997')
+     validation\MAIN_trickle_validation_results.csv DIFFERS  first diff: (7, 'MeanLeafPurity,0.7683623762160414', 'MeanLeafPurity,0.7684582443984096')
+     validation\bridge_nodes.csv                   IDENTICAL
+     validation\bridge_residuals.csv               IDENTICAL
+  GATE: FAIL

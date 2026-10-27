@@ -1,0 +1,175 @@
+{
+ "id": "SITE-SUPPORT",
+ "title": "SITE-SUPPORT: transfer support (TBE) of certified vs uncertified sites across the four AF MMLU-Pro re-draw trees on their common items; real sites vs random subsets (zero calls; REGISTERED 2026-10-04)",
+ "question": "Do certified sites recur across re-draws more than uncertified ones?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "633255f2",
+  "program_lines": "docs/judge_v2_program.md L24349-L24360",
+  "program_lines_as_of": "633255f2 (parent b7fb6bc8), re-grepped",
+  "date": "2026-10-04",
+  "provenance": "docs/literature/2026-10-04_hierarchy_evaluation.md (68a3d731; blob a6e8148b); docs/agents/plans/2026-10-04_literature_shortlist.md (68a3d731); the author's Go (docs/agents/plans/2026-10-04_W1_W2_schedule.md (be8e54d3))"
+ },
+ "script": {
+  "path": "tools/analysis/site_support.py",
+  "sha16": null,
+  "blob": "4612345c (LF; sha256-lf16 3c049176bd4afebb)",
+  "helper": "tools/analysis/zc_common.py blob c912dccf (LF; sha256-lf16 8fe96303de21504e)",
+  "commit": "e8504eb2"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_zero_call_trio.md",
+  "commit": "10a5aa3d",
+  "blob": "4dd640a1 (LF)",
+  "verdict": "READY"
+ },
+ "go": "the author's Go for zero-call windows (2026-10-04)",
+ "run": {
+  "outcome_file": "E:/TaxoArena_backup_2026-10-04_site_support/site_support_outcome.txt (sha256 60d4cb396f917be09ea5637f7a40a1a03336b805dcf87937a024aceba61bb1a5); never committed",
+  "outcome_commit": "run from main (code merged e8504eb2); outcome not committed",
+  "calls": 0,
+  "cce": 0,
+  "pool": "reader: p2dca21ab5f4ef3ae, pd610c9ad05255f16, p19d9f473b5a610a0, p8a29d8f3ff75aa55 (read-only, staged copies)",
+  "date": "2026-10-04"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_site_support.md",
+  "commit": "194dd078",
+  "blob": "afc21c07 (LF)",
+  "verdict": "VALID (corrected words C-SB2, C-P1, C-F-SS, C-DEFF; no BLOCKER)"
+ },
+ "criteria": [
+  {
+   "id": "SB1",
+   "text": "DECIDING: SUPPORT-TRACKS-CERT iff G (certified - uncertified TBE, depth x size strata) > 0 AND within-stratum permutation p <= 0.05; NOT-SHOWN otherwise. Verdict line: DESCRIPTIVE-ONLY at the prediction (pilot DEFF 1.3; SE 0.0365; MDE80 0.091)",
+   "result": "FAILED",
+   "value": "NOT-SHOWN: G (w = min) -0.0173, one-sided within-stratum permutation p 0.7657 (10,000; permutation SD 0.0235); G <= 0 under harmonic (-0.0196) and n weights (-0.0411); raw gap +0.1238 removed by the depth x size strata; P-2 (tree x depth x size) G -0.0132, no word change",
+   "denominator": "264 sites on |C| = 2,772 (48 certified at site-null p95, per site, uncorrected, 300 reps / 216 uncertified); 10 of 11 strata with both classes"
+  },
+  {
+   "id": "SB2",
+   "text": "DECIDING: RECURS iff median real-site TBE > median random-subset p97.5; NOT-RECURS otherwise",
+   "result": "HELD",
+   "value": "RECURS against the registered random-subset null, which is a floor (median p97.5 = 0.0000; 263 of 264 sites above their own p97.5; 98.1% of random-subset TBE values are exactly 0); median real-site TBE 0.6293. It shows only that the four re-draw trees are not mutually unrelated, not that their sites recur beyond any coherent partition. Beside it (reviewer, descriptive): 167 of 264 sites clear a same-tree leaf-union null (all 91 at depth <= 3, 76 of 173 at depth >= 4) (C-SB2)",
+   "denominator": "264 sites; 200 random subsets each (leaf-union null: 50 per site, descriptive, not registered)"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "|C| 2,200 [1,500, 3,000]",
+   "result": "HELD",
+   "value": "HELD (|C| = 2,772 observed at the dry-run, before the run; not a prediction tested by the run) (C-P1)",
+   "denominator": "items (intersection of the four trees' member sets, SS-R1)"
+  },
+  {
+   "id": "P2",
+   "text": "G +0.08 [0.00, 0.20]; SUPPORT-TRACKS-CERT 0.45",
+   "result": "FAILED",
+   "value": "G -0.0173 outside [0.00, 0.20]; SUPPORT-TRACKS-CERT did not occur; Brier 0.2025",
+   "denominator": "264 sites"
+  },
+  {
+   "id": "P3",
+   "text": "SB2 RECURS 0.80",
+   "result": "HELD",
+   "value": "RECURS occurred; Brier 0.0400 (against the floor null, C-SB2)",
+   "denominator": "264 sites"
+  }
+ ],
+ "falsifier": {
+  "text": "F-SS fires iff SB1 NOT-SHOWN with G <= 0.",
+  "fired": true,
+  "outcome": "FIRED, on own-cluster TBE (children-TBE G -0.0351, P-1: same sign) (C-F-SS)"
+ },
+ "numbers_of_record": {
+  "SB1_G": "-0.0173 (w = min; one-sided within-stratum permutation p 0.7657, 10,000; 48 certified / 216 uncertified sites on |C| 2,772)",
+  "SB2": "median real-site TBE 0.6293 vs median random-subset p97.5 0.0000; 263 of 264 sites above (floor null, C-SB2)",
+  "leaf_union_null": "167 of 264 sites clear a same-tree leaf-union null (all 91 at depth <= 3; 76 of 173 at depth >= 4; 38/48 certified, 129/216 uncertified); reviewer, descriptive, not registered",
+  "P-1_children_TBE_G": "-0.0351 (262 sites, 48 certified; own-RNG p 0.907); no sign change",
+  "P-2_G": "-0.0132 (tree x depth x size, 23 strata; p 0.712); no word change",
+  "P-3_DEFF": "UNDETERMINED at 8 clusters (ANOVA 5.11 for a mean; CR-ratio 0.27 for the contrast); measured permutation SD of G 0.0235 (MDE80 0.058)",
+  "support_as_realised": "SE 0.2383 x sqrt(1/48 + 1/216) x sqrt(1.3) = 0.0434; n_eff 203; MDE80 0.1078 (DEFF 1.3 declared); DESCRIPTIVE-ONLY at the prediction",
+  "C": "2,772 (pool reading 3,073 beside, NOT of record)"
+ },
+ "sentence_of_record": "SITE-SUPPORT (2026-10-04, 0 calls) — VALID; SB1 NOT-SHOWN, F-SS FIRED. On the four anchor-free MMLU-Pro re-draw trees [LF] (264 sites on 2,772 common items; 48 certified at site-null p95, per site, uncorrected, 300 reps), certified sites' own clusters do not recur across re-draws more than uncertified ones of the same depth and size: G -0.0173 TBE (one-sided within-stratum permutation p 0.7657); F-SS on own-cluster TBE (children-TBE G -0.0351, P-1: same sign). SB2 RECURS against the registered random-subset null, which is a floor (median p97.5 0.0000; 263 of 264 sites above): it shows only that the four trees are not mutually unrelated; 167 of 264 sites clear a same-tree leaf-union null (reviewer, descriptive). DEFF UNDETERMINED at 8 clusters (ANOVA 5.11; CR-ratio 0.27); permutation SD of G 0.0235. P1 HELD at the dry-run; P2 FAILED (Brier 0.2025); P3 HELD (Brier 0.0400). [POSTRUN docs/reviews/POSTRUN_site_support.md, 194dd078; outcome on E: only, sha256 60d4cb39...]",
+ "chips": [
+  "REGISTERED 2026-10-04, BEFORE ANY CODE; not built",
+  "READY 2026-10-04 (code 4612345c; pre-data brackets); not run",
+  "VALID (POST-RUN 194dd078): SB1 NOT-SHOWN (G &minus;0.0173, p 0.7657); F-SS FIRED (OWN-CLUSTER TBE; CHILDREN SAME SIGN)",
+  "SB2 RECURS AGAINST A FLOOR NULL ONLY (TREES NOT MUTUALLY UNRELATED; LEAF-UNION 167/264, DESCRIPTIVE); DEFF UNDETERMINED (8 CLUSTERS); P1 AT THE DRY-RUN"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-04",
+   "by": "registrar (pre-data; READY_zero_call_trio)",
+   "text": "READY. SS-R1 C = intersection of the four trees' member sets (2,772; pool reading 3,073 beside, NOT of record; decides P1, observed at the dry-run); SS-R2 size quintiles on |S|; SS-R4 one-sided, certified higher; D-3 'own cluster recurs' wording; post-run P-1..P-3; D-10. L24352, L24353, L24357."
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (POSTRUN 194dd078)",
+   "text": "outcome recorded in the review's corrected words C-SB2, C-P1, C-F-SS, C-DEFF; OUTCOME brackets on READOUTS AND CRITERIA (L24355), SUPPORT (L24356), FALSIFIER (L24358); outcome section docs/judge_v2_program.md L24536-L24549 (section \"## SITE-SUPPORT (2026-10-04, 0 calls) — VALID (POSTRUN 194dd078) ...\"; _as_of the commit that writes it, parent 6cb817b6, re-grepped)."
+  },
+  {
+   "date": "2026-10-05",
+   "by": "registrar (STABILITY-VS-KMEANS pre-data; docs/reviews/READY_stability_vs_kmeans.md (a00ceecc; reviewed blob:b278a7a9, LF))",
+   "text": "DISCLOSURE on the descriptive triplet line (outcome sha256 60d4cb396f917be0...): tree pairs 0.0684 vs k-means seed pairs 0.3243 is inflated by unresolved triplets scoring as agreement (about 0.07 in favour of the trees); any deck or draft quoting it carries that qualifier until STABILITY-VS-KMEANS ST1 decides; SB1, SB2 untouched. Bracket on READOUTS AND CRITERIA L24355 (_as_of the commit that writes it, parent a00ceecc, re-grepped)."
+  },
+  {
+   "date": "2026-10-05",
+   "by": "registrar (STABILITY-VS-KMEANS outcome; docs/reviews/POSTRUN_stability_vs_kmeans.md (13933eb4; blob ab45eed0, LF))",
+   "text": "the 2026-10-05 DISCLOSURE on the descriptive 0.0684 vs 0.3243 is now decided by STABILITY-VS-KMEANS (ST1 NEITHER, F-ST FIRED): \"SITE-SUPPORT's 0.0684 vs 0.3243 is not read as a tree property. On matched data and shape the gap persists against agglomerative-on-centroids k-means but vanishes against bisecting k-means. It reflects the baseline construction, and about 0.07 of it is unresolved-triplet credit.\" Quote the line only with that sentence. SB1, SB2 untouched. Bracket appended to READOUTS AND CRITERIA L24355; STABILITY-VS-KMEANS outcome docs/judge_v2_program.md L24701-L24712 ('## STABILITY-VS-KMEANS (2026-10-05, 0 calls) — VALID (POSTRUN 13933eb4): ...'; _as_of the commit that writes it, parent 13933eb4, re-grepped)."
+  }
+ ],
+ "does_not_show": [
+  "that recurring splits are correct (stability is not correctness)",
+  "that the trees' sites recur beyond any coherent partition (SB2 is against a floor null)",
+  "any EVAL quantity",
+  "content-closed re-draws (three are id-only)",
+  "FDR-corrected certification",
+  "a measured DEFF (UNDETERMINED at 8 clusters)"
+ ],
+ "ledger": {
+  "row_id": "SITE-SUPPORT",
+  "version": "v396 (2026-10-05: STABILITY-VS-KMEANS pointer bracket) | v393 (2026-10-05: disclosure bracket) | v387 (2026-10-04: OUTCOME bracket, NULL + WARN chips) | v383 (2026-10-04: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "ANCHOR-FREE-REDRAW",
+  "CERT-ALIGN-SIZE (strata)"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; no Gaussian-mixture LR / BIC, MDL or Bayesian evidence (MIX-LRT-SITE untouched); no judge, rubric, reference, frontier, temperature"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "CPU minutes-1 h (pool reader)",
+  "agent_hours": "about 3 h",
+  "reads_pool": true
+ },
+ "outputs": "never committed: stored on E: with SHA256SUMS.txt; temp under E:/TaxoArena_tmp via scratch_dir",
+ "sources": [
+  "docs/judge_v2_program.md L24349-L24360 (_as_of 633255f2, parent b7fb6bc8, re-grepped)",
+  "docs/literature/2026-10-04_hierarchy_evaluation.md (68a3d731; blob a6e8148b)",
+  "docs/agents/plans/2026-10-04_literature_shortlist.md (68a3d731)",
+  "docs/reviews/READY_zero_call_trio.md (10a5aa3d; blob 4dd640a1, LF); merge e8504eb2",
+  "docs/reviews/POSTRUN_site_support.md (194dd078; blob afc21c07, LF)",
+  "E:/TaxoArena_backup_2026-10-04_site_support/site_support_outcome.txt (sha256 60d4cb39...; SHA256SUMS.txt)",
+  "docs/judge_v2_program.md L24536-L24549 (section \"## SITE-SUPPORT (2026-10-04, 0 calls) — VALID (POSTRUN 194dd078) ...\"; _as_of the commit that writes it, parent 6cb817b6, re-grepped)",
+  "docs/reviews/READY_stability_vs_kmeans.md (a00ceecc; reviewed blob:b278a7a9, LF) (B-1; the 2026-10-05 disclosure)"
+ ],
+ "last_update": "2026-10-05",
+ "label_status": "AF-U [SC] where used",
+ "plain_description": {
+  "sq": "SQ3 Taxonomy",
+  "what": "Across four anchor-free MMLU-Pro trees from different re-draws, it measures how often each branch point's cluster reappears in the other trees. It compares certified with uncertified branch points of the same depth and size, and also with random subsets. No judge calls.",
+  "why": "If the certificate means something, certified branch points should be more stable across re-draws than uncertified ones.",
+  "information": "Higher recurrence for certified sites would link the certificate to stability. Result: done, not shown, and the failure condition fired: certified branch points do not recur more than uncertified ones. Nearly all sites (263 of 264) recur more than random subsets, but that null is only a floor and shows just that the trees are related. Stability is not correctness either way.",
+  "written": "2026-10-07"
+ }
+}

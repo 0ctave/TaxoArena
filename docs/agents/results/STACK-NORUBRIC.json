@@ -1,0 +1,125 @@
+{
+  "id": "STACK-NORUBRIC",
+  "title": "STACK-NORUBRIC: FRAMEWORK item 20: the recipe WITHOUT the anchor rubric; what does a cell with no induced rubric lose? (2,100 calls)",
+  "question": "The fully de-induced recipe ($systemPrompt = GENERIC_SYSTEM, $rubric = GENERIC_RUBRIC; Amendment 1 D3) on the 944 key-decidable R3 pairs, grok-4-1-fast-non-reasoning, dual order, cap 8192, temperature omitted, against the cached STACK-v2 verdicts, with two byte-identical control sessions of the recipe WITH the rubric on a 53-match subset as the session floor: is it non-inferior within 2pp under both tie conventions?",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "eaf1dbf",
+    "program_lines": "docs/judge_v2_program.md L3603-L3611 (by reference; FRAMEWORK L376 item 20); the registered criterion and arm restated at L3886-L3892; scripts dry-run and D3 fix at 1e3b1ea (Block 2 launch record L3613-L3623)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-15 (before any run) — BY REFERENCE: the 26 tests in docs/design/FRAMEWORK.md \"Tests to register before shipping\" (commit 8d77f7b), with the criteria, predictions and call counts stated there, scheduled in docs/plan_2026-09-15.md",
+    "outcome_heading": [
+      "L3885: ## STACK-NORUBRIC (2026-09-16, 2,100 calls) — FRAMEWORK item 20: PASS, non-inferior as predicted; the anchor rubric is worth +1.5pp of decisiveness and +0.2pp of discrimination"
+    ],
+    "date": "2026-09-15"
+  },
+  "script": {
+    "path": "tools/analysis/stack_norubric.py",
+    "sha16": "4ed7d7f5a702083e (at the Block 2 dry-run commit 1e3b1ea; the cache's pinned first-launch sha a55f6e72 posted nothing and every verdict came from the fixed version d99610c5, per the programme's provenance note)",
+    "commit": "1e3b1ea (later edited 7076615 / 13f2142 / 7d11c4e)"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (~2,100 calls; 'optional' in FRAMEWORK item 20; authorised in full by the by-reference registration); Amendment 1 D2 (temperature omitted) and D3 (fully de-induced arm; unparsed kept as NON_TERMINATED)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/stack_norubric_outcome.txt",
+    "outcome_commit": "a75df45",
+    "calls": 2100,
+    "cce": "not stated in the programme",
+    "pool": "p2dca21ab5f4ef3ae (the R3 sample's 944 key-decidable matches)",
+    "date": "2026-09-16",
+    "other_files": [
+      "experiment_results/x12_crossdomain/stack_norubric.db (gitignored)"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the Block 2 dry-run review (1e3b1ea) fixed D3 before any call (unparsed verdicts dropped from the paired set could turn a FAIL into a PASS: verified with a synthetic 4%-length cache, +0.000 PASS before, about -0.035 FAIL after); no post-run recomputation file exists",
+    "commit": "1e3b1ea",
+    "verdict": "PASS, non-inferior as predicted; the rubric is +1.5pp of decisiveness (p 0.044) and +0.2pp of discrimination"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "non-inferior within 2pp under both tie conventions against the session floor",
+      "result": "HELD",
+      "value": "convention A (decisive-and-correct) norubric 0.850 vs cached STACK-v2 0.864, delta -0.015 [-0.029, -0.002], McNemar 14:28 p 0.044: -0.015 >= -0.020 OK; convention B (correct given committed) 0.927 vs 0.929, -0.002 [-0.010, +0.005]: OK; ties 0.084 vs 0.070; session floor on the 53-match control subset (three byte-identical sessions): verdict disagreement 0.000 / 0.019 / 0.019 (DECOMP 0.057), largest between-session accuracy gap A 0.019, B 0.003 (SE ~0.097 at n = 53): PASS, NON-INFERIOR",
+      "denominator": "944 key-decidable R3 pairs, paired; 53 x 2 control matches"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "non-inferior (the record's rubric value is 0 to +1pp n.s.)",
+      "result": "HELD",
+      "value": "non-inferior; the rubric's value reads +1.5pp of decisiveness (A, p 0.044) and +0.2pp of discrimination (B, inside its CI)",
+      "denominator": "944 pairs"
+    }
+  ],
+  "falsifier": {
+    "text": "the 2pp non-inferiority bar under either convention (registered by reference)",
+    "fired": false,
+    "note": "the framework's Stage 3 rule stands as written (STACK-v2 keeps the anchor rubric where it already exists, at no induction cost); a cell WITHOUT an induced anchor rubric loses ~1.5pp of decisiveness and nothing else"
+  },
+  "numbers_of_record": {
+    "run": "944 norubric matches + 53 x 2 controls, 2,100 calls; finish_reason stop on all; 0 unparsed on every arm (guard OK)",
+    "paired_944": "A 0.850 vs 0.864, -0.015 [-0.029, -0.002], 14:28 p 0.044; B 0.927 vs 0.929, -0.002 [-0.010, +0.005]; ties 0.084 vs 0.070",
+    "session_floor_53": "verdict disagreement 0.000 / 0.019 / 0.019; largest accuracy gap A 0.019, B 0.003 (SE ~0.097)",
+    "provenance_note": "the cache's pinned first-launch sha (a55f6e72) posted NOTHING (36 jobs errored on a recursive wrapper, 0 calls); every verdict came from the fixed version (d99610c5), so the analysis prints STALE; rows unaffected; the pin should have been taken at the first launch that posted"
+  },
+  "sentence_of_record": "STACK-NORUBRIC (2026-09-16, 2,100 calls): FRAMEWORK item 20: PASS, non-inferior as predicted; the anchor rubric is worth +1.5pp of decisiveness and +0.2pp of discrimination. The anchor rubric buys a small, statistically visible amount of DECISIVENESS (+1.5pp under A, p = 0.044, tie rate 0.070 -> 0.084 without it) and no discrimination (+0.2pp under B, inside its CI): the same anatomy as RK-1b and PAIR-NOREF; on a benchmark scoring ties as wrong, 'rubric value' is mostly the judge committing more often. A cell WITHOUT an induced anchor rubric loses ~1.5pp of decisiveness and nothing else, which is the number a rubric-free deployment should carry.",
+  "chips": [
+    "PASS: NON-INFERIOR, AS PREDICTED",
+    "RUBRIC = +1.5pp OF DECISIVENESS (p=0.044), +0.2pp OF DISCRIMINATION"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-23",
+      "by": "CORRECTIONS_2026-09-23 (registrar)",
+      "text": "[CORRECTED 2026-09-23 by the registrar (identification only, no number changes): the \"current\" sha d99610c5ce1c7999 is now named — it is the LF sha256 of tools/analysis/stack_norubric.py at commit 7076615 (git show 7076615:tools/analysis/stack_norubric.py | sha256sum, first 16 hex), committed 2026-09-16 02:31:47, sixteen seconds after the cache's last resume at 02:31:32. That blob is the script of record for every verdict in stack_norubric.db. The pinned a55f6e72913b95d3 matches no commit in either rendering: it is the uncommitted intermediate whose first launch errored 36 jobs before any call, as this note already records.]"
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a discrimination gain from the rubric (+0.2pp inside its CI)",
+    "anything about rubric text at other granularities (closed lines RUBRIC, LADDER, RUBRIC-512-R, J6, RK-1, LEAF-POWERED)"
+  ],
+  "ledger": {
+    "row_id": "STACK-NORUBRIC",
+    "version": "v104 (9049b12); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "STACK-v2",
+    "RK-1b",
+    "PAIR-NOREF",
+    "DECOMP",
+    "RECIPE-GROK"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "rubric text at every granularity (CONTEXT.md section 5 lists STACK-NORUBRIC among RUBRIC, LADDER, RUBRIC-512-R, J6, RK-1, LEAF-POWERED)"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L3603-L3611 (by-reference registration eaf1dbf) and docs/design/FRAMEWORK.md L376 item 20; docs/plan_2026-09-15.md Amendment 1 D2 / D3; docs/judge_v2_program.md L3613-L3623 (Block 2 launch record: the D3 fix)",
+    "docs/judge_v2_program.md L3885-L3911 (outcome section a75df45): registered, run, result (1)-(3), reading, provenance note",
+    "experiment_results/x12_crossdomain/stack_norubric_outcome.txt (a75df45)",
+    "docs/test_ledger.html row STACK-NORUBRIC (v104): chips verbatim, evidence (stack_norubric.py, outcome, stack_norubric.db gitignored, a75df45)",
+    "script sha16 = sha256 of tools/analysis/stack_norubric.py at 1e3b1ea, first 16 hex (identity, computed by the registrar 2026-09-22; the programme names the run version d99610c5 by its cache pin, not a commit)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' (or '- **ID ...**' bullet) lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06",
+    "script identity vs run-time version (registrar 2026-09-23, zero calls, insertion only): the script.sha16 in the field, 4ed7d7f5a702083e, is the DRY-RUN identity at 1e3b1ea; the script of record for the RUN is tools/analysis/stack_norubric.py at 7076615, LF sha16 d99610c5ce1c7999 (git show 7076615:tools/analysis/stack_norubric.py | sha256sum, first 16 hex), the value the outcome file prints as \"current\"",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Runs the judge recipe without the cell's LLM-written rubric (2,100 calls) and compares it with the recipe that has the rubric.",
+    "why": "It measures what a cell loses when it has no induced rubric, which tells whether rubrics are worth their cost.",
+    "information": "A big loss would make rubrics essential. A small loss would allow rubric-free deployment. Result: as predicted, not worse. The rubric adds about 1.5 points of decisiveness (fewer ties, p = 0.044) and no real accuracy in telling models apart (+0.2, within noise). A later ruling classes this run's judged data as history, not evidence.",
+    "written": "2026-10-07"
+  }
+}

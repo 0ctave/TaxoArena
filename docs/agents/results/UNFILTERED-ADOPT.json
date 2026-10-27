@@ -1,0 +1,149 @@
+{
+  "id": "UNFILTERED-ADOPT",
+  "title": "UNFILTERED-ADOPT: FRAMEWORK item 3: adopt the unfiltered 920-edge widener fit in place of the 891 filtered one? (zero calls)",
+  "question": "The 920 any-gap x12 edge set vs the 891 filtered set, LOAO and in-sample, established labels 809 / 26 (identical on both sets: 0 of the 29 added edges established); cluster bootstrap over 8 seeds; (d) the LOAO row printed by systematic_budget.py itself.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "eaf1dbf",
+    "program_lines": "docs/judge_v2_program.md L3603-L3611 (by reference; docs/design/FRAMEWORK.md L356 item 3); the Block 1 record bullet at L3685",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-15 (before any run) — BY REFERENCE: the 26 tests in docs/design/FRAMEWORK.md \"Tests to register before shipping\" (commit 8d77f7b), with the criteria, predictions and call counts stated there, scheduled in docs/plan_2026-09-15.md",
+    "outcome_heading": [
+      "L3662: ## Block 1 record (2026-09-15/16, zero calls) — FRAMEWORK items 1-12, 14-16: fourteen zero-call tests built, each adversarially checked; verdicts of record below (checker's number wins where it refutes the builder)",
+      "L3685: - **UNFILTERED-ADOPT (2026-09-15, zero calls): 3 of 4 criteria met; prediction \"adopted\" NOT YET confirmed because (d) needs a one-line change to systematic_budget.py this test may not make; adoption is a population-honesty change, not an accuracy gain.**"
+    ],
+    "date": "2026-09-15"
+  },
+  "script": {
+    "path": "tools/analysis/unfiltered_adopt.py",
+    "sha16": "44138e21019b90e3",
+    "commit": "7076615"
+  },
+  "ready": null,
+  "go": "n/a (0 calls; Block 1)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/unfiltered_adopt.txt",
+    "outcome_commit": "7076615",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (pool_guard.assert_pool_of_record() first; union pool paeec37aa28063c75 by explicit id where used)",
+    "date": "2026-09-15/16"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); each Block 1 test was 'adversarially checked' at build time and the checker's number wins where it refutes the builder (Block 1 record header L3662-L3663); the checker-confirmed defects are listed in the bullet",
+    "commit": "7076615",
+    "verdict": ""
+  },
+  "criteria": [
+    {
+      "id": "(a)",
+      "text": "established-label profile rejects b1 = 0 on the 920 set",
+      "result": "HELD",
+      "value": "MLE b0 -2.6463 / b1 +2.1430, delta-dev 5.22 (checker 5.223, p 0.022); profile set [0.30, 5.60]; cluster bootstrap one-sided P 0.017-0.035 over 8 seeds, 95% CI includes 0 in 3 of 8 (PASS, non-discriminating: 5.22 is the record's number reproduced)",
+      "denominator": "809 established / 26 wrong on the 920 set"
+    },
+    {
+      "id": "(b)",
+      "text": "utility >= 60%",
+      "result": "HELD",
+      "value": "LOAO 646/920 = 70.2% (69.9% over the 924 deployable pairs; 86.4% of raw calls)",
+      "denominator": "920 edges"
+    },
+    {
+      "id": "(c)",
+      "text": "established wrong at 0.975 not above the filtered fit's",
+      "result": "HELD",
+      "value": "four like-for-like comparisons all equal: LOAO 920 3(2)/646 vs 3(2)/664; in-sample 2(1)/651 vs 2(1)/666; on 891 3(2)/645 vs 3(2)/663, 2(1)/650 vs 2(1)/665",
+      "denominator": "920 / 891 edges"
+    },
+    {
+      "id": "(d)",
+      "text": "LOAO row printed by systematic_budget.py",
+      "result": "FAILED",
+      "value": "NOT MET: not present in the committed file (the LOAO loop iterates filt only, lines 253-267); the row computed from its functions: 920 fit LOAO 646 / 3(2) / nominal 1.28 (2.35x) / 70.2%; Poisson P(>= 3 | 1.28) 0.137; status UNDETERMINED; pending Block 4",
+      "denominator": "920 edges"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "adopted",
+      "result": "n/a",
+      "value": "NOT YET: (d) pending Block 4 (LOAO over all_edges in systematic_budget.py), after which the item closes by re-reading that output against 646/3(2)/1.28/70.2%; adoption is a population-honesty change, not an accuracy gain",
+      "denominator": "920 edges"
+    }
+  ],
+  "falsifier": {
+    "text": "none beyond the criteria (registered by reference)",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "fit_920": "b0 -2.6463 / b1 +2.1430 (established MLE); delta-dev 5.22; profile set [0.30, 5.60]; cluster bootstrap P 0.017-0.035 over 8 seeds",
+    "LOAO_920": "646 / 3(2) / nominal 1.28 (2.35x) / 70.2%; Poisson P(>= 3 | 1.28) 0.137 UNDETERMINED",
+    "subset_note": "at LOAO the 920 fit's called set is a strict subset of the 891 fit's (18 correct calls surrendered, 0 wrong removed); the shipped 920 pair fits the established labels worse (delta-dev 3.89 vs 2.26); the 920 fit's out-of-fold nominal is OPTIMISTIC (59.52 vs 60 observed), sign-flipped vs the 891 fit (48.7 vs 44)",
+    "record_corrections": "FRAMEWORK L95 '33 excluded edges, 52%' is the 924-edge count; the 920 build gives 29 excluded / 16 wrong = 55.2%; FRAMEWORK L167 'utility 74.4%' mislabels 663/891 (called / raw called is 89.7%)"
+  },
+  "sentence_of_record": "UNFILTERED-ADOPT (2026-09-15, zero calls): 3 of 4 criteria met ((a) (b) (c) PASS; (d) NOT MET: the LOAO row is not printed by systematic_budget.py, pending Block 4); prediction 'adopted' NOT YET confirmed; adoption is a population-honesty change, not an accuracy gain (the 920 fit's LOAO called set is a strict subset of the 891 fit's, 18 correct calls surrendered, 0 wrong removed). The 920 fit LOAO reads 646 / 3(2) / nominal 1.28 / 70.2%, status UNDETERMINED; the 920 unfiltered denominator is the adopted one in GROK-CALIB and ITEM-26-POOLED.",
+  "chips": [
+    "(a) (b) (c) PASS",
+    "(d) NOT MET",
+    "ADOPTED: NOT YET (BLOCK 4)"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-16",
+      "by": "Block 1 record corrections for LEDGER-CONSISTENCY (programme L3839; FRAMEWORK L95 / L167 bracketed at a75df45)",
+      "text": "FRAMEWORK L95: 33/52% is the 924-edge count, the 920 build is 29/55.2%; L167: 74.4% is called / edges (called / raw called is 89.7%)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "INCONSISTENCIES-PASS (registrar, zero calls; insertion only)",
+      "text": "LEFT OPEN 2026-09-23 by INCONSISTENCIES-PASS (registrar, zero calls; insertion only), so the reader knows it was seen: (d) is still NOT MET at HEAD 0cca0d5: in tools/analysis/systematic_budget.py (last edited 13f2142) the leave-one-anchor-out loop still iterates the filtered set only (the loop after the 'budget, in sample' line); the item closes only when the script prints the 920-set LOAO row and that output is re-read against 646 / 3(2) / 1.28 / 70.2%. Nothing was executed in this pass. [ledger: observed cell of row UNFILTERED-ADOPT, v132]"
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (adversarial review of systematic_budget, C4 (a)/(c), relayed by the coordinator; zero calls)",
+      "text": "CORRECTED 2026-09-23 by the registrar on the adversarial review of systematic_budget (item C4, relayed by the coordinator; zero calls): criterion (d) is scored by RE-READING THE OUTPUT of systematic_budget.py --edges unfiltered against 646 / 3(2) / 1.28 / 70.2%, as the Block 1 record already registers ('(d) pending Block 4 (LOAO over all_edges in systematic_budget.py), after which the item closes by re-reading that output against 646/3(2)/1.28/70.2%.'), and NEVER by the source-string presence check in tools/analysis/unfiltered_adopt.py L366-L368 (prints_row = 'for e in all_edges if e[\"anchor\"] != A_' in src). Once the engine-coder's systematic_budget fix lands, that string is gone, so a re-run of unfiltered_adopt.py would print 'NOT MET' FALSELY; that printed line is not of record. The --edges unfiltered mode is not in the script at HEAD 0cca0d5 (it arrives with the fix). RUNNING --edges unfiltered IS UNFILTERED-ADOPT (d): it runs only as that registered step, under its own launch, and never as a side effect of a merge. This supersedes the closing condition written in the v132 LEFT-OPEN bracket ('closes when it prints the 920-set row'): (d) closes on the re-read, not on any string in the source. [ledger] observed cell, v133; programme: same-line bracket after the Block 1 record's (d) sentence."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "an accuracy gain from adoption (a population-honesty change)",
+    "a discriminating identification on the 920 set (its established edges are exactly the 891 set's)",
+    "the (d) row from systematic_budget.py itself (pending Block 4; the detector is a substring test to be re-scored by hand)"
+  ],
+  "ledger": {
+    "row_id": "UNFILTERED-ADOPT",
+    "version": "v103 (684be03) [v132 2026-09-23: INCONSISTENCIES-PASS insertion in this row] [v133 2026-09-23: bracket in this row]; [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "SYSTEMATIC-BUDGET",
+    "SYSTEMATIC-SIGNAL",
+    "A-REDEFINE-REFIT"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L3603-L3611 (by-reference registration eaf1dbf) and docs/design/FRAMEWORK.md L356 item 3: criterion, prediction, call count",
+    "docs/judge_v2_program.md L3685 ff. (Block 1 record bullet, 7076615): the criterion table, predictions scored, checker-confirmed defects, script and output",
+    "experiment_results/x12_crossdomain/unfiltered_adopt.txt (7076615)",
+    "docs/test_ledger.html row UNFILTERED-ADOPT (v103 684be03): chips verbatim, design / criteria / observed cells, evidence",
+    "script sha16 = sha256 of tools/analysis/unfiltered_adopt.py at 7076615 (its first commit), first 16 hex (identity, computed by the registrar 2026-09-22; later edited at 13f2142 for the pool_guard change)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' heading and the '- **ID (...)**' bullet line inside the Block 1 record, to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Refits the confidence formula for ranking calls on all 920 model pairs instead of the 891 filtered pairs. It then checks whether quality, utility and error rate hold. No judge calls.",
+    "why": "Using all pairs avoids a hidden selection, making the method's reported population honest.",
+    "information": "Shows whether dropping the filter costs anything. Result: 3 of 4 criteria met, with the same error counts and about 70% utility. The fourth check was not met because the main script does not yet print that row, so adoption is not confirmed. The change makes the reported population honest but brings no accuracy gain (18 correct calls given up, 0 wrong ones removed). This belongs to the older question pool, which is now ruled history, not evidence.",
+    "written": "2026-10-07"
+  }
+}

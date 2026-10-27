@@ -1,0 +1,1262 @@
+# RP12 ARCH-V2-E-T-R2 (lane r2) run log (run-operator, 2026-10-01T09:36:34+02:00). Build commit M=2703f2c25807393605f863345c3dc0c8bd132849 (C-1 (a)-(c) verified by the orchestrator)
+Preparing worktree (detached HEAD 2703f2c2)
+Updating files: 100% (4317/4317), done.
+HEAD is now at 2703f2c2 Merge rp12-r2-lane 189ca607 by path after READY_rp12_r2_lane f531148a (MERGEABLE; one commit M = the ARCH-V2-E-T-R2 build commit per C-1). Zero calls.
+worktree add rc=0
+C-1 (d) HEAD: 2703f2c25807393605f863345c3dc0c8bd132849
+[RP12-CONFIGS] check: OK (27 files)
+rc=0
+[RP12-CONFIGS] lane r2: experiment_configs/rp12_r2/ and experiment_results/archv2/rp12_r2/
+[RP12-CONFIGS] check: OK (27 files)
+rc=0
+git status --porcelain | wc -l -> 0
+== BACKUP 2026-10-01T09:36:54+02:00: main DBs (originals stay untouched; builds write worktree copies); E: backup 2026-09-23 file sha256 below
+52229e1ebfdda76ebaed3e461eeee80ae654dfb35ac480eb9cb9868bb0269769 *embeddings_cache.db
+390c313e5a40e0a77a79254802662152a1a01d447891d51c1bfb2bbc83d4c46b *snapshots.db
+ad66e30a0eb4abd6539c17a4edc5aad840b6f74331f009895befa6567e770577 *multicorpus_cache_v1.db
+52229e1ebfdda76ebaed3e461eeee80ae654dfb35ac480eb9cb9868bb0269769 *embeddings_cache.db
+390c313e5a40e0a77a79254802662152a1a01d447891d51c1bfb2bbc83d4c46b *snapshots.db
+ad66e30a0eb4abd6539c17a4edc5aad840b6f74331f009895befa6567e770577 *multicorpus_cache_v1.db
+embeddings_cache.db agent_ratings rows=0 sha256=e3b0c44298fc1c14
+embeddings_cache.db embeddings rows=39631 sha256=348808c8bf968013
+embeddings_cache.db gmm_vectors rows=0 sha256=e3b0c44298fc1c14
+embeddings_cache.db match_history rows=0 sha256=e3b0c44298fc1c14
+embeddings_cache.db queries rows=31986 sha256=5efabd42a268619e
+embeddings_cache.db sqlite_sequence rows=0 sha256=e3b0c44298fc1c14
+snapshots.db snapshots rows=207 sha256=424eca1bb43db2ee
+multicorpus_cache_v1.db active_reserved_pool rows=1 sha256=3c3695fc9856646c
+multicorpus_cache_v1.db ag_news rows=0 sha256=e3b0c44298fc1c14
+multicorpus_cache_v1.db arc rows=0 sha256=e3b0c44298fc1c14
+multicorpus_cache_v1.db corpus_questions rows=21606 sha256=78f2f8d922656d77
+multicorpus_cache_v1.db corpus_registry rows=6 sha256=597beebfcd09ea88
+multicorpus_cache_v1.db eval_question_link rows=0 sha256=e3b0c44298fc1c14
+multicorpus_cache_v1.db eval_results rows=388908 sha256=e45de5b3da6be217
+multicorpus_cache_v1.db eval_results_mathfix rows=23832 sha256=64cf8d0ffb6eef5e
+multicorpus_cache_v1.db mmlu_original rows=0 sha256=e3b0c44298fc1c14
+multicorpus_cache_v1.db mmlu_pro rows=0 sha256=e3b0c44298fc1c14
+multicorpus_cache_v1.db reserved_pool rows=19446 sha256=f15183afe5b63e9c
+multicorpus_cache_v1.db reserved_pool_meta rows=8 sha256=962365915a65224f
+multicorpus_cache_v1.db sqlite_sequence rows=0 sha256=e3b0c44298fc1c14
+multicorpus_cache_v1.db twenty_newsgroups rows=0 sha256=e3b0c44298fc1c14
+52229e1ebfdda76ebaed3e461eeee80ae654dfb35ac480eb9cb9868bb0269769 *.claude/worktrees/rp12-r2-run/embeddings_cache.db
+390c313e5a40e0a77a79254802662152a1a01d447891d51c1bfb2bbc83d4c46b *.claude/worktrees/rp12-r2-run/snapshots.db
+ad66e30a0eb4abd6539c17a4edc5aad840b6f74331f009895befa6567e770577 *.claude/worktrees/rp12-r2-run/multicorpus_cache_v1.db
+W1-W5 2026-10-01T09:39:17+02:00: java/python processes 0; free RAM 38 GB; no git write under src in window (operator: serial, no src edits)
+== B0-2 GUARD [before B0/bbh] 2026-10-01T09:39:17+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+== B0-2 GUARD [after B0/bbh] 2026-10-01T09:39:59+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4136512 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+[B0/bbh] [B0/bbh] end 2026-10-01T09:39:59+02:00 rc=0 wall_s=38 ; proof: [C-2a B0/bbh] COUNT 7/7 PASS; snapshot 20261001_093951_Headless_Run_Auto_ge
+W1-W5 2026-10-01T09:40:03+02:00: java/python processes 0; free RAM 38 GB; no git write under src in window (operator: serial, no src edits)
+== B0-2 GUARD [before B0/math] 2026-10-01T09:40:03+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4136512 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+== B0-2 GUARD [after B0/math] 2026-10-01T09:40:21+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4136512 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+[B0/math] [B0/math] end 2026-10-01T09:40:21+02:00 rc=0 wall_s=15 ; proof: [C-2a B0/math] COUNT 7/7 PASS; snapshot 20261001_094019_Headless_Run_Auto_ge
+W1-W5 2026-10-01T09:40:25+02:00: java/python processes 0; free RAM 38 GB; no git write under src in window (operator: serial, no src edits)
+== B0-2 GUARD [before B0/musr] 2026-10-01T09:40:25+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4136512 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+== B0-2 GUARD [after B0/musr] 2026-10-01T09:40:41+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/multicorpus_cache_v1.db-wal 90672 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4144752 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+[B0/musr] [B0/musr] end 2026-10-01T09:40:41+02:00 rc=0 wall_s=12 ; proof: [C-2a B0/musr] COUNT 7/7 PASS; snapshot 20261001_094040_Headless_Run_Auto_ge
+W1-W5 2026-10-01T09:40:46+02:00: java/python processes 0; free RAM 38 GB; no git write under src in window (operator: serial, no src edits)
+== B0-2 GUARD [before B0/ifeval] 2026-10-01T09:40:46+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/multicorpus_cache_v1.db-wal 90672 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4144752 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+== B0-2 GUARD [after B0/ifeval] 2026-10-01T09:41:01+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4144752 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+[B0/ifeval] [B0/ifeval] end 2026-10-01T09:41:01+02:00 rc=0 wall_s=12 ; proof: [C-2a B0/ifeval] COUNT 7/7 PASS; snapshot 20261001_094100_Headless_Run_Auto_ge
+W1-W5 2026-10-01T09:41:06+02:00: java/python processes 0; free RAM 38 GB; no git write under src in window (operator: serial, no src edits)
+== B0-2 GUARD [before B0/gpqa] 2026-10-01T09:41:06+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4144752 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+== B0-2 GUARD [after B0/gpqa] 2026-10-01T09:41:22+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4144752 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+[B0/gpqa] [B0/gpqa] end 2026-10-01T09:41:22+02:00 rc=0 wall_s=13 ; proof: [C-2a B0/gpqa] COUNT 7/7 PASS; snapshot 20261001_094121_Headless_Run_Auto_ge
+W1-W5 2026-10-01T09:41:27+02:00: java/python processes 0; free RAM 38 GB; no git write under src in window (operator: serial, no src edits)
+== B0-2 GUARD [before B0/mmlu_pro_lb] 2026-10-01T09:41:27+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4144752 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+== B0-2 GUARD [after B0/mmlu_pro_lb] 2026-10-01T09:43:37+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4144752 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+[B0/mmlu_pro_lb] [B0/mmlu_pro_lb] end 2026-10-01T09:43:36+02:00 rc=0 wall_s=126 ; proof: [C-2a B0/mmlu_pro_lb] COUNT 8/8 PASS; snapshot 20261001_094311_Headless_Run_Auto_ge
+== FILL B0/graft_flatleaf 2026-10-01T09:43:41+02:00: BBH=20261001_093951_Headless_Run_Auto_ge MATH=20261001_094019_Headless_Run_Auto_ge MUSR=20261001_094040_Headless_Run_Auto_ge IFEVAL=20261001_094100_Headless_Run_Auto_ge GPQA=20261001_094121_Headless_Run_Auto_ge MMLU_PRO_LB=20261001_094311_Headless_Run_Auto_ge
+[RP12-CONFIGS] lane r2: experiment_configs/rp12_r2/ and experiment_results/archv2/rp12_r2/
+[RP12-CONFIGS] wrote experiment_configs/rp12_r2/B0/graft_flatleaf.toml
+== FILL B0/graft_descent 2026-10-01T09:43:41+02:00: BBH=20261001_093951_Headless_Run_Auto_ge MATH=20261001_094019_Headless_Run_Auto_ge MUSR=20261001_094040_Headless_Run_Auto_ge IFEVAL=20261001_094100_Headless_Run_Auto_ge GPQA=20261001_094121_Headless_Run_Auto_ge MMLU_PRO_LB=20261001_094311_Headless_Run_Auto_ge
+[RP12-CONFIGS] lane r2: experiment_configs/rp12_r2/ and experiment_results/archv2/rp12_r2/
+[RP12-CONFIGS] wrote experiment_configs/rp12_r2/B0/graft_descent.toml
+== C-3 [B0] 2026-10-01T09:43:41+02:00: ConfigParsesTest in the pinned worktree; filled TOMLs: experiment_configs/rp12_r2/B0/graft_descent.toml experiment_configs/rp12_r2/B0/graft_flatleaf.toml 
+C-3 gradle rc=0; tests="9" failures="0" errors="0" timestamp="2026-10-01T07:31:29" 
+W1-W5 2026-10-01T09:43:50+02:00: java/python processes 0; free RAM 38 GB; no git write under src in window (operator: serial, no src edits)
+== B0-2 GUARD [before B0/graft_flatleaf] 2026-10-01T09:43:51+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4144752 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+== B0-2 GUARD [after B0/graft_flatleaf] 2026-10-01T09:45:21+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/multicorpus_cache_v1.db-wal 1536792 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4148872 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+[B0/graft_flatleaf] [B0/graft_flatleaf] end 2026-10-01T09:45:21+02:00 rc=0 wall_s=87 ; proof: [C-2b B0/graft_flatleaf] COUNT 5/5 PASS; snapshot 20261001_094404_Union_graft_of_6_cor
+W1-W5 2026-10-01T09:45:25+02:00: java/python processes 0; free RAM 38 GB; no git write under src in window (operator: serial, no src edits)
+== B0-2 GUARD [before B0/graft_descent] 2026-10-01T09:45:25+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/multicorpus_cache_v1.db-wal 1536792 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4148872 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+== B0-2 GUARD [after B0/graft_descent] 2026-10-01T09:47:32+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/multicorpus_cache_v1.db-wal 1545032 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4148872 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+[B0/graft_descent] [B0/graft_descent] end 2026-10-01T09:47:32+02:00 rc=0 wall_s=123 ; proof: [C-2b B0/graft_descent] COUNT 5/5 PASS; snapshot 20261001_094539_Union_graft_of_6_cor
+W1-W5 2026-10-01T09:48:11+02:00: java/python processes 0; free RAM 38 GB; no git write under src in window (operator: serial, no src edits)
+== INCIDENT C-3 2026-10-01T09:48:11+02:00: the C-3 run above was ':test FROM-CACHE' (C3.B0.txt L20; XML timestamp 07:31:29Z predates the worktree, 07:36Z): the filled graft TOMLs were NOT parsed before the B0 graft launches (24a52d7e, f274b600). C-3 breached in order. Re-run with execution forced:
+C-3 rerun (--no-build-cache --rerun-tasks) rc=0; tests="9" failures="0" errors="0" timestamp="2026-10-01T07:48:58" ; task line: > Task :testClasses
+> Task :test
+C-3 B0 discharged after the fact: test EXECUTED (> Task :test, not FROM-CACHE), walks experiment_configs/**/*.toml incl. the filled grafts; the filled TOMLs are the ones the grafts stamped (verify.py configSha256Lf == LF sha PASS); LF sha256 now: graft_descent.toml 3a7f7852783dbcbb graft_flatleaf.toml 9873e03658c11724 . Disclosed as an ORDER breach of C-3 (parse after, not before, the B0 graft launches); chain.sh c3 fixed to --no-build-cache --rerun-tasks and to refuse a FROM-CACHE test task.
+== B0-4 (c)-(f) 2026-10-01T09:49:54+02:00; tools = main at M (HEAD f274b600), run dirs = byte copies in main's rp12_r2; DBs = pinned worktree copies (WAL checkpointed TRUNCATE first)
+-rw-r--r-- 1 octav 197609 4148872 Oct  1 09:45 .claude/worktrees/rp12-r2-run/embeddings_cache.db-wal
+-rw-r--r-- 1 octav 197609 1545032 Oct  1 09:45 .claude/worktrees/rp12-r2-run/multicorpus_cache_v1.db-wal
+-rw-r--r-- 1 octav 197609       0 Oct  1 09:47 .claude/worktrees/rp12-r2-run/snapshots.db-wal
+.claude/worktrees/rp12-r2-run/embeddings_cache.db (0, 0, 0)
+.claude/worktrees/rp12-r2-run/multicorpus_cache_v1.db (0, 0, 0)
+.claude/worktrees/rp12-r2-run/snapshots.db (0, 0, 0)
+ls: cannot access '.claude/worktrees/rp12-r2-run/*.db-wal': No such file or directory
+== B0-2 GUARD [(f) after (c)-(e)] 2026-10-01T09:50:54+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+(f) main DBs:
+52229e1ebfdda76ebaed3e461eeee80ae654dfb35ac480eb9cb9868bb0269769 *embeddings_cache.db
+390c313e5a40e0a77a79254802662152a1a01d447891d51c1bfb2bbc83d4c46b *snapshots.db
+ad66e30a0eb4abd6539c17a4edc5aad840b6f74331f009895befa6567e770577 *multicorpus_cache_v1.db
+(f) worktree copies (per table):
+embeddings_cache.db agent_ratings rows=0 sha256=e3b0c44298fc1c14
+embeddings_cache.db embeddings rows=39631 sha256=348808c8bf968013
+embeddings_cache.db gmm_vectors rows=0 sha256=e3b0c44298fc1c14
+embeddings_cache.db match_history rows=0 sha256=e3b0c44298fc1c14
+embeddings_cache.db queries rows=33150 sha256=f02581a7bb381016
+embeddings_cache.db sqlite_sequence rows=0 sha256=e3b0c44298fc1c14
+multicorpus_cache_v1.db active_reserved_pool rows=1 sha256=3c3695fc9856646c
+multicorpus_cache_v1.db ag_news rows=0 sha256=e3b0c44298fc1c14
+multicorpus_cache_v1.db arc rows=0 sha256=e3b0c44298fc1c14
+multicorpus_cache_v1.db corpus_questions rows=21606 sha256=78f2f8d922656d77
+multicorpus_cache_v1.db corpus_registry rows=6 sha256=597beebfcd09ea88
+multicorpus_cache_v1.db eval_question_link rows=0 sha256=e3b0c44298fc1c14
+multicorpus_cache_v1.db eval_results rows=388908 sha256=e45de5b3da6be217
+multicorpus_cache_v1.db eval_results_mathfix rows=23832 sha256=64cf8d0ffb6eef5e
+multicorpus_cache_v1.db mmlu_original rows=0 sha256=e3b0c44298fc1c14
+multicorpus_cache_v1.db mmlu_pro rows=0 sha256=e3b0c44298fc1c14
+multicorpus_cache_v1.db reserved_pool rows=36690 sha256=91c1ea22833cf8bd
+multicorpus_cache_v1.db reserved_pool_meta rows=15 sha256=64a59d45e62b34e6
+multicorpus_cache_v1.db sqlite_sequence rows=0 sha256=e3b0c44298fc1c14
+multicorpus_cache_v1.db twenty_newsgroups rows=0 sha256=e3b0c44298fc1c14
+snapshots.db snapshots rows=215 sha256=b1fda3010019c619
+B0-4 COUNT: (a) 6/6 members (5x 7/7 + mmlu_pro_lb 8/8 incl. [OPERATOR-CENSUS] 7228 -> 6993 -> 6992 items / 6799 components); (b) 2/2 grafts 5/5 (C-3: ORDER breach, parsed after launch, test executed and passed 9/0/0 — see INCIDENT C-3 above); (c) EVAL 14/GATE 5/TRAIN 15 + 34 key lines + DENOMINATORS 6139/5628 (before 6153/5642) 0.2275% + json n_eval 6139/6153/5642, 14/5/15 + <no-routing-row> EVAL 0 (scratch --g14-tree-cells, moved to scratchpad); (d) 6139 x2, same set True, EVAL 14 + GATE 5 identical lists, no statistic; (e) pointer experiment_configs/rp12_r2/objects_of_record.json written once, 8 entries, sha256 6f6e40b2...; (f) see guard + hashes above
+W1-W5 2026-10-01T09:51:39+02:00: java/python processes 0; free RAM 38 GB; no git write under src in window (operator: serial, no src edits)
+== B0-2 GUARD [before B0p/bbh] 2026-10-01T09:51:39+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+== B0-2 GUARD [after B0p/bbh] 2026-10-01T09:52:16+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4148872 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+[B0p/bbh] [B0p/bbh] end 2026-10-01T09:52:16+02:00 rc=0 wall_s=33 ; proof: [C-2a B0p/bbh] COUNT 7/7 PASS; snapshot 20261001_095208_Headless_Run_Auto_ge
+W1-W5 2026-10-01T09:52:20+02:00: java/python processes 0; free RAM 38 GB; no git write under src in window (operator: serial, no src edits)
+== B0-2 GUARD [before B0p/math] 2026-10-01T09:52:20+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4148872 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+== B0-2 GUARD [after B0p/math] 2026-10-01T09:52:38+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/multicorpus_cache_v1.db-wal 8272 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4148872 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+[B0p/math] [B0p/math] end 2026-10-01T09:52:38+02:00 rc=0 wall_s=14 ; proof: [C-2a B0p/math] COUNT 7/7 PASS; snapshot 20261001_095236_Headless_Run_Auto_ge
+W1-W5 2026-10-01T09:52:42+02:00: java/python processes 0; free RAM 38 GB; no git write under src in window (operator: serial, no src edits)
+== B0-2 GUARD [before B0p/musr] 2026-10-01T09:52:42+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/multicorpus_cache_v1.db-wal 8272 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4148872 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+== B0-2 GUARD [after B0p/musr] 2026-10-01T09:52:59+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/multicorpus_cache_v1.db-wal 16512 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4148872 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+[B0p/musr] [B0p/musr] end 2026-10-01T09:52:59+02:00 rc=0 wall_s=13 ; proof: [C-2a B0p/musr] COUNT 7/7 PASS; snapshot 20261001_095257_Headless_Run_Auto_ge
+W1-W5 2026-10-01T09:53:03+02:00: java/python processes 0; free RAM 38 GB; no git write under src in window (operator: serial, no src edits)
+== B0-2 GUARD [before B0p/ifeval] 2026-10-01T09:53:03+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/multicorpus_cache_v1.db-wal 16512 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4148872 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+== B0-2 GUARD [after B0p/ifeval] 2026-10-01T09:53:19+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4148872 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+[B0p/ifeval] [B0p/ifeval] end 2026-10-01T09:53:19+02:00 rc=0 wall_s=12 ; proof: [C-2a B0p/ifeval] COUNT 7/7 PASS; snapshot 20261001_095317_Headless_Run_Auto_ge
+W1-W5 2026-10-01T09:53:23+02:00: java/python processes 0; free RAM 38 GB; no git write under src in window (operator: serial, no src edits)
+== B0-2 GUARD [before B0p/gpqa] 2026-10-01T09:53:23+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4148872 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+== B0-2 GUARD [after B0p/gpqa] 2026-10-01T09:53:40+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4148872 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+[B0p/gpqa] [B0p/gpqa] end 2026-10-01T09:53:40+02:00 rc=0 wall_s=13 ; proof: [C-2a B0p/gpqa] COUNT 7/7 PASS; snapshot 20261001_095338_Headless_Run_Auto_ge
+W1-W5 2026-10-01T09:53:44+02:00: java/python processes 0; free RAM 38 GB; no git write under src in window (operator: serial, no src edits)
+== B0-2 GUARD [before B0p/mmlu_pro_lb] 2026-10-01T09:53:44+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4148872 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+== B0-2 GUARD [after B0p/mmlu_pro_lb] 2026-10-01T09:55:56+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4148872 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+[B0p/mmlu_pro_lb] [B0p/mmlu_pro_lb] end 2026-10-01T09:55:55+02:00 rc=0 wall_s=128 ; proof: [C-2a B0p/mmlu_pro_lb] COUNT 8/8 PASS; snapshot 20261001_095529_Headless_Run_Auto_ge
+== FILL B0p/graft_flatleaf 2026-10-01T09:56:00+02:00: BBH=20261001_095208_Headless_Run_Auto_ge MATH=20261001_095236_Headless_Run_Auto_ge MUSR=20261001_095257_Headless_Run_Auto_ge IFEVAL=20261001_095317_Headless_Run_Auto_ge GPQA=20261001_095338_Headless_Run_Auto_ge MMLU_PRO_LB=20261001_095529_Headless_Run_Auto_ge
+[RP12-CONFIGS] lane r2: experiment_configs/rp12_r2/ and experiment_results/archv2/rp12_r2/
+[RP12-CONFIGS] wrote experiment_configs/rp12_r2/B0p/graft_flatleaf.toml
+== C-3 [B0p] 2026-10-01T09:56:00+02:00: ConfigParsesTest in the pinned worktree; filled TOMLs: experiment_configs/rp12_r2/B0/graft_descent.toml experiment_configs/rp12_r2/B0/graft_flatleaf.toml experiment_configs/rp12_r2/B0p/graft_flatleaf.toml 
+C-3 gradle rc=0; tests="9" failures="0" errors="0" timestamp="2026-10-01T07:56:46" 
+W1-W5 2026-10-01T09:56:48+02:00: java/python processes 2; free RAM 36 GB; no git write under src in window (operator: serial, no src edits)
+W1-W5 BREACH
+== W1-W5 breach at 09:56:48 = 2 java processes, the operator's own C-3 gradle test JVMs still exiting (single-use daemon + test worker); at 2026-10-01T09:57:13+02:00 tasklist shows 0 java/python; chain resumed (same command)
+W1-W5 2026-10-01T09:57:13+02:00: java/python processes 0; free RAM 38 GB; no git write under src in window (operator: serial, no src edits)
+== B0-2 GUARD [before B0p/graft_flatleaf] 2026-10-01T09:57:13+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4148872 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+== B0-2 GUARD [after B0p/graft_flatleaf] 2026-10-01T09:58:45+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/multicorpus_cache_v1.db-wal 8272 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4148872 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+[B0p/graft_flatleaf] [B0p/graft_flatleaf] end 2026-10-01T09:58:45+02:00 rc=0 wall_s=88 ; proof: [C-2b B0p/graft_flatleaf] COUNT 5/5 PASS; snapshot 20261001_095727_Union_graft_of_6_cor
+W1-W5 2026-10-01T09:58:50+02:00: java/python processes 0; free RAM 38 GB; no git write under src in window (operator: serial, no src edits)
+== B0-2 GUARD [before o1/bbh] 2026-10-01T09:58:50+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/multicorpus_cache_v1.db-wal 8272 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4148872 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+== B0-2 GUARD [after o1/bbh] 2026-10-01T09:59:25+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4148872 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+[o1/bbh] [o1/bbh] end 2026-10-01T09:59:25+02:00 rc=0 wall_s=32 ; proof: [C-2a o1/bbh] COUNT 7/7 PASS; snapshot 20261001_095917_Headless_Run_Auto_ge
+W1-W5 2026-10-01T09:59:29+02:00: java/python processes 0; free RAM 38 GB; no git write under src in window (operator: serial, no src edits)
+== B0-2 GUARD [before o1/math] 2026-10-01T09:59:29+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4148872 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+== B0-2 GUARD [after o1/math] 2026-10-01T09:59:46+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4152992 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+[o1/math] [o1/math] end 2026-10-01T09:59:46+02:00 rc=0 wall_s=14 ; proof: [C-2a o1/math] COUNT 7/7 PASS; snapshot 20261001_095944_Headless_Run_Auto_ge
+W1-W5 2026-10-01T09:59:50+02:00: java/python processes 0; free RAM 38 GB; no git write under src in window (operator: serial, no src edits)
+== B0-2 GUARD [before o1/musr] 2026-10-01T09:59:50+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4152992 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+== B0-2 GUARD [after o1/musr] 2026-10-01T10:00:06+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4152992 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+[o1/musr] [o1/musr] end 2026-10-01T10:00:06+02:00 rc=0 wall_s=13 ; proof: [C-2a o1/musr] COUNT 7/7 PASS; snapshot 20261001_100005_Headless_Run_Auto_ge
+W1-W5 2026-10-01T10:00:11+02:00: java/python processes 0; free RAM 38 GB; no git write under src in window (operator: serial, no src edits)
+== B0-2 GUARD [before o1/ifeval] 2026-10-01T10:00:11+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4152992 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+== B0-2 GUARD [after o1/ifeval] 2026-10-01T10:00:27+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4152992 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+[o1/ifeval] [o1/ifeval] end 2026-10-01T10:00:27+02:00 rc=0 wall_s=13 ; proof: [C-2a o1/ifeval] COUNT 7/7 PASS; snapshot 20261001_100025_Headless_Run_Auto_ge
+W1-W5 2026-10-01T10:00:31+02:00: java/python processes 0; free RAM 37 GB; no git write under src in window (operator: serial, no src edits)
+== B0-2 GUARD [before o1/gpqa] 2026-10-01T10:00:31+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4152992 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+== B0-2 GUARD [after o1/gpqa] 2026-10-01T10:00:47+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4152992 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+[o1/gpqa] [o1/gpqa] end 2026-10-01T10:00:47+02:00 rc=0 wall_s=12 ; proof: [C-2a o1/gpqa] COUNT 7/7 PASS; snapshot 20261001_100046_Headless_Run_Auto_ge
+W1-W5 2026-10-01T10:00:52+02:00: java/python processes 0; free RAM 38 GB; no git write under src in window (operator: serial, no src edits)
+== B0-2 GUARD [before o1/mmlu_pro_lb] 2026-10-01T10:00:52+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4152992 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+== B0-2 GUARD [after o1/mmlu_pro_lb] 2026-10-01T10:03:01+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4152992 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+[o1/mmlu_pro_lb] [o1/mmlu_pro_lb] end 2026-10-01T10:03:01+02:00 rc=0 wall_s=126 ; proof: [C-2a o1/mmlu_pro_lb] COUNT 8/8 PASS; snapshot 20261001_100237_Headless_Run_Auto_ge
+W1-W5 2026-10-01T10:03:06+02:00: java/python processes 0; free RAM 38 GB; no git write under src in window (operator: serial, no src edits)
+== B0-2 GUARD [before o2/bbh] 2026-10-01T10:03:06+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4152992 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+== B0-2 GUARD [after o2/bbh] 2026-10-01T10:03:42+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4152992 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+[o2/bbh] [o2/bbh] end 2026-10-01T10:03:42+02:00 rc=0 wall_s=33 ; proof: [C-2a o2/bbh] COUNT 7/7 PASS; snapshot 20261001_100334_Headless_Run_Auto_ge
+W1-W5 2026-10-01T10:03:46+02:00: java/python processes 0; free RAM 38 GB; no git write under src in window (operator: serial, no src edits)
+== B0-2 GUARD [before o2/math] 2026-10-01T10:03:46+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4152992 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+== B0-2 GUARD [after o2/math] 2026-10-01T10:04:04+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4152992 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+[o2/math] [o2/math] end 2026-10-01T10:04:04+02:00 rc=0 wall_s=14 ; proof: [C-2a o2/math] COUNT 7/7 PASS; snapshot 20261001_100402_Headless_Run_Auto_ge
+W1-W5 2026-10-01T10:04:08+02:00: java/python processes 0; free RAM 38 GB; no git write under src in window (operator: serial, no src edits)
+== B0-2 GUARD [before o2/musr] 2026-10-01T10:04:08+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4152992 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+== B0-2 GUARD [after o2/musr] 2026-10-01T10:04:25+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/multicorpus_cache_v1.db-wal 8272 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4152992 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+[o2/musr] [o2/musr] end 2026-10-01T10:04:24+02:00 rc=0 wall_s=12 ; proof: [C-2a o2/musr] COUNT 7/7 PASS; snapshot 20261001_100423_Headless_Run_Auto_ge
+W1-W5 2026-10-01T10:04:29+02:00: java/python processes 0; free RAM 38 GB; no git write under src in window (operator: serial, no src edits)
+== B0-2 GUARD [before o2/ifeval] 2026-10-01T10:04:29+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/multicorpus_cache_v1.db-wal 8272 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4152992 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+== B0-2 GUARD [after o2/ifeval] 2026-10-01T10:04:44+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4152992 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+[o2/ifeval] [o2/ifeval] end 2026-10-01T10:04:44+02:00 rc=0 wall_s=12 ; proof: [C-2a o2/ifeval] COUNT 7/7 PASS; snapshot 20261001_100443_Headless_Run_Auto_ge
+W1-W5 2026-10-01T10:04:49+02:00: java/python processes 0; free RAM 38 GB; no git write under src in window (operator: serial, no src edits)
+== B0-2 GUARD [before o2/gpqa] 2026-10-01T10:04:49+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4152992 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+== B0-2 GUARD [after o2/gpqa] 2026-10-01T10:05:05+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4152992 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+[o2/gpqa] [o2/gpqa] end 2026-10-01T10:05:05+02:00 rc=0 wall_s=13 ; proof: [C-2a o2/gpqa] COUNT 7/7 PASS; snapshot 20261001_100503_Headless_Run_Auto_ge
+W1-W5 2026-10-01T10:05:09+02:00: java/python processes 0; free RAM 37 GB; no git write under src in window (operator: serial, no src edits)
+== B0-2 GUARD [before o2/mmlu_pro_lb] 2026-10-01T10:05:09+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4152992 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+== B0-2 GUARD [after o2/mmlu_pro_lb] 2026-10-01T10:07:19+02:00
+[UNION-POOL] pool pv2_1575de61bb20e977 recomputed from the side export (5642 EVAL components with a member in mc6-2026-09-11); expected pv2_1575de61bb20e977
+[UNION-POOL] S3 row bijection: 21606 engine rows == 21606 corpus_v2 source_rows (corpus_questions), item per row equal
+[UNION-POOL] ids: eval 6466, gate 2156, reserved 8622, train 12984; rows 21606; global reserved items (all corpora) 8186
+[UNION-POOL]   BBH        namespace  1000000: EVAL 1720, GATE 566, TRAIN 3475
+[UNION-POOL]   GPQA       namespace  5000000: EVAL 352, GATE 124, TRAIN 716
+[UNION-POOL]   IFEVAL     namespace  4000000: EVAL 162, GATE 54, TRAIN 325
+[UNION-POOL]   MATH       namespace  2000000: EVAL 404, GATE 134, TRAIN 786
+[UNION-POOL]   MMLU_PRO   namespace        0: EVAL 3599, GATE 1205, TRAIN 7228
+[UNION-POOL]   MUSR       namespace  3000000: EVAL 229, GATE 73, TRAIN 454
+[UNION-POOL] DRY RUN: every check passed; nothing written (would write Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\engine_pool_pv2_1575de61bb20e977.json)
+v2_union_pool --dry-run rc=0
+pool file sha256 (main, LF): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+pool file sha256 (worktree, LF rendering): 79d48f4b36434a551d3e706618a6a5e0cad9b0174d8e711bfeeb27f601b0f5a6 *-
+multicorpus_cache_v1.db-wal 0 bytes
+embeddings_cache.db-wal 0 bytes
+snapshots.db-wal 0 bytes
+.claude/worktrees/rp12-r2-run/embeddings_cache.db-wal 4152992 bytes
+.claude/worktrees/rp12-r2-run/snapshots.db-wal 0 bytes
+(no line above = sidecar absent)
+[o2/mmlu_pro_lb] [o2/mmlu_pro_lb] end 2026-10-01T10:07:19+02:00 rc=0 wall_s=126 ; proof: [C-2a o2/mmlu_pro_lb] COUNT 8/8 PASS; snapshot 20261001_100654_Headless_Run_Auto_ge
+C-1 (e): 27/27 manifests commit=M dirty_src=false
+== G10 R2 run 2026-10-01T10:08:23+02:00: readouts/g10_r2.txt; 'G10: HELD' rc=0; STOP (no other readout run, per brief). gradlew --stop: no daemons.

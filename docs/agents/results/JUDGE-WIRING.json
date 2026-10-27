@@ -1,0 +1,133 @@
+{
+  "id": "JUDGE-WIRING",
+  "title": "JUDGE-WIRING: FRAMEWORK item 25: does the Kotlin production path, posting the STACK-v2 recipe to grok, reproduce the Python cache of record on identical matches? (600 matches, 1,200 calls)",
+  "question": "Every judged result of record since STACK-v2 was produced by the Python scripts while the Kotlin arena still judged with Mistral on the v1 prompt. Does the production path, switched to the deployed judge and recipe, reproduce the Python cache on identical matches: |delta| <= 1.9pp under both tie conventions on the key-decidable paired subset? Consequence on FAIL: no mixed-judge board until a whole-board re-judge.",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "b9dbf05",
+    "program_lines": "docs/judge_v2_program.md (lines as of 5dc8a06) L4021-L4114 (JUDGE-WIRING implementation record: what landed, what is verified at zero calls, the REGISTERED paired run, criterion, prediction, procedure); by reference L3603 / FRAMEWORK L381 item 25; set of record in plan Amendment 2 (docs/plan_2026-09-15.md L136-L145)",
+    "date": "2026-09-16",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## JUDGE-WIRING implementation record (2026-09-16, zero calls) — FRAMEWORK item 25: the Kotlin production path now posts STACK-v2 byte-identically to the Python cache of record; the 600-match paired run is registered her",
+    "outcome_heading": [
+      "L4021: ## JUDGE-WIRING implementation record (2026-09-16, zero calls) — FRAMEWORK item 25: the Kotlin production path now posts STACK-v2 byte-identically to the Python cache of record; the 600-match paired run is registered her",
+      "L4153: ## JUDGE-WIRING (2026-09-16, 1,200 calls) — FRAMEWORK item 25: FAIL as registered under convention B; the bytes are identical, the verdicts are not; no mixed-judge board until a whole-board re-judge"
+    ]
+  },
+  "script": {
+    "path": "tools/analysis/judge_wiring.py (with JudgeWiringHarness, gradlew judgeWiring; Kotlin StackV2JudgeRecipe / PythonJson / AzureInferenceJudgeClient / StackV2Kit)",
+    "sha16": "2ae7c84d9f2685a6",
+    "commit": "b9dbf05 (later edited at c0f5ff7 / 706b381)"
+  },
+  "ready": null,
+  "go": "plan Amendment 2 (2026-09-16, before the first call): set of record hash ae92da306544f453 registered in judge_wiring.SET_HASH_OF_RECORD; budget 1,200 calls (pilot 12 first); under the 4,000-match rule",
+  "run": {
+    "outcome_file": "experiment_results/judge_wiring/judge_wiring_outcome.txt",
+    "outcome_commit": "c0f5ff7",
+    "calls": 1200,
+    "cce": "not stated in the programme",
+    "pool": "p2dca21ab5f4ef3ae (all 600 set matches inside it by construction)",
+    "date": "2026-09-16",
+    "other_files": [
+      "experiment_results/judge_wiring/judge_wiring_set.json, payload_shas_python.csv, payload_shas_kotlin.csv (c0f5ff7)",
+      "experiment_results/judge_wiring/kotlin_ae92da306544f453.db (gitignored)",
+      "experiment_results/judge_wiring/stack_v2_kit.db (kit hash 4ac924b4...)"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the zero-call preconditions (kit hash; Python-vs-Kotlin payload shas 600/600 byte-identical both orders; parse replay of 1,974 cached matches with 0 disagreements; the reviewer's CR correction by insertion at L4080-L4083) are the check of record; the consequence was discharged by JUDGE-WIRING-BOARD",
+    "commit": "c0f5ff7",
+    "verdict": "FAIL as registered under convention B; A inside; bytes identical; prediction FAILED; consequence discharged 2026-09-16 (JUDGE-WIRING-BOARD: inside 1.9pp under both conventions on 4,495 key-decidable)"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "|delta| <= 1.9pp under convention A (TIE / INVALID / non-terminated wrong) AND B (committed verdicts only), delta = Kotlin - Python on the key-decidable paired subset, question-clustered bootstrap (B = 2,000), McNemar discordants",
+      "result": "FAILED",
+      "value": "A: Kotlin 0.837 vs Python 0.848, -1.1pp [-3.2, +0.7], McNemar 3:6 p 0.51 -> inside; B: 0.888 (n 260) vs 0.914 (n 256), -2.6pp [-4.7, -0.6] -> OUTSIDE; on the 251 matches where BOTH committed discordance 0:2 (p 0.50); REGISTERED: FAIL [CONSEQUENCE DISCHARGED 2026-09-16 by JUDGE-WIRING-BOARD: +0.4pp (A) / +0.2pp (B) on 4,495 key-decidable, inside under both; the 600-set FAIL stands as a denominator effect at n = 276]",
+      "denominator": "276 key-decidable paired matches of the 600-match set ae92da306544f453"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "PASS; expected |delta| < 1pp (the payloads are the same bytes; only provider nondeterminism separates the arms)",
+      "result": "FAILED",
+      "value": "B -2.6pp outside the bar; A -1.1pp",
+      "denominator": "276 key-decidable"
+    }
+  ],
+  "falsifier": {
+    "text": "the criterion itself (registered by reference); consequence on FAIL: no mixed-judge board until a whole-board re-judge through the Kotlin path",
+    "fired": true,
+    "note": "FAIL as registered; the consequence priced the whole-board re-judge (~18,300 calls, above the 4,000-match rule) and was discharged by JUDGE-WIRING-BOARD under plan Amendment 3"
+  },
+  "numbers_of_record": {
+    "set": "600 matches (300 contested + 300 cross-tier from the 1,974 RECIPE-GROK matches, seed 42, Meta-Llama-3-70B-Instruct excluded), hash ae92da306544f453",
+    "preconditions": "kit hash 4ac924b4...; Python vs Kotlin shas 600/600 byte-identical (both orders); parse replay of 1,974 cached matches 0 disagreements; shas over all 1,974 RECIPE-GROK matches 1,974/1,974 x 2 orders byte-identical",
+    "run": "1,200 calls, finish_reason stop 1,199 / length 1, invalid Kotlin 2 vs Python 0; posted-byte sha equality 600/600; 600 of 600 paired",
+    "convention_A": "0.837 vs 0.848, -1.1pp [-3.2, +0.7], McNemar 3:6 p 0.51",
+    "convention_B": "0.888 (n 260) vs 0.914 (n 256), -2.6pp [-4.7, -0.6]; both-committed 251, discordance 0:2 (p 0.50)",
+    "rates": "raw 3-way agreement 0.888; ties 0.274 vs 0.273; flips 0.206 vs 0.204",
+    "reading": "same bytes, so the gap is provider nondeterminism plus the tie convention; B's delta is carried by WHICH matches each arm committed on (260 vs 256), not by disagreement on shared commitments (2 of 251): the DECOMP floor (0.057) as a denominator effect"
+  },
+  "sentence_of_record": "JUDGE-WIRING (2026-09-16, 1,200 calls): FRAMEWORK item 25: FAIL as registered under convention B; the bytes are identical, the verdicts are not; no mixed-judge board until a whole-board re-judge. On the 276 key-decidable paired matches convention A Kotlin 0.837 vs Python 0.848, -1.1pp [-3.2, +0.7] (inside the 1.9pp bar); convention B 0.888 vs 0.914, -2.6pp [-4.7, -0.6] (outside); on the 251 matches where both arms committed the discordance is 0:2. The two arms received the same bytes, so the gap is provider nondeterminism plus the tie convention (the DECOMP floor showing up as a denominator effect under B); it does not license a PASS and it prices the whole-board re-judge the consequence names. [CONSEQUENCE DISCHARGED 2026-09-16 by JUDGE-WIRING-BOARD: on 4,495 key-decidable matches the arms agree within +0.4pp (A) and +0.2pp (B), inside the bar under both conventions; the FAIL on this 600-set stands as registered and reads as a denominator effect at n = 276.]",
+  "chips": [
+    "FAIL AS REGISTERED (B -2.6pp)",
+    "A -1.1pp INSIDE",
+    "BYTES IDENTICAL 600/600",
+    "PREDICTION FAILED"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-16",
+      "by": "the reviewer, correction by insertion in the implementation record (programme L4080-L4083, b9dbf05)",
+      "text": "the parenthetical 'this includes the eval row that carries a \\r' is wrong; the reviewer found no CR in any RECIPE-GROK row, so the 1,974-match sha check exercised no \\r case on the real record; the \\r path is covered only by the synthetic match in StackV2AssemblyGoldenTest; the 1,974/1,974 x 2 count stands."
+    },
+    {
+      "date": "2026-09-16",
+      "by": "JUDGE-WIRING-BOARD (ledger v108 observed cell, b8be7e4; programme L4249-L4255)",
+      "text": "CONSEQUENCE DISCHARGED: the whole-board re-judge through the Kotlin path ran; on 4,495 key-decidable matches the arms agree within +0.4pp (A) and +0.2pp (B), inside the bar under both conventions; the FAIL on this 600-set stands as registered and reads as a denominator effect at n = 276."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: fixture pointer (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM pointer 2026-09-27: ENGINEERING FIXTURE use (voice 4 of the ruling): the code-reproduction / byte-identity verdict stands as a fixture; the judged agreement numbers on its family caches are p2dca judged family — history, not evidence (RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a PASS (the criterion was registered for both conventions)",
+    "that the two paths are different instruments (JUDGE-WIRING-BOARD: the same instrument within the DECOMP floor at whole-board scale)"
+  ],
+  "ledger": {
+    "row_id": "JUDGE-WIRING",
+    "version": "v108 (row added v106 at fd21fec; consequence-discharged bracket v108 at b8be7e4); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "RECIPE-GROK",
+    "DECOMP",
+    "CANARY-BASELINE",
+    "GROK-CALIB"
+  ],
+  "supersedes": null,
+  "superseded_by": "JUDGE-WIRING-BOARD (the consequence discharged; the Kotlin cache is the board of record)",
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md (lines as of 5dc8a06) L4021-L4114 (implementation record and registration b9dbf05): what landed, zero-call verification, the registered set and protocol, criterion, prediction, procedure; FRAMEWORK L381 item 25; docs/plan_2026-09-15.md Amendment 2 (45b4557 lineage; L136-L145)",
+    "docs/judge_v2_program.md (lines as of 5dc8a06) L4153-L4177 (outcome section c0f5ff7): set, preconditions, run, result, prediction, consequence, reading",
+    "experiment_results/judge_wiring/judge_wiring_outcome.txt, judge_wiring_set.json, payload_shas_{python,kotlin}.csv (c0f5ff7)",
+    "docs/test_ledger.html row JUDGE-WIRING (v106 fd21fec; bracketed v108): chips verbatim, observed-cell bracket, evidence (judge_wiring.py, JudgeWiringHarness, outcome, set, shas, kotlin_ae92da306544f453.db, b9dbf05, c0f5ff7)",
+    "script sha16 = sha256 of tools/analysis/judge_wiring.py at b9dbf05, first 16 hex (identity, computed by the registrar 2026-09-22; later edited at c0f5ff7 / 706b381)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' lines (grep -n them regardless of line drift); line numbers are as of programme HEAD 5dc8a06",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "Engineering/infrastructure",
+    "what": "Re-judges 600 matches through the production Kotlin arena, now wired to the newer judge and prompt recipe. It compares the verdicts with the Python research scripts on identical inputs (1,200 calls).",
+    "why": "Every judged result since the new judge recipe came from Python scripts, so the production path had to be shown to give the same verdicts.",
+    "information": "A pass would allow mixing results from both paths. A fail means only a whole-board re-judge can be trusted. Result: done; FAIL as registered under one of the two tie-counting rules (-2.6 points, outside the 1.9-point bar). Under the other rule it was within the bar. Both paths sent identical bytes, so the gap is the provider's own randomness plus how ties are counted. A later whole-board re-judge found the two paths act as the same instrument within the judge's known noise floor.",
+    "written": "2026-10-07"
+  }
+}

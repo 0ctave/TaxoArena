@@ -1,0 +1,129 @@
+{
+  "id": "RECIPE-GROK",
+  "title": "RECIPE-GROK: does the STACK-v2 recipe carry over to a second judge family, or was the gain Mistral-specific? (3,956 calls)",
+  "question": "grok-4-1-fast-non-reasoning as judge with the same reference, v2 mechanics and anchor rubric on R3's 1,980 matches; comparator R3's cached grok verdicts (v1 cell rubric, no reference: 0.743 all, 0.568 top cluster); all-decidable gain > 0 at p < 0.05 AND top cluster > 0.568 + 5pp; prediction 0.84 / 0.66.",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "4320056",
+    "program_lines": "docs/judge_v2_program.md L342-L379 (registration bullet) and L380 ff. (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "- **RECIPE-GROK — the STACK-v2 recipe on a second judge family**: grok-4-1-fast-non-reasoning as the ...",
+    "outcome_heading": [
+      "L380: - **RECIPE-GROK (2026-09-10 15:00): PASS on both registered criteria — the recipe, not the judge model, carries ...**"
+    ],
+    "date": "2026-09-10"
+  },
+  "script": {
+    "path": "tools/analysis/stack_judge.py --prompt v2 --judge grok",
+    "sha16": "e9ec2996385aafd8 (at 55a24c7, the script's first commit; the --judge grok flag landed at 4320056)",
+    "commit": "4320056 (later 4cb39ac and others)"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (1,980 matches, 3,956 calls at 8 workers)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/recipe_grok_outcome.txt",
+    "outcome_commit": "3a3368f",
+    "calls": 3956,
+    "cce": "not stated",
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-10",
+    "other_files": [
+      "experiment_results/x12_crossdomain/stack_v2_promptv2_grok.db (the cache: the grok R3 draw JUDGE-SWAP, JUDGE-TRANSFER and REF-CHECKLIST read)",
+      "recipe_grok.log"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); JUDGE-BY-CELL (2026-09-19, docs/reviews/2026-09-18_night_batch.md f1cd406) confirmed the aggregate sentence at the cell level and bracketed this row (v115)",
+    "commit": "f1cd406",
+    "verdict": "PASS (+12.0pp, p < 0.0001); confirmed at the cell level by JUDGE-BY-CELL"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "all-decidable gain > 0 at p < 0.05 AND top cluster > 0.568 + 5pp",
+      "result": "HELD",
+      "value": "1,974 judged (0 invalid), 944 decidable: recipe 0.864 vs cached grok v1 0.744 (146:32, p < 0.0001); top cluster 0.722 vs 0.568 (+15.4pp, bar 0.618); ties 7.0%; board gemini > iask > arx > gpt-4o (1 violation) = STACK-v2's board",
+      "denominator": "944 key-decidable R3 pairs"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "0.84 / 0.66",
+      "result": "HELD",
+      "value": "0.864 / 0.722",
+      "denominator": "944"
+    }
+  ],
+  "falsifier": {
+    "text": "none beyond the criteria",
+    "fired": false,
+    "note": "Mistral 0.865 / 0.699 vs grok 0.864 / 0.722 under the same recipe: the judge model's identity is nearly irrelevant once the reference and mechanics are shared (-> JUDGE-SWAP decision) [JUDGE-BY-CELL 2026-09-19: confirmed at the cell level; the judge model is ~3% of the committed verdict; judge routing by cell CLOSED]"
+  },
+  "numbers_of_record": {
+    "recipe_vs_v1": "0.864 vs 0.744 (146:32); top cluster 0.722 vs 0.568 (+15.4pp)",
+    "vs_mistral": "0.865 / 0.699 (Mistral) vs 0.864 / 0.722 (grok)",
+    "board": "gemini > iask > arx > gpt-4o, 1 violation",
+    "cell_level_JUDGE-BY-CELL": "per-anchor |M - grok| <= 3.2pp under A with every CI including 0; same-judge floor 2.3pp; committed verdicts follow the reference-agreeing side ~97%"
+  },
+  "sentence_of_record": "RECIPE-GROK (2026-09-10, 3,956 calls): PASS on both registered criteria: the recipe, not the judge model, carries the gain: 944 decidable, recipe 0.864 vs cached grok v1 0.744 (146:32, p < 0.0001); top cluster 0.722 vs 0.568 (+15.4pp); ties 7.0%; the same board as STACK-v2's; Mistral 0.865 / 0.699 vs grok 0.864 / 0.722 under the same recipe: the judge model's identity is nearly irrelevant once the reference and mechanics are shared. [CORRECTED 2026-09-19 by JUDGE-BY-CELL: confirmed at the cell level on the x12 MAIN schedule (9,123 common matches, 4,495 kd, three STACK-v2 draws): per-anchor |M - grok| <= 3.2pp under A with every CI including 0, same-judge floor 2.3pp; committed verdicts follow the reference-agreeing side ~97% of the time, so the judge model is ~3% of the committed verdict under this recipe; judge routing by cell CLOSED at zero calls for this one cross-family pair on the 7 scored anchors (7 UNDETERMINED).]",
+  "chips": [
+    "PASS (+12.0pp, p<0.0001)"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-19",
+      "by": "JUDGE-BY-CELL (ledger v115 observed cell [CORRECTED 2026-09-19 by JUDGE-BY-CELL]; record docs/agents/results/JUDGE-BY-CELL.json)",
+      "text": "confirmed at the cell level on the x12 MAIN schedule (9,123 common matches, 4,495 kd, three STACK-v2 draws: Mistral, grok Python, grok Kotlin): per-anchor |M - grok| differences <= 3.2pp under A with every CI including 0 (the max at History, an UNDETERMINED cell; Law -1.8pp [-4.0, -0.4] under B on both draws, inside the 5.7pp bar), same-judge floor 2.3pp; committed verdicts follow the reference-agreeing side ~97% of the time, so the judge model is ~3% of the committed verdict; judge routing by cell CLOSED at zero calls for this one cross-family pair on the 7 scored anchors (7 UNDETERMINED)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "CORRECTIONS_2026-09-23 (registrar)",
+      "text": "[CORRECTED 2026-09-23 by the registrar: run-time script version NOT RECORDED and not recoverable. script.sha16 e9ec2996385aafd8 is the LF sha256 of tools/analysis/stack_judge.py at 55a24c7, the script's FIRST commit, and is an identity only. The --judge grok path did not exist before 4320056 (2026-09-10 13:54:16, sha16 92629873df81ec14), so the run is at or after it; the next commit 1802c51 (14:22:17, sha16 98c77d260f9e5ac1) added the RECIPE-GROK analysis path and precedes the cache's last write (stack_v2_promptv2_grok.db, mtime 2026-09-10 14:56) and the 15:00 outcome. stack_judge.py writes no meta table and no script sha, and the outcome file prints none, so which of those two blobs (or an uncommitted intermediate) posted the verdicts is UNDETERMINED and no further evidence exists in the record.] [Added on the coordinator's ruling, 2026-09-23: this is a FIXED DEFECT OF AN ERA, not a lapse of bookkeeping. tools/analysis/stack_judge.py of 2026-09-10 writes no meta table, no script sha and no per-row provenance, so no run of it can ever be pinned; the instruments of the 2026-09-16 window onward do write their own identity into the cache — grok_calib.py stores meta.script_sha256_16 and adds script_sha256_16_relaunch if the file changes between resumes (L191, L200-L203), canary_baseline.py the same in run_meta (L316-L317), bfcl_judged_pilot.py script_sha256_16_lf with a mismatch check (L925, L933, L940), and ifeval_response_oracle.py likewise. That is exactly why C5-1 could be settled from GROK-CALIB's cache and this one cannot be settled at all.]"
+    },
+    {
+      "date": "2026-09-23",
+      "by": "INCONSISTENCIES-PASS (registrar, zero calls; insertion only)",
+      "text": "NAME 2026-09-23 by INCONSISTENCIES-PASS (registrar, zero calls; insertion only): the cell names the COMMAND (tools/analysis/stack_judge.py --prompt v2 --judge grok; the --judge flag exists in the script at HEAD, choices mistral / grok); the readout of record is experiment_results/x12_crossdomain/recipe_grok_outcome.txt (tracked, 3a3368f); recipe_grok.log is on disk and gitignored. [ledger: evidence cell of row RECIPE-GROK, v132]"
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a judge-family effect at the cell level (JUDGE-BY-CELL: none beyond the floor)",
+    "anything about a judge family not drawn"
+  ],
+  "ledger": {
+    "row_id": "RECIPE-GROK",
+    "version": "v115 (row added v33 at 1b9312f; [CORRECTED 2026-09-19 by JUDGE-BY-CELL] v115) [v132 2026-09-23: INCONSISTENCIES-PASS insertion in this row]; [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "STACK-v2",
+    "JUDGE-SWAP",
+    "JUDGE-BY-CELL",
+    "JUDGE-2x2"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L342-L379 (registration 4320056) and L380 ff. (outcome 3a3368f)",
+    "experiment_results/x12_crossdomain/recipe_grok_outcome.txt (3a3368f)",
+    "docs/test_ledger.html row RECIPE-GROK (v33; bracketed v115): chips verbatim, observed cell with the JUDGE-BY-CELL bracket, evidence (stack_judge.py --prompt v2 --judge grok, recipe_grok.log, stack_v2_promptv2_grok.db, 4320056)",
+    "script sha16 = sha256 of tools/analysis/stack_judge.py at 55a24c7 (first commit), first 16 hex (identity, computed by the registrar 2026-09-22; the run version is the 4320056 edit, whose sha is not separately named)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Runs the production judge recipe (same reference answers, mechanics and rubric) with a different judge model family, grok, on 1,980 matches. It compares the result with grok's old-recipe verdicts and with the Mistral judge. About 4k calls.",
+    "why": "It asks whether the judge's accuracy gain comes from the recipe or from the particular judge model (Mistral).",
+    "information": "If grok gains as much, the recipe carries the gain and cheaper or other judges can be swapped in. Result: done, passed. Accuracy is 0.864 with the recipe against 0.744 without it, and 0.722 against 0.568 on the top cluster. This is nearly identical to Mistral (0.865 / 0.699) and gives the same leaderboard. A later cell-level check found per-subject gaps of at most 3.2 points, each with an interval that includes zero. Under this recipe the judge model accounts for only about 3% of committed verdicts. Older judged question family, later ruled 'history, not evidence'.",
+    "written": "2026-10-07"
+  }
+}

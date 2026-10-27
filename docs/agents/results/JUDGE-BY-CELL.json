@@ -1,0 +1,222 @@
+{
+  "id": "JUDGE-BY-CELL",
+  "title": "JUDGE-BY-CELL: is there any cell in which one cheap judge beats another by more than the test-retest floor, stably across draws? (zero calls; the MODEL form of the specialised-judge hypothesis)",
+  "question": "Read per bareq512_s42 anchor on the 9,123 common x12 MAIN matches judged by three STACK-v2 draws (Mistral-Large-3; grok-4-1-fast-non-reasoning through Python and through Kotlin): does any anchor show one judge family beating the other by more than DECOMP's 5.7pp floor under both conventions with the sign stable across the two grok draws, and does a cross-fitted per-cell judge choice gain over the best single judge? If not, judge routing by cell is CLOSED at zero calls.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "137cb30",
+    "program_lines": "docs/judge_v2_program.md L7363-L7502 (registration + registrar's check; brackets by insertion L7427 and L7436 added 2026-09-19 at 2cae68a) [re-lined 2026-09-22: batch-1 lines were read at 9c1f37b-era HEAD and shifted by +6 by later insertions]",
+    "program_lines_as_of": "6aa2a0d",
+    "heading": "## Registered 2026-09-18 (before any code or call) — JUDGE-BY-CELL: is there any cell in which one cheap judge beats another by more than the test-retest floor, stably across draws? (zero calls; the MODEL form of the specialised-judge hypothesis)",
+    "outcome_heading": [
+      "L7504: ## JUDGE-BY-CELL (2026-09-19, zero judge calls) — on the 9,123 matches three STACK-v2 draws judged on identical bytes (Mistral-Large-3; grok-4-1-fast-non-reason"
+    ],
+    "date": "2026-09-18"
+  },
+  "script": {
+    "path": "tools/analysis/judge_by_cell.py",
+    "sha16": "c3307e6d96d61665",
+    "commit": "694ab2c"
+  },
+  "ready": null,
+  "go": "n/a (0 calls, 0 builds; 'this test needs no author's go', registration L7489)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/judge_by_cell_outcome.txt",
+    "outcome_commit": "694ab2c",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-19",
+    "other_files": [
+      "experiment_results/x12_crossdomain/judge_by_cell_cells.csv (694ab2c)"
+    ]
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-18_night_batch.md section JUDGE-BY-CELL",
+    "commit": "f1cd406 (file at 074eb3d)",
+    "verdict": "numbers CONFIRMED to the digit; C1 FAILED, C2 FAILED and ROBUST, C3 HELD; defect D1 HIGH: the script's verdict sentence over-reaches; the checker's sentence of record replaces it"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "a cell winner exists: at least one anchor clears the bar (|delta| > 0.057 AND CI excluding 0 under BOTH conventions) against BOTH grok draws with the same sign",
+      "result": "FAILED",
+      "value": "no cell clears against either draw under either convention; largest scored A gap Law M-GK -0.029 [-0.062, +0.006]; Law B -0.018 [-0.040, -0.004] 0/5 p 0.0625 on both draws (inside the bar); 14-cell max |M - grok| A 0.032 at History (UNDETERMINED cell); the B clause is VACUOUS by construction (max attainable |dB| 0.029 / 0.018 / 0.000), closure rests on convention A",
+      "denominator": "7 scored anchors (>= 120 key-decidable questions: Chemistry 193, Computer science 132, Law 190, Math 257, Other 147, Physics 229, Psychology 167 kd q); 7 UNDETERMINED (Biology 115, Business 103, Economics 119, Engineering 105, Health 100, History 80, Philosophy 88)"
+    },
+    {
+      "id": "C2",
+      "text": "routing is a lever: the cross-fitted routed gain > 0 with the interval over splits excluding 0 and the point >= +1.0pp",
+      "result": "FAILED",
+      "value": "M vs GP -0.17pp [-0.81, +0.61] (26% of splits > 0; routed 0.8489 vs single 0.8506; in-sample +0.38pp); M vs GK -0.07pp [-0.76, +0.44] (in-sample +0.56pp); three-way -0.26pp (in-sample +0.58pp); ROBUST over seeds 42/7/2026/99 and 100-500 splits (-0.12 to -0.17 / -0.02 to -0.07pp, every interval incl. 0); oracle in-sample ceiling +0.6pp < the +1.0pp point",
+      "denominator": "4,495 key-decidable matches on 2,025 kd questions, 100 halvings by question (seed 42), all 14 anchors routed"
+    },
+    {
+      "id": "C3",
+      "text": "the grok-vs-grok floor: the 14-cell max |GP - GK| under convention A <= 0.057",
+      "result": "HELD",
+      "value": "0.023 at Chemistry (A; CI [-0.043, -0.003]); 0.005 at Health (B); same 0.023 over the 7 scored cells",
+      "denominator": "14 anchors, the same judge on identical bytes (GP vs GK)"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "overall M vs GP |delta| <= 1.5pp under A and <= 1.0pp under B",
+      "result": "HELD",
+      "value": "A +0.0040 [-0.005, +0.012] McNemar 190/172 p 0.372; B -0.0020 [-0.006, +0.002] (n 3,957); M-GK beside A +0.0000, B -0.0020",
+      "denominator": "4,495 kd matches on the common set"
+    },
+    {
+      "id": "P2",
+      "text": "no anchor clears the bar under both conventions against both grok draws (C1 FAILED)",
+      "result": "HELD",
+      "value": "none clears",
+      "denominator": "14 anchors"
+    },
+    {
+      "id": "P3",
+      "text": "14-cell max |M - grok| (A) 4-7pp on Business / Philosophy / History with CIs including 0",
+      "result": "FAILED",
+      "value": "max 0.032 at History (M-GK), CI [-0.071, +0.000]: range no, anchor yes, CI yes; the three named cells are unscored under the registration's own support rule (bracket L7421)",
+      "denominator": "14 anchors"
+    },
+    {
+      "id": "P4",
+      "text": "same-judge max |GP - GK| (A) 2-5pp (C3 HELD)",
+      "result": "HELD",
+      "value": "0.023 at Chemistry",
+      "denominator": "14 anchors"
+    },
+    {
+      "id": "P5",
+      "text": "cross-fitted routed gain -1.0 to +0.5pp with an interval including 0 (C2 FAILED)",
+      "result": "HELD",
+      "value": "-0.17pp / -0.07pp, both intervals include 0",
+      "denominator": "100 halvings"
+    },
+    {
+      "id": "P6",
+      "text": "in-sample routed gain +1 to +2pp",
+      "result": "FAILED",
+      "value": "+0.38pp / +0.56pp",
+      "denominator": "in-sample, all 14 anchors"
+    },
+    {
+      "id": "P7",
+      "text": "Mistral's decidable tie rate lower than grok's in every anchor by 1-3pp",
+      "result": "FAILED",
+      "value": "M lower than both grok draws in 5 of 14 anchors, within 1-3pp against both in 3 of 14; on-schedule decidable tie M 0.0714 / GP 0.0716 / GK 0.0691 (the premise mixed R3's 5.6% with x12's 6.9%, checker D5)",
+      "denominator": "14 anchors, decidable tie rates on the common set"
+    }
+  ],
+  "falsifier": {
+    "text": "C1 AND C2 HELD (a cell where one cheap judge beats the other beyond the floor on both draws, and a cross-fitted routed board that gains) overturns RECIPE-GROK's 'the recipe, not the judge, carries the gain' AT THE CELL LEVEL and reopens judge choice as a cell property",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "common_set": "9,123 matches (the 19 reference-less matches of M and GP dropped, as JUDGE-WIRING-BOARD did); 2,801 judged questions; 4,495 key-decidable matches on 2,025 kd questions; 14 anchors; 12 contestants; identity checks 0 disagreements (models, anchor, ref_letter); GROK-CALIB ref_correct == x12 ref_correct on 9,123 / 9,123",
+    "caches": "M stack_v2_promptv2_x12all.db 9,142; GP grok_calib.db 9,142 (INVALID 11); GK judge_wiring/board/kotlin_c0d3f708cbc3930e.db 9,123 (INVALID 17); all mode=ro, none written",
+    "overall_accA": "M 0.8523 / GP 0.8483 / GK 0.8523; decidable tie 0.0714 / 0.0716 / 0.0691; flip 0.0687 / 0.0651 / 0.0649",
+    "overall_pair_differences": "M-GP A +0.0040 [-0.005, +0.012] 190/172 p 0.372, B -0.0020 [-0.006, +0.002] (n 3,957) 25/33 p 0.358; M-GK A +0.0000 [-0.009, +0.009] 171/171 p 1, B -0.0020 (n 3,972) 23/31 p 0.341; GP-GK A -0.0040 [-0.010, +0.002] 93/111 p 0.234, B +0.0002 [-0.001, +0.001] (n 4,039) 3/2 p 1",
+    "own_committed_B": "M 0.9178 (n 4,174) / GP 0.9155 (4,165) / GK 0.9172 (4,177) = ARENA-V2 0.918 / GROK-CALIB 0.916 / JUDGE-WIRING-BOARD 0.917 (derived by the registrar from judge_by_cell_cells.csv; NOT in the outcome file, checker D2)",
+    "per_anchor_scored_A": "Chemistry M-GP +0.026 [-0.003, +0.053] 22/12 p 0.121, M-GK +0.003, GP-GK -0.023 [-0.043, -0.003] 5/14 p 0.064; Computer science +0.007 / +0.010 / +0.003; Law -0.025 [-0.060, +0.009] / -0.029 [-0.062, +0.006] / -0.003; Math +0.015 / +0.009 / -0.006; Other +0.014 / +0.014 / +0.000; Physics -0.003 / -0.007 / -0.003; Psychology +0.006 / -0.003 / -0.008 (n = the anchor's kd matches: 387 / 302 / 314 / 656 / 363 / 601 / 354)",
+    "per_anchor_undetermined_A": "Biology -0.003 / +0.000 / +0.003; Business +0.025 [-0.026, +0.084] / +0.025 / +0.000; Economics +0.000 / -0.007 / -0.007; Engineering +0.005 / +0.005 / +0.000; Health +0.005 / +0.023 [-0.019, +0.069] / +0.019; History -0.022 [-0.068, +0.020] / -0.032 [-0.071, +0.000] 4/10 p 0.18 / -0.011; Philosophy -0.011 / -0.017 / -0.006",
+    "Law_B": "M-grok -0.018 [-0.040, -0.004] 0/5 p 0.0625 on BOTH draws: above the same-judge floor, inside the 5.7pp bar",
+    "B_vacuity": "committed-verdict identity GP-GK 99.88%, M-GP 98.53%, M-GK 98.64%; max attainable |dB| per cell 0.029 (Other) / 0.018 (Law) / 0.000 (Business); 12 B rows exactly [0, 0]",
+    "wrong_established": "Law M 3/4/59, GP 1/2/55, GK 1/2/54; Other 1/2/53, 1/4/52, 1/2/51; Psychology 0/0/52, 1/1/53, 1/1/54 (established / wrong / called edges); every other anchor 0 established for all three judges",
+    "C2_cross_fitted": "M vs GP -0.0017 [-0.0081, +0.0061], 26% of splits > 0, routed 0.8489 vs single 0.8506 (single = M on 86 of 100 halvings), in-sample +0.38pp; M vs GK -0.0007 [-0.0076, +0.0044], 35% > 0, in-sample +0.56pp; three-way -0.26pp [-0.0081, +0.0049], in-sample +0.58pp; checker: seeds 42/7/2026/99, 100-500 splits -0.12 to -0.17 / -0.02 to -0.07pp; 7 scored cells -0.04 / +0.04pp",
+    "mechanism": "raw responses differ on 9,123 / 9,123; single-order votes agree 89.4%; dual-order TIE-on-flip filters disagreement into ties; committed verdicts follow the reference-agreeing side 96.8-97.7%; a judge committing against the reference is right 22-25%: the judge model is ~3% of the committed verdict",
+    "key_join": "46-model roster (Meta-Llama-3-70B-Instruct excluded); OPTIONS-key join on 2,801 judged q 1:1 2,678 / multi 3 / none 120 (LaTeX escaping, harmless: checker D6); gt_answer == mmlu_pro.answer on 2,671 of 2,678; x12 ref_correct vs (ref_letter == gt) disagree on 21 of 9,123 (the kit's grade, used as is)",
+    "elapsed": "run 2026-09-19 00:10:37, 108 s, zero calls"
+  },
+  "sentence_of_record": "JUDGE-BY-CELL: on the 9,123 matches judged by three STACK-v2 draws on identical bytes (Mistral-Large-3; grok-4-1-fast-non-reasoning through Python and through Kotlin), 4,495 key-decidable, no anchor shows a judge winning by more than the 5.7pp bar (C1 FAILED on the 7 scored anchors; max |M - grok| 3.2pp at History, an UNDETERMINED cell, CI including 0; Law -1.8pp [-4.0, -0.4] under B on both draws, inside the bar, above the same-judge floor), the same-judge floor is 2.3pp (A) / 0.0 (B) (C3 HELD), and a per-cell judge choice cross-fitted over 100-500 splits loses 0.1-0.2pp against the best single judge with an oracle ceiling of +0.6pp (C2 FAILED, robust). Under this recipe committed verdicts follow the reference-agreeing side 97% of the time (the draws are independent; dual-order TIE-on-flip turns their disagreement into ties), so the judge model is ~3% of the committed verdict and the convention-B bar is unreachable by construction; closure rests on convention A. Judge routing by cell is CLOSED at zero calls for Mistral-Large-3 vs grok-4-1-fast-non-reasoning under STACK-v2 with the shared grok-reasoning reference, on the 7 scored anchors (7 UNDETERMINED by the 120-kd-question rule, deltas <= 3.2pp); it is not a statement about an untested judge family. P1, P2, P4, P5 HELD; P3, P6, P7 FAILED; falsifier not fired. The record's own-committed B figures 0.9178 / 0.9155 / 0.9172 reproduce ARENA-V2 / GROK-CALIB / JUDGE-WIRING-BOARD.",
+  "chips": [
+    "C1 FAILED (A; B VACUOUS BY CONSTRUCTION)",
+    "C2 FAILED (ORACLE CEILING +0.6pp)",
+    "C3 HELD (2.3pp)",
+    "JUDGE MODEL ~3% OF THE COMMITTED VERDICT",
+    "CLOSED ON 7 SCORED ANCHORS, 7 UNDETERMINED; ONE CROSS-FAMILY PAIR",
+    "P3 / P6 / P7 FAILED"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-18",
+      "by": "the registrar at registration (programme L7473, 137cb30)",
+      "text": "5.6% is STACK-v2's decidable tie rate on R3 (Mistral; programme L204 / L622); 6.9% is the Kotlin x12 MAIN decidable tie rate (JUDGE-WIRING-BOARD, L4246); GROK-CALIB's outcome prints tie 0.219 over all matches and no decidable tie rate, so its per-anchor decidable tie rate is read for the first time by this test. The prediction 'Mistral lower than grok in every anchor by 1-3pp' is scored against the per-anchor decidable tie rates the instrument prints for all three caches on the common set."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "JUDGE-BY-CELL (programme L7421, 2cae68a)",
+      "text": "P3 names Business, Philosophy and History as the cells on which the 14-cell max is read, while the registration's own support rule (a cell under 120 key-decidable QUESTIONS is UNDETERMINED, printed, not scored) leaves all three unscored (103 / 88 / 80 kd questions); P3 was scored as written on the printed 14-cell max (0.032 at History, FAILED on the range) and cannot carry C1. The 120-question threshold was borrowed from the leaf rule without a power derivation for anchors; at the anchors' ~150-650 kd matches the accuracy-gap SE is ~2-4pp, so the rule is conservative for C1 and is kept as registered."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "JUDGE-BY-CELL (programme L7430, 2cae68a)",
+      "text": "the rule left 7 of 14 anchors UNDETERMINED (Biology 115, Business 103, Economics 119, Engineering 105, Health 100, History 80, Philosophy 88 kd questions) and 7 scored; closure is on the 7 scored anchors only; the threshold is the leaf rule's, not derived for anchors."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "ledger v115 (RECIPE-GROK row bracketed: confirmed at the cell level)",
+      "text": "RECIPE-GROK is confirmed at the cell level (falsifier not fired)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "CORRECTIONS_2026-09-23 (registrar)",
+      "text": "[CORRECTED 2026-09-23 by the registrar (line pointer only, zero calls; no number, no criterion and no sentence moves): registration.program_lines names docs/judge_v2_program.md L7363, and that was exact when it was written. After commit cd83eac inserted four one-line correction brackets mid-file (hunks @@ -3911,0 / -6535,0 / -6692,0 / -6949,0 @@), the heading of record \"## Registered 2026-09-18 (before any code or call) — JUDGE-BY-CELL: is there any cell in which one cheap judge beats another by more than th ...\" stands at L7367, +4; the whole span shifts by the same +4. Verified at HEAD by sed -n '7367p' docs/judge_v2_program.md. The map for every such pointer is the programme's \"## Line-shift map, appended 2026-09-23\" section: +0 up to old L3911, +1 to L6535, +2 to L6692, +3 to L6949, +4 below. The recorded span is left standing beside this bracket, not rewritten.]"
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "anything about a judge family not drawn (the pair is Mistral-Large-3 vs grok-4-1-fast-non-reasoning, and GP / GK are the same model)",
+    "anything for the 7 UNDETERMINED anchors (Biology, Business, Economics, Engineering, Health, History, Philosophy) beyond their printed deltas (<= 3.2pp, every CI including 0)",
+    "anything at leaf level (no leaf row; the sub-anchor line stays closed)",
+    "that the ~3% share would hold under another recipe (single order, no reference, a different wrapper: not measured)",
+    "a preference or frontier statement",
+    "any change to a board, profile, tier or band of record",
+    "a re-draw-based confirmation (a confirmation, if one were ever warranted, needs new questions: ITEM-26-POOLED)"
+  ],
+  "ledger": {
+    "row_id": "JUDGE-BY-CELL",
+    "version": "v115; [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "RECIPE-GROK",
+    "JUDGE-WIRING-BOARD",
+    "GROK-CALIB",
+    "ARENA-V2",
+    "DECOMP",
+    "JUDGE-2x2",
+    "ITEM-26-POOLED",
+    "STACK-NORUBRIC"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "judge routing by cell (the judge MODEL per cell) CLOSED at zero calls for Mistral-Large-3 vs grok-4-1-fast-non-reasoning under STACK-v2 with the shared grok-reasoning reference, on the 7 scored anchors; with REF-FORM-BY-CELL, 'specialise the judge by cell' closed for model and reference form (programme L7754-L7763). Reopens none of CONTEXT.md section 5's lines (registrar's check L7445-L7458)."
+  },
+  "sources": [
+    "docs/judge_v2_program.md L7357-L7496 (registration 137cb30; brackets L7421 / L7430 / L7473): question, data objects, instrument, criteria, predictions, falsifier, hygiene",
+    "docs/judge_v2_program.md L7498-L7624 (outcome section, 2cae68a): every number, scored criteria and predictions, defects D1-D6, does-not-show, the sentence of record, own-committed B derivation",
+    "docs/reviews/2026-09-18_night_batch.md section JUDGE-BY-CELL (f1cd406; file last at 074eb3d): CONFIRMED status, defects, sentence of record, chips",
+    "experiment_results/x12_crossdomain/judge_by_cell_outcome.txt and judge_by_cell_cells.csv (694ab2c)",
+    "docs/test_ledger.html row JUDGE-BY-CELL (v115): chips verbatim, evidence cell (137cb30 registration, 694ab2c script + outcome, f1cd406 review, 2cae68a outcome section)",
+    "script sha16 = sha256 of tools/analysis/judge_by_cell.py at 694ab2c, first 16 hex (identity, computed by the registrar 2026-09-20; no READY file for this zero-call test)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' lines to grep -n regardless of line drift; line numbers re-lined 2026-09-22 as of programme HEAD 6aa2a0d (shift +6 from the batch-1 reading)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "On 9,123 matches judged by two cheap judge models (Mistral-Large-3 and two runs of grok), it checks, per MMLU-Pro subject area, whether one judge beats the other by more than the judge's own retest noise (5.7 points). It also checks whether picking the best judge per cell beats using one judge everywhere. No calls.",
+    "why": "Earlier work found that the recipe, not the judge model, carries the gain. This test checks whether that still holds cell by cell, or whether judges should be routed by query type.",
+    "information": "A stable per-cell winner would reopen judge choice as a property of the cell. Result: done. On the 7 subject areas with enough questions to score, no judge wins beyond the noise bar (largest gap anywhere 3.2 points, not significant). The other 7 areas are undetermined because they have too few questions. Choosing a judge per cell loses 0.1-0.2 points against the single best judge. Judge routing by cell is closed for this pair of judges and this recipe, on the scored areas. Later ruled history rather than evidence, because it ran on the older question pool.",
+    "written": "2026-10-07"
+  }
+}

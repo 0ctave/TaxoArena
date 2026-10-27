@@ -1,0 +1,98 @@
+{
+  "id": "JUDGE-2x2",
+  "title": "JUDGE-2x2: is the judge limited by its own ability to solve the question, or only by the reference? (zero calls; the clean 2x2 that retires Probe B's confound)",
+  "question": "Verdict accuracy on the discriminating questions conditioned on BOTH whether the judge model itself solved the question and whether the reference was right, for the pairwise and the pointwise format.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "2c181aa",
+    "program_lines": "docs/judge_v2_program.md L1072-L1099 (the 'Three probes' bullet; not separately registered: exploratory probes reading existing caches)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "- **Three probes (2026-09-14, zero calls): the judge needs a correct reference, not competence; GPQA has the headroom MMLU-Pro lost; and the pointwise board advantage does not survive small samples.**",
+    "outcome_heading": [
+      "L1072: the same bullet"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "n/a (free check; scratch script, no script of record; the output file is the record)",
+    "sha16": "n/a",
+    "commit": "2c181aa"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/three_probes.txt",
+    "outcome_commit": "2c181aa",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-14"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); descriptive probes",
+    "commit": "2c181aa",
+    "verdict": "descriptive"
+  },
+  "criteria": [
+    {
+      "id": "readout",
+      "text": "descriptive: the 2x2 of judge-solved x reference-right",
+      "result": "DELIVERED",
+      "value": "pairwise: judge solved / reference right n 82 0.780 | judge failed / reference right n 93 0.796 | solved / wrong n 12 0.250 | failed / wrong n 55 0.145; pointwise: 0.854 (n 82) | 0.837 (n 92) | 0.417 (n 12) | 0.130 (n 54); holding the reference fixed the judge's own ability makes essentially NO difference",
+      "denominator": "the discriminating questions of R3"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none (descriptive)",
+    "fired": false,
+    "note": "the prediction ESCALATE-LLAMA-LAW (FRAMEWORK item 24) was built on: FAIL, as this probe predicted"
+  },
+  "numbers_of_record": {
+    "pairwise": "0.780 / 0.796 (reference right); 0.250 / 0.145 (reference wrong)",
+    "pointwise": "0.854 / 0.837; 0.417 / 0.130"
+  },
+  "sentence_of_record": "JUDGE-2x2 (2026-09-14, zero calls): holding the reference fixed, judge ability makes no difference: pairwise 0.780 (judge solved) vs 0.796 (judge failed) when the reference is right; pointwise 0.854 vs 0.837; when the reference is wrong 0.250 / 0.145 and 0.417 / 0.130. Probe B's capability effect was entirely the reference confound: a cheap judge does not need to solve the question, it needs the right answer. Validates the cheap-judge architecture.",
+  "chips": [
+    "REFERENCE ONLY"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a judge-capability effect independent of the reference"
+  ],
+  "ledger": {
+    "row_id": "JUDGE-2x2",
+    "version": "v65 (2c181aa); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "PROBE-B",
+    "RECIPE-GROK",
+    "ORACLE",
+    "ESCALATE-LLAMA-LAW"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L1072-L1099 (2c181aa)",
+    "experiment_results/x12_crossdomain/three_probes.txt (2c181aa)",
+    "docs/test_ledger.html row JUDGE-2x2 (v65): chips verbatim, evidence (three_probes.txt)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (rubric_v2_design.md / multi_corpus_design.md lines as of their last commits named in sources)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "No calls. Judge accuracy on discriminating questions was split four ways: whether the judge model could solve the question itself, crossed with whether the reference answer was right. Done for the pairwise and grading formats.",
+    "why": "It asks whether a cheap judge must be smart enough to solve the question, or only needs a correct reference.",
+    "information": "If judge ability mattered at a fixed reference, cheap judges would be risky. If only the reference matters, a cheap judge plus a good reference is enough. Result: done, descriptive. With the reference held fixed, judge ability made no difference (for example 0.78 vs 0.80 accuracy when the reference is right). A wrong reference drives accuracy down sharply. This supports the cheap-judge design. Note: older question pool, ruled 'history, not evidence'.",
+    "written": "2026-10-07"
+  }
+}

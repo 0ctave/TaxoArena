@@ -1,0 +1,136 @@
+{
+  "id": "REF-QUAL-KIMI",
+  "title": "REF-QUAL-KIMI: qualify Kimi-K2.6 as a candidate REFERENCE before buying a full re-judge (569 calls; first attempt VOID)",
+  "question": "569 calls on 302 discriminating + 267 weak-cell questions; gate registered at 16b5a91 before any candidate ran: beat the incumbent's 0.726 on the discriminating subset by >= 3pp AND let no frontier contestant gain > 3pp of answer agreement; first attempt VOID (8,192-token cap, 40.5% empty); corrected run at 32,768 tokens, resumed twice from cache across two machine crashes with a clean hot-journal rollback.",
+  "kind": "solve",
+  "state": "done",
+  "registration": {
+    "commit": "16b5a91",
+    "program_lines": "docs/judge_v2_program.md L2633-L2660 (first attempt, VOID) and L3048-L3098 (corrected run); the gate registered at 16b5a91",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "- **REF-QUAL-KIMI, first attempt (2026-09-14, ~569 calls): VOID — my instrument was broken, not the candidate.**",
+    "outcome_heading": [
+      "L2633: the first-attempt bullet (VOID)",
+      "L3048: - **REF-QUAL-KIMI, corrected run (2026-09-15, 569 calls at a 32,768-token cap, after two machine crashes and a"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "tools/analysis/ref_qualify.py",
+    "sha16": "157781e0e71822f1 at 16b5a91; 9142728036b23655 (at 9768e40)",
+    "commit": "9768e40"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (569 calls, plus the ~569 VOID first attempt)",
+  "run": {
+    "outcome_file": "docs/judge_v2_program.md L3048-L3098 (the corrected-run bullet carries the numbers of record); experiment_results/judge_solve/refqual_Kimi_K2_6_mt32768.txt on disk is the script's 'VERDICT REFUSED' guard output (42 of 559 unparsed, finish_reason length), not the scored readout",
+    "outcome_commit": "1d9c779",
+    "calls": "569 (559 answered; 10 Azure content-filter 400s) + ~569 VOID",
+    "cce": "not stated",
+    "pool": "302 discriminating + 267 weak-cell questions",
+    "date": "2026-09-15",
+    "other_files": [
+      "experiment_results/judge_solve/refqual_Kimi_K2_6_mt32768.db (the cache the numbers were read from)",
+      "refqual_kimi_mt32768.log",
+      "experiment_results/judge_solve/refqual_Kimi_K2_6.txt (first attempt, VOID)"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); REF-QUAL-KIMI-JSON (2026-09-16) re-solved Kimi under the incumbent's JSON protocol as this outcome's instrument rule required",
+    "commit": "9768e40",
+    "verdict": "(1) FAIL -2.0pp; (3) PASS; CONFOUNDED BY MY DESIGN (two prompts, two token regimes); DO NOT PROMOTE"
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "beat the incumbent's 0.726 on the discriminating subset by >= 3pp",
+      "result": "FAILED",
+      "value": "n = 298: candidate 0.705 vs incumbent 0.725, -0.020; the fourth number: non-termination at 32k is 11.0% on the discriminating subset (13.0% Engineering, 0% History and Law), all finish_reason 'length'; among answers that TERMINATED Kimi scores 0.789, +6.4pp; the registered wording applied literally (truncation counts as wrong) with the other number recorded beside it",
+      "denominator": "298 discriminating"
+    },
+    {
+      "id": "(2)",
+      "text": "weak cells",
+      "result": "DELIVERED",
+      "value": "History +0.093, Engineering -0.020, Law 0.000",
+      "denominator": "267 weak-cell questions"
+    },
+    {
+      "id": "(3)",
+      "text": "no frontier contestant gains > 3pp of answer agreement",
+      "result": "HELD",
+      "value": "worst gain +0.023 (gemini): Kimi mirrors the frontier LESS than the incumbent does",
+      "denominator": "frontier contestants"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "the registered gate",
+    "fired": true,
+    "note": "NOT LIKE FOR LIKE: the incumbent's 0.725 comes from judge_solve_map's JSON answer-only protocol (six-token answers, reasoning hidden server-side, 0 empty) while Kimi got the contestants' chain-of-thought prompt: two prompts, two token regimes, my design error, the second in this instrument after the 8,192 cap; INSTRUMENT RULE ADDED: a candidate must be solved under the same protocol as the incumbent, and the protocol recorded"
+  },
+  "numbers_of_record": {
+    "discriminating": "0.705 vs 0.725 (-0.020, n 298); terminated-only 0.789 (+6.4pp)",
+    "non_termination": "11.0% discriminating; 13.0% Engineering; 0% History / Law; median 5,044 tokens, p90 19,658, max 32,463",
+    "weak_cells": "History +0.093; Engineering -0.020; Law 0.000",
+    "agreement": "worst +0.023 (gemini)"
+  },
+  "sentence_of_record": "REF-QUAL-KIMI (2026-09-15, 569 calls): 559 of 569 answered; (1) discriminating n = 298: candidate 0.705 vs incumbent 0.725, -0.020, FAIL; (2) History +0.093, Engineering -0.020, Law 0.000; (3) worst frontier agreement gain +0.023, PASS; the fourth number: non-termination at 32k is 11.0% on the discriminating subset, and among answers that TERMINATED Kimi scores 0.789, +6.4pp; the registered wording is applied literally with the other number recorded beside it; AND the comparison is not like for like: the incumbent's 0.725 comes from the JSON answer-only protocol while Kimi got the chain-of-thought prompt, two prompts, two token regimes, my design error. DECISION: DO NOT PROMOTE on this evidence. INSTRUMENT RULE ADDED: a candidate must be solved under the same protocol as the incumbent.",
+  "chips": [
+    "(1) FAIL −2.0pp",
+    "(3) PASS",
+    "CONFOUNDED BY MY DESIGN",
+    "DO NOT PROMOTE"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-16",
+      "by": "REF-QUAL-KIMI-JSON",
+      "text": "re-solved under the incumbent's JSON protocol: the like-for-like comparison exists in principle and Kimi is not deployable as the reference (see that record)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "INCONSISTENCIES-PASS (registrar, zero calls; insertion only)",
+      "text": "NAME 2026-09-23 by INCONSISTENCIES-PASS (registrar, zero calls; insertion only): experiment_results/judge_solve/refqual_Kimi_K2_6_mt32768.txt is the script's VERDICT REFUSED guard output (42 of 559 unparsed, finish_reason length), NOT the scored readout; the numbers of record (discriminating 0.705 candidate vs 0.725 incumbent; accuracy among terminated 0.789; worst frontier agreement gain +0.023) are in the programme bullet '- **REF-QUAL-KIMI, corrected run (2026-09-15, 569 calls at a 32,768-token cap, after two machine crashes and a' and in the cache refqual_Kimi_K2_6_mt32768.db only. [ledger: evidence cell of row REF-QUAL-KIMI, v132]"
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a like-for-like reference comparison (REF-QUAL-KIMI-JSON supplied it)",
+    "the candidate's quality when terminated as a deployment reading"
+  ],
+  "ledger": {
+    "row_id": "REF-QUAL-KIMI",
+    "version": "v86 (20fd4a8) [v132 2026-09-23: INCONSISTENCIES-PASS insertion in this row]; [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "ARXIASK",
+    "REF-QUAL-KIMI-JSON",
+    "REF-SC",
+    "REF-QUALITY-MONITOR"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L2633-L2660 and L3048-L3098 (16b5a91 / 9768e40)",
+    "experiment_results/judge_solve/refqual_Kimi_K2_6_mt32768.txt (1d9c779)",
+    "docs/test_ledger.html row REF-QUAL-KIMI (v86): chips verbatim, observed cell, evidence",
+    "script sha16 = sha256 of tools/analysis/ref_qualify.py at 16b5a91 and 9768e40, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "NOTE (registrar 2026-09-22): the ledger's evidence cell cites refqual_Kimi_K2_6_mt32768.txt, whose on-disk content is the guard refusal; the 0.705 / 0.725 / 0.789 / +0.023 figures are in the programme bullet L3055-L3065 only (inconsistency list)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Has Kimi-K2.6 solve 569 questions to see whether it would be a better reference answer source for the judge than the current one.",
+    "why": "A better reference should make judge verdicts more accurate; this was a cheap qualifying test before paying for a full re-judge.",
+    "information": "A pass would justify a re-judge with Kimi as reference. Result: done. It failed the gate (70.5% vs 72.5% on discriminating questions) and was not promoted. But the comparison was not like-for-like (different prompt and token budget, a design error), so a rule was added that candidates must be solved the same way as the incumbent. A later like-for-like test also found Kimi unusable as reference. Later ruled history rather than evidence, because it ran on the older question pool.",
+    "written": "2026-10-07"
+  }
+}

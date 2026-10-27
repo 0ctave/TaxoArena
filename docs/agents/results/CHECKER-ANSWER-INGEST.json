@@ -1,0 +1,142 @@
+{
+  "id": "CHECKER-ANSWER-INGEST",
+  "title": "CHECKER-ANSWER-INGEST: FRAMEWORK item 7: ingest the checker's answers on the generative corpora; is MATH decidable (D_c >= 0.95) and how much of it is offered to the judge? (zero calls)",
+  "question": "Backfill normalised checker outputs for MATH (target) and IFEval (per-constraint vector) into checker_answers_v1.db; three readings (A checker every row; B checker + NON_TERMINATED via unclosed <think>; C); D_c on the 18-model MATH cell (union pool eval side 398 q, 153 pairs) and the offered share (DISAGREE + UNDETERMINED); the handoff to item 8 on GEN-ARENA's 8-model schedule.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "eaf1dbf",
+    "program_lines": "docs/judge_v2_program.md L3603-L3611 (by reference; docs/design/FRAMEWORK.md L360 item 7); the Block 1 record bullet at L3731",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-15 (before any run) — BY REFERENCE: the 26 tests in docs/design/FRAMEWORK.md \"Tests to register before shipping\" (commit 8d77f7b), with the criteria, predictions and call counts stated there, scheduled in docs/plan_2026-09-15.md",
+    "outcome_heading": [
+      "L3662: ## Block 1 record (2026-09-15/16, zero calls) — FRAMEWORK items 1-12, 14-16: fourteen zero-call tests built, each adversarially checked; verdicts of record below (checker's number wins where it refutes the builder)",
+      "L3731: - **CHECKER-ANSWER-INGEST (2026-09-15/16, zero calls): FAIL on (1) under the verdict-of-record reading and on (2) under every reading; prediction \"MATH passes\" NOT HELD; the interpretive layer (\"roster property, drop two contestants\") is refuted: the object is the harness's 1,024-token cap.**"
+    ],
+    "date": "2026-09-15"
+  },
+  "script": {
+    "path": "tools/analysis/checker_answer_ingest.py",
+    "sha16": "a8f18855dbdae068",
+    "commit": "7076615"
+  },
+  "ready": null,
+  "go": "n/a (0 calls; Block 1)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/checker_answer_ingest.txt",
+    "outcome_commit": "7076615",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (pool_guard.assert_pool_of_record() first; union pool paeec37aa28063c75 by explicit id where used)",
+    "date": "2026-09-15/16"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); each Block 1 test was 'adversarially checked' at build time and the checker's number wins where it refutes the builder (Block 1 record header L3662-L3663); the checker-confirmed defects are listed in the bullet",
+    "commit": "7076615",
+    "verdict": ""
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "D_c >= 0.95 on MATH",
+      "result": "FAILED",
+      "value": "reading B (verdict of record): source 0.8268 [0.8184, 0.8350], min cell Precalculus 0.7679: FAIL; reading A 0.9840, min cell 0.9630 [0.9369, 0.9841] PASS-AT-POINT; reading C 0.6091; checker HIGH: consistently applied (the 1,024-token cap, 1,320 of 7,164 eval-side rows), D_c is 0.6701 [0.6501, 0.6890] on 18 models and 0.8167 [0.7952, 0.8380] on 16",
+      "denominator": "18 models, union pool eval side 398 MATH q, 153 pairs"
+    },
+    {
+      "id": "(2)",
+      "text": "offered share (DISAGREE + UNDETERMINED) < 50%",
+      "result": "FAILED",
+      "value": "B / normalised string 0.8178 [0.7993, 0.8369]; A 0.8076; canonical numeric 0.8031; MATH-FIX semantic equality 0.784; DISAGREE-alone floor B 0.6447; top-5 roster 0.5158 [0.4784, 0.5548]; decidable pairs kept 0.9974: FAIL under every reading",
+      "denominator": "153 pairs x 398 q"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "MATH passes",
+      "result": "FAILED",
+      "value": "(2) fails under every reading",
+      "denominator": "MATH cell"
+    },
+    {
+      "id": "P2",
+      "text": "IFEval stays below 0.95",
+      "result": "FAILED",
+      "value": "A 1.0000 by construction; B 0.9932 [0.9884, 0.9973] (10 of 2,916 eval-side rows unclosed, not the '53' printed): NOT HELD under A/B; consistent cap proxy (cap 1280; 80 rows) 0.9468 [0.9327, 0.9595] UNDETERMINED",
+      "denominator": "2,916 IFEval eval-side rows"
+    },
+    {
+      "id": "P3",
+      "text": "IFEval PREDICTIVE-ONLY by D_c",
+      "result": "FAILED",
+      "value": "PARTLY: NO under A/B; unsettled under the consistent proxy; MATH PREDICTIVE-ONLY under B and under the consistent proxy (every domain cell 0.43-0.82)",
+      "denominator": "IFEval / MATH cells"
+    }
+  ],
+  "falsifier": {
+    "text": "none beyond the criteria (registered by reference)",
+    "fired": false,
+    "note": "the truncation finding (checker HIGH) was carried into item 8 (CERT-CORPUS) and STAGE3-MATH before any judged spend on MATH; plan Amendment 1 D7's 'non_terminated = 0 for all eight models' holds only for the <think> proxy"
+  },
+  "numbers_of_record": {
+    "db": "experiment_results/multicorpus/checker_answers_v1.db: math_checker_answers 23,832 rows, ifeval_checker_answers 9,738; sha256 cc4a4a29...; producing code hash a8f18855 (= this script's LF sha16 at 7076615); eval_results.pred blank on all 23,832 MATH and 9,738 IFEval rows; MATH-FIX overlay 5,181 raised, 0 mismatches",
+    "D_c_readings": "B 0.8268 [0.8184, 0.8350] (min Precalculus 0.7679); A 0.9840 (min 0.9630); C 0.6091; consistent cap proxy 0.6701 [0.6501, 0.6890] (18 models) / 0.8167 [0.7952, 0.8380] (16)",
+    "offered_share": "B 0.8178; A 0.8076; canonical numeric 0.8031; semantic 0.784; DISAGREE-alone 0.6447; top-5 roster 0.5158",
+    "item8_handoff": "8-model roster MATH D_c 0.9898 (A and B), offered 0.7465; 447 of 1,800 judged MATH matches AGREE, 26 UNDETERMINED; IFEval D_c 1.0, offered 0.4138, 728 of 1,200 identical vectors; under the consistent cap proxy 8-model D_c 0.8189 [0.7935, 0.8433] (321 of 3,152 scheduled rows at the cap) and 367 of 1,800 judged MATH matches involve a cap-hit response",
+    "cap_finding": "raw lm-eval files max_gen_toks 1024 on MATH; 12-19% of eval-side rows of Llama-3.1/3.2/3.3-70B, OLMo-2, Qwen2.5-Coder/72B/Math at the cap with an abrupt end (1,320 of 7,164 vs the builder's 600)"
+  },
+  "sentence_of_record": "CHECKER-ANSWER-INGEST (2026-09-15/16, zero calls): FAIL on (1) under the verdict-of-record reading (B: D_c 0.8268 [0.8184, 0.8350], min cell Precalculus 0.7679) and on (2) under every reading (offered share 0.78-0.82 against < 50%); prediction 'MATH passes' NOT HELD; 'IFEval below 0.95' NOT HELD under A/B; the interpretive layer ('roster property, drop two contestants') is refuted: the object is the harness's 1,024-token cap (12-19% of eval-side rows of several models end at the cap with no <think> marker; consistently applied, D_c is 0.6701 on 18 models and 0.8167 on 16). Carried into item 8 and STAGE3-MATH before any judged spend on MATH.",
+  "chips": [
+    "(1) FAIL UNDER B (VERDICT OF RECORD)",
+    "(2) FAIL, EVERY READING",
+    "\"MATH PASSES\" NOT HELD",
+    "CHECKER HIGH: THE OBJECT IS THE 1,024-TOKEN CAP"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-16",
+      "by": "the Block 1 checker (HIGH), carried into FRAMEWORK L360 item 7 (bracket at a75df45), plan Amendment 1 D7 and STAGE3-MATH HELD",
+      "text": "reading B applies NON_TERMINATED only where an unclosed <think> makes it visible; the MATH harness capped generations at 1,024 tokens; consistently applied, D_c is 0.6701 [0.6501, 0.6890] on 18 models and 0.8167 on 16; Amendment 1 D7's 'non_terminated = 0 for all eight models' holds only for the <think> proxy; checker_answers_v1.db's non_terminated column encodes the <think> proxy only (superseded by checker_answers_v2 under STAGE3-MATH-CAPFREE)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "INCONSISTENCIES-PASS (registrar, zero calls; insertion only)",
+      "text": "NO-FILE 2026-09-23 by INCONSISTENCIES-PASS (registrar, zero calls; insertion only): experiment_results/multicorpus/checker_answers_v1.db is on disk and UNTRACKED but NOT gitignored (.gitignore re-includes experiment_results/**/*.db; the backfill's 'gitignored' was wrong): a cache of record not committed; the readout of record is experiment_results/x12_crossdomain/checker_answer_ingest.txt, which IS tracked. [ledger: evidence cell of row CHECKER-ANSWER-INGEST, v132]"
+    }
+  ],
+  "does_not_show": [
+    "a decidable MATH cell under the verdict-of-record reading",
+    "a text-detectable blank rule that is absent on IFEval (the cap 1280 exists)",
+    "that D7 was in the committed registration (not verifiable by the builder without git)"
+  ],
+  "ledger": {
+    "row_id": "CHECKER-ANSWER-INGEST",
+    "version": "v103 (684be03) [v132 2026-09-23: INCONSISTENCIES-PASS insertion in this row]"
+  },
+  "depends_on": [
+    "MATH-FIX",
+    "GEN-ARENA",
+    "MC-BUILD"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L3603-L3611 (by-reference registration eaf1dbf) and docs/design/FRAMEWORK.md L360 item 7: criterion, prediction, call count",
+    "docs/judge_v2_program.md L3731 ff. (Block 1 record bullet, 7076615): the criterion table, predictions scored, checker-confirmed defects, script and output",
+    "experiment_results/x12_crossdomain/checker_answer_ingest.txt (7076615)",
+    "docs/test_ledger.html row CHECKER-ANSWER-INGEST (v103 684be03): chips verbatim, design / criteria / observed cells, evidence",
+    "script sha16 = sha256 of tools/analysis/checker_answer_ingest.py at 7076615 (its first commit), first 16 hex (identity, computed by the registrar 2026-09-22; later edited at 13f2142 for the pool_guard change)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' heading and the '- **ID (...)**' bullet line inside the Block 1 record, to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06",
+    "experiment_results/multicorpus/checker_answers_v1.db (gitignored; sha256 cc4a4a29..., verified unchanged, never rewritten)"
+  ],
+  "last_update": "2026-09-23",
+  "plain_description": {
+    "sq": "Data hygiene",
+    "what": "Loads the automatic answer checker's outputs for the MATH and IFEval benchmarks into a database. It then measures how often the key can decide a pair of models on MATH (18 models), and how many pairs would still have to go to the judge.",
+    "why": "Before spending on judged MATH matches, it checks whether MATH is actually decidable by its answer key, as had been assumed.",
+    "information": "If MATH is decidable, the judge is barely needed there. If not, judged results on MATH need care. Result: FAIL. Under the reading of record only about 83% of MATH pairs are key-decidable, and about 80% would still go to the judge. The reason is a 1,024-token output limit in the test harness: many answers were cut off, and with that applied consistently decidability drops to 0.67. This was carried into later MATH work before any judged spend.",
+    "written": "2026-10-07"
+  }
+}

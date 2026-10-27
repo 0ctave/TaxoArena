@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="taxonomy.dataset.SplitTextClosureTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-01T07:10:07" hostname="HORTENSIA" time="0.507">
+  <properties/>
+  <testcase name="splitTrainTest with a seed closes the same way and gates only train()" classname="taxonomy.dataset.SplitTextClosureTest" time="0.42"/>
+  <testcase name="the per-item side assertion trips on a tampered landing set()" classname="taxonomy.dataset.SplitTextClosureTest" time="0.031"/>
+  <testcase name="splitByReservedFile closes train under content and keeps the file's pool id()" classname="taxonomy.dataset.SplitTextClosureTest" time="0.055"/>
+  <system-out><![CDATA[09:10:07.165 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+09:10:07.167 [INFO ] DatasetFetcher - Train/test split (ratio=0.3, seed=1): 12 train / 6 test across 2 domains.
+09:10:07.168 [INFO ] DatasetFetcher - Successfully reserved 6 test queries across 2 domains to reserved_test_queries.json (6 arena-judgeable, 0 unlinked and routing-only).
+09:10:07.184 [INFO ] DatasetFetcher - [POOL] recorded p7cd7f4b0dac80fd9 (seed=1, ratio=0.3, 6 judgeable ids; sentinels excluded); nothing activated
+09:10:07.193 [INFO ] DatasetFetcher - [SPLIT-CLOSURE] 2 train item(s) share their text with a test item and move to test as routing-only members (pool id unchanged)
+09:10:07.195 [INFO ] DatasetFetcher - [SPLIT-SIDE] 10 train (2 gate) / 8 test; every item's side == f(item); |gate ∩ eval| = 0; pool p7cd7f4b0dac80fd9; FunctionStamp(normaliserVersion=norm-v1, keyRule=ck-v1, modulus=1000, evalUpper=300, gateLower=300, gateUpper=400, poolId=p7cd7f4b0dac80fd9)
+09:10:07.197 [INFO ] DatasetFetcher - Train/test split (ratio=0.3, seed=2): 12 train / 6 test across 2 domains.
+09:10:07.197 [INFO ] DatasetFetcher - Successfully reserved 6 test queries across 2 domains to reserved_test_queries.json (5 arena-judgeable, 1 unlinked and routing-only).
+09:10:07.205 [INFO ] DatasetFetcher - [POOL] recorded p60532f6ace10d03f (seed=2, ratio=0.3, 5 judgeable ids; sentinels excluded); nothing activated
+09:10:07.212 [INFO ] DatasetFetcher - [SPLIT-CLOSURE] 2 train item(s) share their text with a test item and move to test as routing-only members (pool id unchanged)
+09:10:07.213 [INFO ] DatasetFetcher - [SPLIT-SIDE] 10 train (1 gate) / 8 test; every item's side == f(item); |gate ∩ eval| = 0; pool p60532f6ace10d03f; FunctionStamp(normaliserVersion=norm-v1, keyRule=ck-v1, modulus=1000, evalUpper=300, gateLower=300, gateUpper=400, poolId=p60532f6ace10d03f)
+09:10:07.215 [INFO ] DatasetFetcher - Train/test split (ratio=0.3, seed=3): 12 train / 6 test across 2 domains.
+09:10:07.215 [INFO ] DatasetFetcher - Successfully reserved 6 test queries across 2 domains to reserved_test_queries.json (6 arena-judgeable, 0 unlinked and routing-only).
+09:10:07.223 [INFO ] DatasetFetcher - [POOL] recorded pd82b31b93987795f (seed=3, ratio=0.3, 6 judgeable ids; sentinels excluded); nothing activated
+09:10:07.230 [INFO ] DatasetFetcher - [SPLIT-CLOSURE] 2 train item(s) share their text with a test item and move to test as routing-only members (pool id unchanged)
+09:10:07.230 [INFO ] DatasetFetcher - [SPLIT-SIDE] 10 train (2 gate) / 8 test; every item's side == f(item); |gate ∩ eval| = 0; pool pd82b31b93987795f; FunctionStamp(normaliserVersion=norm-v1, keyRule=ck-v1, modulus=1000, evalUpper=300, gateLower=300, gateUpper=400, poolId=pd82b31b93987795f)
+09:10:07.231 [INFO ] DatasetFetcher - Train/test split (ratio=0.3, seed=4): 12 train / 6 test across 2 domains.
+09:10:07.231 [INFO ] DatasetFetcher - Successfully reserved 6 test queries across 2 domains to reserved_test_queries.json (6 arena-judgeable, 0 unlinked and routing-only).
+09:10:07.239 [INFO ] DatasetFetcher - [POOL] recorded pe9d88cf6716e9d26 (seed=4, ratio=0.3, 6 judgeable ids; sentinels excluded); nothing activated
+09:10:07.246 [INFO ] DatasetFetcher - [SPLIT-CLOSURE] 2 train item(s) share their text with a test item and move to test as routing-only members (pool id unchanged)
+09:10:07.246 [INFO ] DatasetFetcher - [SPLIT-SIDE] 10 train (0 gate) / 8 test; every item's side == f(item); |gate ∩ eval| = 0; pool pe9d88cf6716e9d26; FunctionStamp(normaliserVersion=norm-v1, keyRule=ck-v1, modulus=1000, evalUpper=300, gateLower=300, gateUpper=400, poolId=pe9d88cf6716e9d26)
+09:10:07.250 [INFO ] DatasetFetcher - Train/test split (ratio=0.3, seed=5): 12 train / 6 test across 2 domains.
+09:10:07.250 [INFO ] DatasetFetcher - Successfully reserved 6 test queries across 2 domains to reserved_test_queries.json (6 arena-judgeable, 0 unlinked and routing-only).
+09:10:07.258 [INFO ] DatasetFetcher - [POOL] recorded pdf9f50b626f9e57e (seed=5, ratio=0.3, 6 judgeable ids; sentinels excluded); nothing activated
+09:10:07.265 [INFO ] DatasetFetcher - [SPLIT-CLOSURE] 2 train item(s) share their text with a test item and move to test as routing-only members (pool id unchanged)
+09:10:07.265 [INFO ] DatasetFetcher - [SPLIT-SIDE] 10 train (2 gate) / 8 test; every item's side == f(item); |gate ∩ eval| = 0; pool pdf9f50b626f9e57e; FunctionStamp(normaliserVersion=norm-v1, keyRule=ck-v1, modulus=1000, evalUpper=300, gateLower=300, gateUpper=400, poolId=pdf9f50b626f9e57e)
+09:10:07.270 [INFO ] DatasetFetcher - Train/test split (ratio=0.3, seed=6): 12 train / 6 test across 2 domains.
+09:10:07.270 [INFO ] DatasetFetcher - Successfully reserved 6 test queries across 2 domains to reserved_test_queries.json (6 arena-judgeable, 0 unlinked and routing-only).
+09:10:07.278 [INFO ] DatasetFetcher - [POOL] recorded p462085380017550f (seed=6, ratio=0.3, 6 judgeable ids; sentinels excluded); nothing activated
+09:10:07.285 [INFO ] DatasetFetcher - [SPLIT-CLOSURE] 2 train item(s) share their text with a test item and move to test as routing-only members (pool id unchanged)
+09:10:07.285 [INFO ] DatasetFetcher - [SPLIT-SIDE] 10 train (1 gate) / 8 test; every item's side == f(item); |gate ∩ eval| = 0; pool p462085380017550f; FunctionStamp(normaliserVersion=norm-v1, keyRule=ck-v1, modulus=1000, evalUpper=300, gateLower=300, gateUpper=400, poolId=p462085380017550f)
+09:10:07.289 [INFO ] DatasetFetcher - Train/test split (ratio=0.3, seed=7): 12 train / 6 test across 2 domains.
+09:10:07.289 [INFO ] DatasetFetcher - Successfully reserved 6 test queries across 2 domains to reserved_test_queries.json (5 arena-judgeable, 1 unlinked and routing-only).
+09:10:07.297 [INFO ] DatasetFetcher - [POOL] recorded p91a968fd56a5aaac (seed=7, ratio=0.3, 5 judgeable ids; sentinels excluded); nothing activated
+09:10:07.304 [INFO ] DatasetFetcher - [SPLIT-CLOSURE] 1 train item(s) share their text with a test item and move to test as routing-only members (pool id unchanged)
+09:10:07.304 [INFO ] DatasetFetcher - [SPLIT-SIDE] 11 train (1 gate) / 7 test; every item's side == f(item); |gate ∩ eval| = 0; pool p91a968fd56a5aaac; FunctionStamp(normaliserVersion=norm-v1, keyRule=ck-v1, modulus=1000, evalUpper=300, gateLower=300, gateUpper=400, poolId=p91a968fd56a5aaac)
+09:10:07.305 [INFO ] DatasetFetcher - Train/test split (ratio=0.3, seed=8): 12 train / 6 test across 2 domains.
+09:10:07.305 [INFO ] DatasetFetcher - Successfully reserved 6 test queries across 2 domains to reserved_test_queries.json (5 arena-judgeable, 1 unlinked and routing-only).
+09:10:07.314 [INFO ] DatasetFetcher - [POOL] recorded p191dcb5edf777849 (seed=8, ratio=0.3, 5 judgeable ids; sentinels excluded); nothing activated
+09:10:07.321 [INFO ] DatasetFetcher - [SPLIT-CLOSURE] 2 train item(s) share their text with a test item and move to test as routing-only members (pool id unchanged)
+09:10:07.321 [INFO ] DatasetFetcher - [SPLIT-SIDE] 10 train (2 gate) / 8 test; every item's side == f(item); |gate ∩ eval| = 0; pool p191dcb5edf777849; FunctionStamp(normaliserVersion=norm-v1, keyRule=ck-v1, modulus=1000, evalUpper=300, gateLower=300, gateUpper=400, poolId=p191dcb5edf777849)
+09:10:07.325 [INFO ] DatasetFetcher - Train/test split (ratio=0.3, seed=9): 12 train / 6 test across 2 domains.
+09:10:07.326 [INFO ] DatasetFetcher - Successfully reserved 6 test queries across 2 domains to reserved_test_queries.json (6 arena-judgeable, 0 unlinked and routing-only).
+09:10:07.333 [INFO ] DatasetFetcher - [POOL] recorded p48f52011b27f3f6d (seed=9, ratio=0.3, 6 judgeable ids; sentinels excluded); nothing activated
+09:10:07.340 [INFO ] DatasetFetcher - [SPLIT-CLOSURE] 2 train item(s) share their text with a test item and move to test as routing-only members (pool id unchanged)
+09:10:07.341 [INFO ] DatasetFetcher - [SPLIT-SIDE] 10 train (1 gate) / 8 test; every item's side == f(item); |gate ∩ eval| = 0; pool p48f52011b27f3f6d; FunctionStamp(normaliserVersion=norm-v1, keyRule=ck-v1, modulus=1000, evalUpper=300, gateLower=300, gateUpper=400, poolId=p48f52011b27f3f6d)
+09:10:07.345 [INFO ] DatasetFetcher - Train/test split (ratio=0.3, seed=10): 12 train / 6 test across 2 domains.
+09:10:07.345 [INFO ] DatasetFetcher - Successfully reserved 6 test queries across 2 domains to reserved_test_queries.json (6 arena-judgeable, 0 unlinked and routing-only).
+09:10:07.353 [INFO ] DatasetFetcher - [POOL] recorded p53385e168bdaa3e6 (seed=10, ratio=0.3, 6 judgeable ids; sentinels excluded); nothing activated
+09:10:07.360 [INFO ] DatasetFetcher - [SPLIT-CLOSURE] 2 train item(s) share their text with a test item and move to test as routing-only members (pool id unchanged)
+09:10:07.360 [INFO ] DatasetFetcher - [SPLIT-SIDE] 10 train (1 gate) / 8 test; every item's side == f(item); |gate ∩ eval| = 0; pool p53385e168bdaa3e6; FunctionStamp(normaliserVersion=norm-v1, keyRule=ck-v1, modulus=1000, evalUpper=300, gateLower=300, gateUpper=400, poolId=p53385e168bdaa3e6)
+09:10:07.365 [INFO ] DatasetFetcher - Train/test split (ratio=0.3, seed=11): 12 train / 6 test across 2 domains.
+09:10:07.365 [INFO ] DatasetFetcher - Successfully reserved 6 test queries across 2 domains to reserved_test_queries.json (6 arena-judgeable, 0 unlinked and routing-only).
+09:10:07.373 [INFO ] DatasetFetcher - [POOL] recorded pc9c53530e5bee6bc (seed=11, ratio=0.3, 6 judgeable ids; sentinels excluded); nothing activated
+09:10:07.380 [INFO ] DatasetFetcher - [SPLIT-CLOSURE] 2 train item(s) share their text with a test item and move to test as routing-only members (pool id unchanged)
+09:10:07.380 [INFO ] DatasetFetcher - [SPLIT-SIDE] 10 train (1 gate) / 8 test; every item's side == f(item); |gate ∩ eval| = 0; pool pc9c53530e5bee6bc; FunctionStamp(normaliserVersion=norm-v1, keyRule=ck-v1, modulus=1000, evalUpper=300, gateLower=300, gateUpper=400, poolId=pc9c53530e5bee6bc)
+09:10:07.384 [INFO ] DatasetFetcher - Train/test split (ratio=0.3, seed=12): 12 train / 6 test across 2 domains.
+09:10:07.385 [INFO ] DatasetFetcher - Successfully reserved 6 test queries across 2 domains to reserved_test_queries.json (6 arena-judgeable, 0 unlinked and routing-only).
+09:10:07.392 [INFO ] DatasetFetcher - [POOL] recorded p02808b0272b93dd7 (seed=12, ratio=0.3, 6 judgeable ids; sentinels excluded); nothing activated
+09:10:07.399 [INFO ] DatasetFetcher - [SPLIT-CLOSURE] 2 train item(s) share their text with a test item and move to test as routing-only members (pool id unchanged)
+09:10:07.400 [INFO ] DatasetFetcher - [SPLIT-SIDE] 10 train (2 gate) / 8 test; every item's side == f(item); |gate ∩ eval| = 0; pool p02808b0272b93dd7; FunctionStamp(normaliserVersion=norm-v1, keyRule=ck-v1, modulus=1000, evalUpper=300, gateLower=300, gateUpper=400, poolId=p02808b0272b93dd7)
+09:10:07.400 [INFO ] DatasetFetcher - Train/test split (ratio=0.3, seed=13): 12 train / 6 test across 2 domains.
+09:10:07.401 [INFO ] DatasetFetcher - Successfully reserved 6 test queries across 2 domains to reserved_test_queries.json (5 arena-judgeable, 1 unlinked and routing-only).
+09:10:07.408 [INFO ] DatasetFetcher - [POOL] recorded p64cedf5db478671d (seed=13, ratio=0.3, 5 judgeable ids; sentinels excluded); nothing activated
+09:10:07.415 [INFO ] DatasetFetcher - [SPLIT-CLOSURE] 1 train item(s) share their text with a test item and move to test as routing-only members (pool id unchanged)
+09:10:07.416 [INFO ] DatasetFetcher - [SPLIT-SIDE] 11 train (1 gate) / 7 test; every item's side == f(item); |gate ∩ eval| = 0; pool p64cedf5db478671d; FunctionStamp(normaliserVersion=norm-v1, keyRule=ck-v1, modulus=1000, evalUpper=300, gateLower=300, gateUpper=400, poolId=p64cedf5db478671d)
+09:10:07.420 [INFO ] DatasetFetcher - Train/test split (ratio=0.3, seed=14): 12 train / 6 test across 2 domains.
+09:10:07.420 [INFO ] DatasetFetcher - Successfully reserved 6 test queries across 2 domains to reserved_test_queries.json (5 arena-judgeable, 1 unlinked and routing-only).
+09:10:07.428 [INFO ] DatasetFetcher - [POOL] recorded pf8e395ae20ac4307 (seed=14, ratio=0.3, 5 judgeable ids; sentinels excluded); nothing activated
+09:10:07.435 [INFO ] DatasetFetcher - [SPLIT-CLOSURE] 1 train item(s) share their text with a test item and move to test as routing-only members (pool id unchanged)
+09:10:07.435 [INFO ] DatasetFetcher - [SPLIT-SIDE] 11 train (1 gate) / 7 test; every item's side == f(item); |gate ∩ eval| = 0; pool pf8e395ae20ac4307; FunctionStamp(normaliserVersion=norm-v1, keyRule=ck-v1, modulus=1000, evalUpper=300, gateLower=300, gateUpper=400, poolId=pf8e395ae20ac4307)
+09:10:07.436 [INFO ] DatasetFetcher - Train/test split (ratio=0.3, seed=15): 12 train / 6 test across 2 domains.
+09:10:07.436 [INFO ] DatasetFetcher - Successfully reserved 6 test queries across 2 domains to reserved_test_queries.json (6 arena-judgeable, 0 unlinked and routing-only).
+09:10:07.445 [INFO ] DatasetFetcher - [POOL] recorded pbd59f4678e3da3a4 (seed=15, ratio=0.3, 6 judgeable ids; sentinels excluded); nothing activated
+09:10:07.452 [INFO ] DatasetFetcher - [SPLIT-SIDE] 12 train (2 gate) / 6 test; every item's side == f(item); |gate ∩ eval| = 0; pool pbd59f4678e3da3a4; FunctionStamp(normaliserVersion=norm-v1, keyRule=ck-v1, modulus=1000, evalUpper=300, gateLower=300, gateUpper=400, poolId=pbd59f4678e3da3a4)
+09:10:07.455 [INFO ] DatasetFetcher - Train/test split (ratio=0.3, seed=16): 12 train / 6 test across 2 domains.
+09:10:07.456 [INFO ] DatasetFetcher - Successfully reserved 6 test queries across 2 domains to reserved_test_queries.json (6 arena-judgeable, 0 unlinked and routing-only).
+09:10:07.464 [INFO ] DatasetFetcher - [POOL] recorded p7f54bf12427f8341 (seed=16, ratio=0.3, 6 judgeable ids; sentinels excluded); nothing activated
+09:10:07.471 [INFO ] DatasetFetcher - [SPLIT-SIDE] 12 train (1 gate) / 6 test; every item's side == f(item); |gate ∩ eval| = 0; pool p7f54bf12427f8341; FunctionStamp(normaliserVersion=norm-v1, keyRule=ck-v1, modulus=1000, evalUpper=300, gateLower=300, gateUpper=400, poolId=p7f54bf12427f8341)
+09:10:07.475 [INFO ] DatasetFetcher - Train/test split (ratio=0.3, seed=17): 12 train / 6 test across 2 domains.
+09:10:07.476 [INFO ] DatasetFetcher - Successfully reserved 6 test queries across 2 domains to reserved_test_queries.json (6 arena-judgeable, 0 unlinked and routing-only).
+09:10:07.484 [INFO ] DatasetFetcher - [POOL] recorded p4ca96794037f1027 (seed=17, ratio=0.3, 6 judgeable ids; sentinels excluded); nothing activated
+09:10:07.491 [INFO ] DatasetFetcher - [SPLIT-CLOSURE] 1 train item(s) share their text with a test item and move to test as routing-only members (pool id unchanged)
+09:10:07.491 [INFO ] DatasetFetcher - [SPLIT-SIDE] 11 train (1 gate) / 7 test; every item's side == f(item); |gate ∩ eval| = 0; pool p4ca96794037f1027; FunctionStamp(normaliserVersion=norm-v1, keyRule=ck-v1, modulus=1000, evalUpper=300, gateLower=300, gateUpper=400, poolId=p4ca96794037f1027)
+09:10:07.495 [INFO ] DatasetFetcher - Train/test split (ratio=0.3, seed=18): 12 train / 6 test across 2 domains.
+09:10:07.495 [INFO ] DatasetFetcher - Successfully reserved 6 test queries across 2 domains to reserved_test_queries.json (5 arena-judgeable, 1 unlinked and routing-only).
+09:10:07.503 [INFO ] DatasetFetcher - [POOL] recorded pb338e907610ba19e (seed=18, ratio=0.3, 5 judgeable ids; sentinels excluded); nothing activated
+09:10:07.510 [INFO ] DatasetFetcher - [SPLIT-CLOSURE] 2 train item(s) share their text with a test item and move to test as routing-only members (pool id unchanged)
+09:10:07.510 [INFO ] DatasetFetcher - [SPLIT-SIDE] 10 train (2 gate) / 8 test; every item's side == f(item); |gate ∩ eval| = 0; pool pb338e907610ba19e; FunctionStamp(normaliserVersion=norm-v1, keyRule=ck-v1, modulus=1000, evalUpper=300, gateLower=300, gateUpper=400, poolId=pb338e907610ba19e)
+09:10:07.514 [INFO ] DatasetFetcher - Train/test split (ratio=0.3, seed=19): 12 train / 6 test across 2 domains.
+09:10:07.515 [INFO ] DatasetFetcher - Successfully reserved 6 test queries across 2 domains to reserved_test_queries.json (5 arena-judgeable, 1 unlinked and routing-only).
+09:10:07.523 [INFO ] DatasetFetcher - [POOL] recorded pf35b09950a1a510a (seed=19, ratio=0.3, 5 judgeable ids; sentinels excluded); nothing activated
+09:10:07.530 [INFO ] DatasetFetcher - [SPLIT-CLOSURE] 1 train item(s) share their text with a test item and move to test as routing-only members (pool id unchanged)
+09:10:07.530 [INFO ] DatasetFetcher - [SPLIT-SIDE] 11 train (1 gate) / 7 test; every item's side == f(item); |gate ∩ eval| = 0; pool pf35b09950a1a510a; FunctionStamp(normaliserVersion=norm-v1, keyRule=ck-v1, modulus=1000, evalUpper=300, gateLower=300, gateUpper=400, poolId=pf35b09950a1a510a)
+09:10:07.534 [INFO ] DatasetFetcher - Train/test split (ratio=0.3, seed=20): 12 train / 6 test across 2 domains.
+09:10:07.534 [INFO ] DatasetFetcher - Successfully reserved 6 test queries across 2 domains to reserved_test_queries.json (6 arena-judgeable, 0 unlinked and routing-only).
+09:10:07.542 [INFO ] DatasetFetcher - [POOL] recorded pbe025abb2055bd60 (seed=20, ratio=0.3, 6 judgeable ids; sentinels excluded); nothing activated
+09:10:07.548 [INFO ] DatasetFetcher - [SPLIT-CLOSURE] 2 train item(s) share their text with a test item and move to test as routing-only members (pool id unchanged)
+09:10:07.549 [INFO ] DatasetFetcher - [SPLIT-SIDE] 10 train (1 gate) / 8 test; every item's side == f(item); |gate ∩ eval| = 0; pool pbe025abb2055bd60; FunctionStamp(normaliserVersion=norm-v1, keyRule=ck-v1, modulus=1000, evalUpper=300, gateLower=300, gateUpper=400, poolId=pbe025abb2055bd60)
+09:10:07.584 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+09:10:07.584 [INFO ] DatasetFetcher - [SPLIT-CLOSURE] 2 train item(s) share their text with a test item and move to test as routing-only members (pool id unchanged)
+09:10:07.616 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+09:10:07.621 [INFO ] DatasetFetcher - Train/test split from reserved file 'pinned.json': 13 train / 5 test (file lists 5 ids; 0 not present in the loaded dataset).
+09:10:07.630 [INFO ] DatasetFetcher - [POOL] recorded p122635da994f4f5b (file pinned.json, 5 judgeable ids; sentinels excluded); nothing activated
+09:10:07.637 [INFO ] DatasetFetcher - [SPLIT-CLOSURE] 2 train item(s) share their text with a test item and move to test as routing-only members (pool id unchanged)
+09:10:07.637 [INFO ] DatasetFetcher - [SPLIT-SIDE] 11 train (2 gate) / 7 test; every item's side == f(item); |gate ∩ eval| = 0; pool p122635da994f4f5b; FunctionStamp(normaliserVersion=norm-v1, keyRule=ck-v1, modulus=1000, evalUpper=300, gateLower=300, gateUpper=400, poolId=p122635da994f4f5b)
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

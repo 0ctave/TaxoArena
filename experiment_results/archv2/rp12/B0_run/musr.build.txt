@@ -1,0 +1,588 @@
+[musr] start 2026-10-01T07:01:37+02:00 cmd: ./gradlew.bat bootRun --console=plain --offline -PjvmThreads=12 --args="--config experiment_configs/rp12/B0/musr.toml"
+Configuration on demand is an incubating feature.
+Calculating task graph as no cached configuration is available for tasks: bootRun --args=--config experiment_configs/rp12/B0/musr.toml
+> Task :checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :processResources UP-TO-DATE
+> Task :compileKotlin UP-TO-DATE
+> Task :compileJava NO-SOURCE
+> Task :classes UP-TO-DATE
+> Task :resolveMainClassName UP-TO-DATE
+> Task :processAot UP-TO-DATE
+> Task :processAotResources UP-TO-DATE
+> Task :compileAotKotlin NO-SOURCE
+> Task :compileAotJava UP-TO-DATE
+> Task :aotClasses UP-TO-DATE
+
+> Task :bootRun
+[BOOT] TaxoAdapt starting � pid=33880, java=21.0.6, jar=file:/Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/rp12-b0-run/build/classes/kotlin/main/
+[THREAD-CAP] requested=12 availableProcessors=12 heapEstimate=n/a budget=16.94GB
+[BOOT] corpusDbPath from TOML: taxoadapt.eval.db-path=multicorpus_cache_v1.db
+Page de codes active�: 65001
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+07:01:40.016 [INFO ] EmbeddingCache - SQLite Embedding, GMM & Query Cache initialized successfully.
+07:01:40.027 [INFO ] ModelEvalStore - ModelEvalStore schema ready.
+07:01:40.030 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+07:01:40.048 [WARN ] ArcConfig - LLM provider is AZURE but AZURE_AI_ENDPOINT/AZURE_AI_API_KEY are blank. Create a root-level .env (see .env.example) or export these variables. Falling back to the Ollama chat model at http://localhost:11434 so the application can still start.
+07:01:40.080 [INFO ] LLMClient - [ARENA-PACING] request pacing at 4.0 req/s, semaphore capacity 4
+07:01:40.090 [INFO ] RankingService - SQLite Agent Ratings V2, Match History, and Bradley-Terry schema initialized.
+07:01:40.120 [INFO ] HeadlessRunner - Starting Headless Benchmark Mode with config: experiment_configs/rp12/B0/musr.toml
+07:01:40.148 [INFO ] RatingsDbGuard - [DB-GUARD] ratings database 'ratings.db' is not tracked; safe to write
+07:01:40.171 [INFO ] HeadlessRunner - Loaded CLI Configuration: HeadlessCliConfig(snapshotId=unsaved, models=[DeepSeek-R1-Distill-Llama-8B, DeepSeek-R1-Distill-Qwen-32B, Falcon3-10B-Instruct, Llama-3.1-70B-Instruct, Llama-3.2-3B-Instruct, Llama-3.3-70B-Instruct, Mistral-Small-Instruct-2409, Mixtral-8x7B-Instruct-v0.1, OLMo-2-1124-7B-Instruct, Phi-3.5-mini-instruct, Qwen2.5-32B-Instruct, Qwen2.5-72B-Instruct, Qwen2.5-7B-Instruct, Qwen2.5-Coder-7B-Instruct, Qwen2.5-Math-7B-Instruct, Yi-1.5-34B-Chat-16K, c4ai-command-r-plus-08-2024, internlm2_5-20b-chat], queryLimit=0, category=null, confidenceGate=0.65, parallelism=6, questionsPerRound=12, reservedOnly=true, resumeBenchmark=false, profileMode=false, profileSeTarget=0.15, profileStrataFile=null, maxQueryReuse=2147483647, matchFilter=none, tau=1.0E-6, enableFinalMetrics=true, adaptiveBarFile=null, embeddingSliceDim=512, splitDropTopPcs=0, splitWhiten=false, proposalMemo=null, conditions=[MAIN, ORACLE, GENERIC_JUDGE, RANDOM_SCHEDULER], outputDir=experiment_results/archv2/rp12/B0/musr, testRatio=0.3, seed=42, seeds=[], splitSeed=null, constructionOrderShuffleSeed=null, anchorFree=false, proposalAcceptMultiplier=null, reservedPoolFile=null, v2PoolFile=experiment_configs/engine_pool_pv2_1575de61bb20e977.json, unionRoutingItemKey=false, v2ForeignMembers=[], pool=pv2_1575de61bb20e977, acknowledgedEvalMembers=[], regenerateSplit=false, runPipeline=true, maxDepth=8, minClusterSize=55, proposalSeparationBar=0.0145, membershipFloor=0.25, routingBeamGamma=0.2, descentMargin=0.12, acceptanceZ=2.0, marginalEps=null, maxK=null, excludeFromAnchoring=[], expectedWithheldQueries=null, enableRefitGate=false, defaultKappaPrior=10.0, enableLabeling=false, judgeInduction=false, datasetType=null, corpora=[MUSR], corpusDbPath=multicorpus_cache_v1.db, unionSnapshots=[], unionRootRouting=descent, runBenchmark=false, runTrickle=true, domains=[], enableStableQuestionIds=null, enableResidualRouting=null, enableResidualSplitGate=null, fusionSimilarityThreshold=0.9, effectiveSupportFloor=2.0, numIterations=50, runBaselines=false, enableGtWarmStart=false, maxLeafAssignments=5, dagMode=DAG_MAX, enableProfiling=true, judgeSeesOptions=null, judgeOptionMode=null, judgeRecipe=null, judgeRecipeKit=null, judgeRecipeModel=null, judgeRecipeMaxTokens=null, judgeRecipeTemperature=null)
+07:01:40.172 [INFO ] HeadlessRunner - [SLICE] embedding slice width = 512, split PCA dropTop=0 whiten=false
+07:01:40.172 [INFO ] HeadlessRunner - [CORPUS] corpora=[MUSR] corpusDbPath=multicorpus_cache_v1.db
+07:01:40.172 [INFO ] HeadlessRunner - [JUDGE-RECIPE] disabled: judge = Mistral-Large-3 on the langchain4j path (byte-identical to the board of record)
+07:01:40.260 [INFO ] Diagnostics - [DIAG] diagnostics bundle open at Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\B0\musr\seed_42\diagnostics
+07:01:40.260 [INFO ] HeadlessRunner - ==================================================
+07:01:40.260 [INFO ] HeadlessRunner - STARTING PIPELINE AND EVALUATION WITH SEED: 42
+07:01:40.260 [INFO ] HeadlessRunner - ==================================================
+07:01:40.260 [INFO ] HeadlessRunner - Headless pipeline execution enabled. Starting DAG generation pipeline...
+07:01:40.261 [INFO ] HeadlessRunner - Loading dataset for domains: []
+07:01:40.294 [INFO ] LeaderboardCorpus - Loaded 756 MUSR queries across 3 domain(s) from multicorpus_cache_v1.db
+07:01:40.301 [INFO ] DatasetFetcher - [CORPUS] merged 1 source(s): MUSR=3 domain(s)/756 queries -> 3 domain key(s), 756 queries
+07:01:40.429 [WARN ] HeadlessRunner - [SPLIT-V2] the split is taken AS GIVEN from experiment_configs/engine_pool_pv2_1575de61bb20e977.json (pv2_1575de61bb20e977, CK-CLOSE-v2); seed, testRatio and reservedPoolFile are not used for the split
+07:01:40.601 [WARN ] DatasetFetcher - [SPLIT-V2] namespaced pool file: this build loaded [MUSR] of [BBH, GPQA, IFEVAL, MATH, MMLU_PRO, MUSR]; one-to-one checked on those
+07:01:40.618 [INFO ] DatasetFetcher - [POOL] recorded p01afdc4cf1d2fa86 (v2 pool pv2_1575de61bb20e977, 302 judgeable ids; sentinels excluded); nothing activated
+07:01:40.619 [WARN ] DatasetFetcher - [SPLIT-V2] split taken as given from pv2_1575de61bb20e977 (CK-CLOSE-v2, engine pool file sha256(LF) 79d48f4b36434a55): 454 train / 302 reserved (eval 6466, gate 73, sentinels 0); one-to-one TRAIN and RESERVED hold; 0 TRAIN rows share a stem key with the 8186 global reserved keys; legacy id-list pool p01afdc4cf1d2fa86 (READY_rp12_et D-1: it holds EVAL + GATE ids, never an EVAL pool)
+07:01:40.622 [WARN ] HeadlessRunner - [TRAIN-ONLY] global reserved keys installed: 8186 (pv2_1575de61bb20e977, all corpora, sentinels included); build stamp recorded
+07:01:40.639 [INFO ] HeadlessRunner - [POOL] recorded p01afdc4cf1d2fa86 (seed=42, gate=73, closedByContent=0); nothing activated
+07:01:40.640 [INFO ] HeadlessRunner - Running GMM splitting and trickle routing pipeline...
+07:01:40.643 [INFO ] Engine - Starting Taxonomy Adaptation: MUSR
+07:01:40.644 [INFO ] Engine - 
+┌── TAXONOMY CONFIGURATION PARAMETERS ─────────────────────
+│ Execution Settings:
+│   - Dataset Type:         AG_NEWS
+│   - Corpora:              [MUSR]
+│   - Num Iterations:       50
+│   - Early Stopping:       true
+│   - Labeling:             false
+│   - Selected Domains:     [All]
+│   - Split Dataset:        true
+│   - Test Split Ratio:     0.3
+├── LLM & Embedding Models:
+│   - LLM Provider:         AZURE
+│   - Embedding Provider:   OLLAMA
+│   - Embedding Model:      qwen3-embedding:latest
+│   - Judge Model:          Mistral-Large-3
+│   - Labeling Model:       Mistral-Large-3
+│   - Max Judge Generality: 1
+├── Advanced Mathematical Formalism Controls:
+│   - DAG Mode:             DAG_MAX
+│   - Max Depth:            8
+│   - Min Cluster Size:     55
+│   - Separation Bar:       0.0145
+│   - Slice Dim / PCA:      512 / dropTop=0 whiten=false
+│   - Lexicographic Tau:    1.0E-6
+│   - Membership Floor:     0.25
+│   - Routing Beam Gamma:   0.2
+│   - Descent Margin:       0.12
+│   - Fusion Sim Threshold: 0.9
+│   - Eff Support Floor:    2.0
+│   - Default Kappa Prior:  10.0
+└──────────────────────────────────────────────────────────
+07:01:40.645 [INFO ] Engine - Phase 1: Precomputing Embeddings...
+07:01:40.692 [INFO ] EmbeddingCache - All 454 requested embeddings are already cached on disk.
+07:01:40.693 [INFO ] Engine - Dimension check passed: model=4096 dims, minRequired=512 (maxDepth=8)
+07:01:40.694 [INFO ] Engine - Bootstrap: Seeding GMMs with 100% ground-truth data...
+07:01:40.695 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+07:01:40.741 [INFO ] Fitter - [FITTER] Fitting complete (2 depths, 4 nodes)
+07:01:40.742 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 237.2760     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 223.0863     | 237.2760     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+07:01:40.743 [INFO ] Engine - Initial DAG Structure (Before Statistical Fitting)
+07:01:40.746 [INFO ] Operations - 
+┌── TAXONOMY DAG HIERARCHY ───────────────────────────────
+│ MUSR [q_dir=0, q_rec=454, mass=454.0 - Parent/Residual] (vMF kappa: 237.276)
+│ ├── MUSR/team_allocation [q_dir=150, q_rec=150, mass=150.0 - Leaf] (vMF kappa: 225.478)
+│ ├── MUSR/murder_mysteries [q_dir=148, q_rec=148, mass=148.0 - Leaf] (vMF kappa: 230.570)
+│ └── MUSR/object_placements [q_dir=156, q_rec=156, mass=156.0 - Leaf] (vMF kappa: 213.211)
+└─────────────────────────────────────────────────────────
+07:01:40.746 [INFO ] Engine - STARTING EVOLUTION ITERATION 1
+07:01:41.041 [INFO ] Splitter - Split 'MUSR/team_allocation' (q=150, k=2, sep=0.027, routed=[86, 64], converged=true) -> Spawning 2 children
+07:01:41.111 [INFO ] Splitter - Split 'MUSR/team_allocation' (q=150, k=2, sep=0.027, routed=[86, 64], converged=true) -> Spawning 2 children
+07:01:41.257 [INFO ] Operations - [DJ-SE] GROW 'MUSR/team_allocation' dJ=1.358e-03 SE_dJ=1.053e-03 z=1.29 dV=2
+07:01:41.259 [INFO ] Operations - [GROW REJECTED] 'MUSR/team_allocation' Delta J = 0.001358, Delta V = 2. Reverting.
+07:01:41.264 [INFO ] Splitter - Split 'MUSR/team_allocation' (q=150, k=2, sep=0.027, routed=[86, 64], converged=true) -> Spawning 2 children
+07:01:41.363 [INFO ] Operations - [DJ-SE] GROW 'MUSR/team_allocation' dJ=1.358e-03 SE_dJ=1.053e-03 z=1.29 dV=2
+07:01:41.364 [INFO ] Operations - [GROW REJECTED] 'MUSR/team_allocation' Delta J = 0.001358, Delta V = 2. Reverting.
+07:01:41.368 [INFO ] Splitter - Split 'MUSR/team_allocation' (q=150, k=2, sep=0.027, routed=[86, 64], converged=true) -> Spawning 2 children
+07:01:41.402 [INFO ] Operations - [DJ-SE] GROW 'MUSR/team_allocation' dJ=1.358e-03 SE_dJ=1.053e-03 z=1.29 dV=2
+07:01:41.402 [INFO ] Operations - [GROW REJECTED] 'MUSR/team_allocation' Delta J = 0.001358, Delta V = 2. Reverting.
+07:01:41.545 [INFO ] Splitter - Split 'MUSR/murder_mysteries' (q=148, k=2, sep=0.033, routed=[76, 72], converged=true) -> Spawning 2 children
+07:01:41.560 [INFO ] Operations - [DJ-SE] GROW 'MUSR/murder_mysteries' dJ=-1.640e-03 SE_dJ=1.168e-03 z=-1.40 dV=2
+07:01:41.560 [INFO ] Operations - [GROW REJECTED] 'MUSR/murder_mysteries' Delta J = -0.001640, Delta V = 2. Reverting.
+07:01:41.564 [INFO ] Splitter - Split 'MUSR/murder_mysteries' (q=148, k=2, sep=0.033, routed=[76, 72], converged=true) -> Spawning 2 children
+07:01:41.578 [INFO ] Operations - [DJ-SE] GROW 'MUSR/murder_mysteries' dJ=-1.640e-03 SE_dJ=1.168e-03 z=-1.40 dV=2
+07:01:41.578 [INFO ] Operations - [GROW REJECTED] 'MUSR/murder_mysteries' Delta J = -0.001640, Delta V = 2. Reverting.
+07:01:41.582 [INFO ] Splitter - Split 'MUSR/murder_mysteries' (q=148, k=2, sep=0.033, routed=[76, 72], converged=true) -> Spawning 2 children
+07:01:41.596 [INFO ] Operations - [DJ-SE] GROW 'MUSR/murder_mysteries' dJ=-1.640e-03 SE_dJ=1.168e-03 z=-1.40 dV=2
+07:01:41.596 [INFO ] Operations - [GROW REJECTED] 'MUSR/murder_mysteries' Delta J = -0.001640, Delta V = 2. Reverting.
+07:01:41.730 [INFO ] Splitter - Split 'MUSR/object_placements' (q=156, k=2, sep=0.054, routed=[64, 92], converged=true) -> Spawning 2 children
+07:01:41.745 [INFO ] Operations - [DJ-SE] GROW 'MUSR/object_placements' dJ=1.578e-02 SE_dJ=1.493e-03 z=10.58 dV=2
+07:01:41.745 [INFO ] Operations - [GROW ACCEPTED] 'MUSR/object_placements' Delta J = 0.015784, Delta V = 2
+07:01:41.755 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+07:01:41.760 [INFO ] Fitter - [FIT-μ]  iter=1: mean_MLE_drift=1.000, oscillating_nodes=0/6, earlyout_rate=1.00
+07:01:41.761 [INFO ] Fitter - [FIT-κ]  iter=1: prior_dominated=1/6 (16.7%), median_kfinal=225.48, median_alpha=0.18
+07:01:41.762 [INFO ] Fitter - [FITTER] Fitting complete (3 depths, 6 nodes)
+07:01:41.762 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 237.2760     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 223.0863     | 237.2760     | 0               | 0.0000             | 0.0000            
+│ 2     | 181.1308     | 213.2112     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+07:01:41.763 [INFO ] Engine - [REFIT-DELTA] Iteration 1 | 0.000e+00 (M-step inert, as expected)
+07:01:41.764 [INFO ] Engine - [J-TRACK] Iteration 1 | J_after_trickle: 0.342070 (Trickle Delta: 0.000000) | J_after_edits: 0.357854 (Edits Delta: 0.015784)
+07:01:41.764 [INFO ] Engine - [MU-GAP] Iteration 1 | internal nodes=2 cos(mu_v, resultant) min=0.9993 p10=0.9993 median=1.0000 max=1.0000
+07:01:41.831 [INFO ] Engine - [J-RESOLUTION] Iteration 1 | J=0.357854 SE_boot=3.778e-03 (B=200) | tau=1.000e-06 SE/tau=3777.8 | 2*SE=7.556e-03
+07:01:41.831 [INFO ] Engine - Iteration 1 completed in 1085ms.
+07:01:41.831 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 6 (4 leaves, 2 internal) | Total Mass: 454.00 ===
+07:01:41.845 [INFO ] Engine - === DAG after iteration 1 ===
+07:01:41.851 [INFO ] Operations - 
+┌── TAXONOMY HIERARCHY ───────────────────────────────────
+│ MUSR [q_dir=0, q_rec=454, mass=454.0, Parent] (kappa: 237.3)
+│ ├── MUSR/team_allocation [q_dir=150, q_rec=150, mass=150.0, Leaf] (kappa: 225.5)
+│ ├── MUSR/murder_mysteries [q_dir=148, q_rec=148, mass=148.0, Leaf] (kappa: 230.6)
+│ └── MUSR/object_placements [q_dir=0, q_rec=156, mass=156.0, Parent] (kappa: 213.2)
+│     ├── Emergent Concept #16 [q_dir=92, q_rec=92, mass=92.0, Leaf] (kappa: 172.4)
+│     └── Emergent Concept #15 [q_dir=64, q_rec=64, mass=64.0, Leaf] (kappa: 189.9)
+└─────────────────────────────────────────────────────────
+07:01:41.851 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 1) ===
+07:01:41.852 [INFO ] Engine - GROW: 10 attempted (1 accepted, 6 rejected, 3 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+07:01:41.854 [INFO ] Engine - [CONVERGENCE] Iteration 1 | GED converged=false | J stationary=false (streak 0/5, editsDelta=1.578e-02, trickleDelta=0.000e+00)
+07:01:41.855 [INFO ] Engine - STARTING EVOLUTION ITERATION 2
+07:01:41.988 [INFO ] Splitter - Split 'MUSR/team_allocation' (q=150, k=2, sep=0.027, routed=[86, 64], converged=true) -> Spawning 2 children
+07:01:41.996 [INFO ] Splitter - Split 'MUSR/team_allocation' (q=150, k=2, sep=0.027, routed=[86, 64], converged=true) -> Spawning 2 children
+07:01:42.013 [INFO ] Operations - [DJ-SE] GROW 'MUSR/team_allocation' dJ=5.515e-03 SE_dJ=1.216e-03 z=4.54 dV=2
+07:01:42.014 [INFO ] Operations - [GROW ACCEPTED] 'MUSR/team_allocation' Delta J = 0.005515, Delta V = 2
+07:01:42.140 [INFO ] Splitter - Split 'MUSR/murder_mysteries' (q=148, k=2, sep=0.033, routed=[76, 72], converged=true) -> Spawning 2 children
+07:01:42.154 [INFO ] Operations - [DJ-SE] GROW 'MUSR/murder_mysteries' dJ=4.020e-03 SE_dJ=1.568e-03 z=2.56 dV=2
+07:01:42.155 [INFO ] Operations - [GROW ACCEPTED] 'MUSR/murder_mysteries' Delta J = 0.004020, Delta V = 2
+07:01:42.162 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+07:01:42.182 [INFO ] Fitter - [FIT-μ]  iter=2: mean_MLE_drift=1.000, oscillating_nodes=0/10, earlyout_rate=1.00
+07:01:42.182 [INFO ] Fitter - [FIT-κ]  iter=2: prior_dominated=4/10 (40.0%), median_kfinal=198.42, median_alpha=0.49
+07:01:42.182 [INFO ] Fitter - [FITTER] Fitting complete (3 depths, 10 nodes)
+07:01:42.182 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 237.2760     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 223.0863     | 237.2760     | 0               | 0.0000             | 0.0000            
+│ 2     | 188.9965     | 223.0863     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+07:01:42.184 [INFO ] Engine - [REFIT-DELTA] Iteration 2 | 0.000e+00 (M-step inert, as expected)
+07:01:42.184 [INFO ] Engine - [J-TRACK] Iteration 2 | J_after_trickle: 0.357854 (Trickle Delta: 0.000000) | J_after_edits: 0.367389 (Edits Delta: 0.009535)
+07:01:42.184 [INFO ] Engine - [MU-GAP] Iteration 2 | internal nodes=4 cos(mu_v, resultant) min=0.9993 p10=0.9993 median=1.0000 max=1.0000
+07:01:42.199 [INFO ] Engine - [J-RESOLUTION] Iteration 2 | J=0.367389 SE_boot=5.020e-03 (B=200) | tau=1.000e-06 SE/tau=5020.4 | 2*SE=1.004e-02
+07:01:42.199 [INFO ] Engine - Iteration 2 completed in 344ms.
+07:01:42.199 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 10 (6 leaves, 4 internal) | Total Mass: 454.00 ===
+07:01:42.212 [INFO ] Engine - === DAG Changes in iteration 2 ===
+07:01:42.214 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│ "MUSR" (Parent, q=0/454)
+│ ├── [MUTATED] "MUSR/team_allocation" (Parent, kappa: 225.5, q=0/150) -> type changed: Leaf -> Parent
+│ │   ├── [ADDED] "Emergent Concept #19" (Leaf, kappa: 185.2, q=88/88)
+│ │   └── [ADDED] "Emergent Concept #20" (Leaf, kappa: 198.4, q=64/64)
+│ └── [MUTATED] "MUSR/murder_mysteries" (Parent, kappa: 230.6, q=0/148) -> type changed: Leaf -> Parent
+│     ├── [ADDED] "Emergent Concept #22" (Leaf, kappa: 193.5, q=72/72)
+│     └── [ADDED] "Emergent Concept #21" (Leaf, kappa: 194.5, q=76/76)
+└──────────────────────────────────────────────────────────
+07:01:42.214 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 2) ===
+07:01:42.214 [INFO ] Engine - GROW: 14 attempted (2 accepted, 0 rejected, 12 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+07:01:42.215 [INFO ] Stabilizer - GED Analysis (Iter 2): +4/-0 nodes, +4/-0 relations.
+07:01:42.215 [INFO ] Engine - [CONVERGENCE] Iteration 2 | GED converged=false | J stationary=false (streak 0/5, editsDelta=9.535e-03, trickleDelta=0.000e+00)
+07:01:42.215 [INFO ] Engine - STARTING EVOLUTION ITERATION 3
+07:01:42.227 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+07:01:42.247 [INFO ] Fitter - [FIT-μ]  iter=3: mean_MLE_drift=1.000, oscillating_nodes=0/10, earlyout_rate=1.00
+07:01:42.247 [INFO ] Fitter - [FIT-κ]  iter=3: prior_dominated=4/10 (40.0%), median_kfinal=198.42, median_alpha=0.49
+07:01:42.247 [INFO ] Fitter - [FITTER] Fitting complete (3 depths, 10 nodes)
+07:01:42.247 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 237.2760     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 223.0863     | 237.2760     | 0               | 0.0000             | 0.0000            
+│ 2     | 188.9965     | 223.0863     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+07:01:42.248 [INFO ] Engine - [REFIT-DELTA] Iteration 3 | 0.000e+00 (M-step inert, as expected)
+07:01:42.248 [INFO ] Engine - [J-TRACK] Iteration 3 | J_after_trickle: 0.367389 (Trickle Delta: -0.000000) | J_after_edits: 0.367389 (Edits Delta: 0.000000)
+07:01:42.248 [INFO ] Engine - [MU-GAP] Iteration 3 | internal nodes=4 cos(mu_v, resultant) min=0.9993 p10=0.9993 median=1.0000 max=1.0000
+07:01:42.265 [INFO ] Engine - [J-RESOLUTION] Iteration 3 | J=0.367389 SE_boot=5.020e-03 (B=200) | tau=1.000e-06 SE/tau=5020.4 | 2*SE=1.004e-02
+07:01:42.265 [INFO ] Engine - Iteration 3 completed in 50ms.
+07:01:42.265 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 10 (6 leaves, 4 internal) | Total Mass: 454.00 ===
+07:01:42.277 [INFO ] Engine - === DAG Changes in iteration 3 ===
+07:01:42.277 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│   (No structural changes in this iteration)
+└──────────────────────────────────────────────────────────
+07:01:42.277 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 3) ===
+07:01:42.277 [INFO ] Engine - GROW: 30 attempted (0 accepted, 0 rejected, 30 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+07:01:42.278 [INFO ] Stabilizer - GED Analysis (Iter 3): +0/-0 nodes, +0/-0 relations.
+07:01:42.278 [INFO ] Engine - [CONVERGENCE] Iteration 3 | GED converged=false | J stationary=true (streak 1/5, editsDelta=0.000e+00, trickleDelta=-1.119e-08)
+07:01:42.278 [INFO ] Engine - STARTING EVOLUTION ITERATION 4
+07:01:42.287 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+07:01:42.305 [INFO ] Fitter - [FIT-μ]  iter=4: mean_MLE_drift=1.000, oscillating_nodes=0/10, earlyout_rate=1.00
+07:01:42.305 [INFO ] Fitter - [FIT-κ]  iter=4: prior_dominated=4/10 (40.0%), median_kfinal=198.42, median_alpha=0.49
+07:01:42.306 [INFO ] Fitter - [FITTER] Fitting complete (3 depths, 10 nodes)
+07:01:42.306 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 237.2760     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 223.0863     | 237.2760     | 0               | 0.0000             | 0.0000            
+│ 2     | 188.9965     | 223.0863     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+07:01:42.306 [INFO ] Engine - [REFIT-DELTA] Iteration 4 | 0.000e+00 (M-step inert, as expected)
+07:01:42.306 [INFO ] Engine - [J-TRACK] Iteration 4 | J_after_trickle: 0.367389 (Trickle Delta: 0.000000) | J_after_edits: 0.367389 (Edits Delta: 0.000000)
+07:01:42.307 [INFO ] Engine - [MU-GAP] Iteration 4 | internal nodes=4 cos(mu_v, resultant) min=0.9993 p10=0.9993 median=1.0000 max=1.0000
+07:01:42.321 [INFO ] Engine - [J-RESOLUTION] Iteration 4 | J=0.367389 SE_boot=5.020e-03 (B=200) | tau=1.000e-06 SE/tau=5020.4 | 2*SE=1.004e-02
+07:01:42.321 [INFO ] Engine - Iteration 4 completed in 43ms.
+07:01:42.321 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 10 (6 leaves, 4 internal) | Total Mass: 454.00 ===
+07:01:42.332 [INFO ] Engine - === DAG Changes in iteration 4 ===
+07:01:42.332 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│   (No structural changes in this iteration)
+└──────────────────────────────────────────────────────────
+07:01:42.333 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 4) ===
+07:01:42.333 [INFO ] Engine - GROW: 30 attempted (0 accepted, 0 rejected, 30 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+07:01:42.333 [INFO ] Stabilizer - GED Analysis (Iter 4): +0/-0 nodes, +0/-0 relations.
+07:01:42.334 [INFO ] Engine - [CONVERGENCE] Iteration 4 | GED converged=false | J stationary=true (streak 2/5, editsDelta=0.000e+00, trickleDelta=1.084e-11)
+07:01:42.334 [INFO ] Engine - STARTING EVOLUTION ITERATION 5
+07:01:42.344 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+07:01:42.358 [INFO ] Fitter - [FIT-μ]  iter=5: mean_MLE_drift=1.000, oscillating_nodes=0/10, earlyout_rate=1.00
+07:01:42.358 [INFO ] Fitter - [FIT-κ]  iter=5: prior_dominated=4/10 (40.0%), median_kfinal=198.42, median_alpha=0.49
+07:01:42.358 [INFO ] Fitter - [FITTER] Fitting complete (3 depths, 10 nodes)
+07:01:42.358 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 237.2760     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 223.0863     | 237.2760     | 0               | 0.0000             | 0.0000            
+│ 2     | 188.9965     | 223.0863     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+07:01:42.359 [INFO ] Engine - [REFIT-DELTA] Iteration 5 | 0.000e+00 (M-step inert, as expected)
+07:01:42.359 [INFO ] Engine - [J-TRACK] Iteration 5 | J_after_trickle: 0.367389 (Trickle Delta: -0.000000) | J_after_edits: 0.367389 (Edits Delta: 0.000000)
+07:01:42.359 [INFO ] Engine - [MU-GAP] Iteration 5 | internal nodes=4 cos(mu_v, resultant) min=0.9993 p10=0.9993 median=1.0000 max=1.0000
+07:01:42.374 [INFO ] Engine - [J-RESOLUTION] Iteration 5 | J=0.367389 SE_boot=5.020e-03 (B=200) | tau=1.000e-06 SE/tau=5020.4 | 2*SE=1.004e-02
+07:01:42.374 [INFO ] Engine - Iteration 5 completed in 40ms.
+07:01:42.374 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 10 (6 leaves, 4 internal) | Total Mass: 454.00 ===
+07:01:42.385 [INFO ] Engine - === DAG Changes in iteration 5 ===
+07:01:42.385 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│   (No structural changes in this iteration)
+└──────────────────────────────────────────────────────────
+07:01:42.385 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 5) ===
+07:01:42.385 [INFO ] Engine - GROW: 30 attempted (0 accepted, 0 rejected, 30 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+07:01:42.385 [INFO ] Stabilizer - GED Analysis (Iter 5): +0/-0 nodes, +0/-0 relations.
+07:01:42.386 [INFO ] Stabilizer - Convergence streak: 1/5
+07:01:42.386 [INFO ] Engine - [CONVERGENCE] Iteration 5 | GED converged=false | J stationary=true (streak 3/5, editsDelta=0.000e+00, trickleDelta=-1.066e-14)
+07:01:42.386 [INFO ] Engine - STARTING EVOLUTION ITERATION 6
+07:01:42.396 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+07:01:42.416 [INFO ] Fitter - [FIT-μ]  iter=6: mean_MLE_drift=1.000, oscillating_nodes=0/10, earlyout_rate=1.00
+07:01:42.416 [INFO ] Fitter - [FIT-κ]  iter=6: prior_dominated=4/10 (40.0%), median_kfinal=198.42, median_alpha=0.49
+07:01:42.416 [INFO ] Fitter - [FITTER] Fitting complete (3 depths, 10 nodes)
+07:01:42.417 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 237.2760     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 223.0863     | 237.2760     | 0               | 0.0000             | 0.0000            
+│ 2     | 188.9965     | 223.0863     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+07:01:42.417 [INFO ] Engine - [REFIT-DELTA] Iteration 6 | 0.000e+00 (M-step inert, as expected)
+07:01:42.417 [INFO ] Engine - [J-TRACK] Iteration 6 | J_after_trickle: 0.367389 (Trickle Delta: -0.000000) | J_after_edits: 0.367389 (Edits Delta: 0.000000)
+07:01:42.417 [INFO ] Engine - [MU-GAP] Iteration 6 | internal nodes=4 cos(mu_v, resultant) min=0.9993 p10=0.9993 median=1.0000 max=1.0000
+07:01:42.434 [INFO ] Engine - [J-RESOLUTION] Iteration 6 | J=0.367389 SE_boot=5.020e-03 (B=200) | tau=1.000e-06 SE/tau=5020.4 | 2*SE=1.004e-02
+07:01:42.434 [INFO ] Engine - Iteration 6 completed in 48ms.
+07:01:42.434 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 10 (6 leaves, 4 internal) | Total Mass: 454.00 ===
+07:01:42.447 [INFO ] Engine - === DAG Changes in iteration 6 ===
+07:01:42.447 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│   (No structural changes in this iteration)
+└──────────────────────────────────────────────────────────
+07:01:42.447 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 6) ===
+07:01:42.447 [INFO ] Engine - GROW: 30 attempted (0 accepted, 0 rejected, 30 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+07:01:42.447 [INFO ] Stabilizer - GED Analysis (Iter 6): +0/-0 nodes, +0/-0 relations.
+07:01:42.447 [INFO ] Stabilizer - Convergence streak: 2/5
+07:01:42.447 [INFO ] Engine - [CONVERGENCE] Iteration 6 | GED converged=false | J stationary=true (streak 4/5, editsDelta=0.000e+00, trickleDelta=-1.110e-16)
+07:01:42.447 [INFO ] Engine - STARTING EVOLUTION ITERATION 7
+07:01:42.456 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+07:01:42.472 [INFO ] Fitter - [FIT-μ]  iter=7: mean_MLE_drift=1.000, oscillating_nodes=0/10, earlyout_rate=1.00
+07:01:42.472 [INFO ] Fitter - [FIT-κ]  iter=7: prior_dominated=4/10 (40.0%), median_kfinal=198.42, median_alpha=0.49
+07:01:42.472 [INFO ] Fitter - [FITTER] Fitting complete (3 depths, 10 nodes)
+07:01:42.472 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 237.2760     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 223.0863     | 237.2760     | 0               | 0.0000             | 0.0000            
+│ 2     | 188.9965     | 223.0863     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+07:01:42.473 [INFO ] Engine - [REFIT-DELTA] Iteration 7 | 0.000e+00 (M-step inert, as expected)
+07:01:42.473 [INFO ] Engine - [J-TRACK] Iteration 7 | J_after_trickle: 0.367389 (Trickle Delta: 0.000000) | J_after_edits: 0.367389 (Edits Delta: 0.000000)
+07:01:42.473 [INFO ] Engine - [MU-GAP] Iteration 7 | internal nodes=4 cos(mu_v, resultant) min=0.9993 p10=0.9993 median=1.0000 max=1.0000
+07:01:42.488 [INFO ] Engine - [J-RESOLUTION] Iteration 7 | J=0.367389 SE_boot=5.020e-03 (B=200) | tau=1.000e-06 SE/tau=5020.4 | 2*SE=1.004e-02
+07:01:42.488 [INFO ] Engine - Iteration 7 completed in 41ms.
+07:01:42.488 [INFO ] Engine - === DAG DIAGNOSTICS | Nodes: 10 (6 leaves, 4 internal) | Total Mass: 454.00 ===
+07:01:42.501 [INFO ] Engine - === DAG Changes in iteration 7 ===
+07:01:42.502 [INFO ] Engine - ┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+│   (No structural changes in this iteration)
+└──────────────────────────────────────────────────────────
+07:01:42.502 [INFO ] Engine - === PROPOSAL SUMMARY (ITERATION 7) ===
+07:01:42.502 [INFO ] Engine - GROW: 30 attempted (0 accepted, 0 rejected, 30 no-proposal) | SHRINK: 0 | [MEMO] hits=0 boundary-exempt=0
+07:01:42.502 [INFO ] Stabilizer - GED Analysis (Iter 7): +0/-0 nodes, +0/-0 relations.
+07:01:42.502 [INFO ] Stabilizer - Convergence streak: 3/5
+07:01:42.502 [INFO ] Engine - [CONVERGENCE] Iteration 7 | GED converged=false | J stationary=true (streak 5/5, editsDelta=0.000e+00, trickleDelta=0.000e+00)
+07:01:42.502 [INFO ] Engine - Early stopping triggered in iteration 7 due to convergence (J stationarity).
+07:01:42.503 [INFO ] Engine - [FIXED-POINT] iteration=7 editsDelta=0.000e+00 trickleDelta=0.000e+00 maxMuDelta=0.000e+00 maxKappaRel=1.805e-13 tol=1.000e-06 certified=true
+07:01:42.504 [INFO ] Engine - === STARTING FINALIZATION PHASE ===
+07:01:42.504 [INFO ] Fitter - Starting level-by-level parallel vMF/NiW fitting...
+07:01:42.519 [INFO ] Fitter - [FITTER] Fitting complete (3 depths, 10 nodes)
+07:01:42.519 [INFO ] Fitter - 
+┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────
+│ Depth | Avg Prefix K | Avg Prior K  | Small Leaves    | Avg (K_ML - K_pref) | Avg (K_ML - K_new)
+├─────────────────────────────────────────────────────────
+│ 0     | 237.2760     | 10.0000      | 0               | 0.0000             | 0.0000            
+│ 1     | 223.0863     | 237.2760     | 0               | 0.0000             | 0.0000            
+│ 2     | 188.9965     | 223.0863     | 0               | 0.0000             | 0.0000            
+└─────────────────────────────────────────────────────────
+07:01:42.519 [INFO ] Engine - Finalization phase completed in 15ms.
+07:01:42.520 [INFO ] Engine - --- 50-Iteration Evolution Completed ---
+07:01:42.522 [INFO ] Operations - 
+┌── TAXONOMY DAG HIERARCHY ───────────────────────────────
+│ MUSR [q_dir=0, q_rec=454, mass=454.0 - Parent/Residual] (vMF kappa: 237.276)
+│ ├── MUSR/team_allocation [q_dir=0, q_rec=150, mass=150.0 - Parent/Residual] (vMF kappa: 225.478)
+│ │   ├── Emergent Concept #19 [q_dir=88, q_rec=88, mass=86.7 - Leaf] (vMF kappa: 185.239)
+│ │   └── Emergent Concept #20 [q_dir=64, q_rec=64, mass=63.3 - Leaf] (vMF kappa: 198.416)
+│ ├── MUSR/murder_mysteries [q_dir=0, q_rec=148, mass=148.0 - Parent/Residual] (vMF kappa: 230.570)
+│ │   ├── Emergent Concept #22 [q_dir=72, q_rec=72, mass=72.0 - Leaf] (vMF kappa: 193.525)
+│ │   └── Emergent Concept #21 [q_dir=76, q_rec=76, mass=76.0 - Leaf] (vMF kappa: 194.538)
+│ └── MUSR/object_placements [q_dir=0, q_rec=156, mass=156.0 - Parent/Residual] (vMF kappa: 213.211)
+│     ├── Emergent Concept #16 [q_dir=92, q_rec=92, mass=92.0 - Leaf] (vMF kappa: 172.408)
+│     └── Emergent Concept #15 [q_dir=64, q_rec=64, mass=64.0 - Leaf] (vMF kappa: 189.854)
+└─────────────────────────────────────────────────────────
+07:01:42.524 [INFO ] Engine - 
+========================================================================================================
+                               DAG PERFORMANCE REPORT & INSTRUMENTATION                                 
+========================================================================================================
+Top-Level Roll-Up:
+  Construction     :      1 561 ms (100,0%)
+  Arena/Bench      :          0 ms (  0,0%)
+  Persistence      :          0 ms (  0,0%)
+  Other            :          0 ms (  0,0%)
+  TOTAL TIME       :      1 561 ms (100.0%)
+========================================================================================================
+
+Section: CONSTRUCTION DETAILS
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| Phase / Operation                           | Calls | Total(ms) | Avg(ms) | p50(ms) | p95(ms) |     Count |    Unit/s |  Shr |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| phase4_split                                |     7 |      1306 |   186,6 |       4 |     994 |         7 |       5,4 | 83,7% |
+| phase2_refit                                |     7 |       118 |    16,9 |      19 |      21 |         7 |      59,3 | 7,6% |
+| phase2_bootstrap                            |     1 |        50 |    50,0 |      50 |      50 |         1 |      20,0 | 3,2% |
+| phase1_precompute                           |     1 |        46 |    46,0 |      46 |      46 |       454 |   9 869,6 | 2,9% |
+| phase3_trickle                              |     7 |        24 |     3,4 |       4 |       5 |     3 178 | 132 416,7 | 1,5% |
+| phase5_optimize                             |     7 |        17 |     2,4 |       2 |       6 |         7 |     411,8 | 1,1% |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+
+Construction Per-Iteration Step Times:
+  Iter  1:  1 007 ms  [phase4_split=994ms, phase5_optimize=6ms, phase2_refit=7ms, phase3_trickle=0ms]
+  Iter  2:    325 ms  [phase5_optimize=4ms, phase4_split=297ms, phase2_refit=21ms, phase3_trickle=3ms]
+  Iter  3:     30 ms  [phase5_optimize=2ms, phase4_split=4ms, phase2_refit=20ms, phase3_trickle=4ms]
+  Iter  4:     26 ms  [phase5_optimize=1ms, phase4_split=2ms, phase3_trickle=4ms, phase2_refit=19ms]
+  Iter  5:     23 ms  [phase5_optimize=1ms, phase4_split=4ms, phase3_trickle=4ms, phase2_refit=14ms]
+  Iter  6:     30 ms  [phase5_optimize=1ms, phase4_split=3ms, phase3_trickle=5ms, phase2_refit=21ms]
+  Iter  7:     24 ms  [phase5_optimize=2ms, phase4_split=2ms, phase3_trickle=4ms, phase2_refit=16ms]
+========================================================================================================
+
+07:01:42.599 [INFO ] AdditionalMetrics - [CALIB]  ECE=0.0000, reliability_bins={[0.9,1.0]:1.00/1.00}
+07:01:42.600 [INFO ] Metrics - 
+┌── TAXONOMY CONFIGURATION PARAMETERS ─────────────────────
+│ Execution Settings:
+│   - Dataset Type:         AG_NEWS
+│   - Corpora:              [MUSR]
+│   - Num Iterations:       50
+│   - Early Stopping:       true
+│   - Labeling:             false
+│   - Selected Domains:     [All]
+│   - Split Dataset:        true
+│   - Test Split Ratio:     0.3
+├── LLM & Embedding Models:
+│   - LLM Provider:         AZURE
+│   - Embedding Provider:   OLLAMA
+│   - Embedding Model:      qwen3-embedding:latest
+│   - Judge Model:          Mistral-Large-3
+│   - Labeling Model:       Mistral-Large-3
+│   - Max Judge Generality: 1
+├── Advanced Mathematical Formalism Controls:
+│   - DAG Mode:             DAG_MAX
+│   - Max Depth:            8
+│   - Min Cluster Size:     55
+│   - Separation Bar:       0.0145
+│   - Slice Dim / PCA:      512 / dropTop=0 whiten=false
+│   - Lexicographic Tau:    1.0E-6
+│   - Membership Floor:     0.25
+│   - Routing Beam Gamma:   0.2
+│   - Descent Margin:       0.12
+│   - Fusion Sim Threshold: 0.9
+│   - Eff Support Floor:    2.0
+│   - Default Kappa Prior:  10.0
+└──────────────────────────────────────────────────────────
+| TAXONOMY ARCHITECTURAL METRICS
++----------------------------------------------------------
+| Topology Stats:
+|   Total Nodes:         10
+|   Leaf Nodes:          6
+|   Cross-Domain Nodes:  0
+|   Bridge Node Ratio:   0.00%
+|   Max Depth:           2
+|   Avg Leaf Depth:      2.00
++----------------------------------------------------------
+| Assignment Stats:
+|   Unique Queries:      454
+|   Median Nodes/Query:  1.00
+|   Residual Queries:    0
+|   Avg Match Count:     1.00 leaves/query
++----------------------------------------------------------
+| Structural & Semantic Diagnostics:
+|   Residual Ratio:      0.00%
+|   Max Concentration:   20.26%
+|   Tree Equilibrium:    92.11%
+|   Contamination:       0.00%
+|   vMF κ by depth:
+|     Depth 2: 188.996
++----------------------------------------------------------
+| External Validation & Geometric Metrics:
+|   NMI:                 1.0000
+|   ARI:                 1.0000
+|   Dendrogram Purity:   1.0000
+|   Weighted Leaf Purity:1.0000
+|   Edge F1 vs Gold:     1.0000
+|   Spherical Silhouette:0.1026
+|   Ancestor Correct:    1.0000
+|   Leaf Entropy:        1.7817 nats
++----------------------------------------------------------
+
+07:01:42.715 [INFO ] HeadlessRunner - [TRAIN-ONLY] after construction: 0 EVAL texts among the tree's members (302 keys checked)
+07:01:42.715 [INFO ] HeadlessRunner - Saving generated DAG snapshot to database...
+07:01:42.716 [INFO ] Persistence - Saving taxonomy DAG with Vector-Offloading to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\temp_graph_save.tmp...
+07:01:42.908 [INFO ] Persistence - Saved 10 nodes successfully (offloaded structure to SQL).
+07:01:42.940 [WARN ] AdditionalMetrics - computeRoutingECE: empty ground truth — returning 0.0 (GT plumbing absent)
+07:01:42.946 [INFO ] SnapshotManager - [POOL-PIN] snapshot stores this run's own reserved pool p01afdc4cf1d2fa86
+07:01:43.059 [INFO ] SnapshotManager - [TRAIN-ONLY] saveSnapshot: 0 EVAL texts among the tree's members (302 pool texts checked)
+07:01:43.076 [INFO ] SnapshotManager - Successfully created and saved snapshot to DB: 20261001_070142_Headless_Run_Auto_ge
+07:01:43.076 [INFO ] HeadlessRunner - Successfully generated and saved snapshot. Snapshot ID: 20261001_070142_Headless_Run_Auto_ge
+07:01:43.076 [INFO ] HeadlessRunner - Active graph node set: n00000001
+07:01:43.077 [INFO ] HeadlessRunner - Bridge Nodes CSV written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\B0\musr\seed_42\validation\bridge_nodes.csv
+07:01:43.077 [INFO ] HeadlessRunner - Bridge Residuals CSV written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\B0\musr\seed_42\validation\bridge_residuals.csv
+07:01:43.092 [INFO ] LeaderboardCorpus - Loaded 756 MUSR queries across 3 domain(s) from multicorpus_cache_v1.db
+07:01:43.093 [INFO ] DatasetFetcher - [CORPUS] merged 1 source(s): MUSR=3 domain(s)/756 queries -> 3 domain key(s), 756 queries
+07:01:43.095 [INFO ] HeadlessRunner - ========================================
+07:01:43.095 [INFO ] HeadlessRunner - RUNNING TRICKLE VALIDATION: MAIN
+07:01:43.095 [INFO ] HeadlessRunner - ========================================
+07:01:43.096 [INFO ] HeadlessRunner - Starting Headless Batch Trickle Validation for MAIN...
+07:01:43.098 [INFO ] HeadlessRunner - Graph validity CSV for MAIN written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\B0\musr\seed_42\validation\MAIN_graph_validity.csv
+07:01:43.138 [INFO ] AdditionalMetrics - [CALIB]  ECE=0.0000, reliability_bins={[0.9,1.0]:1.00/1.00}
+07:01:43.138 [INFO ] HeadlessRunner - Taxonomy quality CSV for MAIN written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\B0\musr\seed_42\validation\MAIN_taxonomy_quality.csv
+07:01:43.138 [INFO ] HeadlessRunner - Bridge quality CSV for MAIN written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\B0\musr\seed_42\validation\MAIN_bridge_quality.csv
+07:01:43.145 [INFO ] HeadlessRunner - Loaded 456 ground-truth categories directly from DAG queries.
+07:01:43.150 [INFO ] HeadlessRunner - Backfilled 0 categories from local cache. Total mapping keys: 471
+07:01:43.153 [INFO ] HeadlessRunner - Indexed leaves: 6 / 6 leaves tagged with a domain.
+07:01:43.154 [INFO ] HeadlessRunner - Routing 302 test queries...
+07:01:43.226 [INFO ] AdditionalMetrics - [CALIB]  ECE=0.0454, reliability_bins={[0.9,1.0]:1.00/1.00, [0.7,0.8]:0.73/1.00, [0.6,0.7]:0.67/1.00, [0.5,0.6]:0.56/1.00}
+07:01:43.227 [INFO ] BatchTrickleEvaluator - [ROUTE]  posterior_sum≈1.0000, membership_depth_corr=0.0000, multi_leaf_rate=0.1391, dist={1:0.86, 2:0.14}
+07:01:43.227 [INFO ] BatchTrickleEvaluator - Held-out residual rate: 0.00%
+07:01:43.227 [INFO ] HeadlessRunner - Batch Trickle Results (MAIN):
+07:01:43.227 [INFO ] HeadlessRunner -   - Total Queries: 302
+07:01:43.227 [INFO ] HeadlessRunner -   - Top-1 Accuracy: 100,00% (95% Wilson CI: [98,74%, 100,00%])
+07:01:43.227 [INFO ] HeadlessRunner -   - Any-Match Accuracy: 100,00%
+07:01:43.227 [INFO ] HeadlessRunner -   - Mean Leaf Purity: 100,00%
+07:01:43.228 [INFO ] HeadlessRunner -   - Expected Calibration Error (ECE): 0,0454
+07:01:43.228 [INFO ] HeadlessRunner -   - Macro F1: 100,00%
+07:01:43.228 [INFO ] HeadlessRunner -   - Avg Match Count (Eval): 1,14 leaves/query
+07:01:43.228 [INFO ] HeadlessRunner -   - Median Nodes/Query (Eval): 1,00
+07:01:43.228 [INFO ] HeadlessRunner - Held-out residual rate: 0.00%
+07:01:43.228 [INFO ] HeadlessRunner - 
+Per-Domain Trickle Results (MAIN):
+----------------------------------------------------------------------
+Domain                    | Support | Precision |   Recall |       F1
+----------------------------------------------------------------------
+MUSR/murder_mysteries     |     102 |    100,0% |   100,0% |   100,0%
+MUSR/team_allocation      |     100 |    100,0% |   100,0% |   100,0%
+MUSR/object_placements    |     100 |    100,0% |   100,0% |   100,0%
+======================================================================
+
+07:01:43.232 [INFO ] HeadlessRunner - Trickle validation results written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\B0\musr\seed_42\validation\MAIN_trickle_validation_results.csv
+07:01:43.243 [INFO ] HeadlessRunner - Nearest-Centroid Routing Results (MAIN):
+07:01:43.245 [INFO ] HeadlessRunner -   - Total Evaluated: 302
+07:01:43.245 [INFO ] HeadlessRunner -   - Top-1 Accuracy: 100,00%
+07:01:43.245 [INFO ] HeadlessRunner -   - Top-3 Accuracy: 100,00%
+07:01:43.245 [INFO ] HeadlessRunner -   - Top-5 Accuracy: 100,00%
+07:01:43.245 [INFO ] HeadlessRunner -   - Top-10 Accuracy: 100,00%
+07:01:43.246 [INFO ] HeadlessRunner - Centroid routing results written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\B0\musr\seed_42\validation\MAIN_centroid_routing_results.csv
+07:01:43.279 [INFO ] HeadlessRunner - Migration flow matrix written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\B0\musr\seed_42\validation\MAIN_migration_flow_matrix.csv
+07:01:43.336 [INFO ] HeadlessRunner - Held-out leaf support CSV written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\B0\musr\seed_42\validation\MAIN_heldout_leaf_support.csv
+07:01:43.337 [INFO ] HeadlessRunner - Held-out leaf support (MAIN): leaves=6, top1 min=36 median=51.0 max=64, leaves with <12 held-out top-1 queries: 0
+07:01:43.337 [INFO ] HeadlessRunner - Routing calibration CSV written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\B0\musr\seed_42\validation\MAIN_routing_calibration.csv
+07:01:43.371 [INFO ] AdditionalMetrics - [CALIB]  ECE=0.0000, reliability_bins={[0.9,1.0]:1.00/1.00}
+07:01:43.498 [INFO ] HeadlessRunner - Appended condition MAIN results to ledger at Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\B0\musr\tuning_ledger.csv
+07:01:43.499 [INFO ] HeadlessRunner - Performance report JSON written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\B0\musr\seed_42\performance_report.json
+07:01:43.499 [INFO ] HeadlessRunner - 
+========================================================================================================
+                               DAG PERFORMANCE REPORT & INSTRUMENTATION                                 
+========================================================================================================
+Top-Level Roll-Up:
+  Construction     :      1 635 ms ( 68,2%)
+  Arena/Bench      :        402 ms ( 16,8%)
+  Persistence      :        361 ms ( 15,1%)
+  Other            :          0 ms (  0,0%)
+  TOTAL TIME       :      2 398 ms (100.0%)
+========================================================================================================
+
+Section: CONSTRUCTION DETAILS
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| Phase / Operation                           | Calls | Total(ms) | Avg(ms) | p50(ms) | p95(ms) |     Count |    Unit/s |  Shr |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| phase4_split                                |     7 |      1306 |   186,6 |       4 |     994 |         7 |       5,4 | 54,5% |
+| phase2_refit                                |     7 |       118 |    16,9 |      19 |      21 |         7 |      59,3 | 4,9% |
+| finalization.generate_report                |     2 |        74 |    37,0 |      40 |      40 |         2 |      27,0 | 3,1% |
+| phase2_bootstrap                            |     1 |        50 |    50,0 |      50 |      50 |         1 |      20,0 | 2,1% |
+| phase1_precompute                           |     1 |        46 |    46,0 |      46 |      46 |       454 |   9 869,6 | 1,9% |
+| phase3_trickle                              |     7 |        24 |     3,4 |       4 |       5 |     3 178 | 132 416,7 | 1,0% |
+| phase5_optimize                             |     7 |        17 |     2,4 |       2 |       6 |         7 |     411,8 | 0,7% |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+
+Section: ARENA/BENCHMARK DETAILS
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| Phase / Operation                           | Calls | Total(ms) | Avg(ms) | p50(ms) | p95(ms) |     Count |    Unit/s |  Shr |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| validation.MAIN                             |     1 |       402 |   402,0 |     402 |     402 |       302 |     751,2 | 16,8% |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+
+Section: PERSISTENCE DETAILS
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| Phase / Operation                           | Calls | Total(ms) | Avg(ms) | p50(ms) | p95(ms) |     Count |    Unit/s |  Shr |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| snapshot_save                               |     1 |       361 |   361,0 |     361 |     361 |         1 |       2,8 | 15,1% |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+
+Construction Per-Iteration Step Times:
+  Iter  1:  1 007 ms  [phase4_split=994ms, phase5_optimize=6ms, phase2_refit=7ms, phase3_trickle=0ms]
+  Iter  2:    325 ms  [phase5_optimize=4ms, phase4_split=297ms, phase2_refit=21ms, phase3_trickle=3ms]
+  Iter  3:     30 ms  [phase5_optimize=2ms, phase4_split=4ms, phase2_refit=20ms, phase3_trickle=4ms]
+  Iter  4:     26 ms  [phase5_optimize=1ms, phase4_split=2ms, phase3_trickle=4ms, phase2_refit=19ms]
+  Iter  5:     23 ms  [phase5_optimize=1ms, phase4_split=4ms, phase3_trickle=4ms, phase2_refit=14ms]
+  Iter  6:     30 ms  [phase5_optimize=1ms, phase4_split=3ms, phase3_trickle=5ms, phase2_refit=21ms]
+  Iter  7:     24 ms  [phase5_optimize=2ms, phase4_split=2ms, phase3_trickle=4ms, phase2_refit=16ms]
+========================================================================================================
+
+07:01:43.505 [INFO ] Diagnostics - [DIAG] diagnostics bundle closed (completed) at Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-b0-run\experiment_results\archv2\rp12\B0\musr\seed_42\diagnostics
+07:01:43.505 [INFO ] HeadlessRunner - Headless Benchmark finished successfully.
+07:01:43.507 [INFO ] ModelEvalStore - SQLite evaluation store database connection closed cleanly via shutdown hook.
+07:01:43.507 [INFO ] RankingService - SQLite database connection closed cleanly via shutdown hook.
+07:01:43.512 [INFO ] DatasetFetcher - SQLite dataset fetcher database connection closed cleanly via shutdown hook.
+07:01:43.514 [INFO ] SnapshotManager - SQLite snapshot database connection closed cleanly via shutdown hook.
+
+BUILD SUCCESSFUL in 7s
+7 actionable tasks: 1 executed, 6 up-to-date
+Configuration cache entry stored.
+[musr] end 2026-10-01T07:01:44+02:00 rc=0 wall_s=7

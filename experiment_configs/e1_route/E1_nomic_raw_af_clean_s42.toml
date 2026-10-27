@@ -1,0 +1,99 @@
+# EMBEDDER-CROSS-FLAT E1 arm N-raw (PRIMARY): E1's build config, declared for C-E1R-4 (READY_e1_route2 29e19199).
+# Registration: docs/judge_v2_program.md, EMBEDDER-CROSS-FLAT, "E1-minimal (= RP09; W2): arm N-raw (PRIMARY) and N-card
+# (SECONDARY) ... both built from af_clean_s42.toml with the embedder set by a pinned -Dtaxoadapt.llm.embedding-model launch line".
+# = experiment_configs/anchorfree/redraw/af_clean_s42.toml byte for byte below the '# ---- BASE ----' line, except EXACTLY ONE
+#   line, the outputDir key: "experiment_results/e1_route/E1_nomic_raw" (was the tree of record's directory
+#   experiment_results/anchorfree/redraw/af_clean_s42, which tools/analysis/e1_route_launch.py REFUSES as an outputDir).
+#   outputDir is a NON-TREATMENT key (C-E1R-4: the registrar records it so); numIterations stays 50 (the L1 short stop is
+#   experiment_configs/e1_route/L1_short_af_clean_s42.toml, not this file).
+# The embedder is NOT a key here: the launcher sets -Dtaxoadapt.llm.embedding-model and -Dtaxoarena.embeddingCacheFile (a fresh
+# working copy of the pinned DIR file of arm nomic_raw) and -Dranking.db.path (inside its fresh run dir). Launch ONLY through the
+# launcher, from the main checkout (C-E1-3), in one rule-7 window with a backup first, after E1-ROUTE C1-C5 HELD:
+#   python tools/analysis/e1_route_launch.py --arm nomic_raw --config experiment_configs/e1_route/E1_nomic_raw_af_clean_s42.toml
+# The launcher refuses when experiment_results/e1_route/E1_nomic_raw/seed_42 exists (a build writes a fresh directory).
+# Checked by tools/analysis/e1_configs_check.py --selftest (the one-line diff; the launcher admits it).
+# ---- BASE ----
+# ANCHOR-FREE-REDRAW arm R1 af_clean_s42: the anchor-free recipe on the CLEAN split (pool of record).
+# BASE experiment_configs/anchorfree/af_s42.toml (the anchor-free tree of record, one draw on p8a29).
+# ONE KEY: reservedPoolFile = experiment_configs/reserved_pool_frozen_p2dca.json (construction never
+# sees EVAL; the split is read from the id file, seed 42 no longer drives it). The optional
+# `pool` line beside it is the [POOL-PIN] guard the registration allows (a guard, not a treatment:
+# the build refuses if its split does not hash to the pool of record). Sample re-draw AND clean split.
+#
+# REGISTRATION. docs/judge_v2_program.md, "Registered 2026-09-17 (before running) - ANCHOR-FREE-REDRAW"
+# (commit d61f2cf; plan docs/agents/plans/2026-09-17_anchor_free_redraw.md). Zero judge calls.
+# Every arm = its BASE with exactly ONE treatment key on an active key line (never inside a
+# header comment: commit 92009dc), its own outputDir under experiment_results/anchorfree/redraw/
+# and its own -Dranking.db.path (experiment_results/anchorfree/redraw/ratings_<arm>.db, set by
+# tools/chains/anchor_free_redraw.sh). Label-free, z 2.0, mcs 55, 256-dim slice, bar 0.025.
+# Nothing is activated (pool_guard --activate no longer exists, 2026-09-16); verify the pool of
+# record with `python tools/analysis/pool_guard.py --pool p2dca21ab5f4ef3ae`. The tree this
+# builds is STRUCTURAL EVIDENCE ONLY; the registration does NOT authorise judging on it.
+# Instrument: 300-rep site null at the build's slice (256, dropTop 0, whiten false),
+# anchor_free_readout.py vs experiment_results/anchorfree/af/seed_42 with
+# site_null_af_s42.csv as control, then tools/analysis/anchor_free_redraw.py.
+# Order in the sweep: R1, R1c, R2, R3, R4; all five run regardless (no early stopping).
+#
+datasetType   = "MMLU_PRO"
+
+models        = [
+    "gpt-4o-2024-08-06",
+    "claude-3-5-sonnet-20241022",
+    "gemini-1.5-pro-002",
+    "deepseek-chat-v2_5",
+    "Meta-Llama-3_1-70B-Instruct",
+    "Qwen1.5-72B-Chat",
+    "gpt-4o-mini",
+    "claude-3-5-haiku-20241022",
+    "Mixtral-8x7B-Instruct-v0.1",
+    "c4ai-command-r-v01",
+    "Qwen1.5-14B-Chat",
+    "Meta-Llama-3_1-8B-Instruct",
+    "gemini-1.5-flash-002",
+    "Llama-2-70b-hf",
+    "Llama-2-13b-hf"
+]
+
+category      = ""
+queryLimit    = 0
+outputDir     = "experiment_results/e1_route/E1_nomic_raw"
+testRatio     = 0.3
+seed          = 42
+reservedPoolFile = "experiment_configs/reserved_pool_frozen_p2dca.json"
+pool             = "p2dca21ab5f4ef3ae"   # [POOL-PIN] guard, not a treatment (registration: allowed beside reservedPoolFile)
+
+# Body = o0_s42.toml (seed 42 = the frozen build's split and construction seed). The ONE
+# instrument key of this registration; o0 differs from this file only by its absence.
+anchorFree = true
+
+runPipeline        = true
+runBenchmark       = false
+runTrickle         = true
+runBaselines       = false
+enableFinalMetrics = false
+enableLabeling     = false
+judgeInduction     = false
+
+dagMode = "DAG_MAX"
+
+maxDepth              = 8
+minClusterSize        = 55
+proposalSeparationBar = 0.025
+tau                   = 1e-6
+acceptanceZ           = 2.0
+enableRefitGate       = false
+
+membershipFloor       = 0.25
+routingBeamGamma      = 0.2
+descentMargin         = 0.12
+
+effectiveSupportFloor = 2.0
+defaultKappaPrior     = 10.0
+
+numIterations         = 50
+maxLeafAssignments    = 5
+
+fusionSimilarityThreshold = 0.90
+enableGtWarmStart         = false
+
+enableProfiling           = true

@@ -1,0 +1,166 @@
+{
+  "id": "ANCHOR-FREE",
+  "title": "ANCHOR-FREE: the tree grown from the embeddings alone, no category anchors (one construction, zero LLM calls)",
+  "question": "Every tree in the record was seeded with the corpus's category labels as depth-1 anchors. Does a tree grown WITHOUT the labels (every train query at the root, the same separation gate proposing k-way splits from depth 0 down) recover the categories, certify structure, and carry capability information, and how does it compare with the same-code anchored control o0 (seed 42, label-free)?",
+  "kind": "build",
+  "state": "done",
+  "registration": {
+    "commit": "cfb2ef0",
+    "program_lines": "docs/judge_v2_program.md (lines as of 5dc8a06) L4274-L4306",
+    "date": "2026-09-16",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-16 (before any code or run) — ANCHOR-FREE: the tree grown from the embeddings alone, no category anchors",
+    "outcome_heading": [
+      "L4308: ## ANCHOR-FREE (2026-09-17, zero LLM calls) — all three criteria PASS; the registered prediction FAILED: the labels buy 6.4pp of category purity and COST certification; the tree grown from the embeddings alone has a cert"
+    ]
+  },
+  "script": {
+    "path": "tools/analysis/anchor_free_readout.py (the readout; construction = experiment_configs/anchorfree/af_s42.toml with anchorFree = true, engine flag merged at 812d9cd)",
+    "sha16": "203b62c09b7cfd36",
+    "commit": "e355764"
+  },
+  "ready": null,
+  "go": "n/a (0 LLM calls; one construction ~2 min + one 300-rep site null)",
+  "run": {
+    "outcome_file": "experiment_results/anchorfree/anchor_free_readout.txt",
+    "outcome_commit": "28596ca",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae routed for purity (the tree itself is on the contaminated p8a29d8f3ff75aa55 split: 70.4% of the pool on its train side; a structural artefact, never arena-bound)",
+    "date": "2026-09-17",
+    "other_files": [
+      "experiment_results/anchorfree/site_null_af_s42.csv (300 reps; 28596ca)",
+      "experiment_results/h9_order/site_null_o0_s42.csv (the control's null)",
+      "experiment_results/anchorfree/af/seed_42/ (untracked build dir; snapshot 20260916_235050)",
+      "AnchorFreeInertnessTest"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the adversarial check of record is the one the programme names: the engine flag's adversarial review (two vacuity guards added: placed == train set, root must have split; inert when absent by AnchorFreeInertnessTest against the H9-REM golden DAG) at the worktree merge 812d9cd; the ANCHOR-FREE-REDRAW review (docs/reviews/2026-09-18_night_batch.md, 17a4434) later bracketed this row",
+    "commit": "812d9cd",
+    "verdict": "flag MERGEABLE with the guards; the readout's numbers are re-read by ANCHOR-FREE-REDRAW (2026-09-18), which withdrew 'anchors cost certification' as a headline and re-read 'a certified trunk' as root + discursive depth-1 (4/4) with the quantitative depth-1 at 3/4"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "held-out category purity within 10pp of o0 under the same instrument",
+      "result": "HELD",
+      "value": "0.715 [0.700, 0.730] vs 0.779 [0.764, 0.792]: -6.4pp -> PASS [REDRAW: purity moves 2.3-3.4 pp on a sample re-draw; anchored-over-free gap 4.3 pp on the clean split]",
+      "denominator": "3,445 pool questions routed to the nearest leaf; majority TRAIN label per leaf"
+    },
+    {
+      "id": "C2",
+      "text": "certified sites >= o0's minus 2",
+      "result": "HELD",
+      "value": "16 of 69 vs 5 of 65 -> PASS [CORRECTED 2026-09-18 by ANCHOR-FREE-REDRAW: the 16-vs-5 contrast belonged to the contaminated p8a29 split; on the clean split 14 of 69 vs 11 of 60 (C6 FAILED, F4 FIRED); 'anchors cost certification' WITHDRAWN as a headline]",
+      "denominator": "site null 300 reps on both snapshots (af 20260916_235050, o0 20260916_082755), slice 256"
+    },
+    {
+      "id": "C3",
+      "text": "key-only leaf information within 1/1000 LOO Brier of o0's",
+      "result": "HELD",
+      "value": "leaf +13.19 vs +14.02 per 1000; paired -0.82 [-1.50, -0.17] -> PASS",
+      "denominator": "F6 instrument, 10,925 keyed questions"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "purity BELOW o0 by 10-25pp (predict C1 FAIL)",
+      "result": "FAILED",
+      "value": "-6.4pp (C1 passed)",
+      "denominator": "3,445 pool questions"
+    },
+    {
+      "id": "P2",
+      "text": "leaves fewer, depth similar; certification equal or lower (C2 borderline)",
+      "result": "FAILED",
+      "value": "leaves 81 vs 86, depth 7 vs 6 (leaves fewer HELD); certification three times higher (FAILED)",
+      "denominator": "sites 69 vs 65"
+    },
+    {
+      "id": "P3",
+      "text": "C3 HELD (capability information lives in the geometry, not the labels)",
+      "result": "HELD",
+      "value": "-0.82 per 1000",
+      "denominator": "10,925 keyed q"
+    },
+    {
+      "id": "P4",
+      "text": "the migration matrix shows a few big cells straddling category pairs the record knows to be adjacent",
+      "result": "HELD",
+      "value": "in a stronger form: the tree's own first split is the quantitative / discursive axis (root 0.042 vs p95 0.038, k = 2); its two depth-1 splits certify at twice their p95 (0.059 vs 0.028; 0.056 vs 0.033)",
+      "denominator": "migration matrix TrueCategory x depth-1 cell"
+    }
+  ],
+  "falsifier": {
+    "text": "of the framework sentence 'the anchor layer is a reporting convenience, not a routing mechanism': if C1 PASSES the anchors buy nothing but names and the sentence stands outright; if C1 FAILS while C3 HOLDS the sentence narrows to 'not a routing mechanism for capability, but the source of the category names'",
+    "fired": false,
+    "note": "C1 passed: the sentence stands outright; the record's stronger reading ('anchors COST certifiable structure') was later WITHDRAWN as a headline by ANCHOR-FREE-REDRAW"
+  },
+  "numbers_of_record": {
+    "purity": "anchor-free 0.715 [0.700, 0.730] vs o0 0.779 [0.764, 0.792]; depth-1 cell purity 0.188 (2 cells) vs 0.757 (14 cells)",
+    "structure": "leaves / nodes / depth / iterations 81 / 150 / 7 / 13 vs 86 / 152 / 6 / 10; certified 16 of 69 (d0 1, d1 2, d2 3, d3 4, d4 4, d5 2) vs 5 of 65 (d1 5, nothing below)",
+    "key_only_LOO_Brier": "leaf +13.19 vs +14.02 / 1000 (paired -0.82 [-1.50, -0.17]); depth-1 +3.49 vs +10.42",
+    "key_profile_R": "leaves 0.829 (21 cells) vs 0.874 (12 cells); depth-1 undefined (2) vs 0.925 (14)",
+    "mu_match": "55 of 86 control leaves recovered at cos 0.95",
+    "trunk_margins": "root 0.042 vs p95 0.038; depth-1 sites 0.059 vs 0.028 and 0.056 vs 0.033",
+    "build": "8,133 train queries at the root; 130 s; manifest anchor_free = true"
+  },
+  "sentence_of_record": "ANCHOR-FREE (2026-09-17, zero LLM calls): all three criteria PASS; the registered prediction FAILED: the labels buy 6.4pp of category purity and COST certification; the tree grown from the embeddings alone has a certified trunk. [CORRECTED 2026-09-18 by ANCHOR-FREE-REDRAW: the certified trunk that survives a re-draw is the root (4/4, margin 1.12-1.14) and the DISCURSIVE depth-1 site (4/4, 2.10-2.13); the quantitative depth-1 site reproduces in 3/4 (k-selection at the bar); the re-draw-stable certified set is 5 sites on the discursive spine (n00000001, n00000005, n00000017, n00000016, n00000032), the quantitative side 0; the sites below are a per-draw fringe (10-16 of 64-69). '16 of 69 vs 5 of 65' belonged to the contaminated p8a29 split: on the clean split it is 14 of 69 vs 11 of 60 (C6 FAILED, F4 FIRED; across draws 10-16 vs 5-11, distributions touch), so 'anchors COST certifiable structure' is WITHDRAWN as a headline. Purity moves 2.3-3.4 pp on a sample re-draw; the anchored-over-free gap is 4.3 pp clean (6.4 here).] What the anchors still earn is the reporting granularity the profile relies on (14 named cells at R 0.925 against 2 unnamed cells) and the 0.8 / 1000 of key information the anchored leaves carry over the free ones. The anchored tree stays the tree of record for every published board.",
+  "chips": [
+    "C1 PASS (-6.4pp)",
+    "C2 PASS: 16 OF 69 vs 5 OF 65 (P8A29 SPLIT; CLEAN SPLIT 14 OF 69 vs 11 OF 60, REDRAW F4 FIRED)",
+    "C3 PASS (-0.8 / 1000)",
+    "PREDICTION FAILED, TWICE"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-18",
+      "by": "ANCHOR-FREE-REDRAW (programme L4308 heading and L4342; ledger observed cell and the C2 chip, v114; 3dd0900 / 17a4434)",
+      "text": "the certified trunk that survives a re-draw is the root and the discursive depth-1 site (4/4 each); the quantitative depth-1 site is 3/4 (k-selection at the bar); the re-draw-stable certified set is 5 sites = root + the discursive spine; the sites below are a per-draw fringe (10-16 of 64-69). 'COST certifiable structure' is withdrawn as a headline: on the clean split 14 of 69 vs 11 of 60 (F4 fired). Purity moves 2.3-3.4 pp on a sample re-draw; the anchored-over-free gap is 4.3 pp clean (6.4 here)."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "K-SELECTION (ledger v118, via the ANCHOR-FREE-REDRAW bracket)",
+      "text": "the 3/4 was the greedy first-k-that-passes rule's; under hysteresis at 1.05 x bar the quantitative depth-1 site certifies on 3 of 3 primed draws at the cost of a different tree below it; R1 af_clean_s42 remains the clean free tree of record."
+    }
+  ],
+  "does_not_show": [
+    "routing gain on the union",
+    "judged boards on the free cells",
+    "whether the free tree's cells are tree-robust (PROFILE-TREE-ROBUST's question; ANCHOR-FREE-REDRAW answered the trunk's)",
+    "a certified quantitative depth-1 site that survives a re-draw (3/4; K-SELECTION)"
+  ],
+  "ledger": {
+    "row_id": "ANCHOR-FREE",
+    "version": "v118 (row added v109 at 995d598; bracketed v114 by ANCHOR-FREE-REDRAW, v118 via K-SELECTION's REDRAW bracket)"
+  },
+  "depends_on": [
+    "H9-REM-FLAG",
+    "MC-ROOT",
+    "DESIGN-PROBES",
+    "F6",
+    "PROFILE-RELIABILITY",
+    "SPLIT-RATIO"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md (lines as of 5dc8a06) L4274-L4306 (registration cfb2ef0): question, instrument (1)-(4), criteria, predictions, falsifier",
+    "docs/judge_v2_program.md (lines as of 5dc8a06) L4308-L4348 (outcome section 28596ca; REDRAW brackets L4308 / L4342 at 3dd0900): the readout table, criteria and predictions scored, the reading with the falsifier applied",
+    "experiment_results/anchorfree/anchor_free_readout.txt and site_null_af_s42.csv (28596ca)",
+    "docs/test_ledger.html row ANCHOR-FREE (v109 995d598; bracketed v114 / v118): chips verbatim (the C2 chip as qualified), observed-cell bracket, evidence (af_s42.toml, anchor_free_readout.py, cfb2ef0, 812d9cd, 28596ca)",
+    "script sha16 = sha256 of tools/analysis/anchor_free_readout.py at e355764 (its only commit), first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' lines (grep -n them regardless of line drift); line numbers are as of programme HEAD 5dc8a06"
+  ],
+  "last_update": "2026-09-22",
+  "plain_description": {
+    "sq": "SQ3 Taxonomy",
+    "what": "One tree was grown from the question embeddings alone, without giving it the dataset's category labels as its first layer. It was compared with the same code run with those labels as anchors. No LLM calls were made.",
+    "why": "It tests whether the tree's structure comes from the data or is borrowed from the human category labels it is normally seeded with.",
+    "information": "If the label-free tree recovered the categories and still certified structure, the labels would be doing less work than assumed. Result: done. All three registered criteria passed: purity within 10 points, certified structure, and key information close to the anchored tree's. The labels make cells about 4 to 6 points purer by category (6.4 here, 4.3 on the clean split). The anchors still earn named reporting cells and a little extra key information, so the anchored tree stays the tree of record. The label-free tree has a certified trunk, but a later re-draw cut it to the root plus a 'discursive' branch, about 5 sites. An earlier, stronger reading, that the labels actually cost certifiable structure, was withdrawn.",
+    "written": "2026-10-07"
+  }
+}

@@ -1,0 +1,263 @@
+{
+  "id": "K-SELECTION",
+  "title": "K-SELECTION: is the quantitative depth-1 site's 3-of-4 certification the greedy first-k-that-passes rule's or the corpus's? a geometric hysteresis rule at 1.05 x bar, inert when absent, tested by rebuilding R1' / R2' / R3' with 300-rep site nulls",
+  "question": "With proposalAcceptMultiplier = 1.05 (creation-side hysteresis; inert when absent, I2), do R1' af_clean_s42_k105, R2' af_s137_k105 and R3' af_s2048_k105 certify the quantitative depth-1 site matched to the record's n00000004 in 3 of 3 (C1), keep the discursive site and the root certified in their recorded bands (C2), and keep the 5-site re-draw-stable set (C3)?",
+  "kind": "build",
+  "state": "done",
+  "registration": {
+    "commit": "8fde7fa",
+    "program_lines": "docs/judge_v2_program.md L8224-L8390 (8fde7fa); pre-build naming bracket + JVM-guard NOTE + pointer correction L8761-L8769 (948c69f / a30c995); READY bracket L8770 (461d85b); outcome section L9420-L9610 (023ed7d); brackets L6422 / L6440 / L6471 (REDRAW), L8333 / L8360 (closed-line check) (023ed7d)",
+    "date": "2026-09-19"
+  },
+  "script": {
+    "path": "tools/analysis/k_selection_readout.py (readout of record, --run write-once); tools/chains/k_selection.sh (the serial chain I2, R1', R2', R3' + readout); tools/analysis/k_selection_inert.py; tools/analysis/anchor_free_redraw.py (loaders, REASON_RE)",
+    "sha16": "k_selection_readout.py 60168bb116b3702c; anchor_free_redraw.py f31f6f18ede056de; k_selection.sh bc8f9ea8e2118eba; k_selection_inert.py at 4cd39c6",
+    "commit": "a616826 (tools; re-verified unchanged at edf94ac); flag merged 967a936; chain 4cd39c6"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_k_selection.md (conditions 1-5; launch command in the file)",
+    "commit": "461d85b"
+  },
+  "go": "plan Amendment 6 (0 judge calls; 4 builds + 3 site nulls, ~1.6-1.7 h no-readers window, rule 7); 0 cce",
+  "run": {
+    "outcome_file": "experiment_results/anchorfree/redraw/kselect/k_selection_outcome.txt",
+    "outcome_commit": "4c25e56",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (R1' by reservedPoolFile, 0 of 3,445 in-sample); R2' pd610c9ad05255f16 (68.4% in-sample); R3' p19d9f473b5a610a0 (69.6%)",
+    "date": "2026-09-19",
+    "other_files": [
+      "experiment_results/anchorfree/redraw/kselect/i2_inertness.txt (4c25e56; INERT)",
+      "experiment_results/anchorfree/redraw/kselect/anchor_free_{af_clean_s42_k105,af_s137_k105,af_s2048_k105}_readout.txt (4c25e56)",
+      "experiment_results/anchorfree/redraw/kselect/site_null_{af_clean_s42_k105,af_s137_k105,af_s2048_k105}.csv (4c25e56; 60 / 59 / 57 sites x 300 reps)",
+      "experiment_results/anchorfree/redraw/kselect/chain.log (4c25e56; 15:26:18 -> 16:58:29)",
+      "build dirs af_clean_s42_k105/seed_42, af_s137_k105/seed_137, af_s2048_k105/seed_2048, i2/seed_42; ratings_<arm>.db; *.build.out (untracked, on disk)",
+      "snapshots.db (untracked) snapshot ids I2 20260919_152750, R1' 20260919_152946, R2' 20260919_155942, R3' 20260919_162940"
+    ],
+    "sequence": "chain tools/chains/k_selection.sh at HEAD 64ae3cf (flag 967a936): preflight (no reader, no JVM, src clean, pool guard OK) -> I2 build + k_selection_inert.py (INERT) -> R1' build + 300-rep null -> R2' build + null -> R3' build + null -> k_selection_readout.py --run (write-once; no --undetermined / --suite-line) 16:58:29; 4 builds, 3 nulls, 0 judge calls"
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-19_k_selection_post.md",
+    "commit": "a949a35",
+    "verdict": "numbers REPRODUCE to the digit (20 claims CONFIRMED; chain, pins, hygiene, write-once path as the READY required); READY for the registrar on condition that the verdict sentence is written only with the mandatory bracket, P2 carries defect 2's bracket, the closed-line check carries defect 3's bracket, and the clean-arm purity McNemar is written into the outcome section; not ready as a bare 'resolved by a geometric hysteresis rule'"
+  },
+  "criteria": [
+    {
+      "id": "C0",
+      "text": "INERTNESS: I1 (suite: failures 0, errors 0, n >= 424) AND I2 (byte-identical leaf membership of af_clean_s42 with the key absent) HELD",
+      "result": "HELD",
+      "value": "I1 suite 434 / 0 / 0; I2 INERT: leaves 82 vs 82, leaf member multiset 0 differences, nodes 151, dag_snapshots.jsonl sha 1b9bd34d648ef29e both, manifest multiplier 1.0; snapshots.db graph identical as sets, queryId order differs (review defect 5)",
+      "denominator": "the 434-test suite; R1's 82 leaves"
+    },
+    {
+      "id": "C1",
+      "text": "QUANTITATIVE DEPTH-1 CERTIFICATION: in each of R1', R2', R3' the site matched to the record's n00000004 (best Jaccard over ALL depth-1 sites; certified-only reading beside) is CERTIFIED (observed / p95 > 1) -> 3 of 3; scored per built arm with the denominator named; F1 fires only on R1' failing",
+      "result": "HELD",
+      "value": "3 of 3: R1' n00000004 J 0.977 k 3 observed 0.056502 / p95 0.033471 = 1.688; R2' J 0.977 k 3 0.056303 / 0.032898 = 1.711; R3' J 0.987 k 3 0.056143 / 0.033136 = 1.694; all CERTIFIED; certified-only reading reproduces at the same site; R1' k = 2 at 1.006x refused by the rule only",
+      "denominator": "3 arms; 300-rep site nulls; sites 60 / 59 / 57"
+    },
+    {
+      "id": "C2",
+      "text": "DISCURSIVE SITE AND ROOT UNCHANGED: n00000005's match and the root certified in 3 of 3 arms, margins in the recorded bands (root 1.12-1.14, discursive 2.10-2.13; a change beyond 0.02 printed, C2 still HELD if certified)",
+      "result": "HELD",
+      "value": "3 of 3: discursive n00000005 (J 0.979 / 0.980 / 0.990, k 4) certified 2.084 / 2.117 / 2.132; root n00000001 (k 2) certified 1.137 / 1.140 / 1.124; observed_sep identical to the twins' to 6 decimals; R1' discursive 2.084 outside 2.10-2.13 by 0.016 (< 0.02 draw spread), printed",
+      "denominator": "3 arms"
+    },
+    {
+      "id": "C3",
+      "text": "STABLE SET: the re-draw-stable certified set over R1', R2', R3' (REDRAW rule, J >= 0.5) CONTAINS the record's five (n00000001, n00000005, n00000017, n00000016, n00000032); UNDETERMINED on fewer than 3 built arms",
+      "result": "HELD",
+      "value": "stable set 7 of 16 (n00000001, n00000004, n00000005, n00000016, n00000017, n00000032, n00000043) contains the record's five; per arm 11 / 11 / 9 of 16",
+      "denominator": "3 arms; the record's 16 certified sites"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "(plan) R1' quantitative depth-1 certifies at k = 3 at 1.6-1.8x (observed / p95)",
+      "result": "HELD",
+      "value": "R1' k 3, margin 1.688 in [1.6, 1.8] (twin R1 k 2 at 0.746)",
+      "denominator": "R1'"
+    },
+    {
+      "id": "P2",
+      "text": "(plan) discursive site and root unchanged: 2.10-2.13 and 1.12-1.14 in every arm",
+      "result": "FAILED",
+      "value": "FAILED in all three arms as scored: R1' 2.084 (< 2.10 by 0.016, genuine) / 1.137; R2' 2.117 / 1.14010 (> 1.14 by 0.0001); R3' 2.13174 (> 2.13 by 0.0017) / 1.124; a 2-dp band read at float precision (review defect 2); sites unchanged, observed_sep = twin to 6 decimals, margins within 0.013 of the twins'; substance 'unchanged' HELD",
+      "denominator": "3 arms"
+    },
+    {
+      "id": "P3",
+      "text": "(plan) the stable set grows to 6 (adds n00000004); not computable on fewer than 3 built arms",
+      "result": "FAILED",
+      "value": "stable set 7 (n00000004 and n00000043 added), not 6",
+      "denominator": "3 arms"
+    },
+    {
+      "id": "P4",
+      "text": "(plan) certified fringe count per arm within +-2 of REDRAW's (R1 14, R2 12, R3 10 of 64-69); at risk at R2'/R3' per the pre-run fact (5 / 5 accepted-at-margin k=2 sites in the twins)",
+      "result": "FAILED",
+      "value": "R1' HELD 14 of 60 vs 14 of 69 (+0); R2' FAILED 16 of 59 vs 12 of 64 (+4); R3' FAILED 13 of 57 vs 10 of 66 (+3): count-moving in 2 of 3 arms (review defect 3); no arm > the record's 16; R2'/R3' in-sample",
+      "denominator": "per arm; twin sites 69 / 64 / 66, arm sites 60 / 59 / 57"
+    },
+    {
+      "id": "P5",
+      "text": "(plan) held-out purity per arm within 1 pp of REDRAW's (0.727 / 0.738 / 0.749; R2'/R3' in-sample, identity of the number only)",
+      "result": "FAILED",
+      "value": "R1' 0.712 [0.697, 0.727] vs 0.727 (-1.5 pp; clean; paired exact McNemar 208:157 p 0.0088 ESTABLISHED, review defect 4); R2' 0.725 [0.710, 0.740] vs 0.738 (-1.3 pp; in-sample 68.4%); R3' 0.714 [0.698, 0.729] vs 0.749 (-3.5 pp; in-sample 69.6%)",
+      "denominator": "per arm; the 3,445-question pool of record"
+    },
+    {
+      "id": "P6",
+      "text": "(registrar) I2 byte-identical (0 leaf membership differences)",
+      "result": "HELD",
+      "value": "I2 INERT, 0 leaf membership differences; jsonl sha identical; graph identical as sets (queryId order differs)",
+      "denominator": "82 leaves"
+    },
+    {
+      "id": "P7",
+      "text": "(registrar) proposals refused by the effective gate and accepted by the nominal one (min-pair in [1.00, 1.05) x bar) 1-4 per arm over all iterations, scored on ROWS as registered with the distinct (site, k, emK, sep) count beside; the '> 10 -> fringe moves' inference withdrawn (multiplicity 9-27 rows per distinct refusal)",
+      "result": "FAILED",
+      "value": "rows 29 / 41 / 63 (band 1-4) = re-emissions of 4 / 7 / 6 distinct refusals (READY (iii)); 133 rows over 3 arms; R3' n00000073 at exactly 1.000x; min-pair rows 218 / 217 / 175 as printed, 218 / 225 / 193 sign-aware (review defect 6)",
+      "denominator": "per arm, all iterations"
+    },
+    {
+      "id": "P8",
+      "text": "(registrar) R2' and R3' reproduce their unprimed arms' leaf membership at Jaccard >= 0.9 on >= 70 of ~80 leaves; at risk per the pre-run fact",
+      "result": "FAILED",
+      "value": "twin leaves at Jaccard >= 0.9: R1' 36 of 82, R2' 52 of 79, R3' 42 of 81 (band >= 70); R1' quantitative 0 of 36, discursive 36 of 46",
+      "denominator": "per arm; twin leaves 82 / 79 / 81"
+    },
+    {
+      "id": "P9",
+      "text": "(registrar) R1' leaves in [78, 88] (R1 82)",
+      "result": "FAILED",
+      "value": "R1' 73 leaves (band [78, 88]; R1 82); R2' 75, R3' 71; nodes 133 / 134 / 128; iterations 14 / 14 / 13",
+      "denominator": "R1'"
+    },
+    {
+      "id": "P10",
+      "text": "(registrar) n00000043's match (J 0.646-0.652 in R1 / R2) is NOT rescued into the stable set; not computable on fewer than 3 built arms",
+      "result": "FAILED",
+      "value": "n00000043 IN the stable set: best J R1' 0.863 (n00000031), R2' 0.757 (n00000031), R3' 0.912 (n00000042); rescued",
+      "denominator": "3 arms"
+    }
+  ],
+  "falsifier": {
+    "text": "F1: R1' still uncertified at the quantitative depth-1 site (C1 fails at R1'), OR the discursive site loses certification in any arm (C2 fails); overturns the plan's R2 claim that the 3/4 is the greedy rule's (the fragility is then the corpus's; REDRAW's sentence stands; the flag stays inert or is removed). A C1 failure at R2'/R3' alone is C1 FAILED, not F1 (READY bracket (i)) OUTCOME: NOT FIRED (C1 HELD at R1'; the discursive site certified in every arm).",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "arms": "I2 af_clean_s42_inert (multiplier absent, manifest 1.0), R1' af_clean_s42_k105 (seed 42, clean split p2dca), R2' af_s137_k105 (seed 137), R3' af_s2048_k105 (seed 2048); proposalAcceptMultiplier 1.05; proposalSeparationBar 0.025; label-free, runBenchmark false",
+    "twins_of_record": "REDRAW R1 14 / 69 certified, R2 12 / 64, R3 10 / 66; purity 0.727 / 0.738 / 0.749; identity 7 / 8 / 8 of 16; R1 n00000004 k 2 accepted at 1.006x (0.025148), margin 0.746",
+    "pre_run_fact_accepted_at_margin_k2": "R1 1 (n00000004 0.025148); R2 5 (n00000156 0.025499, n00000120 0.025541, n00000163 0.025328, n00000059 0.025791, n00000066 0.025711); R3 5 (n00000046 0.025985, n00000073 0.025052, n00000082 0.025109, n00000123 0.025447, n00000091 0.025706); incl. k > 2 with joint in band 2 / 7 / 6",
+    "P7_row_multiplicity_in_twins": "R1 171 rows / 20 distinct (histogram {1:11, 2:1, 9:1, 14:1, 18:2, 21:1, 24:1, 27:2}); R2 194 / 21; R3 137 / 20",
+    "pinned_inputs": "snapshots_frozen.db 3f7f5e9a470baba3 (16,175,104 B, mtime 2026-08-02 04:49:35); R1 dag_snapshots.jsonl 1b9bd34d648ef29e; anchor_free_redraw_outcome.txt 0de5deeb0c07c4ea; suite_2026-09-19.log 387 B 'suite: tests 434 failures 0 errors 0 []'",
+    "C1_quantitative_depth1": "R1' / R2' / R3' n00000004 (J 0.977 / 0.977 / 0.987 to the record's), k 3, joint 0.056502 / 0.056303 / 0.056143 = 2.260 / 2.252 / 2.246x bar 0.025, p95 0.033471 / 0.032898 / 0.033136, margin 1.688 / 1.711 / 1.694, CERTIFIED 3 of 3 (300-rep site nulls; sites 60 / 59 / 57); twin R1 k 2 at 1.006x, 0.746",
+    "C2_discursive_and_root": "n00000005 (J 0.979 / 0.980 / 0.990, k 4) margin 2.084 / 2.117 / 2.132 (p95 0.028546 / 0.028421 / 0.028451); root k 2 margin 1.137 / 1.140 / 1.124 (p95 0.037358 / 0.037544 / 0.037739); observed_sep identical to the twins' to 6 decimals",
+    "C3_stable_set": "7 of 16: n00000001, n00000004, n00000005, n00000016, n00000017, n00000032, n00000043 (per arm 11 / 11 / 9 of 16 on 5,625 / 5,666 / 5,656 shared train texts); contains the record's five",
+    "I2_inertness": "leaves 82 vs 82; leaf member multiset 0 / 0 / 0 differences; nodes 151; train ids 8,125; leaf slots 9,082; vmfMu max |delta| 0.000000; dag_snapshots.jsonl sha256[:16] 1b9bd34d648ef29e both; graph JSON same length 4,263,611 B, queryId order differs, sets equal; manifest multiplier 1.0",
+    "certified_count": "R1' 14 of 60 (23.3%) vs twin 14 of 69 (+0); R2' 16 of 59 (27.1%) vs 12 of 64 (+4); R3' 13 of 57 (22.8%) vs 10 of 66 (+3); record 16 of 69 (no arm above it)",
+    "purity_pool_of_record": "R1' 0.712 [0.697, 0.727] vs R1 0.727 (-1.5 pp; clean; paired exact McNemar 208:157, p 0.0088, n 3,445, ESTABLISHED); R2' 0.725 [0.710, 0.740] vs 0.738 (in-sample 2,357 of 3,445); R3' 0.714 [0.698, 0.729] vs 0.749 (in-sample 2,399 of 3,445)",
+    "leaves_nodes_iterations": "R1' 73 / 133 / 14 (R1 82); R2' 75 / 134 / 14 (R2 79); R3' 71 / 128 / 13 (R3 81)",
+    "twin_leaf_identity_J_ge_0.9": "R1' 36 of 82 (1.00: 35, [0.9,1): 1, [0.5,0.9): 10, <0.5: 27; median 0.849; quantitative 0 of 36, discursive 36 of 46); R2' 52 of 79 (51 / 1 / 15 / 8); R3' 42 of 81 (39 / 3 / 19 / 10)",
+    "rule_only_refusals": "rows 29 / 41 / 63 = 4 / 7 / 6 distinct (site, k, emK, sep); R1' n00000004 1.006x, n00000031 1.003x, n00000141 1.038x, n00000180 1.026x; R3' n00000073 exactly 1.000x; build.out bar_eff= lines 218 / 225 / 193",
+    "mechanism_R1_vs_R1prime": "identical through iteration 2 (7 nodes, 706 / 1,320 / 879 / 1,647); iteration 3 on 3,858 members: R1 k 2 dJ 0.024765 (z 38.1) accepted at 1.006x; R1' k 2 refused (0.02515 < 0.02625), k 3 dJ 0.045728 (z 62.95) accepted at joint 0.056502 = 2.26x; R1' children n00000045/46/47 (1,083 / 1,465 / 1,385) = the record's at J 0.975 / 0.935 / 0.940 (R1's k 2 children 0.710 / 0.609 / 0.342)",
+    "mu_match_cos_ge_0.95": "56 / 57 / 52 of 81 (twins 55 / 61 / 58; greedy one-to-one; best-match 60 / 60 / 56)",
+    "record_site_identity": "11 / 11 / 9 of 16 (twins 7 / 8 / 8)",
+    "grow_shrink": "accepted GROW 60 / 59 / 57 vs twins 71 / 68 / 68; SHRINK 0 / 0 / 0 vs 2 / 4 / 2"
+  },
+  "sentence_of_record": "\"the quantitative depth-1 site certifies on every draw under hysteresis at 1.05 x bar\": a stated recipe property. [BRACKET 2026-09-19 by the post-run review (K-SELECTION, chain 15:26-16:58, zero calls; every number recomputed from snapshots.db mode=ro, the site-null CSVs and proposals.csv): C0-C3 HELD on 3 of 3 primed arms (I2 leaf member multiset identical to REDRAW R1, jsonl sha 1b9bd34d648ef29e; margins 1.688 / 1.711 / 1.694; discursive 2.084 / 2.117 / 2.132 and root 1.137 / 1.140 / 1.124, observed_sep identical to the twins' to 6 decimals; stable set 7 of 16 containing the five). The property holds for the MMLU-Pro anchor-free recipe at bar 0.025, three draws, one multiplier value. \"Resolved\" is resolved AT THE DEPTH-1 SITE at the cost of a different tree below it: the rule is not local. R1' (the clean draw): identical to R1 through iteration 2; at iteration 3 on the same 3,858 members the twin accepts k=2 at dJ 0.0248 (min-pair 0.02515 = 1.006x) and R1' accepts k=3 at dJ 0.0457 (joint 0.056502 = 2.26x), whose children are the record's n00000045/46/47 at J 0.975/0.935/0.940; 0 of R1's 36 quantitative leaves and 36 of its 46 discursive leaves reproduce at J >= 0.9 (73 leaves vs 82; the rule also bit at n00000031 1.003x, n00000141 1.038x, n00000180 1.026x); held-out purity on the pool of record 0.727 -> 0.712, -1.5 pp, ESTABLISHED (paired exact McNemar 208:157, p 0.0088, n 3,445). R2' / R3' (in-sample pools): the trunk is the twin's (the rule never fires at n00000004, where k=2 was already below the bar); 7 / 6 distinct deeper refusals leave 75 / 71 leaves (27 / 39 of the twins' 79 / 81 at J < 0.9) and RAISE the certified count +4 / +3 (12 of 64 -> 16 of 59; 10 of 66 -> 13 of 57): the rule moves the certified count in 2 of 3 arms, contrary to the registration's P4 and to the closed-line check's \"not a lever\"; no arm beats the record's 16 and ANCHOR-FREE-CERT stays closed; any sweep over m, or use of m to move a count, is inside that closed class. P2 FAILED as scored on the 2-dp band read at float precision; the sites are unchanged and the margins within 0.013 of their twins'. FW L53 respected: the engine reads acceptEps at TaxonomySplitter.kt L364 and L435 only; certification stays a post-hoc certificate.]",
+  "chips": [
+    "C0 C1 C2 C3 HELD 3/3 (ZERO CALLS; RECOMPUTED TO THE DIGIT)",
+    "SENTENCE OF RECORD WITH BRACKET: RESOLVED AT THE DEPTH-1 SITE, NOT LOCAL (73/75/71 LEAVES; P8 36/52/42; P4 +0/+4/+3)",
+    "CLEAN-ARM PURITY -1.5 pp ESTABLISHED (208:157, p 0.009)",
+    "P1 P4(R1') P6 HELD; P2 FAILED ON A 2-DP BAND (SITES UNCHANGED, OBSERVED_SEP = TWIN); P3 P5 P7 P8 P9 P10 FAILED",
+    "COUNT-MOVING IN 2 OF 3 ARMS: \"NOT A LEVER\" WITHDRAWN; ANCHOR-FREE-CERT NOT REOPENED (NO ARM > 16)",
+    "STRUCTURAL EVIDENCE ONLY; m = 1.05 ONE VALUE, UNTESTED AS A VALUE; BAR 0.025 RECIPE ONLY"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-19",
+      "by": "K-SELECTION pre-build naming bracket (a30c995, L8761-L8769)",
+      "text": "engine-coder names of record (kselect/*_k105, _inert; k_selection_outcome.txt; k_selection_readout.py --run; k_selection_inert.py; tools/chains/k_selection.sh); I2 membership from snapshots.db's SerializedGraph; C1 matched on best Jaccard over all depth-1 sites with the certified-only reading beside; JVM-guard NOTE; pointer L8360-8362 reads L8377-8379."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "K-SELECTION READY (461d85b) condition 2, appended at L8770 before the launch",
+      "text": "(i) F1 fires only on C1 failing at R1'; a C1 failure at R2'/R3' is C1 FAILED, not F1; the root is scored under C1/C2. (ii) On fewer than 3 built arms C3, P3, P10 read UNDETERMINED and the VERDICT sentence is withheld (C1 is 3 of 3); C1 and C2 scored per built arm. (iii) P7 scored on rows with the distinct count beside; the '> 10 -> fringe moves' inference is void. (iv) pre-run fact: accepted-at-margin k=2 sites in the twins R1 1 / R2 5 / R3 5 (2 / 7 / 6 incl. k > 2); pinned inputs and tool shas recorded; outcome of record = the chain's own --run."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "K-SELECTION post-run review (a949a35), mandatory bracket on the sentence of record",
+      "text": "[BRACKET 2026-09-19 by the post-run review (K-SELECTION, chain 15:26-16:58, zero calls; every number recomputed from snapshots.db mode=ro, the site-null CSVs and proposals.csv): C0-C3 HELD on 3 of 3 primed arms (I2 leaf member multiset identical to REDRAW R1, jsonl sha 1b9bd34d648ef29e; margins 1.688 / 1.711 / 1.694; discursive 2.084 / 2.117 / 2.132 and root 1.137 / 1.140 / 1.124, observed_sep identical to the twins' to 6 decimals; stable set 7 of 16 containing the five). The property holds for the MMLU-Pro anchor-free recipe at bar 0.025, three draws, one multiplier value. \"Resolved\" is resolved AT THE DEPTH-1 SITE at the cost of a different tree below it: the rule is not local. R1' (the clean draw): identical to R1 through iteration 2; at iteration 3 on the same 3,858 members the twin accepts k=2 at dJ 0.0248 (min-pair 0.02515 = 1.006x) and R1' accepts k=3 at dJ 0.0457 (joint 0.056502 = 2.26x), whose children are the record's n00000045/46/47 at J 0.975/0.935/0.940; 0 of R1's 36 quantitative leaves and 36 of its 46 discursive leaves reproduce at J >= 0.9 (73 leaves vs 82; the rule also bit at n00000031 1.003x, n00000141 1.038x, n00000180 1.026x); held-out purity on the pool of record 0.727 -> 0.712, -1.5 pp, ESTABLISHED (paired exact McNemar 208:157, p 0.0088, n 3,445). R2' / R3' (in-sample pools): the trunk is the twin's (the rule never fires at n00000004, where k=2 was already below the bar); 7 / 6 distinct deeper refusals leave 75 / 71 leaves (27 / 39 of the twins' 79 / 81 at J < 0.9) and RAISE the certified count +4 / +3 (12 of 64 -> 16 of 59; 10 of 66 -> 13 of 57): the rule moves the certified count in 2 of 3 arms, contrary to the registration's P4 and to the closed-line check's \"not a lever\"; no arm beats the record's 16 and ANCHOR-FREE-CERT stays closed; any sweep over m, or use of m to move a count, is inside that closed class. P2 FAILED as scored on the 2-dp band read at float precision; the sites are unchanged and the margins within 0.013 of their twins'. FW L53 respected: the engine reads acceptEps at TaxonomySplitter.kt L364 and L435 only; certification stays a post-hoc certificate.]"
+    },
+    {
+      "date": "2026-09-19",
+      "by": "K-SELECTION post-run review (a949a35) defect 2, on P2",
+      "text": "P2 FAILED at R1' (2.084 < 2.10 by 0.016); FAILED at R2' / R3' on the literal 2-dp band read at float precision (1.14010 vs 1.14; 2.13174 vs 2.13); observed_sep = twin to 6 decimals; substance 'unchanged' HELD; no re-run."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "K-SELECTION post-run review (a949a35) defect 3, on the closed-line check (programme L8333 / L8360)",
+      "text": "the count moved +4 / +3 in 2 of 3 arms; distinguished from ANCHOR-FREE-CERT by mechanism only; ANCHOR-FREE-CERT not reopened (no arm > 16); any sweep over m, or use of m to move a count, is inside the closed class."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "K-SELECTION post-run review (a949a35) defect 4, on P5",
+      "text": "clean-arm purity drop -1.48 pp ESTABLISHED: paired exact McNemar 208:157, p 0.0088, n 3,445 (own routing, 256-slice cosine to leaf vmfMu, majority train label)."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "K-SELECTION post-run review (a949a35) defect 5, on C0 / P6",
+      "text": "'byte-identical' is true of dag_snapshots.jsonl only; the snapshots.db graph differs from R1's in queryId ORDER within all 82 leaves (sets equal)."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "K-SELECTION (a949a35), inserted into ANCHOR-FREE-REDRAW (programme L6422 / L6440, pointer L6471; ledger row at v118)",
+      "text": "[CORRECTED 2026-09-19 by K-SELECTION (chain 15:26-16:58, zero calls; review recomputed): on the same draw with proposalAcceptMultiplier 1.05 (R1' af_clean_s42_k105, same seed / split / engine; flag inert when absent, I2 identical to R1) k=2 at 1.006x is refused and k=3 accepted at iteration 3 (joint 0.056502 = 2.26x bar, dJ 0.0457 vs k=2's 0.0248 on the same 3,858 members), certified at 1.688 (p95 0.033471); the children are the record's n00000045/46/47 at J 0.94-0.98. The 3/4 was the greedy first-k-that-passes rule's, not the corpus's; \"a different, weaker object\" stands. The certified site is bought with a different tree below it (73 vs 82 leaves; purity 0.712 vs 0.727, -1.5 pp, established p 0.0088); the primed tree is STRUCTURAL EVIDENCE ONLY and R1 af_clean_s42 remains the clean free tree of record. §K-SELECTION.]"
+    }
+  ],
+  "does_not_show": [
+    "a board or any judging on a primed tree",
+    "a union routing gain",
+    "that 1.05 is the right multiplier or that any other m behaves the same (one value, one knob; m untested as a value)",
+    "that the union recipe at bar 0.0145 has the property (MMLU-Pro anchor-free recipe at bar 0.025 only)",
+    "that k = 3 is guaranteed by the rule (it arrives via the iteration-3 proposal after an iteration-2 z-gate rejection in every k = 3 build)",
+    "the accepted min-pair at k = 3 (an interval [1.05, 2.26]x bar)",
+    "that the certified-count rise on R2' / R3' is out-of-sample (own pools, 68-70% in-sample)",
+    "that R1's quantitative half is 'worse' than R1's in any sense but purity (identity says closer to the record)",
+    "a scorable '1-4 refusals per arm' (unscoreable as rows)",
+    "anything about the flag at any other bar; nothing promoted; the flag is absent from every config of record"
+  ],
+  "ledger": {
+    "row_id": "K-SELECTION",
+    "version": "v118",
+    "commit": "e267464"
+  },
+  "depends_on": [
+    "ANCHOR-FREE-REDRAW",
+    "ANCHOR-FREE-CERT",
+    "CAP-PRUNE"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "experiment_results/anchorfree/redraw/kselect/k_selection_outcome.txt (4c25e56): C0-C3, P1-P10 as printed (L325-L367), per-arm margins, p95, counts, purity, histograms, P7 rows, mu-match, identity tables, manifests, snapshot ids",
+    "experiment_results/anchorfree/redraw/kselect/i2_inertness.txt (4c25e56): I2 leaf multiset, nodes, train ids, slots, vmfMu delta, jsonl sha, manifest multiplier",
+    "docs/reviews/2026-09-19_k_selection_post.md (a949a35): per-claim table 1-20 (CONFIRMED), review decimals, McNemar 208:157 p 0.0088, mechanism (deep.py), where the tree changed, defects 1-8, sentence of record + mandatory bracket, chips, does-not-show, REDRAW C3 bracket, plan wording",
+    "docs/judge_v2_program.md section K-SELECTION registration L8224-L8390 (8fde7fa); naming bracket L8761-L8769 (a30c995); READY bracket L8770 (461d85b); outcome section L9420-L9610 (023ed7d)",
+    "docs/reviews/READY_k_selection.md (461d85b): tool shas, pinned inputs, twin numbers, readings (i)-(iv)",
+    "experiment_results/anchorfree/redraw/kselect/chain.log (4c25e56): 15:26:18 start, preflight lines, 16:58 readout"
+  ],
+  "last_update": "2026-09-19",
+  "closed_line_note": "closes nothing; withdraws the registration's 'not a lever' distinction (count moved +4 / +3); ANCHOR-FREE-CERT stays closed and is not reopened by result; any sweep over m is inside that closed class",
+  "plain_description": {
+    "sq": "SQ3 Taxonomy",
+    "what": "Asks whether a first-level split of the MMLU-Pro tree certifying 3 out of 4 times comes from the greedy 'take the first number of children that passes' rule or from the data. It rebuilds three trees with a rule that requires a 5% margin above the bar, plus 300-repetition null tests. No calls.",
+    "why": "It checks whether a taxonomy result is an artefact of a construction rule rather than a property of the corpus.",
+    "information": "If the margin rule makes the split certify every time, the old 3/4 was a rule artefact. Result: done. With the 1.05 margin rule the site certifies on all three draws, but the rule is not local: it changes the tree below the site. This was tested for one corpus, one bar and one margin value only. Nothing was promoted, and there was no judging.",
+    "written": "2026-10-07"
+  }
+}

@@ -1,0 +1,135 @@
+{
+  "id": "ANCHOR-FREE-MCS",
+  "title": "ANCHOR-FREE-MCS: minimum cell size on the anchor-free tree (EXPLORATORY, zero judge calls)",
+  "question": "Does a smaller minimum cell size (40, 30 against the registered 55) let the anchor-free tree split further, and what does it cost in purity, certified share, key information and the question support the profile needs?",
+  "kind": "build",
+  "state": "done",
+  "registration": {
+    "commit": "b90837c",
+    "program_lines": "docs/judge_v2_program.md (lines as of 5dc8a06) L4457-L4463",
+    "date": "2026-09-17",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-17 (before running) — ANCHOR-FREE-MCS: minimum cell size on the anchor-free tree (EXPLORATORY, zero judge calls)",
+    "outcome_heading": [
+      "L4479: ## ANCHOR-FREE-MCS (2026-09-17, zero judge calls) — smaller cells buy leaves and label purity, keep the key information, lower the certified share, and thin the support the profile needs"
+    ]
+  },
+  "script": {
+    "path": "tools/analysis/anchor_free_readout.py (arms experiment_configs/anchorfree/af_mcs{40,30}_s42.toml)",
+    "sha16": "203b62c09b7cfd36",
+    "commit": "e355764"
+  },
+  "ready": null,
+  "go": "n/a (0 judge calls; two constructions + two 300-rep site nulls)",
+  "run": {
+    "outcome_file": "experiment_results/anchorfree/anchor_free_mcs40_readout.txt",
+    "outcome_commit": "b46c723",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae routed for purity; tree on the p8a29 split (structural evidence only)",
+    "date": "2026-09-17",
+    "other_files": [
+      "experiment_results/anchorfree/anchor_free_mcs30_readout.txt (b46c723)",
+      "experiment_results/anchorfree/site_null_af_mcs{40,30}_s42.csv"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the adversarial check of record is the one the programme names: EXPLORATORY, DESCRIPTIVE row; no adversarial recomputation recorded",
+    "commit": "b46c723",
+    "verdict": "descriptive; adjudicates nothing; mcs 55 stays the setting of record"
+  },
+  "criteria": [
+    {
+      "id": "readout",
+      "text": "EXPLORATORY: no criterion; leaves, purity, certified sites and share, key-only leaf information, key profile R, per-leaf held-out support",
+      "result": "DELIVERED",
+      "value": "mcs 55 / 40 / 30: leaves 81 / 108 / 143 (nodes 150 / 202 / 265; depth 7 / 7 / 8); purity 0.715 / 0.738 / 0.742; certified 16 of 69 (23%) / 18 of 94 (19%) / 22 of 122 (18%); key-only +13.19 / +13.38 (+0.19 [-0.25, +0.61]) / +13.42 (+0.23 [-0.36, +0.79]); key profile R at leaves >= 50 q 0.829 (21 cells) / 0.861 (10) / 0.852 (7); held-out top-1 per leaf median 37 / ~27 / 20 (min 6 at mcs 30); leaves at >= 50 q 21 / 10 / 7; matched to the record 80 of 81 / 78 of 81",
+      "denominator": "readout against the mcs 55 tree of record; 300-rep site nulls"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "leaves rise above 100",
+      "result": "HELD",
+      "value": "108 / 143",
+      "denominator": "arms"
+    },
+    {
+      "id": "P2",
+      "text": "held-out purity flat within 1pp",
+      "result": "FAILED",
+      "value": "+2.3 / +2.7pp (finer leaves carry finer majority labels, a mechanical gain)",
+      "denominator": "3,445 pool q"
+    },
+    {
+      "id": "P3",
+      "text": "more split sites with a LOWER certified share",
+      "result": "HELD",
+      "value": "23 -> 19 -> 18%",
+      "denominator": "69 / 94 / 122 sites"
+    },
+    {
+      "id": "P4",
+      "text": "key-only leaf information flat or down by under 1 / 1000",
+      "result": "HELD",
+      "value": "+0.19 / +0.23",
+      "denominator": "10,925 keyed q"
+    },
+    {
+      "id": "P5",
+      "text": "key profile R at the leaves falls (fewer questions per cell)",
+      "result": "FAILED",
+      "value": "FAILED as measured (0.829 -> 0.861 -> 0.852) but the measurable set collapsed: 7 of 143 leaves reach the 50-question floor at mcs 30 vs 21 of 81 at mcs 55",
+      "denominator": "leaves with >= 50 held-out q"
+    }
+  ],
+  "falsifier": {
+    "text": "none (EXPLORATORY; adjudicates nothing)",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "table": "mcs 55 / 40 / 30: leaves 81 / 108 / 143; purity 0.715 / 0.738 / 0.742; certified 16 of 69 / 18 of 94 / 22 of 122; key-only +13.19 / +13.38 / +13.42; held-out top-1 per leaf median 37 / ~27 / 20 (min 6); leaves at >= 50 q 21 / 10 / 7",
+    "support_reading": "at mcs 30 the median leaf has 20 held-out questions and the smallest 6, an order of magnitude below the ~120-190 the design-effect rule needs for a per-cell SE of 0.15 (H6b)"
+  },
+  "sentence_of_record": "ANCHOR-FREE-MCS (2026-09-17, zero judge calls): smaller cells buy leaves and label purity, keep the key information, lower the certified share, and thin the support the profile needs. Smaller cells are cheap in every label metric and expensive in the one that matters for reporting: question support per cell (median 20 at mcs 30, min 6, an order of magnitude below the ~120-190 the design-effect rule needs for SE 0.15). mcs 55 stays the setting of record. EXPLORATORY; adjudicates nothing.",
+  "chips": [
+    "DESCRIPTIVE",
+    "LEAVES 81 -> 108 -> 143, PURITY +2.3 / +2.7pp",
+    "SUPPORT PER CELL COLLAPSES (MEDIAN 20 AT MCS 30)",
+    "CERTIFIED SHARE 23 -> 19 -> 18%"
+  ],
+  "brackets": [],
+  "does_not_show": [
+    "a measured profile at any granularity below mcs 55 (support collapses)",
+    "anything adjudicated"
+  ],
+  "ledger": {
+    "row_id": "ANCHOR-FREE-MCS",
+    "version": "v111 (85a661e)"
+  },
+  "depends_on": [
+    "ANCHOR-FREE",
+    "ANCHOR-FREE-Z",
+    "H9-EXT"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md (lines as of 5dc8a06) L4457-L4463 (registration b90837c): arms, prediction",
+    "docs/judge_v2_program.md (lines as of 5dc8a06) L4479-L4497 (outcome section b46c723): the table, the prediction scored, the reading",
+    "experiment_results/anchorfree/anchor_free_mcs40_readout.txt and anchor_free_mcs30_readout.txt (b46c723)",
+    "docs/test_ledger.html row ANCHOR-FREE-MCS (v111): chips verbatim, evidence (af_mcs{40,30}_s42.toml, readouts, site nulls, b90837c, b46c723)",
+    "script sha16 = sha256 of tools/analysis/anchor_free_readout.py at e355764, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' lines (grep -n them regardless of line drift); line numbers are as of programme HEAD 5dc8a06"
+  ],
+  "last_update": "2026-09-22",
+  "plain_description": {
+    "sq": "SQ3 Taxonomy",
+    "what": "Rebuilds the tree learned without topic labels (the anchor-free tree) with smaller minimum cell sizes (40 and 30 questions instead of 55). It then compares the number of leaves, label purity, how many splits pass the certificate, and how many held-out questions each leaf gets. No judge calls.",
+    "why": "Checks whether the anchor-free tree could split further, and what finer cells would cost.",
+    "information": "If smaller cells keep quality and still have enough questions, finer cells could be used. If they leave too few questions per cell, the registered size of 55 stays. Result: exploratory only, so it settles nothing. Smaller cells give more leaves (81, then 108, then 143) and slightly higher purity. They lower the share of certified splits and leave very few questions per cell (median 20 at size 30, as few as 6), far below the roughly 120-190 needed. Size 55 stays.",
+    "written": "2026-10-07"
+  }
+}

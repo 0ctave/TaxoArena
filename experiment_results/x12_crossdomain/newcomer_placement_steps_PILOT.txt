@@ -1,0 +1,151 @@
+=== PLACEMENT-STEPS: one further step per separable tier (400 matches = 800 calls; registration 20cb7b6; Amendment 6) ===
+  pool p2dca21ab5f4ef3ae | judge grok-4-1-fast-non-reasoning | max_tokens 8192 | temperature omitted | reference grok-reasoning | protocol: PLACEMENT-STEPS: one further step per separable tier, fixed anchors, 100 answer-disagreement-filtered pool questions per step, CACHED_SOLVE grok-reasoning reference (D5), STACK-v2 (prompt v2 + anchor rubric + reference block), dual order, TIE on flip, no third call (NO-TIES)
+  cache experiment_results\x12_crossdomain\newcomer_placement_steps.db (mode=ro) | producing script sha bb150a1facb590ce | this script bb150a1facb590ce | started 2026-09-19 14:49:53 | resumed - | override_guard no
+  board of record: x12 9142 + x20 12394 = 21536 verdicts, 20 models, Meta-Llama-3-70B-Instruct absent; key tiers 14 at 0.017 over the 2811 x20-judged questions; frontier band arx_0314, iask_pro, gemini-3.1-pro_5-shots, gpt-4o-2024-08-06
+    tier  1: gemini-3.1-pro_5-shots 0.912
+    tier  2: arx_0314 0.833, iask_pro 0.816
+    tier  3: arx_3 0.784, claude-3-5-sonnet-20241022 0.782
+    tier  4: gpt-4o-2024-08-06 0.750
+    tier  5: deepseek-chat-v2_5 0.651
+    tier  6: gpt-4o-mini 0.631, claude-3-5-haiku-20241022 0.629, Meta-Llama-3_1-70B-Instruct 0.628
+    tier  7: Qwen1.5-110B 0.492, Qwen1.5-72B-Chat 0.476
+    tier  8: Mixtral-8x7B-Instruct-v0.1 0.417
+    tier  9: c4ai-command-r-v01 0.370, Meta-Llama-3_1-8B 0.369
+    tier 10: Qwen1.5-14B-Chat 0.351
+    tier 11: gemma-7b 0.313
+    tier 12: Yi-6b-Chat 0.274
+    tier 13: Llama-2-13b-hf 0.239
+    tier 14: Llama-2-7b-hf 0.184
+  cache rows: verdicts 24 of 800 | matches with both orders 12 of 400 | unusable 0 (0.0%) | finish_reason {'stop': 24}
+  PARTIAL: 12 of 400 matches judged in both orders
+C0 GATE: the four recorded certificates per newcomer replayed and asserted equal to PLACEMENT-CEILING's (sonnet 0.910 below / 0.505 / 0.510 unseparated / 0.225 above; gpt-4o-mini 0.710 below / 0.595 below / 0.170 above / 0.360 above); bands 7 / 3: HELD
+
+--- claude-3-5-sonnet-20241022 (own key tier 3, key 0.782) ---
+  step vs deepseek-chat-v2_5           (t5):   9 :   1 (ties  2, unusable  0, pending 88) on 100 fixed matches
+  step vs claude-3-5-haiku-20241022    (t6):   0 :   0 (ties  0, unusable  0, pending 100) on 100 fixed matches
+  step vs Qwen1.5-110B                 (t7):   0 :   0 (ties  0, unusable  0, pending 100) on 100 fixed matches
+  [PRIMARY] new anchors, win share with ties 1/2, unusable excluded, question-clustered bootstrap B=2000, seed 42:
+    vs deepseek-chat-v2_5           (t5, key 0.651): n  12, share 0.833, sd 0.091 | draws above 0.5: 1996, below:    2, at: 2 | newcomer ABOVE anchor at 0.975 (opposite draws 4); below at 0.95
+    vs claude-3-5-haiku-20241022   : no usable match
+    vs Qwen1.5-110B                : no usable match
+  [A] new anchors, win share with ties 1/2, unusable 1/2, question-clustered bootstrap B=2000, seed 42:
+    vs deepseek-chat-v2_5           (t5, key 0.651): n  12, share 0.833, sd 0.091 | draws above 0.5: 1996, below:    2, at: 2 | newcomer ABOVE anchor at 0.975 (opposite draws 4); below at 0.95
+    vs claude-3-5-haiku-20241022   : no usable match
+    vs Qwen1.5-110B                : no usable match
+  [B] new anchors, win share with committed verdicts only, question-clustered bootstrap B=2000, seed 42:
+    vs deepseek-chat-v2_5           (t5, key 0.651): n  10, share 0.900, sd 0.093 | draws above 0.5: 1997, below:    0, at: 3 | newcomer ABOVE anchor at 0.975 (opposite draws 3); below at 0.95
+    vs claude-3-5-haiku-20241022   : no usable match
+    vs Qwen1.5-110B                : no usable match
+  [PRIMARY] band re-read over 7 anchors: INCLUSIVE (tier_interval over all certificates) tiers 1..5 = 5 (own tier contained) | EXCLUSIVE (band of record 1..7 minus bounded (iii) tiers) tiers [1, 2, 3, 4, 6] width 5 | classes {'ii': 3, 'i': 1, 'iii-a': 1} | (i)+(ii) tiers [1, 2, 3, 4]
+    tier  1 -> (ii) bounded by gemini-3.1-pro_5-shots (above)
+        gemini-3.1-pro_5-shots         key 0.912  (ii) above
+    tier  2 -> (ii) no certificate
+        arx_0314                       key 0.833  (ii) never judged
+        iask_pro                       key 0.816  (ii) never judged
+    tier  3 -> (i) no certificate
+        arx_3                          key 0.784  (i) unseparated
+    tier  4 -> (ii) no certificate
+        gpt-4o-2024-08-06              key 0.750  (ii) unseparated
+    tier  5 -> (iii-c) BOUNDED by deepseek-chat-v2_5 (newcomer certified above)
+        deepseek-chat-v2_5             key 0.651  (iii-c) below
+    tier  6 -> (iii-a) judged, UNSEPARATED: claude-3-5-haiku-20241022
+        gpt-4o-mini                    key 0.631  (iii-b) never judged  (peer newcomer, D5: never an anchor)
+        claude-3-5-haiku-20241022      key 0.629  (iii-a) unseparated
+        Meta-Llama-3_1-70B-Instruct    key 0.628  (iii-b) never judged
+    tier  7 -> (iii-c) BOUNDED by Qwen1.5-72B-Chat (newcomer certified above)
+        Qwen1.5-110B                   key 0.492  (iii-a) unseparated
+        Qwen1.5-72B-Chat               key 0.476  (iii-c) below
+  [A] band re-read over 7 anchors: INCLUSIVE (tier_interval over all certificates) tiers 1..5 = 5 (own tier contained) | EXCLUSIVE (band of record 1..7 minus bounded (iii) tiers) tiers [1, 2, 3, 4, 6] width 5 | classes {'ii': 3, 'i': 1, 'iii-a': 1} | (i)+(ii) tiers [1, 2, 3, 4]
+    tier  1 -> (ii) bounded by gemini-3.1-pro_5-shots (above)
+        gemini-3.1-pro_5-shots         key 0.912  (ii) above
+    tier  2 -> (ii) no certificate
+        arx_0314                       key 0.833  (ii) never judged
+        iask_pro                       key 0.816  (ii) never judged
+    tier  3 -> (i) no certificate
+        arx_3                          key 0.784  (i) unseparated
+    tier  4 -> (ii) no certificate
+        gpt-4o-2024-08-06              key 0.750  (ii) unseparated
+    tier  5 -> (iii-c) BOUNDED by deepseek-chat-v2_5 (newcomer certified above)
+        deepseek-chat-v2_5             key 0.651  (iii-c) below
+    tier  6 -> (iii-a) judged, UNSEPARATED: claude-3-5-haiku-20241022
+        gpt-4o-mini                    key 0.631  (iii-b) never judged  (peer newcomer, D5: never an anchor)
+        claude-3-5-haiku-20241022      key 0.629  (iii-a) unseparated
+        Meta-Llama-3_1-70B-Instruct    key 0.628  (iii-b) never judged
+    tier  7 -> (iii-c) BOUNDED by Qwen1.5-72B-Chat (newcomer certified above)
+        Qwen1.5-110B                   key 0.492  (iii-a) unseparated
+        Qwen1.5-72B-Chat               key 0.476  (iii-c) below
+  [B] band re-read over 7 anchors: INCLUSIVE (tier_interval over all certificates) tiers 1..5 = 5 (own tier contained) | EXCLUSIVE (band of record 1..7 minus bounded (iii) tiers) tiers [1, 2, 3, 4, 6] width 5 | classes {'ii': 3, 'i': 1, 'iii-a': 1} | (i)+(ii) tiers [1, 2, 3, 4]
+    tier  1 -> (ii) bounded by gemini-3.1-pro_5-shots (above)
+        gemini-3.1-pro_5-shots         key 0.912  (ii) above
+    tier  2 -> (ii) no certificate
+        arx_0314                       key 0.833  (ii) never judged
+        iask_pro                       key 0.816  (ii) never judged
+    tier  3 -> (i) no certificate
+        arx_3                          key 0.784  (i) unseparated
+    tier  4 -> (ii) no certificate
+        gpt-4o-2024-08-06              key 0.750  (ii) unseparated
+    tier  5 -> (iii-c) BOUNDED by deepseek-chat-v2_5 (newcomer certified above)
+        deepseek-chat-v2_5             key 0.651  (iii-c) below
+    tier  6 -> (iii-a) judged, UNSEPARATED: claude-3-5-haiku-20241022
+        gpt-4o-mini                    key 0.631  (iii-b) never judged  (peer newcomer, D5: never an anchor)
+        claude-3-5-haiku-20241022      key 0.629  (iii-a) unseparated
+        Meta-Llama-3_1-70B-Instruct    key 0.628  (iii-b) never judged
+    tier  7 -> (iii-c) BOUNDED by Qwen1.5-72B-Chat (newcomer certified above)
+        Qwen1.5-110B                   key 0.492  (iii-a) unseparated
+        Qwen1.5-72B-Chat               key 0.476  (iii-c) below
+  power column (PRIMARY; unseparated new anchors; SE_n = sd x sqrt(n / n'); certify at 0.975 if the share held):
+    none unseparated
+  SECONDARY, MIXED-FIT / EXTRAPOLATED (never the verdict; ARENA-13 scale caveat): theta with the 4 recorded anchors +1.421 -> with the new edges +1.436 (delta +0.015; 399 + 12 protocol edges)
+
+--- gpt-4o-mini (own key tier 6, key 0.631) ---
+  step vs deepseek-chat-v2_5           (t5):   0 :   0 (ties  0, unusable  0, pending 100) on 100 fixed matches
+  [PRIMARY] new anchors, win share with ties 1/2, unusable excluded, question-clustered bootstrap B=2000, seed 42:
+    vs deepseek-chat-v2_5          : no usable match
+  [A] new anchors, win share with ties 1/2, unusable 1/2, question-clustered bootstrap B=2000, seed 42:
+    vs deepseek-chat-v2_5          : no usable match
+  [B] new anchors, win share with committed verdicts only, question-clustered bootstrap B=2000, seed 42:
+    vs deepseek-chat-v2_5          : no usable match
+  [PRIMARY] band re-read over 5 anchors: INCLUSIVE (tier_interval over all certificates) tiers 4..6 = 3 (own tier contained) | EXCLUSIVE (band of record 4..6 minus bounded (iii) tiers) tiers [4, 5, 6] width 3 | classes {'ii': 1, 'iii-a': 1, 'i': 1} | (i)+(ii) tiers [4, 6]
+    tier  4 -> (ii) bounded by gpt-4o-2024-08-06 (above)
+        gpt-4o-2024-08-06              key 0.750  (ii) above
+    tier  5 -> (iii-a) judged, UNSEPARATED: deepseek-chat-v2_5
+        deepseek-chat-v2_5             key 0.651  (iii-a) unseparated
+    tier  6 -> (i) bounded by claude-3-5-haiku-20241022 (below)
+        claude-3-5-haiku-20241022      key 0.629  (i) below
+        Meta-Llama-3_1-70B-Instruct    key 0.628  (i) never judged
+  [A] band re-read over 5 anchors: INCLUSIVE (tier_interval over all certificates) tiers 4..6 = 3 (own tier contained) | EXCLUSIVE (band of record 4..6 minus bounded (iii) tiers) tiers [4, 5, 6] width 3 | classes {'ii': 1, 'iii-a': 1, 'i': 1} | (i)+(ii) tiers [4, 6]
+    tier  4 -> (ii) bounded by gpt-4o-2024-08-06 (above)
+        gpt-4o-2024-08-06              key 0.750  (ii) above
+    tier  5 -> (iii-a) judged, UNSEPARATED: deepseek-chat-v2_5
+        deepseek-chat-v2_5             key 0.651  (iii-a) unseparated
+    tier  6 -> (i) bounded by claude-3-5-haiku-20241022 (below)
+        claude-3-5-haiku-20241022      key 0.629  (i) below
+        Meta-Llama-3_1-70B-Instruct    key 0.628  (i) never judged
+  [B] band re-read over 5 anchors: INCLUSIVE (tier_interval over all certificates) tiers 4..6 = 3 (own tier contained) | EXCLUSIVE (band of record 4..6 minus bounded (iii) tiers) tiers [4, 5, 6] width 3 | classes {'ii': 1, 'iii-a': 1, 'i': 1} | (i)+(ii) tiers [4, 6]
+    tier  4 -> (ii) bounded by gpt-4o-2024-08-06 (above)
+        gpt-4o-2024-08-06              key 0.750  (ii) above
+    tier  5 -> (iii-a) judged, UNSEPARATED: deepseek-chat-v2_5
+        deepseek-chat-v2_5             key 0.651  (iii-a) unseparated
+    tier  6 -> (i) bounded by claude-3-5-haiku-20241022 (below)
+        claude-3-5-haiku-20241022      key 0.629  (i) below
+        Meta-Llama-3_1-70B-Instruct    key 0.628  (i) never judged
+  power column (PRIMARY; unseparated new anchors; SE_n = sd x sqrt(n / n'); certify at 0.975 if the share held):
+    none unseparated
+  SECONDARY, MIXED-FIT / EXTRAPOLATED (never the verdict; ARENA-13 scale caveat): theta with the 4 recorded anchors +0.706 -> with the new edges +0.706 (delta +0.000; 400 + 0 protocol edges)
+
+=== criteria (PRIMARY; A and B printed above) ===
+  C1 SONNET (iii) -> 0: iii-a 1 + iii-b 0 + iii-c 0 = 1 on the exclusive reading (every tier-5/6/7 tier bounded: [(5, True), (6, False), (7, True)]) -> FAILED
+  C2 SONNET BAND = the structural floor: (i)+(ii) tiers [1, 2, 3, 4] (needs [1, 2, 3, 4]) and EXCLUSIVE width 5 (needs 4); INCLUSIVE beside: 1..5 = 5 -> FAILED
+  C3 GPT-4O-MINI: deepseek unseparated; (iii-b) 0; exclusive tiers [4, 5, 6] width 3 (2 or 3; t4 and t6 present) -> HELD | criterion (22) NOT MET on the INCLUSIVE interval 4..6 = 3 (own tier contained) (MET iff inclusive width 2 and the own key tier 6 contained; the exclusive set {t4, t6} is not an interval; exclusive width 3 beside)
+=== predictions (blind, labelled) ===
+  P1 (plan) sonnet (iii) 3 -> 0; band 4 [4, 5] (exclusive 4, inclusive 5): (iii) 1, exclusive 5, inclusive 5 -> FAILED
+  P2 (plan) gpt-4o-mini band 2 or 3: exclusive 3 -> HELD
+  P3 sonnet shares vs deepseek [0.60, 0.75], haiku [0.65, 0.80], Qwen1.5-110B [0.75, 0.90]: deepseek-chat-v2_5 0.833, claude-3-5-haiku-20241022 n/a, Qwen1.5-110B n/a -> FAILED
+  P4 each sonnet step certifies at 0.975 with >= 1,900 of 2000 draws on one side: deepseek-chat-v2_5 1996/2 below, claude-3-5-haiku-20241022 0/0 unseparated, Qwen1.5-110B 0/0 unseparated -> FAILED
+  P5 gpt-4o-mini vs deepseek share in [0.45, 0.60]: n/a; certificate unseparated (P(certified) recorded 0.5, no direction) -> FAILED
+  P6 tie rate under PRIMARY on the 400 new matches in [0.20, 0.30]: 0.167 (2 ties of 12 usable) -> FAILED
+  P7 unusable rows <= 2 of 400: 0 -> HELD
+  P8 sonnet MIXED-FIT theta moves by < 0.10: +1.421 -> +1.436 (|delta| 0.015) -> HELD
+=== verdict rule ===
+  NO VERDICT (refused: PARTIAL: 12 of 400 matches judged in both orders)
+  not overturned: the 4-tier structural floor, the two placements' directions, the contained key tiers, FILTER-BOARD, the frontier order (unread)

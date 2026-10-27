@@ -1,0 +1,261 @@
+{
+  "id": "IFEVAL-RESPONSE-ORACLE",
+  "title": "IFEVAL-RESPONSE-ORACLE: with an executed per-response constraint-checker vector attached to each trace, does the IFEval judge's INDECISION collapse (COULD-NOT-VERIFY) or persist (WOULD-NOT-COMMIT)? (judged, 1,628 calls under plan Amendment 9; a decisiveness-and-obedience instrument, never a rung of the reference ladder)",
+  "question": "GEN-ARENA's IFEval cell failed as much by refusing to commit as by being wrong (accuracy 0.658, decidable ties 0.256, flips 0.380, against MATH's 0.935 / 0.055 / 0.237). Does handing the judge the executed checker's per-response PASS/FAIL vector collapse the ties and flips (COULD-NOT-VERIFY) or leave them standing while accuracy jumps (WOULD-NOT-COMMIT)? The name is not CHECKER-OUTPUT: the IFEVAL RULING of 2026-09-23 establishes that IFEval has no question-level checker output, so what is attached is a per-response ORACLE and the ladder's IFEval rung stays at SPECIFICATION 0.658 permanently whatever this test reads.",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "4c8379c",
+    "program_lines": "docs/judge_v2_program.md L11239-L11423 at HEAD before this outcome commit (registered at L11148-L11329 in 4c8379c, the pointer the outcome file carries; the file has since grown above it - review defect D6, correct as written, brittle as a reference). The P4 paragraph now carries the D1 correction bracket inserted 2026-09-23.",
+    "program_lines_as_of": "4c8379c (the registration commit)",
+    "heading": "## Registered 2026-09-23 (before any code or call) — IFEVAL-RESPONSE-ORACLE: with an EXECUTED per-response constraint-checker vector attached to each trace, does the IFEval judge's INDECISION collapse (COULD-NOT-VERIFY) or persist (WOULD-NOT-COMMIT)? (judged; 1,628 calls under plan Amendment 9; a decisiveness-and-obedience instrument, NEVER a rung of the reference ladder)",
+    "date": "2026-09-23"
+  },
+  "script": {
+    "path": "tools/analysis/ifeval_response_oracle.py",
+    "sha16": "b8ba94311d813ce7 (sha256[:16] of the LF-normalised file; raw CRLF sha256[:16] 6196a1b4e33e9e7a). Pinned value, matched at the pilot, the run and the analysis; the working tree was clean at the reviewer's recompute.",
+    "commit": "42678a2 (the READY-defect fixes D1-D4 before the first posted call; first landed at 3c79ae4)"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_ifeval_response_oracle.md",
+    "commit": "2dea289 (section 9 re-pin at 70e6476); conditions C1-C5, all five verified satisfied by the post-run review"
+  },
+  "go": "docs/plan_2026-09-15.md Amendment 9 (2026-09-23, L316-L363; ebd462d) for the SPEND, at 1,628 calls and not the 838 the queue proposed (the IFEVAL RULING refuses the cheaper form for having no same-session control). Ceiling 1,700 for the test; 14,000 hard ceiling for the night.",
+  "run": {
+    "outcome_file": "experiment_results/multicorpus/ifeval_response_oracle_outcome.txt",
+    "outcome_commit": "3d1312f",
+    "calls": 1628,
+    "cce": 1628,
+    "pool": "no MMLU-Pro pool opened (p2dca21ab5f4ef3ae and paeec37aa28063c75 untouched). Population: the IFEval RESERVED (EVAL) side of the multi-corpus per-(source, domain) 0.30 / seed-42 split, GEN-ARENA's schedule unchanged - 1,200 IFEval verdicts over 162 distinct questions -> 407 key-decidable matches over 122 distinct questions; deciding subset 407 after 0 NON_TERMINATED exclusions; schedule hash ba4a0ac8a2364a49 (independently rebuilt by the reviewer). Cache experiment_results/multicorpus/ifeval_response_oracle.db, 814 rows, md5 eba2c8ed0c283a59a5b1afb1a9c13138, byte-identical to its backup.",
+    "program_outcome_lines": "docs/judge_v2_program.md L11590-L11770 at commit e99253c (the outcome section of record, appended newest last)",
+    "date": "2026-09-23 (session 05:32-05:43; night call ledger experiment_results/night_calls_2026-09-23.json, commit ca2e346: 48 + 1,580 = 1,628)"
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-23_ifeval_response_oracle_post.md",
+    "commit": "eae039e",
+    "verdict": "ACCEPTED, with ONE mandatory correction by insertion (defect D1, HIGH: P4's flip leg was scored against a mis-specified comparator and HOLDS on the registered denominator). Zero calls, read-only; every headline number independently recomputed and CONFIRMED; the population, the pairing, the pins and the schedule hash independently rebuilt; no database of record written. The checker's reading wins wherever it differs from the outcome file."
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "THE OBEDIENCE FLOOR (GEN-ARENA criterion 1, renamed by the ruling: no longer verification fidelity): the share of key-decidable matches on which the judge commits to the contestant a correct per-response reference names; bar 0.85 under convention A, both conventions, with the question-clustered interval. MANDATORY BRACKET: the per-response vector DETERMINES the key (all(inst_level_strict_acc) == prompt_level_strict_acc, asserted row by row), so this is an obedience / TRANSCRIPTION floor, not verification fidelity.",
+      "result": "HELD",
+      "value": "convention A 0.988 [0.976, 0.998] question-clustered (402 of 407; reviewer's own bootstrap [0.9760, 0.9975], clustered SE 0.0054); convention B 1.000 (n = 402); bar 0.85. Disobedience rate 0.012.",
+      "denominator": "the deciding subset: 407 key-decidable matches over 122 questions, 0 NON_TERMINATED exclusions"
+    },
+    {
+      "id": "C2",
+      "text": "DECISIVENESS, paired on the same matches: the decidable TIE RATE, control vs treatment, exact McNemar on the discordant pairs. SCOREABLE ONLY AT |delta| >= 10pp. HELD iff the tie rate falls by >= 10pp with p < 0.05 (COULD-NOT-VERIFY).",
+      "result": "HELD",
+      "value": "0.263 -> 0.012, delta -0.2506 (-25.1pp); discordant treatment-only 5 against control-only 107; exact two-sided McNemar p = 5.42e-26 (the outcome file prints 'p = 0.0000'). Robust at the worst end of the honest DEFF bracket: n_eff 93 (Kish 4.376, rho = 1) gives MDE80 15.23pp; the question-clustered bootstrap of the paired delta gives [-0.302, -0.199], entirely below -10pp.",
+      "denominator": "the same 407 paired matches in both arms (key_winner identical across arms on all 407; no (match_id, arm) twice)"
+    },
+    {
+      "id": "C3",
+      "text": "the FLIP RATE, same pairing, same denominator, same McNemar treatment, same 10pp scoreability floor. BRACKET (review D3): flips are a STRICT SUBSET of ties in both arms, so C3 is a near-restatement of C2 under tie-on-flip and NOT independent corroboration.",
+      "result": "HELD",
+      "value": "0.243 -> 0.012, delta -0.2310 (-23.1pp); discordant 5 against 99; exact McNemar p = 9.54e-24. Worst-end MDE80 14.68pp at n_eff 93; clustered bootstrap of the paired delta [-0.278, -0.183]. D3: control 99 flips inside 107 ties, treatment 5 flips = the same 5 ties; C3's 104 discordant pairs sit inside C2's 112.",
+      "denominator": "the same 407 paired matches in both arms"
+    },
+    {
+      "id": "C4",
+      "text": "NON_TERMINATED accounting per rule 10, per contestant, with the recorded limit that IFEval's only proxy is the unclosed-<think> one (checker_answers_v2.db is MATH-only; IFEval's harness cap is 1,280).",
+      "result": "DELIVERED",
+      "value": "PRINTED (no bar; the record's vocabulary word for a printed readout is DELIVERED): 0 of 407 excluded (0.0%), per contestant none. BRACKET (review D5): rule 10's exclusion path was NOT EXERCISED - not structurally impossible (53 of the 9,738 IFEval checker rows carry non_terminated = 1) but UNTESTED ON THIS CACHE.",
+      "denominator": "the 407 key-decidable matches"
+    },
+    {
+      "id": "C5",
+      "text": "the leakage readout, PRINTED, NO BAR: per-contestant agreement (the share of committed verdicts following the all-pass contestant, per model and pooled) beside every accuracy; plus the DRIFT readout, control-vs-cache agreement on the same matches.",
+      "result": "DELIVERED",
+      "value": "PRINTED, NO BAR (the record's vocabulary word for a printed readout is DELIVERED): both eight-contestant tables and both pooled rows reproduce TO THE UNIT: control pooled 266 / 300 = 0.887, treatment pooled 402 / 402 = 1.000. DRIFT 365 / 407 = 0.89680. The Qwen2.5-Math-7B-Instruct row (control 0 / 14) is EXPLORATORY as a claim - see exploratory_math7b.",
+      "denominator": "the deciding subset; per-contestant rows on committed verdicts only (control n = 300, treatment n = 402)"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "the obedience floor in [0.88, 0.96] under convention A (ORACLE's 0.720 / 0.797 under a question-level key is the nearest anchor, so 1.0 is not the expectation)",
+      "result": "FAILED",
+      "value": "0.988 [0.976, 0.998] -> FAILED HIGH, and not marginally (the interval's lower bound clears the band's ceiling by 1.6pp). The review's reading is the reading of record: the band was transported from ORACLE's QUESTION-LEVEL key, the wrong class of object; a failure of the registered PRIOR, not of the instrument. A higher floor makes the WOULD-NOT-COMMIT branch MORE reachable and the data did not take it, so P1's failure STRENGTHENS COULD-NOT-VERIFY and BOUNDS it to the oracle limit.",
+      "denominator": "the deciding subset, 407"
+    },
+    {
+      "id": "P2",
+      "text": "the treatment decidable tie rate below 0.10, from the control's ~0.256",
+      "result": "HELD",
+      "value": "0.012 (5 of 407)",
+      "denominator": "the deciding subset, treatment arm"
+    },
+    {
+      "id": "P3",
+      "text": "the treatment flip rate below 0.25, from the control's ~0.380",
+      "result": "HELD",
+      "value": "0.012 (5 of 407)",
+      "denominator": "the deciding subset, treatment arm"
+    },
+    {
+      "id": "P4",
+      "text": "the CONTROL arm reproduces GEN-ARENA within the session floor: accuracy 0.658 +- 0.07, tie rate 0.256 +- 0.09, flip rate 0.380 +- 0.09",
+      "result": "HELD",
+      "value": "accuracy 0.65356 (|0.6536 - 0.6585| = 0.005) HELD; tie 0.26290 (|0.2629 - 0.2555| = 0.007) HELD; flip 0.24324 recorded FAILED in the outcome file and CORRECTED 2026-09-23 by the review (defect D1, HIGH): the registered target 0.380 is GEN-ARENA's flip rate over its WHOLE 1,200-match IFEval schedule, while the other two legs are on the 407 key-decidable subset; the same-denominator comparator is 0.228501 and |0.2432 - 0.2285| = 0.015 sits inside the +-0.09 band, so ALL THREE LEGS HOLD, the control reproduces the 2026-09-13 cell to within 1.5pp on every leg (drift 0.897 >= 0.85 corroborating), and the registered clause 'a control arm outside P4's bands makes the session, not the treatment, the finding' DOES NOT FIRE. C2 and C3 are unchanged and unweakened.",
+      "denominator": "the deciding subset, control arm (407); the comparator is the 2026-09-13 gen_arena_grok.db cache RESTRICTED TO THOSE SAME 407 MATCHES, never its whole 1,200-match schedule"
+    },
+    {
+      "id": "P5",
+      "text": "the drift readout (control-vs-cache agreement on the same matches) >= 0.85; below that the session floor itself is the finding",
+      "result": "HELD",
+      "value": "0.89680 (365 / 407)",
+      "denominator": "the deciding subset"
+    },
+    {
+      "id": "P6",
+      "text": "registrar's addition: NON_TERMINATED exclusions <= 5% of the 407 under the unclosed-<think> proxy",
+      "result": "HELD",
+      "value": "0 of 407 - HELD and VACUOUS (review D5: the exclusion path never fired)",
+      "denominator": "the 407 key-decidable matches"
+    },
+    {
+      "id": "P7",
+      "text": "registrar's addition: unusable rows (content_filter + length) <= 1% of the 1,628 posted calls",
+      "result": "HELD",
+      "value": "0 of 814 rows; all 1,628 calls finish_reason 'stop', one provider fingerprint azure:grok-4-1-fast-non-reasoning; 0 INVALID, 0 NON_TERMINATED",
+      "denominator": "the 1,628 posted calls / 814 cache rows"
+    }
+  ],
+  "falsifier": {
+    "text": "If the tie rate does not fall by more than the MDE while accuracy rises above 0.88, the IFEval failure is WOULD-NOT-COMMIT: the abstention and order-instability line owns it, NO REFERENCE OF ANY STRENGTH REPAIRS THE RUNG, and GEN-ARENA finding 2's MECHANISM is overturned while its numbers stand. UNDETERMINED: any move below 10pp on C2 / C3; and a control arm outside P4's bands makes the session, not the treatment, the finding.",
+    "fired": false,
+    "reading": "tie delta -25.1pp with treatment accuracy 0.988 -> NOT FIRED; COULD-NOT-VERIFY, at the oracle limit only. The UNDETERMINED branch is not reached. The P4 session clause DOES NOT FIRE either (review D1: on the correct denominator all three P4 legs HOLD)."
+  },
+  "numbers_of_record": {
+    "population": "407 key-decidable matches over 122 distinct questions (from 1,200 IFEval verdicts over 162 questions); deciding subset 407 after 0 NON_TERMINATED exclusions; schedule hash ba4a0ac8a2364a49; support 3.3361 matches per question, Kish mean cluster size 4.3759, cluster sizes 1:23 / 2:30 / 3:16 / 4:14 / 5:22 / 6:11 / 7:4 / 8:2",
+    "control_arm": "accuracy A 0.65356 (266 / 407) [0.596, 0.710] clustered SE 0.030; accuracy B 0.88667 (266 / 300); ties A 0.26290 (107 / 407); flips A 0.24324 (99 / 407); INVALID 0",
+    "treatment_arm": "accuracy A 0.98771 (402 / 407) [0.976, 0.998] clustered SE 0.005; accuracy B 1.00000 (402 / 402); ties A 0.01229 (5 / 407); flips A 0.01229 (5 / 407); INVALID 0",
+    "tie_delta": "-0.2506 (-25.1pp), discordant 5 against 107 of 407, exact two-sided McNemar p = 5.42e-26; question-clustered bootstrap of the paired delta [-0.302, -0.199] over 122 questions; cluster-robust analytic SE 0.0264",
+    "flip_delta": "-0.2310 (-23.1pp), discordant 5 against 99 of 407, exact two-sided McNemar p = 9.54e-24; clustered bootstrap [-0.278, -0.183]; cluster-robust analytic SE 0.0242",
+    "paired_accuracy_delta": "+0.3342 on the 407 paired matches: 136 treatment-only correct against ZERO control-only correct, exact p = 2.3e-41 - the treatment is NEVER WORSE on any match (recomputed by the review; not in the outcome file)",
+    "worst_end_power": "at n_eff 93 (Kish 4.3759, rho = 1, the worst honest end) the paired-difference MDE at 80% power is 15.23pp (tie, discordance 0.2752) and 14.68pp (flip, 0.2555), both below the observed 25.1 / 23.1pp; McNemar z inflated by sqrt(DEFF 4.376) reads 4.61 (p 4.1e-06) and 4.41 (p 1.1e-05). The registered n_eff 204 (DEFF 2.0) sits inside the honest bracket 327-93.",
+    "drift": "control-vs-cache agreement 365 / 407 = 0.89680 against the 2026-09-13 GEN-ARENA cache (a READOUT, never the comparator of record); its complement 10.3% EXCEEDS CANARY-BASELINE's 0.087 retest floor and therefore BARS any future small-effect comparison against that cache",
+    "p4_correct_comparator": "the 2026-09-13 cache restricted to the same 407 key-decidable matches: accuracy 0.6585, decidable ties 0.2555, flips 0.228501. The registered 0.380 is that cache's WHOLE-1,200-match flip rate and is the wrong denominator (review D1). The control arm may be transported onto the GEN-ARENA IFEval cell only as 0.6585 / 0.2555 / 0.2285.",
+    "calls": "1,628 posted of the 1,628 registered, ceiling 1,700; pilot 48 inside the count (24 rows), run 1,580 (790 rows); 814 rows total; night total 1,752 of 14,000 including BFCL-JUDGED-PILOT's probe (100) and pilot (24)",
+    "forbidden_comparison": "this accuracy may NEVER be quoted beside MATH's 0.958 / 0.993 (STAGE3-MATH-CAPFREE) or placed on the reference ladder, for two independent reasons (the reference objects are not the same kind; no IFEval cap-hit proxy exists). Refused IN CODE by scrub() and --compare-math."
+  },
+  "exploratory_math7b": {
+    "status": "EXPLORATORY, NOT PUBLISHABLE WITHOUT ITS OWN REGISTRATION. C5 is registered as the leakage readout PRINTED, NO BAR, and the registration's cost-and-consequence clause gives this schedule NO PER-MODEL ROW, NOW OR LATER; the Fisher test, the concentration statement and the length control were computed by the review and are not registered. It may not be quoted as a finding, as a per-model result, or as a bias claim about the deployed judge.",
+    "measured": "control Qwen2.5-Math-7B-Instruct 0 / 14 = 0.000 committed (0 / 16 on the full convention-A denominator: 14 committed-and-wrong plus 2 ties) against the other seven contestants pooled 266 / 286, Fisher exact p = 3.5e-15; those 14 matches carry 41% of the control's 34 committed-and-wrong verdicts while being 3.4% of the 407. NOT the record's length mechanism: on those 16 matches the all-pass Math-7B response is the LONGER one in 10 of 16 (median 1,564 against 1,167 characters), so verbosity bias would have favoured it and did not. The residual therefore reads as a contestant-identity / apparent-quality prior overriding the constraint evidence. The oracle block repairs 12 of the 16 and converts the remaining 4 into ties; 4 of the 5 treatment ties are the same contestant. n = 16 matches, far below the 120-question support rule.",
+    "if_pursued": "it needs its own registration."
+  },
+  "sentence_of_record": "On the IFEval reserved side, attaching an EXECUTED per-response constraint-checker vector to each trace collapsed the deployed judge's indecision: on the same 407 key-decidable matches over 122 questions, judged in one interleaved session, the decidable tie rate fell from 0.263 to 0.012 (-25.1pp, discordant 5 against 107, exact McNemar p < 1e-25) and the flip rate from 0.243 to 0.012 (-23.1pp, 5 against 99, p < 1e-23), while convention-A accuracy rose from 0.654 to 0.988 [0.976, 0.998] question-clustered (paired: 136 matches repaired, 0 broken). GEN-ARENA's IFEval cell is COULD-NOT-VERIFY, not WOULD-NOT-COMMIT: the judge failed to count the constraints, not to commit. [MANDATORY BRACKET (i) THE ORACLE LIMIT: the per-response vector DETERMINES the key (prompt_level_strict_acc = all(inst_level_strict_acc), asserted row by row before any call), so the treatment arm removed the verification task rather than assisting it; C1's 0.988 is an obedience / transcription floor, not verification fidelity, and COULD-NOT-VERIFY is established AT THE ORACLE LIMIT ONLY - the run says nothing about a weaker, non-determinative aid.] [MANDATORY BRACKET (ii) THE 1.2% IRREDUCIBLE DISOBEDIENCE: under the strongest reference that can exist the deployed judge still fails 1.2% of the time (5 of 407, all five as ties); not uniform - 4 of the 5 sit on one contestant (exploratory, not registered).] [MANDATORY BRACKET (iii) NO LADDER RUNG: IFEval stays at SPECIFICATION 0.658 permanently.]",
+  "chips": [
+    "COULD-NOT-VERIFY (AT THE ORACLE LIMIT)",
+    "C1 HELD (OBEDIENCE FLOOR 0.988 [0.976, 0.998] A / 1.000 B, BAR 0.85)",
+    "C2 HELD (TIES -25.1pp, EXACT McNEMAR p 5.4e-26)",
+    "C3 HELD (FLIPS -23.1pp, p 9.5e-24; NEAR-DUPLICATE OF C2)",
+    "C4 PRINTED (0 OF 407; PATH NOT EXERCISED)",
+    "C5 PRINTED, NO BAR (MATH-7B ROW EXPLORATORY)",
+    "P1 FAILED HIGH (WRONG CLASS OF PRIOR; STRENGTHENS AND BOUNDS)",
+    "P4 FLIP LEG: RECORDED FAILED, CORRECTED - HOLDS ON THE REGISTERED DENOMINATOR",
+    "P2 P3 P5 P6 P7 HELD",
+    "1,628 / 1,628 CALLS, 0 UNUSABLE",
+    "REVIEW ACCEPTED, ONE CORRECTION BY INSERTION"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, phase A, in the BFCL-REF-ORACLE amendment commit (programme bracket in this registration's guards-and-ceiling paragraph; plan Amendment 9 clause (e) bracketed in the same commit)",
+      "text": "THE NIGHT'S COUNT OF RECORD IS A FILE: experiment_results/night_calls_2026-09-23.json, a JSON list of {test, launch, calls, ts} appended after every posting launch with the calls ACTUALLY posted and read by every instrument BEFORE it posts (append-only; reconciled from the cache if a launch dies; quoted by every outcome of the night; the refusal at 14,000 remains the operator's act). This instrument reads and appends to that same file, as does BFCL-JUDGED-PILOT. Adopted from the engine-coder's build (commit 1c43c20) because nothing in the repository computed the night's cumulative call count, a gap Amendment 9 left open."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "MANDATORY BRACKET (i), from the post-run review (eae039e) section 7, on every use of the sentence of record",
+      "text": "THE ORACLE LIMIT. The per-response vector DETERMINES the key (all(inst_level_strict_acc) == prompt_level_strict_acc, asserted row by row on all 407 before anything is posted), so the treatment arm REMOVED THE VERIFICATION TASK rather than assisting it. C1's 0.988 is an obedience / TRANSCRIPTION floor, not verification fidelity, and COULD-NOT-VERIFY is established AT THE ORACLE LIMIT ONLY: the run says nothing about what a weaker, realistic, non-determinative aid would buy."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "MANDATORY BRACKET (ii), from the post-run review (eae039e) section 7",
+      "text": "THE 1.2% IRREDUCIBLE DISOBEDIENCE. Under the strongest reference that can exist the deployed judge still fails 1.2% of the time (5 of 407, all five as ties, none as a committed error). This is the only number of its kind in the record and it is NOT uniform: 4 of the 5 sit on Qwen2.5-Math-7B-Instruct and the fifth on Phi-3.5-mini-instruct - EXPLORATORY, not registered."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "MANDATORY BRACKET (iii), from the post-run review (eae039e) section 7 and the IFEVAL RULING (af116f8) section 1",
+      "text": "NO LADDER RUNG. The IFEval rung stays at SPECIFICATION 0.658 permanently; this accuracy may never be placed beside MATH's 0.958 / 0.993 or on the reference ladder."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "THE MANDATORY CORRECTION, review defect D1 (HIGH); inserted in three places in the same commit - the programme outcome section's P4 line, the registration's P4 text, and the GEN-ARENA table at docs/multi_corpus_design.md L568-L571 (defect D2). Nothing rewritten.",
+      "text": "P4's FLIP LEG WAS SCORED AGAINST A MIS-SPECIFIED COMPARATOR. The registered 0.380 is GEN-ARENA's flip rate over its WHOLE 1,200-match IFEval schedule; on the 407 key-decidable matches the same cache gives 0.228501, and the control measured 0.2432, i.e. |0.0147| inside the +-0.09 band. On the correct denominator ALL THREE P4 LEGS HOLD (accuracy 0.005, ties 0.007, flips 0.015); the control reproduces the 2026-09-13 cell to within 1.5pp on every leg; drift 0.897 >= 0.85 corroborates; and the 'a control outside P4's bands makes the session the finding' clause DOES NOT FIRE. C2 and C3 are unchanged and unweakened. The GEN-ARENA table's `flip` column is WHOLE-SCHEDULE for both corpora (MATH 0.237 = 0.23667 over 1,800) while `accuracy` and `decidable ties` are key-decidable, all unlabelled: the columns are labelled by insertion and any future prediction quoting that table must name its denominator. Same error class as the '162 questions' bracket, caught there and missed here. The control arm may be transported onto the GEN-ARENA cell ONLY on the key-decidable denominator (0.6585 / 0.2555 / 0.2285), never against 0.380."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "review defect D3, mandatory wherever C2 and C3 are quoted together",
+      "text": "C2 AND C3 ARE NOT TWO INDEPENDENT CRITERIA. Flips are a strict subset of ties in both arms (control 99 flips inside 107 ties; treatment 5 flips = the same 5 ties) and C3's 104 discordant pairs sit inside C2's 112, so 'C2 HELD and C3 HELD' is not independent confirmation: C3 is a near-restatement of C2 under tie-on-flip."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "review defect D4, a note of record with no number moving",
+      "text": "analyze() computes the convention-B TIE and FLIP rates over PARSED (non-INVALID) rows, not over COMMITTED verdicts as convention B is registered. With INVALID = 0 the printed B equals A and nothing in this outcome is wrong; on a cache with INVALIDs it would be mislabelled and must be fixed before any reuse. The registered convention-B tie rate is 0 by construction, which is why it should print 'n/a by construction'."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "review defect D5",
+      "text": "C4's NON_TERMINATED machinery never fired (0 of 407). Not structurally impossible - 53 of the 9,738 IFEval checker rows carry non_terminated = 1 - so rule 10's exclusion path is UNTESTED ON THIS CACHE and P6 is vacuous at 0."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "CORRECTIONS_2026-09-23 (registrar)",
+      "text": "[CORRECTED 2026-09-23 by the registrar (line pointer only, zero calls; no number, no criterion and no sentence moves): registration.program_lines names docs/judge_v2_program.md L11239, and that was exact when it was written. After commit cd83eac inserted four one-line correction brackets mid-file (hunks @@ -3911,0 / -6535,0 / -6692,0 / -6949,0 @@), the heading of record \"## Registered 2026-09-23 (before any code or call) — IFEVAL-RESPONSE-ORACLE: with an EXECUTED per-response constraint-checker vector attache ...\" stands at L11243, +4; the whole span shifts by the same +4. Verified at HEAD by sed -n '11243p' docs/judge_v2_program.md. The map for every such pointer is the programme's \"## Line-shift map, appended 2026-09-23\" section: +0 up to old L3911, +1 to L6535, +2 to L6692, +3 to L6949, +4 below. The recorded span is left standing beside this bracket, not rewritten.]"
+    }
+  ],
+  "does_not_show": [
+    "ONE corpus (IFEval), ONE judge (grok-4-1-fast-non-reasoning), ONE session (2026-09-23 05:32-05:43), one prompt family, one temperature convention (omitted)",
+    "THE ORACLE IS NOT THE DEPLOYED CONDITION: there is no deployment in which a per-response executed-checker vector is available at judgment time - if it were, there would be nothing to judge. The treatment arm is a BOUND, not a recipe.",
+    "THE TIE COLLAPSE AND THE ACCURACY RISE ARE NOT SEPARABLE HERE: the block determines the key, so the two move together by construction and the run cannot say what fraction of the tie collapse would survive a reference that informs without deciding",
+    "C3 adds almost nothing to C2 (flips are a subset of ties; D3)",
+    "122 questions, just above the 120-question support rule, at Kish 4.376: adequate for a 25pp effect, INADEQUATE for anything near the 5.7pp DECOMP test-retest floor; no stratum, cell, leaf or per-model breakdown is supported",
+    "TEN DAYS OF PROVIDER DRIFT sit inside the drift readout: 1 - 0.897 = 10.3% same-question disagreement against the 2026-09-13 cache, ABOVE CANARY-BASELINE's 0.087 retest floor - harmless against a 25pp effect, and it BARS ANY FUTURE SMALL-EFFECT COMPARISON AGAINST THAT CACHE",
+    "the NON_TERMINATED path was never exercised (0 of 407) and IFEval has no cap-hit proxy at all, so this run's truncation accounting is weaker than MATH's even though it reports 0",
+    "no rung of the reference ladder: IFEval stays at SPECIFICATION 0.658 permanently (the IFEVAL RULING, af116f8, section 1); nothing may place 0.988 or 1.000 beside MATH's 0.958 / 0.993 or in any sentence ranking corpora by checker-repair accuracy",
+    "no Spearman rho, no per-corpus board, no BRIDGE / argmax, no router claim from this schedule (declared NOT SCORED, twice over, before the run)",
+    "no per-model row, no per-constraint-family row, no bias claim from the Math-7B observation, without its own registration",
+    "nothing about the 793 non-decidable matches, and nothing about the reference ceiling (the reference-wrong stratum is EMPTY BY CONSTRUCTION; CONSENSUS-FIT's KEY / REF logistic is not estimable here, the regressors being collinear)",
+    "'the tie rate did not move' is never available as a null; the registered null form is 'did not move by more than about 9pp'",
+    "nothing here touches rubric text, ensembles, gating, confidence, order policy, temperature or the frontier order - all unchanged and all closed"
+  ],
+  "ledger": {
+    "row_id": "IFEVAL-RESPONSE-ORACLE",
+    "version": "v126 (the row was added at v125; v126 is a pointer-only dated bracket in the same row, correcting the programme outcome span to L11590-L11770 at e99253c; no number, criterion, prediction, chip or sentence of record moves)"
+  },
+  "depends_on": [
+    "GEN-ARENA",
+    "CHECKER-ANSWER-INGEST",
+    "ORACLE",
+    "STAGE3-MATH-CAPFREE",
+    "DECOMP",
+    "QUERY-SUPPORT",
+    "CANARY-BASELINE"
+  ],
+  "supersedes": "the queue's IFEVAL-CHECKER-OUTPUT item as proposed (838 calls, CHECKER_OUTPUT framing, GEN-ARENA criteria 2 and 3 still standing): renamed and re-scoped by the IFEVAL RULING of 2026-09-23",
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing and reopens nothing. REF-CHECKLIST (induced criteria text by a model) is NOT touched: this block is the output of executed deterministic checker code read verbatim from disk and states what each response PASSED and FAILED, never a checklist of criteria to apply. Rubric text is not touched (generative_arena.py L39 byte-identical between the arms). ORACLE and the frontier-order closure are obeyed, not reopened. REF-FORM-BY-CELL is touched only in that this names a mechanism its closure did not cover: a corpus family whose verifier is a predicate over the response, so the reference-form ladder has no question-level rung above SPECIFICATION at all. It ADDS a bracket to the record's judge-residual statement (FRAMEWORK L171, L258 and the ORACLE traceability row): on IFEval's key-decidable cell the abstention component of the residual is a VERIFICATION failure, at the oracle limit only."
+  },
+  "sources": [
+    "docs/reviews/2026-09-23_ifeval_response_oracle_post.md (eae039e): every scored value, the exact McNemar p-values, the clustered intervals and bootstraps, the Kish readout, the paired accuracy delta, the worst-end power table, the Math-7B paragraph, the three mandatory brackets, the sentence of record, the may-not-be-said list, the does-not-show list, defects D1-D7",
+    "experiment_results/multicorpus/ifeval_response_oracle_outcome.txt (3d1312f): the arms, the criteria as printed, the leakage and drift tables, the predictions as first scored (P4's flip leg superseded by the D1 bracket)",
+    "docs/judge_v2_program.md, the registration (4c8379c) and the outcome section appended 2026-09-23",
+    "docs/agents/leads/2026-09-23_ifeval_ruling.md (af116f8): the structural finding, the instrument, the four conditions",
+    "docs/reviews/READY_ifeval_response_oracle.md (2dea289, re-pin 70e6476): conditions C1-C5",
+    "experiment_results/night_calls_2026-09-23.json (ca2e346): the night's count of record",
+    "docs/plan_2026-09-15.md Amendment 9 (ebd462d): the 14,000-call hard ceiling; Amendment 1 D2 (temperature omitted)"
+  ],
+  "last_update": "2026-09-23",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "On instruction-following questions (IFEval), judges the same 407 matches twice: once normally, and once with the automatic constraint checker's pass/fail result for each response attached. It then compares tie rate, order flips and accuracy. Uses 1,628 judge calls.",
+    "why": "The judge did poorly on IFEval (many ties and flips). This tests whether it could not check the constraints or simply would not commit to a verdict.",
+    "information": "If ties vanish once checking is done for the judge, the problem is verification; if ties persist, the judge is unwilling to decide. Result: ties fell from 26% to 1%, flips from 24% to 1%, and accuracy rose from 0.65 to 0.99. So the judge failed to count constraints, not to commit. Important limit: the attached result decides the answer outright. This is an upper bound, not a usable recipe, and it is from one judge, one session and one corpus.",
+    "written": "2026-10-07"
+  }
+}

@@ -1,0 +1,128 @@
+AGENT-CORPUS-ADMISSION pilot readout (registered 2026-09-18, programme L5855-L5982, commit 9cbd5ab); zero LLM calls
+corpus=bfcl_result_2025-12-16 pool_id=p2035adddedd1becb
+db=Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\agent\bfcl_result_2025-12-16.db snapshot=2025-12-16 archive_sha=6830ed13035c0cfee9aa7a9a0ffed70f10b3dd50 gorilla_sha=9d8416a96d1d69975493f1b6d60ff07d12a1726a script=7108cac91869dc88
+agents ingested (8): DeepSeek-V3.2-Exp-FC, Qwen_Qwen3-32B-FC, Salesforce_Llama-xLAM-2-70b-fc-r, claude-sonnet-4-5-20250929-FC, gemini-2.5-flash-FC, gpt-5.2-2025-12-11-FC, grok-4-1-fast-reasoning-FC, meta-llama_Llama-3.3-70B-Instruct-FC
+agents excluded (missing files): none
+draw: 300 episodes = 75 per stratum x 4 strata, seed 42; labels: 50 rows, file written before this readout
+
+== C1: parts (a)-(e) verified by command on the ingested tables ==
+(a) side recomputed per row (split_side.tier_b, norm-v1): mismatches 0 of 800; straddling families 0 of 200; EVAL tasks per stratum base 57, miss_func 57, miss_param 57, long_context 57; pool id p2035adddedd1becb over 228 EVAL ids -> Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_configs\reserved_pool_frozen_bfcl_p2035adddedd1becb.json; registry NOT edited: VERIFIED
+(b) checker view present True; reading rules in meta (termination_rule, term_v1_rule) True; checker table sha 7373a7768f474b16af7786d3bc3c466d5f752a9b17f7d9b287d5f2bffe3cc913 over 6400 rows; checker-decided error_types ['multi_turn:empty_turn_model_response', 'multi_turn:execution_response_mismatch', 'multi_turn:instance_state_mismatch', 'multi_turn:method_invoke_order_mismatch']; harness outcomes ['multi_turn:force_terminated', 'multi_turn:inference_error']; unknown error_types none: VERIFIED
+(c) bfcl_term_v1 per agent x stratum (denominator = the agent's 800; marker class beside):
+    agent                                    stratum           n  pass   rate |  TERM   CAP   ERR |  term   cap   err   unk
+    DeepSeek-V3.2-Exp-FC                     base            200    83  0.415 |   198     2     0 |   198     2     0     0
+    DeepSeek-V3.2-Exp-FC                     miss_func       200    79  0.395 |   196     4     0 |   196     4     0     0
+    DeepSeek-V3.2-Exp-FC                     miss_param      200    67  0.335 |   195     5     0 |   196     4     0     0
+    DeepSeek-V3.2-Exp-FC                     long_context    200    70  0.350 |   196     4     0 |   197     3     0     0
+    DeepSeek-V3.2-Exp-FC                     ALL             800   299  0.374 |   785    15     0 |   787    13     0     0
+    Qwen_Qwen3-32B-FC                        base            200   112  0.560 |   199     1     0 |   199     1     0     0
+    Qwen_Qwen3-32B-FC                        miss_func       200   105  0.525 |   196     4     0 |   196     4     0     0
+    Qwen_Qwen3-32B-FC                        miss_param      200    80  0.400 |   196     4     0 |   197     3     0     0
+    Qwen_Qwen3-32B-FC                        long_context    200    86  0.430 |   173     4    23 |   173     4    23     0
+    Qwen_Qwen3-32B-FC                        ALL             800   383  0.479 |   764    13    23 |   765    12    23     0
+    Salesforce_Llama-xLAM-2-70b-fc-r         base            200   165  0.825 |   200     0     0 |   200     0     0     0
+    Salesforce_Llama-xLAM-2-70b-fc-r         miss_func       200   154  0.770 |   199     1     0 |   199     1     0     0
+    Salesforce_Llama-xLAM-2-70b-fc-r         miss_param      200   148  0.740 |   200     0     0 |   200     0     0     0
+    Salesforce_Llama-xLAM-2-70b-fc-r         long_context    200   152  0.760 |   199     1     0 |   199     1     0     0
+    Salesforce_Llama-xLAM-2-70b-fc-r         ALL             800   619  0.774 |   798     2     0 |   798     2     0     0
+    claude-sonnet-4-5-20250929-FC            base            200   138  0.690 |   199     1     0 |   199     1     0     0
+    claude-sonnet-4-5-20250929-FC            miss_func       200   130  0.650 |   199     1     0 |   199     1     0     0
+    claude-sonnet-4-5-20250929-FC            miss_param      200   105  0.525 |   199     1     0 |   199     1     0     0
+    claude-sonnet-4-5-20250929-FC            long_context    200   118  0.590 |   200     0     0 |   200     0     0     0
+    claude-sonnet-4-5-20250929-FC            ALL             800   491  0.614 |   797     3     0 |   797     3     0     0
+    gemini-2.5-flash-FC                      base            200    83  0.415 |   199     0     1 |   199     0     1     0
+    gemini-2.5-flash-FC                      miss_func       200    72  0.360 |   200     0     0 |   200     0     0     0
+    gemini-2.5-flash-FC                      miss_param      200    64  0.320 |   200     0     0 |   200     0     0     0
+    gemini-2.5-flash-FC                      long_context    200    71  0.355 |   200     0     0 |   200     0     0     0
+    gemini-2.5-flash-FC                      ALL             800   290  0.362 |   799     0     1 |   799     0     1     0
+    gpt-5.2-2025-12-11-FC                    base            200    73  0.365 |   199     1     0 |   199     1     0     0
+    gpt-5.2-2025-12-11-FC                    miss_func       200    36  0.180 |   200     0     0 |   200     0     0     0
+    gpt-5.2-2025-12-11-FC                    miss_param      200    55  0.275 |   200     0     0 |   200     0     0     0
+    gpt-5.2-2025-12-11-FC                    long_context    200    61  0.305 |   199     1     0 |   199     1     0     0
+    gpt-5.2-2025-12-11-FC                    ALL             800   225  0.281 |   798     2     0 |   798     2     0     0
+    grok-4-1-fast-reasoning-FC               base            200   141  0.705 |   200     0     0 |   200     0     0     0
+    grok-4-1-fast-reasoning-FC               miss_func       200   119  0.595 |   200     0     0 |   200     0     0     0
+    grok-4-1-fast-reasoning-FC               miss_param      200    86  0.430 |   199     1     0 |   199     1     0     0
+    grok-4-1-fast-reasoning-FC               long_context    200   125  0.625 |   200     0     0 |   200     0     0     0
+    grok-4-1-fast-reasoning-FC               ALL             800   471  0.589 |   799     1     0 |   799     1     0     0
+    meta-llama_Llama-3.3-70B-Instruct-FC     base            200    52  0.260 |   132    68     0 |   133    67     0     0
+    meta-llama_Llama-3.3-70B-Instruct-FC     miss_func       200    38  0.190 |   127    73     0 |   127    73     0     0
+    meta-llama_Llama-3.3-70B-Instruct-FC     miss_param      200    29  0.145 |   128    72     0 |   129    71     0     0
+    meta-llama_Llama-3.3-70B-Instruct-FC     long_context    200    53  0.265 |   139    54     7 |   140    53     7     0
+    meta-llama_Llama-3.3-70B-Instruct-FC     ALL             800   172  0.215 |   526   267     7 |   529   264     7     0
+    (c) every agent has 800 episodes: VERIFIED
+(d) artefact (decoded call sequence + final state_info) re-read from the raw result files for 299 of 300 drawn episodes; 1 without artefact (error / missing rows: multi_turn_long_context_134 x meta-llama_Llama-3.3-70B-Instruct-FC); length chars min 453 p5 737 median 1812 p95 9691 max 28798; ESTIMATED tokens (chars/4, no tokenizer) median 453 p95 2422 max 7199; per-episode artefact cap: NOT DECLARED (the author's number; the pilot prints the distribution only); fingerprint / provider / response id: UNSTAMPED (archive carries none): FAILED (artefact missing for 1 drawn episodes)
+(e) stratum = (BFCL, category): base 200 tasks, miss_func 200 tasks, miss_param 200 tasks, long_context 200 tasks: VERIFIED
+C1: FAILED (a True, b True, c True, d False, e True)
+
+== C2: strict D_c on the draw (episode decidable = bfcl_term_v1 TERMINATED AND checker-decided; denominator = ALL drawn episodes of the stratum; Wilson 95%) ==
+    stratum       D_c of record (bfcl_term_v1)             | D_c marker reading (termination_class)   | class
+    base          72/75 = 0.9600 [0.8889, 0.9863]          | 72/75 = 0.9600 [0.8889, 0.9863]          | PASS-AT-POINT
+    miss_func     71/75 = 0.9467 [0.8707, 0.9791]          | 71/75 = 0.9467 [0.8707, 0.9791]          | PREDICTIVE-ONLY
+    miss_param    70/75 = 0.9333 [0.8532, 0.9712]          | 70/75 = 0.9333 [0.8532, 0.9712]          | PREDICTIVE-ONLY
+    long_context  70/75 = 0.9333 [0.8532, 0.9712]          | 70/75 = 0.9333 [0.8532, 0.9712]          | PREDICTIVE-ONLY
+    ALL           283/300 = 0.9433 [0.9111, 0.9643]        | 283/300 = 0.9433 [0.9111, 0.9643]        | pooled
+C2: per stratum base PASS-AT-POINT (0.9600), miss_func PREDICTIVE-ONLY (0.9467), miss_param PREDICTIVE-ONLY (0.9333), long_context PREDICTIVE-ONLY (0.9333)
+
+== C3: cap-hit share and ERROR share per agent over the agent's DRAWN episodes (both proxies); terminated share beside ==
+    agent                                    drawn | CAP_HIT v1             ERROR v1               TERMINATED v1          | step_cap marker        error marker           terminated marker     
+    DeepSeek-V3.2-Exp-FC                        37 | 1/37=0.027[0.00,0.14]  0/37=0.000[0.00,0.09]  36/37=0.973[0.86,1.00] | 1/37=0.027[0.00,0.14]  0/37=0.000[0.00,0.09]  36/37=0.973[0.86,1.00]
+    Qwen_Qwen3-32B-FC                           38 | 0/38=0.000[0.00,0.09]  0/38=0.000[0.00,0.09]  38/38=1.000[0.91,1.00] | 0/38=0.000[0.00,0.09]  0/38=0.000[0.00,0.09]  38/38=1.000[0.91,1.00]
+    Salesforce_Llama-xLAM-2-70b-fc-r            37 | 0/37=0.000[0.00,0.09]  0/37=0.000[0.00,0.09]  37/37=1.000[0.91,1.00] | 0/37=0.000[0.00,0.09]  0/37=0.000[0.00,0.09]  37/37=1.000[0.91,1.00]
+    claude-sonnet-4-5-20250929-FC               38 | 0/38=0.000[0.00,0.09]  0/38=0.000[0.00,0.09]  38/38=1.000[0.91,1.00] | 0/38=0.000[0.00,0.09]  0/38=0.000[0.00,0.09]  38/38=1.000[0.91,1.00]
+    gemini-2.5-flash-FC                         37 | 0/37=0.000[0.00,0.09]  0/37=0.000[0.00,0.09]  37/37=1.000[0.91,1.00] | 0/37=0.000[0.00,0.09]  0/37=0.000[0.00,0.09]  37/37=1.000[0.91,1.00]
+    gpt-5.2-2025-12-11-FC                       39 | 0/39=0.000[0.00,0.09]  0/39=0.000[0.00,0.09]  39/39=1.000[0.91,1.00] | 0/39=0.000[0.00,0.09]  0/39=0.000[0.00,0.09]  39/39=1.000[0.91,1.00]
+    grok-4-1-fast-reasoning-FC                  37 | 0/37=0.000[0.00,0.09]  0/37=0.000[0.00,0.09]  37/37=1.000[0.91,1.00] | 0/37=0.000[0.00,0.09]  0/37=0.000[0.00,0.09]  37/37=1.000[0.91,1.00]
+    meta-llama_Llama-3.3-70B-Instruct-FC        37 | 15/37=0.405[0.26,0.57] 1/37=0.027[0.00,0.14]  21/37=0.568[0.41,0.71] | 15/37=0.405[0.26,0.57] 1/37=0.027[0.00,0.14]  21/37=0.568[0.41,0.71]
+    per stratum (drawn):
+    base                                        75 | 3/75=0.040[0.01,0.11]  0/75=0.000[0.00,0.05]  72/75=0.960[0.89,0.99] | 3/75=0.040[0.01,0.11]  0/75=0.000[0.00,0.05]  72/75=0.960[0.89,0.99]
+    miss_func                                   75 | 4/75=0.053[0.02,0.13]  0/75=0.000[0.00,0.05]  71/75=0.947[0.87,0.98] | 4/75=0.053[0.02,0.13]  0/75=0.000[0.00,0.05]  71/75=0.947[0.87,0.98]
+    miss_param                                  75 | 5/75=0.067[0.03,0.15]  0/75=0.000[0.00,0.05]  70/75=0.933[0.85,0.97] | 5/75=0.067[0.03,0.15]  0/75=0.000[0.00,0.05]  70/75=0.933[0.85,0.97]
+    long_context                                75 | 4/75=0.053[0.02,0.13]  1/75=0.013[0.00,0.07]  70/75=0.933[0.85,0.97] | 4/75=0.053[0.02,0.13]  1/75=0.013[0.00,0.07]  70/75=0.933[0.85,0.97]
+    ALL                                        300 | 16/300=0.053[0.03,0.08] 1/300=0.003[0.00,0.02] 283/300=0.943[0.91,0.96] | 16/300=0.053[0.03,0.08] 1/300=0.003[0.00,0.02] 283/300=0.943[0.91,0.96]
+C3: printed (a readout, no bar)
+
+== C4: reproduction of the 50 manual labels against the ingested columns (passed, bfcl_term_v1) ==
+    reproduction 50/50 = 1.0000 [0.9286, 1.0000]; disagreements: none
+C4: HELD (bar >= 0.98, i.e. 49 of 50)
+
+== Descriptive (registrar's addition, not scored): full-table strict D_c and CAP_HIT share per stratum x agent over the agent's 800 ==
+    agent                                    base                     miss_func                miss_param               long_context             ALL                     
+    DeepSeek-V3.2-Exp-FC                     Dc 0.990 cap 0.010 (200) Dc 0.980 cap 0.020 (200) Dc 0.975 cap 0.025 (200) Dc 0.980 cap 0.020 (200) Dc 0.981 cap 0.019 (800)
+    Qwen_Qwen3-32B-FC                        Dc 0.995 cap 0.005 (200) Dc 0.980 cap 0.020 (200) Dc 0.980 cap 0.020 (200) Dc 0.865 cap 0.020 (200) Dc 0.955 cap 0.016 (800)
+    Salesforce_Llama-xLAM-2-70b-fc-r         Dc 1.000 cap 0.000 (200) Dc 0.995 cap 0.005 (200) Dc 1.000 cap 0.000 (200) Dc 0.995 cap 0.005 (200) Dc 0.998 cap 0.003 (800)
+    claude-sonnet-4-5-20250929-FC            Dc 0.995 cap 0.005 (200) Dc 0.995 cap 0.005 (200) Dc 0.995 cap 0.005 (200) Dc 1.000 cap 0.000 (200) Dc 0.996 cap 0.004 (800)
+    gemini-2.5-flash-FC                      Dc 0.995 cap 0.000 (200) Dc 1.000 cap 0.000 (200) Dc 1.000 cap 0.000 (200) Dc 1.000 cap 0.000 (200) Dc 0.999 cap 0.000 (800)
+    gpt-5.2-2025-12-11-FC                    Dc 0.995 cap 0.005 (200) Dc 1.000 cap 0.000 (200) Dc 1.000 cap 0.000 (200) Dc 0.995 cap 0.005 (200) Dc 0.998 cap 0.003 (800)
+    grok-4-1-fast-reasoning-FC               Dc 1.000 cap 0.000 (200) Dc 1.000 cap 0.000 (200) Dc 0.995 cap 0.005 (200) Dc 1.000 cap 0.000 (200) Dc 0.999 cap 0.001 (800)
+    meta-llama_Llama-3.3-70B-Instruct-FC     Dc 0.660 cap 0.340 (200) Dc 0.635 cap 0.365 (200) Dc 0.640 cap 0.360 (200) Dc 0.695 cap 0.270 (200) Dc 0.657 cap 0.334 (800)
+    ALL agents                               Dc 0.9537 term 0.9537 (1600) Dc 0.9481 term 0.9481 (1600) Dc 0.9481 term 0.9481 (1600) Dc 0.9413 term 0.9413 (1600) Dc 0.9478 term 0.9478 (6400)
+    pairwise decidable share on the full table (coordinator's pair reading, descriptive): base 2289/5600=0.409 (both decidable 2000/5085=0.393); miss_func 2287/5600=0.408 (both decidable 2017/5023=0.402); miss_param 2048/5600=0.366 (both decidable 1814/5027=0.361); long_context 2192/5600=0.391 (both decidable 1874/4958=0.378)
+
+== Predictions (recorded blind in the registration; scored on the numbers above) ==
+P1 strict D_c < 0.95 at the point in >= 2 of 4 strata AND long_context the lowest: below-bar strata ['miss_func', 'miss_param', 'long_context'] (3); lowest miss_param (0.9333): FAILED
+P2 median agent's cap-hit share on its full 800 (bfcl_term_v1) in [0.12, 0.19]: per agent DeepSeek-V3.2-Exp-FC 0.0187, Qwen_Qwen3-32B-FC 0.0163, Salesforce_Llama-xLAM-2-70b-fc-r 0.0025, claude-sonnet-4-5-20250929-FC 0.0037, gemini-2.5-flash-FC 0.0000, gpt-5.2-2025-12-11-FC 0.0025, grok-4-1-fast-reasoning-FC 0.0013, meta-llama_Llama-3.3-70B-Instruct-FC 0.3337; median 0.0031: FAILED
+P3 at least one stratum PREDICTIVE-ONLY: ['miss_func', 'miss_param', 'long_context']: HELD
+P4 terminated share >= 0.60 in all 4 strata (draw, bfcl_term_v1): base 0.9600, miss_func 0.9467, miss_param 0.9333, long_context 0.9333: HELD
+Registrar's blind addition, C4 HELD: HELD
+
+== Falsifier of the admission test (a first JUDGED pilot refused by the truncation guard, or a full judged run's strict D_c < 0.95 in a stratum that passed the pilot) ==
+    NOT TRIGGERABLE at this stage: no judged pilot exists (nothing judged is scheduled by the registration).
+    early warning on the archive itself (full-table strict D_c vs the pilot's class): none (every PASS-AT-POINT stratum is also >= 0.95 on its full table, or none passed)
+== Enforcement clause ==
+    base          PASS-AT-POINT: may receive the item-19 probe and a first judged pilot (<= 4,000 matches), a separate launch
+    miss_func     PREDICTIVE-ONLY: REFUSED for judged cells; checker-built rows on terminated episodes only (terminated share draw 0.9467, full 0.9481)
+    miss_param    PREDICTIVE-ONLY: REFUSED for judged cells; checker-built rows on terminated episodes only (terminated share draw 0.9333, full 0.9481)
+    long_context  PREDICTIVE-ONLY: REFUSED for judged cells; checker-built rows on terminated episodes only (terminated share draw 0.9333, full 0.9413)
+== Support rule (fewer than 120 EVAL-side tasks in a stratum -> admitted for description only, UNDETERMINED as a profile cell) ==
+    base          EVAL-side tasks 57: profile cell UNDETERMINED (description only)
+    miss_func     EVAL-side tasks 57: profile cell UNDETERMINED (description only)
+    miss_param    EVAL-side tasks 57: profile cell UNDETERMINED (description only)
+    long_context  EVAL-side tasks 57: profile cell UNDETERMINED (description only)
+
+== Hazard notes (bracket-ready; see the docstring's [H1] [H2]) ==
+    [H1] bfcl_term_v1 (>= 20 responses) vs the harness force-quit marker: disagree on 6 of 6400 episodes
+    [H2] marker cap-hits evaluated by the checker (cap on the last turn): 13 of 297, of which passed 0
+
+== Verdict of record ==
+C1 FAILED; C2 base PASS-AT-POINT, miss_func PREDICTIVE-ONLY, miss_param PREDICTIVE-ONLY, long_context PREDICTIVE-ONLY; C3 printed; C4 HELD; P1 FAILED; P2 FAILED; P3 HELD; P4 HELD; falsifier NOT TRIGGERABLE; support rule: all 4 strata description-only

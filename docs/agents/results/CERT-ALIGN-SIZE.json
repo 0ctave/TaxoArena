@@ -1,0 +1,151 @@
+{
+ "id": "CERT-ALIGN-SIZE",
+ "title": "CERT-ALIGN-SIZE: on the four anchor-free MMLU-Pro re-draw trees, are site-certified splits better aligned with the declared categories than uncertified splits of the same size (tree x size strata; permutation)? 20NG and o0_clean_s42 descriptive (zero calls; REGISTERED 2026-10-04)",
+ "question": "Does the site certificate carry label-alignment information beyond site size?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "the commit that writes it (parent be8e54d3)",
+  "program_lines": "docs/judge_v2_program.md L24245-L24257",
+  "program_lines_as_of": "the commit that writes them, parent be8e54d3, re-grepped",
+  "date": "2026-10-04",
+  "provenance": "the author's 'Go' (docs/agents/plans/2026-10-04_W1_W2_schedule.md (be8e54d3)); queue draft (94d8e373); TOPIC-PARTITION-20NG P9 design"
+ },
+ "script": {
+  "path": "tools/analysis/cert_align_size.py",
+  "sha16": "80f7bb788f4feac0 (git blob, LF)",
+  "commit": "b7fb6bc8 (merged)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_cert_align_size.md",
+  "commit": "b7fb6bc8",
+  "blob": "820802de (LF)",
+  "verdict": "READY; C1, C2 pre-data brackets before --run; C3 brackets; C4, C5 post-run duties"
+ },
+ "go": "the author's 'Go' for W1 (2026-10-04)",
+ "run": {
+  "outcome_file": "E:/TaxoArena_backup_2026-10-04_cert_align_size/cert_align_size_outcome.txt (sha256 86446d9e...); never committed",
+  "outcome_commit": "run from main after 404d286d",
+  "calls": 0,
+  "cce": 0,
+  "pool": "none (TRAIN members only; embeddings_cache.db read-only)",
+  "date": "2026-10-04"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_cert_align_size.md",
+  "commit": "150b2f7c",
+  "verdict": "VALID with one qualifier (C4)"
+ },
+ "criteria": [
+  {
+   "id": "CA1",
+   "text": "DECIDING: ALIGNED-BEYOND-SIZE iff G > 0 AND one-sided within-stratum permutation p <= 0.05; SIZE-ONLY otherwise. Verdict line: SCOREABLE, thin (pilot DEFF 1.3 declared; SE 0.0166; MDE80 0.041) [C1 2026-10-04: SE of the registered G = 0.2050 x SD; MDE80 0.051 at SD 0.10: at the SCOREABLE / DESCRIPTIVE-ONLY edge]",
+   "result": "HELD",
+   "value": "ALIGNED-BEYOND-SIZE: G +0.0633 NMI, p 0.0001 (52 certified / 216 uncertified; 16 of 20 strata); SE 0.0189, MDE80 0.0471 (SCOREABLE, thin); C4 size unmatched in q4, sign holds (+0.047 to +0.056; q0-q3 +0.032, p 0.048)",
+   "denominator": "sites of af_clean_s42, af_s137, af_s2048, af_s42_o1 (planning ~280, ~60 certified), tree x size strata"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "G +0.05 [0.00, 0.12]; CA1 ALIGNED-BEYOND-SIZE 0.55",
+   "result": "HELD",
+   "value": "G +0.0633 in [0.00, 0.12]; ALIGNED-BEYOND-SIZE occurred; Brier 0.2025",
+   "denominator": "AF sites"
+  },
+  {
+   "id": "P2",
+   "text": "raw - G +0.04 [0.00, 0.10]",
+   "result": "HELD",
+   "value": "see POSTRUN_cert_align_size per-claim table",
+   "denominator": "AF sites"
+  },
+  {
+   "id": "P3",
+   "text": "20NG size-stratified gap +0.06 [0.00, 0.12] (descriptive, seen arm)",
+   "result": "HELD",
+   "value": "see POSTRUN_cert_align_size per-claim table",
+   "denominator": "20NG sites"
+  },
+  {
+   "id": "P4",
+   "text": "o0_clean_s42 [AN] G +0.02 [-0.03, +0.07] (descriptive)",
+   "result": "HELD",
+   "value": "see POSTRUN_cert_align_size per-claim table",
+   "denominator": "o0 sites"
+  }
+ ],
+ "falsifier": {
+  "text": "F-CA fires iff CA1 SIZE-ONLY: certification carries no declared-category alignment beyond size on MMLU-Pro; 20NG P9 not general; memo change 10 limited to geometry.",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "CA1": "G +0.0633 NMI, one-sided within-stratum permutation p 0.0001 (10,000); 268 sites, 52 certified (site-null p95, per site, uncorrected, 300 reps)",
+  "support": "SE 0.0189 (permutation SD x sqrt(1.3)); MDE80 0.0471 < 0.05: SCOREABLE, thin",
+  "C4_size_controls": "OLS log-n adjusted +0.0470 (HC1 SE 0.0158); deciles +0.0563 (p 0.0003); q4 split +0.0544 (p 0.0006); q0-q3 +0.0319 (p 0.0479); q4 only +0.0946",
+  "C5": "DEFF 1.3 assumed (unmeasurable at 4 trees); p < 0.05 up to DEFF 5.4"
+ },
+ "sentence_of_record": "CERT-ALIGN-SIZE (2026-10-04, 0 calls) — VALID; CA1 ALIGNED-BEYOND-SIZE, F-CA not fired. On the four anchor-free MMLU-Pro re-draw trees [LF] (268 sites, 52 certified at site-null p95, per site, uncorrected, 300 reps), certified splits align with the declared categories better than uncertified splits in the same tree x size quintile: G +0.0633 NMI (one-sided within-stratum permutation p 0.0001, 10,000 permutations). Support (f) per the C1 bracket: SE 0.0189, MDE80 0.0471, SCOREABLE, thin. QUALIFIER (C4): size is unmatched inside the top quintile (certified geometric-mean n 2,163 vs 1,103). The sign holds under every size control (log-n-adjusted OLS +0.047, SE 0.0158; deciles +0.056; q4 split +0.054), the magnitude is about 0.01-0.016 smaller, and q0-q3 alone gives +0.032 (p 0.048). DEFF 1.3 stays an assumption (unmeasurable at 4 trees; p < 0.05 holds to DEFF 5.4). P1-P4 HELD (Brier 0.2025). Licenses: the per-site certificate carries declared-category alignment beyond site size ON THESE TREES; not correctness, not FDR certification, not other corpora or embedders. Outcome E:/TaxoArena_backup_2026-10-04_cert_align_size/cert_align_size_outcome.txt sha256 86446d9e…; POSTRUN docs/reviews/POSTRUN_cert_align_size.md.",
+ "chips": [
+  "REGISTERED 2026-10-04, BEFORE ANY CODE; not built",
+  "VALID (POST-RUN 150b2f7c): CA1 ALIGNED-BEYOND-SIZE (G +0.0633, p 0.0001); F-CA NOT FIRED",
+  "THESE FOUR LF MMLU-PRO RE-DRAWS ONLY; SIZE UNMATCHED IN q4 (SIGN HOLDS, MAGNITUDE &minus;0.01&ndash;0.016); NEVER &#x27;CORRECT&#x27; OR FDR; DEFF 1.3 ASSUMED"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-04",
+   "by": "registrar (pre-data; READY_cert_align_size C1-C5)",
+   "text": "C1 SE of the registered G (0.205 x SD; MDE80 0.051: edge, not 'SCOREABLE, thin'; script's MDE clause not of record) L24253; C2 embeddings_cache.db added (multi-holder members, cosine to child vmfMu) L24248; C3 readings (2) cutpoint convention, (3) depth x tree, (6) o0 = 60 sites L24250 / L24248; post-run duties C4 (q4 size unmatched) and C5 (DEFF 1.3 unmeasurable) L24253."
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (POSTRUN 150b2f7c)",
+   "text": "outcome recorded; singleton-cell SE convention recorded (the permutation SD decided). docs/judge_v2_program.md L24443-L24455 (section \"## CERT-ALIGN-SIZE (2026-10-04, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent 150b2f7c)"
+  }
+ ],
+ "does_not_show": [
+  "that certified splits are correct or category splits",
+  "FDR-corrected certification",
+  "other corpora, embedders or recipes",
+  "a size-free +0.063 (C4)",
+  "anything about G12, the judge or routing"
+ ],
+ "ledger": {
+  "row_id": "CERT-ALIGN-SIZE",
+  "version": "v384 (2026-10-04: OUTCOME bracket, OK + WARN chips) | v381 (2026-10-04: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "ANCHOR-FREE-REDRAW",
+  "TOPIC-PARTITION-20NG"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; J site null of record, no LR (MIX-LRT-SITE untouched)"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "minutes",
+  "agent_hours": "about 1.5 h",
+  "reads_pool": false
+ },
+ "outputs": "never committed: stored on E: with SHA256SUMS.txt; temp on E: via scratch_dir",
+ "sources": [
+  "docs/judge_v2_program.md L24245-L24257 (_as_of the commit that writes it, parent be8e54d3, re-grepped)",
+  "docs/agents/plans/2026-10-04_W1_W2_schedule.md (be8e54d3)",
+  "docs/agents/plans/2026-10-04_queue_rerank.md (002f20b8)",
+  "docs/reviews/POSTRUN_cert_align_size.md (150b2f7c; blob 394b514e, LF)",
+  "docs/judge_v2_program.md L24443-L24455 (section \"## CERT-ALIGN-SIZE (2026-10-04, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent 150b2f7c)"
+ ],
+ "last_update": "2026-10-04",
+ "plain_description": {
+  "sq": "SQ2 Trust",
+  "what": "On four MMLU-Pro trees built without any category labels, compares splits that passed the statistical 'site certificate' with uncertified splits of similar size, on how well each matches MMLU-Pro's declared subject categories.",
+  "why": "Checks that the certificate is not just rewarding big splits, i.e. that it carries real information about meaningful structure.",
+  "information": "If certified splits align better at equal size, the certificate means more than 'large'; if not, it is mostly a size filter. Result: done; certified splits align better (+0.063 on a 0-1 agreement scale, permutation p 0.0001), holding under every size control though about 0.01-0.016 smaller, and size is not fully matched in the largest group. Valid on these trees only; it does not show splits are 'correct', nor other corpora or embedders.",
+  "written": "2026-10-07"
+ }
+}

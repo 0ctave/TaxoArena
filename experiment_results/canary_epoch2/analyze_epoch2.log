@@ -1,0 +1,47 @@
+[POOL] p2dca21ab5f4ef3ae (pool of record; active pool verified by pool_guard)
+[PIN] --analyze-epoch2 (start): pass 1 5142795bdc8c5a8e (pin 5142795bdc8c5a8e) | pass 2 9e2f4b7cb2b30b3a (pin 9e2f4b7cb2b30b3a) -> UNCHANGED
+[ACCOUNT] CANARY-EPOCH2-RUNG (outcome): (i) own 1252 (cache 1200, ledgers 1252) + 0 = 1252 of 1260 | (ii) matches 626 of 4000 | (iii) 4060 + CANARY-EPOCH2-RUNG 1252 + TRACE-TRUNCATION 2178 + 0 = 7490 of 14000 | ledger of record for today's posts: Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\day_calls_2026-09-24.json -> OK
+=== CANARY-EPOCH2-RUNG | docs/judge_v2_program.md L14931-L14970 (registered 2026-09-23 at fad9ea2, before any code or call); record docs/agents/results/CANARY-EPOCH2-RUNG.json ===
+  set 50af669ac6997f9f (300 matches over 279 questions, Kish 1.160) | judge grok-4-1-fast-non-reasoning | max_tokens 8192 | temperature omitted | dual order, TIE on flip | convention A DECIDES (an unusable row in either pass = a disagreement; denominator the 300), B beside (pairs usable in both) | script sha256-lf16 32236c62be50038c
+
+(C0) VALIDITY, FIRST:
+     (a) set hash 50af669ac6997f9f                                      PASS  recomputed 50af669ac6997f9f
+     (b) the pass 1 -> 2 floor 26/300 reproduced from the caches        PASS  26/300
+     (c) every pass 3 / pass 4 call fingerprinted azure:grok-4-1-fast-non-reasoning PASS  {'azure:grok-4-1-fast-non-reasoning': 1200}
+     (d) pass 3 complete                                                PASS  300 of 300
+     (e) the pass-3 pilot's truncation guard (<= 5%)                    PASS  0 of 12 unusable
+     rung: VALID - pass 4 300 of 300 | started 2026-09-24 14:06:09, first row 1127 s and launch 1093 s after pass 3's last row (window 7200 s) -> within-session | pass-4 pilot 0 of 12 unusable
+
+(C1) THE ALARM (registered at L9983): d32 = the share of the 300 matches whose combined dual-order verdict differs between pass 2 and pass 3 = 21/300 = 0.0700 (convention A); convention B 21/300 = 0.0700 (0 pairs unusable in either pass dropped); question-clustered interval [0.039, 0.101] (SE 0.0159, B 2000, seed 42; printed, NOT deciding: THE POINT DECIDES)
+     C1 (CONVENTION A DECIDES, b0b5d0d): NO ALARM (d32_A 21/300 = 0.0700 < 0.138 = floor 0.087 + 3 SE at n = 300; one-sided)
+     beside, deciding nothing: convention B would read NO ALARM (d32_B 21/300 = 0.0700)
+     A and B agree on the alarm.
+ALARM STATE: NO ALARM
+     halves (descriptive): contested 11/150, cross-tier 10/150
+
+(C2) THE RUNG, DESCRIPTIVE-ONLY: d43 (pass 3 vs pass 4, same session) = 28/300 = 0.0933 [0.060, 0.127] (SE 0.0172); convention B 28/300 = 0.0933 | Delta = d32 - d43 = -0.0233 [-0.057, +0.010] (SE 0.0171, paired on the same matches, question-clustered)
+     halves: contested 16/150, cross-tier 12/150
+RUNG d43 = 0.0933 [0.0597, 0.1270]
+     bootstrap seeds 43-62 (C1's point does not depend on them): 43:d32 0.0163/d43 0.0176/Delta 0.0167, 44:d32 0.0157/d43 0.0174/Delta 0.0163, 45:d32 0.0160/d43 0.0170/Delta 0.0167, 46:d32 0.0161/d43 0.0171/Delta 0.0163, 47:d32 0.0159/d43 0.0173/Delta 0.0164, 48:d32 0.0156/d43 0.0166/Delta 0.0164, 49:d32 0.0158/d43 0.0171/Delta 0.0164, 50:d32 0.0161/d43 0.0170/Delta 0.0164, 51:d32 0.0158/d43 0.0172/Delta 0.0168, 52:d32 0.0158/d43 0.0175/Delta 0.0166, 53:d32 0.0156/d43 0.0169/Delta 0.0163, 54:d32 0.0160/d43 0.0168/Delta 0.0162, 55:d32 0.0158/d43 0.0176/Delta 0.0163, 56:d32 0.0158/d43 0.0170/Delta 0.0164, 57:d32 0.0162/d43 0.0173/Delta 0.0170, 58:d32 0.0160/d43 0.0173/Delta 0.0170, 59:d32 0.0154/d43 0.0169/Delta 0.0162, 60:d32 0.0162/d43 0.0174/Delta 0.0168, 61:d32 0.0162/d43 0.0177/Delta 0.0163, 62:d32 0.0163/d43 0.0176/Delta 0.0166
+
+(C3) REVERSALS (decisive in both passes, opposite winners): (1, 2) 0 of 215 [record: 0 of 215] | (2, 3) 0 of 218 | (3, 4) 0 of 210
+(C4) THE POOLED LINE, DESCRIPTIVE: 3 pass pair(s) pooled: 75/900 = 0.0833 beside 0.116 at n = 900 (not an alarm rule: its pooling rule is not registered)
+
+SUPPORT. REGISTERED SUPPORT: (a) 300 frozen matches over 279 questions, Kish mean cluster size 1.14 [corrected to 1.160 by TIE-MECHANICS' review 64bdecb]; (b) DEFF 1.09 MEASURED on the pass 1 / pass 2 pair; (c) n_eff 275.2; (d) SE 0.0170 (match-level disagreement indicator, not per-call arithmetic); SE(Delta) <= 0.034 by the triangle inequality; (e) MDE C1 0.0476, C2 <= 0.095; (f) C1 SCOREABLE (thin: 0.051 vs 0.048), C2 DESCRIPTIVE-ONLY; (g) C2 bounded by the frozen set.
+  MEASURED: d32 SE 0.0159 (question-clustered), binomial 0.0147, DEFF 1.17, n_eff 256.6, MDE (2.80 x SE) 0.0446; Kish 1.160 over 279 questions
+
+PREDICTIONS (registered; scored on the points):
+  P1 d32 = 0.087 [0.050, 0.125]                                     0.0700                       -> HELD
+  P2 C1 NO ALARM                                                    NO ALARM                     -> HELD
+  P3 d43 = 0.080 [0.045, 0.120]                                     0.0933                       -> HELD
+  P4 Delta = +0.007 [-0.040, +0.050]                                -0.0233                      -> HELD
+  P5 reversals 0 [0, 2] in each of (2, 3) and (3, 4)                0 / 0                        -> HELD
+  P6 fingerprint on 1,200 of 1,200; INVALID or unusable 0 [0, 3]    1200 calls, foreign none, unusable 0 -> HELD
+
+FALSIFIER: NOT FIRED.
+ACCOUNTING (b0b5d0d): (i) CANARY-EPOCH2-RUNG 1252 of 1260 calls | (ii) 626 of 4000 matches | (iii) 4060 + CANARY-EPOCH2-RUNG 1252 + TRACE-TRUNCATION 2178 = 7490 of 14000
+HEADER: CANARY-EPOCH2-RUNG | caches 1:present, 2:present, 3:present, 4:present | pass 3 meta started 2026-09-24 12:47:20 / pass 4 2026-09-24 14:06:09 | old-cache pins {1: '5142795bdc8c5a8e', 2: '9e2f4b7cb2b30b3a'} | written 2026-09-24 15:23:53
+
+[ANALYZE-EPOCH2] wrote experiment_results\x12_crossdomain\canary_epoch2_outcome.txt (write-once)
+[PIN] --analyze-epoch2 (end): pass 1 5142795bdc8c5a8e (pin 5142795bdc8c5a8e) | pass 2 9e2f4b7cb2b30b3a (pin 9e2f4b7cb2b30b3a) -> UNCHANGED
+[DBGUARD] 10 connect(s): ro-immutable mmlu_pro_dataset_cache_v2.db; ro-immutable experiment_results\x12_crossdomain\canary_baseline_pass1.db; ro-immutable experiment_results\x12_crossdomain\canary_baseline_pass2.db; ro-immutable experiment_results\x12_crossdomain\canary_baseline_pass3.db; ro-immutable experiment_results\x12_crossdomain\canary_baseline_pass4.db; ro-immutable experiment_results\multicorpus\trace_truncation.db

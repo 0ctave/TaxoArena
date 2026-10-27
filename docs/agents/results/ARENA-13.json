@@ -1,0 +1,135 @@
+{
+  "id": "ARENA-13",
+  "title": "ARENA-13: add grok-4-1-fast-reasoning as a 13th contestant without circularity, and measure self-preference on purpose (2,394 calls)",
+  "question": "1,800 new-pair matches judged against a leave-out ENSEMBLE reference (the 8 strongest, excluding both models in the match; no grok model in it), single order, disagreement-filtered; plus the SAME 598 frontier matches re-judged with grok's own reference; (1) the new contestant places 2nd or 3rd; (2) the 12 keep their order, tau >= 0.90; (3) new-pair key-decidable accuracy >= 0.85; (4) self-preference positive under paired McNemar.",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "b49a89c",
+    "program_lines": "docs/judge_v2_program.md L1115-L1137 (registration) and L1138-L1176 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-14 (before any call) — ARENA-13: a 13th contestant, and self-preference measured on purpose",
+    "outcome_heading": [
+      "L1138: - **ARENA-13 OUTCOME (2026-09-14): 2 of 4 criteria fail, and the failures identify a bias the whole programme"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "tools/analysis/arena13.py",
+    "sha16": "e6230b6f468136fb (at 4f58bc1)",
+    "commit": "4f58bc1"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (2,394 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/arena13_outcome.txt",
+    "outcome_commit": "3529c88",
+    "calls": 2394,
+    "cce": "not stated",
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-14",
+    "other_files": [
+      "arm A (ensemble reference, single order, 1,800) and arm B (grok's own reference, 598)"
+    ]
+  },
+  "review": {
+    "file": "the follow-up chain DECOMP -> CONSENSUS-FIT -> POSITION-DECOMP -> POSITION-FULL -> PLACEBO-ENTRY (all 2026-09-14) reinterpreted (1) and (4); the ledger row's observed cell carries the chain",
+    "commit": "7ce80d4",
+    "verdict": "(2) PASS, (4) CONFIRMED as measured then reinterpreted (composition, not self-preference); (1) (3) FAIL; (1) UNRESOLVED at this budget, a flaw in the criterion"
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "the new contestant places 2nd or 3rd",
+      "result": "FAILED",
+      "value": "places FIRST (theta +2.156) above gemini (+1.855) despite the key ranking it 2nd (0.849 vs 0.913); POSITION-FULL attributed 85% of the gap to single-order presentation; PLACEBO-ENTRY (4): the residual +0.045 theta has a bootstrap CI [-0.068, +0.186], so the ordering is UNRESOLVED at this budget, not mis-ranked: a rank test on a point estimate with no resolution check",
+      "denominator": "13-model board"
+    },
+    {
+      "id": "(2)",
+      "text": "the 12 keep their order, tau >= 0.90",
+      "result": "HELD",
+      "value": "tau 0.970",
+      "denominator": "12 originals"
+    },
+    {
+      "id": "(3)",
+      "text": "new-pair key-decidable accuracy >= 0.85",
+      "result": "FAILED",
+      "value": "0.837 on mostly cross-tier pairs",
+      "denominator": "new-pair key-decidable matches"
+    },
+    {
+      "id": "(4)",
+      "text": "self-preference positive under paired McNemar",
+      "result": "HELD",
+      "value": "win rate 0.697 with the ensemble reference vs 0.776 with its own, +7.9pp, 84:37, p = 2.3e-05; reinterpreted by DECOMP: composition (which answer the reference endorses), not self-preference",
+      "denominator": "598 paired frontier matches"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none beyond the criteria",
+    "fired": false,
+    "note": "the consensus-alignment mechanism first offered for (1) was withdrawn by CONSENSUS-FIT (9% of the gap); methodological rule from PLACEBO-ENTRY: every rank-based pass/fail criterion needs a resolution check"
+  },
+  "numbers_of_record": {
+    "board": "newcomer theta +2.156 vs gemini +1.855 (key 0.849 vs 0.913); tau 0.970",
+    "accuracy": "0.837 (bar 0.85)",
+    "self_preference": "0.697 vs 0.776, +7.9pp, 84:37, p 2.3e-05 (composition per DECOMP)",
+    "residual_gap": "+0.301 -> +0.087 -> +0.045 [-0.068, +0.186]"
+  },
+  "sentence_of_record": "ARENA-13 (2026-09-14, 2,394 calls): (2) tau 0.970, an arena extends incrementally at 1,800 calls without disturbing the existing order; (3) 0.837 vs the 0.85 bar; (1) the new model places FIRST (theta +2.156) above gemini (+1.855) despite the key ranking it 2nd; (4) win rate 0.697 with the ensemble reference vs 0.776 with its own, +7.9pp, 84:37, p = 2.3e-05, reinterpreted by DECOMP as composition, not self-preference; the consensus-alignment mechanism was withdrawn by CONSENSUS-FIT (9% of the gap), POSITION-FULL attributed 85% of it to single-order presentation, and PLACEBO-ENTRY closed it: the residual +0.045 theta has a CI of [-0.068, +0.186], so the ordering is UNRESOLVED at this budget, not mis-ranked; (1) was a rank test on a point estimate with no resolution check, a flaw in the criterion.",
+  "chips": [
+    "(2) PASS · (4) CONFIRMED",
+    "(1)(3) FAIL"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-14",
+      "by": "DECOMP, CONSENSUS-FIT, POSITION-DECOMP, POSITION-FULL, PLACEBO-ENTRY (carried in the observed cell)",
+      "text": "(4) is composition (the reference endorsing the contestant), not self-preference; (1)'s consensus-alignment mechanism withdrawn (9% of the gap); 85% of the gap is single-order presentation; the residual +0.045 has CI [-0.068, +0.186]: UNRESOLVED, not mis-ranked."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "self-preference (composition)",
+    "an over-ranked newcomer (unresolved at this budget)",
+    "incremental extension at single order (must be dual order: POSITION-DECOMP)"
+  ],
+  "ledger": {
+    "row_id": "ARENA-13",
+    "version": "v69 (3529c88); the chain's reinterpretations in the observed cell; [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "ARENA-V2",
+    "DECOMP",
+    "CONSENSUS-FIT",
+    "POSITION-DECOMP",
+    "POSITION-FULL",
+    "PLACEBO-ENTRY"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L1115-L1176 (b49a89c / 3529c88)",
+    "experiment_results/x12_crossdomain/arena13_outcome.txt (3529c88)",
+    "docs/test_ledger.html row ARENA-13 (v69): chips verbatim, observed cell, evidence",
+    "script sha16 = sha256 of tools/analysis/arena13.py at 4f58bc1 (first commit), first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Adds a 13th model (grok-4-1-fast-reasoning) to the judged arena. About 1,800 new matches are judged against a reference answer built from other strong models, and 598 frontier matches are re-judged with grok's own answer as the reference. 2,394 judge calls.",
+    "why": "Tests whether an arena can take a new model without upsetting the existing order, and whether a judge favours its own model family.",
+    "information": "A stable order would show that boards can grow step by step. A gap between the two references would point to self-preference. Result: the 12 existing models kept their order (rank agreement 0.970). Accuracy was 0.837, just below the 0.85 bar. The newcomer came first, but later checks found the ordering unresolved at this budget, not wrong. The apparent self-preference (+7.9 points) was later explained as the reference agreeing with that model, not as true self-preference. This test belongs to the older question pool, so it now counts as history, not evidence.",
+    "written": "2026-10-07"
+  }
+}

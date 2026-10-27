@@ -1,0 +1,185 @@
+{
+  "id": "ANCHOR-FREE-CERT",
+  "title": "ANCHOR-FREE-CERT: how many split sites of the embeddings-only tree can be certified at the registered site null, and at what cost (EXPLORATORY sweep, zero judge calls; six construction levers, one knob per arm)",
+  "question": "The anchor-free tree of record (af_s42: z 2.0, mcs 55, 256-dim slice, bar 0.025; 81 leaves) certifies 16 of 69 split sites at the 300-rep site null. Which construction levers (prune, slice 512, all-but-top-1/2 PCs, slice 512 at the bar-equalised bar, bar 0.030, their combination) raise the certified COUNT without spending its information or its support, and how much of any gain is the null moving rather than the tree?",
+  "kind": "build",
+  "state": "done",
+  "registration": {
+    "commit": "46bd1cb",
+    "program_lines": "docs/judge_v2_program.md (lines as of 5dc8a06) L4499-L4537 (registration; plan docs/agents/plans/2026-09-17_anchor_free_cert.md); amendment L4560 (4dc4aea, before running arm 4: arm 4 run although arm 1 certified 2, because arm 1 failed to BUILD, not at certification)",
+    "date": "2026-09-17",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-17 (before running) — ANCHOR-FREE-CERT: how many split sites of the embeddings-only tree can be certified at the registered site null, and at what cost (EXPLORATORY sweep, zero judge calls; plan doc",
+    "outcome_heading": [
+      "L4562: ## ANCHOR-FREE-CERT (2026-09-17, zero judge calls; EXPLORATORY) — the certified count rises only when the null is deflated; under a common null no lever beats the record's 16; width buys purity and information on this tr"
+    ]
+  },
+  "script": {
+    "path": "tools/chains/anchor_free_cert.sh (with anchor_free_cert_arm4.sh; readout tools/analysis/anchor_free_readout.py e355764; arm 0 tools/analysis/anchor_free_prune.py 8152a96 sha16 1cffd6dca8552272)",
+    "sha16": "5a4ae83907454df0",
+    "commit": "4bdfc47 (file last at d1d2df5)"
+  },
+  "ready": null,
+  "go": "n/a (0 judge calls; <= 6 constructions + <= 8 site nulls, ~4 h serialised; arm 4 under the dated amendment 4dc4aea)",
+  "run": {
+    "outcome_file": "experiment_results/anchorfree/anchor_free_bareq512_readout.txt (arm 4; one readout per arm: anchor_free_{prune,d512,abt1,abt2,bareq512,bar030}_readout.txt)",
+    "outcome_commit": "ea02446",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae routed for purity; every arm on the p8a29 split (structural evidence only)",
+    "date": "2026-09-17",
+    "other_files": [
+      "experiment_results/anchorfree/anchor_free_prune_readout.txt (8152a96)",
+      "experiment_results/anchorfree/site_null_af_{d512,abt1,abt2,bareq512,bar030}_s42.csv (+ _rawnull for abt1 / abt2)",
+      "experiment_results/anchorfree/af_<arm>/seed_42, af_<arm>.build.out, cert_chain.log, cert_arm4.log",
+      "experiment_configs/anchorfree/af_{d512,abt1,abt2,bareq512,bar030,abt2d512}_s42.toml"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the adversarial check of record is the one the programme names: EXPLORATORY sweep under a research-lead plan; no adversarial recomputation recorded; the ANCHOR-FREE-REDRAW review (docs/reviews/2026-09-18_night_batch.md, 17a4434) later bracketed this row",
+    "commit": "ea02446",
+    "verdict": "exploratory; the line CLOSED under the registered stopping rule (ii) in substance; two REDRAW brackets (2026-09-18) re-read 'one bar step from not existing' and 'the honest maximum 16 of 69'"
+  },
+  "criteria": [
+    {
+      "id": "G1-G3",
+      "text": "guardrails a 'win' keeps: G1 purity >= 0.685; G2 key-only leaf information >= +12.19 / 1000; G3 leaves in [60, 100], median held-out support per leaf >= 30, >= 15 leaves at >= 50 questions",
+      "result": "DELIVERED",
+      "value": "record 0.715 / +13.19 / 81 leaves, support 37 / 19; arm 0 PRUNE view A / B F F F; arm 1 d512 (4 leaves, purity 0.314, +4.89) F F F; arm 2 abt1 (54 leaves, 0.652, +12.53, support 41 / 26) F H F; arm 3 abt2 (77, 0.696, +12.80, 36 / 22) H H H; arm 4 bareq512 (92, 0.759, +13.77, 33 / 17) H H H; arm 5 bar030 (2 leaves, 0.186, +3.44) F F F; arm 6 skipped",
+      "denominator": "per arm: 3,445 pool questions routed; 10,925 keyed q; held-out top-1 per leaf"
+    },
+    {
+      "id": "stop",
+      "text": "stopping rule: an arm at >= 22 under G1-G3 with its control within 3 sites ends the sweep (stage 2); arms 1-3 all <= 18 under G1-G3 closes it",
+      "result": "DELIVERED",
+      "value": "(i) not met (arm 3 at 23 under G1-G3 but its common-null control is 5, not within 3); (ii) met in substance: no arm exceeds 18 under G1-G3 on a null the record can compare; arm 6 stays unrun; the line CLOSES",
+      "denominator": "arms 1-5"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P-arm1",
+      "text": "af_d512 (512 dims, flat bar 0.025): 22-27 certified of 56-66 (35-42%); leaves 68-78; G1-G3 hold",
+      "result": "FAILED",
+      "value": "2 of 3; the tree stops at 4 leaves (depth-1 separations 0.0108-0.0110 vs the flat bar 0.025): failed to BUILD, the registration's own confound (flat bar = 6.2x the 512 isotropic floor)",
+      "denominator": "arm 1"
+    },
+    {
+      "id": "P-arm2",
+      "text": "af_abt1: 18-24 of 45-60 (32-42%); leaves 65-80; root leaves the quantitative / discursive axis; purity -1 to -3pp; key-only -0.5 to -1.5",
+      "result": "FAILED",
+      "value": "14 of 34 (41%); the root still splits on the axis; purity -6.3pp; 54 leaves; key-only -0.67 [-1.39, +0.02] (G2 holds at the border); 7 of 14 under the raw null",
+      "denominator": "arm 2"
+    },
+    {
+      "id": "P-arm3",
+      "text": "af_abt2: 22-30 of 35-45 (55-70%); leaves 50-65; purity -2 to -4pp; key-only -1.5 to -2.5 (G2 FAIL); cross-null 14-20",
+      "result": "HELD",
+      "value": "count HELD (23 of 36, 64%); 'G2 FAIL' FAILED (-0.40 [-1.14, +0.30], G2 holds); purity -1.9pp at the edge; cross-null FAILED (5); the root splits three ways; 18 of the 23 certify ONLY under the deflated null (median n 325 vs 622)",
+      "denominator": "arm 3"
+    },
+    {
+      "id": "P-arm4",
+      "text": "af_bareq512 (512 + bar 0.0145): 19-24 of 70-80 (26-31%); leaves 82-92; G1-G3 hold",
+      "result": "FAILED",
+      "value": "count FAILED (10 of 87, 11%); leaves HELD (92); G1-G3 HELD; purity 0.759 (+4.4pp, best of every arm), key-only +13.77 (+0.57 [-0.10, +1.27], best), leaf key-profile R 0.870",
+      "denominator": "arm 4"
+    },
+    {
+      "id": "P-arm5",
+      "text": "af_bar030: 14-16 of 52-60; the bar cannot raise the count",
+      "result": "FAILED",
+      "value": "1 of 1; the tree stops at 2 leaves (depth-1 children 0.0241 / 0.0133 vs 0.030)",
+      "denominator": "arm 5"
+    },
+    {
+      "id": "P-overall",
+      "text": "the best count under G1-G3 is arm 1 (or 4) at 20-27, share 30-42%; no arm reaches 50% share while keeping G2",
+      "result": "FAILED",
+      "value": "FAILED twice: best under G1-G3 is arm 3 at 23 (64%, keeping G2) but 18 of its 23 exist only under its deflated null; under the common null every arm is below the record (7, 5, 1)",
+      "denominator": "the sweep"
+    },
+    {
+      "id": "P-arm0",
+      "text": "PRUNE view A 11 of 11 (100%), 19 leaves, purity 0.60-0.65, key-only +7 to +9, support ~180 (G2, G3 FAIL); view B 16 of 24 (67%), 34 leaves, purity 0.66-0.70, key-only +10 to +12, support ~100 (G2, G3 FAIL)",
+      "result": "HELD",
+      "value": "view A 11 of 11, 19 leaves; view B 16 of 24, 34 leaves; both fail G1-G3 (as the ledger reads it)",
+      "denominator": "arm 0, zero build"
+    }
+  ],
+  "falsifier": {
+    "text": "of D1/D2's width finding on this tree: arms 1 AND 4 both <= 16",
+    "fired": true,
+    "note": "TRIGGERED (2 and 10): the anchored tree's width gain (D1: 13 of 54 at 512 vs 5 of 65 at 256) does not transfer to the anchor-free tree; the null tightens with width, the separations fall with it"
+  },
+  "numbers_of_record": {
+    "arm_table": "record af_s42 (256, 0.025) 81 leaves / 69 sites / 16 (23%) / purity 0.715 / +13.19 / support 37, 19 at >= 50; 0 PRUNE A / B 19 / 34 leaves, 11 of 11 (100%) / 16 of 24 (67%); 1 d512 4 leaves, 3 sites, 2 (67%), purity 0.314, +4.89; 2 abt1 54 / 34 / 14 (41%; 7 under the raw null) / 0.652 / +12.53 / 41, 26; 3 abt2 77 / 36 / 23 (64%; 5 raw) / 0.696 / +12.80 / 36, 22; 4 bareq512 92 / 87 / 10 (11%) / 0.759 / +13.77 / 33, 17; 5 bar030 2 / 1 / 1 (100%) / 0.186 / +3.44; 6 skipped",
+    "null_width": "median site p95 / median observed separation: record 0.052 / 0.039; abt1 0.031 / 0.030; abt2 0.028 / 0.032; bareq512 0.046 / 0.032; d512 0.031 / 0.031; certified vs uncertified median site n: record 622 / 259; abt1 933 / 245; abt2 325 / 186; bareq512 758 / 273",
+    "reading": "the levers that move the count move the null (all-but-top deflates it 1.7-1.9x; width tightens it); the levers that move the tree (bar, cell size, z, data, pruning) reshuffle or remove sites; certification is bounded by site size under the null; the honest maximum stays the record's 16 of 69 [REDRAW: the record draw's count; the fringe is a per-draw object 10-16 of 64-69]"
+  },
+  "sentence_of_record": "ANCHOR-FREE-CERT (2026-09-17, zero judge calls; EXPLORATORY): the certified count rises only when the null is deflated; under a common null no lever beats the record's 16; width buys purity and information on this tree, not certification. The levers that move the count move the null (all-but-top deflates it, width tightens it); the levers that move the tree (bar, cell size, z, data, pruning) reshuffle or remove sites; certification is bounded by site size under the null (certified median n 622 vs 259). The record's 16 of 69 stays the honest maximum; 'a certified trunk plus a functional fringe'. No promotion; nothing arena-bound. [CORRECTED 2026-09-18 by ANCHOR-FREE-REDRAW: the certified fringe is a PER-DRAW object: 10, 12, 14, 16 of 64-69 across four anchor-free draws (SD ~2.6); only the 5 re-draw-stable sites (the discursive spine) are certified across draws, and '16 of 69 stays the honest maximum' is the record draw's count. 'One bar step from not existing' -> 'one bar step from a DIFFERENT ACCEPTED k': the tree built on every draw; at the quantitative depth-1 site three draws refuse k = 2 and certify k = 3 at 0.056, the clean draw accepts k = 2 at 0.025148 and is uncertified.]",
+  "chips": [
+    "EXPLORATORY",
+    "LINE CLOSED: NO LEVER BEATS 16 UNDER A COMMON NULL",
+    "WIDTH FALSIFIER TRIGGERED ON THIS TREE",
+    "5 OF 7 PREDICTIONS FAILED"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-17",
+      "by": "ANCHOR-FREE-CERT amendment before running arm 4 (programme L4560, 4dc4aea)",
+      "text": "arm 4 (af_bareq512) is run although arm 1 certified 2, not > 18: arm 1 did not fail at certification, it failed to BUILD (at 512 dims the depth-1 separations fall to 0.0108-0.0110 against the flat bar 0.025 and the tree stops at 4 leaves; bar030 likewise at 2 leaves). The bar-equalised arm is the registered width number and the falsifier of D1/D2 is undecidable without it. Zero judge calls; one construction; arm 6 stays skipped."
+    },
+    {
+      "date": "2026-09-18",
+      "by": "ANCHOR-FREE-REDRAW (programme L4601 and L4619; ledger observed cell v114; 3dd0900)",
+      "text": "'one bar step from not existing' -> 'one bar step from a DIFFERENT ACCEPTED k' (the tree built on every draw; the bar decides which k is accepted, not whether the tree exists); the certified fringe is a PER-DRAW object (10-16 of 64-69; SD ~2.6); only the 5 re-draw-stable sites are certified across draws; 'the honest maximum stays the record's 16 of 69' is the record draw's count, not a property of the recipe."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "K-SELECTION (ledger v118, via the REDRAW bracket; the registration's 'ANCHOR-FREE-CERT not reopened' finding)",
+      "text": "the primed hysteresis rule (1.05 x bar) certifies the quantitative depth-1 site on 3 of 3 draws at the cost of a different tree below it (certified count +4 / +3 on the in-sample draws); no arm beats 16 on the record draw, so ANCHOR-FREE-CERT is not reopened."
+    }
+  ],
+  "does_not_show": [
+    "any arm as a board, a routing gain or a tree-robust cell set; any promotion",
+    "that the record's 16 of 69 is a recipe property (it is the record draw's count: ANCHOR-FREE-REDRAW)",
+    "whether the 512 / bar-equalised tree routes the union corpus better (a stage 2 the registration named, not run)"
+  ],
+  "ledger": {
+    "row_id": "ANCHOR-FREE-CERT",
+    "version": "v118 (row added v111 at 85a661e; bracketed v114 by ANCHOR-FREE-REDRAW; v118 via K-SELECTION)"
+  },
+  "depends_on": [
+    "ANCHOR-FREE",
+    "ANCHOR-FREE-Z",
+    "ANCHOR-FREE-MCS",
+    "ANCHOR-FREE-FULL",
+    "D1",
+    "D2",
+    "H9-EXT"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "construction levers for certification on the anchor-free tree (CONTEXT.md: 'ANCHOR-FREE-CERT closed construction levers for certification'; K-SELECTION's 1.05 x bar hysteresis is one value untested as a value and any sweep over m is inside the closed class)"
+  },
+  "sources": [
+    "docs/judge_v2_program.md (lines as of 5dc8a06) L4499-L4537 (registration 46bd1cb) and the amendment L4560 (4dc4aea): question, hygiene, instrument, guardrails, arms and predictions, falsifier, stopping rule",
+    "docs/judge_v2_program.md (lines as of 5dc8a06) L4562-L4627 (outcome section ea02446; REDRAW brackets L4601 / L4619 at 3dd0900): the arm table, null widths, predictions scored, the falsifier, the stopping rule, the reading",
+    "experiment_results/anchorfree/anchor_free_{prune,d512,abt1,abt2,bareq512,bar030}_readout.txt (8152a96 / ea02446) and the site nulls",
+    "docs/agents/plans/2026-09-17_anchor_free_cert.md (the research-lead plan)",
+    "docs/test_ledger.html row ANCHOR-FREE-CERT (v111 85a661e; bracketed v114 / v118): chips verbatim, observed-cell bracket, evidence (46bd1cb, 8152a96, 4dc4aea, ea02446)",
+    "script sha16 = sha256 of tools/chains/anchor_free_cert.sh at 4bdfc47, first 16 hex (identity, computed by the registrar 2026-09-22; the file was later edited at d1d2df5)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' lines (grep -n them regardless of line drift); line numbers are as of programme HEAD 5dc8a06"
+  ],
+  "last_update": "2026-09-22",
+  "plain_description": {
+    "sq": "SQ3 Taxonomy",
+    "what": "Exploratory sweep with no judge calls. The tree is built from embeddings alone, with no declared subject labels. The test counted how many of its split points pass the statistical significance check (the 'certificate'). It then tried six construction changes one at a time (wider embeddings, pruning, removing top principal components, a different split bar, and combinations).",
+    "why": "It asks whether the tree's structure is real and certifiable, or whether only a small part of it passes the significance check.",
+    "information": "If some change raised the certified count fairly, it would give a better recipe for building trees. If not, the record count is the honest ceiling. Result: done, exploratory. No change beat the record's 16 of 69 certified splits under a common null. Gains only appeared when a change also weakened the null. A later re-draw corrected the reading: the certified 'fringe' changes from draw to draw (10 to 16 sites), and only 5 core splits are certified on every draw. Nothing was promoted.",
+    "written": "2026-10-07"
+  }
+}

@@ -1,0 +1,25 @@
+[EMBED-QUANT-W] pacing: pause 0.25 s after each batch; TIME_WAIT drain threshold 20000 (poll 10 s, cap 600 s)
+[INTENT-S0] pin intent_transfer_corpora_v1.db: sha256 487e0093719c184c98bca53bc9bc61c193559690abb206d77010fd77f81c09a2 [PIN OK]
+[INTENT-S0] raw provenance amazon-massive-dataset-1.1.tar.gz: sha256 4cba5faa11c71437928e17cb1b9b3d8b8e727e7ea363a3a9a8045e19c0491577 [PIN OK]
+[INTENT-S0] raw provenance banking77_test.csv: sha256 d12d6e3bc4c3103966ae786dc435913c0c563dfa328f5a3646d0e62cfeeb474d [PIN OK]
+[INTENT-S0] raw provenance banking77_train.csv: sha256 b06e26ac675513959a63135f11b94ea7786ed02da65db93a5650d8838cbc664b [PIN OK]
+[INTENT-S0] raw provenance clinc_data_oos_plus.json: sha256 bfcca9ae515623541dc1983c94c4ed7cae9d26b42ae47d74b972e51bb6f7a21f [PIN OK]
+[INTENT-S0] raw provenance clinc_domains.json: sha256 b947b579d3b8e74b06f93b01083d8efaff2888b43a3e362533bd88a6e1211b3a [PIN OK]
+[INTENT-S0] pin intent_emb_qwen3.db: sha256 9e100e04fc91b137a075b8abedbc87d2b29a6dc2244c5f242b1c587004a4ee74 [PIN OK]
+[EMBED-QUANT-W] embed qwen3_q8 (qwen3-embedding:8b-q8_0, RAW) -> Z:\FAC\TUBerlin\THESIS\TaxoArena\intent_emb_qwen3_q8.db (exists: RESUME): text set 57350 (sha256 0ba7eb3c805127d5), present 51584, missing 5766, this launch 5766
+[EMBED-QUANT-W] heavy foreign processes: none
+[EMBED-QUANT-W] DISK before: 199.92 GB free on the volume of Z:\FAC\TUBerlin\THESIS\TaxoArena
+[EMBED-QUANT-W] shared caches per-table before: {"embeddings_cache.db": {"agent_ratings": "e3b0c44298fc1c14/0", "embeddings": "641ff6fad35bd1af/39631", "gmm_vectors": "e3b0c44298fc1c14/0", "match_history": "e3b0c44298fc1c14/0", "queries": "cdeca05e573e2578/31986"}, "embeddings_cache_embeddinggemma_latest.db": {"embeddings": "041a4dd1e4afb8fe/8249", "gmm_vectors": "e3b0c44298fc1c14/0", "queries": "e3b0c44298fc1c14/0"}, "embeddings_cache_nomic-embed-text_latest.db": {"embeddings": "826d5d6a8fb87a38/11769", "gmm_vectors": "e3b0c44298fc1c14/0", "queries": "9fea09b43d8397aa/8299"}}
+[EMBED-QUANT-W] Ollama endpoint http://127.0.0.1:11434/api/embed (resolved from OLLAMA_HOST='http://127.0.0.1:11434' by embedder_arms.client_base)
+[EMBED-QUANT-W] T1 /api/tags: qwen3-embedding:8b-q8_0 digest 9704fd987c12aa746934ea9f99dc85527c83c6e4b98b3a10b94689332ee866bb; qwen3-embedding:latest digest 64b933495768fbd3b87c20583d379728a07471e0c66733a9df87cd1901b3c44b
+[EMBED-QUANT-W] T2 cos(Q8, Q4) on 20 texts (S0 text set, first 20 by sha256), slice 256 + renormalise: min 0.978622 median 0.991462 (different models: PRINTED, NO BAR)
+[EMBED-QUANT-W] T2 cos(Q8, Q4) on 20 texts (S0 text set, first 20 by sha256), slice 1024 + renormalise: min 0.979189 median 0.991525 (different models: PRINTED, NO BAR)
+[EMBED-QUANT-W] T2 cos(Q8, Q4) on 20 texts (S0 text set, first 20 by sha256), slice 4096 + renormalise: min 0.976993 median 0.991307 (different models: PRINTED, NO BAR)
+[EMBED-QUANT-W] T3 repeatability qwen3-embedding:8b-q8_0: 20 texts posted twice, cos after slice-256 + renormalise min 0.999898 median 1.000000 (bar >= 0.9980): PASS
+[EMBED-QUANT-W] T4 resume parity intent_emb_qwen3_q8.db: 20 stored rows re-embedded, cos after slice-256 + renormalise min 0.999848 median 1.000000 (bar >= 0.9980): PASS
+[EMB-ARMS] target Z:\FAC\TUBerlin\THESIS\TaxoArena\intent_emb_qwen3_q8.db (exists) sha256 before b9f033d215c92f60888462f4939b147e6ddbc670ea748c3840a6f3e490d9d195
+[EMB-ARMS] wrote 5766 vectors; sha256 after 771666bc8563d972f6c3fea4d987925365cdcb0ce7f56815a8436d0a9fd26266
+[EMBED-QUANT-W] shared caches per-table after: unchanged
+[EMBED-QUANT-W] S0's pins re-checked after: unchanged {'ingest_db': '487e0093719c184c', 'qwen3': '9e100e04fc91b137'}
+[EMBED-QUANT-W] DISK after: 199.83 GB free on the volume of Z:\FAC\TUBerlin\THESIS\TaxoArena
+[EMBED-QUANT-W] embed qwen3_q8: wrote 5766; 0 of the set still missing (COMPLETE)

@@ -1,0 +1,33 @@
+MATH-FIX: 23832 (question, model) rows | extractor 1->0 disagreements: 60 (reported below)
+
+model                            before    after    delta   responses with no extractable answer
+  Qwen2.5-32B-Instruct            0.000    0.598   +0.598   0
+  Qwen2.5-72B-Instruct            0.012    0.584   +0.572   0
+  Qwen2.5-Math-7B-Instruct        0.248    0.564   +0.316   20
+  Qwen2.5-7B-Instruct             0.000    0.489   +0.489   2
+  Llama-3.3-70B-Instruct          0.002    0.473   +0.471   2
+  internlm2_5-20b-chat            0.000    0.397   +0.397   2
+  Llama-3.1-70B-Instruct          0.280    0.387   +0.106   2
+  Qwen2.5-Coder-7B-Instruct       0.034    0.378   +0.344   1
+  Falcon3-10B-Instruct            0.259    0.282   +0.023   8
+  Yi-1.5-34B-Chat-16K             0.188    0.224   +0.036   66
+  Mistral-Small-Instruct-2409     0.181    0.204   +0.023   3
+  Phi-3.5-mini-instruct           0.150    0.199   +0.050   17
+  DeepSeek-R1-Distill-Llama-8B    0.000    0.198   +0.198   40
+  Llama-3.2-3B-Instruct           0.156    0.184   +0.028   12
+  DeepSeek-R1-Distill-Qwen-32B    0.000    0.144   +0.144   27
+  OLMo-2-1124-7B-Instruct         0.061    0.143   +0.082   11
+  c4ai-command-r-plus-08-2024     0.110    0.129   +0.019   1
+  Mixtral-8x7B-Instruct-v0.1      0.082    0.100   +0.019   3
+  BUG 1->0: q2000019 Mixtral-8x7B-Instruct-v0.1 pred='\\frac{\\ln8}{\\ln4}' target='\\frac{3}{2}'
+  BUG 1->0: q2000243 Mistral-Small-Instruct-2409 pred='2^2(3-x)(3+x)' target='4(3-x)(3+x)'
+  BUG 1->0: q2000243 Phi-3.5-mini-instruct pred='(6 - 2x)(6 + 2x)' target='4(3-x)(3+x)'
+  BUG 1->0: q2000243 Qwen2.5-72B-Instruct pred='(6 - 2x)(6 + 2x)' target='4(3-x)(3+x)'
+  BUG 1->0: q2000243 Yi-1.5-34B-Chat-16K pred='(6 +2 x)(6 -2 x)' target='4(3-x)(3+x)'
+  BUG 1->0: q2000275 Falcon3-10B-Instruct pred='\\left(\\frac{3}{5},\\frac{8}{3}\\right]' target='\\le(\\frac{3}{5},\\frac{8}{3}\\right]'
+  BUG 1->0: q2020002 Phi-3.5-mini-instruct pred='\\frac{1}{2}' target='1:2'
+  BUG 1->0: q2020028 Llama-3.1-70B-Instruct pred='4+4\\sqrt{2}' target='4\\sqrt{2}+4'
+  BUG 1->0: q2020028 Llama-3.2-3B-Instruct pred='4+4\\sqrt{2}' target='4\\sqrt{2}+4'
+  BUG 1->0: q2020028 Mixtral-8x7B-Instruct-v0.1 pred='4(1+\\sqrt{2})' target='4\\sqrt{2}+4'
+
+wrote eval_results_mathfix: 23832 rows (eval_results untouched)

@@ -1,0 +1,28 @@
+=== POSITION-FULL: ARENA-13 arm A brought to FULL dual order (1800 matches: 600 frontier, 1200 cross-tier) ===
+
+  (3) IS POSITION WEAKER OFF THE FRONTIER?
+      frontier    n= 600 | flip 0.182 | win rate FIRST 0.695 vs SECOND 0.560 (-0.135) | 91:10 | McNemar p=1.698e-17
+      cross-tier  n=1200 | flip 0.055 | win rate FIRST 0.910 vs SECOND 0.899 (-0.011) | 37:24 | McNemar p=0.1237
+      prediction was a cross-tier flip rate of 0.10-0.16 (below the frontier's 0.182) and a
+      direction effect of 5-12pp (below 13.5pp): see the numbers above
+
+  (1) BOARD, dual order on 1800 of 1800 arm A matches (0 still single order):
+      1. grok-4-1-fast-reasoning            theta +1.934 | key 0.849   <- new
+      2. gemini-3.1-pro_5-shots             theta +1.889 | key 0.913
+      3. iask_pro                           theta +1.870 | key 0.817
+      4. arx_0314                           theta +1.391 | key 0.834
+      5. gpt-4o-2024-08-06                  theta +1.270 | key 0.750
+      6. deepseek-chat-v2_5                 theta +0.417 | key 0.657
+      the new contestant places 1, key rank 2 -> FAIL
+  (2) the twelve keep their order, Kendall tau 0.970 -> PASS
+
+  (4) WAS THE IMPUTATION CALIBRATED? POSITION-DECOMP imputed a gap of -0.326, 90%% range [-0.367, -0.288].
+      realised gap +0.045 -> the imputation OVERSHOT, as predicted
+      Transition-rate imputation from a contested subset therefore gives the right direction but not the right size as a cheap forecast.
+
+  (5) ARENA-13 (3) RE-RUN under dual order: new-pair key-decidable accuracy 0.793 on 1542 pairs
+      against 0.837 single order and the 0.85 bar -> still FAIL
+
+  AMENDMENT RULE fixed before the run: it still places 1st on fully balanced evidence -> position is NOT the explanation. The remaining
+      candidates are quality the key does not capture and trace-generation style, neither testable
+      without another REGEN-scale run; state as an open limitation.

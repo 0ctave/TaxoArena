@@ -1,0 +1,176 @@
+{
+  "id": "PROFILE-INTERVAL-ALL-UNION",
+  "title": "PROFILE-INTERVAL-ALL-UNION: do the 52 (source, domain) union strata carry a key-built profile row with a class? (zero calls; plan A2)",
+  "question": "On the 18-model key rows of the union (pool paeec37aa28063c75, 6,482 reserved questions), per (source, domain) stratum, is the within-stratum model order split-half reliable at the registered 0.70 bar, with an interval, so that each stratum carries a class (PASS / PASS-WITH-INTERVAL / FAIL), and what is the board-level reliability over the 52 strata and over the 6 sources? The test adds or marks rows; it certifies no order and routes nothing.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "62c4084",
+    "program_lines": "docs/judge_v2_program.md L5404-L5459; pre-run note L5590 (1534a4a): the routing CSV has no id column (identity checked at the key / count level), min_cell = 12, P1 scored strictly, P2 = at least 8 of 14, the class read on the PROFILE reading with the raw-order reading beside, per-source R in two forms [re-lined 2026-09-22: batch-1 lines were read at 9c1f37b-era HEAD and shifted by +2 by later insertions]",
+    "program_lines_as_of": "6aa2a0d",
+    "heading": "## Registered 2026-09-17 (before any code or call) — PROFILE-INTERVAL-ALL-UNION: do the 52 (source, domain) union strata carry a key-built profile row with a class? (zero calls; plan A2; lens docs/agents/leads/2026-09-17_refuter.md §3.1, 2026-09-17_cells.md §5)",
+    "outcome_heading": [
+      "L5596: ## PROFILE-INTERVAL-ALL-UNION (2026-09-18, zero judge calls) — 52 of 52 union strata classed on the 18-model key (profile reading 31 PASS / 12 PASS-WITH-INTERVA"
+    ],
+    "date": "2026-09-17"
+  },
+  "script": {
+    "path": "tools/analysis/profile_interval_union.py",
+    "sha16": "6c25f714b8894556",
+    "commit": "09969da"
+  },
+  "ready": null,
+  "go": "n/a (0 calls; key only)",
+  "run": {
+    "outcome_file": "experiment_results/multicorpus/profile_interval_all_union.txt",
+    "outcome_commit": "f5e447b",
+    "calls": 0,
+    "cce": 0,
+    "pool": "paeec37aa28063c75 (6,482 reserved ids in experiment_configs/reserved_pool_frozen_paeec.json; 52 strata; pa95843d826d40ffd and every other pool refused)",
+    "date": "2026-09-18",
+    "other_files": [
+      "experiment_results/multicorpus/profile_interval_all_union_strata.csv (52 rows: cls = profile class, cls_raw = order class; f5e447b)"
+    ]
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-18_profile_batch1.md section PROFILE-INTERVAL-ALL-UNION",
+    "commit": "46f44e8",
+    "verdict": "numbers CONFIRMED (per-stratum R_prof / R_raw to 3e-16 over 52 x 2; class rule 0 mismatches); D1 HIGH the board R 0.9424 is carried by the stratum main effect (interaction-only 0.8537; a no-interaction null reads 0.93); D2 HIGH GPQA/Physics and GPQA/Chemistry PASS on an offset with no within-stratum order (class of record = the worse of the two readings, 27 / 12 / 13); D3 8 of the 9 BBH FAIL strata carry a reproducible raw order"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "every stratum with >= 25 reserved questions receives a class (PASS: lower bound >= 0.70; PASS-WITH-INTERVAL: point >= 0.70, lower < 0.70; FAIL: point < 0.70) with R, halving SD, both lower bounds and n",
+      "result": "HELD",
+      "value": "52 of 52 classed, 0 below the floor (smallest 37); profile reading 31 PASS / 12 PASS-WITH-INTERVAL / 9 FAIL (all 9 FAIL in BBH); raw-order reading 39 / 8 / 5 (FAIL: BBH/causal_judgement 0.5168, MUSR/murder_mysteries 0.4894, MUSR/team_allocation 0.6367, GPQA/Physics 0.3056, GPQA/Chemistry 0.2217); class of record (checker D2, the worse of the two) 27 / 12 / 13",
+      "denominator": "52 strata; the stratum's reserved question count 37-405; class on the lower of the recentred bootstrap B = 125 x 16 and the delete-one jackknife; 18-model key"
+    },
+    {
+      "id": "C2",
+      "text": "board-level R over the 52 strata with its jackknife interval and halving SD",
+      "result": "DELIVERED",
+      "value": "0.9424 (r 0.8912), halving SD 0.0048, leave-one-stratum-out [0.9264, 0.9585] fixed / [0.9217, 0.9632] re-halved; labelled 'model-demeaned, includes stratum difficulty' with the interaction-only 0.8537 beside (checker D1); recorded-default reading (47 strata >= 50 q) 0.9381; roster spread does not inflate R (middle-9 0.9416, top-9 0.9502, bottom-9 0.9321)",
+      "denominator": "52 strata, 40 halvings Random(7), 18 models"
+    },
+    {
+      "id": "C3",
+      "text": "board-level R per source (6 cells) with intervals; the 14 MMLU-Pro strata's classes beside PROFILE-INTERVAL-ALL's merged key-20 classes, roster named, no comparison of levels",
+      "result": "DELIVERED",
+      "value": "six pooled source cells 0.9788 [0.9642, 0.9934] fixed / [0.9601, 0.9975] re-halved; per source over its own strata MMLU_PRO_LB 0.9450 [0.9081, 0.9820] (14), BBH 0.9184 [0.8761, 0.9607] (24), MATH 0.9004 [0.8094, 0.9914] (7), MUSR 0.8587 [0.4938, 1.2235] (3), GPQA 0.8158 [-0.4022, 2.0339] (3), IFEVAL undefined (1); MMLU_PRO_LB strata 11 PASS + 3 PWI (business 0.7541, history 0.7789, computer science 0.7119) on the profile reading, 14 / 14 on the order reading, beside PROFILE-INTERVAL-ALL's merged key-20 8 / 2 / 4",
+      "denominator": "6 sources; supports MMLU_PRO_LB 3,609 / 14, BBH 1,728 / 24, MATH 398 / 7, MUSR 227 / 3, IFEVAL 162 / 1, GPQA 358 / 3"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "(plan) MMLU-Pro-source strata PASS (scored strictly: all 14 PASS)",
+      "result": "FAILED",
+      "value": "profile reading 11 of 14 PASS, 3 PASS-WITH-INTERVAL, 0 FAIL -> FAILED as registered; order reading 14 of 14 -> HELD (checker D3; both recorded)",
+      "denominator": "14 MMLU_PRO_LB strata"
+    },
+    {
+      "id": "P2",
+      "text": "(plan) MATH / GPQA / MuSR / IFEval strata mostly FAIL by support (>= 8 of those 14 strata FAIL or UNSUPPORTED, on the reserved denominators 398 / 358 / 227 / 162 over 7 / 3 / 3 / 1 strata)",
+      "result": "FAILED",
+      "value": "profile reading 0 of 14; order reading 4 of 14; class of record 4 of 14",
+      "denominator": "14 strata"
+    }
+  ],
+  "falsifier": {
+    "text": "none in the plan's sense (the test adds or marks rows); what it overturns is a sentence: FRAMEWORK L258's 'union strata have no reliability measurement at all' becomes false whatever the values; if the 14 MMLU-Pro strata do NOT all PASS, the key-built profile's reliability is roster- and cell-dependent at the stratum level (a finding beside PROFILE-RELIABILITY's 0.9135, not a refutation)",
+    "fired": false,
+    "note": "FRAMEWORK L258 bracketed by insertion; P1 FAILED so the roster- / cell-dependence finding is recorded"
+  },
+  "numbers_of_record": {
+    "run": "2026-09-18 00:36, 42 s; eval_results 388,908 rows = 21,606 q x 18 models; MATH read from eval_results_mathfix on all 398 MATH pool ids (the ingested MATH rows differ on 1,598 of 7,164 pool cells); routing CSV 6,482 rows, 52 keys, per-key counts == the frozen file, true_source == key source on every row; min_cell = 12",
+    "board_R": "0.9424 (r 0.8912), SD 0.0048, LOSO [0.9264, 0.9585] fixed / [0.9217, 0.9632] re-halved; question-bootstrap raw mean 0.8893 (bias -0.0532), recentred [0.9379, 0.9467]; interaction-only (model- AND stratum-demeaned) 0.8537 vs 0.17-0.25 under a no-interaction null; model-only instrument under that null 0.93; variance shares stratum 58% / model 20% / interaction 22%",
+    "six_sources": "pooled 0.9788 (r 0.9584) [0.9642, 0.9934]; leave-one-source-out 0.9743 (-IFEVAL) .. 0.9846 (-MUSR); interaction-only six sources 0.9656 (null 0.96 model-demeaned)",
+    "classes": "profile 31 / 12 / 9; order 39 / 8 / 5; class of record 27 / 12 / 13 (recomputed by the registrar from the strata CSV)",
+    "BBH_FAIL_profile": "causal_judgement 0.6302, date_understanding 0.6647, formal_fallacies 0.3733, logical_deduction_five_objects 0.6288, _seven_objects 0.4557, penguins_in_a_table 0.4800, snarks 0.4243, tracking_shuffled_objects_five 0.5691, _seven 0.6243; 8 of the 9 carry a reproducible raw order (R_raw 0.747-0.902), only causal_judgement fails both",
+    "GPQA_offset": "GPQA/Physics raw-order 0.3056, GPQA/Chemistry 0.2217; all 18 models at 0.29-0.30 accuracy (SD 0.036 / 0.041; chance 0.25); offset correlates -0.93 / -0.91 with the board mean; a planted Bernoulli(0.30) stratum reads R_prof 0.893 PASS",
+    "support_curve_R_prof": "[25, 50) 0.8020 (5 strata); [50, 100) 0.7689 (30); [100, 200) 0.8453 (6); [200, 300) 0.8529 (7); >= 300 0.8873 (4)",
+    "BBH": "24 strata, profile 9 PASS / 6 PWI / 9 FAIL (no prediction registered)"
+  },
+  "sentence_of_record": "PROFILE-INTERVAL-ALL-UNION: 52/52 union strata classed on the 18-model key (profile reading 31 PASS / 12 PASS-WITH-INTERVAL / 9 FAIL; order reading 39 / 8 / 5; both-readings class 27 / 12 / 13). Board R 0.9424 [0.9264, 0.9585] is model-demeaned and includes stratum difficulty (a no-interaction null reads 0.93); the interaction-only R is 0.8537 (six sources 0.9656). GPQA/Physics and GPQA/Chemistry PASS on a board-relative offset with no within-stratum order (raw 0.31 / 0.22, all models at 0.29-0.30) and carry no order claim; 8 of the 9 BBH FAIL strata carry a reproducible order (0.75-0.90) and fail only the deviation claim. P1 FAILED on the profile reading (11/14), HELD on the order reading (14/14); P2 FAILED on both (0/14 and 4/14). Roster spread does not inflate R (middle-9 0.9416). FRAMEWORK L258 bracketed.",
+  "chips": [
+    "CLASSED 52/52",
+    "PROFILE 31/12/9, ORDER 39/8/5; CLASS OF RECORD (WORSE OF THE TWO) 27/12/13",
+    "BOARD R 0.94 INCLUDES STRATUM DIFFICULTY; INTERACTION-ONLY 0.85",
+    "GPQA PASS = OFFSET, NOT ORDER",
+    "P1 FAILED (PROFILE 11/14) / HELD (ORDER 14/14)",
+    "P2 FAILED (0/14; ORDER 4/14)",
+    "18-MODEL ROSTER, NO LEVEL COMPARISON"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-18",
+      "by": "REVIEW, pre-run note (programme L5588, 1534a4a)",
+      "text": "(i) the routing CSV of record carries no question-id column: identity checked as same 52 keys, same per-key counts, true_source == key source; the frozen id file is the stratum definition. (ii) profile_reliability.reliability called unchanged with min_cell = 12 so every stratum at or above the 25-question floor contributes; the default-25 reading printed beside. (iii) P1 scored strictly; P2 = at least 8 of the 14. (iv) The class is read on the PROFILE reading; the raw-order reading printed beside. (v) R per source printed in two forms."
+    },
+    {
+      "date": "2026-09-18",
+      "by": "the adversarial reviewer D1 / D2 (docs/reviews/2026-09-18_profile_batch1.md, 46f44e8), recorded in the outcome section; consequence: PROFILE-RELIABILITY's 0.9135 bracketed with the same caveat in the v113 patch; FRAMEWORK L258 bracketed",
+      "text": "0.9424 is published only labelled 'model-demeaned, includes stratum difficulty'; 0.8537 is the profile number; class of record = the worse of (profile, raw order); GPQA/Physics and GPQA/Chemistry carry no order claim."
+    },
+    {
+      "date": "2026-09-18",
+      "by": "PROFILE-RELIABILITY-INTERACTION (programme L5643 bracket, one bracket for L5420, L5643, L5661 and L6313; 3dd0900)",
+      "text": "the recorded 0.9135 is the 12-model ARENA12 key (K12), not a 46-model key; the 46-model key reads 0.9177 model-demeaned and 0.8118 [0.7254, 0.8983] interaction-only; K12 interaction-only 0.8665 [0.8000, 0.9330]; '46-model 0.9135' wherever it appears in PROFILE-INTERVAL-ALL-UNION is to be read as '12-model 0.9135'."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "CORRECTIONS_2026-09-23 (registrar)",
+      "text": "[CORRECTED 2026-09-23 by the registrar (line pointer only, zero calls; no number, no criterion and no sentence moves): registration.program_lines names docs/judge_v2_program.md L5404, and that was exact when it was written. After commit cd83eac inserted four one-line correction brackets mid-file (hunks @@ -3911,0 / -6535,0 / -6692,0 / -6949,0 @@), the heading of record \"## Registered 2026-09-17 (before any code or call) — PROFILE-INTERVAL-ALL-UNION: do the 52 (source, domain) union strata carry a key-built p ...\" stands at L5405, +1; the whole span shifts by the same +1. Verified at HEAD by sed -n '5405p' docs/judge_v2_program.md. The map for every such pointer is the programme's \"## Line-shift map, appended 2026-09-23\" section: +0 up to old L3911, +1 to L6535, +2 to L6692, +3 to L6949, +4 below. The recorded span is left standing beside this bracket, not rewritten.]"
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the coordinator's verified record-integrity blocker A1 (insertion only, zero calls; no number of this record moves)",
+      "text": "DISCLOSED 2026-09-23 by the registrar (blocker A1, insertion only, zero calls; NO number of this record moves and nothing above is rewritten): THE UNION TREE THIS RESULT IS ROUTED ON FAILS THE TRAIN-ONLY INVARIANT. Snapshot 20260911_144214 carries 427 distinct EVAL texts among its member slots by exact text and 432 under the split function's own key norm-v1 (FRAMEWORK L229 / L373, `gradlew trainOnlyAudit`, read-only), i.e. 432 of the 6,482 paeec EVAL ids = 6.66% of the routed population were visible to construction. THE WORST-CASE BOUND, which needs no run and is a BOUND AND NOT AN ESTIMATE OF THE EFFECT (it assumes every contaminated item is correct BECAUSE of the contamination, which is the largest the effect can possibly be). UNION TREE 20260911_144214: 432 of 6,482 paeec EVAL ids = 6.66% (exact text 427). At MC-ROOT's Top-1 of 81.58% that is 5,288.0 correct, so a clean reading is at worst (5,288 - 432) / (6,482 - 432) = 4,856 / 6,050 = 80.26%: THE UNION ROUTING HEADLINE CANNOT FALL BY MORE THAN 1.32pp. MC-E2E's +3.38pp router gain and PROFILE-INTERVAL-ALL-UNION's 0.8537 are bounded by the same 6.66% share. MMLU-PRO TREE 20260910_043557: 70 of 3,445 = 2.03% (exact text 37), so AT MOST 2.03pp on any routed proportion - about 5 questions per anchor spread over the 14 bareq512_s42 anchors at 119-304 questions per anchor. THE BOUND IS A WORST CASE AND NOT AN ESTIMATE; no clean re-read was run, and whether to rebuild under content closure (0 judge calls, new snapshot ids, every routed readout moves) or to disclose at this bound is an OPEN AUTHOR DECISION registered in docs/agents/results/SPLIT-FUNCTION-IMPL.json."
+    }
+  ],
+  "does_not_show": [
+    "any judged reliability (key only; no judge, no reference, no rubric)",
+    "a comparison of levels with the 12-model 0.9135 or the merged key-20 rows (rosters and pools differ)",
+    "a routing gain (MC-E2E not re-read)",
+    "a within-stratum order in GPQA/Physics or GPQA/Chemistry",
+    "anything below the designed (source, domain) stratum",
+    "a profile row for a FAIL stratum (FAIL / UNSUPPORTED strata ship as counts without a profile claim)",
+    "[DISCLOSED 2026-09-23 by the registrar (blocker A1, insertion only, zero calls; NO number of this record moves and nothing above is rewritten): THE UNION TREE THIS RESULT IS ROUTED ON FAILS THE TRAIN-ONLY INVARIANT. Snapshot 20260911_144214 carries 427 distinct EVAL texts among its member slots by exact text and 432 under the split function's own key norm-v1 (FRAMEWORK L229 / L373, `gradlew trainOnlyAudit`, read-only), i.e. 432 of the 6,482 paeec EVAL ids = 6.66% of the routed population were visible to construction. THE WORST-CASE BOUND, which needs no run and is a BOUND AND NOT AN ESTIMATE OF THE EFFECT (it assumes every contaminated item is correct BECAUSE of the contamination, which is the largest the effect can possibly be). UNION TREE 20260911_144214: 432 of 6,482 paeec EVAL ids = 6.66% (exact text 427). At MC-ROOT's Top-1 of 81.58% that is 5,288.0 correct, so a clean reading is at worst (5,288 - 432) / (6,482 - 432) = 4,856 / 6,050 = 80.26%: THE UNION ROUTING HEADLINE CANNOT FALL BY MORE THAN 1.32pp. MC-E2E's +3.38pp router gain and PROFILE-INTERVAL-ALL-UNION's 0.8537 are bounded by the same 6.66% share. MMLU-PRO TREE 20260910_043557: 70 of 3,445 = 2.03% (exact text 37), so AT MOST 2.03pp on any routed proportion - about 5 questions per anchor spread over the 14 bareq512_s42 anchors at 119-304 questions per anchor. THE BOUND IS A WORST CASE AND NOT AN ESTIMATE; no clean re-read was run, and whether to rebuild under content closure (0 judge calls, new snapshot ids, every routed readout moves) or to disclose at this bound is an OPEN AUTHOR DECISION registered in docs/agents/results/SPLIT-FUNCTION-IMPL.json.]"
+  ],
+  "ledger": {
+    "row_id": "PROFILE-INTERVAL-ALL-UNION",
+    "version": "v113 [UPDATED 2026-09-23 at ledger v130 (audit OK, 227 rows): the blocker-A1 TRAIN-ONLY disclosure, with its counts and its worst-case bound, inserted into this row's observed cell. No number in the row moves.]"
+  },
+  "depends_on": [
+    "PROFILE-INTERVAL-ALL",
+    "PROFILE-RELIABILITY",
+    "PROFILE-RELIABILITY-X20",
+    "ANCHOR-PROFILE-INTERVAL",
+    "MC-ROUTER",
+    "MC-E2E",
+    "MC-FED",
+    "MC-LEAF",
+    "CERT-CORPUS",
+    "MATH-FIX"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L5402-L5457 (registration 62c4084) and the pre-run note L5588 (1534a4a): question, hygiene, instrument, criteria C1-C3, predictions, falsifier",
+    "docs/judge_v2_program.md L5594-L5675 (outcome section, f5e447b; the L5643 bracket at 3dd0900): every number, classes, criteria and predictions scored, defects D1-D5, does-not-show, the sentence of record",
+    "docs/reviews/2026-09-18_profile_batch1.md section PROFILE-INTERVAL-ALL-UNION (46f44e8): CONFIRMED status, D1-D3, the variance decomposition, the planted-stratum and roster-subset numbers, chips",
+    "experiment_results/multicorpus/profile_interval_all_union.txt and _strata.csv (f5e447b)",
+    "docs/test_ledger.html row PROFILE-INTERVAL-ALL-UNION (v113): chips verbatim, evidence (62c4084, 1534a4a, f5e447b)",
+    "script sha16 = sha256 of tools/analysis/profile_interval_union.py at 09969da, first 16 hex (identity, computed by the registrar 2026-09-20; the file was later edited at a244386)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' lines to grep -n regardless of line drift; line numbers re-lined 2026-09-22 as of programme HEAD 6aa2a0d (shift +2 from the batch-1 reading)"
+  ],
+  "last_update": "2026-09-23",
+  "plain_description": {
+    "sq": "SQ1 Use",
+    "what": "Using answer keys only (no judge), for each of 52 (benchmark, domain) groups in the 6-benchmark union with 18 models, checks by split-half whether the model ranking inside the group is reproducible, and gives each group a pass/fail class.",
+    "why": "Per-cell profiles are only useful if the per-cell ranking is stable; before this, union groups had no reliability measurement at all.",
+    "information": "It shows which groups can carry a per-cell profile and which cannot. Result: done; all 52 classed (on the strictest reading 27 pass, 12 pass with interval, 13 fail); overall reliability high (0.85 for group-specific differences). Two GPQA groups pass without any real within-group order. Key-based only, no judge; caveat: the union tree used leaks some evaluation questions into training (disclosed later).",
+    "written": "2026-10-07"
+  }
+}

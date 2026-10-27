@@ -1,0 +1,416 @@
+{
+  "id": "JV2-RATE-PROBE",
+  "title": "JV2-RATE-PROBE: at how many concurrent in-flight calls N in {1, 2, 4, 8, 12} does the grok-4-1-fast-non-reasoning deployment stop buying throughput on the probe day, and is the gain G = rate(N*) / rate(1) worth a parallel writer (G >= 1.5)? (transport measurement; <= 398 invocations, ceiling 400; SYNTHETIC-DEV payloads, no corpus item judged)",
+  "question": "On the probe day, alone on the deployment, with payloads the size and shape of the recipe's: what is the largest in-flight count N* in {1, 2, 4, 8, 12} whose HTTP-429 share, exhausted-429 invocations and p95 invocation latency stay inside registered bounds, and what is its throughput gain G = rate(N*) / rate(1)? An engineering measurement of a transport; it decides nothing about any board, recipe, reference, judge or model; no verdict is read as data (1.1).",
+  "kind": "engineering",
+  "state": "done",
+  "registration": {
+    "commit": "the commit that writes this record (parent 0c10ea2)",
+    "program_lines": "docs/judge_v2_program.md L18979-L19094",
+    "program_lines_as_of": "_as_of the commit that writes them, parent 0c10ea2, re-grepped",
+    "date": "2026-09-25",
+    "heading": "## Registered 2026-09-25 (before any code or call) — JV2-RATE-PROBE: ...",
+    "provenance": "parallel_posting_registration_draft.md (the judge-design-specialist's own write, session scratchpad, not committed), sha256 8c50c0e8d28f40cdad2ee369e3a8ba4e44e0383e7c8ce195e5e1948ea57d2861 (UTF-8, LF, 0 CR, 240 lines, 42,113 bytes; registrar-verified); recorded verbatim in three contiguous blocks, sha256 block 1/3 edc3bf000e2241e6ebbf98ec83bd9683c400e1910ec2e5133dea54a108271388, 2/3 5362eb2fe7f9d0f36c027afc3d0b63b2d54d193e209942dd7f90c0ae928e0fea, 3/3 d68ddb4f67f538e8c32aaa805f27b173420815dff62db98e63dd90b9bacb07f0; concatenation re-hashed from the programme = the file",
+    "authority": "THE AUTHOR 2026-09-25: \"do both, start the LCB build now and register parallel posting\" (plan Amendment 23, recorded at a3df39a); the two-item split, the gates and the placement are the specialist's (relayed by the orchestrator), not author decisions"
+  },
+  "script": {
+    "path": "tools/analysis/jv2_rate_probe.py + tools/analysis/jv2_rate_probe_selftest.py (+1 line CEILINGS[\"JV2-RATE-PROBE\"] = 400 in tools/analysis/accepted_tests_ledger.py by 3-way merge); MERGED on main at b19b8fb from branch tip 261ce02",
+    "sha16": "MERGED PINS (READY a34642c): jv2_rate_probe.py blob:5f075d18f1e04638d5b33b3e35c4077066a21d6d / sha256-lf16:553fd699a7bbe279 / sha256-crlf16:f1191d61bba8e6c5 (LF of record); jv2_rate_probe_selftest.py blob:7c6fd9c97f9560c0610fe75097efd6c29c43dc51 / sha256-lf16:d37df4ab2e7be3e1 / sha256-crlf16:e81c3aca6979e1b7; accepted_tests_ledger.py blob:b90e64dc93458daeb6102d47279bfd7640c3e9e0 / sha256-lf16:e0ca9d9ade161f7f; judge_v2/pool.py blob:e9bc770f unchanged; plan sha256 b2177cd172eacab59df2e72b6276fe25768c8fc610d623e5051e90b96f09f86f | [PRE-PATCH build cd57564, superseded: jv2_rate_probe.py blob:cfa0cfb0 / sha256-lf16:e7fbb36cff578e18; jv2_rate_probe_selftest.py blob:af51fdbb / sha256-lf16:21322fd83c45dd87]",
+    "commit": "b19b8fb (merge by path of 261ce02 after READY a34642c); built cd57564, patched 261ce02"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_jv2_rate_probe.md (blob:08ed39f68d1160cb44b4fb69c9f89446ee8be503): READY, MERGEABLE by path with the 3-way merge on the ledger module; launch conditions C1-C8; D1 MEDIUM (4 selftest survivors, code correct by execution), D2 MEDIUM (falsifier reachability day-dependent -> C6), D3-D5 LOW, D6 INFO",
+    "commit": "a34642c (2026-09-26 00:00:35 +0200; recorded late, at the outcome: docs/judge_v2_program.md L20478-L20556 (section \"## JV2-RATE-PROBE (2026-09-26, 398 calls) — VALID (post-run review 6ea4f02): C0 HELD, V5 HELD; N* = 12 ...\"; _as_of the commit that writes it, parent ef045a1, re-grepped), item 1)"
+  },
+  "go": "n/a: 398 invocations (199 match-equivalents), under the 4,000-match rule; day cap (iii) at launch: day 2026-09-26 total 0 + 400 = 400 of 14000 (dry-run transcript)",
+  "run": {
+    "outcome_file": "experiment_results/jv2_rate_probe/JV2_RATE_PROBE_outcome.txt (blob:15f40a542068139954bd97b53351a777e53d9f6c / sha256-lf16:71070843af1db4d8 (LF, of record) / sha256-crlf16:59a3b8634e99d08d (working tree and E: copy; the run commit's and the review's '59a3b863...'))",
+    "outcome_commit": "b0c231c (run of record, with the PILOT file, jv2_rate_probe.db, jv2_rate_probe.db.invocations.db, day_calls_2026-09-26.json and the launch transcripts)",
+    "calls": 398,
+    "cce": 398,
+    "pool": "none (SYNTHETIC-DEV payloads; content gate 0 hits)",
+    "date": "2026-09-26 local 00:23:20-00:33:09 (= 2026-09-25 22:23-22:33Z); pilot#1 12 + run#2 386; launched from main b19b8fb at script blob 5f075d18"
+  },
+  "review": {
+    "file": "docs/reviews/POSTRUN_jv2_rate_probe.md (blob:d9099ad4f94064e3bcda4c8d15ec77b96ac572d8 / sha256-lf16:edf5c683f6fe9c8b)",
+    "commit": "6ea4f02",
+    "verdict": "VALID: every per-step figure, C1, G, P1-P5, the falsifier and the D1 branches recomputed from DB copies to the printed digit; no BLOCKER, no HIGH; D1 MEDIUM (C6 wording absent from the write-once outcome), D2 MEDIUM (scope), D3 LOW (process_snapshot fails open), D4 LOW (x-ratelimit-key value in the DB)"
+  },
+  "instrument": {
+    "calls": "at most 398 invocations (S1-S5 = 24 / 36 / 48 / 64 / 76 = 248; S6 = 150 at N* if N* >= 2); journal ceiling 400 (CEILINGS[\"JV2-RATE-PROBE\"] = 400, by 3-way merge into accepted_tests_ledger.py)",
+    "arms": "steps S1-S5 at N = 1, 2, 4, 8, 12, 60 s idle gaps; S6 confirmation; control of record S1 (N = 1)",
+    "judge": "grok-4-1-fast-non-reasoning, provider azure, cap 8192, TEMPERATURE OMITTED (plan Amendment 1 D2), via rr.call_judge_full; single order per call, no verdict formed",
+    "payloads": "SYNTHETIC-DEV: seeded generator 'JV2-RATE-PROBE:<registration commit>', 10-option MCQs with a computed key, two templated responses, a templated reference through rejudge_reference.with_reference; the recipe's system text byte for byte (sha = the K46 store's system_template_sha / rubric_sha); sizes at the K46 store's q10 / q50 / q90 user-message bytes",
+    "guards": "content gate (stem_key vs MMLU-Pro + union corpora, 0 hits); exclusivity X1 (process list at every step boundary) / X2 (not a JudgeBench posting day) / X3 disclosed; pilot 12 = S1's first 12 (> 5% unparsed, any length / content_filter finish, any non-200 exhausted -> refuse); write-ahead journal at the 5e9de0f semantics with the unresolved bound = the step's N; LedgerLock on the day ledger; rollover stop; wire counter (thread-local urlopen wrapper: every HTTP attempt, status, Retry-After, x-ratelimit-* names and values; body fidelity asserted)",
+    "admissible_step": "(a) HTTP-429 attempts <= 2% of the step's HTTP attempts; (b) 0 invocations exhausted on 429; (c) p95 invocation wall latency <= min(1.5 x p95(S1), 10 s); stop at the first inadmissible step; within a step abort at 3 exhausted-429 invocations or 10 HTTP-429 attempts",
+    "outcome_file": "experiment_results/jv2_rate_probe/JV2_RATE_PROBE_outcome.txt (write-once; pilot to _PILOT.txt)"
+  },
+  "criteria": [
+    {
+      "id": "C0",
+      "text": "VALIDITY: V1 exclusivity held (X1 printed at every step; X2); V2 content gate 0 hits; V3 ledger == journal and invocations <= 400; V4 pilot guard PASS; V5 realism (probe median user bytes within K46 q50 +-10%, median completion_tokens within K46's +-30%). V1-V4 failing VOIDS the probe (re-registered, not re-read); V5 failing leaves the numbers DESCRIPTIVE with the size caveat. THE ONLY HELD / FAILED CRITERION (registrar's reading R2)",
+      "result": "HELD",
+      "value": "V1 exclusivity held (X1 / X2 at every step boundary, 14 samples, all OK); V2 content gate 0 hits; V3 ledger 398 == journal 398 <= 400; V4 pilot guard PASS (12 / 12 RETURNED, 0 unparsed)",
+      "denominator": "398 invocations; 14 X1 samples; the pilot 12"
+    },
+    {
+      "id": "V5",
+      "text": "REALISM (part of C0; failing leaves the numbers DESCRIPTIVE): median user bytes within K46 q50 +-10%, median completion tokens within K46's +-30%",
+      "result": "HELD",
+      "value": "median user bytes 2634.0 vs K46 q50 2634 (+-10%); median completion tokens 248.0 vs K46 254.0 (+-30%); the bytes leg holds by construction (F6), V5 is carried by the tokens leg",
+      "denominator": "398 invocations vs the K46 run2 store (lengths only)"
+    },
+    {
+      "id": "C1",
+      "text": "DECISION (READOUT OF RECORD, not HELD/FAILED; R2): N* = the largest N whose step (and S6, when run) is admissible AND whose rate >= 1.3 x the rate of the previous admissible step; if no N >= 2 qualifies, N* = 1. Admissibility decided at the POINT (R1)",
+      "result": "n/a",
+      "value": "READOUT (decision rule, not HELD/FAILED; R2): N* = 12 (ramp N* 12 at S5; S6 admissible); knee none; C1 ratios S2 2.0112, S3 1.8920, S4 1.8449, S5 1.4708 (review). N* is measured under rr's retry schedule (6 attempts, Retry-After ignored); every HTTP 429 counts for admissibility; it does not transfer as-is to a pool that honours Retry-After (A4). Beside N* (C6, recorded in the programme, D1): '(c) false-stop rate under no degradation at S2 is about 8-16% (READY a34642c)'. N* = 12 is a ramp-capped LOWER BOUND (D2)",
+      "denominator": "the per-step invocations S1 24 / S2 36 / S3 48 / S4 64 / S5 76 / S6 150 (= 398) and their HTTP attempts (= 398)"
+    },
+    {
+      "id": "C2",
+      "text": "VALUE (READOUT OF RECORD; R2): G >= 1.5 -> 'build JV2-PARALLEL-POSTING'; G < 1.5 -> 'build DEFERRED unless the author decides otherwise'; the author may override either way (recorded as the author's) [SUPERSEDED FOR THE BUILD DECISION ONLY 2026-09-25 by the author's override (plan Amendment 24): the build is not deferred whatever G reads; C2's value is still computed and printed as a readout of record]",
+      "result": "n/a",
+      "value": "READOUT (decision rule; R2): G = 10.326 >= 1.5 -> 'build JV2-PARALLEL-POSTING' [superseded for the build decision by Amendment 24; the build was already merged at 3187b6f]; rate(S6) / rate(S1) = 10.683; G is capped by the ramp at N = 12",
+      "denominator": "rate(S5) 203.10 / rate(S1) 19.67 calls/min (S1 wall = 37.600 + 35.608 s)"
+    },
+    {
+      "id": "C3",
+      "text": "JUDGEBENCH NOTE (informational; changes no JB condition): the JB G arm's HTTP overhead at N = 4 = (HTTP attempts - invocations) / invocations from S3, printed beside JB's 10% HTTP margin (770 / 700)",
+      "result": "n/a",
+      "value": "READOUT (informational): (48 - 48) / 48 = 0.000 beside JudgeBench's 770 / 700 = 10% margin",
+      "denominator": "S3's 48 invocations and 48 HTTP attempts"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "the 09-24 regime persists (the specialist's confidence about 60%): (i) N* in {1, 2} AND (ii) the rate at N = 4 (S3) < 35 calls/min (< 2x S1); if S3 is not posted, (ii) NOT OBSERVED and P1 scored on (i) (R4)",
+      "result": "FAILED",
+      "value": "(i) N* = 12 in {1, 2}: False; (ii) rate(S3) = 74.85 calls/min < 35: False; joined with the falsifier (R6): P1 FAILED, falsifier FIRED",
+      "denominator": "N* over S1-S6; S3's 48 invocations over its wall"
+    },
+    {
+      "id": "P2",
+      "text": "at the first inadmissible step the HTTP-429 share >= 10%; UNDETERMINED if no step is inadmissible (R5)",
+      "result": "UNDETERMINED",
+      "value": "no inadmissible step (R5)",
+      "denominator": "none (no inadmissible step)"
+    },
+    {
+      "id": "P3",
+      "text": "S1 reproduces K46: median invocation latency 3.0-4.5 s and 0 exhausted-429 invocations",
+      "result": "FAILED",
+      "value": "S1 median invocation latency 2.898 s, below [3.0, 4.5] (pilot segment 2.933 s and run segment both < 3.0); exhausted-429 0",
+      "denominator": "S1's 24 invocations"
+    },
+    {
+      "id": "P4",
+      "text": "whether x-ratelimit headers are returned: NO DIRECTIONAL PREDICTION; recorded as a READOUT (present yes / no, their names), NOT SCORED (registrar's reading R3, rule 5)",
+      "result": "n/a",
+      "value": "READOUT (not scored; R3): rate headers returned: yes, 10 names (x-ratelimit-abusepenalty-active, -key, -limit-requests, -limit-tokens, -remaining-requests, -remaining-tokens, -renewalperiod-requests, -renewalperiod-tokens, -reset-requests, -reset-tokens); limit-requests 500, limit-tokens 500000 (review, DESCRIPTIVE)",
+      "denominator": "398 HTTP attempts"
+    },
+    {
+      "id": "P5",
+      "text": "V5 holds (probe median user bytes within K46 q50 +-10%; median completion_tokens within K46's +-30%)",
+      "result": "HELD",
+      "value": "= V5: median user bytes 2634.0 vs 2634 +-10%; median completion tokens 248.0 vs 254.0 +-30%",
+      "denominator": "398 invocations vs the K46 run2 store"
+    }
+  ],
+  "falsifier": {
+    "text": "P1 FALSIFIED if S3 (N = 4) runs at >= 50 calls/min with HTTP-429 share <= 2%, 0 exhausted and p95 <= 1.5 x p95(S1), i.e. the 09-16 regime is back: N* >= 4, C2 says build, the parallel writer worth about 3-8x in wall time. It OVERTURNS the specialist's reading that the 09-24 regime persists (section 0.2 CONSEQUENCE, P1). P1 can FAIL without it firing (S3 at 35-50 calls/min); both scored, recorded joined (R6)",
+    "fired": true,
+    "result": "FIRED: S3 ran at 74.85 calls/min >= 50 with 429 share 0.0000 <= 2%, 0 exhausted, p95 3.708 <= 1.5 x p95(S1) (= 6.222): the 09-16 regime is back; P1 FALSIFIED; C2 reads build. C6 (recorded in the programme, D1): 'falsifier REACHABLE on the day (4 x rate(S1) = 78.68 >= 50; 0 x 429 in S3); FIRED counts as evidence'. It overturns 'the 09-24 regime persists' for the probe night only"
+  },
+  "support": "(a) per-step invocations 24/36/48/64/76 (+150 S6) and their HTTP attempts; clusters temporal (one limiter window), Kish NOT DEFINED. (b) DEFF: NO SOURCE (first HTTP-level measurement on this deployment); declared pilot assumption: each step ONE observation of the regime (DEFF = n). (c) n_eff = 1 per step for regime inference. (d) SE none reported; exact CP 95% upper bound at 0 of n, 1 - 0.05^(1/n): 11.7% / 8.0% / 6.1% / 4.6% / 3.9% / 2.0% (n 24/36/48/64/76/150), descriptive. (e) MDE: P(<= 1 of 48 | p = 0.10) = 0.9^48 + 48 x 0.1 x 0.9^47 = 0.00636 + 0.03393 = 0.0403; regimes >= 2x apart in rate vs timing spread 4.6/3.5 = 1.31; a 2% share cannot be certified by any step. (f) SCOREABLE for C0, P1, P2, P3, P5 and the falsifier on the observed points; DESCRIPTIVE-ONLY for the 429 share at the 2% screening bar and for any inference beyond the probe day. (g) STRUCTURAL: C0 reachable; N* >= 2 / G >= 1.5 reachable only if the day's limit admits (observed 09-16); at N* = 2, G <= 2.0; G capped by the ramp at N = 12; an outside consumer (X3) can make any step inadmissible (the probe reads the day, not the quota)",
+  "registrar_readings": [
+    "R1 (rule 7) admissibility decided at the POINT; CP upper bounds printed, decide nothing; no UNDETERMINED branch for admissibility, N* or G",
+    "R2 (rule 8) C1 and C2 are decision rules (cannot FAIL), recorded as readouts of record; C0 the only HELD/FAILED criterion (failing observables: foreign poster in X1 / JB posting day; >= 1 content-gate hit; ledger != journal or > 400; pilot guard FAIL; V5 out of band -> DESCRIPTIVE); C3 informational",
+    "R3 (rule 5) P4 has no number: a readout, not scored",
+    "R4 P1 two clauses; (ii) NOT OBSERVED if S3 not posted; an aborted S3's rate over its posted invocations",
+    "R5 P2 at the first inadmissible step (S6 included); UNDETERMINED if none",
+    "R6 P1 and the falsifier scored joined; the falsifier overturns 'the 09-24 regime persists'",
+    "R7 the CEILINGS entry reaches main only after the K46 posting has ended; if accepted_tests_ledger.py is in K46's C0 (c) pin set, after the K46 outcome (F5)",
+    "R8 (conflict 1.2 vs 1.10; the stricter binds) the K46 run2 store is opened by the probe's dry-run only AFTER THE K46 OUTCOME IS WRITTEN; the probe therefore posts after the K46 outcome; objectable before the build",
+    "R9 (rule 4) no closed line touched (TEMP-0, ORDER-1 / SELECTIVE-ORDER, rubric / reference / ensemble lines checked); no earlier JV2 / rate-probe id in the ledger or results"
+  ],
+  "open_items": [
+    "1. THE AUTHOR (zero calls): read the grok-4-1-fast-non-reasoning deployment's quota (TPM / RPM) in the Azure portal; may settle the question without the probe (then WITHDRAWN or kept, by the author's decision) [2026-09-25: NOT ANSWERED; no quota number given; the author intends to raise the quota (\"I'll find a way to increase the quota\", plan Amendment 24); stays OPEN] [2026-09-25 registrar: ANSWERED: TPM 500,000 / RPM 500, applying to BOTH Grok deployments (the author's portal readings); no withdraw-or-keep decision taken; the probe stays registered]",
+    "2. THE AUTHOR: build JV2-PARALLEL-POSTING even if G < 1.5, as insurance? [ANSWERED 2026-09-25 by THE AUTHOR: YES, \"build it anyway\" (plan Amendment 24)]",
+    "3. THE REGISTRAR, LATER (after the probe's outcome): does C3 change JUDGEBENCH-REASONING-SIDE's --workers 4 launch condition?",
+    "[2026-09-26 registrar: 3. ANSWERED on the outcome: C3 0.000 at S3 (night): no reason to change the G arm's --workers 4; the S1 reasoning arm not licensed by the probe; JudgeBench's --workers item stays OPEN (author / orchestrator), lean toward 4]"
+  ],
+  "finding_of_record": {
+    "id": "GROK-NR-THROUGHPUT (section 0 of the specialist's write; no record of its own)",
+    "where": "docs/judge_v2_program.md L18908-L18977 (section \"## Finding of record 2026-09-25 (registrar; zero calls; read-only evidence of the judge-design-specialist, recorded VERBATIM) — GROK-NR-THROUGHPUT: ...\"; block 1/3 verbatim between the marker lines L18913 and L18966)",
+    "F-1": "grok-4-1-fast-non-reasoning throughput fell about 10x in 8 days: GROK-CALIB 09-16 8 workers ~136.6 calls/min (lat median 3.5 s, p95 4.6 s); CANARY 09-16 pass 1 ~136; CANARY 09-22 pass 2 ~87; TRACE 09-24 ~14.9 (18 invocations exhausted on 429); CANARY 09-24 pass 3 ~10.0 (22 exhausted-429 re-posts), pass 4 ~12.1 (20); 34 HTTP-429 invocations over passes 3-4; K46 09-25 1 worker 14-18 calls/min, ~3.5 s/call (the brief's; store not opened). Worker counts = script defaults, UNVERIFIED. 09-24 runs did not overlap; payloads identical across CANARY passes; 10-15 at 8 workers < sequential bound 17.1",
+    "F-2": "rr.call_judge_full (blob:1339592a) L111-L165 retries 408/429/5xx internally, 6 attempts, 3/6/12/24/48 s, IGNORES Retry-After; 429s are invisible to callers; K46's '4,005 of 4,005 attempts HTTP 200' (the brief's) counts invocations, not HTTP attempts",
+    "F-3": "judgebench_side.py (85a2d9f) already posts with 4 workers (L1888) and its HTTP counter counts retries against its 770 cap; under the 09-24 regime CANARY pass 3 spent >= 132 HTTP-429 attempts per 600 invocations (>= 22%) > JB's 10% margin",
+    "F-4": "accepted_tests_ledger.append (L126-L147) has no cross-process lock (read-modify-os.replace); two same-day appenders can lose a row",
+    "F-5": "the one-in-flight rule is enforced by the K46 driver's journal trigger invocation_unresolved (archv2_pilot/accounting.py L131 @5e9de0f); judge_v2/writer.py main blob:6db4ab3207a24aa61a1d4ea43ca6f2da2c68e547 drains sequentially",
+    "F-6": "azure_concurrency_sweep.py / azure_ratelimit_probe.py (bf55a98) target Mistral-Large-3 and set temperature 0: not reusable on grok"
+  },
+  "numbers_of_record": {
+    "draft_sha256": "8c50c0e8d28f40cdad2ee369e3a8ba4e44e0383e7c8ce195e5e1948ea57d2861 (parallel_posting_registration_draft.md; UTF-8, LF, 240 lines, 42,113 bytes; registrar-verified)",
+    "block_2_of_3_sha256": "5362eb2fe7f9d0f36c027afc3d0b63b2d54d193e209942dd7f90c0ae928e0fea (file lines 53-127, 13,894 bytes; re-hashed from the programme: equal)",
+    "invocation_ceiling": "398 planned max (248 ramp + 150 S6), journal ceiling 400; expected ~258 under P1, ~108 if N* = 1 (1.9)",
+    "day_cap_check": "on 09-25 after K46: 26 + 5,328 + 400 = 5,754 of 14,000 (the specialist's; read again at launch)",
+    "cp95_upper_at_0": "11.7% / 8.0% / 6.1% / 4.6% / 3.9% / 2.0% at n = 24 / 36 / 48 / 64 / 76 / 150 (registrar re-computed)",
+    "grok_nr_throughput_09-16": "~136.6 calls/min at 8 workers (GROK-CALIB, 9,142 matches; worker count = script default, unverified)",
+    "grok_nr_throughput_09-22": "~87 calls/min at 8 workers (CANARY pass 2, 300 matches)",
+    "grok_nr_throughput_09-24": "~10.0-14.9 calls/min at 8 workers with HTTP 429s (TRACE 1,077 jobs; CANARY passes 3-4)",
+    "grok_nr_throughput_09-25": "14-18 calls/min at 1 worker (K46 run2; the brief's figure, store not opened)",
+    "sequential_bound": "60 / 3.5 s = 17.1 calls/min",
+    "invocations_of_record": "398 of ceiling 400 (pilot#1 12 + run#2 386, 2026-09-26); journal 398 = ledger 398; 0 unresolved; HTTP attempts 398; HTTP 429 0; exhausted 0; unparsed 0 of 398",
+    "rate_per_step": "S1 N=1 19.67 / S2 N=2 39.56 / S3 N=4 74.85 / S4 N=8 138.09 / S5 N=12 203.10 / S6 N=12 210.13 calls/min (invocations over the step's wall; S1 wall = 37.600 + 35.608 s)",
+    "latency_per_step": "median / p95 (nearest rank) s: S1 2.898 / 4.148; S2 2.877 / 3.894; S3 3.147 / 3.708; S4 3.185 / 4.155; S5 3.231 / 3.861; S6 3.188 / 4.090; p95 / p95(S1) <= 1.002 (review)",
+    "cp95_upper_429_share": "0/24 0.1173, 0/36 0.0798, 0/48 0.0605, 0/64 0.0457, 0/76 0.0387, 0/150 0.0198 (DESCRIPTIVE, R1)",
+    "N_star": "12 (ramp-capped LOWER BOUND, knee none; N* is measured under rr's retry schedule (6 attempts, Retry-After ignored); every HTTP 429 counts for admissibility; it does not transfer as-is to a pool that honours Retry-After (A4))",
+    "G": "10.326 = rate(S5) / rate(S1) (capped by the ramp at N = 12); rate(S6) / rate(S1) 10.683",
+    "C3_overhead": "0.000 at S3 (48 - 48) / 48 vs JudgeBench's 10% margin",
+    "falsifier_reachability": "4 x rate(S1) = 78.68 >= 50; 0 x 429 in S3 (review; C6 recorded in the programme)",
+    "c_false_stop_rate": "about 8-16% at S2 under no degradation (READY a34642c; C6)",
+    "rate_headers": "x-ratelimit-limit-requests 500, -limit-tokens 500000 (= the author's portal reading, non-reasoning deployment); remaining-requests min 488; remaining-tokens min 485,567 (review, DESCRIPTIVE, A4)",
+    "S6_duration": "42.8 s (registered 'about 1-4 min' not reached)",
+    "window": "ONE night: 2026-09-26 00:23:20-00:33:09 local = 2026-09-25 22:23-22:33Z; grok-4-1-fast-non-reasoning ONLY",
+    "realism": "median user bytes 2634.0 vs 2634; median completion tokens 248.0 vs 254.0"
+  },
+  "sentence_of_record": "JV2-RATE-PROBE (2026-09-26, 398 invocations, 0 HTTP 429, 0 exhausted; post-run review 6ea4f02 VALID): alone on grok-4-1-fast-non-reasoning on the night of 2026-09-25/26 (22:23-22:33Z), steps S1-S6 at N = 1 / 2 / 4 / 8 / 12 / 12 ran 19.67 / 39.56 / 74.85 / 138.09 / 203.10 / 210.13 calls/min with p95 3.708-4.155 s; N* = 12, G = 10.326; P1 FAILED, P2 UNDETERMINED, P3 FAILED, P5 HELD; the falsifier FIRED and was reachable (4 x rate(S1) = 78.68 >= 50; 0 x 429 in S3): the 09-16 regime was back that night. [N* is measured under rr's retry schedule (6 attempts, Retry-After ignored); every HTTP 429 counts for admissibility; it does not transfer as-is to a pool that honours Retry-After (A4). N* = 12 is a ramp-capped LOWER BOUND (knee none; remaining-requests >= 488 of 500), S6 lasted 42.8 s, ONE night, non-reasoning only: it licenses no daytime run, no reasoning-deployment run, no pooled-poster setting and no sustained window.]",
+  "chips": [
+    "REGISTERED 2026-09-25, BEFORE ANY CODE",
+    "VALID (POST-RUN 6ea4f02); C0 HELD, V5 HELD; READY a34642c, MERGED b19b8fb, RUN b0c231c: 398 CALLS, 0 x 429, 0 EXHAUSTED",
+    "N* = 12 (RAMP-CAPPED LOWER BOUND, KNEE NONE); G = 10.326; C2 READS BUILD (SUPERSEDED BY AMENDMENT 24)",
+    "P1 FAILED; P2 UNDETERMINED (NO INADMISSIBLE STEP); P3 FAILED (S1 MEDIAN 2.898 s); P5 HELD; FALSIFIER FIRED (REACHABLE): THE 09-16 REGIME WAS BACK",
+    "SCOPE: ONE NIGHT (22:23-22:33Z), NON-REASONING ONLY, S6 42.8 s; MEASURED UNDER rr'S RETRY SCHEDULE, NOT TRANSFERABLE AS-IS TO THE POOL (A4); NO DAYTIME, REASONING, POOLED OR SUSTAINED LICENCE",
+    "<= 398 INVOCATIONS (CEILING 400); SYNTHETIC-DEV PAYLOADS; NO ITEM JUDGED; TEMPERATURE OMITTED",
+    "FINDING OF RECORD: GROK NON-REASONING THROUGHPUT FELL ~10x IN 8 DAYS; 429s INVISIBLE TO rr'S CALLERS"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-25",
+      "by": "registrar (registration; zero calls; insertion only)",
+      "text": "REGISTERED before any code at docs/judge_v2_program.md L18979-L19094 (section \"## Registered 2026-09-25 (before any code or call) — JV2-RATE-PROBE: ...\"; block 2/3 verbatim between the marker lines L18983 and L19059), _as_of the commit that writes them, parent 0c10ea2, re-grepped; the section-0 evidence recorded as a finding of record at docs/judge_v2_program.md L18908-L18977 (section \"## Finding of record 2026-09-25 (registrar; zero calls; read-only evidence of the judge-design-specialist, recorded VERBATIM) — GROK-NR-THROUGHPUT: ...\"; block 1/3 verbatim between the marker lines L18913 and L18966); from parallel_posting_registration_draft.md (the judge-design-specialist's own write, session scratchpad, not committed), sha256 8c50c0e8d28f40cdad2ee369e3a8ba4e44e0383e7c8ce195e5e1948ea57d2861 (UTF-8, LF, 0 CR, 240 lines, 42,113 bytes; registrar-verified); recorded verbatim in three contiguous blocks, sha256 block 1/3 edc3bf000e2241e6ebbf98ec83bd9683c400e1910ec2e5133dea54a108271388, 2/3 5362eb2fe7f9d0f36c027afc3d0b63b2d54d193e209942dd7f90c0ae928e0fea, 3/3 d68ddb4f67f538e8c32aaa805f27b173420815dff62db98e63dd90b9bacb07f0; concatenation re-hashed from the programme = the file. THE AUTHOR 2026-09-25: \"do both, start the LCB build now and register parallel posting\" (plan Amendment 23, recorded at a3df39a); the two-item split, the gates and the placement are the specialist's (relayed by the orchestrator), not author decisions. Ledger v272, new row JV2-RATE-PROBE."
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (author's decisions, relayed verbatim by the orchestrator; zero calls; insertion only)",
+      "text": "THE AUTHOR's override of C2 (\"Go for 350 and build it anyway I'll find a way to increase the quota\"; plan Amendment 24): C2 is SUPERSEDED FOR THE BUILD DECISION ONLY; JV2-PARALLEL-POSTING is built whatever G reads. The probe STILL RUNS after the K46 outcome (R8), alone on the deployment, to measure it; its registration, C0, P1-P5, the falsifier, the cap (<= 398, ceiling 400) and its placement are unchanged; C2's value is still printed as a readout and informs the first live N > 1 and the quota question; the falsifier's 'C2 says build' consequence is moot for the build. Open item 2 ANSWERED; open item 1 (portal TPM / RPM) stays OPEN; open item 3 stays OPEN. The author intends to raise the quota (no change recorded as made). docs/judge_v2_program.md L19341-L19376 (section \"## Author's decisions 2026-09-25 (recorded by the registrar; zero calls; insertion only) — (1) JUDGEBENCH-REASONING-SIDE SIZE = 350 ...\"; _as_of the commit that writes it, parent 95d9821, re-grepped)"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (JV2-PARALLEL-POSTING merge record; zero calls; insertion only)",
+      "text": "R8 ('after the K46 OUTCOME') MET (outcome 38ec2f3); the orchestrator's 'pool merged' condition MET at 3187b6f (JV2-PARALLEL-POSTING merged; not a condition in this registration's text: the probe's script touches no judge_v2 file, R7). STATE UNCHANGED: registered, NOT BUILT, no READY. Gate (3) of JV2-PARALLEL-POSTING cites this probe: the first live pooled or rate-flagged run takes its N and --max-rpm from it; at the default --max-rpm 20 the pool is capped at ~1.17x the sequential 17.1 calls/min. Open item 1 (the author's portal quota) OPEN. docs/judge_v2_program.md L19976-L20052 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — JV2-PARALLEL-POSTING MERGED at 3187b6f (8 paths by path from 5ece92f, blob-equal), after ... NOT READY d32fa75 ... and DELTA READY 1 10c5213 ...\"; _as_of the commit that writes it, parent ca4afcd, re-grepped)"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (zero calls; insertion only)",
+      "text": "OPEN ITEM 1 ANSWERED (request for information CLOSED): the author's Azure readings of 2026-09-25: quota verbatim \"Tokens per Minute Rate Limit 500000; Requests per Minute Rate Limit 500\", applying to BOTH Grok deployments (reasoning and non-reasoning); StatusCode 09-25 mostly 200 with only a few 429, 09-24 many 429; the 7-day Azure Monitor chart (Model Requests, Sum, by StatusCode, per resource, 09-19..09-25): 200 = 15.05k, 429 = 3.14k, 400 = 0; the orchestrator's chart reading at an INFERRED 30-min bucket: 09-23 about 58/min with no 429, 09-24 about 28 attempts/min with about 40% refused, 09-25 (K46) about 17/min falling to about 3/min with about 0 429; INTERPRETATION, NOT MEASUREMENT: 09-25 = latency (about 3.5 s -> 20 s per call), 09-24 429s consistent with shared-capacity throttling (Global Standard), not the configured quota; the booking-based 40-45/min ceiling estimate bracketed as too pessimistic. NO withdraw-or-keep decision on the probe is taken; STATE UNCHANGED: registered, NOT BUILT; the registration governs (arms, caps, criteria, falsifier unchanged). A candidate --max-rpm ladder 20 / 30 / 40 / 60 stopping at the first 429 (the orchestrator's relay) is a candidate for the first live pooled or rate-flagged judge_v2 run (JV2-PARALLEL-POSTING gate (3)), not an arm of this probe. docs/judge_v2_program.md L20164-L20220 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — BANNED-MODELS-REASON-CORRECTION MERGED at 52474d6 ... and NOISRESERVED-TEST-ALLOWLIST MERGED at 7e71cba after READY c832a16 ...\"), _as_of the commit that writes it, parent 7e71cba, re-grepped"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (zero calls; insertion only; before the READY and before any data)",
+      "text": "BUILT at cd57564 (branch jv2-rate-probe, base 7e71cba; pins re-derived, pre-patch, in 'script'); tests and dry-run relayed; deviations D-1..D-3 consistent; reachability findings F1-F5 confirmed (F5's hypothesis not established); PRE-DATA AMENDMENTS A1-A7 (the orchestrator's) recorded: (a) 429 share <= 2% OR <= 1 HTTP 429 (A3), (c) p95 <= 2 x p95(S1) with S1 exempt and no 10 s cap (A2), every 429 counts with the retry-schedule qualifier (A4), the builder's readings ratified (A5), the probe and JudgeBench never on the same day (A6), diagnostics descriptive (A7); the falsifier NOT amended; OBJECTIONS O1 (A5 (iv) vs C1) and O2 (A2's factor 2); REQUIRED CODE CHANGES RC0-RC5 before the READY; state registered -> built. docs/judge_v2_program.md L20222-L20309 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run; BEFORE the READY and before any data) — JV2-RATE-PROBE BUILT ... and PRE-DATA AMENDMENTS A1-A7 ...\"; _as_of the commit that writes it, parent bd5cfbb, re-grepped)"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (zero calls; insertion only; the orchestrator's rulings, before the READY and before any data)",
+      "text": "O2 ACCEPTED: A2 REVISED to remove only the absolute 10 s cap in (c) and exempt S1, KEEPING the registered 1.5 x p95(S1); S6 not exempt; admissibility (c) and the falsifier share the factor 1.5. O1 ACCEPTED: RC5 (a) applies, replacing A5 (iv): the S6 drop goes to the largest ramp step below N*'s that qualified under C1, else S1. RC1 at 1.5 (FALSIFIER_P95_FACTOR separate, also 1.5). The builder applies RC1, RC2, RC3 and RC5 (a) now; the READY follows on the patched pins. State stays built. docs/judge_v2_program.md line-end brackets \"[RULED 2026-09-25 by the orchestrator ...]\" at L19003, L19005, L19094 and in section L20222-L20309 (\"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run; BEFORE the READY and before any data) — JV2-RATE-PROBE BUILT ... and PRE-DATA AMENDMENTS A1-A7 ...\") at L20256, L20258, L20259, L20265, L20267, L20277, L20281, L20287, L20296, L20309; _as_of the commit that writes them, parent d10e029, re-grepped"
+    },
+    {
+      "date": "2026-09-26",
+      "by": "registrar (outcome; zero calls; insertion only)",
+      "text": "OUTCOME recorded at docs/judge_v2_program.md L20478-L20556 (section \"## JV2-RATE-PROBE (2026-09-26, 398 calls) — VALID (post-run review 6ea4f02): C0 HELD, V5 HELD; N* = 12 ...\"; _as_of the commit that writes it, parent ef045a1, re-grepped): READY a34642c and merge b19b8fb recorded late (record lag disclosed); run of record b0c231c (398 invocations); post-run review 6ea4f02 VALID; C0 HELD, V5 HELD; N* = 12, G = 10.326; P1 FAILED, P2 UNDETERMINED, P3 FAILED, P5 HELD; FALSIFIER FIRED. D1 (MEDIUM): C6 absent from the write-once outcome; recorded in the programme: 'falsifier REACHABLE on the day (4 x rate(S1) = 78.68 >= 50; 0 x 429 in S3); FIRED counts as evidence' and '(c) false-stop rate under no degradation at S2 is about 8-16% (READY a34642c)'. D2 (MEDIUM): the review's scope section recorded verbatim (N* a ramp-capped lower bound; remaining-requests >= 488 of 500; S6 42.8 s; ONE night 22:23-22:33Z; non-reasoning only; no daytime, reasoning, pooled or sustained licence); headers 500 RPM / 500k TPM CONFIRM the author's quota reading. D3 LOW (process_snapshot fails open on empty PowerShell output), D4 LOW (the opaque x-ratelimit-key value committed in the DB; not the key or the host). Gate (3) recommendation (the reviewer's; NOT registered): daytime --post-workers 8 --max-rpm 60 with the pilot 12 at N = 8; night --post-workers 12 --max-rpm 120 only after a clean first run at 60; never above 12 workers or 210 rpm. JudgeBench: no posting on 09-26 (probe day, A6; 398 probe calls); earliest 09-27; the C2 operator check the only barrier; G arm no reason to change --workers 4; the S1 reasoning arm not licensed (read its HTTP-attempt cap at its pilot; stop early on a 429-heavy start); the --workers item stays OPEN, lean 4 (open item 3 ANSWERED). Finding M2: archv2_pilot/selftest.py fails after 2026-09-25 (TODAY L126; L886 wrap_call without clock= -> local_day() -> DAY ROLLOVER; identical pre-merge 7c6c588); 148 of 282 checks executed; fix clock=lambda: TODAY REQUIRED before any archv2 READY or M-check; queue item ARCHV2-SELFTEST-CLOCK-FIX added. Evidence: E:\\TaxoArena_backup_2026-09-25\\jv2_rate_probe\\ 5 files + SHA256SUMS, 5 / 5 OK re-verified; pilot_guard.json gitignored (.gitignore:124:*.db.*), its copy of record on E:. State built -> done. Ledger v296."
+    },
+    {
+      "date": "2026-09-26",
+      "by": "registrar (zero calls; insertion only)",
+      "text": "M2 DISCHARGED: ARCHV2-SELFTEST-CLOCK-FIX READY c0e46f9 and MERGED at 83ad26a (archv2_pilot/selftest.py blob:82ee9cde -> blob:34743f1e / sha256-lf16:bcaf589f8c9a755e; package lf16 unchanged 00bce6429d6dea64); post-merge rc 0 (relayed); D1 MEDIUM: the selftest cannot itself detect real-clock reads (ARCHV2-SELFTEST-CLOCK-TRAP drafted; until then a READY needing date independence runs its own fake-clock pass). docs/judge_v2_program.md L20846-L20862 (section \"## Registrar's record 2026-09-26 (insertion only; zero calls; nothing run) — ARCHV2-SELFTEST-CLOCK-FIX READY (docs/reviews/READY_archv2_selftest_clock_fix.md, c0e46f9: READY, MERGEABLE by path) and MERGED at 83ad26a ...\"; _as_of the commit that writes it, parent 83ad26a, re-grepped)"
+    }
+  ],
+  "does_not_show": [
+    "the limit on any other day (a ~10x swing within 8 days is documented; N* is a snapshot); a run at N > 1 needs E-5's live controls whatever N* says",
+    "anything about the reasoning deployment (JudgeBench S1, reference solves): its own quota, not probed",
+    "whether concurrency changes verdicts (no verdict compared; system_fingerprint not surfaced by rr)",
+    "whether the synthetic items are judged like real ones (only size and output length matched)",
+    "the contribution of consumers outside this machine to the limiter (X3)",
+    "the deployment's quota itself (TPM / RPM), unless rate headers are returned; the portal read is the author's (open item 1)",
+    "[2026-09-26 outcome] any daytime rate or 429 behaviour: only 22:23-22:33Z was sampled (K46 saw 82-88% of latencies above 10 s at 10-12Z; 09-24 429s at about half the 09-23 clean rate)",
+    "[2026-09-26 outcome] the limit itself: N* = 12 is a ramp-capped lower bound (knee none; remaining-requests >= 488 of 500)",
+    "[2026-09-26 outcome] a sustained window: S6 lasted 42.8 s, not the registered 1-4 min; nothing about a limiter window >= 1 min or hours of posting",
+    "[2026-09-26 outcome] the pooled poster's behaviour under throttling (Retry-After, halving, --max-rpm): 0 429s observed (A4)",
+    "[2026-09-26 outcome] that the 429 share is <= 2% (S6's CP95 at 0 of 150 is 1.98%, exactly the bound; DESCRIPTIVE)",
+    "[2026-09-26 outcome] that X1's 0-process readings are not empty snapshots (D3: process_snapshot fails open)",
+    "[2026-09-26 outcome] the reasoning deployment's headers, latency or 429s (not probed)"
+  ],
+  "ledger": {
+    "row_id": "JV2-RATE-PROBE",
+    "version": "v296 (2026-09-26: OUTCOME: an outcome bracket in the observed cell; chips BUILT ... READY PENDING [plan] -> VALID ... [ok], PLACEMENT ... [warn] -> SCOPE ... [warn], C0 SCOREABLE ... [plan] -> N* = 12 ... [ok]; a predictions chip added [warn]) | v292 (2026-09-25: the orchestrator's rulings on O1 / O2: a bracket in the observed cell; chip BUILT ... OBJECTIONS O1, O2; READY PENDING ... -> BUILT ... O1, O2 ACCEPTED ...; class plan unchanged) | v291 (2026-09-25: built + pre-data amendments: a bracket in the observed cell; chip NOT BUILT; C2 NO LONGER GATES ... -> BUILT cd57564 (UNMERGED); PRE-DATA AMENDMENTS A1-A7 ...; class plan unchanged) | v290 (2026-09-25: a bracket in the observed cell: the author's Azure readings; open item 1 answered; chips unchanged) | v286 (2026-09-25: a bracket in the observed cell: R8 met, pool merged; chips unchanged) | v276 (2026-09-25: C2 superseded for the build decision only; bracket in the observed cell; chip NOT BUILT -> NOT BUILT; C2 NO LONGER GATES ..., class plan unchanged); v272 (2026-09-25: registered; new row)"
+  },
+  "depends_on": [
+    "ARCH-V2-PILOT-K46 (its posting must end and, under R8, its outcome be written; its store's body-length quantiles)",
+    "READY-TEMPLATE-TRANSPORT (the READY's transport check (a)/(b); queue item)",
+    "JUDGEBENCH-REASONING-SIDE (X2: not on a JB posting day; its LedgerLock and wire-counter patterns)"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing; the build question C2 was moot (Amendment 24; merged 3187b6f); reopens no closed line (TEMP-0: temperature omitted; ORDER-1 / SELECTIVE-ORDER: no verdict formed)"
+  },
+  "cost": {
+    "calls_expected": 258,
+    "cce_expected": 258,
+    "calls_max": 398,
+    "cce_max": 398,
+    "ceiling": 400,
+    "machine": "about 10-30 min plus 5 x 60 s gaps; no pool DB read, no rule-7 window",
+    "agent_time": "engine-coder about 2-3 h; adversarial-reviewer about 1-1.5 h; run-operator about 45 min",
+    "source": "the specialist's 1.9; PROVISIONAL, the experiment-manager's to confirm"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L18979-L19094 (section \"## Registered 2026-09-25 (before any code or call) — JV2-RATE-PROBE: ...\"; block 2/3 verbatim between the marker lines L18983 and L19059), _as_of the commit that writes them, parent 0c10ea2, re-grepped",
+    "docs/judge_v2_program.md L18908-L18977 (section \"## Finding of record 2026-09-25 (registrar; zero calls; read-only evidence of the judge-design-specialist, recorded VERBATIM) — GROK-NR-THROUGHPUT: ...\"; block 1/3 verbatim between the marker lines L18913 and L18966), _as_of the commit that writes them, parent 0c10ea2, re-grepped",
+    "parallel_posting_registration_draft.md (the judge-design-specialist's own write, session scratchpad, not committed), sha256 8c50c0e8d28f40cdad2ee369e3a8ba4e44e0383e7c8ce195e5e1948ea57d2861 (UTF-8, LF, 0 CR, 240 lines, 42,113 bytes; registrar-verified); recorded verbatim in three contiguous blocks, sha256 block 1/3 edc3bf000e2241e6ebbf98ec83bd9683c400e1910ec2e5133dea54a108271388, 2/3 5362eb2fe7f9d0f36c027afc3d0b63b2d54d193e209942dd7f90c0ae928e0fea, 3/3 d68ddb4f67f538e8c32aaa805f27b173420815dff62db98e63dd90b9bacb07f0; concatenation re-hashed from the programme = the file",
+    "plan Amendment 23 (docs/plan_2026-09-15.md, \"## Amendment 23 (2026-09-25) — \\\"do both, start the LCB build now and register parallel posting\\\" ...\"), bracketed at this record",
+    "the orchestrator's relay of 2026-09-25 (two items; cost <= 398 / ceiling 400; placement after K46 stops posting, alone; the section-0 finding; open items 1-3)",
+    "read-only checks at HEAD 0c10ea2: sha256 of the draft; git hash-object tools/analysis/judge_v2/writer.py (6db4ab32...); IDENTITY_KEYS at writer.py L108-L111; grep of the ledger and docs/agents/results/ for JV2 / rate-probe ids (0 hits)",
+    "docs/judge_v2_program.md L19341-L19376 (section \"## Author's decisions 2026-09-25 (recorded by the registrar; zero calls; insertion only) — (1) JUDGEBENCH-REASONING-SIDE SIZE = 350 ...\"; _as_of the commit that writes it, parent 95d9821, re-grepped)",
+    "docs/plan_2026-09-15.md Amendment 24 (\"## Amendment 24 (2026-09-25) — \\\"Go for 350 and build it anyway ...\\\" ...\")",
+    "docs/judge_v2_program.md L19976-L20052 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — JV2-PARALLEL-POSTING MERGED at 3187b6f (8 paths by path from 5ece92f, blob-equal), after ... NOT READY d32fa75 ... and DELTA READY 1 10c5213 ...\"; _as_of the commit that writes it, parent ca4afcd, re-grepped)",
+    "docs/judge_v2_program.md L20164-L20220 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — BANNED-MODELS-REASON-CORRECTION MERGED at 52474d6 ... and NOISRESERVED-TEST-ALLOWLIST MERGED at 7e71cba after READY c832a16 ...\"), _as_of the commit that writes it, parent 7e71cba, re-grepped",
+    "docs/judge_v2_program.md L20222-L20309 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run; BEFORE the READY and before any data) — JV2-RATE-PROBE BUILT ... and PRE-DATA AMENDMENTS A1-A7 ...\"; _as_of the commit that writes it, parent bd5cfbb, re-grepped)",
+    "branch jv2-rate-probe at cd575646835de27bc1dede733b4f9285cb836c28 (git objects read by the registrar: blobs, LF / CRLF sha256, diff --stat against main)",
+    "docs/judge_v2_program.md line-end brackets \"[RULED 2026-09-25 by the orchestrator ...]\" at L19003, L19005, L19094 and in section L20222-L20309 (\"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run; BEFORE the READY and before any data) — JV2-RATE-PROBE BUILT ... and PRE-DATA AMENDMENTS A1-A7 ...\") at L20256, L20258, L20259, L20265, L20267, L20277, L20281, L20287, L20296, L20309; _as_of the commit that writes them, parent d10e029, re-grepped",
+    "docs/judge_v2_program.md L20478-L20556 (section \"## JV2-RATE-PROBE (2026-09-26, 398 calls) — VALID (post-run review 6ea4f02): C0 HELD, V5 HELD; N* = 12 ...\"; _as_of the commit that writes it, parent ef045a1, re-grepped)",
+    "experiment_results/jv2_rate_probe/JV2_RATE_PROBE_outcome.txt (b0c231c; blob:15f40a54 / sha256-lf16:71070843af1db4d8 / sha256-crlf16:59a3b8634e99d08d)",
+    "docs/reviews/POSTRUN_jv2_rate_probe.md (6ea4f02; blob:d9099ad4)",
+    "docs/reviews/READY_jv2_rate_probe.md (a34642c; blob:08ed39f6)",
+    "experiment_results/day_calls_2026-09-26.json (b0c231c): JV2-RATE-PROBE pilot#1 12 + run#2 386",
+    "experiment_results/jv2_rate_probe/dryrun_stdout_transcript.txt (b0c231c): day 2026-09-26 total 0 + 400 = 400 of 14000",
+    "E:\\TaxoArena_backup_2026-09-25\\jv2_rate_probe\\SHA256SUMS (sha256sum -c: 5 / 5 OK, registrar 2026-09-26)",
+    "docs/judge_v2_program.md L20846-L20862 (section \"## Registrar's record 2026-09-26 (insertion only; zero calls; nothing run) — ARCHV2-SELFTEST-CLOCK-FIX READY (docs/reviews/READY_archv2_selftest_clock_fix.md, c0e46f9: READY, MERGEABLE by path) and MERGED at 83ad26a ...\"; _as_of the commit that writes it, parent 83ad26a, re-grepped)"
+  ],
+  "last_update": "2026-09-26 (registrar: OUTCOME recorded; READY a34642c and merge b19b8fb recorded late; post-run review 6ea4f02 VALID; state done; ledger v296); 2026-09-26 (registrar: M2 discharged by ARCHV2-SELFTEST-CLOCK-FIX 83ad26a; ledger v299)",
+  "author_decisions": [
+    {
+      "date": "2026-09-25",
+      "words_verbatim": "Go for 350 and build it anyway I'll find a way to increase the quota",
+      "relayed_by": "orchestrator",
+      "question": "open item 2: build JV2-PARALLEL-POSTING even if G < 1.5?",
+      "decision": "YES (C2's override, for the build decision only); the probe still runs to measure the deployment; open item 1 (portal quota) not answered; the author intends to raise the quota",
+      "amendment": "plan Amendment 24",
+      "programme": "docs/judge_v2_program.md L19341-L19376 (section \"## Author's decisions 2026-09-25 (recorded by the registrar; zero calls; insertion only) — (1) JUDGEBENCH-REASONING-SIDE SIZE = 350 ...\"; _as_of the commit that writes it, parent 95d9821, re-grepped)"
+    }
+  ],
+  "build": {
+    "relayed_tests": "selftest 109 checks, 0 failed; 21 / 21 mutants killed (15 by check, 6 by exception); python and -O; the other accepted_tests_ledger-importing selftests pass except induce_run_selftest and induce_run_2_selftest, failing identically on main (F7, pre-existing); Gradle 451 tests, only the 2 known worktree failures (relayed; not re-run by the registrar)",
+    "dry_run": "0 calls: transport preflight OK (booleans + deployment name); LIVE, ADMITTED; K46 body quantiles q10/q50/q90 = 4,581 / 5,369 / 6,805 bytes (user = body - 2,735); system turn = K46's; content gate 0 hits; X1/X2 OK; plan S1 N=1: 24 (pilot 12), S2 N=2: 36, S3 N=4: 48, S4 N=8: 64, S5 N=12: 76, S6 N*: 150; <= 398 invocations, ceiling 400; (iii) 5,354 + 400 = 5,754 of 14,000; plan sha256 b2177cd172eacab59df2e72b6276fe25768c8fc610d623e5051e90b96f09f86f (PRE-PATCH; expected unchanged by RC1-RC5, may change: RC0) (relayed)",
+    "deviations_from_brief": [
+      "D-1 judge_v2/pool.py is not the poster (rr posts at a fixed N with its own retries, as registered); only LedgerLock and helpers reused; CONSISTENT",
+      "D-2 the preflight prints booleans plus the deployment name; CONSISTENT (the READY checks no key / URL / host beyond G4)",
+      "D-3 X2 refuses only a JudgeBench day; a K46 day is printed, not refused; CONSISTENT (X1 needs K46 finished); ratified by A6"
+    ],
+    "reachability_findings": [
+      "F1 CONFIRMED: registered (c) reduces to p95(S1) <= 10 s at S1; K46 run2 (the builder's reading) median 3.63 s, p95 10.68 s, 5.46% > 10 s; P(nearest-rank p95 of 24 > 10 s) = 1 - 0.2599 - 0.3602 = 0.380; S2-S6 0.47-0.60 and P(S3 admissible) about 0.13 relayed (simulation); on a 09-25-like day N* = 1 for a latency reason and P1 (i) holds vacuously",
+      "F2 CONFIRMED: at 2%, one 429 in S1-S3 (1/25, 1/37, 1/49) is inadmissible; S4 and S5 admit one, S6 three",
+      "F3 CONFIRMED: every 429 counts alike and rr ignores Retry-After: N* does not transfer as-is to a pool that honours Retry-After",
+      "F4 CONFIRMED: 8 -> 12 needs 1.3 / 1.5 = 86.7% scaling efficiency",
+      "F5 arithmetic confirmed, hypothesis NOT established: 500,000 TPM / (8,192 + about 1,400) = about 52 calls/min, reached at S3; bracketed as too pessimistic at v290"
+    ]
+  },
+  "amendments": [
+    {
+      "id": "A1",
+      "by": "orchestrator (pre-data)",
+      "text": "keep the registered N ladder; the 20/30/40/60 rpm ladder is not a probe arm (its own registration, the first gate-(3) rate-flagged pooled run)",
+      "registrar": "CONSISTENT; no code change"
+    },
+    {
+      "id": "A2",
+      "by": "orchestrator (pre-data)",
+      "text": "admissibility (c) becomes p95(step) <= 2 x p95(S1), S1 exempt from (c), the absolute 10 s cap removed; rationale: the probe measures whether concurrency degrades service, not the day's baseline latency",
+      "registrar": "cap removal and S1 exemption CONSISTENT, they remove F1's vacuity; S6 stays subject to (c); OBJECTION O2 on the factor 2; the falsifier NOT amended (1.5 x p95(S1)); code RC1",
+      "ruling": "[RULED 2026-09-25 by the orchestrator: O2 ACCEPTED; A2 REVISED: only the absolute 10 s cap in (c) is removed and S1 is exempt from (c); the registered relative factor 1.5 x p95(S1) is KEPT; S6 not exempt; the 2x loosening WITHDRAWN; admissibility (c) and the falsifier use the same factor 1.5; no null-rate resampling needed]",
+      "effective": "(c): p95(step) <= 1.5 x p95(S1) for S2-S6; S1 exempt; no absolute cap"
+    },
+    {
+      "id": "A3",
+      "by": "orchestrator (pre-data)",
+      "text": "(a) becomes 429 share <= 2% OR at most 1 HTTP 429 in the step; (b), the within-step aborts and P2 unchanged",
+      "registrar": "CONSISTENT with Support (e) (the MDE computed at <= 1 of 48); disclosed: P(a 10% regime passes (a)) S1 0.080 -> 0.293, S2 0.023 -> 0.113, S3 0.0064 -> 0.040, S4-S6 unchanged; the falsifier's share <= 2% stays literal; code RC2"
+    },
+    {
+      "id": "A4",
+      "by": "orchestrator (pre-data)",
+      "text": "every 429 counts for admissibility (the probe reads the day); the quota-vs-capacity split (provider message, x-ratelimit-remaining) descriptive only; the words of record carry the qualifier that N* is measured under rr's retry schedule and does not transfer as-is to a pool that honours Retry-After",
+      "registrar": "CONSISTENT; the qualifier binds the outcome, the ledger sentence, sentence_of_record and any gate-(3) use of N*; code RC3"
+    },
+    {
+      "id": "A5",
+      "by": "orchestrator (pre-data)",
+      "text": "ratify the builder's readings where the registration is silent: (i) size unit = body bytes (user = body - 2,735); (ii) p95 nearest-rank; (iii) C1 literal 'largest N that qualifies'; (iv) S6 drop to the previous ramp step; (v) G from the ramp-step rate; (vi) S1 wall = sum of its pilot and run segments; (vii) orphans and not-sent slots never re-posted; (viii) (iii) literal; (ix) abort stops new reservations only",
+      "registrar": "CONSISTENT except (iv): OBJECTION O1",
+      "ruling": "[RULED 2026-09-25 by the orchestrator: O1 ACCEPTED; (iv) REPLACED by RC5 (a): on an inadmissible S6, N* drops to the largest ramp step below N*'s step that qualified under C1, otherwise S1 (N* = 1); (i)-(iii), (v)-(ix) stand]"
+    },
+    {
+      "id": "A6",
+      "by": "orchestrator (pre-data; operator rule)",
+      "text": "the probe and JudgeBench never post on the same day, in either direction; the probe may post on a K46 day, as registered, provided K46 has 0 unresolved",
+      "registrar": "probe side = registered X2; the reverse direction is a NEW OPERATOR CONDITION on JUDGEBENCH-REASONING-SIDE's launch (not an amendment of its registration), not mechanically enforced by the JudgeBench runner: the run-operator checks the day ledger for JV2-RATE-PROBE rows before any JudgeBench launch; bracketed into JUDGEBENCH-REASONING-SIDE.json, its queue item and its ledger row"
+    },
+    {
+      "id": "A7",
+      "by": "orchestrator (pre-data)",
+      "text": "the builder's diagnostics (provider error code, first 160 characters of 429/5xx bodies, header names only, never api-key) are descriptive",
+      "registrar": "CONSISTENT; x-ratelimit-* / retry-after-ms NAMES AND VALUES are still recorded as registered (1.3, 1.4); the READY checks the redaction (RC4)"
+    }
+  ],
+  "objections": [
+    {
+      "id": "O1",
+      "on": "A5 (iv)",
+      "text": "the S6 drop to 'the previous ramp step' can assign an N* that C1's 1.3x rule rejected (the builder's selftest branch D: N* = 4 with S2 < 1.3x over S1 -> the drop gives 2, C1 gives 1); C1 (the decision rule of record, R2) read with S6 gives the largest qualifying N below, else 1; the readings coincide whenever the previous step qualified. Recommended: RC5 (a); if A5 (iv) is kept, RC5 (b) prints the C1 reading beside it when they differ. The decision stands unless the orchestrator changes it before the READY.",
+      "status": "ACCEPTED 2026-09-25 by the orchestrator; RESOLVED",
+      "resolution": "RC5 (a) applies; RC5 (b) moot"
+    },
+    {
+      "id": "O2",
+      "on": "A2",
+      "text": "the factor change 1.5 -> 2.0 loosens the registered relative bar, which F1 (the absolute 10 s cap) does not implicate; a reason may exist (the spread of a nearest-rank p95 at n = 24-36) but is not shown. Recommended: keep 1.5 x (remove only the cap, exempt S1), or show before the READY, at zero calls, the null rate P(p95(S_k) > f x p95(S1)) for f = 1.5 and 2.0 by resampling K46 run2's N = 1 latencies. The decision stands as A2 unless the orchestrator changes it before the READY.",
+      "status": "ACCEPTED 2026-09-25 by the orchestrator; RESOLVED",
+      "resolution": "A2 revised to the registered factor 1.5 x p95(S1), only the 10 s cap removed and S1 exempt; resampling moot"
+    }
+  ],
+  "required_code_changes": [
+    "RC0 re-pin: the plan sha is expected unchanged (digest over [idx, step, cls, body sha] + SEED + targets; build_plan untouched) but MAY CHANGE; the READY re-runs the dry-run at 0 calls and its printed plan sha is of record for --expect-plan-sha; both files re-pinned in three kinds",
+    "RC1 (A2) jv2_rate_probe.py: P95_REL_FACTOR = 2.0 for admissibility, FALSIFIER_P95_FACTOR = 1.5 for the falsifier only; admissible(): S1 exempt from (c) (note '(c) exempt (A2)'), otherwise inadmissible iff p95_s1 None, lat_p95 None or lat_p95 > 2 x p95_s1; S6 not exempt; the callers decide / next_action / analyze keep their signatures (st['step']); score()'s falsifier reads 1.5; analyze() prints the amended rule; the docstring ADMISSIBILITY paragraph gets a dated bracket (insertion only); selftest: branch E inverted, branch F re-based at the 2x boundary, new checks (S1 at 30 s admissible on (c); S6 subject; p95_s1 None; S3 at 1.8x admissible with the falsifier NOT FIRED), new mutants killed (cap back, factor 1.5, S1 not exempt, S6 exempt, falsifier on the admissibility factor)",
+    "RC2 (A3) jv2_rate_probe.py: ADMIT_429_MAX_COUNT = 1; admissible() (a) inadmissible iff share > 0.02 AND n429 > 1; FALSIFIER_429_SHARE = 0.02 literal in score(); the aborts (3 exhausted, 10 HTTP-429), (b) and P2 unchanged; selftest: 1 x 429 in S3 (49) admissible, 2 x 429 in S3 inadmissible, 1 x 429 in S4 admissible, S3 >= 50/min with one 429 admissible and the falsifier NOT FIRED; mutants killed (OR dropped, OR as AND, bound 2, falsifier on the OR)",
+    "RC3 (A4) analyze(): the retry-schedule qualifier printed verbatim beside N* and G; the provider-error / x-ratelimit-remaining line labelled DESCRIPTIVE (A4); a selftest check on both strings",
+    "RC4 (A7) no logic change; the READY checks the redaction of the 160-character excerpts and the header lists",
+    "RC5 (O1) decide(): (a) if O1 is adopted, drop to the largest ramp step below N*'s that qualified under C1, else S1; (b) if A5 (iv) is kept, print the C1-literal drop beside N* when it differs (DESCRIPTIVE); a selftest check on branch D with an inadmissible S6",
+    "[RULED 2026-09-25 by the orchestrator: RC1 AT 1.5 (P95_REL_FACTOR = 1.5; FALSIFIER_P95_FACTOR a separate constant, also 1.5; every '2 x p95(S1)' in RC1 reads '1.5 x p95(S1)'); selftest at 1.5: branch F as built with a 6.0 / 6.01 boundary check; 'S3 at 1.8x admissible' VOID, replaced by 'S3 at 1.5x admissible, falsifier FIRES at >= 50/min with 0 429s'; the mutants 'factor 1.5 in admissible()' and 'falsifier reading P95_REL_FACTOR' are EQUIVALENT at equal values and dropped; a mutant P95_REL_FACTOR = 2.0 must be killed; RC5 (a) APPLIES, RC5 (b) moot; the builder applies RC1 (1.5), RC2, RC3 and RC5 (a) now; the READY follows on the patched pins (RC0)]"
+  ],
+  "findings_build": [
+    "F6 (registrar): V5's bytes leg holds by construction (bodies padded exactly to K46's quantiles, classes cycled): the realism claim of V5 / P5 rests on the completion-tokens leg; stated beside V5 and P5 in the outcome",
+    "F7 (builder, relayed): induce_run_selftest and induce_run_2_selftest fail identically on main (a jv2-induce-5 vs -4 version pin); pre-existing",
+    "F8 (builder): after the merge every accepted_tests_ledger guard caller's (iii) line gains '+ JV2-RATE-PROBE 0' (printed text only; JudgeBench's dry350.txt no longer byte-matches on that line)",
+    "F9 (registrar): accepted_tests_ledger.py is CRLF in the worktree; the blob of record is the LF blob b90e64dc"
+  ],
+  "findings_outcome": [
+    "D1 MEDIUM (review): C6 absent from the write-once outcome; recorded in the programme (item 4)",
+    "D2 MEDIUM (review): scope carry-forward; the review's section 4 recorded verbatim (item 5)",
+    "D3 LOW (review): process_snapshot() (data_v2/build.py L78-95) returns [] on empty PowerShell output -> '0 processes -> OK': fails open; fix: fail closed when the snapshot lacks the caller's own PID",
+    "D4 LOW (review): the committed probe DB stores the opaque x-ratelimit-key value (27 chars, 1 distinct); not the api-key, not the host (0 of 12 needles)",
+    "M2 (review section 3 item 1): archv2_pilot/selftest.py (blob:82ee9cde) fails after 2026-09-25 (TODAY L126; L886 wrap_call without clock=); 148 of 282 checks executed; identical pre-merge 7c6c588; fix clock=lambda: TODAY REQUIRED before any archv2 READY or M-check; queue ARCHV2-SELFTEST-CLOCK-FIX",
+    "GATE (3) recommendation (the reviewer's; NOT registered): daytime --post-workers 8 --max-rpm 60 (pilot 12 at N = 8); night --post-workers 12 --max-rpm 120 only after a clean first run at 60; never above 12 workers or 210 rpm; --request-timeout-s 120, --breaker-k 8"
+  ],
+  "plain_description": {
+    "sq": "Engineering/infrastructure",
+    "what": "Sends up to 398 synthetic judge requests to the grok-4-1-fast-non-reasoning deployment at 1, 2, 4, 8 and 12 parallel calls, measuring throughput, rate-limit errors and latency.",
+    "why": "Decides whether it is worth building a parallel caller to make judged runs faster; it says nothing about judge quality.",
+    "information": "A large speed-up would support parallel posting. None would keep runs sequential. Result: done. On one night, 12 parallel calls ran about 10x faster than 1, with zero rate-limit errors. The registered falsifier fired: the good conditions of an earlier night had returned. The decision to build the parallel caller had already been taken by the author regardless of this result, so the probe measures the limit rather than deciding the build. 12 is a lower bound, measured on one night only and on the non-reasoning model only. It licenses no daytime run, where limits were much worse earlier.",
+    "written": "2026-10-07"
+  }
+}

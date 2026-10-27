@@ -1,0 +1,56 @@
+[15:26:18] CHAIN start (dry=0) HEAD 64ae3cf | order I2 i2 (af_clean_s42_inert), R1' af_clean_s42_k105, R2' af_s137_k105, R3' af_s2048_k105 | all four run regardless
+[15:26:18] PREFLIGHT no tools/analysis python reader running
+[15:26:18] PREFLIGHT no non-daemon JVM running
+[15:26:19] PREFLIGHT K-SELECTION merge 967a936 is an ancestor of HEAD 64ae3cf
+[15:26:19] PREFLIGHT src/ clean
+[15:26:19] PREFLIGHT pool guard: python tools/analysis/pool_guard.py --pool p2dca21ab5f4ef3ae
+[15:26:19] PREFLIGHT pool guard OK: pool p2dca21ab5f4ef3ae OK: experiment_configs/reserved_pool_frozen_p2dca.json hashes to it; reserved_pool rows in mmlu_pro_dataset_cache_v2.db agree
+[15:26:19] PREFLIGHT config af_clean_s42_inert = base af_clean_s42 + outputDir only (key ABSENT; comment-stripped diff OK)
+[15:26:19] PREFLIGHT config af_clean_s42_k105 = base af_clean_s42 + outputDir + 'proposalAcceptMultiplier = 1.05' (comment-stripped diff OK)
+[15:26:19] PREFLIGHT config af_s137_k105 = base af_s137 + outputDir + 'proposalAcceptMultiplier = 1.05' (comment-stripped diff OK)
+[15:26:19] PREFLIGHT config af_s2048_k105 = base af_s2048 + outputDir + 'proposalAcceptMultiplier = 1.05' (comment-stripped diff OK)
+[15:26:20] PREFLIGHT inertness checker selftest: I2 INERTNESS VERDICT: INERT (C0 / P6 HELD)
+[15:26:20] PREFLIGHT outputs are new dirs under experiment_results/anchorfree/redraw/kselect (nothing of record is overwritten); ctrl experiment_results/anchorfree/af/seed_42 + experiment_results/anchorfree/site_null_af_s42.csv; I2 reference experiment_results/anchorfree/redraw/af_clean_s42/seed_42 (snapshot 20260917_201353_Headless_Run_Auto_ge)
+[15:26:20] ==== ARM i2 (config af_clean_s42_inert, seed dir seed_42, inert) ====
+[15:26:20] i2 BUILD start  config experiment_configs/anchorfree/redraw/kselect/af_clean_s42_inert.toml  ratings db experiment_results/anchorfree/redraw/kselect/ratings_i2.db  -> experiment_results/anchorfree/redraw/kselect/i2/seed_42
+[15:28:13] i2 BUILD exit 0 | Snapshot ID: 20260919_152750_Headless_Run_Auto_ge | [SPLIT-CLOSURE] 171 train item | leaves=82 | [SLICE] embedding slice width = 256, split PCA dropTop=0 whiten=false
+[15:28:13] i2 BUILD [K-SELECTION] lines: 0 | manifest proposal_accept_multiplier: "proposal_accept_multiplier": 1.0 | bar_eff NO-SPLIT lines: 0
+[15:28:14] I2 INERTNESS k_selection_inert.py --i2 experiment_results/anchorfree/redraw/kselect/i2/seed_42 --r1 experiment_results/anchorfree/redraw/af_clean_s42/seed_42 --r1-null experiment_results/anchorfree/redraw/site_null_af_clean_s42.csv
+[15:28:14] I2 INERTNESS exit 0 -> INERT | leaf member sets (multiset of frozenset(queryIds), node ids free to permute): 0 only in I2, 0 only in R1, 0 multiplicity differences -> 0 differences
+[15:28:14] ==== ARM af_clean_s42_k105 (config af_clean_s42_k105, seed dir seed_42, primed) ====
+[15:28:15] af_clean_s42_k105 BUILD start  config experiment_configs/anchorfree/redraw/kselect/af_clean_s42_k105.toml  ratings db experiment_results/anchorfree/redraw/kselect/ratings_af_clean_s42_k105.db  -> experiment_results/anchorfree/redraw/kselect/af_clean_s42_k105/seed_42
+[15:30:08] af_clean_s42_k105 BUILD exit 0 | Snapshot ID: 20260919_152946_Headless_Run_Auto_ge | [SPLIT-CLOSURE] 171 train item | leaves=73 | [SLICE] embedding slice width = 256, split PCA dropTop=0 whiten=false
+[15:30:08] af_clean_s42_k105 BUILD [K-SELECTION] lines: 2 | manifest proposal_accept_multiplier: "proposal_accept_multiplier": 1.05 | bar_eff NO-SPLIT lines: 218
+[15:30:09] af_clean_s42_k105 SITENULL start snapshot 20260919_152946_Headless_Run_Auto_ge (sliceDim 256 dropTop 0 whiten false reps 300) -> experiment_results/anchorfree/redraw/kselect/site_null_af_clean_s42_k105.csv
+[15:57:50] af_clean_s42_k105 SITENULL exit 0 -> 14 60 reps=300
+[15:57:50] af_clean_s42_k105 READOUT anchor_free_readout.py experiment_results/anchorfree/redraw/kselect/af_clean_s42_k105/seed_42 vs experiment_results/anchorfree/af/seed_42 (unprimed twin: experiment_results/anchorfree/redraw/af_clean_s42)
+[15:58:10] af_clean_s42_k105 READOUT exit 0 |  certified sites (site null, cert_site_p95) 14 of 60 sites (defl 28; 300 reps) 16 of 69 sites (defl 35; 300 reps)
+[15:58:10] ==== ARM af_s137_k105 (config af_s137_k105, seed dir seed_137, primed) ====
+[15:58:10] af_s137_k105 BUILD start  config experiment_configs/anchorfree/redraw/kselect/af_s137_k105.toml  ratings db experiment_results/anchorfree/redraw/kselect/ratings_af_s137_k105.db  -> experiment_results/anchorfree/redraw/kselect/af_s137_k105/seed_137
+[16:00:05] af_s137_k105 BUILD exit 0 | Snapshot ID: 20260919_155942_Headless_Run_Auto_ge | [SPLIT-CLOSURE] 164 train item | leaves=75 | [SLICE] embedding slice width = 256, split PCA dropTop=0 whiten=false
+[16:00:05] af_s137_k105 BUILD [K-SELECTION] lines: 2 | manifest proposal_accept_multiplier: "proposal_accept_multiplier": 1.05 | bar_eff NO-SPLIT lines: 225
+[16:00:06] af_s137_k105 SITENULL start snapshot 20260919_155942_Headless_Run_Auto_ge (sliceDim 256 dropTop 0 whiten false reps 300) -> experiment_results/anchorfree/redraw/kselect/site_null_af_s137_k105.csv
+[16:27:49] af_s137_k105 SITENULL exit 0 -> 16 59 reps=300
+[16:27:50] af_s137_k105 READOUT anchor_free_readout.py experiment_results/anchorfree/redraw/kselect/af_s137_k105/seed_137 vs experiment_results/anchorfree/af/seed_42 (unprimed twin: experiment_results/anchorfree/redraw/af_s137)
+[16:28:12] af_s137_k105 READOUT exit 0 |  certified sites (site null, cert_site_p95) 16 of 59 sites (defl 29; 300 reps) 16 of 69 sites (defl 35; 300 reps)
+[16:28:12] ==== ARM af_s2048_k105 (config af_s2048_k105, seed dir seed_2048, primed) ====
+[16:28:13] af_s2048_k105 BUILD start  config experiment_configs/anchorfree/redraw/kselect/af_s2048_k105.toml  ratings db experiment_results/anchorfree/redraw/kselect/ratings_af_s2048_k105.db  -> experiment_results/anchorfree/redraw/kselect/af_s2048_k105/seed_2048
+[16:30:06] af_s2048_k105 BUILD exit 0 | Snapshot ID: 20260919_162940_Headless_Run_Auto_ge | [SPLIT-CLOSURE] 195 train item | leaves=71 | [SLICE] embedding slice width = 256, split PCA dropTop=0 whiten=false
+[16:30:06] af_s2048_k105 BUILD [K-SELECTION] lines: 2 | manifest proposal_accept_multiplier: "proposal_accept_multiplier": 1.05 | bar_eff NO-SPLIT lines: 193
+[16:30:07] af_s2048_k105 SITENULL start snapshot 20260919_162940_Headless_Run_Auto_ge (sliceDim 256 dropTop 0 whiten false reps 300) -> experiment_results/anchorfree/redraw/kselect/site_null_af_s2048_k105.csv
+[16:58:05] af_s2048_k105 SITENULL exit 0 -> 13 57 reps=300
+[16:58:06] af_s2048_k105 READOUT anchor_free_readout.py experiment_results/anchorfree/redraw/kselect/af_s2048_k105/seed_2048 vs experiment_results/anchorfree/af/seed_42 (unprimed twin: experiment_results/anchorfree/redraw/af_s2048)
+[16:58:25] af_s2048_k105 READOUT exit 0 |  certified sites (site null, cert_site_p95) 13 of 57 sites (defl 24; 300 reps) 16 of 69 sites (defl 35; 300 reps)
+[16:58:25] ==== K-SELECTION READOUT ====
+[16:58:29] K-SELECTION READOUT exit 0 (log experiment_results/anchorfree/redraw/kselect/k_selection_readout.log; outcome experiment_results/anchorfree/redraw/kselect/k_selection_outcome.txt)
+[16:58:29] SWEEP DONE
+[16:58:29] ---- SUMMARY ----
+[16:58:29] I2: I2 INERTNESS VERDICT: INERT (C0 / P6 HELD)
+[16:58:30] af_clean_s42_k105: leaves=73 | "proposal_accept_multiplier": 1.05 | NO-SPLIT lines carrying bar_eff 218 | certified/sites 14 60 reps=300 | unprimed af_clean_s42: 14 69 reps=300
+[16:58:30] af_s137_k105: leaves=75 | "proposal_accept_multiplier": 1.05 | NO-SPLIT lines carrying bar_eff 225 | certified/sites 16 59 reps=300 | unprimed af_s137: 12 64 reps=300
+[16:58:30] af_s2048_k105: leaves=71 | "proposal_accept_multiplier": 1.05 | NO-SPLIT lines carrying bar_eff 193 | certified/sites 13 57 reps=300 | unprimed af_s2048: 10 66 reps=300
+[16:58:30] tracked files modified (must be only the two standing local edits .gitignore / config/application.yml):
+[16:58:30]   M .gitignore
+[16:58:30]   M config/application.yml
+[16:58:30] snapshots_frozen.db sha256: 3f7f5e9a470baba3
+[16:58:30] verify: python tools/analysis/pool_guard.py --pool p2dca21ab5f4ef3ae; python tools/analysis/k_selection_inert.py --i2 experiment_results/anchorfree/redraw/kselect/i2/seed_42; ls experiment_results/anchorfree/redraw/kselect

@@ -1,0 +1,172 @@
+reserved_pool_id=p2dca21ab5f4ef3ae
+=== JUDGE-BY-CELL: is there any cell in which one cheap judge beats another by more than the test-retest floor, stably across draws? ===
+  registered 2026-09-18 (docs/judge_v2_program.md L7355-L7493, commit 137cb30) before this script; zero judge calls; caches mode=ro; run 2026-09-19 00:10:37
+  bar |delta| > 0.057 AND question-clustered 95% CI excluding 0 under BOTH conventions (A: TIE / INVALID / NON_TERMINATED wrong; B: the pair's both-committed matches)
+  bootstrap B = 1000, seed 42, questions resampled within the anchor; boards B = 1000; lever halvings 100, seed 42; a cell under 120 key-decidable QUESTIONS is UNDETERMINED (printed, not scored)
+
+--- data objects ---
+  tree bareq512_s42 snapshot 20260909_212117_Headless_Run_Auto_ge | 158 nodes | 3445 routed pool questions | 14 anchors | 87 leaves
+  cache M   Mistral-Large-3, Python (ARENA-V2 x12all)                      experiment_results/x12_crossdomain/stack_v2_promptv2_x12all.db | 9142 rows (pinned 9142) | INVALID column 0 | finish columns no | rule-10 reclassified 0 | questions 2811
+  cache GP  grok-4-1-fast-non-reasoning, Python (GROK-CALIB)               experiment_results/x12_crossdomain/grok_calib.db | 9142 rows (pinned 9142) | INVALID column 11 | finish columns yes | rule-10 reclassified 1 | questions 2811
+  cache GK  grok-4-1-fast-non-reasoning, Kotlin production path (JUDGE-WIRING-BOARD) experiment_results/judge_wiring/board/kotlin_c0d3f708cbc3930e.db | 9123 rows (pinned 9123) | INVALID column 17 | finish columns yes | rule-10 reclassified 0 | questions 2801
+  common set vs M : 19 matches of M not in Kotlin, of which 19 reference-less (ref_correct = -1); reference-less in M overall 19
+  common set vs GP: 19 matches of GP not in Kotlin, of which 19 reference-less (ref_correct = -1); reference-less in GP overall 19
+  identity on the common set (9123 matches): (model_a, model_b, qid) disagree on 0 | anchor column disagrees across caches on 0
+  Kotlin ref_correct joined from x12 by match_id on 9123 matches | ref_letter disagreements before the join 0 | GROK-CALIB ref_correct == x12 ref_correct on 9123 of 9123
+  anchor column check: every common-set row of every cache equals anchor_fn(route[qid]) on bareq512_s42
+  key: roster 46 models (Meta-Llama-3-70B-Instruct excluded) | OPTIONS-key join eval_results -> mmlu_pro on the 2801 judged questions: 1:1 2678 | multi 3 | none 120 | gt_answer == mmlu_pro.answer on 2671 of 2678
+  hygiene: x12 ref_correct column vs (ref_letter == eval gt_answer) disagree on 21 of 9123 common matches (the column is the kit's grade; used as is)
+  common set: 9123 matches | 2801 judged questions | 4495 key-decidable matches | 14 anchors | models 12
+  x20 (Mistral only, a different schedule): excluded by construction; leaves: no leaf row (support rule 120 kd questions; ~32 judged per leaf)
+
+--- (i) per anchor, per judge: key-decidable accuracy, decisiveness, wrong(established) ---
+  columns: kd matches / kd questions | per judge accA (n = kd matches), accB (n = the judge's committed kd), decidable tie rate, flip rate (valid kd), INVALID rows | board: wrong(established) / wrong / called edges
+    cell Biology          done | kd matches 298 | kd questions 115 | UNDETERMINED (< 120 kd questions)
+    cell Business         done | kd matches 157 | kd questions 103 | UNDETERMINED (< 120 kd questions)
+    cell Chemistry        done | kd matches 387 | kd questions 193
+    cell Computer science done | kd matches 302 | kd questions 132
+    cell Economics        done | kd matches 295 | kd questions 119 | UNDETERMINED (< 120 kd questions)
+    cell Engineering      done | kd matches 192 | kd questions 105 | UNDETERMINED (< 120 kd questions)
+    cell Health           done | kd matches 214 | kd questions 100 | UNDETERMINED (< 120 kd questions)
+    cell History          done | kd matches 186 | kd questions 80 | UNDETERMINED (< 120 kd questions)
+    cell Law              done | kd matches 314 | kd questions 190
+    cell Math             done | kd matches 656 | kd questions 257
+    cell Other            done | kd matches 363 | kd questions 147
+    cell Philosophy       done | kd matches 176 | kd questions 88 | UNDETERMINED (< 120 kd questions)
+    cell Physics          done | kd matches 601 | kd questions 229
+    cell Psychology       done | kd matches 354 | kd questions 167
+
+  anchor            kd_m  kd_q | M   accA   accB(n)      tie   flip  inv  w_est/w/called | GP  accA   accB(n)      tie   flip  inv  w_est/w/called | GK  accA   accB(n)      tie   flip  inv  w_est/w/called
+  Biology            298   115 | M   0.886  0.930( 284)  0.047  0.047    0  0/0/58 | GP  0.889  0.950( 279)  0.064  0.060    0  0/0/58 | GK  0.886  0.946( 279)  0.064  0.064    0  0/0/58  UNDETERMINED
+  Business           157   103 | M   0.898  0.953( 148)  0.057  0.057    0  0/0/46 | GP  0.873  0.945( 145)  0.076  0.076    0  0/0/47 | GK  0.873  0.951( 144)  0.077  0.077    2  0/0/48  UNDETERMINED
+  Chemistry          387   193 | M   0.876  0.936( 362)  0.065  0.065    0  0/2/60 | GP  0.850  0.927( 355)  0.083  0.075    0  0/1/58 | GK  0.873  0.939( 360)  0.067  0.060    3  0/1/58
+  Computer science   302   132 | M   0.838  0.927( 273)  0.096  0.096    0  0/0/51 | GP  0.831  0.906( 277)  0.077  0.077    2  0/0/54 | GK  0.828  0.912( 274)  0.090  0.086    1  0/0/54
+  Economics          295   119 | M   0.915  0.957( 282)  0.044  0.044    0  0/0/52 | GP  0.915  0.957( 282)  0.044  0.044    1  0/0/53 | GK  0.922  0.968( 281)  0.047  0.047    0  0/0/56  UNDETERMINED
+  Engineering        192   105 | M   0.786  0.904( 167)  0.130  0.094    0  0/0/51 | GP  0.781  0.882( 170)  0.115  0.083    0  0/0/54 | GK  0.781  0.888( 169)  0.115  0.105    1  0/0/51  UNDETERMINED
+  Health             214   100 | M   0.827  0.889( 199)  0.070  0.070    0  0/0/49 | GP  0.822  0.871( 202)  0.047  0.047    2  0/0/51 | GK  0.804  0.869( 198)  0.070  0.070    3  0/0/50  UNDETERMINED
+  History            186    80 | M   0.688  0.762( 168)  0.097  0.091    0  0/2/51 | GP  0.710  0.754( 175)  0.059  0.054    0  0/1/49 | GK  0.720  0.753( 178)  0.043  0.038    0  0/1/48  UNDETERMINED
+  Law                314   190 | M   0.822  0.890( 290)  0.076  0.076    0  3/4/59 | GP  0.847  0.902( 295)  0.061  0.054    0  1/2/55 | GK  0.850  0.908( 294)  0.064  0.064    1  1/2/54
+  Math               656   257 | M   0.913  0.961( 623)  0.050  0.046    0  0/0/59 | GP  0.898  0.959( 614)  0.061  0.052    3  0/0/58 | GK  0.904  0.956( 620)  0.052  0.047    3  0/0/59
+  Other              363   147 | M   0.843  0.903( 339)  0.066  0.066    0  1/2/53 | GP  0.829  0.907( 332)  0.080  0.072    2  1/4/52 | GK  0.829  0.912( 330)  0.091  0.083    1  1/2/51
+  Philosophy         176    88 | M   0.795  0.915( 153)  0.131  0.131    0  0/0/44 | GP  0.807  0.910( 156)  0.114  0.102    1  0/0/45 | GK  0.812  0.917( 156)  0.114  0.102    0  0/0/42  UNDETERMINED
+  Physics            601   229 | M   0.864  0.927( 560)  0.068  0.067    0  0/1/62 | GP  0.867  0.937( 556)  0.075  0.073    0  0/0/60 | GK  0.870  0.927( 564)  0.062  0.060    1  0/0/60
+  Psychology         354   167 | M   0.808  0.877( 326)  0.079  0.079    0  0/0/52 | GP  0.802  0.869( 327)  0.074  0.062    1  1/1/53 | GK  0.811  0.870( 330)  0.065  0.057    1  1/1/54
+
+--- (i)-(iii) per anchor, per pairing: paired differences (first minus second), CI, exact McNemar (b / c / p), bar, sign ---
+  the GP-vs-GK row is the empirical same-judge floor for the cell (identical judge, identical bytes)
+  Biology (kd matches 298, kd questions 115; UNDETERMINED by support)
+    M-GP     A -0.003 [-0.026, +0.021] McNemar   9/ 10 p=1 no | B (n= 270) -0.004 [-0.017, +0.008] McNemar   1/  2 p=1 no | clears bar under both: no
+    M-GK     A +0.000 [-0.032, +0.035] McNemar   9/  9 p=1 no | B (n= 269) -0.004 [-0.017, +0.008] McNemar   1/  2 p=1 no | clears bar under both: no
+    GP-GK    A +0.003 [-0.017, +0.028] McNemar   7/  6 p=1 no | B (n= 271) +0.000 [+0.000, +0.000] McNemar   0/  0 p=1 no | clears bar under both: no  <- floor
+  Business (kd matches 157, kd questions 103; UNDETERMINED by support)
+    M-GP     A +0.025 [-0.026, +0.084] McNemar   9/  5 p=0.424 no | B (n= 138) +0.000 [+0.000, +0.000] McNemar   0/  0 p=1 no | clears bar under both: no
+    M-GK     A +0.025 [-0.030, +0.085] McNemar   9/  5 p=0.424 no | B (n= 138) +0.000 [+0.000, +0.000] McNemar   0/  0 p=1 no | clears bar under both: no
+    GP-GK    A +0.000 [-0.031, +0.033] McNemar   4/  4 p=1 no | B (n= 139) +0.000 [+0.000, +0.000] McNemar   0/  0 p=1 no | clears bar under both: no  <- floor
+  Chemistry (kd matches 387, kd questions 193)
+    M-GP     A +0.026 [-0.003, +0.053] McNemar  22/ 12 p=0.121 no | B (n= 339) +0.003 [-0.006, +0.013] McNemar   2/  1 p=1 no | clears bar under both: no
+    M-GK     A +0.003 [-0.025, +0.031] McNemar  17/ 16 p=1 no | B (n= 345) +0.000 [-0.015, +0.017] McNemar   3/  3 p=1 no | clears bar under both: no
+    GP-GK    A -0.023 [-0.043, -0.003] McNemar   5/ 14 p=0.0636 no | B (n= 345) +0.003 [+0.000, +0.009] McNemar   1/  0 p=1 no | clears bar under both: no  <- floor
+  Computer science (kd matches 302, kd questions 132)
+    M-GP     A +0.007 [-0.037, +0.051] McNemar  18/ 16 p=0.864 no | B (n= 256) -0.004 [-0.025, +0.017] McNemar   3/  4 p=1 no | clears bar under both: no
+    M-GK     A +0.010 [-0.035, +0.050] McNemar  19/ 16 p=0.736 no | B (n= 253) -0.016 [-0.037, +0.004] McNemar   1/  5 p=0.219 no | clears bar under both: no
+    GP-GK    A +0.003 [-0.027, +0.034] McNemar   9/  8 p=1 no | B (n= 264) +0.000 [+0.000, +0.000] McNemar   0/  0 p=1 no | clears bar under both: no  <- floor
+  Economics (kd matches 295, kd questions 119; UNDETERMINED by support)
+    M-GP     A +0.000 [-0.034, +0.037] McNemar  10/ 10 p=1 no | B (n= 272) -0.004 [-0.023, +0.009] McNemar   1/  2 p=1 no | clears bar under both: no
+    M-GK     A -0.007 [-0.039, +0.024] McNemar   8/ 10 p=0.815 no | B (n= 272) -0.007 [-0.026, +0.000] McNemar   0/  2 p=0.5 no | clears bar under both: no
+    GP-GK    A -0.007 [-0.028, +0.010] McNemar   4/  6 p=0.754 no | B (n= 275) +0.000 [+0.000, +0.000] McNemar   0/  0 p=1 no | clears bar under both: no  <- floor
+  Engineering (kd matches 192, kd questions 105; UNDETERMINED by support)
+    M-GP     A +0.005 [-0.033, +0.053] McNemar   8/  7 p=1 no | B (n= 157) -0.013 [-0.030, +0.000] McNemar   0/  2 p=0.5 no | clears bar under both: no
+    M-GK     A +0.005 [-0.033, +0.049] McNemar   9/  8 p=1 no | B (n= 156) -0.013 [-0.031, +0.000] McNemar   0/  2 p=0.5 no | clears bar under both: no
+    GP-GK    A +0.000 [-0.033, +0.033] McNemar   5/  5 p=1 no | B (n= 164) +0.000 [+0.000, +0.000] McNemar   0/  0 p=1 no | clears bar under both: no  <- floor
+  Health (kd matches 214, kd questions 100; UNDETERMINED by support)
+    M-GP     A +0.005 [-0.035, +0.045] McNemar   8/  7 p=1 no | B (n= 193) +0.010 [-0.011, +0.032] McNemar   3/  1 p=0.625 no | clears bar under both: no
+    M-GK     A +0.023 [-0.019, +0.069] McNemar  12/  7 p=0.359 no | B (n= 188) +0.016 [+0.000, +0.042] McNemar   3/  0 p=0.25 no | clears bar under both: no
+    GP-GK    A +0.019 [-0.010, +0.049] McNemar   8/  4 p=0.388 no | B (n= 194) +0.005 [+0.000, +0.016] McNemar   1/  0 p=1 no | clears bar under both: no  <- floor
+  History (kd matches 186, kd questions 80; UNDETERMINED by support)
+    M-GP     A -0.022 [-0.068, +0.020] McNemar   6/ 10 p=0.454 no | B (n= 160) -0.013 [-0.035, +0.000] McNemar   0/  2 p=0.5 no | clears bar under both: no
+    M-GK     A -0.032 [-0.071, +0.000] McNemar   4/ 10 p=0.18 no | B (n= 165) -0.006 [-0.030, +0.013] McNemar   1/  2 p=1 no | clears bar under both: no
+    GP-GK    A -0.011 [-0.031, +0.010] McNemar   2/  4 p=0.688 no | B (n= 171) +0.000 [+0.000, +0.000] McNemar   0/  0 p=1 no | clears bar under both: no  <- floor
+  Law (kd matches 314, kd questions 190)
+    M-GP     A -0.025 [-0.060, +0.009] McNemar  10/ 18 p=0.185 no | B (n= 275) -0.018 [-0.040, -0.004] McNemar   0/  5 p=0.0625 no | clears bar under both: no
+    M-GK     A -0.029 [-0.062, +0.006] McNemar   9/ 18 p=0.122 no | B (n= 275) -0.018 [-0.040, -0.004] McNemar   0/  5 p=0.0625 no | clears bar under both: no
+    GP-GK    A -0.003 [-0.026, +0.017] McNemar   6/  7 p=1 no | B (n= 286) +0.000 [+0.000, +0.000] McNemar   0/  0 p=1 no | clears bar under both: no  <- floor
+  Math (kd matches 656, kd questions 257)
+    M-GP     A +0.015 [-0.006, +0.036] McNemar  25/ 15 p=0.154 no | B (n= 593) -0.002 [-0.007, +0.004] McNemar   1/  2 p=1 no | clears bar under both: no
+    M-GK     A +0.009 [-0.012, +0.027] McNemar  19/ 13 p=0.377 no | B (n= 603) +0.003 [-0.004, +0.012] McNemar   4/  2 p=0.688 no | clears bar under both: no
+    GP-GK    A -0.006 [-0.022, +0.010] McNemar  11/ 15 p=0.557 no | B (n= 601) +0.000 [-0.005, +0.005] McNemar   1/  1 p=1 no | clears bar under both: no  <- floor
+  Other (kd matches 363, kd questions 147)
+    M-GP     A +0.014 [-0.024, +0.052] McNemar  25/ 20 p=0.551 no | B (n= 315) +0.003 [-0.020, +0.023] McNemar   5/  4 p=1 no | clears bar under both: no
+    M-GK     A +0.014 [-0.025, +0.054] McNemar  23/ 18 p=0.533 no | B (n= 314) +0.003 [-0.014, +0.019] McNemar   4/  3 p=1 no | clears bar under both: no
+    GP-GK    A +0.000 [-0.026, +0.026] McNemar   9/  9 p=1 no | B (n= 319) +0.000 [+0.000, +0.000] McNemar   0/  0 p=1 no | clears bar under both: no  <- floor
+  Philosophy (kd matches 176, kd questions 88; UNDETERMINED by support)
+    M-GP     A -0.011 [-0.067, +0.040] McNemar   9/ 11 p=0.824 no | B (n= 142) -0.007 [-0.030, +0.015] McNemar   1/  2 p=1 no | clears bar under both: no
+    M-GK     A -0.017 [-0.071, +0.037] McNemar   7/ 10 p=0.629 no | B (n= 144) -0.007 [-0.030, +0.015] McNemar   1/  2 p=1 no | clears bar under both: no
+    GP-GK    A -0.006 [-0.034, +0.022] McNemar   5/  6 p=1 no | B (n= 150) +0.000 [+0.000, +0.000] McNemar   0/  0 p=1 no | clears bar under both: no  <- floor
+  Physics (kd matches 601, kd questions 229)
+    M-GP     A -0.003 [-0.029, +0.022] McNemar  19/ 21 p=0.875 no | B (n= 536) +0.004 [-0.008, +0.015] McNemar   6/  4 p=0.754 no | clears bar under both: no
+    M-GK     A -0.007 [-0.030, +0.018] McNemar  18/ 22 p=0.636 no | B (n= 538) +0.002 [-0.008, +0.011] McNemar   4/  3 p=1 no | clears bar under both: no
+    GP-GK    A -0.003 [-0.023, +0.016] McNemar  13/ 15 p=0.851 no | B (n= 541) -0.002 [-0.006, +0.000] McNemar   0/  1 p=1 no | clears bar under both: no  <- floor
+  Psychology (kd matches 354, kd questions 167)
+    M-GP     A +0.006 [-0.020, +0.035] McNemar  12/ 10 p=0.832 no | B (n= 311) +0.000 [-0.013, +0.013] McNemar   2/  2 p=1 no | clears bar under both: no
+    M-GK     A -0.003 [-0.028, +0.020] McNemar   8/  9 p=1 no | B (n= 312) +0.003 [+0.000, +0.010] McNemar   1/  0 p=1 no | clears bar under both: no
+    GP-GK    A -0.008 [-0.034, +0.014] McNemar   5/  8 p=0.581 no | B (n= 319) +0.000 [+0.000, +0.000] McNemar   0/  0 p=1 no | clears bar under both: no  <- floor
+
+--- C3: the grok-vs-grok floor ---
+  14-cell max |GP - GK| under A = 0.023 at Chemistry (under B: max 0.005 at Health); cells above the bar: none
+  beside it (not the registered C3 statistic): max |GP - GK| under A over the 7 cells with >= 120 kd questions = 0.023
+  C3 (max |GP - GK| under A <= 0.057): HELD
+
+--- C1: a cell winner (clears the bar under both conventions against BOTH grok draws, same sign; >= 120 kd questions; C3 holds in the cell) ---
+  Biology          M-GP A -0.003 B -0.004 clears no  | M-GK A +0.000 B -0.004 clears no  | signs agree no  | floor |GP-GK| A 0.003 | UNDETERMINED (kd questions 115 < 120)
+  Business         M-GP A +0.025 B +0.000 clears no  | M-GK A +0.025 B +0.000 clears no  | signs agree yes | floor |GP-GK| A 0.000 | UNDETERMINED (kd questions 103 < 120)
+  Chemistry        M-GP A +0.026 B +0.003 clears no  | M-GK A +0.003 B +0.000 clears no  | signs agree yes | floor |GP-GK| A 0.023 | no winner
+  Computer science M-GP A +0.007 B -0.004 clears no  | M-GK A +0.010 B -0.016 clears no  | signs agree yes | floor |GP-GK| A 0.003 | no winner
+  Economics        M-GP A +0.000 B -0.004 clears no  | M-GK A -0.007 B -0.007 clears no  | signs agree no  | floor |GP-GK| A 0.007 | UNDETERMINED (kd questions 119 < 120)
+  Engineering      M-GP A +0.005 B -0.013 clears no  | M-GK A +0.005 B -0.013 clears no  | signs agree yes | floor |GP-GK| A 0.000 | UNDETERMINED (kd questions 105 < 120)
+  Health           M-GP A +0.005 B +0.010 clears no  | M-GK A +0.023 B +0.016 clears no  | signs agree yes | floor |GP-GK| A 0.019 | UNDETERMINED (kd questions 100 < 120)
+  History          M-GP A -0.022 B -0.013 clears no  | M-GK A -0.032 B -0.006 clears no  | signs agree yes | floor |GP-GK| A 0.011 | UNDETERMINED (kd questions 80 < 120)
+  Law              M-GP A -0.025 B -0.018 clears no  | M-GK A -0.029 B -0.018 clears no  | signs agree yes | floor |GP-GK| A 0.003 | no winner
+  Math             M-GP A +0.015 B -0.002 clears no  | M-GK A +0.009 B +0.003 clears no  | signs agree yes | floor |GP-GK| A 0.006 | no winner
+  Other            M-GP A +0.014 B +0.003 clears no  | M-GK A +0.014 B +0.003 clears no  | signs agree yes | floor |GP-GK| A 0.000 | no winner
+  Philosophy       M-GP A -0.011 B -0.007 clears no  | M-GK A -0.017 B -0.007 clears no  | signs agree yes | floor |GP-GK| A 0.006 | UNDETERMINED (kd questions 88 < 120)
+  Physics          M-GP A -0.003 B +0.004 clears no  | M-GK A -0.007 B +0.002 clears no  | signs agree yes | floor |GP-GK| A 0.003 | no winner
+  Psychology       M-GP A +0.006 B +0.000 clears no  | M-GK A -0.003 B +0.003 clears no  | signs agree no  | floor |GP-GK| A 0.008 | no winner
+  cells clearing the bar against both draws with the same sign (before the support / C3 rule): none
+  cells UNDETERMINED (not scored for C1): Biology, Business, Economics, Engineering, Health, History, Philosophy
+  C1 (at least one scored cell winner): FAILED
+
+--- C2: the lever, cross-fitted (choose per cell on half A by convention-A accuracy, read on half B; 100 halvings, seed 42) ---
+  all 14 anchors are routed (the support rule governs C1's scoring, not the lever's arithmetic); gain = routed half-B accuracy - best single judge (chosen on half A) half-B accuracy
+  M vs GP                                              cross-fitted gain mean -0.0017 (-0.17pp) interval over halvings [-0.0081, +0.0061] | splits with gain > 0: 26% | routed 0.8489 vs single 0.8506 | in-sample gain +0.0038 (+0.38pp; single = M)
+      single judge chosen on half A: M 86, GP 14 | per-cell choice frequency: Biology M 54/GP 46; Business M 82/GP 18; Chemistry M 99/GP 1; Computer science M 62/GP 38; Economics M 58/GP 42; Engineering M 66/GP 34; Health M 64/GP 36; History GP 79/M 21; Law GP 88/M 12; Math M 92/GP 8; Other M 72/GP 28; Philosophy GP 63/M 37; Physics M 50/GP 50; Psychology M 73/GP 27
+  M vs GK                                              cross-fitted gain mean -0.0007 (-0.07pp) interval over halvings [-0.0076, +0.0044] | splits with gain > 0: 35% | routed 0.8499 vs single 0.8506 | in-sample gain +0.0056 (+0.56pp; single = M)
+      single judge chosen on half A: M 56, GK 44 | per-cell choice frequency: Biology M 57/GK 43; Business M 74/GK 26; Chemistry M 62/GK 38; Computer science M 64/GK 36; Economics GK 62/M 38; Engineering M 58/GK 42; Health M 81/GK 19; History GK 97/M 3; Law GK 95/M 5; Math M 76/GK 24; Other M 72/GK 28; Philosophy GK 72/M 28; Physics GK 66/M 34; Psychology GK 55/M 45
+  three-way M / GP / GK (supplementary, not scored)    cross-fitted gain mean -0.0026 (-0.26pp) interval over halvings [-0.0081, +0.0049] | splits with gain > 0: 16% | routed 0.8477 vs single 0.8503 | in-sample gain +0.0058 (+0.58pp; single = M)
+      single judge chosen on half A: M 55, GK 42, GP 3 | per-cell choice frequency: Biology GK 38/M 38/GP 24; Business M 74/GK 16/GP 10; Chemistry M 62/GK 38; Computer science M 56/GP 26/GK 18; Economics GK 50/M 35/GP 15; Engineering M 53/GK 27/GP 20; Health M 63/GP 32/GK 5; History GK 75/GP 22/M 3; Law GK 61/GP 35/M 4; Math M 74/GK 21/GP 5; Other M 64/GP 21/GK 15; Philosophy GK 49/M 27/GP 24; Physics GK 49/M 31/GP 20; Psychology GK 47/M 43/GP 10
+  C2 per grok draw (mean > 0, interval excluding 0, point >= +1.0pp): M vs GP FAILED | M vs GK FAILED
+  C2 (both grok draws): FAILED
+
+--- (v) overall on the common set (kd matches 4495, kd questions 2025; questions resampled over the common set) ---
+  accA: M 0.8523 GP 0.8483 GK 0.8523 | decidable tie rate: M 0.0714 GP 0.0716 GK 0.0691 | flip rate: M 0.0687 GP 0.0651 GK 0.0649
+  M-GP   A +0.0040 [-0.005, +0.012] McNemar 190/172 p=0.372 | B (n=3957; M 0.9265 vs GP 0.9285) -0.0020 [-0.006, +0.002] McNemar 25/33 p=0.358
+  M-GK   A +0.0000 [-0.009, +0.009] McNemar 171/171 p=1 | B (n=3972; M 0.9272 vs GK 0.9293) -0.0020 [-0.006, +0.002] McNemar 23/31 p=0.341
+  GP-GK  A -0.0040 [-0.010, +0.002] McNemar 93/111 p=0.234 | B (n=4039; GP 0.9218 vs GK 0.9215) +0.0002 [-0.001, +0.001] McNemar 3/2 p=1
+
+--- predictions (registration), scored ---
+  P1 overall M vs GP |delta| <= 1.5pp (A) and <= 1.0pp (B): A +0.0040, B -0.0020 -> HELD (M vs GK beside: A +0.0000, B -0.0020)
+  P2 no anchor clears the bar under both conventions against both grok draws (C1 FAILED): HELD
+  P3 14-cell max |M - grok| (A) 4-7pp, on Business / Philosophy / History, CI including 0: max 0.032 at History (M-GK), CI [-0.071, +0.000] -> range no, anchor yes, CI incl 0 yes -> FAILED
+  P4 same-judge max |GP - GK| (A) 2-5pp (C3 HELD): max 0.023 at Chemistry -> HELD; C3 HELD
+  P5 cross-fitted routed gain -1.0 to +0.5pp with an interval including 0 (C2 FAILED): M vs GP -0.17pp [-0.008, +0.006] yes | M vs GK -0.07pp [-0.008, +0.004] yes -> HELD; C2 FAILED
+  P6 in-sample routed gain +1 to +2pp: M vs GP +0.38pp no | M vs GK +0.56pp no -> FAILED
+  P7 Mistral's decidable tie rate lower than grok's in every anchor by 1-3pp: M lower than both grok draws in 5 of 14 anchors; within 1-3pp against both in 3 of 14 -> FAILED
+      per anchor (grok - M, decidable tie rate): Biology GP +0.017 GK +0.017; Business GP +0.019 GK +0.020; Chemistry GP +0.018 GK +0.003; Computer science GP -0.019 GK -0.006; Economics GP +0.000 GK +0.003; Engineering GP -0.016 GK -0.015; Health GP -0.023 GK +0.000; History GP -0.038 GK -0.054; Law GP -0.016 GK -0.013; Math GP +0.011 GK +0.002; Other GP +0.014 GK +0.025; Philosophy GP -0.017 GK -0.017; Physics GP +0.007 GK -0.007; Psychology GP -0.005 GK -0.014
+
+--- criteria and verdict ---
+  C1 (a cell winner exists): FAILED
+  C2 (routing is a lever, cross-fitted, both grok draws): FAILED
+  C3 (grok-vs-grok floor, 14-cell max |GP - GK| under A <= 0.057): HELD (max 0.023 at Chemistry)
+  predictions: P1 HELD, P2 HELD, P3 FAILED, P4 HELD, P5 HELD, P6 FAILED, P7 FAILED
+  FALSIFIER (C1 AND C2 HELD overturns RECIPE-GROK's 'the recipe, not the judge, carries the gain' at the cell level): not fired
+  VERDICT: judge routing is CLOSED at zero calls; the judge model is interchangeable per cell to within the floor.
+  no leaf row (sub-anchor line closed); x20 excluded by construction; no board, profile or tier of record changed; zero judge calls; elapsed 108 s

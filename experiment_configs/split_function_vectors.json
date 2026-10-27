@@ -1,0 +1,319 @@
+{
+  "normaliser_version": "norm-v1",
+  "key_rule": "ck-v1",
+  "modulus": 1000,
+  "eval_upper": 300,
+  "gate_lower": 300,
+  "gate_upper": 400,
+  "field_sep": "\u001f",
+  "option_sep": "\u001e",
+  "whitespace_class": "[\\t\\n\\x0b\\x0c\\r \\x85\\xa0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000]+",
+  "cases": [
+    {
+      "label": "ascii",
+      "stem": "What is 2+2?",
+      "options": [
+        "4",
+        "5",
+        "3",
+        "22"
+      ],
+      "contract_id": "MC_LETTER",
+      "family_id": null,
+      "norm_stem": "what is 2+2?",
+      "content_key": "6b653b112b619d44fd2ed5e64ace44e4a8538dec1d993e853b84ed1d6011695e",
+      "stem_key": "a163c71e9c6427085f28d0f88ce7020e8a4368f744bcfae795fdac8e18c45e9a",
+      "stem_h": 143,
+      "h": 79,
+      "side": "EVAL"
+    },
+    {
+      "label": "case-fold-ascii",
+      "stem": "WHAT Is 2+2?",
+      "options": [
+        "4",
+        "5",
+        "3",
+        "22"
+      ],
+      "contract_id": "MC_LETTER",
+      "family_id": null,
+      "norm_stem": "what is 2+2?",
+      "content_key": "6b653b112b619d44fd2ed5e64ace44e4a8538dec1d993e853b84ed1d6011695e",
+      "stem_key": "a163c71e9c6427085f28d0f88ce7020e8a4368f744bcfae795fdac8e18c45e9a",
+      "stem_h": 143,
+      "h": 79,
+      "side": "EVAL"
+    },
+    {
+      "label": "whitespace-runs",
+      "stem": "  What   is\t2+2?\n",
+      "options": [
+        "4 ",
+        " 5",
+        "3",
+        "22"
+      ],
+      "contract_id": "MC_LETTER",
+      "family_id": null,
+      "norm_stem": "what is 2+2?",
+      "content_key": "6b653b112b619d44fd2ed5e64ace44e4a8538dec1d993e853b84ed1d6011695e",
+      "stem_key": "a163c71e9c6427085f28d0f88ce7020e8a4368f744bcfae795fdac8e18c45e9a",
+      "stem_h": 143,
+      "h": 79,
+      "side": "EVAL"
+    },
+    {
+      "label": "option-order",
+      "stem": "What is 2+2?",
+      "options": [
+        "22",
+        "3",
+        "5",
+        "4"
+      ],
+      "contract_id": "MC_LETTER",
+      "family_id": null,
+      "norm_stem": "what is 2+2?",
+      "content_key": "6b653b112b619d44fd2ed5e64ace44e4a8538dec1d993e853b84ed1d6011695e",
+      "stem_key": "a163c71e9c6427085f28d0f88ce7020e8a4368f744bcfae795fdac8e18c45e9a",
+      "stem_h": 143,
+      "h": 79,
+      "side": "EVAL"
+    },
+    {
+      "label": "contract-change",
+      "stem": "What is 2+2?",
+      "options": [
+        "4",
+        "5",
+        "3",
+        "22"
+      ],
+      "contract_id": "IMPORTED:exact_match",
+      "family_id": null,
+      "norm_stem": "what is 2+2?",
+      "content_key": "2ed0f45a3902ee3ea1d5dd81e11501a381edccdc528a903ded8fbb1e3396dfb2",
+      "stem_key": "a163c71e9c6427085f28d0f88ce7020e8a4368f744bcfae795fdac8e18c45e9a",
+      "stem_h": 143,
+      "h": 385,
+      "side": "GATE"
+    },
+    {
+      "label": "empty-options",
+      "stem": "Prove that sqrt(2) is irrational.",
+      "options": [],
+      "contract_id": "IMPORTED:exact_match",
+      "family_id": null,
+      "norm_stem": "prove that sqrt(2) is irrational.",
+      "content_key": "839e435743a1bf13ad1639f18afbf844a636718e45ae49cf7191fa9bd25dde4e",
+      "stem_key": "5d3c2943aa24756e4803a7322ae5b978c6ebe9a7eb3066cb18c4d035233cb192",
+      "stem_h": 475,
+      "h": 265,
+      "side": "EVAL"
+    },
+    {
+      "label": "nfc-composed",
+      "stem": "caf\u00e9 au lait",
+      "options": [
+        "oui",
+        "non"
+      ],
+      "contract_id": "MC_LETTER",
+      "family_id": null,
+      "norm_stem": "caf\u00e9 au lait",
+      "content_key": "0f687de50ce08e609d1932d5f7418a4511e5000955d96d67f558bc2624c6608c",
+      "stem_key": "513e53efc0e78432cc15a750908e8dcb4afd0e10fc114b8da03dcdb482b1c7c2",
+      "stem_h": 409,
+      "h": 662,
+      "side": "TRAIN"
+    },
+    {
+      "label": "nfd-decomposed",
+      "stem": "cafe\u0301 au lait",
+      "options": [
+        "oui",
+        "non"
+      ],
+      "contract_id": "MC_LETTER",
+      "family_id": null,
+      "norm_stem": "caf\u00e9 au lait",
+      "content_key": "0f687de50ce08e609d1932d5f7418a4511e5000955d96d67f558bc2624c6608c",
+      "stem_key": "513e53efc0e78432cc15a750908e8dcb4afd0e10fc114b8da03dcdb482b1c7c2",
+      "stem_h": 409,
+      "h": 662,
+      "side": "TRAIN"
+    },
+    {
+      "label": "nfkc-compat",
+      "stem": "\uff21\uff22\uff23 \u2460",
+      "options": [
+        "\ufb01"
+      ],
+      "contract_id": "MC_LETTER",
+      "family_id": null,
+      "norm_stem": "abc 1",
+      "content_key": "6bd05351ed7b5265f7cb378f9ddb0531ed6cc3e3b06d4257062450f3ec3c1d10",
+      "stem_key": "3c02d7854a7c0be4f765cdd08740fbfb437e9c4b5b0fa9c04bad442bfa2ec5f8",
+      "stem_h": 373,
+      "h": 726,
+      "side": "TRAIN"
+    },
+    {
+      "label": "dotted-capital-i",
+      "stem": "\u0130stanbul",
+      "options": [
+        "a"
+      ],
+      "contract_id": "MC_LETTER",
+      "family_id": null,
+      "norm_stem": "\u0130stanbul",
+      "content_key": "569d77584fd9583370eb7369750bdaffcdf62a47cbe7457c1536470e62d3d14c",
+      "stem_key": "dfaa38614a2721ef67032d5b580d698ecb90af72a3bcbfec693f2fdc786f157f",
+      "stem_h": 776,
+      "h": 968,
+      "side": "TRAIN"
+    },
+    {
+      "label": "cjk",
+      "stem": "\u6771\u4eac\u306f\u65e5\u672c\u306e\u9996\u90fd\u3067\u3059\u3002",
+      "options": [
+        "\u306f\u3044",
+        "\u3044\u3044\u3048"
+      ],
+      "contract_id": "MC_LETTER",
+      "family_id": null,
+      "norm_stem": "\u6771\u4eac\u306f\u65e5\u672c\u306e\u9996\u90fd\u3067\u3059\u3002",
+      "content_key": "3a7071f4572cff47f9060c01bc63fbc0dd310fad11f00e786ea851120ab379c7",
+      "stem_key": "b12907bf55609210e1068ef0ebef937a0b13b7878f0a2f2e8c58d48443ebe94a",
+      "stem_h": 838,
+      "h": 767,
+      "side": "TRAIN"
+    },
+    {
+      "label": "supplementary-sort",
+      "stem": "emoji options",
+      "options": [
+        "\ud83d\ude00",
+        "\ufb01",
+        "z"
+      ],
+      "contract_id": "MC_LETTER",
+      "family_id": null,
+      "norm_stem": "emoji options",
+      "content_key": "da3730b72127a7387d8aff6f8b9ffacfb9933606d71a87328bbc4dff9ae4f278",
+      "stem_key": "7f72ca94563ca4266f037214cd2092e162bb9d746575725bc47fedb40200d6af",
+      "stem_h": 172,
+      "h": 809,
+      "side": "TRAIN"
+    },
+    {
+      "label": "family-override",
+      "stem": "any stem",
+      "options": [
+        "x"
+      ],
+      "contract_id": "MC_LETTER",
+      "family_id": "family:bbh/navigate/template-7",
+      "norm_stem": "any stem",
+      "content_key": "1c8f64082c07db6f1325627dcbef3326fa828228591f9c752ceb759fe612ea1b",
+      "stem_key": "dc612cf6d8b9e33e2ae96ad70c8ad3ef2c73768eb05634e227a402aa4daa02d8",
+      "stem_h": 192,
+      "h": 521,
+      "side": "TRAIN"
+    },
+    {
+      "label": "nbsp-and-ideographic-space",
+      "stem": "a\u00a0b\u3000c\u2028d",
+      "options": [
+        "e\u1680f"
+      ],
+      "contract_id": "MC_LETTER",
+      "family_id": null,
+      "norm_stem": "a b c d",
+      "content_key": "e435236e0097c3247008fbdcef673df51608820c24f541fbe33d9f65fb76adc2",
+      "stem_key": "7c6416470605050ad5cd7aac57e506c87e1f316f5b5f19e606e99510c130928a",
+      "stem_h": 586,
+      "h": 742,
+      "side": "TRAIN"
+    },
+    {
+      "label": "boundary-299",
+      "stem": "boundary-274",
+      "options": [],
+      "contract_id": "",
+      "family_id": null,
+      "norm_stem": "boundary-274",
+      "content_key": "c949dadaf1189b350da2dfcfff329d403b6e97de0ce2acd71fc7408327c6d42d",
+      "stem_key": "c949dadaf1189b350da2dfcfff329d403b6e97de0ce2acd71fc7408327c6d42d",
+      "stem_h": 299,
+      "h": 299,
+      "side": "EVAL"
+    },
+    {
+      "label": "boundary-300",
+      "stem": "boundary-265",
+      "options": [],
+      "contract_id": "",
+      "family_id": null,
+      "norm_stem": "boundary-265",
+      "content_key": "7c0ebd80c5cde3e39410ac948c13cb6620099f1dff6006300252819d4a5c5ed6",
+      "stem_key": "7c0ebd80c5cde3e39410ac948c13cb6620099f1dff6006300252819d4a5c5ed6",
+      "stem_h": 300,
+      "h": 300,
+      "side": "GATE"
+    },
+    {
+      "label": "boundary-399",
+      "stem": "boundary-457",
+      "options": [],
+      "contract_id": "",
+      "family_id": null,
+      "norm_stem": "boundary-457",
+      "content_key": "daae228692f07d33787b616ab1880ceb673130f922c4823a447182922b94a914",
+      "stem_key": "daae228692f07d33787b616ab1880ceb673130f922c4823a447182922b94a914",
+      "stem_h": 399,
+      "h": 399,
+      "side": "GATE"
+    },
+    {
+      "label": "boundary-400",
+      "stem": "boundary-161",
+      "options": [],
+      "contract_id": "",
+      "family_id": null,
+      "norm_stem": "boundary-161",
+      "content_key": "e6dcca2729aed427f0f5b86f7bb09371271822c3a80649e5c3f44f07084ee3b3",
+      "stem_key": "e6dcca2729aed427f0f5b86f7bb09371271822c3a80649e5c3f44f07084ee3b3",
+      "stem_h": 400,
+      "h": 400,
+      "side": "TRAIN"
+    },
+    {
+      "label": "boundary-0",
+      "stem": "boundary-2197",
+      "options": [],
+      "contract_id": "",
+      "family_id": null,
+      "norm_stem": "boundary-2197",
+      "content_key": "84ac2fac299fd0005b437d5443f2d17b5065b25e1181d9101f143838dd04176a",
+      "stem_key": "84ac2fac299fd0005b437d5443f2d17b5065b25e1181d9101f143838dd04176a",
+      "stem_h": 0,
+      "h": 0,
+      "side": "EVAL"
+    },
+    {
+      "label": "boundary-999",
+      "stem": "boundary-401",
+      "options": [],
+      "contract_id": "",
+      "family_id": null,
+      "norm_stem": "boundary-401",
+      "content_key": "e6dff16d9e8cd1fd21fb87db35d076e70c23a58fd174d5c6776015dd07ce32f1",
+      "stem_key": "e6dff16d9e8cd1fd21fb87db35d076e70c23a58fd174d5c6776015dd07ce32f1",
+      "stem_h": 999,
+      "h": 999,
+      "side": "TRAIN"
+    }
+  ]
+}

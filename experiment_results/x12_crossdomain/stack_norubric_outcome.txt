@@ -1,0 +1,31 @@
+=== STACK-NORUBRIC: the recipe without the anchor rubric, on the 944 key-decidable R3 pairs (pool p2dca21ab5f4ef3ae) ===
+  arm norubric | judge grok-4-1-fast-non-reasoning | STACK-v2 pairwise: v2 verify-first mechanics + grok-reasoning reference block + confidence; dual order, TIE on flip | max_tokens 8192 | temperature omitted (provider default, as the cached session) | cache stack_norubric.db
+  temperature decision: omitted from the payload (provider default) by decision: docs/plan_2026-09-15.md Amendment 1, D2
+  norubric prompt: $systemPrompt = GENERIC_SYSTEM, $rubric = GENERIC_RUBRIC (imported from rubric_value_contrast; fully de-induced; plan Amendment 1 D3)
+  provenance: finish_reason, completion tokens, provider and system-prompt sha stored per order; provider_response_id / batch_id NOT stored (rejudge_reasoning.call_judge_full does not return the response id; JUDGE-FINISH-AUDIT, Block 4)
+  scoring: unparsed / non-terminated verdicts kept in the paired set as NON_TERMINATED (wrong under A, not committed under B, never a tie); same for the controls
+  producing script sha256 (pinned at first launch) a55f6e72913b95d3 | current d99610c5ce1c7999   <- STALE: the cache was judged by a different version | started 2026-09-16 02:30:21 | resumed 2026-09-16 02:30:30; 2026-09-16 02:30:46; 2026-09-16 02:31:32
+  guard norubric n= 944 | unparsed or non-terminated 0 (0.0%)
+  guard ctrl2    n=  53 | unparsed or non-terminated 0 (0.0%)
+  guard ctrl1    n=  53 | unparsed or non-terminated 0 (0.0%)
+
+  (1) PRIMARY, paired on 944 matches: norubric vs the cached STACK-v2 session (anchor rubric present)
+      convention A  decisive-and-correct (ties and non-terminated wrong)   norubric 0.850 (non-terminated 0) | cached 0.864 (non-terminated 0) | delta -0.015  95% CI [-0.029, -0.002] | 14:28 McNemar p=0.04356
+      convention B  correct-given-committed (non-terminated excluded)      norubric 0.927 (committed n=865, non-terminated 0) | cached 0.929 (committed n=878, non-terminated 0) | delta -0.002  95% CI [-0.010, +0.005]
+      tie rate      norubric 0.084 | cached 0.070 (+0.014)
+      flip rate     norubric 0.083 of 944 parsed (reported, not gated)
+
+  (2) SESSION FLOOR on the control subset (n=53): the recipe WITH the rubric, three byte-identical sessions
+      cached  conv A 0.792 | conv B 0.840 | ties 0.057 | non-terminated 0
+      ctrl1   conv A 0.792 | conv B 0.840 | ties 0.057 | non-terminated 0
+      ctrl2   conv A 0.774 | conv B 0.837 | ties 0.075 | non-terminated 0
+      verdict disagreement between sessions: cached/ctrl1 0.000, cached/ctrl2 0.019, ctrl1/ctrl2 0.019 | DECOMP floor 0.057
+      floor = largest between-session accuracy gap: conv A 0.019 | conv B 0.003  (n=53: an SE of about 0.097 on each gap)
+      norubric on the same subset: conv A 0.792 (mean of the 3 sessions 0.786, +0.006) | conv B 0.840 (mean 0.839, +0.001)
+
+  (3) REGISTERED CRITERION: non-inferior within 2pp under both tie conventions against the session floor
+      convention A delta -0.015 >= -0.020: OK | convention B delta -0.002 >= -0.020: OK
+      read against the floor: |delta A| 0.015 <= floor 0.019; |delta B| 0.002 <= floor 0.003
+      -> PASS: NON-INFERIOR; the delta sits inside the session floor, indistinguishable from a byte-identical re-run
+      prediction was non-inferior (rubric value 0 to +1pp n.s.): as predicted
+      STALE: producing code hash differs from the cache's pinned first-launch sha; re-run --analyze from the recorded version or re-register

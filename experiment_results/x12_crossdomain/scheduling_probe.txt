@@ -1,0 +1,15 @@
+=== SCHEDULING: does 'the two answers differ' predict 'the key can discriminate'? (3358 questions) ===
+model A       model B        differ% decidable% P(dec|differ)  P(dec|same)
+iask_pro      gemini-3.1-pr    15.4%      13.4%       0.865        0.001
+iask_pro      gpt-4o-2024-0    19.0%      13.9%       0.731        0.000
+iask_pro      arx_0314         11.9%       8.5%       0.712        0.000
+gemini-3.1-pr gpt-4o-2024-0    21.9%      19.4%       0.882        0.001
+gemini-3.1-pr arx_0314         13.5%      11.4%       0.843        0.001
+gpt-4o-2024-0 arx_0314         19.5%      14.2%       0.728        0.000
+
+  pooled over the 6 top-4 pairs: answers differ on 16.9% of question-pairs; of those 79.6% are key-decidable;
+  of the pairs where the answers AGREE, only 0.04% are key-decidable.
+  A scheduler that only matches disagreeing answers keeps 99.8% of all decidable pairs while judging
+  16.9% of the matches -> the signal-free pairs that FRONTIER showed carry the bias are never scheduled.
+
+  NOTE: this rule needs NO answer key - only the two candidates' own extracted final answers.

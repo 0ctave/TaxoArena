@@ -1,0 +1,32 @@
+=== ARENA-13 arm A (ensemble reference): 1800 verdicts, 1542 key-decidable ===
+  (3) key-decidable accuracy on the new pairs 0.837 -> FAIL
+
+  13-model board (existing verdicts + the new pairs):
+    1. grok-4-1-fast-reasoning            theta +2.156 | key 0.849   <- new
+    2. gemini-3.1-pro_5-shots             theta +1.855 | key 0.913
+    3. iask_pro                           theta +1.844 | key 0.817
+    4. arx_0314                           theta +1.362 | key 0.834
+    5. gpt-4o-2024-08-06                  theta +1.245 | key 0.750
+    6. deepseek-chat-v2_5                 theta +0.398 | key 0.657
+  (1) the new contestant places 1 (key rank 2) -> FAIL
+  (2) the 12 keep their order, Kendall tau 0.970 -> OK
+
+=== arm B (self-reference), 598 shared frontier matches ===
+  the new contestant's win rate: ensemble reference 0.697 | its OWN reference 0.776 (+0.079)
+  discordant self-only 84 : ensemble-only 37 | McNemar p=2.316e-05
+  (4) SELF-PREFERENCE higher with its own reference at p<0.05 -> CONFIRMED
+
+=== CONSENSUS-ALIGNMENT: how often does each model's answer match the ensemble reference? ===
+  (reference = leave-out majority of the 8 strongest, excluding the model being scored)
+  arx_0314                           agrees with the ensemble 0.897 | key accuracy 0.834 | n=3306
+  grok-4-1-fast-reasoning            agrees with the ensemble 0.882 | key accuracy 0.853 | n=3310   <- new contestant
+  iask_pro                           agrees with the ensemble 0.878 | key accuracy 0.811 | n=3260
+  gemini-3.1-pro_5-shots             agrees with the ensemble 0.865 | key accuracy 0.912 | n=3322
+  gpt-4o-2024-08-06                  agrees with the ensemble 0.848 | key accuracy 0.750 | n=3305
+  deepseek-chat-v2_5                 agrees with the ensemble 0.734 | key accuracy 0.659 | n=3325
+  Meta-Llama-3_1-70B-Instruct        agrees with the ensemble 0.710 | key accuracy 0.631 | n=3310
+  Qwen1.5-72B-Chat                   agrees with the ensemble 0.651 | key accuracy 0.475 | n=2706
+
+  the new contestant agrees with the reference 1.7pp MORE than gemini does (0.882 vs 0.865)
+  while scoring 5.9pp LOWER on the key (0.853 vs 0.912).
+  A judge told to verify against that reference will favour the model that mirrors it, independently of correctness.

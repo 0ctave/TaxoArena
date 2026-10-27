@@ -1,0 +1,137 @@
+{
+  "id": "ANCHOR-PROFILE-INTERVAL",
+  "title": "ANCHOR-PROFILE-INTERVAL: is the 0.7183 pass a pass? (zero calls)",
+  "question": "Leave-one-anchor-out jackknife (14 folds) on the 40-halving mean split-half r, Spearman-Brown, on the x12 board (0.6728) and the merged 20-model board (0.7183): does the interval's LOWER bound clear 0.70? And the decomposition of the gain into 'more verdicts' (the 12 original profile rows on the merged fit) and 'more models' (20 rows).",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "60cb7f3",
+    "program_lines": "docs/judge_v2_program.md L3312 (section) and L3367-L3376 (E. ANCHOR-PROFILE-INTERVAL)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-15 (before any run) — six tests from the big picture after the review. Standing rules from the review apply to all six: every wrong-direction count carries its McNemar-established count on the anchor's judged questions; UNDETERMINED is a registered outcome; the key denominator is named; nulls preserve what the question conditions on; the data object is checked before strata are read into it.",
+    "outcome_heading": [
+      "L3399: ## BIG-PICTURE TESTS A, C, D, E — outcomes (2026-09-15, zero calls). Each built by one agent from the registration at 60cb7f3 and recomputed by an independent checker; every number reproduced; verdict labels corrected by the checker where the builder's rested on an unregistered reading.",
+      "L3451: - **ANCHOR-PROFILE-INTERVAL (2026-09-15, zero calls): the 0.7183 pass is a point-estimate pass; the leave-one-anchor-out jackknife 95% interval is [0.6076, 0.8291], lower bound below 0.70 on every reading and seed; RESOLVE may publish per-anchor claims on a board of this size WITH the interval, not as a bare pass; the merged-board gain is \"more verdicts\" (+0.093) net of \"more models\" (−0.047), total not distinguishable from zero.**"
+    ],
+    "date": "2026-09-15"
+  },
+  "script": {
+    "path": "tools/analysis/anchor_profile_interval.py",
+    "sha16": "f87cf6e2808108a4",
+    "commit": "22e16f7"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/anchor_profile_interval.txt",
+    "outcome_commit": "22e16f7",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-15"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the independent checker's recomputation recorded inside the outcome bullet (check_*.py scratch scripts named there; 'every number reproduced; verdict labels corrected by the checker where the builder's rested on an unregistered reading')",
+    "commit": "22e16f7",
+    "verdict": "every number reproduced by the independent checker; verdict labels as corrected by the checker"
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "the merged-board jackknife 95% interval; does the LOWER bound clear 0.70",
+      "result": "FAILED",
+      "value": "r 0.5604, R 0.7183, SE 0.0565 (14 folds): [0.6076, 0.8291] primary (R scale after SB); t(13) [0.5962, 0.8404]; r-scale jackknife then SB [0.5983, 0.8194]; fixed halvings [0.6102, 0.8264]; bias-corrected R 0.7305; extra halving seeds 11 / 23: R 0.7115 [0.6078, 0.8152] / 0.7174 [0.6110, 0.8238]; folds below 0.70 when dropped: Physics 0.6822, Math 0.6911 (Law 0.7099); x12 0.6728 [0.4932, 0.8524]: the lower bound does NOT clear 0.70; consequence as registered: RESOLVE may publish per-anchor claims on a board of this size WITH the interval, not as a bare pass",
+      "denominator": "merged 21,536 verdicts, 14 anchors (119-304 q, mean 200.8), 40 halvings Random(7), min_cell 25"
+    },
+    {
+      "id": "(2)",
+      "text": "the decomposition",
+      "result": "HELD",
+      "value": "A x12 12 rows 0.6728 [0.4932, 0.8524]; B merged 20-model fit, profile restricted to the 12 ARENA12 rows 0.7654 [0.6483, 0.8825]; C merged 20 rows 0.7183 [0.6076, 0.8291]; 'more verdicts' B - A = +0.0926 [+0.0199, +0.1653] (fixed [+0.0374, +0.1478]); 'more models' C - B = -0.0471 [-0.0836, -0.0105]; total C - A = +0.0455 [-0.0442, +0.1352], positive in all 14 folds; key comparator 0.9135 (12) / 0.9139 (20): the registered directional reading CONFIRMED (checker; the builder's UNDETERMINED rested on an unregistered share statistic)",
+      "denominator": "14 folds; two halving readings"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "the lower bound does NOT clear 0.70 (interval roughly [0.55, 0.85])",
+      "result": "HELD",
+      "value": "[0.6076, 0.8291], narrower than the guess and inside it",
+      "denominator": "14 folds"
+    },
+    {
+      "id": "P2",
+      "text": "the gain over x12 is mostly 'more verdicts', not 'more models'",
+      "result": "HELD",
+      "value": "in direction: more verdicts raises anchor R (+0.093), more rows lowers it (-0.047), both paired intervals excluding zero; the total (+0.0455) is not distinguishable from zero and the x12 and merged intervals overlap almost entirely",
+      "denominator": "14 folds"
+    }
+  ],
+  "falsifier": {
+    "text": "a lower bound above 0.70 makes the pass unqualified",
+    "fired": false,
+    "note": "does not fire; the margin over the bar is about one halving-SD (0.7115-0.7183 across seeds; bias-corrected 0.6775 at seed 11)"
+  },
+  "numbers_of_record": {
+    "interval": "R 0.7183, SE 0.0565, [0.6076, 0.8291]; alternatives [0.5962, 0.8404] / [0.5983, 0.8194] / [0.6102, 0.8264]; bias-corrected 0.7305; seeds 11 / 23 0.7115 / 0.7174",
+    "decomposition": "A 0.6728 -> B 0.7654 (+0.0926 [+0.0199, +0.1653]) -> C 0.7183 (-0.0471 [-0.0836, -0.0105]); total +0.0455 [-0.0442, +0.1352]",
+    "B_note": "the x20 cache holds 0 verdicts on the 66 original pairs, so B - A is the transitive effect of 12,394 new-pair verdicts on the original 12 rows through the joint 20-model BT fit",
+    "key_comparator": "0.9135 (12) / 0.9139 (20) [PROFILE-RELIABILITY-INTERACTION: model-demeaned, includes anchor difficulty; interaction-only 0.8665 / 0.8391]"
+  },
+  "sentence_of_record": "ANCHOR-PROFILE-INTERVAL (2026-09-15, zero calls): the 0.7183 pass is a point-estimate pass; the leave-one-anchor-out jackknife 95% interval is [0.6076, 0.8291], lower bound below 0.70 on every reading and seed (the x12 and merged intervals overlap almost entirely: 'merged clears, x12 misses' is a difference of point estimates); RESOLVE may publish per-anchor claims on a board of this size WITH the interval, not as a bare pass; the merged-board gain is 'more verdicts' (+0.093 [+0.020, +0.165]) net of 'more models' (-0.047 [-0.084, -0.011]), total +0.046 not distinguishable from zero; the margin over the bar is about one halving-SD.",
+  "chips": [
+    "LOWER BOUND BELOW 0.70",
+    "PREDICTION CONFIRMED"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-15",
+      "by": "the independent checker (check_api.py), recorded in the outcome bullet (22e16f7)",
+      "text": "the builder's UNDETERMINED on (2) came from a self-imposed share statistic whose ratio jackknife is degenerate; the registered directional reading is confirmed; the primary interval is on the R scale (r-scale sensitivity [0.5983, 0.8194], same verdict); the point estimate moves with the halving seed by about one halving-SD."
+    },
+    {
+      "date": "2026-09-18",
+      "by": "PROFILE-RELIABILITY-INTERACTION (the like-for-like re-reading; the judge's 0.7183 is interaction-only by construction)",
+      "text": "the key comparator 0.9135 / 0.9139 is model-demeaned and includes anchor difficulty; the like-for-like key figures are K12 interaction-only 0.8665 [0.8000, 0.9330] and K20 0.8391 [0.7760, 0.9021]; the paired gap key - judge is +0.121 [0.030, 0.211] merged."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a bare pass at 0.70 (the lower bound is 0.6076)",
+    "'more verdicts on the same pairs' as the registration worded it (the x20 cache has 0 verdicts on the 66 original pairs; B - A is a transitive effect)"
+  ],
+  "ledger": {
+    "row_id": "ANCHOR-PROFILE-INTERVAL",
+    "version": "v98 (22e16f7); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "PROFILE-RELIABILITY-X20",
+    "X20-MERGED",
+    "PROFILE-RELIABILITY",
+    "PROFILE-INTERVAL-ALL"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L3312 / L3367-L3376 (E. ANCHOR-PROFILE-INTERVAL) (registration 60cb7f3): question, criteria, prediction, falsifier",
+    "docs/judge_v2_program.md L3451 ff. (outcome bullet, 22e16f7): the criterion table, predictions scored, the checker's recomputation and defects",
+    "experiment_results/x12_crossdomain/anchor_profile_interval.txt (22e16f7)",
+    "docs/test_ledger.html row ANCHOR-PROFILE-INTERVAL (v98 (22e16f7)): chips verbatim, design / criteria / observed cells, evidence",
+    "script sha16 = sha256 of tools/analysis/anchor_profile_interval.py at 22e16f7, first 16 hex (identity, computed by the registrar 2026-09-22; later edited at 13f2142 for the pool_guard change)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' or '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Measures how reliable the per-subject model profiles are (how well two random halves of the judged questions agree), and puts a confidence interval around it by leaving out one subject (one of 14 anchor domains) at a time. Done on the 12-model board and the merged 20-model board, using already-stored verdicts (no new judge calls).",
+    "why": "The merged board's reliability of 0.7183 just cleared the 0.70 bar, and the question was whether that is a real pass or a lucky point estimate.",
+    "information": "If the lower end of the interval clears 0.70, per-subject claims can be published as reliable; if not, they need the interval printed next to them. Result: not a clear pass. The interval is about 0.61 to 0.83, so its lower end is below 0.70 on every reading. Per-subject claims may be published only with the interval. The gain from merging boards is not distinguishable from zero. Ruled later as history rather than evidence, because it was judged on the older question pool.",
+    "written": "2026-10-07"
+  }
+}

@@ -1,0 +1,284 @@
+pool of record: p2dca21ab5f4ef3ae (pool_guard.assert_pool_of_record)
+=== BOUNDARY-DISAGREEMENT (registered 2026-09-17; ZERO judge calls) ===
+  eval join by the OPTIONS key (whitespace-stripped, every model's options_json row, Meta-Llama-3-70B-Instruct excluded): pool 3445 -> unique mmlu_pro text 3441, ambiguous (dropped) 4, none 0
+  tree of record bareq512_s42: run dir experiment_results\promoted\bareq512_s42\seed_42, snapshot 20260909_212117_Headless_Run_Auto_ge, 158 nodes / 87 leaves / sliceDim 512 / depth 6; routing CSV names 87 leaves; run-dir vs snapshots.db |dmu| max 5.0e-07; manifest split pool p2dca21ab5f4ef3ae = the pool of record (clean: the tree never saw an eval question)
+  secondary tree af_s42: 150 nodes / 81 leaves / 2 depth-1 cells / sliceDim 256; manifest split pool p8a29d8f3ff75aa55 (NOT the pool of record: part of the judged set was on this tree's TRAIN side; descriptive only)
+  depth-1 cells of the tree of record: 14 (Math, Physics, Economics, Other, Health, Chemistry, History, Psychology, Engineering, Biology, Business, Computer scien, Law, Philosophy)
+  cache x12    experiment_results\x12_crossdomain\stack_v2_promptv2_x12all.db: 9142 rows (record 9142) | 2811 judged questions | 12 models | 14 anchors | anchor == anchor_of(Kotlin primary leaf) on 9142 rows
+  cache x20    experiment_results\x12_crossdomain\stack_v2_promptv2_x20.db: 12394 rows (record 12394) | 2646 judged questions | 20 models | 14 anchors | anchor == anchor_of(Kotlin primary leaf) on 12394 rows
+  cache grok   experiment_results\x12_crossdomain\grok_calib.db: 9142 rows (record 9142) | 2811 judged questions | 12 models | 14 anchors | anchor == anchor_of(Kotlin primary leaf) on 9142 rows
+  cache kotlin experiment_results\judge_wiring\board\kotlin_c0d3f708cbc3930e.db: 9123 rows (record 9123) | 2801 judged questions | 12 models | 14 anchors | anchor == anchor_of(Kotlin primary leaf) on 9123 rows
+  cache merged: x12 + x20 = 21536 rows (the board of record, x20_merged.merged_rows), 2811 judged questions, 20 models
+  judged set x20 subset of x12's: True (2646 of 2646)
+  judged set grok subset of x12's: True (2811 of 2811)
+  judged set kotlin subset of x12's: True (2801 of 2801)
+  judged questions (x12 u x20) 2811; with OPTIONS-key text 2808; with an embedding 2808 = the margin population
+
+  MARGIN DISTRIBUTION on the primary population P0 = x12-judged questions with a margin, n = 2808 (no outcome numbers here)
+    bareq512_s42 leaf_margin min 0.0000 | p10 0.0085 | p25 0.0233 | median 0.0527 | p75 0.0907 | p90 0.1287 | max 0.2518
+    bareq512_s42 d1_margin   min 0.0000 | p10 0.0109 | p25 0.0284 | median 0.0606 | p75 0.1011 | p90 0.1367 | max 0.2246
+    bareq512_s42 rec_margin  min -0.1453 | p10 -0.0102 | p25 0.0157 | median 0.0500 | p75 0.0899 | p90 0.1287 | max 0.2518 | negative (flatLeaf and Kotlin disagree) 416
+    af_s42       leaf_margin min 0.0001 | p10 0.0079 | p25 0.0203 | median 0.0459 | p75 0.0848 | p90 0.1212 | max 0.2531
+    af_s42       d1_margin   min 0.0001 | p10 0.0281 | p25 0.0666 | median 0.1238 | p75 0.1709 | p90 0.2031 | max 0.3061
+    quintile cut-points of bareq512_s42 leaf margin: 0.0175, 0.0394, 0.0666, 0.1024 (Q1 = lowest margin = nearest a boundary)
+    quintile cut-points of af_s42 leaf margin: 0.0156, 0.0347, 0.0595, 0.0942
+    quintile cut-points of bareq512_s42 depth-1 margin: 0.0221, 0.0481, 0.0753, 0.1114
+    flatLeaf best leaf == Kotlin primary leaf (cell of record): 2392 of 2808; Kotlin leaf is the flatLeaf second-best: 303
+    Kotlin two-candidate questions (n_leaves = 2 in the routing CSV): pool 410 of 3445; P0 314 of 2808
+    per-anchor (cell of record) median leaf margin and share of its questions in Q1:
+      Math              n  303 | median margin 0.0531 | in Q1 20.1%
+      Law               n  271 | median margin 0.0944 | in Q1 10.0%
+      Chemistry         n  269 | median margin 0.0682 | in Q1 14.9%
+      Psychology        n  260 | median margin 0.0331 | in Q1 30.0%
+      Physics           n  259 | median margin 0.0718 | in Q1 16.6%
+      Other             n  211 | median margin 0.0384 | in Q1 26.5%
+      Biology           n  181 | median margin 0.0317 | in Q1 28.7%
+      Economics         n  178 | median margin 0.0449 | in Q1 23.0%
+      Business          n  174 | median margin 0.0627 | in Q1 16.1%
+      Engineering       n  162 | median margin 0.0912 | in Q1 6.2%
+      Computer science  n  160 | median margin 0.0505 | in Q1 26.9%
+      Philosophy        n  132 | median margin 0.0394 | in Q1 27.3%
+      Health            n  129 | median margin 0.0382 | in Q1 20.9%
+      History           n  119 | median margin 0.0581 | in Q1 16.8%
+    the MULTI-OWNERSHIP bill on x12 if it targeted Q1: 562 questions, 1933 matches (x2 calls dual order); the Kotlin two-candidate set: 1083 matches
+    the MULTI-OWNERSHIP bill on merged if it targeted Q1: 562 questions, 4513 matches (x2 calls dual order); the Kotlin two-candidate set: 2652 matches
+
+=== READOUT (bootstrap B = 2000 question-clustered, Random seed 42; wrong counts written wrong(established)) ===
+
+--- cache x12: 9131 matches on 2808 questions with a margin (11 matches on questions without one dropped); 14 anchors; 924 edges tested, 809 established (McNemar p < 0.05 on the anchor's judged questions in this cache); INVALID rows 0; non-stop finish rows 0
+  quintiles of leaf_margin[bareq512_s42] (Q1 = lowest margin):
+    Q      n_q    n_m | tie                      flip                     both-tie                 INVALID                  | wrongA (kd)              wrongB (committed kd)    | wrong(est) A             wrong(est) B            
+    Q1     562   1933 | 0.217 [0.197, 0.239]     0.154 [0.136, 0.171]     0.064 [0.052, 0.075]     0.000 [0.000, 0.000]     | 0.163 [0.131, 0.198]     0.086 [0.061, 0.113]     | 0.143 [0.110, 0.175]     0.072 [0.050, 0.098]    
+    Q2     561   1907 | 0.209 [0.190, 0.228]     0.146 [0.129, 0.163]     0.063 [0.052, 0.076]     0.000 [0.000, 0.000]     | 0.136 [0.105, 0.168]     0.071 [0.048, 0.094]     | 0.119 [0.087, 0.151]     0.070 [0.046, 0.096]    
+    Q3     562   1851 | 0.214 [0.195, 0.234]     0.145 [0.129, 0.161]     0.069 [0.055, 0.083]     0.000 [0.000, 0.000]     | 0.166 [0.134, 0.199]     0.098 [0.072, 0.127]     | 0.147 [0.116, 0.177]     0.084 [0.059, 0.111]    
+    Q4     561   1760 | 0.203 [0.184, 0.222]     0.137 [0.120, 0.154]     0.066 [0.054, 0.079]     0.000 [0.000, 0.000]     | 0.133 [0.107, 0.162]     0.072 [0.051, 0.094]     | 0.127 [0.100, 0.156]     0.067 [0.047, 0.090]    
+    Q5     562   1680 | 0.201 [0.179, 0.221]     0.126 [0.110, 0.143]     0.074 [0.059, 0.089]     0.000 [0.000, 0.000]     | 0.140 [0.111, 0.172]     0.083 [0.059, 0.112]     | 0.128 [0.098, 0.159]     0.077 [0.054, 0.104]    
+    key-decidable matches per quintile: 957, 861, 910, 892, 883; established key-decidable: 855, 740, 804, 794, 765
+    Q1 - Q5 (pp): tie +1.7 [-1.2, +4.5] | flip +2.7 [+0.4, +5.2] | both-tie -1.1 [-2.9, +0.9] | INVALID +0.0 [+0.0, +0.0]
+    Q1 - Q5 (pp): wrongA +2.3 [-2.3, +7.1] | wrongB +0.2 [-3.4, +4.0] | wrong(est) A +1.5 [-3.1, +5.9] | wrong(est) B -0.5 [-4.2, +3.1]
+  quintiles of d1_margin[bareq512_s42] (Q1 = lowest margin):
+    Q      n_q    n_m | tie                      flip                     both-tie                 INVALID                  | wrongA (kd)              wrongB (committed kd)    | wrong(est) A             wrong(est) B            
+    Q1     562   2100 | 0.224 [0.205, 0.243]     0.155 [0.138, 0.171]     0.070 [0.058, 0.082]     0.000 [0.000, 0.000]     | 0.168 [0.136, 0.200]     0.095 [0.068, 0.122]     | 0.150 [0.119, 0.182]     0.084 [0.060, 0.110]    
+    Q2     561   1948 | 0.218 [0.200, 0.237]     0.160 [0.143, 0.178]     0.057 [0.046, 0.068]     0.000 [0.000, 0.000]     | 0.149 [0.117, 0.182]     0.084 [0.061, 0.112]     | 0.132 [0.101, 0.163]     0.070 [0.046, 0.095]    
+    Q3     562   1946 | 0.200 [0.182, 0.217]     0.129 [0.114, 0.144]     0.070 [0.058, 0.083]     0.000 [0.000, 0.000]     | 0.125 [0.099, 0.154]     0.070 [0.049, 0.094]     | 0.116 [0.090, 0.145]     0.065 [0.044, 0.087]    
+    Q4     561   1820 | 0.213 [0.192, 0.232]     0.134 [0.116, 0.152]     0.079 [0.066, 0.093]     0.000 [0.000, 0.000]     | 0.162 [0.133, 0.194]     0.083 [0.058, 0.109]     | 0.140 [0.110, 0.173]     0.076 [0.051, 0.103]    
+    Q5     562   1317 | 0.181 [0.159, 0.204]     0.125 [0.107, 0.145]     0.056 [0.042, 0.071]     0.000 [0.000, 0.000]     | 0.133 [0.102, 0.167]     0.078 [0.053, 0.106]     | 0.127 [0.094, 0.161]     0.078 [0.052, 0.106]    
+    key-decidable matches per quintile: 977, 931, 992, 939, 664; established key-decidable: 846, 813, 881, 836, 582
+    Q1 - Q5 (pp): tie +4.3 [+1.3, +7.3] | flip +2.9 [+0.4, +5.4] | both-tie +1.3 [-0.5, +3.3] | INVALID +0.0 [+0.0, +0.0]
+    Q1 - Q5 (pp): wrongA +3.5 [-1.4, +7.8] | wrongB +1.6 [-2.2, +5.4] | wrong(est) A +2.3 [-2.3, +6.8] | wrong(est) B +0.6 [-3.0, +4.2]
+  quintiles of leaf_margin[af_s42] (Q1 = lowest margin):
+    Q      n_q    n_m | tie                      flip                     both-tie                 INVALID                  | wrongA (kd)              wrongB (committed kd)    | wrong(est) A             wrong(est) B            
+    Q1     562   1895 | 0.211 [0.191, 0.229]     0.143 [0.128, 0.160]     0.068 [0.055, 0.080]     0.000 [0.000, 0.000]     | 0.162 [0.127, 0.194]     0.099 [0.071, 0.128]     | 0.146 [0.113, 0.181]     0.090 [0.064, 0.118]    
+    Q2     561   1862 | 0.211 [0.191, 0.230]     0.146 [0.130, 0.162]     0.065 [0.052, 0.079]     0.000 [0.000, 0.000]     | 0.130 [0.101, 0.161]     0.069 [0.047, 0.094]     | 0.111 [0.087, 0.138]     0.057 [0.037, 0.079]    
+    Q3     562   1899 | 0.217 [0.197, 0.237]     0.144 [0.127, 0.162]     0.073 [0.060, 0.085]     0.000 [0.000, 0.000]     | 0.147 [0.117, 0.178]     0.071 [0.048, 0.095]     | 0.134 [0.104, 0.165]     0.062 [0.043, 0.085]    
+    Q4     561   1779 | 0.208 [0.187, 0.229]     0.139 [0.123, 0.156]     0.069 [0.056, 0.084]     0.000 [0.000, 0.000]     | 0.143 [0.113, 0.175]     0.081 [0.058, 0.105]     | 0.133 [0.101, 0.165]     0.077 [0.053, 0.103]    
+    Q5     562   1696 | 0.198 [0.177, 0.219]     0.137 [0.119, 0.156]     0.061 [0.048, 0.074]     0.000 [0.000, 0.000]     | 0.160 [0.128, 0.194]     0.091 [0.065, 0.120]     | 0.143 [0.112, 0.177]     0.086 [0.060, 0.115]    
+    key-decidable matches per quintile: 909, 908, 925, 877, 884; established key-decidable: 806, 804, 816, 762, 770
+    Q1 - Q5 (pp): tie +1.2 [-1.8, +4.0] | flip +0.6 [-1.9, +3.0] | both-tie +0.7 [-1.1, +2.4] | INVALID +0.0 [+0.0, +0.0]
+    Q1 - Q5 (pp): wrongA +0.2 [-4.9, +4.9] | wrongB +0.9 [-3.3, +4.8] | wrong(est) A +0.4 [-4.3, +5.0] | wrong(est) B +0.4 [-3.6, +4.5]
+  Spearman(leaf margin, per-question share), n questions: tie rho -0.040 [-0.076, -0.003] n=2808 | flip rho -0.051 [-0.088, -0.014] n=2808 | disagreement rho -0.040 [-0.078, -0.001] n=2808 | wrongA rho -0.015 [-0.058, +0.025] n=2029
+  logit flip ~ z(leaf margin) + none   FE: beta -0.079 (SE 0.034) [-0.145, -0.013] OR/SD 0.924, cells 1, n 9131, conv True | + key difficulty: margin -0.087 [-0.153, -0.021], difficulty -0.114 [-0.182, -0.046]
+  logit flip ~ z(leaf margin) + anchor FE: beta -0.086 (SE 0.035) [-0.155, -0.016] OR/SD 0.918, cells 14, n 9131, conv True | + key difficulty: margin -0.087 [-0.156, -0.018], difficulty -0.110 [-0.179, -0.041]
+  logit flip ~ z(leaf margin) + leaf   FE: beta -0.065 (SE 0.039) [-0.141, +0.011] OR/SD 0.937, cells 87, n 9131, conv True | + key difficulty: margin -0.066 [-0.142, +0.010], difficulty -0.117 [-0.188, -0.047]
+  logit tie  ~ z(leaf margin) + none   FE: beta -0.041 (SE 0.029) [-0.099, +0.016] OR/SD 0.959, cells 1, n 9131, conv True | + key difficulty: margin -0.039 [-0.096, +0.018], difficulty +0.034 [-0.025, +0.092]
+  logit tie  ~ z(leaf margin) + anchor FE: beta -0.048 (SE 0.031) [-0.108, +0.013] OR/SD 0.953, cells 14, n 9131, conv True | + key difficulty: margin -0.047 [-0.108, +0.013], difficulty +0.053 [-0.009, +0.115]
+  logit tie  ~ z(leaf margin) + leaf   FE: beta -0.034 (SE 0.034) [-0.100, +0.031] OR/SD 0.966, cells 87, n 9131, conv True | + key difficulty: margin -0.034 [-0.100, +0.032], difficulty +0.024 [-0.038, +0.087]
+  Kotlin two-candidate flag: n_q 314 vs 2494; tie 0.206 vs 0.210, diff -0.4pp [-2.9, +2.2]; flip 0.145 vs 0.142, diff +0.3pp [-2.0, +2.7]
+  order stability per quintile (BT of record on the quintile's matches, 12 models; B = 2000): Q1 rho(key) 0.979 [0.951, 0.986] inst 0.015 | Q2 rho(key) 0.965 [0.937, 0.986] inst 0.020 | Q3 rho(key) 0.944 [0.937, 0.986] inst 0.026 | Q4 rho(key) 0.979 [0.951, 0.993] inst 0.022 | Q5 rho(key) 0.986 [0.958, 0.986] inst 0.014
+    instability Q1 - Q5 +0.001 [-0.030, +0.030] (draw-wise difference; mm_fit vs vectorised max |diff| 8.9e-16)
+
+--- cache merged: 21519 matches on 2808 questions with a margin (17 matches on questions without one dropped); 14 anchors; 2941 edges tested, 2202 established (McNemar p < 0.05 on the anchor's judged questions in this cache); INVALID rows 0; non-stop finish rows 0
+  quintiles of leaf_margin[bareq512_s42] (Q1 = lowest margin):
+    Q      n_q    n_m | tie                      flip                     both-tie                 INVALID                  | wrongA (kd)              wrongB (committed kd)    | wrong(est) A             wrong(est) B            
+    Q1     562   4513 | 0.231 [0.215, 0.247]     0.159 [0.146, 0.171]     0.072 [0.063, 0.082]     0.000 [0.000, 0.000]     | 0.139 [0.113, 0.165]     0.070 [0.051, 0.092]     | 0.124 [0.099, 0.149]     0.062 [0.044, 0.082]    
+    Q2     561   4482 | 0.227 [0.213, 0.242]     0.158 [0.147, 0.170]     0.069 [0.060, 0.078]     0.000 [0.000, 0.000]     | 0.128 [0.101, 0.156]     0.067 [0.049, 0.088]     | 0.111 [0.088, 0.137]     0.065 [0.045, 0.088]    
+    Q3     562   4398 | 0.219 [0.204, 0.234]     0.148 [0.137, 0.159]     0.071 [0.062, 0.081]     0.000 [0.000, 0.000]     | 0.149 [0.123, 0.179]     0.086 [0.065, 0.110]     | 0.140 [0.115, 0.165]     0.081 [0.060, 0.101]    
+    Q4     561   4120 | 0.213 [0.199, 0.228]     0.147 [0.134, 0.159]     0.067 [0.058, 0.077]     0.000 [0.000, 0.000]     | 0.118 [0.097, 0.140]     0.061 [0.046, 0.078]     | 0.108 [0.087, 0.128]     0.055 [0.040, 0.071]    
+    Q5     562   4006 | 0.233 [0.217, 0.249]     0.155 [0.142, 0.167]     0.078 [0.067, 0.089]     0.000 [0.000, 0.000]     | 0.127 [0.106, 0.151]     0.069 [0.052, 0.089]     | 0.112 [0.090, 0.134]     0.062 [0.046, 0.080]    
+    key-decidable matches per quintile: 1818, 1685, 1807, 1743, 1757; established key-decidable: 1613, 1463, 1603, 1550, 1540
+    Q1 - Q5 (pp): tie -0.2 [-2.4, +2.1] | flip +0.4 [-1.3, +2.1] | both-tie -0.6 [-2.0, +0.9] | INVALID +0.0 [+0.0, +0.0]
+    Q1 - Q5 (pp): wrongA +1.1 [-2.3, +4.5] | wrongB +0.1 [-2.6, +2.9] | wrong(est) A +1.2 [-2.3, +4.6] | wrong(est) B +0.0 [-2.5, +2.6]
+  quintiles of d1_margin[bareq512_s42] (Q1 = lowest margin):
+    Q      n_q    n_m | tie                      flip                     both-tie                 INVALID                  | wrongA (kd)              wrongB (committed kd)    | wrong(est) A             wrong(est) B            
+    Q1     562   5003 | 0.232 [0.217, 0.247]     0.162 [0.150, 0.173]     0.071 [0.061, 0.080]     0.000 [0.000, 0.000]     | 0.152 [0.124, 0.181]     0.087 [0.065, 0.109]     | 0.138 [0.112, 0.166]     0.083 [0.062, 0.106]    
+    Q2     561   4627 | 0.230 [0.215, 0.243]     0.163 [0.151, 0.175]     0.067 [0.059, 0.076]     0.000 [0.000, 0.000]     | 0.140 [0.114, 0.169]     0.081 [0.060, 0.103]     | 0.127 [0.103, 0.153]     0.071 [0.052, 0.093]    
+    Q3     562   4479 | 0.220 [0.206, 0.235]     0.147 [0.137, 0.158]     0.073 [0.064, 0.083]     0.000 [0.000, 0.000]     | 0.111 [0.091, 0.134]     0.058 [0.041, 0.074]     | 0.100 [0.080, 0.121]     0.050 [0.036, 0.066]    
+    Q4     561   4314 | 0.228 [0.212, 0.244]     0.152 [0.139, 0.166]     0.076 [0.066, 0.086]     0.000 [0.000, 0.000]     | 0.140 [0.117, 0.164]     0.068 [0.052, 0.086]     | 0.122 [0.100, 0.145]     0.063 [0.047, 0.082]    
+    Q5     562   3096 | 0.207 [0.192, 0.223]     0.137 [0.124, 0.150]     0.071 [0.059, 0.083]     0.000 [0.000, 0.000]     | 0.113 [0.091, 0.137]     0.057 [0.041, 0.077]     | 0.105 [0.082, 0.130]     0.057 [0.039, 0.077]    
+    key-decidable matches per quintile: 1926, 1802, 1894, 1875, 1313; established key-decidable: 1675, 1586, 1685, 1669, 1154
+    Q1 - Q5 (pp): tie +2.5 [+0.2, +4.5] | flip +2.5 [+0.7, +4.3] | both-tie -0.0 [-1.5, +1.5] | INVALID +0.0 [+0.0, +0.0]
+    Q1 - Q5 (pp): wrongA +3.9 [+0.2, +7.7] | wrongB +2.9 [-0.1, +5.8] | wrong(est) A +3.3 [-0.5, +7.0] | wrong(est) B +2.6 [-0.2, +5.6]
+  quintiles of leaf_margin[af_s42] (Q1 = lowest margin):
+    Q      n_q    n_m | tie                      flip                     both-tie                 INVALID                  | wrongA (kd)              wrongB (committed kd)    | wrong(est) A             wrong(est) B            
+    Q1     562   4447 | 0.233 [0.218, 0.247]     0.154 [0.144, 0.166]     0.078 [0.069, 0.088]     0.000 [0.000, 0.000]     | 0.150 [0.122, 0.178]     0.088 [0.067, 0.111]     | 0.133 [0.106, 0.161]     0.079 [0.058, 0.100]    
+    Q2     561   4378 | 0.228 [0.213, 0.242]     0.158 [0.147, 0.170]     0.069 [0.060, 0.079]     0.000 [0.000, 0.000]     | 0.113 [0.089, 0.138]     0.058 [0.039, 0.078]     | 0.099 [0.078, 0.123]     0.051 [0.035, 0.070]    
+    Q3     562   4507 | 0.225 [0.210, 0.241]     0.154 [0.142, 0.166]     0.072 [0.063, 0.082]     0.000 [0.000, 0.000]     | 0.130 [0.107, 0.156]     0.063 [0.046, 0.082]     | 0.118 [0.096, 0.141]     0.058 [0.042, 0.075]    
+    Q4     561   4221 | 0.215 [0.201, 0.231]     0.148 [0.136, 0.160]     0.067 [0.058, 0.077]     0.000 [0.000, 0.000]     | 0.131 [0.107, 0.155]     0.073 [0.054, 0.091]     | 0.122 [0.098, 0.148]     0.071 [0.053, 0.090]    
+    Q5     562   3966 | 0.222 [0.206, 0.237]     0.152 [0.139, 0.165]     0.070 [0.060, 0.080]     0.000 [0.000, 0.000]     | 0.139 [0.115, 0.165]     0.074 [0.055, 0.096]     | 0.124 [0.100, 0.149]     0.069 [0.051, 0.089]    
+    key-decidable matches per quintile: 1729, 1785, 1836, 1722, 1738; established key-decidable: 1513, 1592, 1624, 1501, 1539
+    Q1 - Q5 (pp): tie +1.1 [-1.1, +3.2] | flip +0.3 [-1.4, +1.9] | both-tie +0.8 [-0.6, +2.2] | INVALID +0.0 [+0.0, +0.0]
+    Q1 - Q5 (pp): wrongA +1.2 [-2.7, +4.7] | wrongB +1.3 [-1.7, +4.3] | wrong(est) A +0.9 [-2.9, +4.5] | wrong(est) B +1.0 [-1.9, +3.9]
+  Spearman(leaf margin, per-question share), n questions: tie rho -0.012 [-0.048, +0.027] n=2808 | flip rho -0.034 [-0.072, +0.001] n=2808 | disagreement rho -0.012 [-0.047, +0.027] n=2808 | wrongA rho +0.017 [-0.023, +0.057] n=2338
+  logit flip ~ z(leaf margin) + none   FE: beta -0.024 (SE 0.022) [-0.068, +0.020] OR/SD 0.976, cells 1, n 21519, conv True | + key difficulty: margin -0.032 [-0.076, +0.012], difficulty -0.099 [-0.145, -0.054]
+  logit flip ~ z(leaf margin) + anchor FE: beta -0.029 (SE 0.023) [-0.075, +0.017] OR/SD 0.971, cells 14, n 21519, conv True | + key difficulty: margin -0.031 [-0.076, +0.015], difficulty -0.090 [-0.136, -0.044]
+  logit flip ~ z(leaf margin) + leaf   FE: beta -0.024 (SE 0.025) [-0.074, +0.025] OR/SD 0.976, cells 87, n 21519, conv True | + key difficulty: margin -0.026 [-0.075, +0.024], difficulty -0.098 [-0.145, -0.051]
+  logit tie  ~ z(leaf margin) + none   FE: beta -0.013 (SE 0.020) [-0.053, +0.027] OR/SD 0.987, cells 1, n 21519, conv True | + key difficulty: margin -0.013 [-0.053, +0.028], difficulty +0.002 [-0.040, +0.043]
+  logit tie  ~ z(leaf margin) + anchor FE: beta -0.018 (SE 0.022) [-0.060, +0.024] OR/SD 0.982, cells 14, n 21519, conv True | + key difficulty: margin -0.018 [-0.060, +0.024], difficulty +0.022 [-0.022, +0.066]
+  logit tie  ~ z(leaf margin) + leaf   FE: beta -0.008 (SE 0.024) [-0.054, +0.039] OR/SD 0.992, cells 87, n 21519, conv True | + key difficulty: margin -0.008 [-0.054, +0.039], difficulty -0.001 [-0.046, +0.043]
+  Kotlin two-candidate flag: n_q 314 vs 2494; tie 0.223 vs 0.225, diff -0.2pp [-2.2, +1.8]; flip 0.154 vs 0.153, diff +0.1pp [-1.6, +1.9]
+  order stability per quintile (BT of record on the quintile's matches, 20 models; B = 2000): Q1 rho(key) 0.970 [0.952, 0.982] inst 0.020 | Q2 rho(key) 0.955 [0.934, 0.968] inst 0.023 | Q3 rho(key) 0.959 [0.937, 0.971] inst 0.026 | Q4 rho(key) 0.967 [0.943, 0.976] inst 0.024 | Q5 rho(key) 0.962 [0.949, 0.973] inst 0.019
+    instability Q1 - Q5 +0.001 [-0.021, +0.026] (draw-wise difference; mm_fit vs vectorised max |diff| 6.7e-16)
+
+--- cache grok: 9131 matches on 2808 questions with a margin (11 matches on questions without one dropped); 14 anchors; 924 edges tested, 809 established (McNemar p < 0.05 on the anchor's judged questions in this cache); INVALID rows 10; non-stop finish rows 1
+  quintiles of leaf_margin[bareq512_s42] (Q1 = lowest margin):
+    Q      n_q    n_m | tie                      flip                     both-tie                 INVALID                  | wrongA (kd)              wrongB (committed kd)    | wrong(est) A             wrong(est) B            
+    Q1     562   1933 | 0.229 [0.208, 0.250]     0.163 [0.144, 0.182]     0.066 [0.055, 0.078]     0.002 [0.001, 0.004]     | 0.176 [0.142, 0.211]     0.091 [0.064, 0.117]     | 0.161 [0.127, 0.198]     0.080 [0.056, 0.107]    
+    Q2     561   1907 | 0.225 [0.205, 0.245]     0.162 [0.146, 0.179]     0.063 [0.051, 0.076]     0.001 [0.000, 0.002]     | 0.139 [0.107, 0.175]     0.078 [0.052, 0.110]     | 0.128 [0.094, 0.166]     0.079 [0.050, 0.110]    
+    Q3     562   1851 | 0.210 [0.190, 0.230]     0.149 [0.133, 0.166]     0.061 [0.050, 0.073]     0.001 [0.000, 0.003]     | 0.163 [0.130, 0.197]     0.101 [0.073, 0.133]     | 0.146 [0.116, 0.176]     0.084 [0.059, 0.109]    
+    Q4     561   1760 | 0.209 [0.191, 0.227]     0.140 [0.125, 0.154]     0.069 [0.057, 0.083]     0.001 [0.000, 0.002]     | 0.133 [0.106, 0.163]     0.066 [0.047, 0.090]     | 0.121 [0.093, 0.149]     0.059 [0.041, 0.081]    
+    Q5     562   1680 | 0.220 [0.197, 0.243]     0.155 [0.136, 0.175]     0.065 [0.052, 0.078]     0.001 [0.000, 0.003]     | 0.147 [0.117, 0.178]     0.085 [0.060, 0.112]     | 0.142 [0.112, 0.173]     0.083 [0.057, 0.110]    
+    key-decidable matches per quintile: 957, 861, 910, 892, 883; established key-decidable: 855, 740, 804, 794, 765
+    Q1 - Q5 (pp): tie +0.9 [-2.2, +3.9] | flip +0.8 [-1.9, +3.4] | both-tie +0.1 [-1.6, +1.9] | INVALID +0.1 [-0.2, +0.4]
+    Q1 - Q5 (pp): wrongA +2.8 [-1.8, +7.4] | wrongB +0.6 [-3.2, +4.2] | wrong(est) A +1.9 [-2.7, +6.8] | wrong(est) B -0.3 [-4.0, +3.3]
+  quintiles of d1_margin[bareq512_s42] (Q1 = lowest margin):
+    Q      n_q    n_m | tie                      flip                     both-tie                 INVALID                  | wrongA (kd)              wrongB (committed kd)    | wrong(est) A             wrong(est) B            
+    Q1     562   2100 | 0.242 [0.222, 0.262]     0.170 [0.154, 0.188]     0.071 [0.060, 0.083]     0.001 [0.000, 0.003]     | 0.181 [0.146, 0.217]     0.098 [0.071, 0.129]     | 0.171 [0.137, 0.205]     0.092 [0.066, 0.120]    
+    Q2     561   1948 | 0.215 [0.195, 0.233]     0.160 [0.143, 0.177]     0.055 [0.044, 0.065]     0.001 [0.000, 0.002]     | 0.159 [0.124, 0.197]     0.095 [0.065, 0.127]     | 0.144 [0.110, 0.179]     0.081 [0.053, 0.112]    
+    Q3     562   1946 | 0.202 [0.183, 0.221]     0.139 [0.123, 0.156]     0.064 [0.051, 0.076]     0.002 [0.000, 0.004]     | 0.120 [0.093, 0.147]     0.063 [0.042, 0.087]     | 0.111 [0.086, 0.138]     0.058 [0.037, 0.080]    
+    Q4     561   1820 | 0.229 [0.207, 0.252]     0.156 [0.138, 0.175]     0.073 [0.059, 0.086]     0.002 [0.000, 0.004]     | 0.163 [0.130, 0.194]     0.087 [0.062, 0.117]     | 0.145 [0.113, 0.178]     0.076 [0.053, 0.104]    
+    Q5     562   1317 | 0.200 [0.176, 0.222]     0.140 [0.120, 0.158]     0.060 [0.047, 0.074]     0.000 [0.000, 0.000]     | 0.133 [0.102, 0.167]     0.080 [0.054, 0.108]     | 0.127 [0.096, 0.160]     0.080 [0.054, 0.109]    
+    key-decidable matches per quintile: 977, 931, 992, 939, 664; established key-decidable: 846, 813, 881, 836, 582
+    Q1 - Q5 (pp): tie +4.2 [+1.2, +7.3] | flip +3.1 [+0.5, +5.6] | both-tie +1.1 [-0.6, +3.0] | INVALID +0.1 [+0.0, +0.3]
+    Q1 - Q5 (pp): wrongA +4.9 [-0.0, +9.6] | wrongB +1.8 [-2.0, +5.8] | wrong(est) A +4.4 [-0.3, +9.0] | wrong(est) B +1.2 [-2.8, +5.0]
+  quintiles of leaf_margin[af_s42] (Q1 = lowest margin):
+    Q      n_q    n_m | tie                      flip                     both-tie                 INVALID                  | wrongA (kd)              wrongB (committed kd)    | wrong(est) A             wrong(est) B            
+    Q1     562   1895 | 0.214 [0.195, 0.234]     0.148 [0.132, 0.165]     0.066 [0.055, 0.079]     0.001 [0.000, 0.002]     | 0.164 [0.132, 0.197]     0.102 [0.072, 0.132]     | 0.149 [0.116, 0.184]     0.091 [0.064, 0.119]    
+    Q2     561   1862 | 0.236 [0.213, 0.259]     0.170 [0.150, 0.189]     0.066 [0.054, 0.080]     0.001 [0.000, 0.002]     | 0.142 [0.111, 0.174]     0.070 [0.047, 0.095]     | 0.124 [0.095, 0.154]     0.058 [0.037, 0.080]    
+    Q3     562   1899 | 0.216 [0.196, 0.237]     0.148 [0.132, 0.166]     0.068 [0.056, 0.080]     0.002 [0.000, 0.004]     | 0.136 [0.105, 0.170]     0.079 [0.052, 0.111]     | 0.131 [0.099, 0.165]     0.076 [0.049, 0.102]    
+    Q4     561   1779 | 0.223 [0.203, 0.245]     0.156 [0.140, 0.175]     0.067 [0.054, 0.081]     0.001 [0.000, 0.003]     | 0.141 [0.110, 0.176]     0.076 [0.051, 0.104]     | 0.131 [0.100, 0.163]     0.070 [0.045, 0.097]    
+    Q5     562   1696 | 0.204 [0.184, 0.224]     0.147 [0.130, 0.164]     0.057 [0.045, 0.068]     0.002 [0.000, 0.004]     | 0.178 [0.144, 0.212]     0.096 [0.069, 0.125]     | 0.166 [0.134, 0.202]     0.089 [0.063, 0.118]    
+    key-decidable matches per quintile: 909, 908, 925, 877, 884; established key-decidable: 806, 804, 816, 762, 770
+    Q1 - Q5 (pp): tie +1.0 [-1.8, +3.9] | flip +0.1 [-2.3, +2.5] | both-tie +0.9 [-0.7, +2.6] | INVALID -0.1 [-0.4, +0.1]
+    Q1 - Q5 (pp): wrongA -1.4 [-6.4, +3.2] | wrongB +0.6 [-3.6, +4.6] | wrong(est) A -1.7 [-6.5, +3.0] | wrong(est) B +0.2 [-3.7, +4.1]
+  Spearman(leaf margin, per-question share), n questions: tie rho -0.023 [-0.060, +0.014] n=2808 | flip rho -0.016 [-0.054, +0.021] n=2808 | disagreement rho -0.024 [-0.062, +0.014] n=2808 | wrongA rho -0.024 [-0.068, +0.020] n=2029
+  logit flip ~ z(leaf margin) + none   FE: beta -0.046 (SE 0.032) [-0.109, +0.018] OR/SD 0.955, cells 1, n 9131, conv True | + key difficulty: margin -0.047 [-0.111, +0.017], difficulty -0.013 [-0.080, +0.053]
+  logit flip ~ z(leaf margin) + anchor FE: beta -0.049 (SE 0.033) [-0.114, +0.016] OR/SD 0.952, cells 14, n 9131, conv True | + key difficulty: margin -0.049 [-0.114, +0.016], difficulty -0.008 [-0.078, +0.061]
+  logit flip ~ z(leaf margin) + leaf   FE: beta -0.039 (SE 0.036) [-0.110, +0.032] OR/SD 0.962, cells 87, n 9131, conv True | + key difficulty: margin -0.039 [-0.110, +0.032], difficulty -0.024 [-0.094, +0.046]
+  logit tie  ~ z(leaf margin) + none   FE: beta -0.033 (SE 0.030) [-0.091, +0.025] OR/SD 0.967, cells 1, n 9131, conv True | + key difficulty: margin -0.029 [-0.087, +0.029], difficulty +0.060 [+0.001, +0.120]
+  logit tie  ~ z(leaf margin) + anchor FE: beta -0.040 (SE 0.031) [-0.100, +0.020] OR/SD 0.961, cells 14, n 9131, conv True | + key difficulty: margin -0.039 [-0.099, +0.020], difficulty +0.082 [+0.018, +0.146]
+  logit tie  ~ z(leaf margin) + leaf   FE: beta -0.032 (SE 0.033) [-0.097, +0.032] OR/SD 0.968, cells 87, n 9131, conv True | + key difficulty: margin -0.032 [-0.097, +0.032], difficulty +0.050 [-0.014, +0.114]
+  Kotlin two-candidate flag: n_q 314 vs 2494; tie 0.219 vs 0.219, diff -0.0pp [-2.8, +3.0]; flip 0.163 vs 0.153, diff +1.0pp [-1.5, +3.6]
+  order stability per quintile (BT of record on the quintile's matches, 12 models; B = 2000): Q1 rho(key) 0.972 [0.930, 0.986] inst 0.017 | Q2 rho(key) 0.965 [0.937, 0.986] inst 0.021 | Q3 rho(key) 0.972 [0.937, 0.986] inst 0.024 | Q4 rho(key) 0.972 [0.958, 0.993] inst 0.017 | Q5 rho(key) 0.986 [0.965, 0.993] inst 0.013
+    instability Q1 - Q5 +0.004 [-0.030, +0.045] (draw-wise difference; mm_fit vs vectorised max |diff| 6.7e-16)
+
+--- cache kotlin: 9112 matches on 2798 questions with a margin (11 matches on questions without one dropped); 14 anchors; 924 edges tested, 810 established (McNemar p < 0.05 on the anchor's judged questions in this cache); INVALID rows 17; non-stop finish rows 3
+  quintiles of leaf_margin[bareq512_s42] (Q1 = lowest margin):
+    Q      n_q    n_m | tie                      flip                     both-tie                 INVALID                  | wrongA (kd)              wrongB (committed kd)    | wrong(est) A             wrong(est) B            
+    Q1     561   1930 | 0.225 [0.204, 0.249]     0.165 [0.147, 0.183]     0.060 [0.049, 0.071]     0.003 [0.001, 0.005]     | 0.159 [0.129, 0.192]     0.085 [0.060, 0.113]     | 0.145 [0.114, 0.177]     0.076 [0.052, 0.103]    
+    Q2     561   1907 | 0.223 [0.203, 0.243]     0.165 [0.148, 0.182]     0.058 [0.047, 0.069]     0.003 [0.001, 0.005]     | 0.144 [0.111, 0.179]     0.080 [0.052, 0.109]     | 0.131 [0.097, 0.166]     0.081 [0.054, 0.113]    
+    Q3     562   1851 | 0.222 [0.202, 0.243]     0.151 [0.133, 0.168]     0.071 [0.058, 0.084]     0.001 [0.000, 0.003]     | 0.169 [0.134, 0.207]     0.107 [0.075, 0.141]     | 0.160 [0.126, 0.196]     0.096 [0.068, 0.127]    
+    Q4     557   1755 | 0.221 [0.202, 0.238]     0.165 [0.148, 0.182]     0.055 [0.045, 0.067]     0.002 [0.000, 0.004]     | 0.131 [0.104, 0.160]     0.062 [0.042, 0.083]     | 0.127 [0.099, 0.156]     0.058 [0.039, 0.080]    
+    Q5     557   1669 | 0.209 [0.186, 0.233]     0.145 [0.128, 0.163]     0.064 [0.050, 0.079]     0.001 [0.000, 0.003]     | 0.134 [0.106, 0.166]     0.079 [0.054, 0.106]     | 0.130 [0.099, 0.161]     0.078 [0.053, 0.105]    
+    key-decidable matches per quintile: 955, 861, 910, 890, 875; established key-decidable: 857, 741, 814, 794, 763
+    Q1 - Q5 (pp): tie +1.6 [-1.6, +4.8] | flip +2.0 [-0.5, +4.5] | both-tie -0.4 [-2.2, +1.4] | INVALID +0.1 [-0.1, +0.4]
+    Q1 - Q5 (pp): wrongA +2.5 [-1.8, +7.0] | wrongB +0.6 [-3.1, +4.5] | wrong(est) A +1.5 [-3.0, +6.0] | wrong(est) B -0.2 [-3.9, +3.4]
+  quintiles of d1_margin[bareq512_s42] (Q1 = lowest margin):
+    Q      n_q    n_m | tie                      flip                     both-tie                 INVALID                  | wrongA (kd)              wrongB (committed kd)    | wrong(est) A             wrong(est) B            
+    Q1     562   2100 | 0.248 [0.228, 0.268]     0.183 [0.166, 0.200]     0.064 [0.054, 0.075]     0.001 [0.000, 0.003]     | 0.173 [0.139, 0.210]     0.099 [0.071, 0.129]     | 0.162 [0.130, 0.196]     0.094 [0.068, 0.122]    
+    Q2     560   1947 | 0.215 [0.194, 0.234]     0.160 [0.144, 0.175]     0.055 [0.045, 0.066]     0.003 [0.001, 0.005]     | 0.153 [0.120, 0.190]     0.092 [0.064, 0.124]     | 0.142 [0.108, 0.178]     0.084 [0.056, 0.113]    
+    Q3     562   1946 | 0.217 [0.197, 0.238]     0.158 [0.142, 0.175]     0.060 [0.048, 0.071]     0.002 [0.000, 0.004]     | 0.130 [0.103, 0.158]     0.059 [0.038, 0.081]     | 0.121 [0.095, 0.149]     0.054 [0.036, 0.073]    
+    Q4     561   1820 | 0.220 [0.196, 0.242]     0.151 [0.133, 0.169]     0.069 [0.056, 0.083]     0.001 [0.000, 0.002]     | 0.146 [0.118, 0.179]     0.082 [0.059, 0.109]     | 0.139 [0.108, 0.171]     0.078 [0.054, 0.104]    
+    Q5     553   1299 | 0.189 [0.167, 0.211]     0.130 [0.112, 0.149]     0.059 [0.046, 0.073]     0.004 [0.001, 0.008]     | 0.133 [0.101, 0.168]     0.083 [0.055, 0.113]     | 0.128 [0.094, 0.164]     0.084 [0.056, 0.114]    
+    key-decidable matches per quintile: 977, 930, 992, 939, 653; established key-decidable: 848, 817, 883, 843, 578
+    Q1 - Q5 (pp): tie +5.8 [+2.8, +8.9] | flip +5.3 [+2.8, +7.9] | both-tie +0.5 [-1.2, +2.2] | INVALID -0.2 [-0.6, +0.1]
+    Q1 - Q5 (pp): wrongA +4.0 [-0.9, +8.9] | wrongB +1.7 [-2.3, +5.8] | wrong(est) A +3.4 [-1.5, +8.0] | wrong(est) B +1.1 [-3.2, +5.1]
+  quintiles of leaf_margin[af_s42] (Q1 = lowest margin):
+    Q      n_q    n_m | tie                      flip                     both-tie                 INVALID                  | wrongA (kd)              wrongB (committed kd)    | wrong(est) A             wrong(est) B            
+    Q1     561   1892 | 0.226 [0.206, 0.245]     0.159 [0.141, 0.174]     0.068 [0.056, 0.080]     0.001 [0.000, 0.002]     | 0.158 [0.127, 0.190]     0.099 [0.075, 0.127]     | 0.144 [0.114, 0.178]     0.089 [0.063, 0.118]    
+    Q2     561   1862 | 0.230 [0.208, 0.253]     0.169 [0.149, 0.189]     0.061 [0.049, 0.074]     0.003 [0.001, 0.005]     | 0.143 [0.113, 0.176]     0.066 [0.042, 0.091]     | 0.126 [0.099, 0.155]     0.054 [0.035, 0.075]    
+    Q3     560   1897 | 0.229 [0.208, 0.250]     0.166 [0.150, 0.183]     0.063 [0.051, 0.075]     0.002 [0.001, 0.004]     | 0.143 [0.110, 0.176]     0.078 [0.051, 0.110]     | 0.142 [0.108, 0.178]     0.079 [0.053, 0.106]    
+    Q4     560   1778 | 0.217 [0.197, 0.238]     0.154 [0.137, 0.171]     0.064 [0.051, 0.077]     0.003 [0.001, 0.005]     | 0.140 [0.110, 0.174]     0.078 [0.053, 0.108]     | 0.138 [0.108, 0.171]     0.074 [0.049, 0.100]    
+    Q5     556   1683 | 0.197 [0.177, 0.216]     0.145 [0.128, 0.163]     0.052 [0.041, 0.063]     0.001 [0.000, 0.003]     | 0.155 [0.125, 0.186]     0.093 [0.068, 0.122]     | 0.145 [0.114, 0.181]     0.094 [0.065, 0.124]    
+    key-decidable matches per quintile: 907, 908, 924, 877, 875; established key-decidable: 808, 808, 818, 768, 767
+    Q1 - Q5 (pp): tie +3.0 [+0.3, +5.6] | flip +1.4 [-1.0, +3.6] | both-tie +1.6 [+0.0, +3.2] | INVALID -0.1 [-0.3, +0.1]
+    Q1 - Q5 (pp): wrongA +0.2 [-4.1, +4.7] | wrongB +0.6 [-3.3, +4.3] | wrong(est) A -0.1 [-4.7, +4.4] | wrong(est) B -0.4 [-4.6, +3.7]
+  Spearman(leaf margin, per-question share), n questions: tie rho -0.020 [-0.059, +0.019] n=2798 | flip rho -0.008 [-0.044, +0.032] n=2798 | disagreement rho -0.022 [-0.060, +0.014] n=2798 | wrongA rho -0.033 [-0.075, +0.010] n=2022
+  logit flip ~ z(leaf margin) + none   FE: beta -0.054 (SE 0.032) [-0.116, +0.008] OR/SD 0.947, cells 1, n 9112, conv True | + key difficulty: margin -0.052 [-0.114, +0.010], difficulty +0.023 [-0.041, +0.088]
+  logit flip ~ z(leaf margin) + anchor FE: beta -0.054 (SE 0.033) [-0.119, +0.010] OR/SD 0.947, cells 14, n 9112, conv True | + key difficulty: margin -0.054 [-0.118, +0.010], difficulty +0.030 [-0.037, +0.098]
+  logit flip ~ z(leaf margin) + leaf   FE: beta -0.061 (SE 0.036) [-0.132, +0.009] OR/SD 0.941, cells 86, n 9068, conv True | + key difficulty: margin -0.061 [-0.132, +0.009], difficulty +0.011 [-0.057, +0.079]
+  logit tie  ~ z(leaf margin) + none   FE: beta -0.044 (SE 0.030) [-0.103, +0.016] OR/SD 0.957, cells 1, n 9112, conv True | + key difficulty: margin -0.037 [-0.096, +0.022], difficulty +0.087 [+0.028, +0.146]
+  logit tie  ~ z(leaf margin) + anchor FE: beta -0.046 (SE 0.031) [-0.107, +0.016] OR/SD 0.955, cells 14, n 9112, conv True | + key difficulty: margin -0.044 [-0.106, +0.017], difficulty +0.106 [+0.043, +0.169]
+  logit tie  ~ z(leaf margin) + leaf   FE: beta -0.040 (SE 0.034) [-0.107, +0.026] OR/SD 0.960, cells 87, n 9112, conv True | + key difficulty: margin -0.040 [-0.106, +0.026], difficulty +0.071 [+0.008, +0.134]
+  Kotlin two-candidate flag: n_q 314 vs 2484; tie 0.208 vs 0.222, diff -1.4pp [-4.2, +1.1]; flip 0.151 vs 0.160, diff -0.8pp [-3.0, +1.5]
+  order stability per quintile (BT of record on the quintile's matches, 12 models; B = 2000): Q1 rho(key) 0.972 [0.944, 0.993] inst 0.017 | Q2 rho(key) 0.979 [0.944, 0.986] inst 0.022 | Q3 rho(key) 0.958 [0.937, 0.986] inst 0.020 | Q4 rho(key) 0.993 [0.958, 0.993] inst 0.019 | Q5 rho(key) 0.979 [0.958, 0.986] inst 0.013
+    instability Q1 - Q5 +0.004 [-0.030, +0.045] (draw-wise difference; mm_fit vs vectorised max |diff| 4.4e-16)
+
+--- cache x20: 12388 matches on 2643 questions with a margin (6 matches on questions without one dropped); 14 anchors; 2024 edges tested, 1384 established (McNemar p < 0.05 on the anchor's judged questions in this cache); INVALID rows 0; non-stop finish rows 0
+  quintiles of leaf_margin[bareq512_s42] (Q1 = lowest margin):
+    Q      n_q    n_m | tie                      flip                     both-tie                 INVALID                  | wrongA (kd)              wrongB (committed kd)    | wrong(est) A             wrong(est) B            
+    Q1     533   2580 | 0.241 [0.222, 0.261]     0.163 [0.146, 0.179]     0.078 [0.067, 0.091]     0.000 [0.000, 0.000]     | 0.111 [0.084, 0.143]     0.053 [0.033, 0.076]     | 0.104 [0.076, 0.135]     0.052 [0.030, 0.075]    
+    Q2     529   2575 | 0.240 [0.221, 0.259]     0.167 [0.152, 0.184]     0.073 [0.061, 0.085]     0.000 [0.000, 0.000]     | 0.119 [0.087, 0.151]     0.063 [0.041, 0.090]     | 0.103 [0.076, 0.136]     0.061 [0.036, 0.088]    
+    Q3     532   2547 | 0.222 [0.204, 0.241]     0.150 [0.135, 0.165]     0.073 [0.062, 0.085]     0.000 [0.000, 0.000]     | 0.133 [0.103, 0.162]     0.075 [0.051, 0.101]     | 0.132 [0.101, 0.165]     0.075 [0.051, 0.101]    
+    Q4     521   2360 | 0.221 [0.203, 0.240]     0.154 [0.138, 0.169]     0.067 [0.056, 0.079]     0.000 [0.000, 0.000]     | 0.102 [0.078, 0.127]     0.050 [0.032, 0.069]     | 0.084 [0.061, 0.108]     0.040 [0.026, 0.057]    
+    Q5     528   2326 | 0.256 [0.235, 0.276]     0.175 [0.158, 0.192]     0.081 [0.068, 0.095]     0.000 [0.000, 0.000]     | 0.114 [0.091, 0.139]     0.055 [0.038, 0.074]     | 0.096 [0.073, 0.120]     0.048 [0.031, 0.066]    
+    key-decidable matches per quintile: 861, 824, 897, 851, 874; established key-decidable: 759, 727, 797, 753, 774
+    Q1 - Q5 (pp): tie -1.5 [-4.3, +1.3] | flip -1.2 [-3.7, +0.9] | both-tie -0.3 [-2.0, +1.4] | INVALID +0.0 [+0.0, +0.0]
+    Q1 - Q5 (pp): wrongA -0.3 [-4.1, +3.6] | wrongB -0.2 [-3.0, +2.7] | wrong(est) A +0.8 [-2.8, +4.7] | wrong(est) B +0.4 [-2.5, +3.3]
+  quintiles of d1_margin[bareq512_s42] (Q1 = lowest margin):
+    Q      n_q    n_m | tie                      flip                     both-tie                 INVALID                  | wrongA (kd)              wrongB (committed kd)    | wrong(est) A             wrong(est) B            
+    Q1     543   2903 | 0.238 [0.220, 0.256]     0.166 [0.153, 0.181]     0.071 [0.060, 0.083]     0.000 [0.000, 0.000]     | 0.136 [0.103, 0.173]     0.079 [0.055, 0.106]     | 0.126 [0.093, 0.160]     0.081 [0.055, 0.109]    
+    Q2     537   2679 | 0.238 [0.221, 0.258]     0.164 [0.150, 0.179]     0.074 [0.063, 0.086]     0.000 [0.000, 0.000]     | 0.131 [0.101, 0.160]     0.077 [0.053, 0.105]     | 0.121 [0.091, 0.151]     0.073 [0.049, 0.101]    
+    Q3     527   2533 | 0.236 [0.216, 0.255]     0.161 [0.146, 0.176]     0.075 [0.063, 0.086]     0.000 [0.000, 0.000]     | 0.096 [0.074, 0.120]     0.045 [0.030, 0.064]     | 0.082 [0.061, 0.106]     0.033 [0.019, 0.047]    
+    Q4     534   2494 | 0.239 [0.219, 0.259]     0.166 [0.149, 0.183]     0.073 [0.063, 0.084]     0.000 [0.000, 0.000]     | 0.118 [0.092, 0.144]     0.054 [0.038, 0.073]     | 0.103 [0.080, 0.129]     0.050 [0.033, 0.067]    
+    Q5     502   1779 | 0.227 [0.206, 0.248]     0.145 [0.127, 0.163]     0.082 [0.068, 0.097]     0.000 [0.000, 0.000]     | 0.092 [0.070, 0.120]     0.036 [0.021, 0.054]     | 0.080 [0.057, 0.104]     0.033 [0.017, 0.050]    
+    key-decidable matches per quintile: 949, 871, 902, 936, 649; established key-decidable: 833, 771, 801, 831, 574
+    Q1 - Q5 (pp): tie +1.1 [-1.7, +3.9] | flip +2.1 [-0.1, +4.4] | both-tie -1.0 [-2.9, +0.8] | INVALID +0.0 [+0.0, +0.0]
+    Q1 - Q5 (pp): wrongA +4.3 [+0.2, +8.6] | wrongB +4.3 [+1.3, +7.3] | wrong(est) A +4.6 [+0.4, +8.7] | wrong(est) B +4.8 [+1.8, +8.1]
+  quintiles of leaf_margin[af_s42] (Q1 = lowest margin):
+    Q      n_q    n_m | tie                      flip                     both-tie                 INVALID                  | wrongA (kd)              wrongB (committed kd)    | wrong(est) A             wrong(est) B            
+    Q1     538   2552 | 0.249 [0.229, 0.269]     0.163 [0.147, 0.178]     0.086 [0.073, 0.099]     0.000 [0.000, 0.000]     | 0.138 [0.105, 0.171]     0.075 [0.050, 0.101]     | 0.118 [0.088, 0.151]     0.066 [0.043, 0.093]    
+    Q2     533   2516 | 0.240 [0.222, 0.260]     0.167 [0.152, 0.182]     0.073 [0.062, 0.085]     0.000 [0.000, 0.000]     | 0.095 [0.069, 0.123]     0.047 [0.029, 0.068]     | 0.089 [0.065, 0.119]     0.045 [0.026, 0.066]    
+    Q3     536   2608 | 0.231 [0.212, 0.250]     0.160 [0.145, 0.175]     0.071 [0.060, 0.083]     0.000 [0.000, 0.000]     | 0.113 [0.086, 0.142]     0.055 [0.037, 0.075]     | 0.103 [0.077, 0.129]     0.053 [0.036, 0.074]    
+    Q4     517   2442 | 0.221 [0.202, 0.239]     0.155 [0.139, 0.171]     0.066 [0.055, 0.078]     0.000 [0.000, 0.000]     | 0.120 [0.092, 0.150]     0.064 [0.044, 0.088]     | 0.108 [0.082, 0.138]     0.062 [0.042, 0.087]    
+    Q5     519   2270 | 0.239 [0.220, 0.259]     0.163 [0.146, 0.179]     0.077 [0.065, 0.089]     0.000 [0.000, 0.000]     | 0.117 [0.091, 0.146]     0.058 [0.037, 0.079]     | 0.104 [0.078, 0.133]     0.050 [0.029, 0.073]    
+    key-decidable matches per quintile: 820, 877, 911, 845, 854; established key-decidable: 704, 786, 809, 740, 771
+    Q1 - Q5 (pp): tie +1.0 [-1.8, +3.6] | flip +0.0 [-2.3, +2.3] | both-tie +0.9 [-0.9, +2.6] | INVALID +0.0 [+0.0, +0.0]
+    Q1 - Q5 (pp): wrongA +2.1 [-2.4, +6.4] | wrongB +1.7 [-1.7, +5.1] | wrong(est) A +1.4 [-2.8, +5.6] | wrong(est) B +1.7 [-1.5, +5.2]
+  Spearman(leaf margin, per-question share), n questions: tie rho +0.008 [-0.032, +0.048] n=2643 | flip rho -0.005 [-0.045, +0.035] n=2643 | disagreement rho +0.008 [-0.030, +0.047] n=2643 | wrongA rho +0.020 [-0.025, +0.066] n=1818
+  logit flip ~ z(leaf margin) + none   FE: beta +0.011 (SE 0.027) [-0.043, +0.065] OR/SD 1.011, cells 1, n 12388, conv True | + key difficulty: margin +0.002 [-0.052, +0.056], difficulty -0.099 [-0.155, -0.044]
+  logit flip ~ z(leaf margin) + anchor FE: beta +0.007 (SE 0.029) [-0.050, +0.064] OR/SD 1.007, cells 14, n 12388, conv True | + key difficulty: margin +0.005 [-0.052, +0.062], difficulty -0.086 [-0.144, -0.028]
+  logit flip ~ z(leaf margin) + leaf   FE: beta +0.002 (SE 0.031) [-0.060, +0.063] OR/SD 1.002, cells 87, n 12388, conv True | + key difficulty: margin -0.000 [-0.061, +0.061], difficulty -0.094 [-0.153, -0.035]
+  logit tie  ~ z(leaf margin) + none   FE: beta +0.006 (SE 0.025) [-0.042, +0.055] OR/SD 1.006, cells 1, n 12388, conv True | + key difficulty: margin +0.003 [-0.045, +0.052], difficulty -0.029 [-0.080, +0.022]
+  logit tie  ~ z(leaf margin) + anchor FE: beta +0.001 (SE 0.027) [-0.051, +0.053] OR/SD 1.001, cells 14, n 12388, conv True | + key difficulty: margin +0.001 [-0.052, +0.053], difficulty -0.009 [-0.063, +0.045]
+  logit tie  ~ z(leaf margin) + leaf   FE: beta +0.009 (SE 0.030) [-0.049, +0.067] OR/SD 1.009, cells 87, n 12388, conv True | + key difficulty: margin +0.009 [-0.049, +0.067], difficulty -0.029 [-0.084, +0.027]
+  Kotlin two-candidate flag: n_q 305 vs 2338; tie 0.235 vs 0.236, diff -0.1pp [-2.6, +2.5]; flip 0.160 vs 0.162, diff -0.2pp [-2.3, +2.2]
+
+  cross-judge disagreement x12 vs grok (winner differs on the same match id; 9131 matches, 2808 questions): Q1 0.170 [0.153, 0.188] | Q2 0.166 [0.149, 0.184] | Q3 0.173 [0.156, 0.190] | Q4 0.159 [0.141, 0.178] | Q5 0.150 [0.133, 0.167] | Q1 - Q5 +2.0pp [-0.4, +4.6]
+  cross-judge disagreement x12 vs kotlin (winner differs on the same match id; 9112 matches, 2798 questions): Q1 0.166 [0.149, 0.184] | Q2 0.164 [0.146, 0.182] | Q3 0.159 [0.141, 0.178] | Q4 0.157 [0.140, 0.175] | Q5 0.151 [0.132, 0.170] | Q1 - Q5 +1.5pp [-1.0, +4.2]
+
+=== CRITERIA (scored on the merged Mistral board of record; replications on x12, grok, kotlin) ===
+  C1 concentration [merged]: tie Q1-Q5 -0.2pp [-2.4, +2.1] -> FAILED; flip +0.4pp [-1.3, +2.1] -> FAILED  (PRIMARY)
+  C1 concentration [x12]: tie Q1-Q5 +1.7pp [-1.2, +4.5] -> FAILED; flip +2.7pp [+0.4, +5.2] -> HELD
+  C1 concentration [grok]: tie Q1-Q5 +0.9pp [-2.2, +3.9] -> UNDETERMINED; flip +0.8pp [-1.9, +3.4] -> UNDETERMINED
+  C1 concentration [kotlin]: tie Q1-Q5 +1.6pp [-1.6, +4.8] -> UNDETERMINED; flip +2.0pp [-0.5, +4.5] -> UNDETERMINED
+  C1 concentration [x20]: tie Q1-Q5 -1.5pp [-4.3, +1.3] -> FAILED; flip -1.2pp [-3.7, +0.9] -> UNDETERMINED
+  C2 within-cell (leaf FE, flip) [merged]: beta -0.024 [-0.074, +0.025] -> FAILED; C2' with key difficulty: -0.026 [-0.075, +0.024] -> NOT HELD  (PRIMARY)
+  C2 within-cell (leaf FE, flip) [x12]: beta -0.065 [-0.141, +0.011] -> FAILED; C2' with key difficulty: -0.066 [-0.142, +0.010] -> NOT HELD
+  C2 within-cell (leaf FE, flip) [grok]: beta -0.039 [-0.110, +0.032] -> FAILED; C2' with key difficulty: -0.039 [-0.110, +0.032] -> NOT HELD
+  C2 within-cell (leaf FE, flip) [kotlin]: beta -0.061 [-0.132, +0.009] -> FAILED; C2' with key difficulty: -0.061 [-0.132, +0.009] -> NOT HELD
+  C3 wrong(established) [merged]: A +1.2pp [-2.3, +4.6]; B +0.0pp [-2.5, +2.6] -> HELD (no difference)  (PRIMARY)
+  C3 wrong(established) [x12]: A +1.5pp [-3.1, +5.9]; B -0.5pp [-4.2, +3.1] -> HELD (no difference)
+  C3 wrong(established) [grok]: A +1.9pp [-2.7, +6.8]; B -0.3pp [-4.0, +3.3] -> HELD (no difference)
+  C3 wrong(established) [kotlin]: A +1.5pp [-3.0, +6.0]; B -0.2pp [-3.9, +3.4] -> HELD (no difference)
+  C4 order stability [merged]: instability Q1 - Q5 +0.001 [-0.021, +0.026] -> NOT SHOWN  (PRIMARY)
+  C4 order stability [x12]: instability Q1 - Q5 +0.001 [-0.030, +0.030] -> NOT SHOWN
+  C4 order stability [grok]: instability Q1 - Q5 +0.004 [-0.030, +0.045] -> NOT SHOWN
+  C4 order stability [kotlin]: instability Q1 - Q5 +0.004 [-0.030, +0.045] -> NOT SHOWN
+  Spearman prediction |rho| < 0.15 [merged]: tie -0.012, flip -0.034 -> HELD
+
+  Falsifier (the MULTI-OWNERSHIP mechanism: boundary questions carry the disagreement): OVERTURNED
+  Consequence: no E4 judged arm; the MULTI-OWNERSHIP line closes at zero calls.
+
+=== PREDICTIONS (blind, docstring) scored on the merged board unless stated ===
+  caller: tie Q1-Q5 in [3, 6]pp: -0.2 -> MISSED | flip in [2, 4]pp: +0.4 -> MISSED | |rho| < 0.15 (tie -0.012, flip -0.034) -> HELD | within-cell survives (C2) -> FAILED | wrong(established) does not differ (C3) -> HELD (no difference)
+  arena specialist: tie in [1, 4]pp -> MISSED | flip in [1, 3]pp -> MISSED | |rho| < 0.10 -> HELD | C2 HELD and C2' NOT HELD -> MISSED | wrong(est) within +-2pp, intervals cover 0 -> HELD | instability Q1-Q5 covers 0 (+0.001 [-0.021, +0.026]) -> HELD | two-candidate tie diff < 2pp and covers 0 (-0.2pp [-2.2, +1.8]) -> HELD | grok and kotlin same tie sign as x12 -> HELD | af gradient weaker than bareq512 -> MISSED

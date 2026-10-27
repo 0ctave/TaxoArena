@@ -1,0 +1,107 @@
+{
+  "id": "JUDGE-SWAP",
+  "title": "JUDGE-SWAP: standing DECISION (2026-09-11): which model is the cheap judge? (free paired check, zero calls)",
+  "question": "The same 944 key-decidable R3 pairs under the same recipe (reasoning reference + v2 mechanics + clean anchor rubric + dual order + confidence): Mistral-Large-3 (stack_v2_promptv2.db) against grok-4-1-fast-non-reasoning (stack_v2_promptv2_grok.db); accuracy parity at roughly a tenth the price decides the cheap judge for every future re-judge run.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "d9d5592",
+    "program_lines": "docs/judge_v2_program.md L618-L632 (a Decision entry; no separate registration: a free paired check on existing caches)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Decision 2026-09-11 — JUDGE-SWAP: the cheap judge becomes grok-4-1-fast-non-reasoning (free paired check, zero calls)",
+    "outcome_heading": [
+      "L618: the same section (decision and check in one entry)"
+    ],
+    "date": "2026-09-11"
+  },
+  "script": {
+    "path": "n/a (free check; scratch script, no script of record; the output file is the record)",
+    "sha16": "n/a",
+    "commit": "d9d5592"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/judge_swap_free_check.txt",
+    "outcome_commit": "d9d5592",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-11",
+    "other_files": [
+      "stack_v2_promptv2.db (Mistral) and stack_v2_promptv2_grok.db (grok) caches of record"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); a paired check on two existing caches; the ledger audit (1ee0f5c, v77) added the row and the independence caveat's update",
+    "commit": "1ee0f5c",
+    "verdict": "ADOPTED: grok-4-1-fast-non-reasoning is the cheap judge; the reference stays grok-4-1-fast-reasoning (cached)"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "accuracy parity at roughly a tenth the price",
+      "result": "HELD",
+      "value": "Mistral 0.865 vs grok 0.864 (33:34, p 1.0); top cluster 0.699 vs 0.722 (+2.3pp, 19:13, p 0.38); board gemini > iask > arx > gpt-4o with 1 violation under both; decidable ties 5.6% vs 7.0%; flips 13.9% vs 15.8%; grok's per-call price roughly an order of magnitude below Mistral-Large-3 on Azure",
+      "denominator": "944 key-decidable R3 pairs"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none (a decision on a free check)",
+    "fired": false,
+    "note": "DECISION: every future re-judge run uses grok-4-1-fast-non-reasoning; the reference stays grok-4-1-fast-reasoning (cached for 3,432 of the 3,445 pool questions); the Kotlin production arena still judged with Mistral via application.yml until JUDGE-WIRING (2026-09-16)"
+  },
+  "numbers_of_record": {
+    "parity": "0.865 vs 0.864 (33:34, p 1.0); top cluster 0.699 vs 0.722 (19:13, p 0.38); 1 violation under both; ties 5.6% vs 7.0%; flips 13.9% vs 15.8%",
+    "independence_caveat": "the row originally noted 'the contestant roster has no xAI model'; ARENA-13 admitted grok-4-1-fast-reasoning as a contestant on 2026-09-14, so judge, reference and one contestant share a vendor; judge-family affinity to that contestant is untested and constant across both DECOMP arms"
+  },
+  "sentence_of_record": "JUDGE-SWAP (2026-09-11, zero calls): Mistral 0.865 vs grok 0.864 (33:34, p = 1.0) on the same 944 key-decidable R3 pairs under the same recipe; top cluster 0.699 vs 0.722 (n.s.); the same board with 1 violation under both; ties 5.6% vs 7.0%; flips 13.9% vs 15.8%. Accuracy is a wash at ~an order of magnitude lower cost, so every re-judge run since uses grok-4-1-fast-non-reasoning, reference still grok-4-1-fast-reasoning (cached, zero reference calls on the pool of record). Independence caveat, out of date as written: ARENA-13 admitted grok-4-1-fast-reasoning as a contestant on 2026-09-14, so judge, reference and one contestant now share a vendor; judge-family affinity to that contestant is untested.",
+  "chips": [
+    "ADOPTED"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-14",
+      "by": "the ledger audit (1ee0f5c) and ARENA-13 (the independence caveat updated in the observed cell)",
+      "text": "the contestant roster now has an xAI model (grok-4-1-fast-reasoning admitted by ARENA-13); judge, reference and one contestant share a vendor; the affinity is untested and constant across both DECOMP arms, so DECOMP cannot see it."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "judge-vs-contestant independence for the xAI contestant (untested)",
+    "the Kotlin production path's judge (Mistral until JUDGE-WIRING)"
+  ],
+  "ledger": {
+    "row_id": "JUDGE-SWAP",
+    "version": "v77 (1ee0f5c; the decision dates 2026-09-11); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "RECIPE-GROK",
+    "STACK-v2",
+    "ARENA-13",
+    "DECOMP"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L618-L632 (d9d5592)",
+    "experiment_results/x12_crossdomain/judge_swap_free_check.txt (d9d5592)",
+    "docs/test_ledger.html row JUDGE-SWAP (v77): chips verbatim, observed cell, evidence (judge_swap_free_check.txt)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (rubric_v2_design.md / multi_corpus_design.md lines as of their last commits named in sources)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ4 Price",
+    "what": "Compares Mistral-Large and grok-4-1-fast as judges on the same 944 answer-key-decidable pairs, with the same recipe, using cached verdicts. No calls.",
+    "why": "It decides whether a judge about ten times cheaper can replace the expensive one for all future re-judging.",
+    "information": "Equal accuracy justifies the swap. A gap would mean paying for quality. Result: accuracy is a wash (0.865 vs 0.864) and the board is the same, so grok became the standard re-judge model. Caveat: grok later also entered as a contestant, and judge-to-same-family bias is untested. Later ruled 'history, not evidence'.",
+    "written": "2026-10-07"
+  }
+}

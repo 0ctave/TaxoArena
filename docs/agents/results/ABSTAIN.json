@@ -1,0 +1,100 @@
+{
+  "id": "ABSTAIN",
+  "title": "ABSTAIN: the judge scores 0.15 when misled; can the reference's own confidence flag those cases and turn them into abstentions? (zero calls)",
+  "question": "On the 242 discriminating questions with a reference confidence score, abstain (score 0.5) when reference confidence < T, sweep T; expected score against always-answering (T = 0), pairwise and pointwise.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "a42dd82",
+    "program_lines": "docs/judge_v2_program.md L986-L996 (a bullet; exploratory, not separately registered)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "- **ABSTAIN (2026-09-13, zero calls): NEGATIVE - confidence-gated abstention does not beat answering.**",
+    "outcome_heading": [
+      "L986: the same bullet"
+    ],
+    "date": "2026-09-13"
+  },
+  "script": {
+    "path": "n/a (free check / probe; scratch script, no script of record; the output file is the record)",
+    "sha16": "n/a",
+    "commit": "a42dd82"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/abstain_outcome.txt",
+    "outcome_commit": "a42dd82",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-13"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); exploratory",
+    "commit": "a42dd82",
+    "verdict": "NEGATIVE: the third confidence-based mitigation to fail, after reference gating and REF-CONF"
+  },
+  "criteria": [
+    {
+      "id": "readout",
+      "text": "expected score against always-answering (T = 0)",
+      "result": "FAILED",
+      "value": "the confidence carries signal (reference correct 0.477 below 90, 0.718 at 90-99, 0.896 at 100) but every threshold loses: pairwise 0.698 (T = 0) vs 0.686 / 0.655 / 0.576; pointwise 0.733 vs 0.700 / 0.671 / 0.583; abstention discards more wins than losses",
+      "denominator": "242 discriminating questions with a confidence score"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "closed line: confidence gating (CONTEXT.md section 5: REF-CONF, ABSTAIN)"
+  },
+  "numbers_of_record": {
+    "confidence_signal": "reference correct 0.477 (< 90) / 0.718 (90-99) / 0.896 (100)",
+    "sweep": "pairwise 0.698 vs 0.686 / 0.655 / 0.576; pointwise 0.733 vs 0.700 / 0.671 / 0.583"
+  },
+  "sentence_of_record": "ABSTAIN (2026-09-13, zero calls): NEGATIVE: the reference's confidence does carry signal (reference correct 0.477 below 90, 0.718 at 90-99, 0.896 at 100) but every abstention threshold loses to always answering (pairwise 0.698 vs 0.686 / 0.655 / 0.576; pointwise 0.733 vs 0.700 / 0.671 / 0.583); abstention discards more wins than losses. The third confidence-based mitigation to fail, after reference gating and REF-CONF.",
+  "chips": [
+    "NEGATIVE"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a confidence gate that beats answering"
+  ],
+  "ledger": {
+    "row_id": "ABSTAIN",
+    "version": "v62 (a42dd82); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "REF-CONF",
+    "J2-D",
+    "FRONTIER"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "confidence gating (CONTEXT.md section 5: ENSEMBLE-REF, J2-D, REF-CONF, ABSTAIN)"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L986-L996 (a42dd82)",
+    "experiment_results/x12_crossdomain/abstain_outcome.txt (a42dd82)",
+    "docs/test_ledger.html row ABSTAIN (v62): chips verbatim, evidence",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "On 242 questions where models disagree, the judge was allowed to abstain (score as a coin flip) whenever the reference answer's own confidence fell below a threshold. Several thresholds were compared with always answering.",
+    "why": "The judge goes badly wrong when the reference answer misleads it. The test asks whether the reference's own confidence can flag those cases in advance.",
+    "information": "A win would give a cheap safety valve for the judge. A loss would close another confidence-based fix. Result: negative (no new calls). Confidence does carry signal: the reference is right 48% of the time below 90 and 90% at 100. But every abstention threshold scores lower than always answering, because abstaining throws away more wins than losses. This is the third confidence-based fix to fail. It is on the older judged data, which the author has since ruled history rather than evidence.",
+    "written": "2026-10-07"
+  }
+}

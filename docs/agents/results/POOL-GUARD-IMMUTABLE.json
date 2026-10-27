@@ -1,0 +1,173 @@
+{
+  "id": "POOL-GUARD-IMMUTABLE",
+  "title": "POOL-GUARD-IMMUTABLE: pool_guard.open_ro opens with mode=ro&immutable=1 after a -wal emptiness check, so a guard read leaves no -wal / -shm beside a DB of record (engineering, zero calls)",
+  "question": "Can the pool guard read a WAL-mode DB of record without creating or touching any sidecar, with the content sha unchanged and every pool id still verifying, and without turning a loud failure into a silent torn read?",
+  "kind": "engineering",
+  "state": "done",
+  "registration": {
+    "commit": null,
+    "program_lines": "no programme registration: queued engineering item (queue.json POOL-GUARD-IMMUTABLE, from review acd054a D7); the registrar's record of its READY review is docs/judge_v2_program.md L14509-L14527",
+    "program_lines_as_of": "this commit",
+    "date": "2026-09-23"
+  },
+  "script": {
+    "path": "tools/analysis/pool_guard.py (MERGED on main at d30c19e, from 9745ed2)",
+    "sha16": "blob:6521b51ac0fce04063563f9e6dcf42554ad86591 / sha256-lf16:8ca50c0fba9b8ce3 / sha256-crlf16:5c528e083c4120d2 (LF sha256 8ca50c0fba9b8ce3023a42f14723391b95d9bc926de2b7ab7dfb0ea3028419be; CRLF sha256 5c528e083c4120d2ae991726541676d1124183a2bb6ce051671598b5891989fb)",
+    "commit": "d30c19e"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_pool_guard_immutable_rr.md",
+    "commit": "cc0ccc9 (census bracket e4e045a)",
+    "verdict": "READY-WITH-CONDITIONS at d0946e3, MERGEABLE after C1 (replay byte-identical p2dca / paeec / --diff-flag; no sidecar change; 20NG refused 0 connects; no DB at import; hot and live -journal refused; M1-M11 KILLED; J8 and J14 survive: D-R1)",
+    "script": "tools/analysis/pool_guard.py at d0946e3, blob:9ababad62965ae2acc97d46493853868e049eee8 / sha256-lf16:b890fc283b6e3634 / sha256-crlf16:d25833c3e751601d (NOT MERGED)",
+    "conditions": [
+      "C1: D-R1 selftest cases 8 (a rollback-mode DB, journal_mode DELETE, header 1/1, no -journal: ACCEPTED, exactly one connect, pool id verified) and 9 (journal_mode TRUNCATE after a clean commit, 0 B -journal: ACCEPTED, the -journal left at 0 B) land; the reviewer re-runs mut_rr.py and the selftest: 36+/36+ under python and -O, J8 and J14 KILLED, M1-M11 and J1-J13 still KILLED; a mechanical check of the new blob, not a full re-review; the new blob and its pin triple re-stated in the merge message",
+      "C2: merge by path only (git checkout <branch-commit> -- tools/analysis/pool_guard.py, then git commit -- tools/analysis/pool_guard.py); no -journal and no non-empty -wal beside p2dca or paeec at merge time; the stat at merge shows the 0 B -wal and 32 KB -shm state",
+      "C3: TOPIC-PARTITION-20NG resume only, not this merge (carried from d72c790 D3; already on its record): back up and checkpoint the 20NG DB; topic_partition.sh maps a [POOL-GUARD] refusal to a failed precondition, never 'C0 pool clause FAILED' (TP20-GUARD-REFUSAL-PRECONDITION)"
+    ],
+    "known_limitation": "D-R3: a PERSIST-mode DB is refused after a clean commit (a zeroed, non-empty -journal); convert or checkpoint before a guard read (fail-closed, deliberate; no PERSIST writer today: 10 of 10 journal_mode settings in src/main/kotlin are WAL, tools/ sets none)",
+    "record": "docs/judge_v2_program.md L14551-L14570"
+  },
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "docs/judge_v2_program.md L14591-L14599 (the merge record; engineering, no outcome file under experiment_results)",
+    "outcome_commit": "d30c19e",
+    "calls": 0,
+    "cce": 0,
+    "pool": "n/a (a guard); post-merge replay --pool p2dca21ab5f4ef3ae stdout sha256-16 f9769b8aec7b4bfd, equal to both reviews",
+    "date": "2026-09-23"
+  },
+  "review": {
+    "file": "docs/reviews/READY_pool_guard_immutable_rr.md",
+    "commit": "cc0ccc9 (census bracket e4e045a)",
+    "verdict": "READY-WITH-CONDITIONS at d0946e3; C1 verified mechanically at 9745ed2 by the coordinator (selftest 43/43 python and -O; J8, J14 KILLED; J2, J15 equivalent), C2 checked at merge"
+  },
+  "criteria": [],
+  "predictions": [],
+  "falsifier": {
+    "text": "n/a (engineering item; its READY condition is the queue's: a guard read of a WAL-mode DB leaves no new sidecar, by execution; the content sha unchanged; every pool id still verifies)",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "success_path_p2dca": "--pool p2dca21ab5f4ef3ae: rc 0, stdout 277 B, sha256-16 f9769b8aec7b4bfd, identical old / new / new (review d72c790 claim 1)",
+    "success_path_paeec": "--pool paeec37aa28063c75: stdout 544 B, sha256-16 9a9489b635b723e6, identical in all three runs, 6 members OK (claim 1)",
+    "diff_flag_p2dca": "--diff-flag p2dca21ab5f4ef3ae: 91 B, 3eb648a7909e69a9, symdiff 0 (claim 1)",
+    "hot_journal_torn_read": "immutable=1 on a hot -journal (322064 B): 20000 rows, 19634 negated never committed, silent; mode=ro raises; a read-write open rolls back to 0 negated (claim 2, D1 HIGH)",
+    "selftest": "15/15 under python and -O at abeacf1; own mutants 10 of 11 KILLED, M3 SURVIVES (claim 5e, D2 MEDIUM)",
+    "twenty_ng_refusal": "pf844849e133cda4e refused, rc 1, 0 CONNECT, -wal 708672 B (claim 1e)",
+    "rr_journal_mutants": "11 of 15 KILLED; J8 and J14 SURVIVE (no rollback ACCEPT case, D-R1 MEDIUM); J2 and J15 equivalent (D-R2) (review cc0ccc9)",
+    "rr_replay": "real-DB replay byte-identical old vs d0946e3 on --pool p2dca21ab5f4ef3ae, --pool paeec37aa28063c75, --diff-flag; no sidecar or main-file change; 20NG refused with 0 connects (review cc0ccc9)",
+    "merge_replay": "post-merge --pool p2dca21ab5f4ef3ae stdout sha256-16 f9769b8aec7b4bfd on main at d30c19e (the coordinator), equal to reviews d72c790 and cc0ccc9",
+    "merge_selftest": "43/43 under python and -O at 9745ed2; mut_rr J8 and J14 KILLED, J2 and J15 equivalent survivors (the coordinator's C1 check)"
+  },
+  "sentence_of_record": "POOL-GUARD-IMMUTABLE (2026-09-23, zero calls): pool_guard.open_ro opens mode=ro&immutable=1 and refuses a non-empty -wal or -journal before any connect, merged at d30c19e (blob:6521b51ac0fce04063563f9e6dcf42554ad86591 / sha256-lf16:8ca50c0fba9b8ce3 / sha256-crlf16:5c528e083c4120d2); byte-identical to the old guard on every pool of record, no sidecar moved [known limitation: a PERSIST-mode DB is refused after a clean commit; rule 7 is the only protection against a concurrent writer].",
+  "chips": [],
+  "brackets": [
+    {
+      "date": "2026-09-23",
+      "by": "registrar (review d72c790, relayed by the coordinator)",
+      "text": "READY review filed: NOT READY at abeacf1 (D1 HIGH, D2 MEDIUM; D3-D6 operational / LOW). The success path on the real DBs is CONFIRMED byte-identical old vs new and no DB is opened at import. The builder is fixing it; re-review is narrow (selftest, the reviewer's mutants, one real-DB replay). The companion .kt comment (TREES-OF-RECORD-AUDIT-COMMENT) was READY and merged separately at a441ae2. docs/judge_v2_program.md L14509-L14527."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (re-review cc0ccc9 and census bracket e4e045a, relayed by the coordinator)",
+      "text": "READY-WITH-CONDITIONS at d0946e3 (blob:9ababad62965ae2acc97d46493853868e049eee8 / sha256-lf16:b890fc283b6e3634 / sha256-crlf16:d25833c3e751601d), MERGEABLE after C1 (selftest cases 8 and 9, J8 / J14 killed; a mechanical check). C2 merge by path with no -journal or non-empty -wal beside p2dca / paeec. C3 binds TOPIC-PARTITION-20NG's resume only. D-R3 known limitation: a PERSIST-mode DB is refused after a clean commit (a zeroed, non-empty -journal); convert or checkpoint before a guard read. Pin-impact list held for the merge, updated from the review. docs/judge_v2_program.md L14551-L14570."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (merge d30c19e, relayed by the coordinator)",
+      "text": "MERGED at d30c19e from 9745ed2 by pathspec, after CERT-UNDER-FILTER's run b4b1688. blob:6521b51ac0fce04063563f9e6dcf42554ad86591 / sha256-lf16:8ca50c0fba9b8ce3 / sha256-crlf16:5c528e083c4120d2. C1 verified mechanically, C2 checked at merge, post-merge replay f9769b8aec7b4bfd. The held pin-impact list applied. State done. docs/judge_v2_program.md L14591-L14599."
+    }
+  ],
+  "pin_impact_on_merge": [
+    {
+      "where": "docs/agents/results/TOPIC-PARTITION-20NG.json L19 (`sha16`)",
+      "kind": "sha256-lf16 + blob",
+      "action": "bracket: true of the runs done (both pool_guard_ng_af_*.out from c857fd2e); from merge <sha> the instrument is <C1 blob triple> and refuses on a non-empty -wal or -journal; new pin plus the C3 re-review condition for any T2 arm or re-verification"
+    },
+    {
+      "where": "docs/agents/results/TOPIC-PARTITION-20NG.json L197 (`instrument_shas_of_record`)",
+      "kind": "sha256-lf full + sha256-crlf full",
+      "action": "the same bracket with the merged blob's full LF and CRLF sha256"
+    },
+    {
+      "where": "docs/judge_v2_program.md L10865-L10866 (SCRIPT SHAS OF RECORD at 634e969)",
+      "kind": "sha256-lf, sha256-crlf, blob",
+      "action": "bracket appended at the END of the programme: superseded at the merge; 'byte-identical at both branch commits' stays true of 634e969"
+    },
+    {
+      "where": "docs/agents/queue.json L843 (TOPIC-PARTITION-20NG)",
+      "kind": "sha256-lf16",
+      "action": "append the new pin"
+    },
+    {
+      "where": "RESOLVED notes",
+      "kind": "behaviour ('pool_guard mode=ro without immutable moves the -shm')",
+      "action": "docs/reviews/READY_model_vintage_stamp.md L46; docs/reviews/2026-09-22_model_vintage_stamp_post.md L25; docs/reviews/READY_cert_under_filter_sing.md D7 (L94); programme L14378-L14381 (D7): RESOLVED at the merge"
+    },
+    {
+      "where": "docs/agents/CONTEXT.md L27 (the forward note)",
+      "kind": "behaviour",
+      "action": "bring into force with the wording: the verify command REFUSES on a non-empty -wal or -journal, or on a PERSIST-mode DB; a refusal is a failed precondition, never an outcome"
+    },
+    {
+      "where": "POOL-GUARD-IMMUTABLE record and queue item",
+      "kind": "state",
+      "action": "-> MERGED (done) with the C1 blob's triple and the D-R3 limitation"
+    },
+    {
+      "where": "NOT EDITED",
+      "kind": "historical",
+      "action": "READY_topic_partition_20ng.md L15 / L141 / L173 (C3 before any new pool_export); MODEL-VINTAGE-CANARY.json L34; agent_admission_pilot.py L17 / L408 and bfcl_judged_pilot.py L224 (still true)"
+    }
+  ],
+  "does_not_show": [
+    "that the change is safe on a rollback-journal DB (D1: it is not, at abeacf1)",
+    "that the -wal check guards the real sidecar state of the DBs of record (D2: the selftest never builds a 0 B -wal beside a 32 KB -shm)",
+    "protection against a concurrent writer: immutable=1 removes locking; rule 7 is the only protection (D4)",
+    "acceptance of a rollback-mode DB by the selftest (D-R1: no ACCEPT case until C1 lands)",
+    "that a PERSIST-mode DB can be read: it is refused after a clean commit (D-R3, a known limitation, fail-closed)"
+  ],
+  "ledger": {
+    "row_id": null,
+    "version": null
+  },
+  "depends_on": [],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closes": false,
+    "what": "nothing"
+  },
+  "sources": [
+    "docs/reviews/READY_pool_guard_immutable.md (d72c790): verdict, per-claim table, defects D1-D6, pin impact, conditions 1-5",
+    "docs/agents/queue.json POOL-GUARD-IMMUTABLE (the READY condition)",
+    "docs/judge_v2_program.md L14509-L14527",
+    "docs/reviews/READY_pool_guard_immutable_rr.md (cc0ccc9; census bracket e4e045a); docs/judge_v2_program.md L14551-L14570",
+    "docs/judge_v2_program.md L14591-L14599 (the coordinator's merge d30c19e and C1 / C2 checks)"
+  ],
+  "last_update": "2026-09-23 (registrar: MERGED at d30c19e, pin-impact list applied; docs/judge_v2_program.md L14591-L14599)",
+  "ready_history": [
+    {
+      "file": "docs/reviews/READY_pool_guard_immutable.md",
+      "commit": "d72c790",
+      "verdict": "NOT READY at abeacf1 (D1 HIGH: immutable=1 reads uncommitted pages under a hot or live -journal, 19634 of 20000 rows, where mode=ro errored; D2 MEDIUM: mutant M3, -shm for -wal, survives 15/15)",
+      "conditions": [
+        "C1: D1 fixed (a -journal refusal before any connect, or header-conditional immutable), with a selftest case for a hot journal and one for a live rollback writer",
+        "C2: D2 cases (i) 0 B -wal beside a 32 KB -shm accepted with the -shm unchanged, (ii) non-empty -wal with no -shm refused before any connect, (iii) the immutable and mode=ro views differ on the case-3 DB; M3 and the other ten mutants all KILLED under python and -O",
+        "C3: a real-DB replay as in claims 1-1e on the new blob: byte-identical stdout for p2dca, paeec and --diff-flag; no sidecar size, mtime or sha change; 20NG refused with 0 connects",
+        "C4: the refusal text names the killed-writer remedy (D3c); D3(a) in topic_partition.sh is a condition on TOPIC-PARTITION-20NG's resume, not on this merge",
+        "C5: the pins of the pin-impact list re-stated with the new blob: / sha256-lf16: / sha256-crlf16: triple"
+      ]
+    }
+  ],
+  "pin_census": "5 files / 14 lines at b9a945b (e4e045a): the 8 of d72c790 plus 6 in this record and its programme section, which are not instrument pins and need no new-pin bracket",
+  "pin_impact_on_merge_applied": "APPLIED 2026-09-23 at the commit following d30c19e (docs/judge_v2_program.md L14591-L14599): TOPIC-PARTITION-20NG.json sha16 and instrument_shas_of_record brackets; programme bracket at the END for L10865-L10866; queue.json TOPIC-PARTITION-20NG script; RESOLVED notes at READY_model_vintage_stamp.md L46, 2026-09-22_model_vintage_stamp_post.md L25, READY_cert_under_filter_sing.md L94, programme L14381; CONTEXT.md L27 in force",
+  "plain_description": {
+    "sq": "Data hygiene",
+    "what": "An engineering change: the tool that checks the reserved question pool now opens the database read-only, in 'immutable' mode, after first checking that no pending write log exists. It is verified on every pool of record. No judge calls.",
+    "why": "Reading the database used to create side files next to databases of record, which risks silently altering or misreading the frozen pool that keeps arena questions out of construction.",
+    "information": "Confirms that the guard reads frozen pools without touching them and fails loudly rather than reading torn data. Result: done and merged. Output is byte-identical to the old guard on every pool of record and no side file is created. Known limits: it refuses some database modes, and it offers no protection against a concurrent writer (only a process rule does).",
+    "written": "2026-10-07"
+  }
+}

@@ -1,0 +1,66 @@
+=== NEWCOMER-PLACEMENT-LIVE (FRAMEWORK item 22) ===
+  pool p2dca21ab5f4ef3ae | judge grok-4-1-fast-non-reasoning | max_tokens 8192 | temperature omitted (D2: omitted = provider default) | reference grok-reasoning | protocol: ARENA-13 newcomer protocol at the registered budget: 4 anchors by sequential bisection of the 19-incumbent board of record (peer newcomer excluded from the anchor set) x 100 pool questions, answer-disagreement filter, CACHED_SOLVE grok-reasoning reference (the board of record's reference), STACK-v2 (prompt v2 + anchor rubric + reference block), dual order, TIE on flip, no third call (NO-TIES)
+  board of record: x12 9142 + x20 12394 = 21536 verdicts, 20 models; Meta-Llama-3-70B-Instruct absent; incumbents' edges Mistral-judged and UNFILTERED, protocol edges grok-judged and answer-disagreement FILTERED (never one fit: FRAMEWORK L85/L238)
+  producing script sha e460a379cefd7e2c | this script 7be4338c21206bb8 (DIFFERS) | started 2026-09-16 02:10:00 | resumed 2026-09-16 02:10:36;2026-09-16 02:14:27;2026-09-16 02:16:10
+  key tiers at 0.017 gap over the 2811 x20-judged questions: 14 (x20_merged.txt says 14 -> OK)
+    tier  1: gemini-3.1-pro_5-shots 0.912
+    tier  2: arx_0314 0.833, iask_pro 0.816
+    tier  3: arx_3 0.784, claude-3-5-sonnet-20241022 0.782
+    tier  4: gpt-4o-2024-08-06 0.750
+    tier  5: deepseek-chat-v2_5 0.651
+    tier  6: gpt-4o-mini 0.631, claude-3-5-haiku-20241022 0.629, Meta-Llama-3_1-70B-Instruct 0.628
+    tier  7: Qwen1.5-110B 0.492, Qwen1.5-72B-Chat 0.476
+    tier  8: Mixtral-8x7B-Instruct-v0.1 0.417
+    tier  9: c4ai-command-r-v01 0.370, Meta-Llama-3_1-8B 0.369
+    tier 10: Qwen1.5-14B-Chat 0.351
+    tier 11: gemma-7b 0.313
+    tier 12: Yi-6b-Chat 0.274
+    tier 13: Llama-2-13b-hf 0.239
+    tier 14: Llama-2-7b-hf 0.184
+
+--- claude-3-5-sonnet-20241022 ---
+  step 1 [ 0,18] vs Qwen1.5-72B-Chat                88 :   6 (ties  6, unusable  0) -> up
+  step 2 [ 0, 8] vs gpt-4o-2024-08-06               41 :  40 (ties 18, unusable  1) -> up
+  step 3 [ 0, 3] vs gemini-3.1-pro_5-shots          19 :  74 (ties  7, unusable  0) -> down
+  step 4 [ 2, 3] vs arx_3                           40 :  38 (ties 22, unusable  0) -> up
+  scheduled 400 matches (full schedule) | judged 400 | unusable (unparsed/non-terminated in either order) 1 (0.2%)
+  key-decidable 298 of 399 | judge accuracy there 0.765 | ties 0.133
+  PRIMARY (single-source: the protocol's own grok-judged edges only), per anchor, win share with ties 1/2, question-clustered bootstrap B=2000:
+    step 1 vs Qwen1.5-72B-Chat               (incumbent #10, key tier  7): n 100, win share 0.910, 95% CI [0.855, 0.960] | draws above 0.5: 2000, below: 0, at: 0 | newcomer ABOVE anchor at 0.975 (opposite draws 0); newcomer ABOVE anchor at 0.95
+    step 2 vs gpt-4o-2024-08-06              (incumbent # 5, key tier  4): n  99, win share 0.505, 95% CI [0.414, 0.591] | draws above 0.5: 1069, below: 851, at: 80 | unseparated at 0.975 (opposite draws n/a); unseparated at 0.95
+    step 3 vs gemini-3.1-pro_5-shots         (incumbent # 2, key tier  1): n 100, win share 0.225, 95% CI [0.155, 0.305] | draws above 0.5: 0, below: 2000, at: 0 | anchor above newcomer at 0.975 (opposite draws 0); anchor above newcomer at 0.95
+    step 4 vs arx_3                          (incumbent # 3, key tier  3): n 100, win share 0.510, 95% CI [0.420, 0.590] | draws above 0.5: 1153, below: 758, at: 89 | unseparated at 0.975 (opposite draws n/a); unseparated at 0.95
+  certificate at 0.975: anchors certified above the newcomer ['gemini-3.1-pro_5-shots'] | certified below it ['Qwen1.5-72B-Chat'] | unseparated ['gpt-4o-2024-08-06', 'arx_3']
+  certificate at 0.950: anchors certified above the newcomer ['gemini-3.1-pro_5-shots'] | certified below it ['Qwen1.5-72B-Chat'] | unseparated ['gpt-4o-2024-08-06', 'arx_3']
+  position band on the 20-model board: [3, 10] (incumbents' Mistral-board order; PROVISIONAL, printed as a band, never as a rank)
+  key-tier interval from the certificate at 0.975: tiers 1..7 (7 tiers) | newcomer's own key tier 3 (key 0.782)
+  tiers of the unseparated anchors: 3..4
+  frontier anchors met: gpt-4o-2024-08-06 -> unseparated; gemini-3.1-pro_5-shots -> anchor above newcomer; arx_3 -> unseparated
+  class: BANDED, PROVISIONAL; top-tier rank not claimed: OK
+  (22) certificate interval <= 2 adjacent key tiers and contains the key tier: FAIL
+  SECONDARY, MIXED-FIT / EXTRAPOLATED (not the verdict; FRAMEWORK L85/L238: 19636 Mistral-judged unfiltered incumbent edges + 399 grok-judged filtered protocol edges in ONE fit without a scale term; ARENA-13: filtering widens the theta scale ~13%):
+    theta +1.421 (ties dropped +2.014) | 95% question-clustered bootstrap [+1.249, +1.611] over 2000 draws | position 6, interval [3, 6] | at 0.975: above 2, below 14, unseparated 3 (arx_3(t3), arx_0314(t2), gpt-4o-2024-08-06(t4))
+  comparators (free, never seen by the protocol): theta from its own 1900 withheld x20 edges on the full board +1.745 | 13-model ARENA-13 configuration (x12 + the 299 protocol edges against ARENA12 opponents) +1.317, position 5 of 13
+
+--- gpt-4o-mini ---
+  step 1 [ 0,18] vs Qwen1.5-72B-Chat                64 :  22 (ties 14, unusable  0) -> up
+  step 2 [ 0, 8] vs arx_0314                        10 :  76 (ties 14, unusable  0) -> down
+  step 3 [ 5, 8] vs claude-3-5-haiku-20241022       47 :  28 (ties 25, unusable  0) -> up
+  step 4 [ 5, 5] vs gpt-4o-2024-08-06               26 :  54 (ties 20, unusable  0) -> down
+  scheduled 400 matches (full schedule) | judged 400 | unusable (unparsed/non-terminated in either order) 0 (0.0%)
+  key-decidable 257 of 400 | judge accuracy there 0.817 | ties 0.182
+  PRIMARY (single-source: the protocol's own grok-judged edges only), per anchor, win share with ties 1/2, question-clustered bootstrap B=2000:
+    step 1 vs Qwen1.5-72B-Chat               (incumbent #10, key tier  7): n 100, win share 0.710, 95% CI [0.630, 0.790] | draws above 0.5: 2000, below: 0, at: 0 | newcomer ABOVE anchor at 0.975 (opposite draws 0); newcomer ABOVE anchor at 0.95
+    step 2 vs arx_0314                       (incumbent # 5, key tier  2): n 100, win share 0.170, 95% CI [0.110, 0.235] | draws above 0.5: 0, below: 2000, at: 0 | anchor above newcomer at 0.975 (opposite draws 0); anchor above newcomer at 0.95
+    step 3 vs claude-3-5-haiku-20241022      (incumbent # 7, key tier  6): n 100, win share 0.595, 95% CI [0.505, 0.670] | draws above 0.5: 1964, below: 29, at: 7 | newcomer ABOVE anchor at 0.975 (opposite draws 36); newcomer ABOVE anchor at 0.95
+    step 4 vs gpt-4o-2024-08-06              (incumbent # 6, key tier  4): n 100, win share 0.360, 95% CI [0.275, 0.445] | draws above 0.5: 1, below: 1998, at: 1 | anchor above newcomer at 0.975 (opposite draws 2); anchor above newcomer at 0.95
+  certificate at 0.975: anchors certified above the newcomer ['arx_0314', 'gpt-4o-2024-08-06'] | certified below it ['Qwen1.5-72B-Chat', 'claude-3-5-haiku-20241022'] | unseparated -
+  certificate at 0.950: anchors certified above the newcomer ['arx_0314', 'gpt-4o-2024-08-06'] | certified below it ['Qwen1.5-72B-Chat', 'claude-3-5-haiku-20241022'] | unseparated -
+  position band on the 20-model board: [7, 7] (incumbents' Mistral-board order; PROVISIONAL, printed as a band, never as a rank)
+  key-tier interval from the certificate at 0.975: tiers 4..6 (3 tiers) | newcomer's own key tier 6 (key 0.631)
+  (22) certificate interval <= 2 adjacent key tiers and contains the key tier: FAIL
+  SECONDARY, MIXED-FIT / EXTRAPOLATED (not the verdict; FRAMEWORK L85/L238: 19637 Mistral-judged unfiltered incumbent edges + 400 grok-judged filtered protocol edges in ONE fit without a scale term; ARENA-13: filtering widens the theta scale ~13%):
+    theta +0.706 (ties dropped +1.004) | 95% question-clustered bootstrap [+0.526, +0.891] over 2000 draws | position 8, interval [7, 9] | at 0.975: above 6, below 11, unseparated 2 (claude-3-5-haiku-20241022(t6), deepseek-chat-v2_5(t5))
+  comparators (free, never seen by the protocol): theta from its own 1899 withheld x20 edges on the full board +0.869 | 13-model ARENA-13 configuration (x12 + the 300 protocol edges against ARENA12 opponents) +0.544, position 6 of 13
+
+NEWCOMER-PLACEMENT-LIVE: FAIL - interval wider than 2 tiers for claude-3-5-sonnet-20241022, gpt-4o-mini: 400 matches is not a placement budget (falsifier)

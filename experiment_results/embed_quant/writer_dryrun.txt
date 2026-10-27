@@ -1,0 +1,22 @@
+[EMBED-QUANT-W] zero judge calls; DRY RUN: nothing written; the preflight and the probe POST embeddings (Ollama), nothing else
+[INTENT-S0] pin intent_transfer_corpora_v1.db: sha256 487e0093719c184c98bca53bc9bc61c193559690abb206d77010fd77f81c09a2 [PIN OK]
+[INTENT-S0] raw provenance amazon-massive-dataset-1.1.tar.gz: sha256 4cba5faa11c71437928e17cb1b9b3d8b8e727e7ea363a3a9a8045e19c0491577 [PIN OK]
+[INTENT-S0] raw provenance banking77_test.csv: sha256 d12d6e3bc4c3103966ae786dc435913c0c563dfa328f5a3646d0e62cfeeb474d [PIN OK]
+[INTENT-S0] raw provenance banking77_train.csv: sha256 b06e26ac675513959a63135f11b94ea7786ed02da65db93a5650d8838cbc664b [PIN OK]
+[INTENT-S0] raw provenance clinc_data_oos_plus.json: sha256 bfcca9ae515623541dc1983c94c4ed7cae9d26b42ae47d74b972e51bb6f7a21f [PIN OK]
+[INTENT-S0] raw provenance clinc_domains.json: sha256 b947b579d3b8e74b06f93b01083d8efaff2888b43a3e362533bd88a6e1211b3a [PIN OK]
+[INTENT-S0] pin intent_emb_qwen3.db: sha256 9e100e04fc91b137a075b8abedbc87d2b29a6dc2244c5f242b1c587004a4ee74 [PIN OK]
+[EMBED-QUANT-W] text set 57350 texts sha256 0ba7eb3c805127d5fdfc837f9c2e620beaa3f8d795cdf76056608604defa2a8d; intent_emb_qwen3_q8.db absent (new): 0 present, 57350 to embed
+[EMBED-QUANT-W] heavy foreign processes: none
+[EMBED-QUANT-W] DISK dry-run: 200.81 GB free on the volume of Z:\FAC\TUBerlin\THESIS\TaxoArena
+[EMBED-QUANT-W] Ollama endpoint http://127.0.0.1:11434/api/embed (resolved from OLLAMA_HOST='http://127.0.0.1:11434' by embedder_arms.client_base)
+[EMBED-QUANT-W] T1 /api/tags: qwen3-embedding:8b-q8_0 digest 9704fd987c12aa746934ea9f99dc85527c83c6e4b98b3a10b94689332ee866bb; qwen3-embedding:latest digest 64b933495768fbd3b87c20583d379728a07471e0c66733a9df87cd1901b3c44b
+[EMBED-QUANT-W] T2 cos(Q8, Q4) on 20 texts (S0 text set, first 20 by sha256), slice 256 + renormalise: min 0.978622 median 0.991462 (different models: PRINTED, NO BAR)
+[EMBED-QUANT-W] T2 cos(Q8, Q4) on 20 texts (S0 text set, first 20 by sha256), slice 1024 + renormalise: min 0.979189 median 0.991525 (different models: PRINTED, NO BAR)
+[EMBED-QUANT-W] T2 cos(Q8, Q4) on 20 texts (S0 text set, first 20 by sha256), slice 4096 + renormalise: min 0.976993 median 0.991307 (different models: PRINTED, NO BAR)
+[EMBED-QUANT-W] T3 repeatability qwen3-embedding:8b-q8_0: 20 texts posted twice, cos after slice-256 + renormalise min 1.000000 median 1.000000 (bar >= 0.9980): PASS
+[EMBED-QUANT-W] T4 resume parity: 0 stored rows in intent_emb_qwen3_q8.db (< 20): first launch, nothing to compare
+[EMBED-QUANT-W] PRICE qwen3-embedding:8b-q8_0: timed probe 500 texts in 11.7 s = 42.8 texts/s -> 57350 texts to embed = 22.3 min (estimate from the probe)
+[EMBED-QUANT-W] TRANSPORT PREFLIGHT PASSED (T1-T4)
+[EMBED-QUANT-W] S0's pins re-checked after: unchanged {'ingest_db': '487e0093719c184c', 'qwen3': '9e100e04fc91b137'}
+[EMBED-QUANT-W] dry: nothing written

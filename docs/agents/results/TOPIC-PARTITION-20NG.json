@@ -1,0 +1,431 @@
+{
+  "id": "TOPIC-PARTITION-20NG",
+  "title": "TOPIC-PARTITION-20NG: on a corpus with ground-truth topic labels the construction has never seen (20 Newsgroups, 20 labels under 7 groups), does the anchor-free recipe of record build and certify, partition the embedding space better than k-means / Ward / HDBSCAN at the same number of parts, and identify topics at its certified sites? (zero judge calls; 1 ingest + 1 smoke build + 2 constructions + 2 site nulls [+ 1 contingency pair]; embeddings local; plan Amendment 8)",
+  "question": "Q1 (partition): at the same number of parts, does the certified taxonomy partition the embedding space better than k-means (held-out NMI at 20 labels, paired against k-means seed 0 at k = the tree's leaf count)? Q2 (topics): does certification select the topic-aligned sites once depth is held fixed (depth-stratified certified - uncertified NMI_20 gap, permutation p within depth strata), and is the depth-1 split a coarse-group split? Q3 (transfer): does the recipe of record (R1 af_clean_s42: bar 0.025 at the 256-dim slice) build on 20NG with > 20 leaves and certify the root and at least one depth-1 site, and does the FRAMEWORK per-corpus pair (512 / 0.0145) build as well?",
+  "kind": "build",
+  "state": "done",
+  "registration": {
+    "commit": "6aa2a0d",
+    "program_lines": "docs/judge_v2_program.md L10030-L10390 (registered 2026-09-22 before any code or call; the lead's text with one inline registrar bracket at the QUESTION paragraph; Registrar's check at registration (a)-(h) L10310-L10390)",
+    "program_lines_note": "[CORRECTED 2026-09-22 by TOPIC-PARTITION-20NG pre-run brackets, second batch (the research-lead's decision on the registrar's open reading 4; programme bracket (g), L10883-L10897): the string in registration.program_lines above is OFF BY NINE AT BOTH ENDS and is left in place per correction-by-insertion. THE TRUE RANGE at programme commit 76e5582: the registration's section heading is at L10039, the subsection 'Registrar's check at registration' at L10319, and the section ENDS at L10399 (the next heading, '## MODEL-VINTAGE-CANARY stamp run', is at L10401). So the registration is docs/judge_v2_program.md L10039-L10399 and the registrar's check is L10319-L10399. The same off-by-nine string is carried in docs/agents/queue.json (items TOPIC-PARTITION-20NG, TP20-BUILD, TP20-READY, TP20-REVIEW, TP20-OUTCOME) and in the first bracket batch's preamble at L10726; both are corrected BY REFERENCE to bracket (g), not rewritten. The last bracket wins: a reader resolving the registration reads L10039-L10399.]",
+    "program_lines_as_of": "6aa2a0d",
+    "heading": "## Registered 2026-09-22 (before any code or call) — TOPIC-PARTITION-20NG: on a corpus with ground-truth topic labels the construction has never seen (20 Newsgroups, 20 labels under 7 groups), does the anchor-free recipe of record build and certify, partition the embedding space better than k-means / Ward / HDBSCAN at the same number of parts, and identify topics at its certified sites?",
+    "date": "2026-09-22",
+    "author_sentence": "Start an agent to work on the construction, maybe using another dataset to see how my framework could benefit to partitioning of the embedding space and topic identification.",
+    "plan_amendment": "docs/plan_2026-09-15.md Amendment 8 (L278-L314, 6aa2a0d)"
+  },
+  "script": {
+    "path": "tools/ingest/twenty_newsgroups_ingest.py (I0; --fetch / --dry-run / --selftest / --manifest); experiment_configs/topic_partition/ng_af_s42.toml (T1) and ng_af_bareq512_s42.toml (T1b), ng_af_bar_eq_s42.toml (T2, contingency only); tools/chains/topic_partition.sh (I7; --dry-run); tools/analysis/topic_partition.py (I6; --selftest / --dry-run / --run, write-once outcome); the -DsepBar system property on SeparationNullBySizeTest (I5; absent -> 0.025, byte-inert). ALL ABSENT at registration: registration precedes code.",
+    "sha16": "LF sha256[:16] at 634e969, each recomputed by the registrar from the blob: twenty_newsgroups_ingest.py 0f746d7c88dea895 (blob 24943b9414d6); pool_guard.py 83de84ca92570068 (blob c857fd2e1c20, byte-identical at 3783c5f and 634e969: inert when absent); topic_partition.py 1bb31e964f059791 (blob 8819359b18b4; voids the pass-1 f6cd14d0d2164020); topic_partition.sh 6455d849898fefb5 (blob ba0cca2c983c; voids the pass-1 ab3b75bb43056517). Full LF / CRLF sha256 pairs in programme bracket (d) (L10800-L10827). The scripts print their own script_sha: ingest 0f746d7c88dea895, readout 1bb31e964f059791 (both observed by the reviewer). [CORRECTED 2026-09-23 by POOL-GUARD-IMMUTABLE's merge (docs/judge_v2_program.md L14591-L14599): the pool_guard.py pin above stays true of 634e969 and of the runs done (both pool_guard_ng_af_*.out were produced by c857fd2e); from merge d30c19e (from 9745ed2, by pathspec, after CERT-UNDER-FILTER's run b4b1688, so no run of record spans two guard blobs) pool_guard.py is blob:6521b51ac0fce04063563f9e6dcf42554ad86591 / sha256-lf16:8ca50c0fba9b8ce3 / sha256-crlf16:5c528e083c4120d2; it opens mode=ro&immutable=1 and refuses on a non-empty -wal or -journal (and on a PERSIST-mode DB after a clean commit) before any connect; any later 20NG guard call refuses on the 20NG -wal until it is checkpointed; any T2 arm or re-verification needs the C3 re-review first.]",
+    "commit": "634e969 (branch topic-partition-20ng, second commit; the four blocking defects fixed on 3783c5f) -> merged into main at 611ca62 by the research-lead after the reviewer's MERGEABLE"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_topic_partition_20ng.md",
+    "commit": "ef1dc0a (pass 1, verdict NOT READY at 3783c5f, four blocking defects) -> 2708795 (pass 2, insertion only, +73/-0, the old file a byte prefix of the new one)",
+    "verdict": "READY at 634e969 (second pass, 2708795); branch topic-partition-20ng MERGEABLE at 634e969 (git merge-tree --write-tree 569ccf4 634e969 exit 0)",
+    "instrument_commit": "634e969",
+    "merge_commit": "611ca62 (2026-09-22 13:57:02 +0200; parents 2708795 and 634e969; merged by the research-lead)",
+    "blocking_defects_closed": [
+      "1 HIGH the I1 smoke is not a gate -> smoke_gate() refuses unless the smoke log carries 'Snapshot ID:', '[POOL] recorded p' and 'Total Queries:' (driven on six logs by the reviewer)",
+      "2 MEDIUM construction_started() counted [SPLIT-CLOSURE] -> new pattern verified TRUE on 8 real construction logs, FALSE + embedding_error TRUE on the connectex case",
+      "3 MEDIUM the pin covered 7 of 12 dataset-cache tables -> 12 tables x 2 views, VIEWS AGREE, sqlite_master returns exactly those 12 names today",
+      "4 MEDIUM T2's null-bar refusal was vacuous -> all four registered paths fire (agree / disagree / no [SEPBAR] / no TOML bar)"
+    ],
+    "conditions": [
+      "1 MET at 634e969 (defects 1-4 fixed; ingest --selftest 24/24 and readout --selftest 32/32 unchanged; chain --dry-run exit 0 in both roots; the two new shas re-pinned)",
+      "2 MET by this commit: the registrar's pre-run brackets (a)-(d) appended to the programme at L10723-L10827, BEFORE the ingest",
+      "3 OPERATOR, immediately before launch: Ollama up with qwen3-embedding:latest listed; git status --porcelain -- src/ empty; no tools/analysis python reader and no non-daemon JVM (busy_jvm / busy_python numeric 0); experiment_results/topic_partition/ absent; twenty_newsgroups_cache_v1.db and ag_news_smoke_cache_v1.db absent at the root; the sklearn cache present at sha 00872316da286d48de579c1d223d8e1d2faaca48c217c5a09cd296400126b162; the 2026-09-22 backups still sha-identical to the live files",
+      "4 PINNED INPUTS: snapshots_frozen.db sha256 3f7f5e9a470baba3a66d0dbc870bf772739ae60cc415615b0c4f54e0f4793e4e (16,175,104 B); the registration constants 0.042461 / 0.01319 / the four size bands / 14 of 69; the tool shas above",
+      "5 ACCEPTANCE after the chain (experiment_results/topic_partition/acceptance.txt): every pinned mmlu_pro_dataset_cache_v2.db table unchanged in n and sha; embeddings' 20,710 old keys unchanged; queries' 18,741 old rows unchanged; gmm_vectors 0 -> 0; VIEWS AGREE on both pins; ACCEPTANCE FAILED = stop and report",
+      "6 an interrupted or absent null: the readout refuses while any BUILT arm has no complete 300-rep CSV; a CSV with any row at reps != 300 is PARTIAL and refused; a null on a snapshot id other than the build's is refused",
+      "7 the T2 trigger and its consequences (C3 FAILED and F3 fire whatever T2 does; T2's rows print 'bar re-tuned' and are never compared to T1's or to the record's); the pass-1 clause 'until fix 5 the readout refuses' is superseded by pass 2 (the outcome file IS written on that path)",
+      "8 reading rules for the post-run reviewer (manifest / pool id / [SLICE] / [SEPBAR] / vacuity guard / 'Fetched 16921 20 Newsgroups queries across 20 categories')",
+      "9 NEVER: --fetch; seeds = [...]; two constructions at once; any pool reader during the window; editing a TOML after its build; a second --run over an existing outcome (write-once)",
+      "10 (pass 2) acceptance additionally: sqlite_master on mmlu_pro_dataset_cache_v2.db still returns exactly the 12 pinned names; agent_ratings / match_history / sqlite_sequence in embeddings_cache.db still 0 rows; ratings_topic_partition_<arm>.db present at the root for every arm that built",
+      "11 (pass 2) if T2 runs: the reviewer re-derives the I4 bar by hand and applies the clip [0.010, 0.025] independently, checking it against t2_bar.out, the TOML line and the [SEPBAR] line (the readout only checks that the last two agree); for every built arm the reviewer confirms a [SEPBAR] line exists at all",
+      "12 (pass 2) the next edit of tools/analysis/topic_partition.py must add selftest assertions for the seven new paths and raise the pinned count from 32 in the same commit; no further edit of that readout is READY without them"
+    ],
+    "regression_after_merge": "MAIN checkout: full suite 441 tests / 0 failures / 0 errors (88 XML under build/test-results/test, timestamps 2026-09-22T11:57:12-11:58:06 UTC = 13:57-13:58 +0200, after the merge at 13:57:02; includes SepBarDefaultTest and TopicPartitionConfigTest; verified by the registrar). The six Block 2 dry-runs (canary_baseline, stack_norubric, newcomer_placement, ref_checklist, escalate_llama_law, grok_calib) all exit 0 at zero calls (research-lead's report, copied, not re-run by the registrar).",
+    "operator_gate_left": "bash tools/chains/topic_partition.sh --dry-run from the merged main checkout prints the preflight and refuses ONLY at the Ollama gate (server down, HTTP 000 at localhost:11434). The launch is the orchestrator's, in ONE no-readers window (rule 7), after condition 3: nohup bash tools/chains/topic_partition.sh > experiment_results/topic_partition_chain_stdout.log 2>&1 &",
+    "zero_calls": "the branch, both READY passes and this record change: zero judge calls, zero builds, zero site nulls, no DB of record opened for write"
+  },
+  "go": "n/a on money (0 cce, 0 judge calls; embeddings local); the author's sentence of 2026-09-22 is the go for the construction (plan Amendment 8); READY at 634e969 (2708795) and the instrument merged at 611ca62, so the only gate left is operational: the orchestrator launches the chain in a no-readers window (rule 7) with Ollama up and qwen3-embedding:latest listed (READY condition 3).",
+  "run": {
+    "outcome_file": "experiment_results/topic_partition/topic_partition_outcome.txt (WRITE-ONCE, never edited; UNTRACKED under experiment_results, as the chain wrote it at 04:43:04 on 2026-09-23)",
+    "outcome_commit": "the outcome .txt is not tracked; the outcome OF RECORD in git is the programme section docs/judge_v2_program.md L11425-L11509 (outcome section, this commit). Committed evidence beside it: b1ac058 (the T1b site-null OOM #2 test XMLs, experiment_results/topic_partition/incident_sitenull_oom2_2026-09-23_{suite,executor}.xml: Caused by java.lang.OutOfMemoryError: Java heap space at withinNodeCloud(SeparationNullBySizeTest.kt:575) - why T1b's null exited 1 and wrote no CSV)",
+    "calls": 0,
+    "cce": 0,
+    "pool": "pf844849e133cda4e (the 20NG corpus's own split, seed 42, ratio 0.30, per label; recorded in the separate ingest DB twenty_newsgroups_cache_v1.db). NO arena pool read or written: p2dca21ab5f4ef3ae and paeec37aa28063c75 untouched; mmlu_pro_dataset_cache_v2.db.twenty_newsgroups stays n = 0; snapshots_frozen.db untouched (3f7f5e9a470baba3...)",
+    "date": "2026-09-22 19:29 -> stopped 20:12 by the author -> resumed 2026-09-23 03:36 -> CHAIN DONE 04:43:04, ACCEPTANCE OK",
+    "chain": "tools/chains/topic_partition.sh at HEAD 8949550; readout tools/analysis/topic_partition.py script_sha 1bb31e964f059791; 300-rep site nulls, 1,000 bootstrap resamples, 1,000 permutations, rng seed 20260922"
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-23_topic_partition_post.md",
+    "commit": "18386b5",
+    "verdict": "READY for the registrar's outcome, CONDITIONAL on four insertions (all four made in the outcome section at docs/judge_v2_program.md L11425-L11509 (outcome section, this commit)): (1) the C2 sentence of record written by the registrar (defect D1, a numpy-bool identity bug dropped it from the write-once file); (2) that sentence and the T1b clause carry their mandatory brackets; (3) the registration range, the falsifier lines, the build-log leaf count and P12's T1b clause corrected by insertion; (4) tools/analysis/topic_partition.py is NOT READY for another run until the is True / is False bug and bracket (c)(12)'s seven selftest assertions land. \"The numbers are sound\": every headline figure recomputed by the reviewer from the caches with his own scripts reproduces to four decimals, no exception. The checker's reading wins wherever it differs from the outcome file."
+  },
+  "criteria": [
+    {
+      "id": "C0",
+      "text": "GATE: I0 manifest asserted by the build log (\"Fetched N 20 Newsgroups queries across 20 categories\", N = kept); pool recorded and verified (`pool_guard.py --pool <id>` OK on the separate DB, or the Design-S bracket); T1's null complete at 300 reps on every site; the readout's fail-closed checks pass. Otherwise UNDETERMINED for the criteria that depend on the missing piece.",
+      "result": "HELD",
+      "value": "T1 (the registered arm): manifest asserted by the build log (\"Fetched 16921 20 Newsgroups queries across 20 categories\"); pool pf844849e133cda4e recorded and verified by pool_guard --pool --db --id-file; T1's site null complete at 300 reps on every one of its 101 sites (101 null rows against 101 sites, no orphan, one snapshot id); fail-closed checks pass (held-out in no leaf 0, vectors 16,921 of 16,921, sliceDim, null snapshot). [D8 LOW: C0 is scored on T1 only; the T1b arm block separately states \"C0's null clause FAILED\" for T1b.]",
+      "denominator": "the build log / manifest, the pool_guard output, site_null_ng_af_s42.csv (101 sites x 300 reps)"
+    },
+    {
+      "id": "C1",
+      "text": "(Q1) HELD if NMI(20)_tree - NMI(20)_kmeans0 > seed spread (max - min over k-means seeds 0-4 at k = L) AND the 1,000-resample held-out bootstrap CI (partitions fixed) excludes 0; FAILED otherwise (F1 fires). Purity, ARI, NMI(7), Ward, HDBSCAN, random null, the 4096-d row: REPORTED. Arm of record T1; T1b REPORTED.",
+      "result": "FAILED",
+      "value": "FAILED, F1 FIRED. tree NMI(20) 0.5422 vs k-means seed 0 at k = L = 110 0.5442, diff -0.0020; k-means seed spread (max - min, seeds 0-4) 0.0074; 1,000-resample fixed-partition bootstrap CI [-0.0081, +0.0036] at the registered seed 20260922 ([-0.0084, +0.0039] at the reviewer's seed 777). Both conjuncts of the HELD clause fail. F1' does NOT fire. REPORTED beside, never comparators: tree purity 0.6673 [0.6542, 0.6801] (3,387/5,076), ARI20 0.1855, NMI7 0.4009; Ward 0.5497; HDBSCAN mcs 55 (k = 3, train noise 0.927) 0.2407; k-means at k = L on the FULL 4096-d vectors 0.5585 (a registered SENSITIVITY row, not a C1 comparator; the tree is 0.0163 below it, which may never be promoted to a C1 reading).",
+      "denominator": "n_eval = 5,076 distinct held-out texts of the corpus's own split; k-means seed 0 at k = L = 110"
+    },
+    {
+      "id": "C2",
+      "text": "(Q2) HELD if the depth-stratified certified - uncertified NMI_20 gap > 0 (strata {0-1, 2, 3, 4, >= 5}, weighted by min(n_cert, n_uncert)) with one-sided permutation p < 0.05 over 1,000 permutations of the certified flag within depth strata (and the OLS Y ~ cert + log n + depth cert coefficient > 0); FAILED otherwise (F2 fires). Depth-1 alignment, best-match depths, Jaccards: REPORTED. Arm of record T1; T1b REPORTED.",
+      "result": "HELD",
+      "value": "HELD BUT THIN, F2 NOT FIRED. Depth-stratified certified-minus-uncertified NMI_20 gap +0.0740 with one-sided within-depth permutation p 0.0480 and OLS HC1 cert +0.0865 (SE 0.0395; log n +0.0041 SE 0.0225, depth -0.0146 SE 0.0154, intercept 0.1827); at 7 groups stratified +0.0888, p 0.0030, OLS cert +0.0796 (SE 0.0368); raw gap +0.1215 (20) / +0.1206 (7), confounded. Bracket (e)'s four UNDETERMINED conditions all false (16 certified, 85 uncertified, weight sum 11 > 0, non-degenerate permutation). MANDATORY QUALIFIER (review D2/D3): EFFECTIVE WEIGHT 11; depth-2 stratum EMPTY (4 certified, 0 uncertified); 6 of 11 from depth 4 (6 certified vs 12 uncertified, gap +0.1510); depth-0-1 and depth-3 negative (-0.0114, -0.1064); >= 5 +0.0663 at weight 2. p seed-robust (0.0390 / 0.0420 / 0.0390 at three other seeds; 0.0365 at 200,000 permutations; 7 groups 0.0036 at 200,000) but the null preserves DEPTH ONLY, and an unregistered depth x size-tercile null reads gap +0.0477 at p = 0.133.",
+      "denominator": "T1's 101 sites = 16 certified + 85 uncertified at cert_site_p95; per site its TRAIN members (11,845 distinct train ids over 13,246 leaf slots); effective stratum weight 11"
+    },
+    {
+      "id": "C3",
+      "text": "(Q3) HELD if T1 builds with > 20 leaves AND the root and at least one depth-1 site certify (cert_site_p95 at 300 reps); PARTIAL if T1 builds (> 7 leaves) but fails either clause; FAILED if T1 is not built (F3 fires; T2 runs). T1b scored on the same clauses beside, with its own null at its own bar (0.0145, -DsepBar).",
+      "result": "HELD",
+      "value": "HELD, F3 NOT FIRED. T1 built with L = 110 leaves > 20 (build-log leaf count 110 = snapshot L 110, reviewer-verified at ng_af_s42.build.out:3045); root n00000001 n 11,845 k 2 observed 0.061713 / p95 0.050961 / margin 1.211 CERTIFIED; depth-1 certified 1 of 2 (n00000004 0.042300 / 0.033308 / 1.270 certified; n00000005 0.038280 / 0.045768 / 0.836 not), which satisfies \"at least one\". Certified share 16 of 101 = 0.158 [0.0999, 0.2419]; bands n<200 1/27, 200-400 2/34, 400-800 3/21, >=800 10/19. T2 did not run (UNDETERMINED as designed). C3 BESIDE, T1b: UNDETERMINED - built (100 leaves, 97 sites) but its site null exited 1 (OOM) and wrote no CSV.",
+      "denominator": "T1 leaf count from dag_snapshots.jsonl (L = 110); root and depth-1 rows of site_null_ng_af_s42.csv at 300 reps"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "(specialist) T1 builds at 0.025 (P 0.9); leaves 95-175 (point 130); sites 80-150; depth 8 reached; depth-blocked leaves 2-15; iterations to stop 12-20.",
+      "result": "HELD",
+      "value": "leaves 110 in [95,175]; sites 101 in [80,150]; depth 8 reached; depth-blocked leaves 4 in [2,15]; iterations 15 in [12,20] - every clause HELD",
+      "denominator": "T1"
+    },
+    {
+      "id": "P2",
+      "text": "(specialist) root k = 2 (P 0.75); root observed 0.045-0.10, p95 0.040-0.075, margin 1.1-1.8, certified; both depth-1 sites certified (P 0.75), observed 0.04-0.10, p95 0.030-0.060.",
+      "result": "FAILED",
+      "value": "root k = 2 H; observed 0.061713 H; p95 0.050961 H; margin 1.211 H; root certified H; BOTH depth-1 certified 1 of 2 FAILED; depth-1 observed 0.042300 H but 0.038280 outside [0.04,0.10] FAILED; depth-1 p95 0.033308 / 0.045768 both in [0.030,0.060] H. Bracket (b)(3)'s two-highest-mass reading coincides with the all-sites reading (exactly two depth-1 sites exist)",
+      "denominator": "T1 root and the 2 depth-1 sites; 300-rep null"
+    },
+    {
+      "id": "P3",
+      "text": "(specialist) certified share 22-38% (point 30%); n >= 800 band 50-75%; below n 400 near the record's ~10%.",
+      "result": "FAILED",
+      "value": "certified share 16/101 = 0.158 vs 22-38% FAILED; n >= 800 band 10/19 = 0.526 in [0.50,0.75] HELD; below n 400 3/61 = 0.0492 vs the bracketed 5-15% FAILED - KNIFE-EDGE, 0.0492 misses the 5% floor by ONE SITE IN 61",
+      "denominator": "T1's 101 sites; the four registered size bands (below n 400 = 61 sites)"
+    },
+    {
+      "id": "P4",
+      "text": "(specialist) NMI(20) held-out: tree 0.42-0.58; k-means at k = L 0.44-0.60; tree - kmeans0 in [-0.06, +0.02] (point -0.02); seed spread 0.005-0.02 => C1 FAILED (P 0.8). Ward 0.40-0.58. NMI(7): tree 0.35-0.50, k-means 0.36-0.52. ARI(20): tree 0.18-0.35, k-means 0.20-0.38. Reference k = 20: NMI 0.55-0.70, ARI 0.35-0.55, purity 0.60-0.75; k = 7: NMI(7) 0.45-0.65.",
+      "result": "FAILED",
+      "value": "13 of 14 clauses HELD; the failing one is ARI20 k-means 0.1835 vs [0.20,0.38]",
+      "denominator": "n_eval 5,076"
+    },
+    {
+      "id": "P5",
+      "text": "(specialist) purity (train-majority, held-out, 20 labels) at ~130 cells: tree 0.68-0.82, k-means 0.70-0.84, Ward 0.66-0.82; tree at 7 groups 0.80-0.90; random partition purity 0.10-0.17, NMI(20) 0.03-0.08 (finite-sample MI bias), ARI 0.000 +- 0.003.",
+      "result": "FAILED",
+      "value": "tree purity 0.6673 (< 0.68) FAILED; k-means purity 0.6789 (< 0.70) FAILED; random purity ~0.050 vs [0.10,0.17] FAILED; Ward 0.6844, tree-7group 0.8160, random NMI20 ~0.062, random ARI ~0.0002 HELD",
+      "denominator": "n_eval 5,076"
+    },
+    {
+      "id": "P6",
+      "text": "(specialist) HDBSCAN: train noise 35-80% (point 55%); k 8-40; held-out NMI(20) 0.35-0.60.",
+      "result": "FAILED",
+      "value": "all three clauses fail: train noise 0.927 vs 35-80%; k = 3 vs 8-40; held-out NMI20 0.2407 vs [0.35,0.60]. The HDBSCAN comparator is effectively degenerate at mcs 55 on these vectors",
+      "denominator": "TRAIN vectors (noise); n_eval 5,076 (NMI)"
+    },
+    {
+      "id": "P7",
+      "text": "(specialist) depth-1 (k = 2) 7-group purity 0.35-0.60 (0.50-0.70 if k = 3-4); depth-1 20-label purity 0.10-0.25; the split separates technical (comp.*, sci.electronics, sci.crypt, misc.forsale) from discursive (talk.*, alt.atheism, soc.religion.christian, sci.med) with rec.* the swing group; best 7-group depth 3-4. Registrar's scoring note (L10310 ff. (e)): the technical / discursive clause is HELD iff the comp.* majority and the talk.* majority fall in different depth-1 cells of the migration matrix, printed with rec.*'s cell and share.",
+      "result": "HELD",
+      "value": "depth-1 7-group held-out purity 0.4277 (2,171/5,076) in [0.35,0.60] H; depth-1 20-label purity 0.1084 (550/5,076) in [0.10,0.25] H, KNIFE-EDGE against the 0.10 floor; qualitative clause H under the pre-run rule (comp.* majority cell n00000004 0.978 vs talk.* majority cell n00000005 0.987; rec.* 0.676 to n00000005); argmax NMI_7 depth 3 in [3,4] H. [D10 INFORMATIONAL: the clause was reduced pre-run (bracket (b)(4)) to something almost any non-degenerate 2-way split satisfies, so P7 HELD IS NOT EVIDENCE for the substantive technical/discursive reading; the migration matrix supports it descriptively only.]",
+      "denominator": "T1 depth-1 cells; 7-group x depth-1 TRAIN migration matrix; held-out purity on n_eval 5,076"
+    },
+    {
+      "id": "P8",
+      "text": "(specialist) per-label best match: median depth 4 (3-5); median best J 0.40-0.60; religion triad best J < 0.40 for >= 2 of 3; comp.os.ms-windows.misc and comp.sys.ibm.pc.hardware < 0.45; >= 6 of {hockey, baseball, space, crypt, med, autos, motorcycles, guns, mideast, forsale} at J >= 0.5; leaves at J >= 0.5: 15-35%.",
+      "result": "FAILED",
+      "value": "median best depth 4.0 in [3,5] H; median best J 0.4058 in [0.40,0.60] H, KNIFE-EDGE (0.0058 above the floor); religion triad below 0.40 for 2 of 3 H (alt.atheism 0.3109, talk.religion.misc 0.1875; soc.religion.christian 0.4957); comp.os.ms-windows.misc 0.2231 and comp.sys.ibm.pc.hardware 0.3054 both < 0.45 H; \">= 6 of the ten at J >= 0.5\": 4 FAILED (hockey 0.8272, baseball 0.8268, med 0.5370, mideast 0.7115 only); leaves at J >= 0.5 = 1/110 = 0.009 vs 15-35% FAILED",
+      "denominator": "20 labels; 110 leaves; Jaccard over the 211 TRAIN member sets (in-sample)"
+    },
+    {
+      "id": "P9",
+      "text": "(specialist) certification vs alignment: raw gap +0.10 to +0.30 (confounded); depth-stratified gap +0.00 to +0.10; permutation p in [0.02, 0.6], point not significant (P 0.6) => C2 FAILED.",
+      "result": "FAILED",
+      "value": "raw gap 0.1215 in [0.10,0.30] H; stratified 0.0740 in [0.00,0.10] H; p 0.0480 in [0.02,0.6] H; the clause \"=> C2 FAILED\" FAILED because C2 is HELD. OBSERVATION OF RECORD (review section 4): the specialist PREDICTED THE GAP AND THE p ALMOST EXACTLY AND PREDICTED THE WRONG CONCLUSION from them, because P9's point was \"not significant\" at a p that came in at 0.048",
+      "denominator": "T1's 101 sites"
+    },
+    {
+      "id": "P10",
+      "text": "(specialist) leak documents 1-4% of held-out; purity change when excluded < 0.5 pp; short-dropped 2-5% of 18,846; duplicate-dropped 1-4%.",
+      "result": "FAILED",
+      "value": "pre-scored FAILED by bracket (a) before the run and confirmed: short-dropped 1,808/18,846 = 9.59% vs 2-5% FAILED; duplicate-dropped 117/18,846 = 0.62% vs 1-4% FAILED; leak held-out 112/5,076 = 0.0221 in 1-4% HELD; purity change excluding leak +0.0148 pp < 0.5 pp HELD. A prediction failure, not an instrument defect",
+      "denominator": "18,846 raw documents; n_eval 5,076"
+    },
+    {
+      "id": "P11",
+      "text": "(specialist) T1b builds (P 0.8) with more leaves than T1 (record: 92 vs 82 on MMLU-Pro) and a lower certified share than T1 (record 11% vs 20%); NMI(20) within 0.03 of T1's.",
+      "result": "UNDETERMINED",
+      "value": "T1b builds H; \"more leaves than T1\" 100 vs 110 FAILED; certified-share comparison UNDETERMINED (no T1b null; and bracket (b)(5) makes it descriptive-only in any case); NMI20 within 0.03 of T1's, |0.5526 - 0.5422| = 0.0104, H",
+      "denominator": "T1b vs T1 (descriptive only: different bars, own nulls)"
+    },
+    {
+      "id": "P12",
+      "text": "(specialist) machine: embedding + T1 build 45-80 min; T1 null 55-90 min; T1b null 40-90 min; smoke 3 min; readout 6-15 min.",
+      "result": "FAILED",
+      "value": "FAILED on its THREE T1 CLAUSES ONLY: embedding + T1 build 36.0 min vs 45-80 FAILED; T1 site null 53.3 min vs 55-90 FAILED; readout 4.7 min vs 6-15 FAILED; smoke 2.1 min vs the bracketed <= 6 min HELD. [CORRECTED 2026-09-23 by the outcome section, review D4: the \"T1b null 40-90 min\" clause reads UNDETERMINED, NOT FAILED - 2.9 min is the wall time of a :siteNull that exited 1 and wrote no CSV, and scoring it contradicts the T1b arm's own rule. P12's verdict does not move.]",
+      "denominator": "chain.log timings"
+    }
+  ],
+  "falsifier": {
+    "text": "F1 (C1 FAILED): the taxonomy's held-out NMI is not above k-means's at the same k by more than the seed spread; leaves standing FW L53 / L179-180 and plan L23-25; overturns any reading that the certified taxonomy is a better flat partition of the embedding space than an unconstrained clustering at the same k. F1' (tree below k-means by > 0.05 NMI with the CI excluding 0): the size floor and the greedy top-down cuts cost partition quality, a limitation to print. F2 (C2 FAILED): certification does not select topic-aligned nodes once depth is held fixed; overturns \"the certificate is topic-informative\"; the geometric reading (elongation beyond the node's own null; CAP-GATE / CAP-PRUNE independence) extends from capability content to topic content. F3 (C3 FAILED): the recipe of record does not build on 20NG at bar 0.025; overturns the transfer of the flat bar; separation_null_by_size.md L20-23 narrows to \"unchanged for MMLU-Pro at this slice and N\"; T2 then measures whether the bar-equalised rule restores a build.",
+    "fired": true,
+    "scored": "F1 FIRED (C1 FAILED: the tree's held-out NMI is not above k-means's at the same k by more than the seed spread, -0.0020 vs 0.0074, CI [-0.0081, +0.0036], n_eval 5,076; this overturns any reading that the certified taxonomy is a better flat partition of the embedding space than an unconstrained clustering at the same k, on a corpus with discrete topics). F1' NOT FIRED (needs the tree below k-means by > 0.05 NMI with the CI excluding 0). F2 NOT FIRED (C2 HELD). F3 NOT FIRED (C3 HELD; T2 never ran and is UNDETERMINED as designed). Source: the outcome section's CORRECTION (2), from review defect D7 - the write-once outcome never printed the falsifier lines."
+  },
+  "numbers_of_record": {
+    "corpus": "20 Newsgroups, bydate, subset='all', headers / footers / quotes removed, shuffle=False: 18,846 documents, 20 labels (628 talk.religion.misc .. 999 rec.sport.hockey) under 7 groups comp (5 labels, 4,891) / rec (4; 3,979) / sci (4; 3,952) / talk (4; 3,253) / soc.religion.christian (997) / misc.forsale (975) / alt.atheism (799) (registration CORPUS; sklearn)",
+    "arms": "T1 = R1 af_clean_s42's recipe (anchorFree, bar 0.025, 256-dim slice, z 2.0, mcs 55, maxDepth 8, 50 iterations, label-free) on the corpus's own split (testRatio 0.30, seed 42, per label); T1b = T1 + embeddingSliceDim 512 + bar 0.0145 (FRAMEWORK L51-53; af_bareq512_s42.toml); T2 = T1 with bar 0.025 x (sep_root_T1 / 0.042461) clipped to [0.010, 0.025], ONLY if T1 not built; smoke = 2,000 ag_news rows, discarded evidence",
+    "record_comparators": "R1 af_clean_s42 root 0.042461 / p95 0.037214 / 1.141; discursive n00000005 0.059496 / 0.028375 / 2.097; quantitative n00000004 0.025148 / 0.033733 / 0.746 (site_null_af_clean_s42.csv); K-SELECTION R1' n00000004 0.056502 / 0.033471 / 1.688; R1 certified 14 of 69 = 20.3%, per-draw band 10-16 of 64-69; certified / uncertified site-size medians 620 / 248 (R1); size-band base rates over the four free draws' 268 sites 3/66, 11/103, 14/52, 24/47; ANCHOR-FREE-CERT arm 4 af_bareq512 92 leaves / 87 sites / 10 certified, arm 1 d512 stopped at 4 leaves",
+    "pins_before_run": "embeddings_cache.db embeddings n = 20,710 sha 6fd5c494...; queries n = 18,741 sha c123ca73... (registration I7; the READY re-pins); reserved_test_queries.json at the root currently p19d9f473b5a610a0 (backed up before the chain)",
+    "cost": "0 cce; 0 judge calls; embeddings local (~17k docs, ~40 min expected, 17-60); machine 2.5-4.7 h in one no-readers window, 3.5-6 h with T1b and the contingency; agent 2.5-3.5 h (cost-estimator, 2026-09-22)",
+    "run": "NOTHING RUN (registration only)",
+    "corpus_as_measured_pre_run": "ingest --dry-run over the sklearn cache 20news-bydate_py3.pkz (15,300,781 B, sha256 00872316da286d48de579c1d223d8e1d2faaca48c217c5a09cd296400126b162), independently recomputed to the digit by the adversarial reviewer: raw 18,846; NUL 0; dropped short (rule (2), norm-v1 < 100 chars) 1,808 = 9.59% of 18,846; dropped duplicate (rule (3)) 117 rows in 57 norm-v1 groups, 9 cross-label, = 0.62% of 18,846; kept 16,921 over 20 labels (16,035 label runs, not label-grouped); leak documents (rule (7), CASE-INSENSITIVE) 380 = 2.25% of 16,921 (case-sensitive 371); documents > 8,000 chars 306 = 1.8% of kept, max 158,787; manifest sha256 over (id, question, category) ORDER BY id = fc27ef38a1b5daedf7d3b07dc48cd53f14d86a4bbd7aa42236a03f756fa46e75. Source: programme bracket (a) L10735-L10761, from docs/reviews/READY_topic_partition_20ng.md (2708795). NOTHING INGESTED: these are the --dry-run's numbers, not a written DB.",
+    "split_expected_pre_run": "testRatio 0.30 per label, seed 42 -> TRAIN 11,846 and n_eval 5,075 (bracket (a)). The registration's '~5.6k' is superseded AS A FACT, not as a denominator rule: the denominator of record stays 'distinct held-out texts of the corpus's own split' and its value is whatever the build writes; 11,846 / 5,075 is the pre-run expectation.",
+    "instrument_shas_of_record": "at 634e969 (LF / CRLF sha256; verified by the registrar): twenty_newsgroups_ingest.py 0f746d7c88dea895822bdccefde9477ffeb6cdd8fe71eaaa2441dfd6c5a1f33a / ee1df1770cf53efb2eae8f9749d76827b1bb4f95f81febfd0e2b703d998bc90b; pool_guard.py 83de84ca9257006892ba86e111cf66194c1d9cf850e1013e61cf3baaf5c61a02 / 30862860dfbab2c5bf4c7d50d0796b2058d956a322619a062da6e6abe5eb0b1e; topic_partition.py 1bb31e964f05979159b0572cf33eb0112763d48ba248e855909ed9d8610e7567 / bad32eae28dbc31fec36a21b29ec86aee91137223f9a1b761b9a4f07c2b8eed9; topic_partition.sh 6455d849898fefb5067f770330c063a1b9f91b4e872300ab648c622abbd50400 / ab204c1452ca9fa399d90ce178538121a550bbd8a73b288126ef14a4b5362de6. All eight reproduce the READY's table exactly. [CORRECTED 2026-09-23 by POOL-GUARD-IMMUTABLE's merge (docs/judge_v2_program.md L14591-L14599): the pool_guard.py pin above stays true of 634e969 and of the runs done (both pool_guard_ng_af_*.out were produced by c857fd2e); from merge d30c19e (from 9745ed2, by pathspec, after CERT-UNDER-FILTER's run b4b1688, so no run of record spans two guard blobs) pool_guard.py is 8ca50c0fba9b8ce3023a42f14723391b95d9bc926de2b7ab7dfb0ea3028419be / 5c528e083c4120d2ae991726541676d1124183a2bb6ce051671598b5891989fb (LF / CRLF sha256; blob 6521b51ac0fc); same consequences as the bracket on `sha16`.]",
+    "split_of_record": "TRAIN 11,845 / held-out 5,076 (the corpus's own split, seed 42, ratio 0.30, per label; snapshot reserved ids 5,076 distinct; 0 held-out texts inside any leaf). [CORRECTED 2026-09-23 by the outcome section: pre-run bracket (a)'s 11,846 / 5,075 is a BANKER'S-ROUNDING ARTEFACT of exactly ONE DOCUMENT - comp.graphics n 875, 875 x 0.30 = 262.5, Java Math.round 263 vs Python round 262 (MMLUDatasetFetcher.splitTrainTest L740). No criterion, denominator or prediction moves.]",
+    "C1_headline": "tree NMI(20) 0.5422 - k-means seed 0 at k = L = 110 0.5442 = -0.0020; k-means seed spread 0.0074; 1,000-resample fixed-partition bootstrap CI [-0.0081, +0.0036]; n_eval 5,076 (reviewer's own seed 777: [-0.0084, +0.0039])",
+    "C1_beside": "tree purity 0.6673 [0.6542, 0.6801] (3,387/5,076), ARI20 0.1855, NMI7 0.4009, pur7 0.8160; k-means k=L seed 0 purity 0.6789, ARI20 0.1835; Ward k=L NMI20 0.5497; HDBSCAN mcs 55 k=3 train noise 0.927 NMI20 0.2407; permuted-label null NMI20 ~0.062; k-means k=L on FULL 4096-d NMI20 0.5585 (registered sensitivity row, NOT a C1 comparator); k=20 reference seed 0 NMI20 0.6160 / ARI20 0.4638 / purity 0.6340; n_eval 5,076",
+    "C2_headline": "depth-stratified certified-minus-uncertified NMI_20 gap +0.0740 at one-sided within-depth permutation p 0.0480 (1,000 permutations), OLS HC1 cert +0.0865 (SE 0.0395); 7 groups +0.0888, p 0.0030, OLS cert +0.0796 (SE 0.0368); raw +0.1215 / +0.1206; 101 sites = 16 certified + 85 uncertified; EFFECTIVE WEIGHT 11 (strata 0-1 w1 -0.0114; 2 w0 EMPTY; 3 w2 -0.1064; 4 w6 +0.1510; >=5 w2 +0.0663); p 0.0390 / 0.0420 / 0.0390 at three other seeds and 0.0365 over 200,000 permutations (7 groups 0.0036); unregistered depth x size-tercile null gap +0.0477 at p 0.133 (weight 10)",
+    "C3_headline": "T1 built: 110 leaves, 101 sites, depth 8, 15 iterations, 4 depth-blocked leaves; root observed 0.061713 / p95 0.050961 / margin 1.211 CERTIFIED; depth-1 1 of 2 certified (n00000004 0.042300 / 0.033308 / 1.270 yes; n00000005 0.038280 / 0.045768 / 0.836 no); certified share 16 of 101 = 0.158 [0.0999, 0.2419]; bands 1/27, 2/34, 3/21, 10/19; build-log leaf count 110 = snapshot L 110",
+    "T1b_reported": "ng_af_bareq512_s42 (slice 512, bar 0.0145): 100 leaves, 97 sites, 17 depth-blocked leaves; tree NMI20 0.5526, ARI20 0.2038, purity 0.6793; diff vs kmeans0 at k = 100 +0.0032, seed spread 0.0079, CI [-0.0026, +0.0090]; SITE NULL ABSENT (exited 1, OOM, no CSV) so certification, C3-beside and every null-reading clause are UNDETERMINED and no certified count exists for this arm",
+    "depth_curve_TRAIN_reported": "T1, TRAIN n = 11,845, max-cosine path, REPORTED not scored: d=1 (2 cells) NMI7 0.2962 / NMI20 0.2472; d=2 (4) 0.4569 / 0.3882; d=3 (10) 0.4812 (argmax NMI_7) / 0.5133; d=4 (21) 0.4586 / 0.5514 (argmax NMI_20, read by NO criterion and NO prediction); d=5 (41) 0.4243 / 0.5392; d=6 (68) 0.4021 / 0.5235; d=7 (100) 0.3872 / 0.5182; d=8 (110) 0.3837 / 0.5161",
+    "jaccards_TRAIN_reported": "T1, in-sample over 211 member sets: median best depth / median best J 4.0 / 0.4058 (20 labels) and 3.0 / 0.4957 (7 groups); leaves at max-Jaccard >= 0.5 = 1 of 110 (0.009); median leaf max J 0.1023",
+    "depth1_purity_heldout": "T1 depth-1 (k = 2), train-majority, HELD-OUT: 7-group 0.4277 [0.4141, 0.4414] (2,171/5,076); 20-label 0.1084 [0.1001, 0.1172] (550/5,076)",
+    "acceptance": "ACCEPTANCE OK: 12 mmlu_pro_dataset_cache_v2.db tables unchanged in n and sha in BOTH views, no table created; embeddings 20,710 -> 39,631 (+18,921 = 16,921 20NG + 2,000 ag_news smoke); queries 18,741 -> 31,986 (+13,245 = 11,845 20NG train + 1,400 ag_news smoke train); gmm_vectors 0; the 3 unpinned embeddings_cache tables still 0 rows; snapshots_frozen.db sha256 3f7f5e9a470baba3a66d0dbc870bf772739ae60cc415615b0c4f54e0f4793e4e unchanged; collision check 0 exact / 0 norm-v1 against every MMLU-Pro and multicorpus text store",
+    "run_as_measured": "CHAIN DONE 2026-09-23 04:43:04; zero LLM calls; timings T1 build 36.0 min, T1 site null 53.3 min (restart), smoke 2.1 min, readout 4.7 min, T1b \"null\" 2.9 min = the crashed task's wall time (UNDETERMINED, not a duration of record)"
+  },
+  "sentence_of_record": "On a corpus with known topics the anchor-free recipe of record builds and certifies, and partitions the embedding space no better than k-means at the same number of parts; its value on this corpus is the split discipline, the support per cell and the certificate, not the partition. [BRACKET 2026-09-23, review section 6 item 10: the value clause is the registration's CONTRAST to the partition claim, not a measured finding - neither routing quality nor question support was measured against any alternative here; the only support figure is descriptive (median held-out support 40 per leaf; 23 of 110 leaves below 30).] || The certificate is topic-informative on a corpus with discrete topics (stratified gap 0.0740, p 0.0480). [MANDATORY BRACKET 2026-09-23 (the sentence itself was written by the registrar because a numpy-bool identity bug dropped it from the write-once outcome, review D1): depth-stratified over 101 sites with EFFECTIVE WEIGHT 11; the depth-2 stratum is EMPTY; 6 of the 11 come from depth 4; the depth-0-1 and depth-3 strata read negative gaps (-0.0114, -0.1064); p seed-robust (0.0390 / 0.0420 / 0.0390, and 0.0365 over 200,000 permutations) but the null preserves DEPTH ONLY, and an unregistered depth x size-tercile null reads gap +0.0477 at p = 0.133. One corpus, one embedding model, one seed. \"Certification selects topic-aligned nodes\" is HELD AT THE REGISTERED INSTRUMENT and is NOT established under a size control.] || The per-corpus pair (512 / 0.0145) builds on this corpus. [MANDATORY BRACKET 2026-09-23: BUILDS ONLY - 100 leaves, 97 sites; T1b's site null exited 1 and wrote no CSV, so its certification, its C3-beside and every prediction clause reading its null are UNDETERMINED; no certified count exists for this arm and none may be compared to T1's or to ANCHOR-FREE-CERT arm 4's.]",
+  "chips": [
+    "BUILD",
+    "0 CALLS",
+    "C3 HELD",
+    "C1 FAILED, F1 FIRED (-0.0020 vs spread 0.0074, CI [-0.0081, +0.0036])",
+    "C2 HELD BUT THIN (gap 0.0740, p 0.048; effective weight 11, one stratum carries 6)",
+    "T1b UNDETERMINED (null crashed)",
+    "P9 PREDICTED THE NUMBERS AND THE WRONG CONCLUSION",
+    "ONE CORPUS / ONE MODEL / ONE SEED",
+    "DEPTH CURVE PEAKS AT d=4 (TRAIN, REPORTED)",
+    "ACCEPTANCE OK, FROZEN DB UNTOUCHED"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-22",
+      "by": "registrar at registration (insertion only, inside the QUESTION paragraph, 6aa2a0d)",
+      "text": "the lead's \"ANCHOR-FREE C1 0.715 free vs 0.757 anchored\" reads the record's table at L4316 across two rows: leaf-level held-out purity is 0.715 [0.700, 0.730] free vs 0.779 [0.764, 0.792] anchored (o0); 0.757 is o0's DEPTH-1 cell purity (14 cells; the free tree's depth-1 reads 0.188 over 2 cells). The lead's number stands as written; no criterion or prediction reads it."
+    },
+    {
+      "date": "2026-09-22",
+      "by": "registrar, pre-run brackets before the first fetch (programme L10723-L10827, bracket (a) L10735-L10761; insertion only)",
+      "text": "THE CORPUS AS THE INGEST MEASURES IT: raw 18,846; NUL 0; short-dropped 1,808 = 9.59%; duplicate-dropped 117 rows in 57 norm-v1 groups (9 cross-label) = 0.62%; kept 16,921 over 20 labels; leak 380 = 2.25% of kept (the leak rule is CASE-INSENSITIVE; case-sensitive 371); > 8,000 chars 306; max 158,787; manifest sha fc27ef38a1b5daedf7d3b07dc48cd53f14d86a4bbd7aa42236a03f756fa46e75; sklearn cache sha 00872316da286d48de579c1d223d8e1d2faaca48c217c5a09cd296400126b162. Split: TRAIN 11,846 and n_eval 5,075; the registration's '~5.6k' superseded as a FACT, not as a denominator rule. P10's short clause FAILED at 9.59% and its duplicate clause FAILED at 0.62% BEFORE the run; the leak clause HOLDS at 2.25% at the corpus level. A prediction failure, not an instrument defect: rules (2) and (3) change the corpus before the split and every method reads that corpus and those vectors, so no same-k contrast is affected (ceiling (5))."
+    },
+    {
+      "date": "2026-09-22",
+      "by": "registrar, pre-run brackets before the first fetch (programme bracket (b) L10762-L10781; insertion only)",
+      "text": "BUILDER READINGS FIXED NOW: (1) P12's 'smoke 3 min' scored as <= 6 min; (2) P3's 'below n 400 near the record's ~10%' scored as 5-15%; (3) P2's 'both depth-1 sites certified' read on the two highest-mass depth-1 sites, UNDETERMINED if the root's accepted k is 2 and only one depth-1 site has >= 2 children; (4) P7's qualitative clause HELD iff the comp.* and talk.* majorities fall in different depth-1 cells of the TRAIN migration matrix, rec.*'s cell printed; (5) P11's certified-share clause DESCRIPTIVE only (T1b's null at 0.0145, T1's at 0.025; cross-bar certified-count comparison forbidden); (6) depth-d cuts resolved along each document's max-cosine path; (7) a restarted site null appends a second [SEPBAR] line and the readout takes the last one; (8) F3 with no I4 input: T2 not run and UNDETERMINED, C3 FAILED, F3 fires, and the readout at 634e969 still writes the outcome file."
+    },
+    {
+      "date": "2026-09-22",
+      "by": "registrar, pre-run brackets before the first fetch (programme bracket (c) L10782-L10799; insertion only)",
+      "text": "THE READY'S CONDITIONS 10-12 AS READING RULES OF RECORD: (10) the pin is a fixed 12-table list of mmlu_pro_dataset_cache_v2.db and pins 3 of 6 embeddings_cache.db tables (agent_ratings, match_history, sqlite_sequence unpinned, all 0 rows today), so 'every table UNCHANGED' is met for the 12 + 3 named and asserted-by-absence-of-a-write-path for the rest; a table created during the run is caught only by the post-run reviewer's manual sqlite_master comparison. (11) The T2 bar, if T2 runs, is checked only for TOML == [SEPBAR] to 1e-9, not against the clip [0.010, 0.025] nor t2_bar.out, so the post-run reviewer recomputes the I4 formula and the clip independently. (12) The readout's seven new paths carry no selftest assertion at 634e969 (selftest 32 checks); the reviewer drove all seven by hand in the second pass, and the next edit of tools/analysis/topic_partition.py must add them and raise the pinned count."
+    },
+    {
+      "date": "2026-09-22",
+      "by": "registrar, pre-run brackets before the first fetch (programme bracket (d) L10800-L10827; insertion only)",
+      "text": "PROVENANCE: registration 6aa2a0d; branch topic-partition-20ng 3783c5f -> 634e969; READY ef1dc0a (NOT READY at 3783c5f) -> 2708795 (READY at 634e969, branch MERGEABLE); merge 611ca62. The four script shas of record at 634e969 (LF / CRLF) as listed in numbers_of_record.instrument_shas_of_record, each recomputed by the registrar and all reproducing the READY's table exactly. After the merge, in the main checkout: full suite 441 tests / 0 failures / 0 errors (registrar-verified from build/test-results/test) and the six Block 2 dry-runs exit 0 at zero calls (research-lead's report, copied). The chain's --dry-run refuses only at the Ollama gate: the one operator condition left."
+    },
+    {
+      "date": "2026-09-22",
+      "by": "research-lead (decision) / registrar (recording), pre-run brackets second batch, before the first fetch (programme bracket (e) L10841-L10862; insertion only)",
+      "text": "C2 WITHOUT A CONTRAST IS UNDETERMINED, NOT FAILED (the registrar's open reading 1). C2 reads UNDETERMINED and F2 does NOT fire when the comparison has no support: (i) fewer than 2 certified sites on the arm, OR (ii) fewer than 2 uncertified sites, OR (iii) the total depth-stratum weight sum(min(n_cert, n_uncert)) over {0-1, 2, 3, 4, >= 5} = 0, OR (iv) the permutation distribution is degenerate (fewer than 2 distinct values over the 1,000 within-stratum permutations). On that path the outcome still prints the raw certified-minus-uncertified gap, the counts per depth stratum and the sentence \"the instrument had no certified/uncertified contrast to read at matched depth\", and F2 is recorded as NOT FIRED. F2 fires only on a measured null: a computed stratified gap <= 0, or a computed permutation p >= 0.05, with (i)-(iv) all false. Reason of record: a negative finding (\"certification does not select topic-aligned nodes\") and an empty instrument are different results, and the record's convention is that UNDETERMINED is an outcome. No metric, denominator or prediction changes; C2's HELD clause is untouched; P8 and P9 are still scored as registered and may read FAILED while C2 reads UNDETERMINED; T1b stays REPORTED, never scored."
+    },
+    {
+      "date": "2026-09-22",
+      "by": "research-lead (decision) / registrar (recording), pre-run brackets second batch, before the first fetch (programme bracket (f) L10864-L10881; insertion only)",
+      "text": "THE NUMBER OF PARTS L IS ONE NAMED OBJECT (the registrar's open reading 2). L of record = the leaf count of the built tree as the READOUT counts it from the snapshot (len(leaf_ids) over the last snapshot of the arm's dag_snapshots.jsonl), and that is the k given to KMeans(n_clusters = L, n_init 10, seeds 0-4) and to AgglomerativeClustering(ward, n_clusters = L). The outcome must ALSO print (i) the chain's leaf count parsed from the build log ('leaves=' / the trickle's held-out leaf support line) and (ii) the effective number of tree cells that receive at least one held-out arrival, with the three numbers side by side; if (i) != L the outcome carries a printed disagreement line and the post-run reviewer states which count each baseline ran at. C1 is read at the registered k = L in every case, with the effective-cell count beside it as a support statement, never as a substitute denominator. Reason: \"at the same number of parts\" is the whole of C1, so the count must be one object, named, with its neighbours visible. C3's leaf-count clauses read the same L."
+    },
+    {
+      "date": "2026-09-22",
+      "by": "research-lead (decision) / registrar (recording, verified by grep on the heading lines), pre-run brackets second batch, before the first fetch (programme bracket (g) L10883-L10897; insertion only)",
+      "text": "THE RECORDED LINE RANGE IS OFF BY NINE AT BOTH ENDS (the registrar's open reading 4). The true range at programme commit 76e5582: heading L10039, the registrar's check at registration L10319, the section ending L10399 (the next heading is at L10401), i.e. registration L10039-L10399 and check L10319-L10399. The originally recorded \"L10030-L10390\" / \"L10310-L10390\" stays in place in registration.program_lines, in docs/agents/queue.json (five items) and in the first batch's preamble (L10726) per correction-by-insertion; registration.program_lines_note and programme bracket (g) are the correction, and the queue's strings are corrected BY REFERENCE, not rewritten. The last bracket wins."
+    },
+    {
+      "date": "2026-09-22",
+      "by": "registrar, pre-run brackets second batch, before the first fetch (programme bracket (h) L10899-L10913; insertion only; nothing decided here)",
+      "text": "TWO ITEMS RECORDED WITHOUT BEING DECIDED. (1) The registrar's open reading 3 (P10's leak clause) is ALREADY COVERED by bracket (a) of 76e5582: the leak clause is scored on the HELD-OUT share the readout prints, with the corpus-level 380 / 16,921 = 2.25% printed beside, and P10 as a whole already reads FAILED before the run on its short-dropped (9.59%) and duplicate-dropped (0.62%) clauses. No new rule, no scoring change. (2) OPERATOR CONDITION repeated from the READY (item 21, LOW operational, 2708795) because the acceptance step is load-bearing on a resumed chain: `pin after` is skipped when experiment_results/topic_partition/pin_after.txt exists, so a relaunch that re-executes an ingest or build step would compare a stale after-state; the operator DELETES pin_after.txt and pin_after_rows.tsv before such a relaunch, and never deletes or rotates ag_news_smoke_s42.build.out (the gate reads it fail-closed). Binds the operator, not the readout; changes no criterion, prediction or falsifier."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar, outcome section (docs/judge_v2_program.md L11425-L11509), from the post-run review docs/reviews/2026-09-23_topic_partition_post.md (18386b5)",
+      "text": "INSERTION (a), the review's first mandatory insertion: the C2 SENTENCE OF RECORD that the script never wrote - \"The certificate is topic-informative on a corpus with discrete topics (stratified gap 0.0740, p 0.0480).\" - is written into the outcome section with its MANDATORY BRACKET: effective weight 11, an EMPTY depth-2 stratum, 6 of 11 from depth 4 (6 certified vs 12 uncertified), two strata negative (-0.0114, -0.1064), p seed-robust (0.0390 / 0.0420 / 0.0390; 0.0365 over 200,000 permutations; 7 groups 0.0030 -> 0.0036) but the null preserves DEPTH ONLY, and an unregistered depth x size-tercile sensitivity reads gap +0.0477 at p = 0.133 - so \"certification selects topic-aligned nodes\" is HELD AT THE REGISTERED INSTRUMENT and is NOT established under a size control. Cause: defect D1 (HIGH), the numpy-bool identity check at tools/analysis/topic_partition.py L1061. The write-once outcome file is NOT edited."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar, outcome section (docs/judge_v2_program.md L11425-L11509), from the post-run review docs/reviews/2026-09-23_topic_partition_post.md (18386b5)",
+      "text": "INSERTION (b): the Q3 sentence \"The per-corpus pair (512 / 0.0145) builds on this corpus.\" carries its MANDATORY BRACKET - BUILDS ONLY (100 leaves / 97 sites); T1b's site null exited 1 (java.lang.OutOfMemoryError at SeparationNullBySizeTest.kt:575, XMLs preserved at b1ac058) and wrote no CSV; certification, C3-beside and every null-reading prediction are UNDETERMINED; no certified count exists for this arm and none may be compared to T1's or to ANCHOR-FREE-CERT arm 4's."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar, outcome section (docs/judge_v2_program.md L11425-L11509), from the post-run review docs/reviews/2026-09-23_topic_partition_post.md (18386b5)",
+      "text": "INSERTION (c), the corrections by insertion: (1) the programme range of record is L10039-L10399 (the outcome header's L10030-L10390 is SUPERSEDED; review D6); (2) F1 FIRED / F2 NOT FIRED / F3 NOT FIRED stated explicitly (F1' does not fire; review D7); (3) the build-log leaf count 110 = snapshot L 110, so pre-run bracket (f)(i) is satisfied by the reviewer's own check at ng_af_s42.build.out:3045 (review D5); (4) P12's T1b-null clause reads UNDETERMINED, not FAILED - 2.9 min was the wall time of a :siteNull that exited 1 and wrote no CSV, and scoring it contradicts the arm's own rule; P12 stays FAILED on its three T1 clauses (review D4); (5) the split of record is 11,845 / 5,076, the pre-run bracket's 11,846 / 5,075 being a banker's-rounding artefact of exactly one document (comp.graphics 875 x 0.30 = 262.5; Java Math.round 263 vs Python round 262)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar, outcome section (docs/judge_v2_program.md L11425-L11509), from the post-run review docs/reviews/2026-09-23_topic_partition_post.md (18386b5)",
+      "text": "INSERTION (d): the depth curve, the per-label / per-group best-Jaccard nodes and the per-leaf Jaccards are REGISTERED readouts (instrument I6 Q2) but REPORTED, NOT SCORED; they are TRAIN-SIDE and IN-SAMPLE (n = 11,845), computed on the construction's own training members; and they are ONE DRAW. Only Q1's purity / NMI / ARI rows and the depth-1 purities (0.4277 / 0.1084) are held-out (n = 5,076). NO CRITERION AND NO PREDICTION READS THE NMI_20 ARGMAX AT d = 4, so it may never be quoted as a scored result. The shape reproduces exactly: NMI_20 peaks at d = 4 (21 cells, 0.5514) and falls to 0.5161 at the 110 leaves; NMI_7 peaks at d = 3 (10 cells, 0.4812) and falls to 0.3837."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar, outcome section (docs/judge_v2_program.md L11425-L11509), from the post-run review docs/reviews/2026-09-23_topic_partition_post.md (18386b5)",
+      "text": "PROCESS DEFECTS recorded with the outcome: D1 HIGH (the numpy-bool `is True` at topic_partition.py L1061 made the C2 sentence FAIL-SILENT IN BOTH DIRECTIONS - `if c2 is False:` at L1063 would equally never fire, so a measured-null path would have carried no C2 sentence at all; the readout is NOT READY for another run until L1061/L1063 use bool(...) with an audit of c1 at L1054/L1056 and bracket (c)(12)'s seven selftest assertions land with the pinned count raised from 32); D2 HIGH (effective weight 11, recorded in the C2 bracket); D3 MEDIUM (the registered null preserves depth but not size; certified sites are 4.6x larger overall, median n 1,301 vs 284, though within depth strata the gap is modest and the OLS log n coefficient is +0.0041 SE 0.0225; the unregistered depth x size-tercile null reads p 0.133 and must NOT be promoted); D4 MEDIUM and D5 MEDIUM (corrected at insertion (c)); D9 INFORMATIONAL (the permutation loop recomputes the gap once per stratum inside the shuffling loop and uses only the last value - the result is correct, the loop is 5x slower than needed); D10 INFORMATIONAL (P7's qualitative clause was reduced pre-run to \"comp.* majority cell differs from talk.* majority cell\", which almost any non-degenerate 2-way split satisfies, so P7 HELD is NOT evidence for the technical/discursive reading)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar, standing-defect section (docs/judge_v2_program.md L11511-L11524), from the engine-coder's D1 fix (74208e8) and the tree-construction-specialist's harness finding",
+      "text": "STANDING DEFECT AGAINST THE REGISTRATION, recorded by insertion: pre-run bracket (e)'s FOUR UNDETERMINED CONDITIONS ARE NOT IMPLEMENTED IN THE C2 CRITERION. tools/analysis/topic_partition.py decides C2 at one expression (stratified gap not None and > 0; permutation p not None and < 0.05; OLS cert > 0) and takes its UNDETERMINED path only when the arm is not built or has no complete site null, so a draw with fewer than 2 certified sites, fewer than 2 uncertified, zero total stratum weight or a degenerate permutation distribution would be scored C2 FAILED and WOULD FIRE F2 on an instrument that measured nothing - a false falsification of \"the certificate is topic-informative\". NO RECORDED NUMBER MOVES: all four conditions were FALSE on the 2026-09-23 draw (16 certified, 85 uncertified, weight 11, non-degenerate), the reviewer verified exactly that, and the outcome section and ledger row v122 stand. THE DECISION IT NEEDS: implementing (e) is a SCORING change (it changes when C2 takes UNDETERMINED and therefore when F2 fires) and needs a REGISTRAR RULING before the next run of this instrument on any draw that could read C2 - the order of evaluation, what each path prints, whether it applies backward (it does not: no recorded draw hit them) and the selftest assertions driving all four paths with the pinned count raised in the same commit. It is not a coder's judgement. The T1b-null addendum registered at L11525-L11553 is NOT blocked by it: that addendum may not touch C2 at all and cannot reach the unimplemented branch. WHAT THE CODER DID FIX at the same site (74208e8, 0 calls; topic_partition.py LF sha d1f48f69beeb69fc / CRLF 3d2250f608fcab34; pinned selftest 32 -> 55 with a drift guard, closing bracket (c)(12)): tribool() normalises every verdict to True / False / None AT THE POINT IT IS DECIDED and refuses anything else; c2_sentence() is TOTAL (HELD, FAILED and UNDETERMINED each write exactly one sentence, anything else dies), so the write-once outcome can no longer lose the sentence in either direction; the None path carries bracket (e)'s OWN WORDING; verdict_word() replaces three three-way printers that would have printed UNDETERMINED beside a measured FAILED; and it is verified against the outcome of record that no recorded number moves and a future --run reproduces the outcome BYTE-IDENTICALLY apart from the added C2 sentence and the script_sha. CODE HAZARD REGISTERED AND NOT FIXED: the setup blocks of withinNull (SeparationNullBySizeTest.kt L1390-L1395) and siteNull (L1680-L1685) are byte-identical, so an edit sited by content lands in the wrong arm and still compiles (this is how tonight's heap guard was first mis-sited); per-arm local names would make it a compile error, and that touches a harness every recorded null ran through, so it needs its own registered, byte-inertness-verified pass. Recorded also at FRAMEWORK guard 22 (L249) and CONTEXT.md standing rule 11."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "research-lead (ruling) / registrar (recording by insertion), docs/judge_v2_program.md L11555-L11576 (registrar's ruling of 2026-09-23, amendment by insertion)",
+      "text": "RULING ON THE STANDING DEFECT: bracket (e) is ADOPTED AS ALREADY REGISTERED. Bracket (e) is registered text; the code simply never implemented it, so making the code print UNDETERMINED where the registration already says UNDETERMINED is CONFORMANCE, not a new scoring decision, and the scoring rule is applied as written for the first time. Mechanics ruled and registered: (a) the four no-contrast conditions are evaluated BEFORE the verdict expression, so a draw with no contrast can never reach \"strat > 0 and p < 0.05 and beta[1] > 0\"; (b) each of the four prints its own NAMED REASON WITH ITS COUNT (certified n, uncertified n, total stratum weight, the permutation's distinct-value count), so an empty instrument is distinguishable from a measured null at a glance, with bracket (e)'s registered sentence and the raw gap and per-stratum counts still printed; (c) F2 MAY NOT FIRE ON AN UNDETERMINED C2 - a falsifier firing on an empty instrument is a false falsification, and F2 fires only on a MEASURED null; (d) IT DOES NOT APPLY BACKWARD: the 2026-09-23 draw had all four conditions FALSE (16 certified, 85 uncertified, weight 11, non-degenerate), so the outcome section, the sentences of record, ledger v122 and its v123 bracket STAND and NO RECORDED NUMBER MOVES; (e) one selftest assertion per condition, each checking the named reason AND that F2 did not fire, with the pinned count raised 55 -> 59 in the same commit. THE CODE CHANGE is queue item TP20-C2-CONFORMANCE (engine-coder, zero calls), and BYTE-INERTNESS IS PART OF THE DELIVERABLE: the coder must prove that the 2026-09-23 inputs still produce an IDENTICAL verdict block (criterion lines, falsifier readings and sentences of record, character for character, apart from the script_sha). tools/analysis/topic_partition.py stays NOT READY for any run that could READ C2 until that lands with a READY. The T1b addendum is explicitly unaffected: it may not touch C2 and cannot reach the four conditions."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "CORRECTIONS_2026-09-23 (registrar)",
+      "text": "[CORRECTED 2026-09-23 by the registrar (line pointer only, zero calls; measurement, not a change of record): registration.program_lines names docs/judge_v2_program.md L10030; at HEAD the heading \"## Registered 2026-09-22 (before any code or call) — TOPIC-PARTITION-20NG: on a corpus with ground-truth topic labels the construction has n ...\" stands at L10093, +63. This drift is NOT the four one-line brackets of cd83eac (which move this pointer by only +4): it PRE-DATES tonight and is the ordinary cost of correcting by insertion INSIDE the registration this pointer names. Verified by sed -n '10093p' docs/judge_v2_program.md at this commit; found by the pointer audit recorded in the programme's \"## Line-shift map, appended 2026-09-23\" section. The recorded span and any corrected span already carried elsewhere in this record are left standing, not rewritten.]"
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar (insertion only, zero calls)",
+      "text": "TP20-C2-CONFORMANCE MERGED at 1494527 (topic_partition.py blob 8721da0, content-identical to 3dc348e; READY 2ab566b): bracket (e)'s four UNDETERMINED conditions are now evaluated before C2's verdict expression. Code only; the outcome of record (blob 90632b36bed0) was not regenerated and no number moves."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, recording TOPIC-PARTITION-20NG-T1B-NULL (insertion only, zero calls)",
+      "text": "The T1b addendum superseded targets (1)-(3) by insertion (target (4), cert-vs-alignment, stays UNDETERMINED): the T1b site null exists (97 sites, 300 reps); T1b BUILDS BUT DOES NOT CERTIFY against its own site null (A2 PARTIAL; AF1 FIRED); P11's certified-share clause reads HELD at the point, DESCRIPTIVE-ONLY. C0, C1, C2, T1's C3 and P12 are untouched. The recorded transfer (C3 HELD) rests on T1 (256 / 0.025) alone on this corpus. See docs/agents/results/TOPIC-PARTITION-20NG-T1B-NULL.json and programme L13784-L13847."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on CONTENT-DISJOINT-SPLIT-AUDIT (review 1df2cf1; insertion only, zero calls)",
+      "text": "D5: 20NG's zero cross-side twins holds BY INGEST RULE (3) (all copies of every norm-v1 duplicate group dropped), not by a cross-side check; the pool id file experiment_configs/reserved_pool_frozen_pf844849e133cda4e_20ng.json is UNTRACKED (the .gitignore scope is author-owned; noted, not touched); the cache's WAL tail (708,672 B, 09-23 04:30) is unread."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (review d72c790, relayed by the coordinator)",
+      "text": "RESUME HAZARDS (registrar, 2026-09-23, from review d72c790 D3/D4; docs/judge_v2_program.md L14509-L14527): (a) twenty_newsgroups_cache_v1.db carries a 708,672 B -wal last written 2026-09-23 04:30:05.638 (main file 2026-09-22 19:32:36.251); pool_guard_ng_af_bareq512_s42.out (04:35:06) prints reserved_pool_meta created_at=1790130605620 (04:30:05.620), consistent with the latest meta row living only in the WAL tail - INFERRED from timestamps, the DB was not opened. Before any resume: back up the DB with its -wal and -shm, the data-steward checkpoints it (read-write open and close, outside any rule-7 window), then verify pf844849e133cda4e. (b) tools/chains/topic_partition.sh pool_export (L533-L537, blob:ba0cca2c983c) logs ANY non-zero guard exit as 'C0 pool clause FAILED'; the two existing arms short-circuit on their OK .out files, a NEW arm (T2) or a deleted .out would hit it. C0's registered text (programme L10282-L10285) has no FAILED leg for the pool clause and does not cover a refusal (the registrar's check in the section cited); queued TP20-GUARD-REFUSAL-PRECONDITION (a refusal is a failed precondition: abort the arm, no C0 line). (c) MEDIUM: under the new guard immutable=1 removes SQLite locking; rule 7 is then the only protection against a concurrent writer (note under rule 7 in CONTEXT.md). Nothing recorded moves: T1's C0 HELD stands on an OK .out. At the merge of POOL-GUARD-IMMUTABLE the pins at L19 (sha16) and L197 (instrument_shas_of_record) get the new blob's triple by insertion (list on POOL-GUARD-IMMUTABLE.json); until then no new pin is applied."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (POOL-GUARD-IMMUTABLE merge d30c19e)",
+      "text": "New-pin brackets applied in-line to `sha16` and `instrument_shas_of_record`: from d30c19e pool_guard.py is blob:6521b51ac0fce04063563f9e6dcf42554ad86591 / sha256-lf16:8ca50c0fba9b8ce3 / sha256-crlf16:5c528e083c4120d2; the old pin stays true of the runs done. docs/judge_v2_program.md L14591-L14599."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (builder's finding, relayed)",
+      "text": "OPEN ITEM FOR THE RESUME: T2's t2() in topic_partition.sh builds and runs the site null WITHOUT calling pool_export; before any T2 run, pool_export (under the new guard, with TP20-GUARD-REFUSAL-PRECONDITION READY, built at abd4a38) must precede its site null, or T2's pool clause is UNDETERMINED. docs/judge_v2_program.md L15027-L15037."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (READY 231029b; merge 0f1bcd5)",
+      "text": "TP20-GUARD-REFUSAL-PRECONDITION merged at 0f1bcd5 (topic_partition.sh blob:3b6f329f03da2da96c05f75db38f24f94f3aa27f / sha256-lf16:3ac4a3a5c691635c / sha256-crlf16:f2730d41c9c96409); resume conditions C1-C2 plus the D2 / D6 rulings recorded in `resume_conditions`; hazard (4)(b)'s premise corrected (T2 never reaches pool_export). docs/judge_v2_program.md L15039-L15050."
+    }
+  ],
+  "does_not_show": [
+    "(1) nothing about CAPABILITY: no models, keys, eval rows, arena, board or judge on 20NG; ANCHOR-FREE's key-only Brier has no analogue here",
+    "(2) ONE EMBEDDING MODEL (qwen3-embedding, 4096-d, sliced to 256 on T1 / 512 on T1b)",
+    "(3) the BAR'S SIZE DEPENDENCE IS UNCONTROLLED: p95 falls with n, so an 11.8k train side certifies more easily than MMLU-Pro's 8.1k and the 16/101 against 14/69 comparison is DESCRIPTIVE, not like-for-like",
+    "(4) the 20-TOPIC CEILING: the religion triad, the comp.* quintet and the politics triad overlap in any embedding, so absolute levels are corpus-bound and only the same-k contrasts are the test",
+    "(5) header stripping and Ollama's silent truncation of long inputs (306 kept documents above 8,000 chars) move absolute levels for EVERY method",
+    "(6) ONE SEED, ONE SPLIT, NO RE-DRAW",
+    "(7) \"CERTIFICATION SELECTS TOPIC-ALIGNED NODES\" DOES NOT SURVIVE A SIZE CONTROL: C2 is HELD at its registered bar, but the estimate rests on 11 effective site-pairs, one stratum supplies 6, two strata read negative, and an added size stratification takes p to 0.13; the record may say the certificate IS topic-informative on this corpus AT THE REGISTERED INSTRUMENT, and may NOT say the effect is established, robust or independent of site size",
+    "(8) NOTHING ABOUT THE CERTIFICATE ON THE 512 / 0.0145 RECIPE: T1b built but never certified; the whole Q2 question is unanswered for the per-corpus pair",
+    "(9) the DEPTH CURVE, the JACCARDS and the PER-SITE NMIs are TRAIN-SIDE; only Q1's purity / NMI / ARI and the depth-1 purities are held-out; no statement about generalisation of the depth structure is supported",
+    "(10) NOTHING ABOUT ROUTING, SUPPORT OR THE SPLIT DISCIPLINE AS VALUES: the verdict sentence's \"its value is the split discipline, the support per cell and the certificate\" is the registered CONTRAST to the partition claim, not a measured finding; the only support figure here is descriptive (median held-out support 40 per leaf; 23 of 110 leaves below 30)",
+    "(11) HDBSCAN IS NOT A FAIR THIRD BASELINE ON THIS CORPUS: at mcs = 55 it labels 92.7% of TRAIN as noise and returns k = 3, so its NMI20 0.2407 says almost nothing about density clustering's ceiling here - \"THE TAXONOMY BEATS HDBSCAN\" MUST NOT BE WRITTEN",
+    "(12) NOTHING ABOUT A SECOND DRAW: leaf count, certified fringe and the depth of the NMI peak are per-draw objects (REDRAW); this run has no re-draw arm",
+    "NO ADDENDUM IS REGISTERED: the T1b-null addendum is NOT registered and may not be launched - tools/analysis/topic_partition.py is NOT READY for another run until D1's identity bug and pre-run bracket (c)(12)'s seven selftest assertions land (an engine-coder holds the fix); it would then need its own registration and its own READY",
+    "the T1b-null addendum is NOW REGISTERED (programme L11525-L11553, this commit, state registered, NOT scheduled and NOT run): it may move only four items from UNDETERMINED to scored (C3-beside for T1b, P11's certified-share clause only, the T1b site-null line, the T1b cert-vs-alignment line) and may not touch C0, C1, C2, T1's C3 or P12, so ceilings (7) and (9)-(12) above are untouched by it and ceiling (8) stands until it runs",
+    "the bracket (e) conformance change (queue item TP20-C2-CONFORMANCE, ruled docs/judge_v2_program.md L11555-L11576 (registrar's ruling of 2026-09-23, amendment by insertion)) is NOT YET WRITTEN: until it lands with a READY and its byte-inertness proof, tools/analysis/topic_partition.py remains NOT READY for any run that could READ C2 - and when it lands it changes nothing recorded here, by ruling clause (d)"
+  ],
+  "ledger": {
+    "row_id": "TOPIC-PARTITION-20NG",
+    "version": "v122 (2026-09-23; section 7, newest-first, inserted before MULTI-SWE-ADMISSION; audit expect_rows 222) | v123 (2026-09-23): no row added and none rewritten - the row's observed cell receives the dated bracket recording the standing defect on pre-run bracket (e) (no number in the row moves), the engine-coder's D1 fix at 74208e8, the registered-but-unfixed harness hazard, the two guard-hygiene process rules (CONTEXT.md rule 11, FRAMEWORK guard 22) and the registered, unscheduled addendum TOPIC-PARTITION-20NG-T1B-NULL; audit line: \"ledger audit OK: v123, 222 rows, chips [null, ok, plan, run, warn]\" | v124 (2026-09-23): a second bracket into the same observed cell records the RULING (bracket (e) adopted as already registered; conformance, not a new scoring decision; mechanics (a)-(e); no backward application, so v122 and v123 and every number in the row stand), the registered code item TP20-C2-CONFORMANCE with its byte-inertness proof, the readout still NOT READY for a run that could read C2, and the addendum explicitly unaffected; audit line: \"ledger audit OK: v124, 222 rows, chips [null, ok, plan, run, warn]\""
+  },
+  "depends_on": [
+    "ANCHOR-FREE",
+    "ANCHOR-FREE-REDRAW",
+    "ANCHOR-FREE-CERT",
+    "K-SELECTION",
+    "CAP-GATE-POSTHOC",
+    "CAP-PRUNE",
+    "COST-AXES-INGEST",
+    "FRAMEWORK",
+    "SPLIT-FUNCTION-IMPL"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "closed_line_note": "Registrar's check (b), programme L10310 ff.: ANCHOR-FREE-CERT's closed class (construction levers for certification on the anchor-free tree; K-SELECTION's bracket: any sweep over m is inside it) is NOT reopened: two NAMED recipes of record run once each on a NEW corpus as a transfer readout; proposalAcceptMultiplier absent; every cross-bar certified-count comparison forbidden; T2 (a bar value by the D2 rule transported to a corpus ratio) only if T1 does not build and excluded from every count comparison. Plan 2026-09-18 section 5 question 2 answered in one direction (a new corpus; no MMLU-Pro lever; EMBED-AF / ARRIVAL-AF stay parked).",
+  "queue_items": [
+    "TOPIC-PARTITION-20NG (machine, ready: awaiting the launch by the orchestrator under rule 7; the Ollama gate is the one operator condition left)",
+    "TP20-BUILD (agent, done: instrument at 634e969, merged 611ca62)",
+    "TP20-READY (agent, done: READY at 634e969, docs/reviews/READY_topic_partition_20ng.md at 2708795)",
+    "TP20-REVIEW (agent, blocked on the chain's completion)",
+    "TP20-OUTCOME (agent, blocked on TP20-REVIEW)"
+  ],
+  "sources": [
+    "docs/judge_v2_program.md L10030-L10390 (registration 6aa2a0d): title, question, corpus, instrument I0-I7, hygiene, criteria C0-C3, predictions P1-P12, falsifiers F1-F3, verdict rule, what the study cannot show, cost, the registrar's check (a)-(h) and the inline bracket",
+    "docs/plan_2026-09-15.md Amendment 8 L278-L314 (6aa2a0d): the author's sentence verbatim, who decided what and why",
+    "docs/agents/plans/2026-09-18_reframing_and_next.md L271 (section 5 question 2) and L20-25",
+    "experiment_results/anchorfree/redraw/site_null_af_clean_s42.csv (R1 rows n00000001 / n00000005 / n00000004; the 620 / 248 medians) and experiment_results/anchorfree/site_null_af_s42.csv + redraw/site_null_af_s137.csv + redraw/site_null_af_s2048.csv (the four size-band base rates over 268 sites), read-only",
+    "docs/judge_v2_program.md L4308 / L4316 / L4342 / L4560 / L4793 (ANCHOR-FREE, ANCHOR-FREE-REDRAW, ANCHOR-FREE-CERT numbers quoted); L8360 (K-SELECTION's closed-class bracket)",
+    "docs/agents/results/{ANCHOR-FREE,ANCHOR-FREE-REDRAW,ANCHOR-FREE-CERT,K-SELECTION,CAP-GATE-POSTHOC,CAP-PRUNE,COST-AXES-INGEST,FRAMEWORK}.json (states, ledger versions, closed_line of ANCHOR-FREE-CERT)",
+    "docs/design/FRAMEWORK.md L51-53, L179-180; docs/separation_null_by_size.md L20-23, L322-333",
+    "experiment_configs/anchorfree/redraw/af_clean_s42.toml (T1's base) and experiment_configs/anchorfree/af_bareq512_s42.toml (the 512 / 0.0145 pair)",
+    "docs/reviews/READY_topic_partition_20ng.md (pass 1 ef1dc0a, NOT READY at 3783c5f; pass 2 2708795, READY at 634e969, branch MERGEABLE): the pinned shas, the reviewer's independent recomputation of the corpus counts, defects 1-21, conditions 1-12",
+    "docs/judge_v2_program.md L10723-L10827 (this commit): the pre-run bracket subsection (a)-(d)",
+    "git: 6aa2a0d (registration), 3783c5f -> 634e969 (branch topic-partition-20ng), ef1dc0a -> 2708795 (READY), 611ca62 (merge into main); the four script shas recomputed by the registrar from the blobs at 634e969",
+    "build/test-results/test (88 XML, timestamps 2026-09-22T11:57:12-11:58:06 UTC): 441 tests / 0 failures / 0 errors in the main checkout after the merge",
+    "docs/judge_v2_program.md L10829-L10913 (this commit): the pre-run bracket subsection, second batch (e)-(h) - the research-lead's decisions on the registrar's open readings 1, 2 and 4, plus reading 3 recorded as already covered by bracket (a) and READY item 21 repeated as an operator condition",
+    "experiment_results/topic_partition/topic_partition_outcome.txt (write-once, untracked; the readout of 2026-09-23, script_sha 1bb31e964f059791): every criterion, prediction, denominator and Q1/Q2/Q3 row above",
+    "docs/reviews/2026-09-23_topic_partition_post.md (18386b5): the independent recomputation of every headline figure to four decimals, defects D1-D10, the four mandatory insertions, the chips, the sentences of record and their mandatory brackets, and the \"what this does not show\" items (7)-(12)",
+    "docs/judge_v2_program.md L11425-L11509 (outcome section, this commit): the scored criteria, predictions, falsifiers, the five corrections by insertion and the twelve does-not-show items",
+    "docs/design/FRAMEWORK.md L53 and L57 (this commit): the clean negative and the qualified positive inserted into Stage 2's Rule paragraph and its Rests-on line",
+    "b1ac058: the preserved T1b site-null OOM #2 test XMLs (java.lang.OutOfMemoryError at SeparationNullBySizeTest.kt:575), the cause of T1b's missing null",
+    "74208e8 (engine-coder merge, 0 calls): the D1 fix - tribool(), the total c2_sentence(), verdict_word(), in_range(), the pinned selftest count 32 -> 55, the byte-identical-reproduction property; topic_partition.py LF sha d1f48f69beeb69fc / CRLF 3d2250f608fcab34",
+    "tools/analysis/topic_partition.py (read, not executed, at 74208e8): the C2 decision expression and its UNDETERMINED path - the evidence for the standing defect",
+    "src/test/kotlin/taxonomy/SeparationNullBySizeTest.kt L1390-L1395 / L1680-L1685 (read): the byte-identical setup blocks of withinNull and siteNull; L1735-L1762: the heap guard that prints its estimate and budget on every run",
+    "docs/judge_v2_program.md L11511-L11524 (standing defect) and L11525-L11553 (the T1b-null addendum registration), this commit",
+    "docs/judge_v2_program.md L11555-L11576 (registrar's ruling of 2026-09-23, amendment by insertion): the ruling that (e) is conformance, its mechanics (a)-(e), the code change it registers and the instrument status until it lands",
+    "docs/reviews/READY_pool_guard_immutable.md (d72c790) D3, D4 and 'Pin impact'; docs/judge_v2_program.md L14509-L14527",
+    "docs/judge_v2_program.md L14591-L14599",
+    "docs/judge_v2_program.md L15027-L15037",
+    "docs/judge_v2_program.md L15039-L15050"
+  ],
+  "last_update": "2026-09-23 (registrar: docs/judge_v2_program.md L15039-L15050)",
+  "resume_conditions": [
+    "C1 (READY 231029b): the chain's refusal classifier is certified ONLY for pool_guard.py blob:6521b51ac0fc; before any step can reach pool_export under a different pool_guard blob (e.g. after POOL-GUARD-IDFILE-ENTRY), re-run the census probe (gen_msgs.py + classify loop) or land the D1 preflight",
+    "C2 (READY 231029b): t2() never calls pool_export; pool_export must precede any T2 site null (the 897a564 resume item)",
+    "D2 RULED: any failure before a comparison is a FAILED PRECONDITION (fail closed toward precondition); D6 RULED: a pool-guard refusal stops the WHOLE chain before any further build writes the ingest DB; code change TP20-CHAIN-FAIL-CLOSED queued",
+    "hazards (a)-(c) of 72adf8b stand: back up and checkpoint the 20NG DB before any resume"
+  ],
+  "plain_description": {
+    "sq": "SQ3 Taxonomy",
+    "what": "The tree-building recipe was run on 20 Newsgroups, a text corpus with 20 known topic labels the method never saw. The test checked whether the recipe builds and certifies a tree, whether it splits the space better than k-means, Ward or HDBSCAN with the same number of parts, and whether its certified splits line up with the true topics.",
+    "why": "It tests on ground truth whether the discovered tree reflects real structure and is better than plain clustering.",
+    "information": "Beating k-means would show the tree finds better structure. Certified splits lining up with the topics would support trusting the certificate. Result: done. The recipe builds and certifies on this corpus. It splits the space no better than k-means with the same number of parts. Certified splits are somewhat more topic-aligned (p about 0.05), but this rests on few effective sites and does not survive a control for cluster size. One embedder, one seed, one split.",
+    "written": "2026-10-07"
+  }
+}

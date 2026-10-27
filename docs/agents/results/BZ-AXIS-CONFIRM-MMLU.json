@@ -1,0 +1,246 @@
+{
+ "id": "BZ-AXIS-CONFIRM-MMLU",
+ "title": "BZ-AXIS-CONFIRM-MMLU: fresh confirmation on original MMLU (14,042 items; HELM 80 models primary, tinyBenchmarks 395 secondary): full axis_v1-recipe tree, C-M1 plain G(L3a|L2) deciding (L1 = 17 subcategories, L2 = 57 subjects), zoom curve descriptive; 3-SE rule; 0 LLM calls",
+ "question": "On original MMLU (cais/mmlu test, 14,042 items, 57 subjects), is G(L3a | L2) (full axis_v1-recipe tree leaves over the 57 subjects) SUPPORTED under the parent's [R2] words (g >= 3 SE AND g > q95 AND g >= 0.10 x 1e-3 nats per cell) on the HELM roster?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "f53ec853",
+  "program_lines": "docs/judge_v2_program.md \"## Registered 2026-10-21 (before any code or call) — BZ-AXIS-CONFIRM-MMLU: ...\" L25503-L25573 (blank L25574; _as_of parent 590937f2, re-grepped; [A1] insertions at L25505, L25531, L25546, L25564-L25573); outcome: \"## Registrar's record 2026-10-22 (insertion only; zero calls; nothing run by the registrar) — BZ-AXIS-CONFIRM-MMLU: READY-2 1d23bf32 ...\" L25629-L25637 and \"## BZ-AXIS-CONFIRM-MMLU (2026-10-22, 0 calls) — OUTCOME CONFIRMED (POSTRUN 7d1a8ed3): ...\" L25639-L25649 (_as_of parent 7d1a8ed3, re-grepped)",
+  "date": "2026-10-21",
+  "note": "draft docs/registrations/BZ-AXIS-CONFIRM-MMLU_DRAFT.md blob:22cfd6a7 (git blob, LF) superseded; E1-E8 of READY 5109ef9c applied; data-acquisition code (benchzoom 450b86e, da79664) precedes, no deciding code",
+  "section_sha256": "sha256 of the section text, LF rendering (benchzoom examples/axis_confirm_mmlu.py section_text: heading line to the line before the next '## ', joined by LF, trailing LF): 8a39c2e71850187cdb55e23c39d2779ba31144d523db0369f4d17e226294a162 (72 lines; after [A1]; was 47d6f4c3 at f53ec853 per READY1 settlement 3). To be pinned as SECTION_SHA in the runner at READY-2."
+ },
+ "script": {
+  "path": "benchzoom examples/axis_confirm_mmlu.py (repo Z:/FAC/TUBerlin/benchzoom)",
+  "sha16": "blob:aec30584c6b3f787 (git blob, LF; vault-time runner at benchzoom dfeb0aa; src/benchzoom tree c9809e98, irt.py blob:57ccac73; the WORK run was blob:01e40f15 at d17fba1)",
+  "commit": "benchzoom dfeb0aa"
+ },
+ "ready": {
+  "file": "docs/reviews/READY1_BZ-AXIS-CONFIRM-MMLU.md (READY-1: fetch + WORK) and docs/reviews/READY2_BZ-AXIS-CONFIRM-MMLU.md (READY-2: ONE vault read; V1-V4; D1 MEDIUM, D2-D4 LOW); deltas FETCH 0e1333c2, FETCH2 70c674dd, WORK1 590937f2 all CORRECT",
+  "commit": "62ca27c1 (READY-1); 1d23bf32 (READY-2)"
+ },
+ "go": "D-2026-10-21-1, D-2026-10-21-2 (37a83396), D-2026-10-21-3 (ca7728d7); 0 calls; vault read authorised by READY-2 1d23bf32",
+ "run": {
+  "outcome_file": "E:/benchzoom_demo/mmlu_confirm/vault_read/outcome.json (sha256 1ad551f150641ae256c6bd3a09ff863a1cc42d5fb4c711a9e4c4bc6134feed84, file bytes; = its SHA256SUMS_vault line) + outcome.txt (sha256 e2af1d17cb94f091b859bf952f887bf56099947b52b2110c3adee48a57ba8e8e); log E:/benchzoom_demo/mmlu_confirm/vault_run.log; never committed; SHA256SUMS_vault 7/7 OK; backup E:/TaxoArena_backup_2026-10-22_mmlu_vault (7 OK; POSTRUN D3: the GUARD named ..._axis_confirm_mmlu)",
+  "outcome_commit": "outcome not committed (run at benchzoom dfeb0aa)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "BZ-AXIS-CONFIRM-MMLU vault: 5,614 items (40% per subject, rng [20261021, k]); 83 near-duplicate drops, 1 not-one-correct -> 5,530 scored; ONE read",
+  "date": "2026-10-22 10:45-11:09"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_BZ-AXIS-CONFIRM-MMLU.md",
+  "commit": "7d1a8ed3",
+  "verdict": "OUTCOME CONFIRMED; every deciding and secondary number reproduced to the digit; D1 MEDIUM (C-M1 net of the L2 re-read +0.0864 SE 0.0326, quoted beside C-M1 every time), D2-D4 LOW; no artefact inflates the gains beyond the L2 re-read"
+ },
+ "criteria": [
+  {
+   "id": "C-M1",
+   "text": "DECIDING: G(L3a|L2), HELM, kept vault items; [R2] words on the POINT (3 SE, q95, delta_min 0.10) in one place; FAILS if any word but SUPPORTED [A1 2026-10-22: DESCRIPTIVE-ONLY by Support (f), vault MDE80 median 0.1122 >= 0.10]",
+   "result": "n/a",
+   "value": "SUPPORTED (DESCRIPTIVE-ONLY by support): g +0.1171, SE 0.0346, q95 +0.0000 (R 200, tau^2=0 in 164), tau^2 0.02; the word decides nothing; net of the L2 re-read (G(L2|L2) +0.0307 SE 0.0132): +0.0864 SE 0.0326",
+   "denominator": "HELM 79 models x 5,530 kept vault items (5,504 twin clusters; 436,870 cells); fits on 8,425 WORK items",
+   "word": "SUPPORTED (DESCRIPTIVE-ONLY by support)"
+  },
+  {
+   "id": "C-M2",
+   "text": "secondary: G(L3a|L1), HELM",
+   "result": "n/a",
+   "value": "SUPPORTED (secondary): g +1.1688, SE 0.1228, q95 +0.0020, tau^2 0.08",
+   "denominator": "HELM 79 models x 5,530 kept vault items (5,504 twin clusters; 436,870 cells); fits on 8,425 WORK items",
+   "word": "SUPPORTED (secondary)"
+  },
+  {
+   "id": "C-M3",
+   "text": "secondary: G(L3a|L2 + diff + len), HELM; needed for 'beyond difficulty AND length' (E3)",
+   "result": "n/a",
+   "value": "BELOW INTEREST (secondary): g +0.0792, SE 0.0187, q95 +0.0018, tau^2 0.01; 'beyond difficulty and length' not licensed",
+   "denominator": "HELM 79 models x 5,530 kept vault items (5,504 twin clusters; 436,870 cells); fits on 8,425 WORK items",
+   "word": "BELOW INTEREST (secondary)"
+  },
+  {
+   "id": "C-M4",
+   "text": "secondary: C-M1 on tinyBenchmarks, only if ALIGNED (Spearman >= 0.50 on WORK) [A1 2026-10-22: NOT ALIGNED (Spearman +0.2219), scores nothing]",
+   "result": "n/a",
+   "value": "NOT SCORED: tinyBenchmarks NOT ALIGNED (Spearman +0.2219)",
+   "denominator": "tinyBenchmarks 395 (not scored)",
+   "word": "NOT SCORED"
+  },
+  {
+   "id": "Z",
+   "text": "descriptive zoom curve per depth, max-T seed [20261021, 109]",
+   "result": "n/a",
+   "value": "DESCRIPTIVE: G(cut_d|L2) d1-d5 -0.0048 / +0.1320 / +0.1467 / +0.1242 / +0.1171 (net of the re-read -0.0354 / +0.1013 / +0.1160 / +0.0935 / +0.0864); max-T +3.826 at d2 (20,000 draws, seed [20261021, 109]); no depth selected",
+   "denominator": "HELM 79 models x 5,530 kept vault items (5,504 twin clusters; 436,870 cells); fits on 8,425 WORK items",
+   "word": "DESCRIPTIVE"
+  },
+  {
+   "id": "S1/S2",
+   "text": "sensitivities: Redux-flag removal; MMLU-Pro stem_key overlap removal",
+   "result": "n/a",
+   "value": "DESCRIPTIVE: S1 +0.1138 SE 0.0350 (148 Redux-flagged removed, n 5,382); S2 +0.1753 SE 0.0441 (2,608 MMLU-Pro overlap removed, n 2,922)",
+   "denominator": "HELM 79 models x 5,530 kept vault items (5,504 twin clusters; 436,870 cells); fits on 8,425 WORK items",
+   "word": "DESCRIPTIVE"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "PM1",
+   "text": "C-M1 in [-0.020, 0.060], point 0.00, NOT SUPPORTED or DEGENERATE",
+   "result": "FAILED",
+   "value": "+0.1171 outside [-0.020, 0.060]; word SUPPORTED not in the set",
+   "denominator": "HELM 79 models x 5,530 kept vault items (5,504 twin clusters; 436,870 cells); fits on 8,425 WORK items"
+  },
+  {
+   "id": "PM2",
+   "text": "C-M2 in [0.050, 0.500], point 0.20, SUPPORTED/INCONCLUSIVE (secondary)",
+   "result": "FAILED",
+   "value": "+1.1688 outside [0.050, 0.500]; word in the set",
+   "denominator": "HELM 79 models x 5,530 kept vault items (5,504 twin clusters; 436,870 cells); fits on 8,425 WORK items"
+  },
+  {
+   "id": "PM3",
+   "text": "C-M3 in [-0.030, 0.050], point 0.00, NOT SUPPORTED/DEGENERATE (secondary)",
+   "result": "FAILED",
+   "value": "+0.0792 outside [-0.030, 0.050]; BELOW INTEREST not in the set",
+   "denominator": "HELM 79 models x 5,530 kept vault items (5,504 twin clusters; 436,870 cells); fits on 8,425 WORK items"
+  },
+  {
+   "id": "PM4",
+   "text": "C-M4 in [-0.020, 0.060], point 0.00, NOT SUPPORTED/DEGENERATE (secondary) [A1 2026-10-22: NOT SCORED, tinyBenchmarks NOT ALIGNED]",
+   "result": "n/a",
+   "value": "NOT SCORED: tinyBenchmarks NOT ALIGNED",
+   "denominator": "tinyBenchmarks 395 (not scored)",
+   "word": "NOT SCORED"
+  },
+  {
+   "id": "PM5",
+   "text": "Z max over d of G(cut_d|L2) in [-0.020, 0.060], range only",
+   "result": "FAILED",
+   "value": "Z max |L2 +0.1467 at d3 outside [-0.020, 0.060]",
+   "denominator": "HELM 79 models x 5,530 kept vault items (5,504 twin clusters; 436,870 cells); fits on 8,425 WORK items"
+  },
+  {
+   "id": "PM6",
+   "text": "S1 minus C-M1 in [-0.020, 0.020], range only",
+   "result": "HELD",
+   "value": "S1 - C-M1 = -0.0033 in [-0.020, 0.020]",
+   "denominator": "HELM 79 models x 5,530 kept vault items (5,504 twin clusters; 436,870 cells); fits on 8,425 WORK items"
+  }
+ ],
+ "falsifier": {
+  "text": "C-M1 SUPPORTED: overturns the reading of BZ-METER-AXIS MMLU-Pro NOT SUPPORTED (and BZ-GRANULARITY-WORK A6) that on subject-labelled MMLU-derived items the axis leaves add nothing of interest over the subject label",
+  "fired": false,
+  "outcome": "The C-M1 word is SUPPORTED (DESCRIPTIVE-ONLY by support): printed, overturns nothing (POSTRUN D2; READY-2 V4). BZ-METER-AXIS MMLU-Pro NOT SUPPORTED and BZ-GRANULARITY-WORK A6 stand."
+ },
+ "numbers_of_record": {
+  "support_SE": "0.0167 = 0.0183 x sqrt(4,654/5,617), transported, no roster credit (READY claim 4: 0.016658)",
+  "support_DEFF": "1.1257 transported from E:/benchzoom_demo/meter_axis_v1/outcome.json mmlu_pro L3a-L2 (cross-model, 23 models; ~1.45 at 80 models under constant ICC)",
+  "support_MDE80": "0.064 (stress 0.142) vs delta_min 0.10 -> SCOREABLE; DESCRIPTIVE-ONLY by insertion if the [A1] vault MDE80 >= 0.10 [A1 2026-10-22: FIRED, vault MDE80 median 0.1122 -> DESCRIPTIVE-ONLY]",
+  "planned_n": "5,617 vault items before near-duplicate drop x 80 HELM models (census: 80 models, 15 yifan runs dropped, gemini-pro no kept run; per brief 2026-10-21) [A1 2026-10-22: HELM roster 79 kept (gemini-pro no kept run); 4 not-one-correct items leave every roster]",
+  "A1_condition_f": "C-M1 vault MDE80 median 0.1122 (min 0.1077, max 0.1125; 5 pseudo-vault draws, WORK n 3342-3348 x 79 HELM models) >= 0.10 -> FIRED, C-M1 DESCRIPTIVE-ONLY",
+  "A1_DEFF_WORK": "C-M1 DEFF 1.881-2.044 over 5 draws (79 models), replacing the transported 1.1257",
+  "A1_tinyB_alignment": "Spearman +0.2219 (WORK rows) < 0.50 -> NOT ALIGNED",
+  "C-M1_G_L3a_given_L2": "+0.1171, item-clustered SE 0.0346, q95 +0.0000 (R 200), tau^2 0.02: SUPPORTED (DESCRIPTIVE-ONLY by support); HELM 79 models x 5,530 kept vault items (5,504 clusters)",
+  "C-M1_net_of_L2_reread": "+0.0864 SE 0.0326 (G(L2|L2) +0.0307 SE 0.0132; about 26% of C-M1; POSTRUN D1; quoted beside C-M1 every time)",
+  "C-M3_G_L3a_given_L2_diff_len": "+0.0792 SE 0.0187, q95 +0.0018: BELOW INTEREST (secondary)",
+  "C-M2_G_L3a_given_L1": "+1.1688 SE 0.1228, q95 +0.0020: SUPPORTED (secondary)",
+  "support_realised": "DEFF 1.934 (registered transport 1.1257), SE 0.0346 (registered 0.0167; cell-iid 0.0249), n_eff 2,860 of 5,530, MDE80 0.1327 vs delta_min 0.10 (POSTRUN D4)",
+  "S1": "+0.1138 SE 0.0350 (148 Redux-flagged removed; n 5,382)",
+  "S2": "+0.1753 SE 0.0441 (2,608 MMLU-Pro overlap removed; n 2,922)",
+  "Z_maxT_given_L2": "+3.826 at d2 (5,504 clusters)",
+  "harness_R18": "PASSED (K 20, 0 exceed, mean -0.0015 SE 0.0007)",
+  "tinyB_alignment": "Spearman +0.2219 < 0.50: NOT ALIGNED (C-M4, PM4 NOT SCORED)"
+ },
+ "sentence_of_record": "BZ-AXIS-CONFIRM-MMLU (2026-10-22, 0 LLM calls; ONE vault read, benchzoom dfeb0aa, runner blob:aec30584, src tree c9809e98; POSTRUN docs/reviews/POSTRUN_BZ-AXIS-CONFIRM-MMLU.md: OUTCOME CONFIRMED). HELM, 79 models x 5,530 kept vault items (5,504 twin clusters), x 1e-3 nats per cell. C-M1 G(L3a | L2) = +0.1171, item-clustered SE 0.0346, q95 +0.0000 (R 200), tau^2 0.02: SUPPORTED (DESCRIPTIVE-ONLY by support; Support condition (f) fired before the vault opened; the word decides nothing). Support realised: DEFF 1.934 (registered transport 1.1257), n_eff 2,860, MDE80 0.1327 vs delta_min 0.10. Net of the L2 re-read (G(L2|L2) +0.0307 SE 0.0132): +0.0864 SE 0.0326. FALSIFIER: the C-M1 word is SUPPORTED (DESCRIPTIVE-ONLY by support): printed, overturns nothing. C-M3 G(L3a | L2 + diff + len) = +0.0792 SE 0.0187: BELOW INTEREST (secondary), so 'beyond difficulty and length' is not licensed. C-M2 G(L3a | L1) = +1.1688 SE 0.1228: SUPPORTED (secondary). Harness [R18] PASSED. tinyBenchmarks NOT ALIGNED (Spearman +0.2219): C-M4 NOT SCORED. Predictions: PM1, PM2, PM3, PM5 FAILED (the observed gains lie above the predicted ranges), PM4 NOT SCORED, PM6 HELD. Descriptive: S1 +0.1138 SE 0.0350 (148 Redux-flagged items removed); S2 +0.1753 SE 0.0441 (2,608 MMLU-Pro overlap items removed); Z max-T over depths given L2 +3.826 at d2. No claim 'the axis leaves add a gain of interest over the 57 subjects' is licensed (C-M1 is descriptive-only); C-M3 is quoted beside C-M1 in every quotation.",
+ "chips": [
+  "C-M1 SUPPORTED (DESCRIPTIVE-ONLY by support; net of L2 re-read +0.0864 SE 0.0326)",
+  "C-M3 BELOW INTEREST (secondary)",
+  "FALSIFIER: overturns nothing",
+  "PM1/PM2/PM3/PM5 FAILED, PM4 NOT SCORED, PM6 HELD; tinyB NOT ALIGNED"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-22",
+   "by": "registrar",
+   "text": "[A1] 2026-10-22 (WORK only; 0 LLM calls; vault reads 0): CONDITION (f) FIRED, C-M1 vault MDE80 median 0.1122 (min 0.1077, max 0.1125) >= 0.10 -> C-M1 DESCRIPTIVE-ONLY by support, before the vault opens; tinyBenchmarks NOT ALIGNED (Spearman +0.2219 < 0.50); HELM roster 79; dress rehearsal HARNESS PASSED; READY-2 owed (synthetic gate re-run on the merged library d17fba1, C1 of 590937f2); incidents disclosed (fetch 1 0e1333c2, fetch 2 70c674dd, WORK 1 590937f2: 7 HELM + 6 tinyB columns raised under the old irt, 1 + 2 at 1 ulp; MATH/MMLU-Pro of record unaffected); GUARD substitution programme blob -> section sha (READY-1 D4) disclosed"
+  },
+  {
+   "date": "2026-10-22",
+   "by": "registrar",
+   "text": "Outcome of record (POSTRUN 7d1a8ed3, OUTCOME CONFIRMED): D1 C-M1 quoted with 'net of the L2 re-read +0.0864 SE 0.0326'; D2 C-M1 'SUPPORTED (DESCRIPTIVE-ONLY by support)', FALSIFIER 'overturns nothing' (outcome.txt prints neither; READY-2 D4); D3 backup is E:/TaxoArena_backup_2026-10-22_mmlu_vault, not the GUARD's ..._axis_confirm_mmlu; D4 realised DEFF 1.934 / SE 0.0346 beside the transported 1.1257 / 0.0167. Incidents FETCH 1 (0e1333c2), FETCH 2 (70c674dd), WORK 1 crash + damped-Newton fix 4cfeb77 / d17fba1 (590937f2) were disclosed in [A1] (f6402011), not re-bracketed; POSTRUN probe: the 7 formerly failing HELM columns contribute +0.0004 of 0.1171."
+  },
+  {
+   "date": "2026-10-27",
+   "by": "registrar (TAU-GRID R2, POSTRUN_TAU-GRID 6f16a31c)",
+   "text": "[CORRECTED 2026-10-27 by TAU-GRID: WORK analogue: the coarse tau_L2 grid inflated G(L3a|L2) by 0.0204; whether the vault moves is open. C-M1 +0.1171 and its net +0.0864 were not re-read; C-M1 is quoted only beside its net; 'net of the L2 re-read' is not a conservative bound (POSTRUN_TAU-GRID 6f16a31c R2)]; ledger v430; docs/judge_v2_program.md section \"## Registrar's record 2026-10-27 (insertion only; zero calls; nothing run) — FRESH-RULES-SIM (POSTRUN 8bebb4ee) and TAU-GRID (POSTRUN 6f16a31c) recorded done ...\" L25726-L25734 (_as_of the commit that writes it, parent c3aada22, re-grepped)"
+  }
+ ],
+ "does_not_show": [
+  "that the axis leaves add a gain of interest over the 57 subjects (C-M1 descriptive-only; net of the L2 re-read +0.0864 SE 0.0326 < 0.10)",
+  "a gain beyond difficulty AND length (C-M3 BELOW INTEREST)",
+  "a held-out or content-closed tree (leaves built on all items' text)",
+  "ability structure separated from contamination / exposure (MMLU public since 2020)",
+  "a uniform gain (miscellaneous 24%, moral_scenarios 15%, human_sexuality 13%; 32 of 79 models contribute < 0)",
+  "anything on tinyBenchmarks (NOT ALIGNED), MATH, other seeds or rosters"
+ ],
+ "ledger": {
+  "row_id": "BZ-AXIS-CONFIRM-MMLU",
+  "version": "v430"
+ },
+ "depends_on": [
+  "BZ-METER-AXIS",
+  "BZ-GRANULARITY-WORK",
+  "BZ-TREE-VARIANTS-WORK"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "nothing"
+ },
+ "sources": [
+  "docs/judge_v2_program.md \"## Registered 2026-10-21 (before any code or call) — BZ-AXIS-CONFIRM-MMLU: ...\" L25503-L25560 (_as_of the commit that writes it, parent 8948b9ed, re-grepped)",
+  "docs/reviews/READY_BZ-AXIS-CONFIRM-MMLU.md (5109ef9c)",
+  "docs/agents/author_decisions/2026-10-21.md",
+  "orchestrator brief 2026-10-21 (HELM census counts; READY-1 header of benchzoom da79664)",
+  "E:/benchzoom_demo/mmlu_confirm/work_run.log (benchzoom d17fba1, runner blob 01e40f15, irt.py blob 57ccac73)",
+  "docs/reviews/READY1_BZ-AXIS-CONFIRM-MMLU.md (62ca27c1)",
+  "docs/reviews/DELTA_BZ-AXIS-CONFIRM-MMLU-FETCH.md (0e1333c2), -FETCH2.md (70c674dd), -WORK1.md (590937f2)",
+  "docs/judge_v2_program.md \"## Registered 2026-10-21 (before any code or call) — BZ-AXIS-CONFIRM-MMLU: ...\" [A1] block, L25503-L25573 (blank L25574; _as_of parent 590937f2, re-grepped; [A1] insertions at L25505, L25531, L25546, L25564-L25573)",
+  "docs/reviews/READY2_BZ-AXIS-CONFIRM-MMLU.md (1d23bf32)",
+  "docs/reviews/POSTRUN_BZ-AXIS-CONFIRM-MMLU.md (7d1a8ed3)",
+  "E:/benchzoom_demo/mmlu_confirm/vault_read/outcome.txt (sha256 e2af1d17...)",
+  "docs/judge_v2_program.md L25629-L25649 (_as_of parent 7d1a8ed3)",
+  "docs/reviews/POSTRUN_TAU-GRID.md (6f16a31c) R2",
+  "docs/judge_v2_program.md section \"## Registrar's record 2026-10-27 (insertion only; zero calls; nothing run) — FRESH-RULES-SIM (POSTRUN 8bebb4ee) and TAU-GRID (POSTRUN 6f16a31c) recorded done ...\" L25726-L25734 (_as_of the commit that writes it, parent c3aada22, re-grepped)"
+ ],
+ "last_update": "2026-10-22; 2026-10-27 (registrar: TAU-GRID R2 bracket on C-M1; ledger v430)",
+ "stage": "done (OUTCOME CONFIRMED, POSTRUN 7d1a8ed3); READY-1 62ca27c1 -> [A1] f6402011 -> READY-2 1d23bf32 -> ONE vault read 2026-10-22 10:45-11:09 -> POSTRUN 7d1a8ed3",
+ "a1": {
+  "date": "2026-10-22",
+  "source": "E:/benchzoom_demo/mmlu_confirm/work_run.log (run 2026-10-22T09:33:00+02:00, exit 0)",
+  "condition_f": "FIRED: C-M1 vault MDE80 median 0.1122 over 5 pseudo-vault draws (min 0.1077, max 0.1125) vs 0.10 -> DESCRIPTIVE-ONLY",
+  "C-M1_word_status": "DESCRIPTIVE-ONLY by support (word printed, decides nothing; falsifier keys on it, overturns nothing: registrar's reading)",
+  "full_WORK_tau2": "L3a=0.02, L3a1=0.08, diff=0.16, len=0.005, L3ac=0.01, grp=0.04, L1g=0.08",
+  "C-M1_support_per_draw": "DEFF 1.881/2.044/1.958/1.947/2.022; n_eff 1777/1638/1708/1717/1653 (WORK n 3342-3348); vault SE 0.0280/0.0292/0.0293/0.0287/0.0293; vault MDE80 0.1077/0.1122/0.1123/0.1101/0.1125",
+  "tinyB_alignment": "Spearman +0.2219 on WORK rows < 0.50 -> NOT ALIGNED (C-M4, PM4 NOT SCORED)",
+  "roster": "HELM 79 kept (80 less google_gemini-pro); 4 not-one-correct items out of every roster",
+  "exploratory": "re-cut draw 0 C-M1 g +0.0765 SE 0.0361 (EXPLORATORY, WORK only); pseudo-vault dress rehearsal HARNESS PASSED",
+  "vault_reads": 0,
+  "llm_calls": 0
+ },
+ "reviews": {
+  "READY": "docs/reviews/READY_BZ-AXIS-CONFIRM-MMLU.md (5109ef9c)",
+  "READY1": "docs/reviews/READY1_BZ-AXIS-CONFIRM-MMLU.md (62ca27c1)",
+  "DELTA_FETCH": "docs/reviews/DELTA_BZ-AXIS-CONFIRM-MMLU-FETCH.md (0e1333c2)",
+  "DELTA_FETCH2": "docs/reviews/DELTA_BZ-AXIS-CONFIRM-MMLU-FETCH2.md (70c674dd)",
+  "DELTA_WORK1": "docs/reviews/DELTA_BZ-AXIS-CONFIRM-MMLU-WORK1.md (590937f2)",
+  "READY2": "docs/reviews/READY2_BZ-AXIS-CONFIRM-MMLU.md (1d23bf32)",
+  "POSTRUN": "docs/reviews/POSTRUN_BZ-AXIS-CONFIRM-MMLU.md (7d1a8ed3)"
+ },
+ "backups": [
+  "E:/TaxoArena_backup_2026-10-22_mmlu_vault (SHA256SUMS_vault 7 OK; POSTRUN row 15, D3)"
+ ]
+}

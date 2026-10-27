@@ -1,0 +1,361 @@
+\chapter{Introduction}\label{ch:introduction}
+
+\section{Motivation}\label{sec:motivation}
+
+Large language models increasingly run inside software pipelines rather
+than in front of a person. A task is broken into sub-tasks, each
+sub-task is dispatched somewhere, and the dispatch target can be
+another model --- HuggingGPT uses one model as a controller that routes
+each sub-task to a specialised one~\parencite{shen2023hugginggpt}.
+Every such decision needs to know which model is best at this kind of
+work, and leaderboards do not say. They
+report one aggregate score per model, averaged over tasks that have
+little to do with one another~\parencite{boubdir2024elo}, and two
+models with the same average can be strong in different
+places~\parencite{raju2024constructing}. A router holding only the
+average sends both the same way.
+
+The published breakdowns do not go much deeper. MMLU-Pro, the corpus
+this thesis uses, groups its questions into fourteen editorial
+categories~\parencite{wang2024mmlupro}, inherited from
+MMLU~\parencite{hendrycks2021measuring}, and no finer per-model
+breakdown of it is published. ``Mathematics'' is one column covering
+combinatorics, real analysis and elementary probability alike. If two
+models diverge \emph{inside} mathematics, nothing on any leaderboard
+records it. That is the gap this thesis works in. What it builds is
+the measurement such a map would rest on --- not the router that
+would consume it; whether the measurement can be trusted is the
+question the thesis actually answers.
+
+Getting a finer reading means judging model outputs at a scale where
+expert human annotation is not
+affordable~\parencite{zheng2023judging}. The tractable substitute is an
+LLM judge, and the tractable form of the judgment is pairwise. Asking
+which of two answers is better for one specific query avoids the
+calibration problem that scalar scoring runs into, since a judge has no
+stable internal reference for what a score of 7 means across domains,
+question types and model generations~\parencite{zheng2023judging}.
+Chatbot Arena runs that format at scale, with human voters,
+Bradley--Terry aggregation and a public
+leaderboard~\parencite{chiang2024chatbotarena}. Its prompts are
+free-form and carry no answer key, so there is nothing to check a
+vote against. This thesis judges a corpus
+that has a key. Every verdict can therefore be checked, and that turns
+out to decide the result.
+
+\subsection*{The argument, stated in advance}
+
+A judge should do better when it is told what ``better'' means
+\emph{here}. A rubric that has to cover all of computer science can
+only say domain-general things --- be correct, be clear, show your work
+--- because every criterion sharp enough to discriminate is false of
+part of the field. A rubric that covers only time-series model
+diagnostics can name which stationarity checks are load-bearing and
+which residual diagnostics decide the case. TaxoArena therefore splits
+an evaluation corpus into small, topically coherent cells, writes a
+rubric for each cell, and has an LLM judge compare model answers
+pairwise inside cells. A narrow cell makes a specific rubric writable,
+and a specific rubric was supposed to make a better judge.
+
+The checks show the judge does not decide that way. It works out which
+answer is correct and picks that side. Across the settled eight-domain
+batch, replacing the cell rubric with a generic prompt moves only how
+often the judge abstains
+(Section~\ref{sec:res-c5}); questions routed off-subject are judged at
+the same agreement rate as on-subject ones
+(Section~\ref{sec:res-offsubject}); and the tie rate nearly doubles
+exactly where the answer key stops discriminating
+(Section~\ref{sec:res-tie-signature}). The rubric changes almost no
+outcome, because on a keyed corpus a capable judge has a shortcut and
+takes it.
+
+What remains of the partition's claim is narrower than the thesis set
+out to test. A pre-registered analysis found that cells do not carry
+different true model rankings on this corpus and roster
+(Section~\ref{sec:res-granularity}), so a per-cell ranking has little
+to add to a global one. The paired arena runs of
+Chapter~\ref{ch:results} therefore answer a smaller question: whether
+the cell-scoped rubric changes what judging concludes at all. It does
+not. The two arms rank identically in seven of eight domains and
+within one adjacent swap in the eighth; what the rubric changes is how
+often the judge abstains, and that difference belongs to the judging
+condition as a bundle rather than to the rubric text alone
+(Section~\ref{sec:res-c5}).
+
+The result is a boundary. Wherever correctness is checkable, a capable
+judge will shortcut the rubric, so on this corpus a cell-scoped rubric
+had little left to improve. The setting where it could matter ---
+open-ended tasks with no verifiable key --- is exactly the routing
+setting, and it is the one this corpus cannot test.
+
+\subsection*{What a partition is for}\label{sec:problem-statement}
+
+\textbf{A cell is a scope for a rubric.} A semantic partition of an
+evaluation corpus is usually a reporting device, deciding which bucket
+each score is written into. Here it does something else, and the
+difference decides what this thesis can claim: splitting a cell
+reduces the surface over which a judge must generalise, which is the
+whole mechanism, and no amount of prompt enlargement substitutes for
+it --- narrowing the cell is what changes what the criteria's
+intersection contains.
+
+\textbf{Homogeneity is supposed to buy three things.} First, a rubric
+becomes writable in the sense above. Second, pairwise outcomes within
+the cell come closer to exchangeable, because the queries a comparison
+could have been drawn from resemble one another; the Bradley--Terry
+model that aggregates the verdicts assumes a single latent strength per
+model within the cell, and that assumption is a statement about the
+cell's homogeneity rather than about the models. Third, the per-cell
+ranking is allowed to differ from the global one, which is the only way
+a capability \emph{profile} carries more information than a capability
+\emph{score}.
+
+The third is the one that turned out to be empirical rather than
+architectural, and it is the one the data refused
+(Section~\ref{sec:res-granularity}). This section is an argument, not a
+measurement. Chapter~\ref{ch:results} reports what happened when each
+part of it was tested.
+
+\section{The System in Outline}\label{sec:approach}
+
+TaxoArena works in three stages. The fourteen MMLU-Pro domain labels
+seed top-level anchor nodes, which are then refined by embedding
+geometry: queries migrate to geometrically closer anchors, and each
+anchor is recursively split into a tree of coherent leaves. Each leaf
+then induces a judge rubric from construction-set queries and their
+correct answers. Finally, held-out model responses are compared
+pairwise within leaves and aggregated by a Bradley--Terry
+model~\parencite{bradley1952rank,hunter2004mm} into per-cell rankings.
+
+\textbf{Position of the taxonomy.} The induced taxonomy is \emph{not}
+the contribution of this thesis. It is the instrument by which
+per-domain ranking resolution is made available. The main text
+therefore presents the construction only at the level needed to
+establish that its cells are granular, coherent and stable enough for
+the arena to mean anything (Section~\ref{sec:arch-requirements}); the
+formalism, the parameter derivations and the fixed-point certificate
+are in Appendix~\ref{app:dag-formalism} and
+Appendix~\ref{app:numerics}. That ordering is forced by a measurement
+rather than chosen late. An elevenfold change in the number of cells,
+from 14 to 152, moves the system's measured discriminative power by
+less than the analysis can resolve
+(Section~\ref{sec:res-granularity}). A construction whose tuning has no
+measured evaluative consequence is an instrument, and it is documented
+like one.
+
+\textbf{Reference-informed at construction, answer-key-blind at test.}
+The judge-generation phase uses correct MMLU-Pro answers from the
+construction query set to induce the rubrics, so the system is
+\emph{reference-informed} at construction time. The arena phase judges
+held-out responses without access to those queries' correct answers, so
+the evaluation is \emph{answer-key-blind} at test time; the MMLU-Pro
+accuracy oracle is revealed only after all matches are complete. A
+hold-out filter enforces the separation in code, and a build-time
+assertion checks the filter against the membership test itself
+(Section~\ref{sec:arch-judge}).
+
+Answer-key-blind is not answer-blind, and the difference is
+load-bearing for Chapter~\ref{ch:results}; the mechanism, and what
+the judge is shown mode by mode, is Section~\ref{sec:arch-judge}.
+
+\textbf{The title terms.} \emph{Dynamic Domains} refers to boundaries
+seeded from MMLU-Pro labels and then adapted by geometric evidence, so
+the evaluation dimensions follow the data rather than a fixed editorial
+list. \emph{Query-Adaptive} names the corpus-level sense of that
+adaptivity: the domain \emph{structure} adapts to the query corpus as a
+whole, which is distinct from the per-prompt sense in which
+Prompt-to-Leaderboard conditions a full ranking on each individual
+prompt~\parencite{frick2025p2l}. \emph{Multidimensional} means the
+output is one ranking per cell rather than one scalar per model.
+
+\section{Three Links and the Research Questions}\label{sec:research-questions}
+
+The claim that a partition improves evaluation is not one claim. It is
+a chain of three claims, and each can fail on its own:
+
+\begin{center}
+coherent cells
+$\;\xrightarrow{\;\text{(1)}\;}\;$ specific rubrics
+$\;\xrightarrow{\;\text{(2)}\;}\;$ better judgments
+$\;\xrightarrow{\;\text{(3)}\;}\;$ ranking closer to ground truth.
+\end{center}
+
+Link~1 asks whether the construction produces cells homogeneous enough
+to write a rubric about. Link~2 asks whether cell-scoped rubrics are in
+fact more specific than generic ones. Link~3 asks whether a judge
+holding a specific rubric produces verdicts that track the truth more
+closely. Naming the links separately is what makes this thesis's
+results readable, because its negative results land on different links
+and mean different things there.
+
+The decomposition was written after the pre-registered granularity
+analysis came back against the premise of the original second research
+question --- that cells carry different true model rankings. A
+contrast built on that premise measures a difference the data gives no
+room to exist, so the question was replaced rather than repaired, and
+the replacement is stated here so the rewrite is on the record rather
+than left to be discovered. What the null removes is one specific
+thing the partition could have bought. It leaves the other two links
+standing.
+
+\begin{enumerate}
+
+    \item[\textbf{RQ1.}] \emph{What decides the verdicts} of
+    answer-key-blind, domain-conditioned pairwise LLM judgments --- and
+    do those judgments recover per-domain capability rankings on
+    held-out queries?
+    \textit{Primary metric: agreement between the judge's winner and
+    the MMLU-Pro answer key, per verdict. Spearman $\rho$ against
+    ground-truth accuracy is reported alongside, under both tie
+    policies, with its quantisation stated.}
+
+    \item[\textbf{RQ2.}] Does a cell-scoped rubric enable \emph{better
+    judging} than judging the same questions under a generic rubric?
+    \textit{Primary metric: per-verdict agreement between the judge's
+    winner and the answer key, compared between the two arms on an
+    identical question set. Spearman $\rho$ is reported alongside, as
+    $\Delta\rho = \rho_{\textsc{main}} - \rho_{\textsc{c5}}$, so a
+    positive value favours cell-scoped judging --- reported for
+    continuity, not relied on: the registered decisive threshold is
+    withdrawn (Section~\ref{sec:exp-metrics}). RQ2 varies the rubric,
+    not the partition: both arms judge the same questions in the same
+    cells under the replay design of
+    Chapter~\ref{ch:experimental-design}.}
+
+\end{enumerate}
+
+RQ2 is answerable with the same arena, and it is the question the
+system actually poses. The change from the original wording matters for
+what gets reported: agreement between judge and ground truth
+\emph{within} a grouping, rather than rank divergence \emph{between}
+groupings.
+
+\section{Contributions}\label{sec:research-goal}
+
+\begin{enumerate}
+
+    \item \textbf{A measured account of what an LLM judge decides on a
+    corpus with a verifiable answer key.} This
+    answers RQ1: the verdicts track answer correctness rather than
+    reasoning quality, recovering the key's ordering on $196$ of the
+    $200$ decidable model pairs across eight domains. Each supporting
+    measurement carries a control sharing every confound with its
+    treatment except the one varied (Section~\ref{sec:res-judge}).
+
+    \item \textbf{A pre-registered rubric-specificity baseline.}
+    This answers RQ2 and tests link~2. Paired arms
+    judged identical comparisons under cell-scoped and generic rubrics,
+    with reading rules fixed in advance. The rubric does not change
+    what judging concludes --- the arms rank identically up to one
+    adjacent swap --- and the abstention difference that remains
+    belongs to the judging condition as a bundle
+    (Section~\ref{sec:res-c5}).
+
+    \item \textbf{A construction method as an instrument, with its
+    limitations.} Link~1 rests on it: the induced
+    87 leaves score $J = 0.2538$ against $0.1270$ for the editorial
+    categories and $0.1260$ for a random 88-cell sub-split, so the
+    gain is not bought by cell count; the construction reaches a
+    certified fixed point (Section~\ref{sec:arch-requirements}). It is
+    seed-dependent --- median ARI $0.677$ across twenty sweeps --- so a
+    query's leaf is not a seed-invariant fact.
+
+    \item \textbf{A pre-registered null on whether finer cells rank
+    models differently at all.} Link~3's premise,
+    and the premise of a capability \emph{profile}: between-cell rank
+    correlation barely moves from 14 to 152 cells, so the answer is a
+    null, readable because its outcomes were named in advance. Power
+    and roster bound its reach (Section~\ref{sec:res-granularity}).
+
+    \item \textbf{The three-link decomposition, offered as a way of
+    stating the claim.} Splitting ``a taxonomy
+    improves evaluation'' into three links is what lets this thesis
+    say which link each negative result lands on. A framing, not a
+    finding.
+
+\end{enumerate}
+
+The thesis set out to test one claim: that a judge built from
+guidelines extracted from a homogeneous set of queries tells you more
+about what a model can do than a general-purpose judge does. Answering
+that meant building a partition first, and most of the engineering went
+there. The claim was always about the judge, which is why
+Chapter~\ref{ch:results} leads with what the judge does and only then
+with what the partition does. An active matchmaking scheduler
+(Section~\ref{sec:meth-scheduling}) keeps judge-call cost tractable; it
+supports the arena rather than standing as a contribution, and its
+behaviour changed mid-project in a way that bounds what the paired runs
+can be read to say.
+
+\section{Scope and Validity}\label{sec:intro-scope}
+
+Six conditions bound everything downstream, and they are stated before
+any result is read.
+
+\textbf{One --- the corpus.} MMLU-Pro is multiple-choice with a
+verifiable key. That is what makes comparison against ground truth
+possible, and it is the same property that lets a capable judge bypass
+the rubric by verifying the answer. Both are true.
+Chapter~\ref{ch:discussion} treats the second as a measurement of where
+the architecture binds rather than as a defect.
+
+\textbf{Two --- selected domains.} The arena is a selected-domain
+study, not a global validation: judge-call budget was spent on eight
+of the fourteen MMLU-Pro domains at high statistical power rather
+than spread across all of them (selection rule in
+Chapter~\ref{ch:experimental-design}). Refit at the settled roster,
+the screen behind that selection saturates, so the eight domains are
+read as replications of one measurement rather than as screened
+contrasts (Section~\ref{sec:res-law}).
+
+\textbf{Three --- quantisation.} At eight models the Spearman
+statistic moves in steps of $0.0119$, so absolute rank correlations
+are not stable to the third decimal and this thesis does not quote
+them that way (Section~\ref{sec:res-tie-policy}).
+
+\textbf{Four --- the scheduler seed.} A seed replicate moved the
+paired $\Delta\rho$ contrast by six grid steps against a registered
+decisive threshold of two, since withdrawn
+(Section~\ref{sec:exp-metrics}). A rank-correlation magnitude is a
+property of the schedule as much as of the arms, and this thesis does
+not read one as the latter (Section~\ref{sec:res-tie-policy}).
+
+\textbf{Five --- no intervals.} No Bradley--Terry confidence interval
+appears anywhere in this thesis. The variance computation was wrong
+before a dated fix and the intervals were never recomputed, so there is
+nothing to print (Section~\ref{sec:disc-debt}).
+
+\textbf{Six --- two earlier run generations are withdrawn.} A pilot
+arena did not persist response text for four of its eight models, so
+half of its comparisons were decided by which side had text at all;
+and a twelve-model paired campaign ran before two scheduler repairs
+that the pilot's defect analysis forced. Neither contributes a
+number to this thesis. The defect, the repair, and what the
+withdrawals cost are reported as results
+(Section~\ref{sec:res-capture-gap}).
+
+The evaluation's validity rests on the reference-informed,
+answer-key-blind separation defined in Section~\ref{sec:approach}. The
+70/30 construction/arena-test split and the information-separation
+protocol that enforces it are specified in
+Chapter~\ref{ch:experimental-design}.
+
+\section{Thesis Structure}\label{sec:thesis-structure}
+
+Chapter~\ref{ch:literature-review} gives the background the argument
+uses: what is known to go wrong with LLM judges, pairwise ranking and
+Bradley--Terry estimation, the family the construction belongs to, and
+query routing as the consumer of the output.
+Chapter~\ref{ch:methodology} is the method. It opens by stating what a
+partition must satisfy for the arena to mean anything and shows that
+the induced partition satisfies it, then specifies the judge, the
+estimator and the scheduler, and closes with the measurement rules
+the thesis holds itself to.
+Chapter~\ref{ch:experimental-design} fixes the corpus, the rosters, the
+conditions, the pre-registrations with their dates, and the statistical
+protocol.
+Chapter~\ref{ch:results} reports what was measured, in mechanism order:
+first what the judge does, then what the partition does.
+Chapter~\ref{ch:discussion} interprets those results, states where the
+architecture binds, records the errors the apparatus caught in its own
+published numbers, and concludes.

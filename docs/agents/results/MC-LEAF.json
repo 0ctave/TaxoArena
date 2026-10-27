@@ -1,0 +1,119 @@
+{
+  "id": "MC-LEAF",
+  "title": "MC-LEAF: multi-corpus stage 2b: does the grown taxonomy route better than the designed source/domain strata? (zero calls)",
+  "question": "The first six-corpus build mc6_s42 (52 anchors, 147 leaves, Top-1 0.785): reserved queries routed to the nearest leaf centroid, per-leaf best model from the train side (fallback to the domain best under 20 train questions), same split as MC-ROUTER; readout fixed in the script docstring before running: leaf minus domain > 2 SE; prediction within +-1pp.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "d9dfc97",
+    "program_lines": "docs/multi_corpus_design.md L268-L285 ('Stage 1 build + stage 2b result'); the readout registered in the script docstring before running; no programme section",
+    "program_lines_as_of": "docs/multi_corpus_design.md at 4ec8f18",
+    "heading": "## Stage 1 build + stage 2b result (2026-09-11, zero calls)",
+    "outcome_heading": [
+      "docs/multi_corpus_design.md L275: Stage 2b (tools/analysis/multicorpus_leaf_router.py, readout registered in its docstring before running): ..."
+    ],
+    "date": "2026-09-11"
+  },
+  "script": {
+    "path": "tools/analysis/multicorpus_leaf_router.py",
+    "sha16": "58e7179c5c7e6c6d (at d9dfc97)",
+    "commit": "d9dfc97 (later 13f2142)"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/multicorpus/leaf_router_mc6.txt",
+    "outcome_commit": "d9dfc97",
+    "calls": 0,
+    "cce": 0,
+    "pool": "the MC-ROUTER split (n = 6,479 reserved); [FLAG 2026-09-15: whether this reserved side sat on the union split later shown ~70% contaminated at chance has not been re-verified]",
+    "date": "2026-09-11"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the session review of 2026-09-15 lists an 'MC-LEAF clean correction' as outstanding; the LEAF-PROFILE-CLEAN entry states MC-LEAF was NOT contaminated by the helper-without-pool class; left open (ledger [FLAG 2026-09-15]) [ID-ONLY 2026-09-23 (CLAIMS-SWEEP-BRACKETS, registrar): pool union paeec37aa28063c75; verified by id only, not by content; reviewed twins on this pool (reviews 1df2cf1, 8ebfa7a): 471 ids / 427 texts exact, 478 / 432 norm-v1 (GPQA 288, MMLU-Pro 185, MATH 3, BBH 2); see docs/judge_v2_program.md L14280-L14340 (CONTENT-DISJOINT-SPLIT-AUDIT) and L14455-L14487 (SPLIT-FOLLOWUPS).]",
+    "commit": "d9dfc97",
+    "verdict": "LOSES (-0.9 +- 0.3pp): the taxonomy loses to the designed strata as a router; contamination status of its reserved side unverified"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "leaf minus domain > 2 SE",
+      "result": "FAILED",
+      "value": "reserved n 6,479: single 0.553; by source 0.591; by domain 0.601; by leaf 0.592; oracle 0.906; leaf minus domain -0.009 +- 0.003: the taxonomy LOSES to the designed strata as a router; per source GPQA +3.4 (borrows MMLU-Pro physics / chemistry leaves), MATH -4.5, MMLU-Pro -1.4, BBH / MuSR 0",
+      "denominator": "6,479 reserved questions; 147 leaves"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "within +-1pp",
+      "result": "HELD",
+      "value": "-0.9pp",
+      "denominator": "6,479"
+    }
+  ],
+  "falsifier": {
+    "text": "none beyond the readout",
+    "fired": false,
+    "note": "routing: 77.2% of reserved queries in their designed anchor, 90.6% in their true source; cross-source flows semantic (MMLU-Pro -> MATH 289, -> GPQA 159, GPQA -> MMLU-Pro 73); model strengths are family / domain-level; leaves dilute support (as LEAF-POWER on MMLU-Pro)"
+  },
+  "numbers_of_record": {
+    "reserved": "single 0.553; source 0.591; domain 0.601; leaf 0.592; oracle 0.906; leaf - domain -0.009 +- 0.003",
+    "routing": "77.2% designed anchor; 90.6% true source",
+    "per_source": "GPQA +3.4; MATH -4.5; MMLU-Pro -1.4; BBH / MuSR 0",
+    "build": "mc6_s42: 242 nodes, 147 leaves, Top-1 0.785 [0.775, 0.795]"
+  },
+  "sentence_of_record": "MC-LEAF (2026-09-11, zero calls): the grown taxonomy LOSES to the designed source / domain strata as a router (leaf 0.592 vs domain 0.601, -0.9 +- 0.3pp; prediction within +-1pp met); 77% of reserved queries land in their designed anchor and 91% in their true source, cross-source flows are semantic; model strengths are family / domain-level and leaves dilute support, as LEAF-POWER found on MMLU-Pro. [FLAG 2026-09-15: whether its reserved n = 6,479 sat on the union split later shown ~70% contaminated at chance has not been re-verified; left open, not asserted either way.]",
+  "chips": [
+    "LOSES (−0.9 ± 0.3pp)"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-15",
+      "by": "the ledger [FLAG 2026-09-15] (the session review's outstanding 'MC-LEAF clean correction'; the LEAF-PROFILE-CLEAN entry)",
+      "text": "whether MC-LEAF's reserved n = 6,479 sat on the union split that later proved ~70% contaminated at chance has not been re-verified; left open, not asserted either way."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "INCONSISTENCIES-PASS (registrar, zero calls; insertion only)",
+      "text": "LEFT OPEN 2026-09-23 by INCONSISTENCIES-PASS (registrar, zero calls; insertion only), so the reader knows it was seen: the [FLAG 2026-09-15] on the reserved side is still unverified. Evidence needed: the reserved n=6,479 question ids read by multicorpus_leaf_router.py checked against the union pool paeec37aa28063c75's EVAL ids and against the member sets of mc6_s42 (a read-only pool / snapshot read; not done in this pass). The 2026-09-23 restatement (R2) quotes MC-LEAF with this flag beside it. [ledger: observed cell of row MC-LEAF, v132]"
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the post-run review 21c4fda (insertion only, zero calls)",
+      "text": "ROUTER-CLEAN-POLICY's C3 (2f53675) re-reads leaf minus domain on the split of record as -0.09pp [-1.09, +0.91], DESCRIPTIVE (replicate mean -0.78pp); this record keeps its [FLAG 2026-09-15] and its -0.9 +- 0.3pp (i.i.d.) is not reproduced as a decided result."
+    }
+  ],
+  "does_not_show": [
+    "a verified-clean reserved side (the flag is open) [ID-ONLY 2026-09-23 (CLAIMS-SWEEP-BRACKETS, registrar): pool union paeec37aa28063c75; verified by id only, not by content; reviewed twins on this pool (reviews 1df2cf1, 8ebfa7a): 471 ids / 427 texts exact, 478 / 432 norm-v1 (GPQA 288, MMLU-Pro 185, MATH 3, BBH 2); see docs/judge_v2_program.md L14280-L14340 (CONTENT-DISJOINT-SPLIT-AUDIT) and L14455-L14487 (SPLIT-FOLLOWUPS).]",
+    "leaf-level routing value on the union"
+  ],
+  "ledger": {
+    "row_id": "MC-LEAF",
+    "version": "v47 (d9dfc97; [FLAG 2026-09-15] in the observed cell) [v132 2026-09-23: INCONSISTENCIES-PASS insertion in this row]"
+  },
+  "depends_on": [
+    "MC-ROUTER",
+    "MC-BUILD",
+    "LEAF-POWER",
+    "MC-E2E"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/multi_corpus_design.md L268-L285 (d9dfc97)",
+    "experiment_results/multicorpus/leaf_router_mc6.txt (d9dfc97)",
+    "docs/test_ledger.html row MC-LEAF (v47; FLAG 2026-09-15): chips verbatim, observed cell, evidence (multicorpus_leaf_router.py, leaf_router_mc6.txt, mc6_s42.toml)",
+    "script sha16 = sha256 of tools/analysis/multicorpus_leaf_router.py at d9dfc97, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)"
+  ],
+  "last_update": "2026-09-23",
+  "plain_description": {
+    "sq": "SQ1 Use",
+    "what": "On a six-dataset combined pool, sends each held-out question to its nearest tree leaf and answers it with the model that did best on that leaf's training questions. Accuracy is compared with routing by the designed dataset/domain groups.",
+    "why": "It asks whether the discovered fine-grained taxonomy routes questions to models better than the obvious human-designed categories.",
+    "information": "It shows whether fine leaves add routing value or spread the data too thin. Result: done. As first read, the grown tree lost to the designed domains (59.2% vs 60.1%, -0.9 points), as predicted, which suggested that model strengths sit at family or domain level and that leaves dilute support. A later clean re-read on the split of record gives -0.09 points with an interval from -1.1 to +0.9, descriptive only, so the loss is not reproduced as a decided result. An open flag remains: the held-out side may overlap with training content and has not been re-verified (pool checked by id only).",
+    "written": "2026-10-07"
+  }
+}

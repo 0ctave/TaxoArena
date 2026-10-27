@@ -1,0 +1,217 @@
+{
+  "id": "F-TAX",
+  "title": "F-TAX: which outcomes move the taxonomy clause of the framing of record (expected sentence / 'an evaluation lever' / 'a filing device only') (zero-call claim registration; REGISTERED)",
+  "question": "After ARCH-V2-E-T (G12, G13) and UNION-AF-ROUTE report, does the thesis's taxonomy sentence stay 'the taxonomy buys filing, a certificate, support and names; on MMLU-Pro its cells are a worse partition than a flat mixture at the same granularity (af_clean_s42, one draw; the anchored control ties, reported only; mechanism not identified); no routing gain is shown', move to 'an evaluation lever', or narrow to 'a filing device only'?",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "the commit that writes this record (parent b9491bf)",
+    "program_lines": "docs/judge_v2_program.md L21557-L21580",
+    "program_lines_as_of": "the commit that writes them, parent b9491bf, re-grepped",
+    "date": "2026-09-27",
+    "heading": "## Registered 2026-09-27 (before any code or call) \u2014 F-TAX: after the content-closed tree lane (ARCH-V2-E-T) and the label-free routing test (UNION-AF-ROUTE) report, does the thesis's taxonomy sentence stay ...",
+    "index_section": "docs/judge_v2_program.md L21535-L21555 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run; BEFORE any code) \u2014 Wave-0 REGISTRATIONS (record 2 of 2) ...\"; _as_of the commit that writes them, parent b9491bf, re-grepped)",
+    "provenance": "plan docs/agents/plans/2026-09-27_research_plan_rev2.md PART C2 (the research-lead's drafts), verified and corrected by the registrar before registration (stale items S1-S14 and reconciliations (i)-(ii) in the index section); the orchestrator's brief of 2026-09-27 (computed task, not the author's words); authority: the author's adoption and 'You can start' (docs/judge_v2_program.md L21435-L21457, _as_of b9491bf)"
+  },
+  "script": {
+    "path": "none (registration only; the builder's)",
+    "sha16": "NOT BUILT",
+    "commit": "n/a (not built)"
+  },
+  "ready": null,
+  "go": "n/a (0 calls, 0 cce)",
+  "run": {
+    "outcome_file": "none of its own: ARCH-V2-E-T-R2 G12_OUTCOME.txt (9c9ee9e7) for N-1, g13_outcome.txt (e8f4e527) for L-2; UNION-AF-ROUTE (L-1) not registered",
+    "outcome_commit": "9c9ee9e7, e8f4e527",
+    "calls": 0,
+    "cce": 0,
+    "pool": "n/a",
+    "date": "2026-10-01"
+  },
+  "review": {
+    "file": "docs/reviews/POSTRUN_rp12_r2_g12_flat.md (G12) and docs/reviews/POSTRUN_rp12_r2.md (G13)",
+    "commit": "9a7ebb2a, 78a30da1",
+    "verdict": "deciding readouts VALID; F-TAX scored by the registrar (W-G3)"
+  },
+  "criteria": [
+    {
+      "id": "L-1",
+      "text": "lever (routing): FIRES iff UNION-AF-ROUTE's two-stage 95% interval of G_AF - G_K,per-source lies wholly above 0 AND the point exceeds spread_K (comparator: k-means within source at AF's per-source leaf counts)",
+      "result": "n/a",
+      "value": "NOT FIRED, by support (UNION-AF-ROUTE U2: D_K -0.45pp [-1.31, +0.41], spread_K 0.58pp; bar 1.22pp)",
+      "denominator": "UNION-AF-ROUTE's EVAL items (6,153 v2 or 6,482 paeec; fixed there)"
+    },
+    {
+      "id": "L-2",
+      "text": "lever (filing): FIRES iff ARCH-V2-E-T's G13 paired interval of flatLeaf filing precision minus class-conditional k-means at matched per-class prototypes lies wholly above 0 AND the point exceeds the comparator's seed spread",
+      "result": "n/a",
+      "value": "NOT FIRED: G13 interval wholly below 0: D13 -0.0215 [-0.0301, -0.0125] (spread_KC 0.0112)",
+      "denominator": "6,139 EVAL items in 5,628 components"
+    },
+    {
+      "id": "N-1",
+      "text": "narrowing (certificate): FIRES iff the v2 MMLU-Pro tree's hierarchical-BH set at per-family q = 0.05 (300 reps) contains NO depth-1 site; per-site p95 count printed beside against P(>= 5 of 70 | 5%) = 0.272; UNDETERMINED-BY-SUPPORT if the top family has m > 15 (1/301 > 0.05/m) or the corpus is below the site-null floor",
+      "result": "HELD",
+      "value": "FIRES: 0 of 14 depth-1 sites in the hier-BH set (0 of 60 sites); TOP m 14 <= 15 (not UNDETERMINED-by-support); floor NOT EVALUATED (R-c); per-site 1 of 60 beside, never deciding",
+      "denominator": "ARCH-V2-E-T-R2 B0 MMLU_PRO_LB: 60 sites, 300 reps"
+    },
+    {
+      "id": "READING",
+      "text": "table: a lever and not N-1 -> 'an evaluation lever: <leg>'; N-1 and no lever -> 'a filing device only'; neither -> the expected sentence; a lever AND N-1 -> recorded joined, no sentence; parity only through a TOST registered before code",
+      "result": "DELIVERED",
+      "value": "a filing device only (N-1 fired) (lever leg not fired, by support); never 'no lever'",
+      "denominator": "the three legs"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "the expected sentence stands: 0.60",
+      "result": "FAILED",
+      "value": "N-1 fired, so the expected sentence cannot stand (Brier 0.36, the registrar's)",
+      "denominator": "the reading"
+    },
+    {
+      "id": "P2",
+      "text": "L-1 fires: 0.15",
+      "result": "n/a",
+      "value": "probability 0.15 that L-1 fires: did not occur (not fired by support)",
+      "denominator": "L-1"
+    },
+    {
+      "id": "P3",
+      "text": "L-2 fires: 0.20",
+      "result": "HELD",
+      "value": "L-2 not fired (Brier 0.04)",
+      "denominator": "L-2"
+    },
+    {
+      "id": "P4",
+      "text": "N-1 fires: 0.20",
+      "result": "FAILED",
+      "value": "N-1 fired (registered 0.20; Brier 0.64)",
+      "denominator": "N-1"
+    },
+    {
+      "id": "P5",
+      "text": "any leg UNDETERMINED by support or by registration: 0.35",
+      "result": "n/a",
+      "value": "PENDING: N-1 and L-2 not UNDETERMINED; L-1 open",
+      "denominator": "the three legs"
+    }
+  ],
+  "falsifier": {
+    "text": "F1 = L-1 or L-2 fires: overturns the standing clause 'no routing gain is shown' / filing only as a device for the presented tree (ROUTER-CLEAN-POLICY C3 -0.09pp [-1.09, +0.91], id-disjoint only, superseded for the thesis sentence, not revised). F2 = N-1 fires: withdraws the certificate clause for the presented tree (CERT-RESOLUTION's exhibits stay as recorded).",
+    "fired": true,
+    "status": "F2 FIRES (N-1 fired): the certificate clause is withdrawn for the presented tree (the v2 anchored tree, B0 MMLU-Pro member); CERT-RESOLUTION exhibits unchanged. F1: not fired on L-2; L-1 pending"
+  },
+  "numbers_of_record": {
+    "N-1": "FIRES: hier-BH set 0 of 60 sites, 0 of 14 depth-1 (ARCH-V2-E-T-R2 B0 MMLU_PRO_LB, 300 reps; min TOP p 0.326 vs 0.00357)",
+    "L-2": "NOT FIRED: D13 -0.0215 [-0.0301, -0.0125] (6,139 / 5,628)",
+    "L-1": "PENDING (UNION-AF-ROUTE, re-scoped by the author's D4)"
+  },
+  "sentence_of_record": "F-TAX (fully scored 2026-10-03): a filing device only (N-1 fired) (lever leg not fired, by support) [N-1 FIRES (ARCH-V2-E-T-R2 G12); L-2 NOT FIRED (G13 FAILED); L-1 NOT FIRED by support (UNION-AF-ROUTE U2); never 'no lever'; the certificate clause withdrawn for the presented tree]",
+  "chips": [
+    "REGISTERED 2026-09-27, BEFORE ANY CODE [plan]",
+    "CLAIM REGISTRATION: SCORED WHEN UNION-AF-ROUTE AND ARCH-V2-E-T REPORT [plan]",
+    "DESCRIPTIVE-ONLY IN ITSELF; EACH LEG BY ITS OWN SUPPORT [plan]",
+    "F2 FIRES (N-1, ARCH-V2-E-T-R2 G12 VALID): CERTIFICATE CLAUSE WITHDRAWN FOR THE PRESENTED TREE [null]",
+    "PARTIALLY SCORED: L-2 NOT FIRED; L-1 PENDING (RP13 RE-SCOPED, D4); NO SENTENCE YET [run]",
+    "FULLY SCORED: A FILING DEVICE ONLY (N-1 FIRED) (LEVER LEG NOT FIRED, BY SUPPORT); NEVER &ldquo;NO LEVER&rdquo;"
+  ],
+  "brackets": [
+    {
+      "date": "2026-10-01",
+      "by": "the registrar",
+      "text": "Partially scored: N-1 FIRES (G12 VALID, 9a7ebb2a), F2 FIRES; L-2 NOT FIRED (G13 FAILED, 78a30da1); L-1 PENDING (UNION-AF-ROUTE re-scoped by the author's D4); P1 FAILED, P3 HELD, P4 FAILED, P2 / P5 pending; no sentence until L-1 is adjudicated. docs/judge_v2_program.md L22555-L22565 (section \"## F-TAX (2026-10-01, 0 calls) \u2014 PARTIALLY SCORED: N-1 FIRES (ARCH-V2-E-T-R2 G12, VALID), so F2 FIRES ...\"; _as_of the commit that writes it, parent 9a7ebb2a, re-grepped)"
+    },
+    {
+      "date": "2026-10-01",
+      "by": "the registrar (the orchestrator's ruling, pre-data)",
+      "text": "F-TAX Support (f) bracketed before any RP13 data: an L-1 leg registered DESCRIPTIVE-ONLY (UNION-AF-ROUTE U2) counts as a FIRE if it is observed to fire; a non-fire stays 'not fired, by support' ('not shown'). UNION-AF-ROUTE registered in the same commit. docs/judge_v2_program.md L22621-L22625 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data, before any UNION-AF-ROUTE code, build or datum) \u2014 F-TAX Support (f): ...\"; _as_of the commit that writes it, parent ce0d0f17, re-grepped); the bracket itself at L21573"
+    },
+    {
+      "date": "2026-10-03",
+      "by": "registrar (UNION-AF-ROUTE POSTRUN 589c04ae)",
+      "text": "L-1 NOT FIRED by support; F-TAX fully scored; reading 'a filing device only (N-1 fired) (lever leg not fired, by support)'. docs/judge_v2_program.md L23676-L23686 (section \"## UNION-AF-ROUTE (RP13) (2026-10-03, 0 calls) \u2014 VALID ...\"; _as_of the commit that writes it, parent 589c04ae)"
+    },
+    {
+      "date": "2026-10-03",
+      "by": "registrar (checkpoint F)",
+      "text": "does_not_show updated by insertion after CERT-PC-SIZE (541fde40) and UNION-AF-ROUTE (589c04ae)"
+    },
+    {
+      "date": "2026-10-04",
+      "by": "registrar (consistency check 2026-10-04; zero calls)",
+      "text": "the 'chips' list had drifted from the ledger row's chips (wording or replaced chips); the chips of record are the ledger's, copied verbatim into 'chips_ledger_verbatim' (ledger v379); 'chips' is kept as history."
+    }
+  ],
+  "does_not_show": [
+    "that the taxonomy is 'a filing device only' (L-1 open) [SUPERSEDED 2026-10-03: L-1 scored (UNION-AF-ROUTE U2, not fired by support); F-TAX reads 'a filing device only (N-1 fired) (lever leg not fired, by support)', never 'no lever']",
+    "anything new about the certificates of bareq512_s42 or af_clean_s42 (unchanged)",
+    "that the declared depth-1 level is non-geometric (B-A2 did not apply)",
+    "that trees, or this construction, are worse partitions in general (never licensed)",
+    "any routing gain or loss (UNION-AF-ROUTE not run) [SUPERSEDED 2026-10-03: UNION-AF-ROUTE ran (POSTRUN 589c04ae): U1 HELD thin +1.52pp [+0.14, +2.91]; U3b a measured shortfall vs declared labels; no parity]",
+    "parity of any kind (no TOST registered)",
+    "[ADDED 2026-10-03 by the registrar, CERT-PC-SIZE POSTRUN 541fde40 W-2] that G12's 0 of 60 (N-1) is explained by site size: the certificate certifies the declared 14-category partition 5/5 at G12's depth-1 sizes (n 486, 441), so the 0 of 60 is NOT explained by n alone; caveats: not k-matched (14 vs 2), not population-matched (all categories vs one anchor), nothing shown about certifiable 2-way structure inside an anchor; N-1 and F2 stand",
+    "[ADDED 2026-10-03 by the registrar, UNION-AF-ROUTE POSTRUN 589c04ae] that label-free cells route equivalently to declared labels (U3b NOT EQUIVALENT, M_AF -1.15pp [-2.19, -0.12]) or that the anchor-free tree files better than unsupervised k-means (AK1 / AK2 UNDETERMINED; F-AK FIRES under mirrored filing)"
+  ],
+  "ledger": {
+    "row_id": "F-TAX",
+    "version": "v329 (2026-10-01: bracket, the orchestrator's pre-data L-1 ruling) | v327 (2026-10-01: partially scored; the CLAIM REGISTRATION plan chip replaced by an F2 null chip and a PARTIALLY SCORED run chip) | v308 (2026-09-27: registered; a new section-7 row, PLAN chips)"
+  },
+  "depends_on": [
+    "UNION-AF-ROUTE (drafted; re-scoped by the author's D4 2026-10-01 onto a fresh anchor-free build on draw 5a3e756 TRAIN; registration owed)",
+    "ARCH-V2-E-T / ARCH-V2-E-T-R2 (R2 done: G12 N-1 FIRES, G13 FAILED)",
+    "FLAT-MIX-MMLU (done; the partition clause)",
+    "CERT-RESOLUTION (done)",
+    "FLAT-GENERALITY (registered; widens the partition clause)",
+    "EMBEDDER-CROSS-FLAT (registered)"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing; touches no closed line (CONTEXT section 5 checked at b9491bf)"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L21557-L21580 (section \"## Registered 2026-09-27 (before any code or call) \u2014 F-TAX: after the content-closed tree lane (ARCH-V2-E-T) and the label-free routing test (UNION-AF-ROUTE) report, does the thesis's taxonomy sentence stay ...\"; _as_of the commit that writes them, parent b9491bf, re-grepped)",
+    "docs/judge_v2_program.md L21535-L21555 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run; BEFORE any code) \u2014 Wave-0 REGISTRATIONS (record 2 of 2) ...\"; _as_of the commit that writes them, parent b9491bf, re-grepped)",
+    "docs/agents/plans/2026-09-27_research_plan_rev2.md section C2 R-A (the draft)",
+    "docs/agents/plans/2026-09-26_framing_of_record.md L104 (bracket B6)",
+    "docs/judge_v2_program.md L22555-L22565 (section \"## F-TAX (2026-10-01, 0 calls) \u2014 PARTIALLY SCORED: N-1 FIRES (ARCH-V2-E-T-R2 G12, VALID), so F2 FIRES ...\"; _as_of the commit that writes it, parent 9a7ebb2a, re-grepped)",
+    "docs/judge_v2_program.md L22567-L22571 (section \"## Author's decision 2026-10-01 (insertion only; zero calls; nothing run) \u2014 checkpoint B's D1 (RP19 go, after RP20), D3 ...\"; _as_of the commit that writes it, parent 9a7ebb2a, re-grepped)",
+    "docs/reviews/POSTRUN_rp12_r2_g12_flat.md (9a7ebb2a)"
+  ],
+  "last_update": "2026-10-04",
+  "support": {
+    "a": "carried by the deciding registrations (UNION-AF-ROUTE; ARCH-V2-E-T G12 / G13); none fixed here",
+    "b": "carried; none declared here",
+    "c": "carried",
+    "d": "carried; none computed here",
+    "e": "carried",
+    "f": "DESCRIPTIVE-ONLY in itself (a reading rule); each leg SCOREABLE or not by its own registration; a leg whose deciding test is DESCRIPTIVE-ONLY cannot fire",
+    "g": "L-1 / L-2 reachable only if the true difference exceeds the comparator's seed spread (does not shrink with n); N-1 reachable at 300 reps iff the top family has m <= 15; not unreachable by construction (the anchored v2 tree has depth-1 sites)"
+  },
+  "cost": {
+    "calls_expected": 0,
+    "cce_expected": 0,
+    "calls_max": 0,
+    "cce_max": 0,
+    "machine": "none (scored by the registrar)",
+    "priced": "UNPRICED (the experiment-manager's)"
+  },
+  "chips_ledger_verbatim": [
+    "plan: REGISTERED 2026-09-27, BEFORE ANY CODE",
+    "null: F2 FIRES (N-1, ARCH-V2-E-T-R2 G12 VALID): CERTIFICATE CLAUSE WITHDRAWN FOR THE PRESENTED TREE",
+    "run: PARTIALLY SCORED: L-2 NOT FIRED; L-1 PENDING (RP13 RE-SCOPED, D4); NO SENTENCE YET",
+    "warn: FULLY SCORED: A FILING DEVICE ONLY (N-1 FIRED) (LEVER LEG NOT FIRED, BY SUPPORT); NEVER \u201cNO LEVER\u201d"
+  ],
+  "plain_description": {
+    "sq": "SQ3 Taxonomy",
+    "what": "A pre-registered rule, with no new calls, that combines three other tests to decide which sentence the thesis may write about the taxonomy. The candidates were: the expected sentence, 'an evaluation lever', or 'a filing device only'.",
+    "why": "It fixes in advance how the thesis's main claim about the tree's value must change given the results, so the wording cannot be chosen after seeing the data.",
+    "information": "A routing or filing advantage over k-means would let the thesis call the tree an evaluation lever; losing the top-level certificate would narrow it to a filing device. Result: 'a filing device only'. The presented tree has no certified top-level split, so its certificate clause is withdrawn. Neither lever condition fired. Filing lost to k-means built within each class. Routing was not distinguishable from per-source k-means (difference within noise). The record explicitly avoids saying 'no lever'.",
+    "written": "2026-10-07"
+  }
+}

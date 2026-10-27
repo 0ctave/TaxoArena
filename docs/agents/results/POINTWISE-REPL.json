@@ -1,0 +1,99 @@
+{
+  "id": "POINTWISE-REPL",
+  "title": "POINTWISE-REPL: does the pointwise board advantage replicate at anchor scale? (zero calls)",
+  "question": "Score each of 13 anchors' boards (64-274 matches each) against THAT anchor's own key accuracy: how many anchors does each format win?",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "2c181aa",
+    "program_lines": "docs/judge_v2_program.md L1072-L1099 (the 'Three probes' bullet; not separately registered: exploratory probes reading existing caches)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "- **Three probes (2026-09-14, zero calls): the judge needs a correct reference, not competence; GPQA has the headroom MMLU-Pro lost; and the pointwise board advantage does not survive small samples.**",
+    "outcome_heading": [
+      "L1072: the same bullet"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "n/a (free check; scratch script, no script of record; the output file is the record)",
+    "sha16": "n/a",
+    "commit": "2c181aa"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/three_probes.txt",
+    "outcome_commit": "2c181aa",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-14"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); descriptive probes",
+    "commit": "2c181aa",
+    "verdict": "descriptive"
+  },
+  "criteria": [
+    {
+      "id": "readout",
+      "text": "how many anchors each format wins",
+      "result": "DELIVERED",
+      "value": "pointwise wins 4, pairwise 8, 1 tie, against the global 0.9930 vs 0.9790 on 1,971 matches; pointwise verdicts are noisier per pair (0.808 vs 0.864) so small samples are dominated by that noise; the first readout scored anchors against GLOBAL key accuracy (3-9-1) and is superseded; the pattern is systematic: pointwise wins Biology, Chemistry, Engineering, Math (Physics tie), pairwise wins Philosophy, Psychology, Other, Economics, History, Law",
+      "denominator": "13 anchors, 64-274 matches each"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none (descriptive)",
+    "fired": false,
+    "note": ""
+  },
+  "numbers_of_record": {
+    "anchors": "pointwise 4, pairwise 8, tie 1 (corrected from 3-9-1)",
+    "global": "0.9930 vs 0.9790 on 1,971 matches; per-pair accuracy 0.808 vs 0.864",
+    "axis": "GRADE where checkable (Biology, Chemistry, Engineering, Math), COMPARE where discursive (Philosophy, Psychology, Other, Economics, History, Law): the same axis as RK-1b and GEN-ARENA"
+  },
+  "sentence_of_record": "POINTWISE-REPL (2026-09-14, zero calls): the pointwise board advantage does not replicate at anchor scale: pointwise wins 4 anchors, pairwise 8, 1 tie, against the global 0.9930 vs 0.9790 on 1,971 matches; pointwise verdicts are noisier per pair (0.808 vs 0.864), so small samples are dominated by that noise; the first readout (against global key accuracy) is superseded and the conclusion unchanged; the pattern is systematic: grading wins where the answer is checkable and loses where it is discursive, the same axis as RK-1b and GEN-ARENA: grade where answers are checkable, compare where they are not.",
+  "chips": [
+    "DOES NOT REPLICATE at small n"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a per-anchor board advantage for pointwise (noise-dominated at 64-274 matches)"
+  ],
+  "ledger": {
+    "row_id": "POINTWISE-REPL",
+    "version": "v65 (2c181aa); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "POINTWISE",
+    "HYBRID",
+    "GEN-ARENA",
+    "RK-1b"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L1072-L1099 (2c181aa)",
+    "experiment_results/x12_crossdomain/three_probes.txt (2c181aa)",
+    "docs/test_ledger.html row POINTWISE-REPL (v65): chips verbatim, evidence (three_probes.txt)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (rubric_v2_design.md / multi_corpus_design.md lines as of their last commits named in sources)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Compares grading each answer alone with comparing two answers side by side, separately within each of 13 subject areas. Each format is scored against that area's own answer key. No judge calls.",
+    "why": "Checks whether grading's overall edge over side-by-side comparison holds inside individual subjects.",
+    "information": "Shows whether one judging format is best everywhere or depends on the type of question. Result: the edge does not replicate per subject. Grading wins 4 areas, comparison 8, with 1 tie. Grading wins where answers are checkable (math, sciences, engineering), and comparison wins in discursive fields (law, history, philosophy). Small per-area samples are noisy. This test belongs to the older question pool, so it now counts as history, not evidence.",
+    "written": "2026-10-07"
+  }
+}

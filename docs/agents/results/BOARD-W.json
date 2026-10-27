@@ -1,0 +1,94 @@
+{
+  "id": "BOARD-W",
+  "title": "BOARD-W: confidence-weighted vs gated vs ungated top-4 board (zero calls)",
+  "question": "STACK-v2's 599 top-cluster matches; weight = mean confidence vs >= 0.95 gate (n = 181) vs ungated; key-order violations; registered readout only.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "218df92",
+    "program_lines": "docs/judge_v2_program.md L321-L323 (registration bullet) and L298-L310 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "- **BOARD-W — confidence-weighted vs gated board** (zero calls): top-4 board from STACK-v2's 599",
+    "outcome_heading": [
+      "L298: - **BOARD-W (2026-09-10 13:25, zero calls, registered readout):** top-4 board from STACK-v2's 599"
+    ],
+    "date": "2026-09-10"
+  },
+  "script": {
+    "path": "n/a (free check / probe; scratch script, no script of record; the output file is the record)",
+    "sha16": "n/a",
+    "commit": "20670ac"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/flip_prov_boardw.txt",
+    "outcome_commit": "20670ac",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-10"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/)",
+    "commit": "20670ac",
+    "verdict": "DESCRIPTIVE: ungated, weighted and gated boards agree (1 violation); squared-confidence weighting = key order, exploratory only"
+  },
+  "criteria": [
+    {
+      "id": "readout",
+      "text": "key-order violations under ungated / confidence-weighted / gated",
+      "result": "DELIVERED",
+      "value": "ungated gemini > iask > arx > gpt-4o (1 violation); weighted same (1); gated (n = 181) same (1); EXPLORATORY squared-confidence weighting = key order (0), noted as exploratory only",
+      "denominator": "599 top-cluster matches"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "paper reports ungated + weighted"
+  },
+  "numbers_of_record": {
+    "boards": "ungated 1 / weighted 1 / gated 1 violation; squared-confidence 0 (exploratory)"
+  },
+  "sentence_of_record": "BOARD-W (2026-09-10, zero calls): on STACK-v2's 599 top-cluster matches the ungated, confidence-weighted and >= 0.95-gated (n = 181) boards all read gemini > iask > arx > gpt-4o with 1 violation; squared-confidence weighting gives the key order (0) and is noted as exploratory only; the paper reports ungated + weighted.",
+  "chips": [
+    "DESCRIPTIVE"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a registered gain from confidence weighting (the squared weighting is exploratory)"
+  ],
+  "ledger": {
+    "row_id": "BOARD-W",
+    "version": "v33 (1b9312f); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "STACK-v2"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L321-L323 and L298-L310 (218df92 / 20670ac)",
+    "experiment_results/x12_crossdomain/flip_prov_boardw.txt (20670ac)",
+    "docs/test_ledger.html row BOARD-W (v33): chips verbatim, observed cell, evidence",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "It re-read the 599 top-model matches of the STACK-v2 judge run, with no new calls. Three versions of the top-4 leaderboard were built: unweighted, weighted by the judge's confidence, and keeping only verdicts with confidence of 0.95 or more.",
+    "why": "It checks whether trusting only confident judge verdicts gives a leaderboard closer to the true answer-key order.",
+    "information": "If weighting or gating fixed the order, confidence would be a useful filter. If not, it adds nothing. Result: done, descriptive. All three boards give the same order with 1 violation of the answer-key order. Squaring the confidence weight gave the key order, but that was exploratory only. Note: this belongs to the older p2dca data family, which is now classed as history, not evidence.",
+    "written": "2026-10-07"
+  }
+}

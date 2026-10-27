@@ -1,0 +1,101 @@
+[POOL] p2dca21ab5f4ef3ae: pool_guard.assert_pool_of_record PASSED (the id file and the reserved_pool rows both hash to it; the guard's own read-only open of the eval DB is not in the DB-open log below)
+=== ARCH-V2 G22 SIMULATOR, leg validity: RUN UNDER THE REGISTRATION ARCH-V2-G22 at d6129cf (programme L15208-L15265), master ARCHV2-G22-REC-1, R 1000 ===
+  argv: tools/analysis/archv2_g22_sim.py --leg validity --workers 2 --out experiment_results/archv2/g22_g23/G22_validity.txt
+  master 'ARCHV2-G22-REC-1' | data root Z:\FAC\TUBerlin\THESIS\TaxoArena | started 2026-09-24 11:09:40
+  instrument identity (git blob / sha256-lf16 of the LF rendering; working tree state):
+    archv2_g22_sim.py                  blob:522cefe751fcbf53d8e898f043218b697c254db2 sha256-lf16:eff3435a973c1cfd (CRLF sha256-crlf16:9023845e49799760)
+    archv2_arena/__init__.py           blob:210bd76eaff44916ea9d85b0d6dcccd711d85154 sha256-lf16:ae6a0736954a8674 (CRLF sha256-crlf16:2f57cabe6c394809)
+    archv2_arena/streams.py            blob:30c23f9700a1309cda059c76bfe6fcbc6c41d64b sha256-lf16:315a30993d340650 (CRLF sha256-crlf16:bd52a16174d485b7)
+    archv2_arena/ro.py                 blob:98cfb84a58e7844e24b73ba301c2792cddc61b7c sha256-lf16:23d4f38710e3007f (CRLF sha256-crlf16:297117b2176e7cd7)
+    archv2_arena/bt.py                 blob:8ee2e28b4fe9097f68b462562adaedea92f54813 sha256-lf16:138bd034706eb2e1 (CRLF sha256-crlf16:b9c25ce1f79d1875)
+    archv2_arena/cert.py               blob:d150ec9c3084352354bd83c4b106f7936f11d036 sha256-lf16:11e2ec7e76e0b495 (CRLF sha256-crlf16:1a5f2a861058b6d1)
+    archv2_arena/verdict_model.py      blob:2d6d0e2c9f494f33bfc40fab18a30d31b2d433ad sha256-lf16:10b9a030c3f09e47 (CRLF sha256-crlf16:5ba1fa98b405f8a1)
+    archv2_arena/data.py               blob:7de0b135028ba96eab24b2ba998a62dd74e03247 sha256-lf16:78d3947f51dc8596 (CRLF sha256-crlf16:769163d4f95b4437)
+    archv2_arena/design.py             blob:4959cb525c8d07a26d19358c3f98342d5b28b3d2 sha256-lf16:becd63768eedb8fc (CRLF sha256-crlf16:c0e5c5ffd6dcd994)
+    archv2_arena/g22.py                blob:257d14ca64328f1d48d52fc57b0386dc71690b3b sha256-lf16:a8e7026c0d7e8c7a (CRLF sha256-crlf16:407a72846563346f)
+    archv2_arena/report.py             blob:51639563bdd47d48e0ec8b1673eee0e7b865653a sha256-lf16:da954a3c4d1b833f (CRLF sha256-crlf16:50e5e1884a1eb849)
+    archv2_arena/synth.py              blob:02db84ba5d3ee2c819bddc1be4455ec0e186b5ca sha256-lf16:b64657775ffa4422 (CRLF sha256-crlf16:3633804b08d6b3f1)
+    archv2_arena/selftest_g22.py       blob:88adb8247e51f9231282fc421fe9b6d82ac18aff sha256-lf16:e12bf469e0071db9 (CRLF sha256-crlf16:50145f9087cd36d5)
+    archv2_arena/selftest_g22_v2.py    blob:bd1e73f96db66ae31cb360a28be466c925e6c86c sha256-lf16:b3f4d8bffa636c41 (CRLF sha256-crlf16:d478cfe70a36b9d1)
+  inputs (size, mtime; -wal / -journal sizes):
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\x12_crossdomain\grok_calib.db | 37879808 B | mtime 2026-09-16 05:00:28 | no sidecar
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\mmlu_pro_dataset_cache_v2.db | 974917632 B | mtime 2026-09-19 16:30:10 | -wal 0 B
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\snapshots.db | 1065541632 B | mtime 2026-09-23 04:34:26 | -wal 0 B
+  board grok: 9131 valid verdicts, 9131 routed, anchors 14, models 12; routing tree bareq512_s42 snapshot 20260909_212117_Headless_Run_Auto_ge
+
+=== (a) VALIDITY LEG: the simulator fitted on grok must reproduce the record ===
+  targets: edges {'f': 891, 'u': 920, 'est': 809} | f_raw_called 733, f_raw_wrong 7, f_loao_called 667, f_loao_wrong 2, f_loao_wrong_est 1, f_loao_nominal 1.11, u_raw_called 740, u_raw_wrong 8, u_loao_called 653, u_loao_wrong 2, u_loao_wrong_est 1, u_loao_nominal 1.24 | delta-deviance range must cover 4.47 and 2.26
+  rule (REGISTERED 2026-09-24 at d6129cf (ARCH-V2-G22, programme L15208-L15265), ruling (1), Bonferroni): EVERY target inside its simulated central (1 - 0.05 / T) interval of the PRIMARY (fresh-judge) mode random; T = 14 targets (12 counts + 2 delta-deviance values) -> central 0.99643 interval; R 1000 replicates per mode, B 300
+  the real board through the NEW fast builder (numpy boards, stream validity/real; the record's own stream is build()'s random.Random(42) through rj.mm_fit, so these are a re-draw of the bootstrap, printed beside):
+    edges f 891 / u 920 / established 809 (record 891 / 920 / 809: EDGE SETS MATCH) | f raw 740 / 8 | f LOAO 666 / 2 (1) 1.18 | u raw 747 / 9 | u LOAO 653 / 2 (1) 1.27 | est b1 +2.5533 ddev 4.47
+  VERDICT MODEL: kappa +1.6386 | pi (first-position) +0.1778 | lam (per 1k chars) +0.1565 | tie cutpoints c = 0.105 / 0.663 / 0.459 (DEC / AGREE / NONDEC) | sigma_v (model) 1.2528 | sigma_w (anchor x model) 0.3182 | ridge sigma0 1.00
+    fit: {'nll': 10890.795781542987, 'n_obs': 18262, 'iters': 111, 'present': 168} | digest ea25e7fd71781e51
+    model-level u (mean over anchors), lowest three: Llama-2-7b-hf -1.664, Llama-2-13b-hf -1.440, Meta-Llama-3_1-8B -1.132
+  retest mode: r_keep 0.7732 reproduces the measured re-draw agreement 0.896 (reachable [0.617, 1.000])
+
+  mode random  (1000 replicates)   <- PRIMARY (the downstream legs' mode)
+    statistic               target      q_lo    median      q_hi pct(target)  covered
+    f_raw_called            733.00    505.84    686.00    765.65      0.902  yes
+    f_raw_wrong               7.00     43.92    222.50    468.73      0.000  NO
+    f_loao_called           667.00      0.00      6.00    384.94      1.000  NO
+    f_loao_wrong              2.00      0.00      0.00      6.00      0.913  yes
+    f_loao_wrong_est          1.00      0.00      0.00      4.00      0.878  yes
+    f_loao_nominal            1.11      0.00      0.07      2.13      0.951  yes
+    u_raw_called            740.00    522.27    708.00    791.43      0.795  yes
+    u_raw_wrong               8.00     51.14    231.00    477.30      0.000  NO
+    u_loao_called           653.00      0.00      5.00    364.46      1.000  NO
+    u_loao_wrong              2.00      0.00      0.00      5.00      0.909  yes
+    u_loao_wrong_est          1.00      0.00      0.00      3.22      0.896  yes
+    u_loao_nominal            1.24      0.00      0.06      2.09      0.961  yes
+    delta-deviance       4.47/2.26    -63.41     12.48    205.12          -  yes   (finite in 1000 of 1000; not identified by the 3.84 bar in 317)
+    descriptive: wrong(established) over all edges median 279; the most-incident model's share median 0.32 (real board: Meta-Llama-3_1-70B-Instruct at 0.33); modal top model gemini-3.1-pro_5-shots
+
+  mode fixed   (1000 replicates)
+    statistic               target      q_lo    median      q_hi pct(target)  covered
+    f_raw_called            733.00    725.78    747.00    764.00      0.017  yes
+    f_raw_wrong               7.00      7.00     12.00     18.22      0.006  yes
+    f_loao_called           667.00    604.78    644.00    678.43      0.963  yes
+    f_loao_wrong              2.00      0.00      2.00      4.22      0.530  yes
+    f_loao_wrong_est          1.00      0.00      1.00      3.00      0.466  yes
+    f_loao_nominal            1.11      0.79      1.07      1.40      0.650  yes
+    u_raw_called            740.00    735.78    757.00    775.00      0.007  yes
+    u_raw_wrong               8.00      8.78     15.00     22.00      0.001  NO
+    u_loao_called           653.00    586.57    631.00    671.22      0.940  yes
+    u_loao_wrong              2.00      0.00      2.00      5.00      0.377  yes
+    u_loao_wrong_est          1.00      0.00      1.00      3.00      0.544  yes
+    u_loao_nominal            1.24      0.87      1.16      1.51      0.774  yes
+    delta-deviance       4.47/2.26      0.78      6.06     16.98          -  yes   (finite in 1000 of 1000; not identified by the 3.84 bar in 190)
+    descriptive: wrong(established) over all edges median 26; the most-incident model's share median 0.31 (real board: Meta-Llama-3_1-70B-Instruct at 0.33); modal top model Meta-Llama-3_1-70B-Instruct
+
+  mode retest  (1000 replicates)
+    statistic               target      q_lo    median      q_hi pct(target)  covered
+    f_raw_called            733.00    725.78    740.00    756.00      0.080  yes
+    f_raw_wrong               7.00      5.00      8.00     13.00      0.132  yes
+    f_loao_called           667.00    633.78    662.00    685.65      0.741  yes
+    f_loao_wrong              2.00      1.00      2.00      4.00      0.511  yes
+    f_loao_wrong_est          1.00      0.00      1.00      2.22      0.423  yes
+    f_loao_nominal            1.11      0.83      1.10      1.39      0.550  yes
+    u_raw_called            740.00    733.78    748.00    764.00      0.050  yes
+    u_raw_wrong               8.00      6.00     11.00     16.22      0.050  yes
+    u_loao_called           653.00    612.78    648.00    678.22      0.699  yes
+    u_loao_wrong              2.00      1.00      2.00      5.00      0.374  yes
+    u_loao_wrong_est          1.00      0.00      1.00      2.00      0.443  yes
+    u_loao_nominal            1.24      0.90      1.18      1.49      0.710  yes
+    delta-deviance       4.47/2.26      1.48      5.50     11.71          -  yes   (finite in 1000 of 1000; not identified by the 3.84 bar in 163)
+    descriptive: wrong(established) over all edges median 24; the most-incident model's share median 0.32 (real board: Meta-Llama-3_1-70B-Instruct at 0.33); modal top model Meta-Llama-3_1-70B-Instruct
+
+  VALIDITY LEG: FAIL (REGISTERED 2026-09-24 at d6129cf (ARCH-V2-G22, programme L15208-L15265)): a target lies outside the primary mode's interval. THE SIMULATOR DECIDES NOTHING; legs (c), (d), (e) and the simulated (g) REFUSE.
+
+  EXECUTION WITNESS (new code paths): {'edges_fast.boards': 12604200, 'edges_fast.edges': 2760920, 'validity.v1_path': 1}
+  DB OPENS (all through pool_guard.open_ro: -wal/-journal refused, then mode=ro&immutable=1): 3
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\snapshots.db
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\x12_crossdomain\grok_calib.db
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\mmlu_pro_dataset_cache_v2.db
+  RANDOM STREAMS (master 'ARCHV2-G22-REC-1'): 45014 named streams, log sha256 58082ad0ee4334435888825fe5d6f7e2f5dde2c379ffc4b09ef40a5b1eda827f (full list in the .streams.tsv beside this file); seed = sha256(master|name)[:8] big-endian unless 'of record'
+    validity/fixed/rep0000/Biology/qboot                          1783490165356329532  numpy.PCG64
+    validity/fixed/rep0000/Business/qboot                        11640409868798359418  numpy.PCG64
+    validity/fixed/rep0000/Chemistry/qboot                        4375673268778540006  numpy.PCG64
+    validity/fixed/rep0000/Computer science/qboot                13515346735368054752  numpy.PCG64
+    validity/fixed/rep0000/Economics/qboot                        8176246628774971546  numpy.PCG64
+    validity/fixed/rep0000/Engineering/qboot                     14230824789702171283  numpy.PCG64
+    ... 45008 more

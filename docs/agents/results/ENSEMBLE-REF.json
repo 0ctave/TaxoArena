@@ -1,0 +1,104 @@
+{
+  "id": "ENSEMBLE-REF",
+  "title": "ENSEMBLE-REF: can a stronger reference be built from the eval set's own strongest models? (free check, zero calls)",
+  "question": "Majority vote of the top-6 contestants' static answers as a reference, and the leave-two-out variant a real match would actually get (its two contestants excluded): does it beat grok-reasoning's 0.860 pool / 0.743 hard-stratum (confidence < 100) accuracy?",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "a388951",
+    "program_lines": "docs/judge_v2_program.md L571-L582 (a free-check bullet; no separate registration)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "- **ENSEMBLE-REF free check (2026-09-11 01:00, zero calls): a reference built from the static answers of the strongest models in the eval set is NOT a stronger family.**",
+    "outcome_heading": [
+      "L571: the same bullet"
+    ],
+    "date": "2026-09-11"
+  },
+  "script": {
+    "path": "n/a (free check; scratch script, no script of record; the output file is the record)",
+    "sha16": "n/a",
+    "commit": "a388951"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/judge_solve/ensemble_reference_free_check.txt",
+    "outcome_commit": "a388951",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-11"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); a free check on the eval set's static answers",
+    "commit": "1ee0f5c",
+    "verdict": "NO: the same ceiling as the single reference it was meant to beat"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "beat grok-reasoning's 0.860 pool / 0.743 hard-stratum accuracy",
+      "result": "FAILED",
+      "value": "top-6 majority 0.875 pool / 0.772 on the confidence < 100 stratum; leave-two-out 0.833-0.880 / 0.720-0.782: the same ceiling; adding grok-reasoning as a voter changes nothing (0.734)",
+      "denominator": "3,445 pool questions; 1,361 hard-stratum questions"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none (free check)",
+    "fired": false,
+    "note": "the hard questions are hard for every model in the set, so a stronger reference must come from OUTSIDE it (the constraint behind ARXIASK, ORACLE and REF-QUAL-KIMI); ARENA-13 could use an ensemble for independence but not for strength"
+  },
+  "numbers_of_record": {
+    "top6_majority": "0.875 pool / 0.772 hard",
+    "leave_two_out": "0.833-0.880 / 0.720-0.782",
+    "with_grok_reasoning_voter": "0.734 hard",
+    "best_single_pool_model": "gemini-3.1-pro 0.913 marks roughly where a frontier reasoning model with thinking would land"
+  },
+  "sentence_of_record": "ENSEMBLE-REF (2026-09-11, zero calls): a reference built from the static answers of the strongest models in the eval set is NOT a stronger family: top-6 majority 0.875 pool / 0.772 on the confidence < 100 stratum; leave-two-out 0.833-0.880 / 0.720-0.782, the same ceiling as the single reference it was meant to beat; adding grok-reasoning as a voter changes nothing (0.734). The hard questions are hard for every model in the set, so a stronger reference must come from OUTSIDE it.",
+  "chips": [
+    "NO"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a stronger reference from inside the eval set",
+    "an ensemble used for strength (ARENA-13 used one for independence only)"
+  ],
+  "ledger": {
+    "row_id": "ENSEMBLE-REF",
+    "version": "v77 (1ee0f5c; the outcome dates 2026-09-11); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "ORACLE",
+    "ARXIASK",
+    "ARENA-13",
+    "REF-QUAL-KIMI-JSON"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "reference ensembles (CONTEXT.md section 5: ENSEMBLE-REF, J2-D, REF-CONF, ABSTAIN)"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L571-L582 (a388951)",
+    "experiment_results/judge_solve/ensemble_reference_free_check.txt (a388951)",
+    "docs/test_ledger.html row ENSEMBLE-REF (v77): chips verbatim, evidence",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (rubric_v2_design.md / multi_corpus_design.md lines as of their last commits named in sources)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "The answers of the 6 strongest models in the set were combined by majority vote to build a reference answer for the judge. The result was compared with the single reasoning-model reference, overall and on hard questions. No calls were made.",
+    "why": "It asks whether a better reference for the judge can be built from the models being evaluated.",
+    "information": "A higher accuracy would give a cheap, stronger reference. The same accuracy would mean a better reference must come from outside the set. Result: done. It is not stronger: 0.875 overall and 0.772 on hard questions, the same ceiling as the single reference. The hard questions are hard for every model in the set. Older p2dca data family: history, not evidence.",
+    "written": "2026-10-07"
+  }
+}

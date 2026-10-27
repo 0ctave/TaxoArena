@@ -1,0 +1,16 @@
+$ python rerun_vf4__MH3-e3-vfc-only__L-tm-e3-log-refused.py tm --build C:\Users\octav\AppData\Local\Temp\claude\Z--FAC-TUBerlin-THESIS-TaxoArena\7c10e5cb-d16b-4a0e-864a-f3a6151d835b\scratchpad\v4drv7\T\tools\analysis --expect-lf b45b75db7d98103e --e3-log C:\Users\octav\AppData\Local\Temp\claude\Z--FAC-TUBerlin-THESIS-TaxoArena\7c10e5cb-d16b-4a0e-864a-f3a6151d835b\scratchpad\v4drv7\e3\e3_ok_LF.txt --repo C:\Users\octav\AppData\Local\Temp\claude\Z--FAC-TUBerlin-THESIS-TaxoArena\7c10e5cb-d16b-4a0e-864a-f3a6151d835b\scratchpad\v4drv7\fake_repo_empty --out C:\Users\octav\AppData\Local\Temp\claude\Z--FAC-TUBerlin-THESIS-TaxoArena\7c10e5cb-d16b-4a0e-864a-f3a6151d835b\scratchpad\v4drv7\outs\o108
+[BUILD] C:\Users\octav\AppData\Local\Temp\claude\Z--FAC-TUBerlin-THESIS-TaxoArena\7c10e5cb-d16b-4a0e-864a-f3a6151d835b\scratchpad\v4drv7\T\tools\analysis\vote_frame_cert.py: sha256[:16] of the file as archived b45b75db7d98103e; of its LF rendering b45b75db7d98103e; CR bytes 0; expected LF b45b75db7d98103e
+[BUILD] C:\Users\octav\AppData\Local\Temp\claude\Z--FAC-TUBerlin-THESIS-TaxoArena\7c10e5cb-d16b-4a0e-864a-f3a6151d835b\scratchpad\v4drv7\T\tools\analysis\position_index_all.py: sha256[:16] of the file as archived 9c78d485f37f442a; of its LF rendering 9c78d485f37f442a; CR bytes 0; expected LF 9c78d485f37f442a
+[BUILD] C:\Users\octav\AppData\Local\Temp\claude\Z--FAC-TUBerlin-THESIS-TaxoArena\7c10e5cb-d16b-4a0e-864a-f3a6151d835b\scratchpad\v4drv7\T\tools\analysis\tie_mechanics.py: sha256[:16] of the file as archived d6a1a0409a0fc06e; of its LF rendering d6a1a0409a0fc06e; CR bytes 0; expected LF d6a1a0409a0fc06e
+Traceback (most recent call last):
+  File "C:\Users\octav\AppData\Local\Temp\claude\Z--FAC-TUBerlin-THESIS-TaxoArena\7c10e5cb-d16b-4a0e-864a-f3a6151d835b\scratchpad\v4drv7\harness_variants\rerun_vf4__MH3-e3-vfc-only__L-tm-e3-log-refused.py", line 266, in <module>
+    SH0 = rec_shas(); print("[C-ii-3] before: %s" % {k: v[:16] for k, v in SH0.items()})
+          ^^^^^^^^^^
+  File "C:\Users\octav\AppData\Local\Temp\claude\Z--FAC-TUBerlin-THESIS-TaxoArena\7c10e5cb-d16b-4a0e-864a-f3a6151d835b\scratchpad\v4drv7\harness_variants\rerun_vf4__MH3-e3-vfc-only__L-tm-e3-log-refused.py", line 265, in rec_shas
+    return {os.path.relpath(p, REPO).replace("\\", "/"): hashlib.sha256(open(p, "rb").read()).hexdigest() for p in RECORD_OUT}
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\octav\AppData\Local\Temp\claude\Z--FAC-TUBerlin-THESIS-TaxoArena\7c10e5cb-d16b-4a0e-864a-f3a6151d835b\scratchpad\v4drv7\harness_variants\rerun_vf4__MH3-e3-vfc-only__L-tm-e3-log-refused.py", line 265, in <dictcomp>
+    return {os.path.relpath(p, REPO).replace("\\", "/"): hashlib.sha256(open(p, "rb").read()).hexdigest() for p in RECORD_OUT}
+                                                                        ^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\octav\\AppData\\Local\\Temp\\claude\\Z--FAC-TUBerlin-THESIS-TaxoArena\\7c10e5cb-d16b-4a0e-864a-f3a6151d835b\\scratchpad\\v4drv7\\fake_repo_empty\\experiment_results\\vote_frame_cert.json'
+[rc 1] expected rc 1; must contain ["[E3] REFUSED: --e3-log is the vfc leg's"]; must not contain [] -> DOES NOT MEET

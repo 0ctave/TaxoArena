@@ -1,0 +1,271 @@
+{
+  "id": "ROUTER-CLEAN-POLICY",
+  "title": "ROUTER-CLEAN-POLICY: does the deployed union router still beat the best single model when every policy is fitted on the TRAIN side of the split of record (15,124) and scored on all 6,482 EVAL questions of paeec37aa28063c75, with an interval that carries the policy's own variance? (zero calls; the re-read of MC-E2E / MC-SEEDS / MC-LEAF on the split of record)",
+  "question": "multicorpus_router_e2e.py fits every policy on its own random split's train (L86-L101) and only then restricts test to the clean pool (L114-L117), so 4,536 / 4,509 / 4,568 of the 6,482 paeec EVAL questions (seeds 42 / 137 / 2048) sat on the policy-fitting side; its bootstrap (L118) resamples questions with the policy fixed; L45 has no Meta-Llama-3-70B-Instruct assertion. Re-read the deployed gain, the paired source-vs-domain and leaf-vs-domain contrasts, a placebo negative control and the policy-variance share on the split of record (cost_axes_ingest.py's form). [ID-ONLY 2026-09-23 (CLAIMS-SWEEP-BRACKETS, registrar): pool union paeec37aa28063c75; verified by id only, not by content; reviewed twins on this pool (reviews 1df2cf1, 8ebfa7a): 471 ids / 427 texts exact, 478 / 432 norm-v1 (GPQA 288, MMLU-Pro 185, MATH 3, BBH 2); see docs/judge_v2_program.md L14280-L14340 (CONTENT-DISJOINT-SPLIT-AUDIT) and L14455-L14487 (SPLIT-FOLLOWUPS).]",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "2bc6184 (the registration commit; it adds this record and the programme section, and precedes all code: no script exists for this test at 2bc6184)",
+    "program_lines": "docs/judge_v2_program.md L12710-L12909 (heading at L12710)",
+    "program_lines_as_of": "2bc6184 (the registration commit); spans re-verified by sed at 88a95d8; resolve by the quoted heading, not by the line number",
+    "heading": "## Registered 2026-09-23 (before any code or call) — ROUTER-CLEAN-POLICY: does the deployed union router still beat the best single model when every policy is fitted on the TRAIN side of the split of record and scored on all 6,482 EVAL questions, with an interval that carries the policy's own variance? (zero calls; the re-read of MC-E2E / MC-SEEDS / MC-LEAF on the split of record)",
+    "date": "2026-09-23"
+  },
+  "script": {
+    "path": "tools/analysis/router_clean_policy.py (MERGED on main at 44806d2, content-identical to d99c59d)",
+    "sha16": "blob:2a7265299d945bac62cfc77c33077ae15409df14 / sha256-lf16:f3161e795b8baa1d / sha256-crlf16:393d386c8222d79e",
+    "commit": "44806d2"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_router_clean_policy.md",
+    "commit": "d0a2304",
+    "verdict": "READY-WITH-CONDITIONS (supersedes NOT READY ea09f3b)",
+    "script": "tools/analysis/router_clean_policy.py at d99c59d, blob:2a7265299d945bac62cfc77c33077ae15409df14 / sha256-lf16:f3161e795b8baa1d / sha256-crlf16:393d386c8222d79e",
+    "conditions": "READY-WITH-CONDITIONS d0a2304 (docs/reviews/READY_router_clean_policy.md; supersedes NOT READY ea09f3b), for tools/analysis/router_clean_policy.py at d99c59d, blob:2a7265299d945bac62cfc77c33077ae15409df14 / sha256-lf16:f3161e795b8baa1d / sha256-crlf16:393d386c8222d79e (the review's 'LF sha16 2a7265299d945bac' is the GIT BLOB prefix, not sha256 of the LF bytes). CONDITIONS: (C1) if trigger T2 (C0 FAILED) fires, the REGISTRAR quotes the lift condition VERBATIM from ruling (a) (programme L13644-L13689): \"THE PRE-EMPTION IS NOT LIFTED WITHIN THIS RUN: a reading of those criteria requires the reviewer's written finding of which instrument is wrong AND a dated registration amendment, committed before any re-read, that names the defect and, if the defect is in this instrument, the fix and its new script sha.\"; the instrument's printed NOT LIFTED line is a shortened wording and is NOT the text of record. (C2) the run-operator quotes the printed script-identity line. (C3) the embeddings_cache.db WAL was checkpointed (adac0c8) and no longer blocks; every input's -wal is still checked at launch. (C4) the numbers review re-measures DEFF, n_eff and MDE beside C1 and C4. LOW GAPS, to fix if the file is touched again: the NOT_LIFTED wording and its selftest literal; checks for the two R4 lines; a mode_run C4 zero-variance case; the WAL recheck done only at launch and prefix.",
+    "supersession_chain": "ea09f3b (NOT READY; script at db0b653, sha16 4be26482ff2a6307 as relayed, kind unstated) -> d0a2304 (READY-WITH-CONDITIONS; d99c59d)"
+  },
+  "go": "n/a: ZERO judge calls, far below the 4,000-match rule; no plan amendment is owed. The author's standing authorisation of 2026-09-23 to schedule and start further tests without waiting for approval (relayed by the orchestrator) is recorded as the DECISION TO SCHEDULE. Operational gates: an instrument written against this registration, a committed adversarial-reviewer READY, a zero-call --dry-run that writes nothing, and a run outside any construction window (rule 7).",
+  "run": {
+    "outcome_file": "experiment_results/multicorpus/router_clean_policy_outcome.txt (working-tree sha256 29fbea6cfa9c9f5c8c6f8b40ba8c10bfe84de98a440ececbd80ad73c77d9602f)",
+    "outcome_commit": "2f53675",
+    "calls": 0,
+    "cce": 0,
+    "pool": "paeec37aa28063c75",
+    "date": "2026-09-23",
+    "script": "blob:2a7265299d945bac62cfc77c33077ae15409df14 / sha256-lf16:f3161e795b8baa1d (merged 44806d2)"
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-23_router_clean_policy_post.md",
+    "commit": "21c4fda",
+    "verdict": "all outcome claims CONFIRMED by independent recomputation; READY condition C4 discharged by the reviewer's re-measurement; D1-D6, none moves a verdict"
+  },
+  "criteria": [
+    {
+      "id": "C0",
+      "text": "CROSS-INSTRUMENT REPRODUCTION: best single (TRAIN argmax, Qwen2.5-72B-Instruct) 0.5912 and the TRUE (source, domain) policy 0.6220 on the 6,482 reproduced to 4 dp (COST-AXES-INGEST, cost_axes_ingest.txt L211-L213). HELD iff both equal and the best single is Qwen2.5-72B-Instruct; FAILED otherwise. SCOREABLE (deterministic). [RULED 2026-09-23: C0 FAILED is registered trigger T2, not lifted within the run.]",
+      "result": "HELD",
+      "value": "Qwen2.5-72B-Instruct 0.5912; TRUE s/d 0.6220",
+      "denominator": "6,482 EVAL questions; 52 strata"
+    },
+    {
+      "id": "C1",
+      "text": "THE DEPLOYED GAIN G = acc(PRED source/domain) - acc(best single). Deciding: the TWO-STAGE bootstrap interval (TRAIN resampled within stratum with every policy re-fitted, EVAL resampled within stratum; point +- 1.96 x SE; B 2000, seed 42). BAR 0. HELD iff wholly above 0; FAILED iff wholly below; UNDETERMINED iff it contains 0. The point decides nothing; the i.i.d., percentile and 52-cell clustered intervals are printed beside. SCOREABLE (MDE 1.75pp at planning DEFF 1.5; prediction +2.4pp; break-even DEFF 2.83). The 52-cell clustered reading: DESCRIPTIVE-ONLY (MDE 2.86pp). [RULED 2026-09-23: pre-empted by T1 (C4 FAILED) or T2 (C0 FAILED), each registered.]",
+      "result": "HELD",
+      "value": "G +2.92pp, two-stage [+1.81, +4.02]; percentile [+1.47, +3.72]; support re-measured BY THE REVIEWER (D4): DEFF 1.31-1.37, n_eff ~4,700-4,900, MDE 1.6pp; content-twin sensitivity +2.68 to +3.40, all above 0",
+      "denominator": "6,482 EVAL questions in 52 fixed strata (Kish mean stratum size 197.3); policies on 15,124 TRAIN questions"
+    },
+    {
+      "id": "C2",
+      "text": "PRED(source, domain) - PRED(source), paired, same deciding form, bar 0. DESCRIPTIVE-ONLY BY SUPPORT (MDE 1.54pp vs prediction +1.3pp): printed and chipped DESCRIPTIVE, no HELD / FAILED recorded. [RULED 2026-09-23: pre-empted by T1 (C4 FAILED) or T2 (C0 FAILED), each registered.]",
+      "result": "DELIVERED",
+      "value": "DESCRIPTIVE: +1.87pp [+0.82, +2.91]",
+      "denominator": "6,482"
+    },
+    {
+      "id": "C3",
+      "text": "PRED leaf - PRED(source, domain), paired, same deciding form, bar 0. DESCRIPTIVE-ONLY BY SUPPORT (MDE 1.19pp vs prediction -0.7pp); printed beside MC-LEAF's -0.9 +- 0.3pp. [RULED 2026-09-23: pre-empted by T1 (C4 FAILED) or T2 (C0 FAILED), each registered.]",
+      "result": "DELIVERED",
+      "value": "DESCRIPTIVE: -0.09pp [-1.09, +0.91]; the point is its most favourable reading (replicate mean -0.78, percentile [-1.87, +0.19]; D3)",
+      "denominator": "6,482"
+    },
+    {
+      "id": "C4",
+      "text": "NEGATIVE CONTROL (replacing the proposal's MMLU-Pro +0.000 control, whose null is false on the union roster): the 52 TRUE labels permuted across all 21,606 questions (Random(42), sizes kept), per-pseudo-stratum argmax on TRAIN scored on EVAL; FAILED iff the placebo gain's two-stage interval lies wholly above 0; HELD otherwise. SCOREABLE AS A NEGATIVE CONTROL against a manufactured gain >= 1.75pp. [RULED 2026-09-23: C4 FAILED is registered trigger T1.]",
+      "result": "HELD",
+      "value": "placebo -0.59pp [-1.51, +0.33]; the permutation distribution is centred at -0.52pp (SD 0.31, 200 seeds), and the control certifies the fit-and-score code, not the routing path (D5)",
+      "denominator": "6,482"
+    },
+    {
+      "id": "R3",
+      "text": "REPLACEMENT FOR MC-SEEDS CRITERION (3) (unmeasurable with the split pinned; also non-discriminating as written, since the range of three normal draws falls below one SD only about 26% of the time): the policy-variance share phi = Var(G | TRAIN resampled, EVAL fixed) / Var(G | two-stage). HELD iff phi < 0.5, FAILED iff >= 0.5; the point decides (Monte-Carlo error printed). SCOREABLE. [RULED 2026-09-23: pre-empted by T1 (C4 FAILED) or T2 (C0 FAILED), each registered.]",
+      "result": "HELD",
+      "value": "phi 0.3065 (variances 9.67e-6 / 3.16e-5; D1)",
+      "denominator": "the 2,000 two-stage and 2,000 TRAIN-only replicates"
+    },
+    {
+      "id": "R4",
+      "text": "DESCRIPTIVE: metadata cost M = acc(TRUE source/domain) - acc(PRED source/domain) with its two-stage interval; every arm with its i.i.d. and two-stage SE; per source; the MMLU-Pro-source subset of C1 (3,609 questions). [RULED 2026-09-23: pre-empted by T1 (C4 FAILED) or T2 (C0 FAILED), each registered.]",
+      "result": "DELIVERED",
+      "value": "DESCRIPTIVE: M +0.17pp [-0.61, +0.95]; MMLU-Pro subset +0.86pp [-0.54, +2.26]; ORC +3.09pp [+1.98, +4.19]",
+      "denominator": "6,482"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "G = +2.4pp, interval [+1.0, +3.6] (COST-AXES-INGEST's OOS TRUE-cell gain +3.08pp on this split minus MC-E2E's clean mean metadata cost +0.71pp) [ID-ONLY 2026-09-23 (CLAIMS-SWEEP-BRACKETS, registrar): pool union paeec37aa28063c75; verified by id only, not by content; reviewed twins on this pool (reviews 1df2cf1, 8ebfa7a): 471 ids / 427 texts exact, 478 / 432 norm-v1 (GPQA 288, MMLU-Pro 185, MATH 3, BBH 2); see docs/judge_v2_program.md L14280-L14340 (CONTENT-DISJOINT-SPLIT-AUDIT) and L14455-L14487 (SPLIT-FOLLOWUPS).]",
+      "result": "HELD",
+      "value": "2.92 in [1.0, 3.6]",
+      "denominator": "6,482"
+    },
+    {
+      "id": "P2",
+      "text": "C2 contrast +1.3pp [+0.3, +2.5]",
+      "result": "HELD",
+      "value": "1.87 in [0.3, 2.5]",
+      "denominator": "6,482"
+    },
+    {
+      "id": "P3",
+      "text": "C3 contrast -0.7pp [-1.5, +0.2]",
+      "result": "HELD",
+      "value": "-0.09 in [-1.5, 0.2]",
+      "denominator": "6,482"
+    },
+    {
+      "id": "P4",
+      "text": "placebo gain -0.3pp [-1.0, +0.2]",
+      "result": "HELD",
+      "value": "-0.59 in [-1.0, 0.2]",
+      "denominator": "6,482"
+    },
+    {
+      "id": "P5",
+      "text": "phi = 0.15 [0.03, 0.40]",
+      "result": "HELD",
+      "value": "0.31 in [0.03, 0.40]",
+      "denominator": "bootstrap replicates"
+    },
+    {
+      "id": "P6",
+      "text": "C0 HELD: 0.5912 and 0.6220 to 4 dp, best single Qwen2.5-72B-Instruct",
+      "result": "HELD",
+      "value": "C0 HELD",
+      "denominator": "6,482"
+    },
+    {
+      "id": "P7",
+      "text": "M = +0.7pp [-0.3, +1.6]",
+      "result": "HELD",
+      "value": "0.17 in [-0.3, 1.6]",
+      "denominator": "6,482"
+    }
+  ],
+  "falsifier": {
+    "text": "IF C1 IS NOT HELD, MC-E2E criterion (1) and FRAMEWORK L180's '+3.38pp mean' are OVERTURNED as evidence of a real deployed gain on the split of record, and the RESTATED 2026-09-23 bracket's 'PENDING ROUTER-CLEAN-POLICY' clause is discharged by a bracket withdrawing the gain claim. IF C1 HELD, +3.38pp is REPLACED by bracket with this test's point and two-stage interval, and +0.71pp by R4's M. IF C4 FAILS, every number of the test is void. NOT OVERTURNED: the routing accuracies (96.2% / 81.3%; MC-ROOT 81.58%), MC-ROUTER, ROUTER-REGRET-MMLU, the A1 bound, any judged result; C2 and C3 are DESCRIPTIVE-ONLY and overturn nothing. [OUTCOME 2026-09-23: C1 HELD; not fired; the PENDING clause of FRAMEWORK L180 discharged by the correction bracket.]",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "split_of_record": "TRAIN 15,124 outside paeec37aa28063c75; EVAL 6,482 (cost_axes_ingest.py L43 / L179 / L206)",
+    "defect_counts": "paeec EVAL questions on the policy-fitting side: 4,536 / 4,509 / 4,568 at seeds 42 / 137 / 2048 (6,482 minus the clean kept counts 1,946 / 1,973 / 1,914 printed in router_e2e_mathfix_clean.txt)",
+    "record_mismatch_found": "MC-E2E criterion (3)'s 'spread 1.56pp vs within-seed SE 0.53pp' (and FRAMEWORK L180's RESTATED bracket beside the clean +3.38pp) are the first readout's (router_e2e.txt 0.0156 vs 0.0053); the clean MATH-FIX file prints 0.0194 vs 0.0093; verdict (3) FAILED unchanged",
+    "deployed_gain": "+2.92pp (0.5912 -> 0.6203), two-stage [+1.81, +4.02]; clustered [+1.49, +4.34] descriptive",
+    "support_remeasured": "DEFF 1.31-1.37, n_eff ~4,700-4,900, MDE 1.6pp (the reviewer's re-measurement; the instrument keeps no replicates)",
+    "oracle_gain": "+3.09pp [+1.98, +4.19]",
+    "metadata_cost": "M +0.17pp [-0.61, +0.95] (neither cost nor parity shown; MDE ~1.1pp)",
+    "contrasts": "C2 +1.87pp [+0.82, +2.91] descriptive; C3 -0.09pp [-1.09, +0.91] descriptive (replicate mean -0.78)",
+    "placebo": "-0.59pp [-1.51, +0.33]; null distribution centred at -0.52pp (SD 0.31)",
+    "phi": "0.3065 (9.67e-6 / 3.16e-5)",
+    "mmlu_pro_subset": "+0.86pp [-0.54, +2.26], n 3,609",
+    "concentration": "BBH +1.96 of +2.92pp; MuSR +0.46; MMLU-Pro +0.48; IFEval +0.15; GPQA -0.08; MATH -0.06",
+    "content_twins": "471 EVAL ids (478 normalised; 427 distinct texts) have a TRAIN twin; GPQA 288 of 358; = blocker A1's 427",
+    "twin_sensitivity": "EVAL minus twins +3.28 [+2.12, +4.44]; TRAIN minus twins +2.68 [+1.62, +3.75]; both +3.40 [+2.26, +4.54]"
+  },
+  "sentence_of_record": "ROUTER-CLEAN-POLICY (2f53675; recomputed independently in this review). On the split of record, the per-cell model policies were fitted on the 15,124 TRAIN questions outside pool paeec37aa28063c75 and scored on all 6,482 EVAL questions in the 52 fixed (source, domain) strata: 18 open-weight leaderboard models, key-scored, MATH-FIX labels. Choosing the TRAIN-best model for the (source, domain) cell PREDICTED by the federated union tree beats the single TRAIN-best model (Qwen2.5-72B-Instruct, 0.5912 → 0.6203) by +2.92pp. The two-stage 95% interval is [+1.81, +4.02]; it re-fits the policy on every replicate (measured DEFF 1.31-1.37, n_eff ≈ 4,700-4,900, MDE 1.6pp). The tree reads that cell from the nearest of 143 leaf centroids, and its depth-1/2 anchors ARE the 52 designed strata. The same policy on the TRUE labels gains +3.09pp [+1.98, +4.19], so the gain is the per-cell model choice over SUPPLIED cells. Reading the cell from the tree instead of the declared label changes accuracy by M = +0.17pp [−0.61, +0.95]. That is not distinguishable from zero at this support (MDE ≈ 1.1pp), and neither a cost nor parity is shown. About two thirds of the gain comes from BBH (+1.96 of +2.92pp), and on the MMLU-Pro source alone it is +0.86pp [−0.54, +2.26]. It survives removing the 478 EVAL questions with a TRAIN text twin (+3.28 [+2.12, +4.44]). It replaces MC-E2E's +3.38pp and +0.71pp, whose policies were fitted partly on reserved questions.",
+  "chips": [
+    "C1 HELD (+2.92pp [+1.81, +4.02])",
+    "C0 / C4 / R3 HELD; P1-P7 HELD",
+    "C2 / C3 / R4 DESCRIPTIVE",
+    "SPLIT DISJOINT BY ID, NOT BY CONTENT (471 EVAL twins); C1 SURVIVES TWIN REMOVAL",
+    "PLACEBO NULL CENTRED AT -0.52pp; CERTIFIES FIT-AND-SCORE, NOT ROUTING",
+    "BBH CARRIES ~2/3 OF THE GAIN",
+    "REPLACES MC-E2E +3.38 / +0.71"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-23",
+      "by": "the registrar (ledger v134 commit; insertion only, zero calls)",
+      "text": "registration.commit resolved from PENDING to 2bc6184 and ledger.version from PENDING to v134; nothing else in this record moves."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the coordinator's relay of the build at db0b653, before any real-data run (insertion only, zero calls)",
+      "text": "Four builder readings ruled (programme L13644-L13689): (a) C4-FAILED (T1) and C0-FAILED (T2) REGISTERED as pre-empting triggers, evaluated after the refusal gates and before any verdict expression; T2 is not lifted within the run. (b) predictions HELD iff the point lies in the closed interval; P6 HELD iff C0 HELD; pre-empted predictions UNDETERMINED (except P4 and P6 under T1). (d) embeddings_cache.db read mode=ro without immutable=1, admitted provided a non-empty -wal refuses at launch; standing rule: a non-empty -wal beside any input refuses, whatever the open mode. (e) zero two-stage variance = refusal gate G4. State registered -> built."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar (insertion only, zero calls)",
+      "text": "embeddings_cache.db's non-empty WAL (5,537,312 bytes, T1b build 04:34) was audited content-neutral and checkpointed (TRUNCATE) by the coordinator after a backup; the -wal is 0 bytes; nothing any reader sees moved (programme L14004-L14032). The standing non-empty-WAL launch refusal no longer blocks this test on that file; every input's -wal is still checked at launch."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar (insertion only, zero calls)",
+      "text": "READY-WITH-CONDITIONS d0a2304 recorded (supersedes NOT READY ea09f3b); MERGED at 44806d2 (blob:2a7265299d945bac62cfc77c33077ae15409df14 / sha256-lf16:f3161e795b8baa1d / sha256-crlf16:393d386c8222d79e, verified by the registrar with git rev-parse and sha256); state built -> running (a second run-operator, alongside the BFCL SWAP run on different DBs). T2's lift condition of record, to be quoted verbatim if T2 fires: \"THE PRE-EMPTION IS NOT LIFTED WITHIN THIS RUN: a reading of those criteria requires the reviewer's written finding of which instrument is wrong AND a dated registration amendment, committed before any re-read, that names the defect and, if the defect is in this instrument, the fix and its new script sha.\" The earlier script pin in this record ('4be26482ff2a6307, LF, as relayed') named no verifiable hash kind; PINS MUST NAME THEIR HASH KIND from now on (standing rule, CONTEXT.md section 4 rule 8 bracket)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the post-run review 21c4fda (insertion only, zero calls)",
+      "text": "OUTCOME recorded (programme L14145-L14199): C0, C1, C4, R3 HELD; C2, C3, R4 DESCRIPTIVE; P1-P7 HELD; READY C4 discharged by the REVIEWER's re-measurement (the instrument keeps no replicates, D4). D1-D6 applied; the FRAMEWORK L180 and plan L25 restatement corrected by the reviewer's bracket; CONTENT-DISJOINT-SPLIT-AUDIT queued HIGH."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on CONTENT-DISJOINT-SPLIT-AUDIT (review 1df2cf1; insertion only, zero calls)",
+      "text": "Route (c) of CONTENT-DISJOINT-SPLIT-AUDIT: the policy fit on the union train side carries the 471-id content duplication (already its D2; twin-removal sensitivity +2.68 to +3.40, all above 0)."
+    }
+  ],
+  "does_not_show": [
+    "Discovery, or that \"the taxonomy earns its place\". The 52 cells are supplied as registered anchors (mc6_s42.toml L4-5; union_s42_flatleaf.toml L10-12). C1 measures filing arrivals into a given address space plus a per-cell argmax. The test of discovery is UNION-AF-ROUTE, which has not run.",
+    "\"Inferring the cell costs nothing.\" M's interval contains 0 but reaches +0.95pp, and the MDE is about 1.1pp. A cost below about 1pp is neither excluded nor shown.",
+    "\"Leaves match domains\" or \"leaves lose\". C3 is DESCRIPTIVE with an interval that contains 0, and its replicate mean is -0.78pp (D3). MC-LEAF's -0.9 +- 0.3pp (i.i.d., [FLAG 2026-09-15]) is not reproduced as a decided result. Policies stay indexed by (source, domain).",
+    "That domain-level policies beat source-level ones as a decided result. C2 is DESCRIPTIVE-ONLY by support, even though its interval lies above 0.",
+    "A gain that is broad across corpora. BBH carries about 67% of G, and MMLU-Pro, GPQA and MATH do not individually show a gain.",
+    "Generalisation to new benchmark cells. The 52-cell clustered reading is DESCRIPTIVE-ONLY and structurally floored.",
+    "Seed stability. The split is pinned. R3 says the policy's resampling variance is about 30% of the total (phi 0.30-0.31 < 0.5); that is a different question from seed stability.",
+    "A tree built clean. The A1 content twins remain in the tree. The sensitivity above bounds their effect on C1 empirically, but it is not a clean rebuild.",
+    "Any judged, preference, cost, latency or frontier claim. Nor any claim against models outside this 18-model roster."
+  ],
+  "ledger": {
+    "row_id": "ROUTER-CLEAN-POLICY",
+    "version": "v134 (2026-09-23; a PLAN-chip registration row in section 7, newest first, inserted before GUARD-22-RENAME-PROOF; audit OK, 232 rows). The adjudicated observed cell is written with the outcome, not now. [UPDATED 2026-09-23 at ledger v156: adjudicated - PLAN chips replaced by outcome chips and an outcome bracket inserted.]"
+  },
+  "depends_on": [
+    "MC-E2E",
+    "MC-LEAF",
+    "MC-ROUTER",
+    "COST-AXES-INGEST",
+    "ROUTER-REGRET-MMLU",
+    "UNION-PROFILE-HOME",
+    "MC-ROOT",
+    "SPLIT-FUNCTION-IMPL"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing and reopens nothing (CONTEXT.md section 5 checked: no rubric, reference, sub-anchor profile, frontier, escalation, single / selective order or temperature line is touched). C3 re-reads the recorded MC-LEAF result on the split of record; 'policies are indexed by (source, domain), never by leaf' is a FRAMEWORK rule, not a closed line, and no leaf policy is proposed."
+  },
+  "queue_items": [
+    "ROUTER-CLEAN-POLICY"
+  ],
+  "support": {
+    "deciding_denominator": "6,482 EVAL questions of paeec37aa28063c75 in 52 fixed strata; sum n^2 1,279,118; Kish mean stratum size 197.3; TRAIN 15,124",
+    "deff_and_source": "i.i.d. SE of G 0.0051 MEASURED at n 6,481 (router_e2e_mathfix.txt), TRANSPORTED at equal n; two-stage DEFF 1.5 planning / 2.5 pessimistic, DECLARED PILOT; 52-cell clustered DEFF 4.0 / 8.0 DECLARED PILOT; C2 i.i.d. SE 0.0045 DECLARED PILOT; C3 i.i.d. SE 0.003 MEASURED (MC-LEAF) with two-stage DEFF 2.0 DECLARED",
+    "n_eff": "C1 4,321 (pessimistic 2,593); clustered 1,620; C3 3,241",
+    "se_arithmetic": "C1 0.0051 x sqrt(1.5) = 0.00625 (pess. 0.00806); clustered 0.0051 x 2 = 0.0102; C2 0.0045 x 1.2247 = 0.00551; C3 0.0030 x sqrt(2) = 0.00424",
+    "mde_80": "C1 1.75pp (pess. 2.26); clustered 2.86pp; C2 1.54pp; C3 1.19pp; C4 1.75pp",
+    "verdict_lines": "C1 SCOREABLE (2.4 > 1.75; break-even DEFF 2.83); clustered reading DESCRIPTIVE-ONLY; C2 DESCRIPTIVE-ONLY; C3 DESCRIPTIVE-ONLY; C4 SCOREABLE AS A NEGATIVE CONTROL; R3 SCOREABLE; C0 SCOREABLE",
+    "structural": "pool closed, n fixed; C1 reachable if G >= 1.75pp; the 52-cell clustered reading has a floor set by between-cell heterogeneity at any budget"
+  },
+  "sources": [
+    "docs/judge_v2_program.md, this registration section (the heading quoted in registration.heading)",
+    "tools/analysis/multicorpus_router_e2e.py at c052e79, L45, L86-L101, L114-L118 (read by the registrar)",
+    "tools/analysis/cost_axes_ingest.py at c052e79, L43, L179, L194, L206",
+    "experiment_results/multicorpus/router_e2e_mathfix_clean.txt (kept counts 1,946 / 1,973 / 1,914; clean per-seed arms; spread 0.0194 vs 0.0093)",
+    "experiment_results/multicorpus/router_e2e_mathfix.txt (i.i.d. SE 0.0051 / 0.0051 / 0.0050 at n 6,481)",
+    "experiment_results/multicorpus/router_e2e.txt (spread 0.0156 vs 0.0053, the first readout)",
+    "experiment_results/x12_crossdomain/cost_axes_ingest.txt L195-L196, L208-L217 (two-stage legs; 0.5912 / 0.6220)",
+    "experiment_results/multicorpus/profile_interval_all_union.txt L18-L69 (52-stratum n table)",
+    "experiment_results/multicorpus/union_profile_home_outcome.txt L200 (MMLU-Pro stratum argmax)",
+    "docs/agents/results/MC-E2E.json, MC-LEAF.json, MC-ROUTER.json, COST-AXES-INGEST.json, ROUTER-REGRET-MMLU.json",
+    "docs/design/FRAMEWORK.md L179-L180 (the RESTATED 2026-09-23 bracket and its PENDING clause)",
+    "docs/agents/queue.json item ROUTER-CLEAN-POLICY (cost, lane, rank: the experiment-manager's)"
+  ],
+  "last_update": "2026-09-23",
+  "plain_description": {
+    "sq": "SQ1 Use",
+    "what": "It re-measured the gain from choosing the best model per cell (cell = benchmark x domain, predicted by the tree), compared with always using the single best model. Policies were fitted only on training questions and scored on all 6,482 held-out questions, with an interval that includes policy-fitting noise.",
+    "why": "The earlier gain (+3.38 points) had been fitted partly on held-out questions, so it needed a clean re-read.",
+    "information": "A clean positive gain supports per-cell routing as useful. No gain would withdraw the claim. Result: done. Per-cell choice beats the single best model by +2.9 points (95% interval +1.8 to +4.0), replacing the old figure. The cells are supplied (declared), not discovered, so this is not evidence that the taxonomy was discovered. About two thirds of the gain comes from BBH, and MMLU-Pro alone shows no clear gain. Reading the cell from the tree instead of the true label changes accuracy by an amount not distinguishable from zero (a cost below about 1 point is neither shown nor excluded).",
+    "written": "2026-10-07"
+  }
+}

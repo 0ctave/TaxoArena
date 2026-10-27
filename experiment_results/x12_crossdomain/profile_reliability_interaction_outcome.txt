@@ -1,0 +1,102 @@
+pool of record: p2dca21ab5f4ef3ae
+=== PROFILE-RELIABILITY-INTERACTION: the model- AND anchor-demeaned split-half R on the 14 MMLU-Pro anchors, key and judge ===
+  registered 2026-09-18 (commit 954e829); zero calls; caches mode=ro; RUN
+
+--- DATA CHECK (the object, before any stratum is read) ---
+  x12 cache stack_v2_promptv2_x12all.db: 9142 valid verdicts (pinned 9142)
+  x20 cache stack_v2_promptv2_x20.db: 12394 valid verdicts (pinned 12394); never read alone
+  eval_results roster minus Meta-Llama-3-70B-Instruct: 46 models (pinned 46); ARENA12 subset: True
+  pool p2dca21ab5f4ef3ae: 2811 judged questions all in the reserved pool; 14 anchors, counts equal to the recorded run's
+  anchors (judged q): Philosophy 132, Psychology 260, Economics 178, Other 211, Business 174, Math 304, Computer science 162, Law 271, Health 129, Biology 181, History 119, Chemistry 269, Engineering 162, Physics 259
+  key rows missing on the judged questions, by model: {'arx_0314': 5, 'deepseek': 3, 'gemini-1.5-flash-002': 5, 'gemini-1.5-pro-002': 3, 'gemini-3.1-pro_5-shots': 2, 'iask_pro': 27, 'sonnet_0shots_12_01_18': 98}
+
+=== C0 (before any number is read): per-anchor mean of each judge half-profile over its models ===
+  J1: max |per-anchor mean| over 40 halvings x 2 halves x 14 anchors = 4.071e-16; balanced (every model in every anchor's half): True
+      first halving: Philosophy (-1.3e-16, +5.6e-17), Psychology (+1.1e-16, -1.3e-16), Economics (+0.0e+00, +7.4e-17), Other (+9.3e-17, +5.6e-17), Business (+5.6e-17, -4.6e-17), Math (-5.6e-17, +1.9e-16), Computer science (+1.1e-16, +1.9e-17), Law (+3.7e-17, -1.5e-16), Health (-1.5e-16, -3.7e-17), Biology (+9.3e-17, -3.0e-16), History (-3.7e-17, +1.4e-16), Chemistry (-7.4e-17, -1.9e-17), Engineering (-5.6e-17, -1.9e-17), Physics (+1.5e-16, +1.7e-16)
+      max |r_model-only - r_interaction-only| over the halvings: 3.331e-16
+  J2: max |per-anchor mean| over 40 halvings x 2 halves x 14 anchors = 3.997e-16; balanced (every model in every anchor's half): True
+      first halving: Philosophy (+5.6e-17, -1.1e-16), Psychology (-3.3e-17, +1.0e-16), Economics (+0.0e+00, +3.3e-17), Other (-1.9e-16, +3.3e-17), Business (-1.1e-17, -2.2e-17), Math (-1.1e-17, +5.6e-17), Computer science (+1.1e-17, -6.7e-17), Law (-1.7e-16, -1.1e-16), Health (+6.7e-17, +1.2e-16), Biology (+5.6e-17, +1.1e-17), History (-6.7e-17, -1.7e-17), Chemistry (+3.3e-17, -3.3e-17), Engineering (-8.9e-17, +0.0e+00), Physics (-1.1e-17, -5.6e-17)
+      max |r_model-only - r_interaction-only| over the halvings: 5.551e-16
+  C0 STATEMENT: the per-anchor Bradley-Terry fit (rj.mm_fit) centres theta over the models of the fit by construction
+  (theta_m - mean_m theta), so every judge half-profile has anchor mean 0 and the anchor-demeaning step subtracts
+  0 from every point (after model-demeaning the anchor means equal minus the grand mean, itself 0). The judge legs'
+  interaction-only R therefore EQUALS the recorded model-demeaned R by IDENTITY. No 'fall' exists to report.
+  K12 (key, for contrast): max |per-anchor mean| = 0.7027 (anchor difficulty; the demeaning removes it)
+  K46 (key, for contrast): max |per-anchor mean| = 0.7046 (anchor difficulty; the demeaning removes it)
+
+=== C1: interaction-only R per leg, with the leave-one-anchor-out jackknife (re-halved primary; fixed beside) and the halving SD ===
+  instrument: profile_reliability.reliability under --interaction-only (demean_two_way) on the same 40 halvings (Random(7));
+  KEY DENOMINATOR: each anchor's JUDGED questions (2,811 of pool p2dca21ab5f4ef3ae, 119-304 per anchor), halved; R = Spearman-Brown of the mean r.
+  McNEMAR-ESTABLISHED RULE: no wrong-direction count exists here (nothing is compared to the key's direction); stated, not applied.
+  leg  demean          r    R(SB)   halvSD  jk RE-HALVED 95%   jk FIXED 95%       | recorded     diff recorded jk           repro gate
+  K12  model      0.8408   0.9135   0.0239  [0.8706, 0.9565]   [0.8727, 0.9544]   | 0.9135    +0.0000 [0.8706, 0.9565]        yes REPRODUCTION GATE
+  K12  both       0.7644   0.8665   0.0220  [0.8000, 0.9330]   [0.7979, 0.9351]   | -               - -                           
+       key, 12 models (ARENA12; the roster of the recorded 0.9135) - LEG OF RECORD
+  K46  model      0.8479   0.9177   0.0202  [0.8740, 0.9614]   [0.8761, 0.9594]   | -               - -                           
+  K46  both       0.6832   0.8118   0.0183  [0.7254, 0.8983]   [0.7278, 0.8958]   | -               - -                           
+       key, 46 models (every eval_results model minus Meta-Llama-3-70B-Instruct) - beside, not the leg of record
+  K20  model      0.8415   0.9139   0.0226  [0.8705, 0.9573]   [0.8694, 0.9584]   | 0.9139    +0.0000 [0.8705, 0.9573]        yes 
+  K20  both       0.7228   0.8391   0.0208  [0.7760, 0.9021]   [0.7678, 0.9103]   | -               - -                           
+       key, 20 models (the merged board's roster; recorded 0.9139) - beside
+  J1   model      0.5069   0.6728   0.0443  [0.4932, 0.8524]   [0.5108, 0.8348]   | 0.6728    -0.0000 [0.4932, 0.8524]        yes REPRODUCTION GATE
+  J1   both       0.5069   0.6728   0.0443  [0.4932, 0.8524]   [0.5108, 0.8348]   | -               - -                           
+       x12 judge board, 12 rows (recorded 0.6728)
+  J2   model      0.5604   0.7183   0.0300  [0.6076, 0.8291]   [0.6102, 0.8264]   | 0.7183    +0.0000 [0.6076, 0.8291]        yes REPRODUCTION GATE
+  J2   both       0.5604   0.7183   0.0300  [0.6076, 0.8291]   [0.6102, 0.8264]   | -               - -                           
+       MERGED judge board, 20 rows, x20_merged rows (recorded 0.7183 [0.6076, 0.8291])
+  reproduction gate (0.9135 / 0.6728 / 0.7183 to 4 dp on the fixed halvings): K12 yes, J1 yes, J2 yes
+  per-anchor leave-one-out R (interaction-only, re-halved), K12 and K46 (which anchors carry the key reading):
+    K12: drop Math 0.8427, drop Chemistry 0.8445, drop Psychology 0.8532, drop Physics 0.8594, drop Other 0.8606, drop Law 0.8615, drop History 0.8658, drop Engineering 0.8664, drop Business 0.8673, drop Economics 0.8681, drop Biology 0.8689, drop Philosophy 0.8695, drop Health 0.8707, drop Computer science 0.8761
+    K46: drop Math 0.7843, drop Chemistry 0.7915, drop Psychology 0.7982, drop Business 0.8001, drop Physics 0.8052, drop Other 0.8078, drop Law 0.8121, drop Engineering 0.8176, drop Economics 0.8182, drop Biology 0.8183, drop Philosophy 0.8201, drop Health 0.8210, drop History 0.8223, drop Computer science 0.8259
+
+=== C2: the no-interaction null Bernoulli(logistic(a_m - d_c)) and the variance decomposition ===
+  K46 table (46 models x 14 anchors; trials per cell 116-304): additive-logit MLE in 9 sweeps, 0 logits clipped
+    a_m range [-1.515, 2.471]; d_c (centred): Philosophy +0.103, Psychology -0.508, Economics -0.623, Other -0.284, Business -0.061, Math +0.316, Computer science +0.001, Law +0.677, Health -0.335, Biology -0.719, History -0.082, Chemistry +0.516, Engineering +0.747, Physics +0.251
+    variance of the accuracy table: model main 0.03512, anchor main 0.00861, interaction 0.00351 (shares 0.74 / 0.18 / 0.07)
+    NULL, 20 tables, model-only instrument: median 0.8968, range [0.8928, 0.9022]  (real 0.9177)
+    NULL, 20 tables, interaction-only:      median 0.2343, range [0.1441, 0.3082]  (real 0.8118; real minus null median +0.5775)
+    UNREGISTERED, beside: probability-additive null (zero accuracy-scale interaction by construction): model-only median 0.8919
+      [0.8872, 0.8984]; interaction-only median 0.0396 [-0.2238, 0.1592] (the sampling floor of the instrument at this cell size)
+  K12 table (12 models x 14 anchors; trials per cell 117-304): additive-logit MLE in 10 sweeps, 0 logits clipped
+    a_m range [-1.511, 2.454]; d_c (centred): Philosophy +0.117, Psychology -0.444, Economics -0.606, Other -0.266, Business -0.105, Math +0.237, Computer science -0.025, Law +0.631, Health -0.269, Biology -0.649, History -0.073, Chemistry +0.494, Engineering +0.735, Physics +0.222
+    variance of the accuracy table: model main 0.05714, anchor main 0.00586, interaction 0.00435 (shares 0.85 / 0.09 / 0.06)
+    NULL, 20 tables, model-only instrument: median 0.8731, range [0.8544, 0.8867]  (real 0.9135)
+    NULL, 20 tables, interaction-only:      median 0.3142, range [0.1806, 0.4683]  (real 0.8665; real minus null median +0.5523)
+    UNREGISTERED, beside: probability-additive null (zero accuracy-scale interaction by construction): model-only median 0.8583
+      [0.8409, 0.8705]; interaction-only median -0.0461 [-0.3094, 0.1338] (the sampling floor of the instrument at this cell size)
+  (a no-LOGIT-interaction table keeps a reproducible accuracy-scale interaction from the logistic curvature, so the null's
+   interaction-only R is not zero by construction; it is the floor the real reading must sit above.)
+
+=== PREDICTIONS AND FALSIFIER (scored on the leg of record K12; K46 beside, labelled) ===
+  --- K12 (LEG OF RECORD): interaction-only R = 0.8665, re-halved jk [0.8000, 0.9330], fixed jk [0.7979, 0.9351], halving SD 0.0220 ---
+    P1  (lane-2 brief, prediction of record) key interaction-only R in [0.80, 0.88]: HELD
+    P1' (night schedule wording)              key interaction-only R in [0.78, 0.88]: HELD
+    P2  key interaction-only R above the 0.70 bar: HELD on the point; class PASS (lower bound rule; re-halved primary)
+    P4  no-interaction null on the model-only instrument <= 0.90: HELD (null median 0.8731, range [0.8544, 0.8867])
+    registrar's addition: null under the interaction-only demeaning <= 0.30 AND real >= 0.50 above it: FAILED (null median 0.3142, real - null +0.5523)
+    FALSIFIER key interaction-only R < 0.70 at the point: silent
+  --- K46 (beside, not the leg of record): interaction-only R = 0.8118, re-halved jk [0.7254, 0.8983], fixed jk [0.7278, 0.8958], halving SD 0.0183 ---
+    P1  (lane-2 brief, prediction of record) key interaction-only R in [0.80, 0.88]: HELD
+    P1' (night schedule wording)              key interaction-only R in [0.78, 0.88]: HELD
+    P2  key interaction-only R above the 0.70 bar: HELD on the point; class PASS (lower bound rule; re-halved primary)
+    P4  no-interaction null on the model-only instrument <= 0.90: HELD (null median 0.8968, range [0.8928, 0.9022])
+    registrar's addition: null under the interaction-only demeaning <= 0.30 AND real >= 0.50 above it: HELD (null median 0.2343, real - null +0.5775)
+    FALSIFIER key interaction-only R < 0.70 at the point: silent
+  --- P3, judge J2 interaction-only R in [0.55, 0.70] on the point ---
+    FAILED-BY-IDENTITY: C0 holds (per-anchor BT theta is centred by construction, max |anchor mean| < 1e-6, table balanced),
+    so J2's interaction-only R = 0.7183 = its model-demeaned R 0.7183 (recorded 0.7183) exactly; J1 0.6728 = 0.6728 (recorded 0.6728).
+    The brief's expectation of a fall was wrong for a structural reason: the demeaning removes nothing from a centred
+    profile. The judge legs carry no falsifier and are read beside their recorded values.
+
+=== VERDICT LINES ===
+  C0: judge half-profiles centred per anchor by construction (identity)
+  C1: K12 interaction-only 0.8665 [0.8000, 0.9330] (model-demeaned 0.9135, recorded 0.9135); K46 0.8118 [0.7254, 0.8983] (model-demeaned 0.9177, no recorded value);
+      J1 0.6728 (= model-demeaned 0.6728, recorded 0.6728); J2 0.7183 [0.6076, 0.8291] (= model-demeaned 0.7183, recorded 0.7183)
+  C2: null (K46) model-only median 0.8968 [0.8928, 0.9022], interaction-only median 0.2343 [0.1441, 0.3082]; variance shares model / anchor / interaction 0.74 / 0.18 / 0.07
+      null (K12) model-only median 0.8731 [0.8544, 0.8867], interaction-only median 0.3142 [0.1806, 0.4683]; shares 0.85 / 0.09 / 0.06
+  P1 HELD | P1' HELD | P2 HELD (PASS) | P3 FAILED-BY-IDENTITY | P4 HELD | registrar's null addition FAILED | FALSIFIER silent   [K12, the leg of record]
+  K46 beside: P1 HELD | P1' HELD | P2 HELD (PASS) | P4 HELD | registrar's addition HELD | falsifier silent
+  REGISTRATION NOTE for the registrar: '(K) the 46-model key ... beside 0.9135' names two rosters; 0.9135 is the 12-model
+  ARENA12 key (profile_reliability.txt line 2; programme L3453). K12 is scored as the leg of record here; a bracket must fix it.
+  CONSEQUENCE (registered): the v113 bracket is answered by insertion (interaction-only 0.8665 beside the 0.9135 in
+  PROFILE-RELIABILITY's row and FRAMEWORK L117); the atlas's key-built rows may say 'profile' with this value beside them.

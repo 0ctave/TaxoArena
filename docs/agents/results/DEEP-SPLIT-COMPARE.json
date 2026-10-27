@@ -1,0 +1,213 @@
+{
+ "id": "DEEP-SPLIT-COMPARE",
+ "title": "DEEP-SPLIT-COMPARE: holding B0's anchors and depth-2 frontier fixed (B0 of lane r2), does a different label-free split rule below depth 2 (flat spherical k-means; PCA-GMM) file EVAL better than the vMF construction, and how much of class-conditioned k-means' edge is label information below depth 2? (zero calls; REGISTERED 2026-10-02)",
+ "question": "Is G13-BREAKDOWN's below-depth-2 loss to KC caused by the SPLIT RULE (a label-free rule recovers the gap) or by LABEL INFORMATION below depth 2 (only class-conditioned k-means recovers it)?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "the commit that writes this record (parent 29ea00ea)",
+  "program_lines": "docs/judge_v2_program.md L23125-L23314",
+  "program_lines_as_of": "the commit that writes them, parent 29ea00ea, re-grepped",
+  "date": "2026-10-02",
+  "heading": "## Registered 2026-10-02 (before any code or call) — DEEP-SPLIT-COMPARE: holding B0's anchors and depth-2 frontier fixed, does a different label-free split rule below depth 2 ...",
+  "provenance": "docs/agents/plans/2026-10-02_deep_split_compare.md §1 (29ea00ea, tree-construction specialist; blob:ec62ddefb46ad01b20abf6ae71851efd9579a4c7, LF), registered as drafted with the registrar's pre-data insertions; the author's go \"yes register the deep split comparison\" (plan Amendment 36); orchestrator Q2 (A not rebuilt at other seeds; seed variance unmeasured, disclosed) and Q3 (C-BIC kept DESCRIPTIVE-ONLY)"
+ },
+ "script": {
+  "path": "tools/analysis/deep_split_compare.py --lane r2",
+  "sha16": "blob:31af4ceaa35fadfaf0bd43acc2a237d85c8ca30e (LF, git hash-object, of record)",
+  "commit": "dab5a621 (merge of deep-split dc7a7674)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_deep_split_delta.md; docs/reviews/READY_deep_split_full.md (C1-C4)",
+  "commit": "e3748086; 1e1c50c6"
+ },
+ "go": "plan Amendment 36: the author's \"yes register the deep split comparison\" (0 calls; the 4k-match rule not engaged)",
+ "run": {
+  "outcome_file": "experiment_results/archv2/rp12_r2/deep_split_compare_outcome.txt (sha256 75ded557518ad7b4...; blob:ae3156f9; LF; write-once; UNTRACKED per the review)",
+  "outcome_commit": "run from main at dab5a621 (script blob 31af4cea); outcome untracked",
+  "calls": 0,
+  "cce": 0,
+  "pool": "pv2_1575de61bb20e977 (B0-2 check rc 0, pin 79d48f4b)",
+  "date": "2026-10-02"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_deep_split.md",
+  "commit": "bcd4a88f",
+  "verdict": "VALID with wording conditions W1, W2 (HIGH)"
+ },
+ "criteria": [
+  {
+   "id": "I1-I4",
+   "text": "IDENTITY PRECONDITIONS (refuse on any miss): I1 P_fl 0.8119, P(KC_s) 0.8334/0.8394/0.8340/0.8446/0.8413, D13 -0.0215 [-0.0301, -0.0125] to the printed digits; I2 52 anchors = 52 classes, 133 leaves, k_a sums 74/36/9/6/5/3, child counts 79x2 + 1x3; I3 F-tree covers 12,334 TRAIN items, per-anchor counts = the draft's §4 table; I4 B at k_a = 1 reproduces NCC-on-F-tree [CORRECTED 2026-10-02 by the registrar (pre-data, HIGH; builder's report d517e21d): I3's per-anchor F-tree counts are ITEM counts (12,334), not flatLeaf TRAIN CSV rows (12,951); 19 anchors differ, e.g. GPQA Chemistry 256 -> 114; list in the programme bracket after I3]",
+   "result": "HELD",
+   "value": "PASSED (I3 on item counts)",
+   "denominator": "6,139 EVAL items / 5,628 CK-CLOSE components (Kish 1.3043); B 2,000 component bootstrap"
+  },
+  {
+   "id": "C-AB",
+   "text": "SCOREABLE; INTERVAL AND POINT jointly: HELD (the vMF construction beats flat spherical k-means at matched cells within the same anchors) iff D_AB = P_A - P(B_0) interval wholly > 0 AND D_AB > spread_B; FAILED (REVERSED) iff wholly < 0 AND D_AB < -spread_B; UNDETERMINED otherwise. Verdict line: DESCRIPTIVE-ONLY at prediction (|-0.003| < MDE80 0.0117); spread conjunct unreachable at the predicted point",
+   "result": "HELD",
+   "value": "D_AB +0.0134, 95% [+0.0069, +0.0203] > spread_B 0.0125 (margin 0.0008; W1: A's construction-seed variance unmeasured and in no bar)",
+   "denominator": "6,139 EVAL items / 5,628 CK-CLOSE components (Kish 1.3043); B 2,000 component bootstrap"
+  },
+  {
+   "id": "C-AC",
+   "text": "SCOREABLE; same form against C_0 (PCA-GMM, d = 16, diagonal, k = k_a) and spread_C. Verdict line: DESCRIPTIVE-ONLY at prediction (0.004 < MDE80 0.0131)",
+   "result": "UNDETERMINED",
+   "value": "D_AC +0.0111 [+0.0039, +0.0180]; spread_C 0.0129",
+   "denominator": "6,139 EVAL items / 5,628 CK-CLOSE components (Kish 1.3043); B 2,000 component bootstrap"
+  },
+  {
+   "id": "C-DB",
+   "text": "SCOREABLE; same form: HELD (label information below depth 2 buys filing over a label-free split at matched cells) iff D_DB = P(D_0) - P(B_0) interval wholly > 0 AND D_DB > max(spread_B, spread_KC); FAILED (REVERSED) symmetric. Verdict line: SCOREABLE, thin (0.018 > 0.0112)",
+   "result": "HELD",
+   "value": "D_DB +0.0349 [+0.0254, +0.0444] > 0.0125 (W2: edge in depth-2 fit-set membership, not label ownership below depth 2)",
+   "denominator": "6,139 EVAL items / 5,628 CK-CLOSE components (Kish 1.3043); B 2,000 component bootstrap"
+  },
+  {
+   "id": "C-AB-M",
+   "text": "SCOREABLE; MMLU_PRO_LB only; the INTERVAL decides (stratum spread printed; 'seed-fragile' appended if |D| < it). Verdict line: DESCRIPTIVE-ONLY at prediction (0.005 < MDE80 0.0168)",
+   "result": "UNDETERMINED",
+   "value": "+0.0052 [-0.0049, +0.0152]; seed-fragile (stratum spread 0.0078)",
+   "denominator": "MMLU_PRO_LB 3,478 / 3,386"
+  },
+  {
+   "id": "C-AC-M",
+   "text": "SCOREABLE; MMLU_PRO_LB only; the INTERVAL decides. Verdict line: DESCRIPTIVE-ONLY at prediction (0.005 < MDE80 0.0182)",
+   "result": "FAILED",
+   "value": "REVERSED: -0.0101 [-0.0190, -0.0006]; seed-fragile (C's MMLU spread 0.0201)",
+   "denominator": "MMLU_PRO_LB 3,478 / 3,386"
+  },
+  {
+   "id": "C-DB-M",
+   "text": "SCOREABLE; MMLU_PRO_LB only; the INTERVAL decides. Verdict line: SCOREABLE (0.035 > MDE80 0.0168)",
+   "result": "HELD",
+   "value": "+0.0497 [+0.0365, +0.0634]",
+   "denominator": "MMLU_PRO_LB 3,478 / 3,386"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P-B",
+   "text": "P(B_0) 0.815 [0.800, 0.830]; D_AB -0.003 [-0.018, +0.012]; spread_B 0.008 [0.004, 0.016]; C-AB HELD 0.10, REVERSED 0.25, UNDETERMINED 0.65",
+   "result": "FAILED",
+   "value": "bands: P(B_0) 0.7985 FAILED; D_AB +0.0134 FAILED; spread_B 0.0125 HELD; verdict event C-AB HELD (prior 0.10)",
+   "denominator": "6,139 EVAL items / 5,628 CK-CLOSE components (union pool pv2_1575de61bb20e977, draw 5a3e756; Kish 1.3043), item-paired; B 2,000 component bootstrap, seed 20260929"
+  },
+  {
+   "id": "P-C",
+   "text": "P(C_0) 0.808 [0.790, 0.825]; D_AC +0.004 [-0.012, +0.020]; spread_C 0.012 [0.006, 0.025]; C-AC HELD 0.15, REVERSED 0.10",
+   "result": "HELD",
+   "value": "bands: P(C_0) 0.8008, D_AC +0.0111, spread_C 0.0129 all HELD; verdict event C-AC UNDETERMINED",
+   "denominator": "6,139 EVAL items / 5,628 CK-CLOSE components (union pool pv2_1575de61bb20e977, draw 5a3e756; Kish 1.3043), item-paired; B 2,000 component bootstrap, seed 20260929"
+  },
+  {
+   "id": "P-DB",
+   "text": "D_DB +0.018 [+0.005, +0.032]; C-DB HELD 0.60, REVERSED 0.03",
+   "result": "FAILED",
+   "value": "band: D_DB +0.0349 > +0.032 FAILED; verdict event C-DB HELD (prior 0.60)",
+   "denominator": "6,139 EVAL items / 5,628 CK-CLOSE components (union pool pv2_1575de61bb20e977, draw 5a3e756; Kish 1.3043), item-paired; B 2,000 component bootstrap, seed 20260929"
+  },
+  {
+   "id": "P-M",
+   "text": "D_AB-M -0.005 [-0.030, +0.020] (C-AB-M REVERSED 0.25); D_AC-M +0.005 [-0.020, +0.030] (C-AC-M HELD 0.15, REVERSED 0.15); D_DB-M +0.035 [+0.015, +0.055] (C-DB-M HELD 0.65)",
+   "result": "HELD",
+   "value": "bands: D_AB-M +0.0052, D_AC-M -0.0101, D_DB-M +0.0497 all HELD; events C-AB-M UNDETERMINED, C-AC-M REVERSED (prior 0.15), C-DB-M HELD (prior 0.65)",
+   "denominator": "MMLU_PRO_LB 3,478 EVAL items / 3,386 components (Kish 1.0713)"
+  },
+  {
+   "id": "P-F",
+   "text": "F-RULE fires 0.45",
+   "result": "n/a",
+   "value": "probability 0.45; event occurred: F-RULE FIRES",
+   "denominator": "6,139 EVAL items / 5,628 CK-CLOSE components (union pool pv2_1575de61bb20e977, draw 5a3e756; Kish 1.3043), item-paired; B 2,000 component bootstrap, seed 20260929"
+  },
+  {
+   "id": "P-DESC",
+   "text": "descriptive: P(B-gt_0) - P(D_0) -0.003 [-0.010, +0.004]; P(B-anc_0) - P(B_0) -0.020 [-0.050, 0.000]; P(B-bis_0) - P(B_0) -0.002 [-0.010, +0.006]; C-BIC total k 133 -> [90, 260], P(C-BIC_0) - P(C_0) 0.000 [-0.015, +0.015]; C-32 level with C [-0.010, +0.010]; C-64 below C by 0.005 [-0.005, +0.020]; R3 D_DB share in k_a >= 4 strata 0.8 [0.5, 1.1]; R4 mean H / log k_a 0.08 [0.02, 0.25], share max resp > 0.9 0.80 [0.55, 0.95]",
+   "result": "FAILED",
+   "value": "13 bands: 10 HELD, 3 FAILED (P(C-BIC_0) - P(C_0) -0.0192; P(C-32_0) - P(C_0) -0.0124; R3 k_a = 1 range 0.0609); B-gt - D +0.0028 HELD",
+   "denominator": "6,139 EVAL items / 5,628 CK-CLOSE components (union pool pv2_1575de61bb20e977, draw 5a3e756; Kish 1.3043), item-paired; B 2,000 component bootstrap, seed 20260929"
+  }
+ ],
+ "falsifier": {
+  "text": "F-RULE (H-RULE 'a better label-free split rule below the anchors closes the G13 gap' falsified at this n) fires iff the 95% intervals of BOTH D_AB and D_AC lie wholly above -0.0108 (= -|D13| / 2). If F-RULE fires and C-DB HELD: the gap is attributed to label information below depth 2 and SPLIT-VMF is not worth an engine change; if C-AB or C-AC REVERSED: the split rule is implicated and SPLIT-VMF is the next registration. Verdict line: DESCRIPTIVE-ONLY at prediction (knife-edge: D_AB leg 0.0078 above the bar vs MDE80 0.0117) [OUTCOME 2026-10-02: FIRES (lower ends +0.0069, +0.0039); consequence printed as registered, read through W2: neither SPLIT-VMF nor HYB-LC as drafted is indicated]",
+  "fired": true
+ },
+ "numbers_of_record": {
+  "P_arms": "P_A 0.8119; P(B_0) 0.7985; P(C_0) 0.8008; P(D_0) 0.8334 (6,139 / 5,628)",
+  "C_AB": "D_AB +0.0134, 95% [+0.0069, +0.0203]; spread_B 0.0125; measured DEFF 1.071",
+  "C_AC": "D_AC +0.0111, 95% [+0.0039, +0.0180]; spread_C 0.0129; DEFF 1.158",
+  "C_DB": "D_DB +0.0349, 95% [+0.0254, +0.0444]; bar 0.0125; DEFF 1.223, MDE80 0.0139",
+  "MMLU": "C-AB-M +0.0052 [-0.0049, +0.0152]; C-AC-M -0.0101 [-0.0190, -0.0006] (seed-fragile); C-DB-M +0.0497 [+0.0365, +0.0634] (3,478 / 3,386)",
+  "B_gt_bridge": "P(B-gt_0) - P(D_0) +0.0028 [-0.0015, +0.0069] (outcome line 221); G13-BREAKDOWN D(2) -0.0023 [-0.0108, +0.0064]",
+  "predictions": "17 HELD / 6 FAILED of 23 bands"
+ },
+ "sentence_of_record": "DEEP-SPLIT-COMPARE (2026-10-02, 0 calls; post-run review bcd4a88f VALID): holding B0's anchors fixed, flat spherical k-means at matched cells files EVAL worse than the vMF construction (C-AB HELD, D_AB +0.0134 [+0.0069, +0.0203]) and class-conditioned k-means files better than flat k-means (C-DB HELD, D_DB +0.0349 [+0.0254, +0.0444]); F-RULE FIRES: no label-free split rule recovers half the G13 gap. [C-AB HELD at a margin of 0.0008 over B's five-seed spread (0.0125); A is one construction, and its construction-seed variance is unmeasured and in no bar; C-DB HELD; the descriptive bridge B-gt places the edge in depth-2 fit-set membership, not label ownership below depth 2. SPLIT-VMF is not indicated (F-RULE fired; C-AB HELD). HYB-LC as drafted (label ownership) is not indicated by this result. The knob it points to is fit-set membership. 6,139 EVAL items / 5,628 components; one draw, recipe, embedder; no parity (no TOST).]",
+ "chips": [
+  "REGISTERED 2026-10-02, BEFORE ANY CODE; not built",
+  "VALID (POST-RUN bcd4a88f): C-AB HELD, C-DB HELD, C-DB-M HELD; F-RULE FIRES",
+  "C-AB KNIFE-EDGE (0.0008 OVER B'S SPREAD; A UNREPLICATED); EDGE IN DEPTH-2 FIT-SET MEMBERSHIP, NOT LABEL OWNERSHIP BELOW DEPTH 2 (B-gt); NEITHER SPLIT-VMF NOR HYB-LC AS DRAFTED INDICATED; C-AC, C-AB-M UNDETERMINED; C-AC-M REVERSED (SEED-FRAGILE)"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-02",
+   "by": "registrar (the orchestrator's brief, on the builder's report d517e21d; pre-data)",
+   "text": "(1) HIGH: I3's F-tree column read as ITEM counts per anchor (sum 12,334), not flatLeaf TRAIN CSV rows (12,951); 19 anchors differ (MMLU_PRO_LB math 741, physics 753, other 505, psychology 534, economics 478, biology 411, health 386, chemistry 796, computer science 446, law 551, engineering 429, business 460, philosophy 291; IFEVAL 296; MATH Number Theory 121; GPQA Biology 56, Physics 90, Chemistry 114; BBH sports_understanding 154); other columns unchanged; arm C's smallest planned cell 59.2; delta READY owed after the ANCHOR_TABLE edit. (2) The pool check is g13_breakdown's B0-2 form (v2_union_pool.py --dry-run rc 0 + engine_pool_pv2_1575de61bb20e977.json sha256-lf16 79d48f4b36434a55 + 0-byte -wal/-journal), replacing pool_guard, as in G13-BREAKDOWN. (3) LOW: when F-RULE fires and C-AB or C-AC is REVERSED, both consequence sentences print, with a NOTE line. No criterion, bar, prediction or Support number moves. Programme brackets at L23129, L23155, L23170, L23220, L23242, L23312; record section L23424-L23429 (_as_of the commit that writes it, parent 487ac3bd)."
+  },
+  {
+   "date": "2026-10-02",
+   "by": "registrar (post-run W1, W2 of POSTRUN_deep_split bcd4a88f)",
+   "text": "C-DB clause and F-RULE consequence read through W2 (depth-2 fit-set membership, not label ownership below depth 2); G13-BREAKDOWN C-a4 'below the anchors' bracketed as location, not cause. section \"## DEEP-SPLIT-COMPARE (2026-10-02, 0 calls) — VALID (post-run review docs/reviews/POSTRUN_deep_split.md, bcd4a88f): ...\" (L23515-L23529, _as_of the commit that writes it, parent a96c7ae6)"
+  }
+ ],
+ "does_not_show": [
+  "a seed-free C-AB (W1; A's construction-seed variance unmeasured, in no bar)",
+  "that label ownership below depth 2 buys filing (W2; B-gt bridge)",
+  "parity of any two arms (no TOST)",
+  "anything about anchor-free trees (RP13 / AF-VS-KMEANS)",
+  "a certificate or modal evidence (MIX-LRT-SITE untouched)",
+  "another draw, recipe, embedder, slice; a wall-clock ratio beyond this machine"
+ ],
+ "ledger": {
+  "row_id": "DEEP-SPLIT-COMPARE",
+  "version": "v346 (2026-10-02: OUTCOME bracket, OK + WARN chips) | v344 (2026-10-02: pre-data correction bracket) | v342 (2026-10-02: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "G13-BREAKDOWN",
+  "ARCH-V2-E-T-R2"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; MIX-LRT-SITE checked and not touched (GMM / BIC used as a partition / k-selection rule only)"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "about 10-30 min single thread (the draft's ESTIMATE; the cost-estimator re-prices)",
+  "agent_hours": "engine-coder about 3 h (the draft's)",
+  "reads_pool": true
+ },
+ "sources": [
+  "docs/judge_v2_program.md L23125-L23314 (section \"## Registered 2026-10-02 (before any code or call) — DEEP-SPLIT-COMPARE: holding B0's anchors and depth-2 frontier fixed, does a different label-free split rule below depth 2 ...\"; _as_of the commit that writes it, parent 29ea00ea, re-grepped)",
+  "docs/agents/plans/2026-10-02_deep_split_compare.md (29ea00ea)",
+  "docs/plan_2026-09-15.md Amendment 36",
+  "experiment_results/archv2/rp12_r2/g13_outcome.txt line 1 (Kish 1.3043)",
+  "docs/agents/results/G13-BREAKDOWN.json (transported DEFFs)",
+  "docs/judge_v2_program.md L23424-L23429 (section \"## Registrar's record 2026-10-02 (insertion only; zero calls; nothing run; pre-data) — DEEP-SPLIT-COMPARE pre-data correction brackets: ...\"; _as_of the commit that writes it, parent 487ac3bd, re-grepped); branch deep-split commit d517e21d message",
+  "docs/judge_v2_program.md section \"## DEEP-SPLIT-COMPARE (2026-10-02, 0 calls) — VALID (post-run review docs/reviews/POSTRUN_deep_split.md, bcd4a88f): ...\" (L23515-L23529, _as_of the commit that writes it, parent a96c7ae6)",
+  "docs/reviews/POSTRUN_deep_split.md (bcd4a88f) W1, W2, per-claim table",
+  "experiment_results/archv2/rp12_r2/deep_split_compare_outcome.txt lines 221, 225-273"
+ ],
+ "last_update": "2026-10-02",
+ "plain_description": {
+  "sq": "SQ3 Taxonomy",
+  "what": "Keeps the tree's declared top two levels fixed and replaces the splitting rule below them with alternatives: plain spherical k-means, a PCA plus Gaussian mixture, and k-means that knows the class labels. It compares how well each one files held-out questions. No judge calls.",
+  "why": "An earlier test found the tree lost to label-aware k-means below depth 2. This one asks whether the cause is the splitting rule or the label information.",
+  "information": "If a label-free rule closes the gap, the engine's splitting rule should change. If only label-aware k-means does, the gap comes from labels and changing the engine is not worth it. Result: done. Plain k-means files worse than the tree's own rule (by a thin margin, one construction). Label-aware k-means files better than plain k-means. No label-free rule recovers half the gap, so the splitting rule is not the cause. A descriptive check places the edge in which items enter the depth-2 fit, not in labels below depth 2.",
+  "written": "2026-10-07"
+ }
+}

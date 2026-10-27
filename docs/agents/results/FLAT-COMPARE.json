@@ -1,0 +1,84 @@
+{
+ "id": "FLAT-COMPARE",
+ "title": "FLAT-COMPARE (M1): axis tree V0 vs within-anchor k-means at V0's leaf count, size-matched random cells and the text-kNN field, on WORK after difficulty + length controls (exploratory)",
+ "question": "After L2, difficulty and length controls, does the axis tree V0 beat matched flat partitions (within-anchor k-means at its leaf count, size-matched random cells) and the text-kNN field, on WORK?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "none (exploratory, not registered)",
+  "program_lines": "docs/judge_v2_program.md section \"## Registrar's record 2026-10-26 (insertion only; zero calls; nothing run) — BZ-AXIS-CONFIRM-FRESH draft amended per D-2026-10-26-1: ...\" L25708-L25724 (_as_of the commit that writes it, parent a8990e4b, re-grepped)",
+  "date": "2026-10-23"
+ },
+ "script": {
+  "path": "benchzoom examples/flat-compare.py",
+  "sha16": "blob:86bddccd (run of record at 8177915; tip blob:da00fcda, docstring only; git blobs, LF, per POSTRUN)",
+  "commit": "benchzoom flat-compare d9144ae..8b937da, merged master 516c6ba"
+ },
+ "ready": null,
+ "go": "D-2026-10-22-2 (the author, verbatim as quoted in the POSTRUN: \"go ahead, and run the flat clustering comparison too\"; 875253bc)",
+ "run": {
+  "outcome_file": "E:/benchzoom_demo/followups/flat-compare (summary.txt sha256 3174c132..., SHA256SUMS 9/9)",
+  "outcome_commit": "outputs not committed",
+  "calls": 0,
+  "cce": 0,
+  "pool": "WORK split only (MATH 2,949, MMLU 8,425, MMLU-Pro 7,197 items); vault / reserved reads 0",
+  "date": "2026-10-23"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_FLAT-COMPARE.md",
+  "commit": "81a99d9b",
+  "verdict": "OUTCOME CONFIRMED (exploratory): K1 KILLED; K2 KILLED on MATH only; V0 vs random TEXT STRUCTURE BEATS SIZE ALONE (MATH, MMLU), NOT DISTINGUISHABLE (UNDERPOWERED) (MMLU-Pro); MERGEABLE; conditions D1 (wording), D2 (SE convention)"
+ },
+ "criteria": [],
+ "predictions": [],
+ "falsifier": {
+  "text": "none (exploratory)",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "C1 MATH V0 / KM / RND / L3k": "+0.1093 / +0.2745 / -0.0053 / +0.3499 (WORK, 2,949 items)",
+  "K1 D_km = C1(V0) - C1(KM)": "MATH -0.1652 SE 0.0358 (z -4.61; 3.41 SE under leaf clustering, D2); MMLU -0.0085 SE 0.0147",
+  "L3k - V0": "+0.2406 / +0.0629 / +0.0784 (z 4.44 / 2.97 / 2.40; MATH / MMLU / MMLU-Pro)",
+  "K2 MATH": "arm A G(N|L2+V0) +0.2450 (0.0459); arm B G(V0|L2+N) +0.0067 (0.0102; 95% upper +0.027)",
+  "V0 vs random": "MATH +0.1146 (0.0316, 3.63 SE; 2.02 SE under leaf clustering); MMLU +0.0439 (0.0180, 2.44 SE; 1.51 SE under leaf clustering, D2); MMLU-Pro -0.0039 (0.0197)"
+ },
+ "sentence_of_record": "On WORK only, after L2, difficulty and length controls, k-means REACHES V0 on MMLU (-0.0085 SE 0.0147) and beats it on MATH (-0.165, 4.6 SE); the text-kNN field beats V0 on all three [EXPLORATORY, adjudicates nothing; POSTRUN 81a99d9b D1 wording; WORK favours V0 (TREE-VARIANTS selection)]",
+ "chips": [],
+ "brackets": [
+  {
+   "date": "2026-10-26",
+   "by": "registrar",
+   "text": "D1 wording of record (POSTRUN_FLAT-COMPARE 81a99d9b): the builder's hand-back line \"k-means and the kNN reader both beat V0\" is not to be quoted"
+  },
+  {
+   "date": "2026-10-26",
+   "by": "registrar",
+   "text": "D2: the MMLU V0-vs-random word is quoted only with its leaf-clustering sensitivity (1.51 SE); any registration built on M1 pre-specifies a cell-aware SE"
+  }
+ ],
+ "does_not_show": [
+  "any fresh, vault or registered statement",
+  "replacing V0 in BZ-AXIS-CONFIRM-FRESH or switching estimators (the author's call)",
+  "\"k-means beats V0\" on MMLU or MMLU-Pro",
+  "\"the axis rule carries no signal\"",
+  "any attribution of the field's lead to method rather than to 4096-d vs 512-d vectors",
+  "k-means at its own best k"
+ ],
+ "ledger": null,
+ "depends_on": [
+  "BZ-TREE-VARIANTS-WORK",
+  "BZ-GRANULARITY-WORK"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "nothing"
+ },
+ "sources": [
+  "docs/reviews/POSTRUN_FLAT-COMPARE.md (81a99d9b)",
+  "docs/agents/author_decisions/2026-10-22.md",
+  "docs/judge_v2_program.md section \"## Registrar's record 2026-10-26 (insertion only; zero calls; nothing run) — BZ-AXIS-CONFIRM-FRESH draft amended per D-2026-10-26-1: ...\" L25708-L25724 (_as_of the commit that writes it, parent a8990e4b, re-grepped)"
+ ],
+ "last_update": "2026-10-26 (registrar: record created, exploratory, no ledger row; D-2026-10-26-1 batch)"
+}

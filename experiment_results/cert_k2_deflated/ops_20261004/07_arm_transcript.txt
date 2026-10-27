@@ -1,0 +1,139 @@
+﻿To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.10/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+Configuration on demand is an incubating feature.
+Calculating task graph as no cached configuration is available for tasks: certK2Deflated
+> Task :checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :processResources UP-TO-DATE
+> Task :processTestResources UP-TO-DATE
+> Task :compileKotlin UP-TO-DATE
+> Task :compileJava NO-SOURCE
+> Task :classes UP-TO-DATE
+> Task :jar UP-TO-DATE
+> Task :compileTestKotlin FROM-CACHE
+> Task :compileTestJava NO-SOURCE
+> Task :testClasses UP-TO-DATE
+
+> Task :processTestAot
+05:11:42.380 [main] INFO org.springframework.test.context.aot.TestClassScanner -- Scanning for Spring test classes in all packages in classpath roots [Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\build\classes\kotlin\test, Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\build\resources\test]
+
+> Task :compileAotTestKotlin NO-SOURCE
+> Task :processAotTestResources UP-TO-DATE
+> Task :compileAotTestJava FROM-CACHE
+> Task :aotTestClasses UP-TO-DATE
+
+> Task :certK2Deflated
+
+SeparationNullBySizeTest > certK2Deflated - declared two-group sites scored against their own deflated null with fresh seeds() STANDARD_OUT
+    [THREAD-CAP] requested=12 availableProcessors=12 heapEstimate=n/a budget=5.80GB
+    [DFL] reads embeddings_cache.db (the qwen3 cache of record; -DembeddingCacheFile / -DembeddingModel refused)
+    [DFL] snapshot 20261001_094311_Headless_Run_Auto_ge root n00000001 'MMLU_PRO_LB' n=6993; site file experiment_results\cert_k2_deflated\site_labels.tsv sha256 00c002394ed99431b0189e5c00c6b7c265a53f6133f6d50197fa0ca8362c0110; sites 97 (IDENTITY + 33 KK + 33 K2 + 20 NC + 10 EC); deflated seed base 20261004
+    [SEPBAR] proposalSeparationBar=0.0145 (-DsepBar '0.0145'); sliceDim=512 dropTop=0 whiten=false reps=300 minClusterSize=55
+    [THREAD-CAP] requested=12 availableProcessors=12 heapEstimate=0.39GB budget=5.80GB
+    [SITENULL-HEAP] sliceDim=512 largest null site n=1282 live=12 -> peak live 0.39 GB; budget 5.80 GB
+    [EMB-GUARD] model=qwen3-embedding:latest (default (no -DembeddingCacheFile, no -DembeddingModel, no manifest reachable: the DB of record's canonical model)); cache=embeddings_cache.db; native dim expected 4096; vectors read 6993 of 6993 ids, raw dims {4096=6993}; slice width 512
+    [EMB-GUARD] vmfMu cosine over 60 sites: min 0.9976 (site n00000014 'MMLU_PRO_LB/philosophy' n=322), median 0.9996; budget 0.99 -> ADMIT
+    [EMB-GUARD]   site n00000014  n=322   found=322   cos=0.9976  MMLU_PRO_LB/philosophy
+    [EMB-GUARD]   site n00000047  n=286   found=286   cos=0.9980  Emergent Concept #32
+    [EMB-GUARD]   site n00000018  n=426   found=426   cos=0.9982  Emergent Concept #3
+    [DFL] IDENTITY n=6993 declared=0.107803 (registered 0.107803; no null drawn)
+    [DFL] site KK_STRONG_n1254_d0   n=1254 groups=[676, 578] declared=0.119598 deflated dims=1 k=  0 p50=0.038769 p95=0.040839 reached=300 (seed base 20261004)
+    [DFL] site KK_STRONG_n486_d1    n= 486 groups=[262, 224] declared=0.121796 deflated dims=1 k=  0 p50=0.051035 p95=0.055460 reached=300 (seed base 20261004)
+    [DFL] site KK_STRONG_n486_d2    n= 486 groups=[262, 224] declared=0.122262 deflated dims=1 k=  0 p50=0.050852 p95=0.055111 reached=300 (seed base 20261004)
+    [DFL] site KK_STRONG_n486_d3    n= 486 groups=[262, 224] declared=0.118862 deflated dims=1 k=  0 p50=0.050285 p95=0.055611 reached=300 (seed base 20261004)
+    [DFL] site KK_STRONG_n486_d4    n= 486 groups=[262, 224] declared=0.124375 deflated dims=1 k=  0 p50=0.048587 p95=0.055472 reached=300 (seed base 20261004)
+    [DFL] site KK_STRONG_n486_d5    n= 486 groups=[262, 224] declared=0.120776 deflated dims=1 k=  0 p50=0.050859 p95=0.056643 reached=300 (seed base 20261004)
+    [DFL] site KK_STRONG_n441_d1    n= 441 groups=[238, 203] declared=0.119302 deflated dims=1 k=  0 p50=0.049063 p95=0.056012 reached=300 (seed base 20261004)
+    [DFL] site KK_STRONG_n441_d2    n= 441 groups=[238, 203] declared=0.123114 deflated dims=1 k=  0 p50=0.050550 p95=0.054751 reached=300 (seed base 20261004)
+    [DFL] site KK_STRONG_n441_d3    n= 441 groups=[238, 203] declared=0.119547 deflated dims=1 k=  0 p50=0.050073 p95=0.057740 reached=300 (seed base 20261004)
+    [DFL] site KK_STRONG_n441_d4    n= 441 groups=[238, 203] declared=0.125640 deflated dims=1 k=  0 p50=0.052603 p95=0.058258 reached=300 (seed base 20261004)
+    [DFL] site KK_STRONG_n441_d5    n= 441 groups=[238, 203] declared=0.119094 deflated dims=1 k=  0 p50=0.049667 p95=0.057423 reached=300 (seed base 20261004)
+    [DFL] site KK_MID_n1158_d0      n=1158 groups=[580, 578] declared=0.105456 deflated dims=1 k=  0 p50=0.045076 p95=0.047864 reached=300 (seed base 20261004)
+    [DFL] site KK_MID_n486_d1       n= 486 groups=[243, 243] declared=0.102525 deflated dims=1 k=  0 p50=0.049109 p95=0.060475 reached=300 (seed base 20261004)
+    [DFL] site KK_MID_n486_d2       n= 486 groups=[243, 243] declared=0.105589 deflated dims=1 k=  0 p50=0.047679 p95=0.058245 reached=300 (seed base 20261004)
+    [DFL] site KK_MID_n486_d3       n= 486 groups=[243, 243] declared=0.106654 deflated dims=1 k=  0 p50=0.051830 p95=0.060641 reached=300 (seed base 20261004)
+    [DFL] site KK_MID_n486_d4       n= 486 groups=[243, 243] declared=0.109214 deflated dims=1 k=  0 p50=0.050189 p95=0.061932 reached=300 (seed base 20261004)
+    [DFL] site KK_MID_n486_d5       n= 486 groups=[243, 243] declared=0.106659 deflated dims=1 k=  0 p50=0.050793 p95=0.062215 reached=300 (seed base 20261004)
+    [DFL] site KK_MID_n441_d1       n= 441 groups=[221, 220] declared=0.100483 deflated dims=1 k=  0 p50=0.050200 p95=0.060650 reached=300 (seed base 20261004)
+    [DFL] site KK_MID_n441_d2       n= 441 groups=[221, 220] declared=0.105074 deflated dims=1 k=  0 p50=0.048215 p95=0.059670 reached=300 (seed base 20261004)
+    [DFL] site KK_MID_n441_d3       n= 441 groups=[221, 220] declared=0.104753 deflated dims=1 k=  0 p50=0.049340 p95=0.060799 reached=300 (seed base 20261004)
+    [DFL] site KK_MID_n441_d4       n= 441 groups=[221, 220] declared=0.108718 deflated dims=1 k=  0 p50=0.049569 p95=0.061684 reached=300 (seed base 20261004)
+    [DFL] site KK_MID_n441_d5       n= 441 groups=[221, 220] declared=0.104193 deflated dims=1 k=  0 p50=0.049833 p95=0.061294 reached=300 (seed base 20261004)
+    [DFL] site KK_EDGE_n1282_d0     n=1282 groups=[504, 778] declared=0.070390 deflated dims=1 k=  0 p50=0.032089 p95=0.033501 reached=300 (seed base 20261004)
+    [DFL] site KK_EDGE_n486_d1      n= 486 groups=[191, 295] declared=0.069286 deflated dims=1 k=  0 p50=0.045162 p95=0.048388 reached=300 (seed base 20261004)
+    [DFL] site KK_EDGE_n486_d2      n= 486 groups=[191, 295] declared=0.071576 deflated dims=1 k=  0 p50=0.043076 p95=0.047253 reached=300 (seed base 20261004)
+    [DFL] site KK_EDGE_n486_d3      n= 486 groups=[191, 295] declared=0.068739 deflated dims=1 k=  0 p50=0.039365 p95=0.048908 reached=300 (seed base 20261004)
+    [DFL] site KK_EDGE_n486_d4      n= 486 groups=[191, 295] declared=0.071357 deflated dims=1 k=  0 p50=0.046185 p95=0.049942 reached=300 (seed base 20261004)
+    [DFL] site KK_EDGE_n486_d5      n= 486 groups=[191, 295] declared=0.071725 deflated dims=1 k=  0 p50=0.046505 p95=0.050281 reached=300 (seed base 20261004)
+    [DFL] site KK_EDGE_n441_d1      n= 441 groups=[173, 268] declared=0.067045 deflated dims=1 k=  0 p50=0.044720 p95=0.049193 reached=300 (seed base 20261004)
+    [DFL] site KK_EDGE_n441_d2      n= 441 groups=[173, 268] declared=0.073032 deflated dims=1 k=  0 p50=0.036689 p95=0.047743 reached=300 (seed base 20261004)
+    [DFL] site KK_EDGE_n441_d3      n= 441 groups=[173, 268] declared=0.070171 deflated dims=1 k=  0 p50=0.038868 p95=0.049249 reached=300 (seed base 20261004)
+    [DFL] site KK_EDGE_n441_d4      n= 441 groups=[173, 268] declared=0.070766 deflated dims=1 k=  0 p50=0.047097 p95=0.050651 reached=300 (seed base 20261004)
+    [DFL] site KK_EDGE_n441_d5      n= 441 groups=[173, 268] declared=0.070328 deflated dims=1 k=  0 p50=0.047260 p95=0.051279 reached=300 (seed base 20261004)
+    [DFL] site K2_economics_n504_d0 n= 504 groups=[238, 266] declared=0.014788 deflated dims=1 k=300 p50=0.050156 p95=0.055149 reached=300 (seed base 20261004)
+    [DFL] site K2_economics_n486_d1 n= 486 groups=[230, 256] declared=0.014634 deflated dims=1 k=300 p50=0.057804 p95=0.065049 reached=300 (seed base 20261004)
+    [DFL] site K2_economics_n486_d2 n= 486 groups=[230, 256] declared=0.014258 deflated dims=1 k=300 p50=0.057297 p95=0.065889 reached=300 (seed base 20261004)
+    [DFL] site K2_economics_n486_d3 n= 486 groups=[230, 256] declared=0.014867 deflated dims=1 k=300 p50=0.056365 p95=0.064577 reached=300 (seed base 20261004)
+    [DFL] site K2_economics_n486_d4 n= 486 groups=[230, 256] declared=0.014458 deflated dims=1 k=300 p50=0.058506 p95=0.066025 reached=300 (seed base 20261004)
+    [DFL] site K2_economics_n486_d5 n= 486 groups=[230, 256] declared=0.014934 deflated dims=1 k=300 p50=0.057193 p95=0.065982 reached=300 (seed base 20261004)
+    [DFL] site K2_economics_n441_d1 n= 441 groups=[208, 233] declared=0.014551 deflated dims=1 k=300 p50=0.057758 p95=0.066307 reached=300 (seed base 20261004)
+    [DFL] site K2_economics_n441_d2 n= 441 groups=[208, 233] declared=0.014166 deflated dims=1 k=300 p50=0.054116 p95=0.064978 reached=300 (seed base 20261004)
+    [DFL] site K2_economics_n441_d3 n= 441 groups=[208, 233] declared=0.014997 deflated dims=1 k=300 p50=0.054792 p95=0.066435 reached=300 (seed base 20261004)
+    [DFL] site K2_economics_n441_d4 n= 441 groups=[208, 233] declared=0.014191 deflated dims=1 k=300 p50=0.057518 p95=0.066834 reached=300 (seed base 20261004)
+    [DFL] site K2_economics_n441_d5 n= 441 groups=[208, 233] declared=0.016125 deflated dims=1 k=300 p50=0.056869 p95=0.065745 reached=300 (seed base 20261004)
+    [DFL] site K2_math_n805_d0      n= 805 groups=[316, 489] declared=0.015900 deflated dims=1 k=300 p50=0.045764 p95=0.057908 reached=300 (seed base 20261004)
+    [DFL] site K2_math_n486_d1      n= 486 groups=[191, 295] declared=0.015878 deflated dims=1 k=300 p50=0.059996 p95=0.063936 reached=300 (seed base 20261004)
+    [DFL] site K2_math_n486_d2      n= 486 groups=[191, 295] declared=0.014934 deflated dims=1 k=300 p50=0.057290 p95=0.061742 reached=300 (seed base 20261004)
+    [DFL] site K2_math_n486_d3      n= 486 groups=[191, 295] declared=0.014413 deflated dims=1 k=300 p50=0.058053 p95=0.062476 reached=300 (seed base 20261004)
+    [DFL] site K2_math_n486_d4      n= 486 groups=[191, 295] declared=0.016542 deflated dims=1 k=300 p50=0.059127 p95=0.062762 reached=300 (seed base 20261004)
+    [DFL] site K2_math_n486_d5      n= 486 groups=[191, 295] declared=0.014397 deflated dims=1 k=300 p50=0.059016 p95=0.063014 reached=300 (seed base 20261004)
+    [DFL] site K2_math_n441_d1      n= 441 groups=[173, 268] declared=0.016557 deflated dims=1 k=300 p50=0.057356 p95=0.062161 reached=300 (seed base 20261004)
+    [DFL] site K2_math_n441_d2      n= 441 groups=[173, 268] declared=0.014956 deflated dims=1 k=300 p50=0.058893 p95=0.063612 reached=300 (seed base 20261004)
+    [DFL] site K2_math_n441_d3      n= 441 groups=[173, 268] declared=0.015077 deflated dims=1 k=300 p50=0.051390 p95=0.062708 reached=300 (seed base 20261004)
+    [DFL] site K2_math_n441_d4      n= 441 groups=[173, 268] declared=0.016743 deflated dims=1 k=300 p50=0.059037 p95=0.064262 reached=300 (seed base 20261004)
+    [DFL] site K2_math_n441_d5      n= 441 groups=[173, 268] declared=0.013884 deflated dims=1 k=300 p50=0.056760 p95=0.062265 reached=300 (seed base 20261004)
+    [DFL] site K2_physics_n778_d0   n= 778 groups=[530, 248] declared=0.017479 deflated dims=1 k=300 p50=0.060643 p95=0.063930 reached=300 (seed base 20261004)
+    [DFL] site K2_physics_n486_d1   n= 486 groups=[331, 155] declared=0.017687 deflated dims=1 k=300 p50=0.063154 p95=0.067435 reached=300 (seed base 20261004)
+    [DFL] site K2_physics_n486_d2   n= 486 groups=[331, 155] declared=0.016026 deflated dims=1 k=300 p50=0.064293 p95=0.067864 reached=300 (seed base 20261004)
+    [DFL] site K2_physics_n486_d3   n= 486 groups=[331, 155] declared=0.016746 deflated dims=1 k=300 p50=0.063751 p95=0.068312 reached=300 (seed base 20261004)
+    [DFL] site K2_physics_n486_d4   n= 486 groups=[331, 155] declared=0.018195 deflated dims=1 k=300 p50=0.063429 p95=0.067696 reached=300 (seed base 20261004)
+    [DFL] site K2_physics_n486_d5   n= 486 groups=[331, 155] declared=0.017495 deflated dims=1 k=300 p50=0.062156 p95=0.066486 reached=300 (seed base 20261004)
+    [DFL] site K2_physics_n441_d1   n= 441 groups=[300, 141] declared=0.015966 deflated dims=1 k=300 p50=0.064252 p95=0.067925 reached=300 (seed base 20261004)
+    [DFL] site K2_physics_n441_d2   n= 441 groups=[300, 141] declared=0.018984 deflated dims=1 k=300 p50=0.065031 p95=0.069083 reached=300 (seed base 20261004)
+    [DFL] site K2_physics_n441_d3   n= 441 groups=[300, 141] declared=0.016568 deflated dims=1 k=300 p50=0.063925 p95=0.068670 reached=300 (seed base 20261004)
+    [DFL] site K2_physics_n441_d4   n= 441 groups=[300, 141] declared=0.018182 deflated dims=1 k=300 p50=0.063483 p95=0.068131 reached=300 (seed base 20261004)
+    [DFL] site K2_physics_n441_d5   n= 441 groups=[300, 141] declared=0.016928 deflated dims=1 k=300 p50=0.063408 p95=0.067822 reached=300 (seed base 20261004)
+    [DFL] site NC_STRONG_n486_s1    n= 486 groups=[262, 224] declared=-0.000801 deflated dims=1 k=300 p50=0.111770 p95=0.125104 reached=300 (seed base 20261004)
+    [DFL] site NC_STRONG_n486_s2    n= 486 groups=[262, 224] declared=-0.000439 deflated dims=1 k=300 p50=0.098617 p95=0.111274 reached=300 (seed base 20261004)
+    [DFL] site NC_STRONG_n486_s3    n= 486 groups=[262, 224] declared=0.000036 deflated dims=1 k=300 p50=0.111017 p95=0.125460 reached=300 (seed base 20261004)
+    [DFL] site NC_STRONG_n486_s4    n= 486 groups=[262, 224] declared=-0.000449 deflated dims=1 k=300 p50=0.103204 p95=0.115854 reached=300 (seed base 20261004)
+    [DFL] site NC_STRONG_n486_s5    n= 486 groups=[262, 224] declared=-0.000653 deflated dims=1 k=300 p50=0.095440 p95=0.107008 reached=300 (seed base 20261004)
+    [DFL] site NC_STRONG_n486_s6    n= 486 groups=[262, 224] declared=0.000201 deflated dims=1 k=300 p50=0.111535 p95=0.125480 reached=300 (seed base 20261004)
+    [DFL] site NC_STRONG_n486_s7    n= 486 groups=[262, 224] declared=-0.000708 deflated dims=1 k=300 p50=0.107312 p95=0.119103 reached=300 (seed base 20261004)
+    [DFL] site NC_STRONG_n486_s8    n= 486 groups=[262, 224] declared=-0.000636 deflated dims=1 k=300 p50=0.113010 p95=0.124770 reached=300 (seed base 20261004)
+    [DFL] site NC_STRONG_n486_s9    n= 486 groups=[262, 224] declared=-0.000213 deflated dims=1 k=300 p50=0.105897 p95=0.119871 reached=300 (seed base 20261004)
+    [DFL] site NC_STRONG_n486_s10   n= 486 groups=[262, 224] declared=0.000949 deflated dims=1 k=300 p50=0.076299 p95=0.085842 reached=300 (seed base 20261004)
+    [DFL] site NC_math_n486_s1      n= 486 groups=[191, 295] declared=-0.000593 deflated dims=1 k=300 p50=0.063699 p95=0.068304 reached=300 (seed base 20261004)
+    [DFL] site NC_math_n486_s2      n= 486 groups=[191, 295] declared=-0.001223 deflated dims=1 k=300 p50=0.064448 p95=0.069492 reached=300 (seed base 20261004)
+    [DFL] site NC_math_n486_s3      n= 486 groups=[191, 295] declared=-0.000216 deflated dims=1 k=300 p50=0.063620 p95=0.068359 reached=300 (seed base 20261004)
+    [DFL] site NC_math_n486_s4      n= 486 groups=[191, 295] declared=0.000423 deflated dims=1 k=300 p50=0.062916 p95=0.067140 reached=300 (seed base 20261004)
+    [DFL] site NC_math_n486_s5      n= 486 groups=[191, 295] declared=0.000405 deflated dims=1 k=300 p50=0.063165 p95=0.068431 reached=300 (seed base 20261004)
+    [DFL] site NC_math_n486_s6      n= 486 groups=[191, 295] declared=0.000706 deflated dims=1 k=300 p50=0.064592 p95=0.068695 reached=300 (seed base 20261004)
+    [DFL] site NC_math_n486_s7      n= 486 groups=[191, 295] declared=0.000594 deflated dims=1 k=300 p50=0.063747 p95=0.068196 reached=300 (seed base 20261004)
+    [DFL] site NC_math_n486_s8      n= 486 groups=[191, 295] declared=0.000355 deflated dims=1 k=300 p50=0.063483 p95=0.067856 reached=300 (seed base 20261004)
+    [DFL] site NC_math_n486_s9      n= 486 groups=[191, 295] declared=-0.001283 deflated dims=1 k=300 p50=0.062698 p95=0.067995 reached=300 (seed base 20261004)
+    [DFL] site NC_math_n486_s10     n= 486 groups=[191, 295] declared=0.000171 deflated dims=1 k=300 p50=0.064823 p95=0.069397 reached=300 (seed base 20261004)
+    [DFL] site EC_STRONG_n486_d1    n= 486 groups=[243, 243] declared=0.114274 deflated dims=1 k=  0 p50=0.051092 p95=0.055887 reached=300 (seed base 20261004)
+    [DFL] site EC_STRONG_n486_d2    n= 486 groups=[243, 243] declared=0.114332 deflated dims=1 k=  0 p50=0.051127 p95=0.055355 reached=300 (seed base 20261004)
+    [DFL] site EC_STRONG_n486_d3    n= 486 groups=[243, 243] declared=0.112621 deflated dims=1 k=  0 p50=0.049804 p95=0.056067 reached=300 (seed base 20261004)
+    [DFL] site EC_STRONG_n486_d4    n= 486 groups=[243, 243] declared=0.116341 deflated dims=1 k=  0 p50=0.050374 p95=0.056101 reached=300 (seed base 20261004)
+    [DFL] site EC_STRONG_n486_d5    n= 486 groups=[243, 243] declared=0.114157 deflated dims=1 k=  0 p50=0.050512 p95=0.056645 reached=300 (seed base 20261004)
+    [DFL] site EC_MID_n486_d1       n= 486 groups=[243, 243] declared=0.102809 deflated dims=1 k=  0 p50=0.049089 p95=0.060125 reached=300 (seed base 20261004)
+    [DFL] site EC_MID_n486_d2       n= 486 groups=[243, 243] declared=0.105915 deflated dims=1 k=  0 p50=0.047799 p95=0.059042 reached=300 (seed base 20261004)
+    [DFL] site EC_MID_n486_d3       n= 486 groups=[243, 243] declared=0.106902 deflated dims=1 k=  0 p50=0.050700 p95=0.060990 reached=300 (seed base 20261004)
+    [DFL] site EC_MID_n486_d4       n= 486 groups=[243, 243] declared=0.109471 deflated dims=1 k=  0 p50=0.050774 p95=0.061526 reached=300 (seed base 20261004)
+    [DFL] site EC_MID_n486_d5       n= 486 groups=[243, 243] declared=0.106914 deflated dims=1 k=  0 p50=0.051284 p95=0.062170 reached=300 (seed base 20261004)
+    [DFL] wrote experiment_results\cert_k2_deflated\arm: sites.csv, replicates.csv, status.txt (COMPLETE); verdicts are the readout's
+
+BUILD SUCCESSFUL in 21m 29s
+9 actionable tasks: 2 executed, 2 from cache, 5 up-to-date
+Configuration cache entry stored.

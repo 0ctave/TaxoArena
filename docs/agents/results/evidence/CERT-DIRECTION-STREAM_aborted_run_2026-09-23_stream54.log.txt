@@ -1,0 +1,88 @@
+reserved_pool_id=p2dca21ab5f4ef3ae
+=== CERT-DIRECTION-STREAM (registered 2026-09-23, commit 46889ea; docs/judge_v2_program.md L14758-L14792) ===
+  script identity: cert_direction_stream.py blob:a4be06c34aa7df18b7e50db754309f9911d007e0 / sha256-lf16:b9164a0457affbd1 (LF rendering; working tree CRLF sha256-crlf16:62f34cd56026ec0e)
+  EXECUTION WITNESS (imported instrument): cert_under_filter.__file__ = Z:\FAC\TUBerlin\THESIS\TaxoArena\tools\analysis\cert_under_filter.py
+    blob:f7d59019c3d65128687df46aebdcb798b43c3062 / sha256-lf16:0db2026f17b559a1 (pinned blob:f7d59019c3d65128687df46aebdcb798b43c3062 / sha256-lf16:0db2026f17b559a1: MATCH, hashed before and after the import); working tree CRLF sha256-crlf16:b144a7d4377acfd3 (record: b144a7d4377acfd3)
+  systematic_budget.build LF source sha16 128baa007a44a219 (CERT's check_build_pin, pinned 128baa007a44a219)
+  ZERO judge calls; no DB written; CERT imported UNEDITED (no attribute of it assigned); the one knob = the seed
+  keyword of cert_under_filter.arm_edges, passed for U, F_A and R_A_01..R_A_20 jointly at every stream.
+  readings d1-d9 (docstring): streams 1..200 with the reference 42 inside (counted once); convention A only; C0 leg 2 on the registration's summary; ddof 1; two-stage rng default_rng(42); integer band edges; P1 HELD iff 36 <= k < 90 of 200 and P5 NOT SCORED (registrar's rulings 60ddf85).
+  run started 2026-09-23 22:01:03; 8 worker(s)
+  before: experiment_results\x12_crossdomain\stack_v2_promptv2_x12all.db sha256_16 eb0bec2795f3e5a0 size 39124992 mtime_ns 1789063117390531800
+  before: mmlu_pro_dataset_cache_v2.db sha256_16 4f65414f7625a1e7 size 974917632 mtime_ns 1789828210106974800
+  before: snapshots.db sha256_16 390c313e5a40e0a7 size 1065541632 mtime_ns 1790130866590831700
+  read-only source experiment_results\x12_crossdomain\stack_v2_promptv2_x12all.db (mode=ro&immutable=1): no WAL sidecar (a non-empty -wal refuses the run)
+  read-only source mmlu_pro_dataset_cache_v2.db (mode=ro&immutable=1): WAL sidecar 0 bytes (a non-empty -wal refuses the run)
+  read-only source snapshots.db (mode=ro&immutable=1): WAL sidecar 0 bytes (a non-empty -wal refuses the run)
+  routing bareq512_s42: 3445 routed questions; pool p2dca21ab5f4ef3ae: 3445 ids; routed set == pool: yes
+
+--- THE FILTER (the shipped MatchFilter.kt rule, profile_r_filtered.verdict; NO key read) ---
+  CONVENTION IN FORCE: A (the deployed filter; a missing prediction is KEPT). Convention B (missing dropped) is run
+  beside in full and DECIDES NOTHING.
+  valid x12 verdicts 9142: AGREE 3076 | DISAGREE 5276 | UNDETERMINED (missing prediction) 790
+  convention A kept 6066 of 9142 = 66.4% | convention B kept 5276 of 8352 (both predictions present) = 63.2%
+  G2 (filter counts reproduce 6066 of 9142 (A) and 5276 of 8352 (B)): PASS
+  rows in the arms (routed, in U's 14 anchors of >= 200 rows): 9142 of 9142
+
+--- G1: U reproduces the record (systematic_budget.build's edge object via the pinned copy) ---
+  U: 920 edges (pin 920), 809 established by exact McNemar p < 0.05 on the anchor's JUDGED questions (pin 809), 26 of them against the key (pin 26): PASS
+  (one arm build = 14 anchors x 300 question-bootstrap boards: 15.9 s wall)
+  R universe: convention A = U's cells (9142 rows); convention B = U's cells minus the 790 missing-prediction rows (8352 rows; ruling R6)
+  G3 (every R draw has exactly F's kept count in every (anchor, pair) cell, drawn from its convention's universe; 20 draws x 2 conventions): PASS
+
+--- DENOMINATORS (convention A; CERT's C4 rule, seed-free) ---
+  anchors removed: Business; remaining 13 of 14; established edges in C1's denominator 752
+    stream   1: W_F 19 mean W_R 24.00 Delta_W -5.00 hi +2.56 UNDETERMINED (1 of 200; elapsed 63 s)
+    stream   2: W_F 17 mean W_R 24.15 Delta_W -7.15 hi +0.24 UNDETERMINED (2 of 200; elapsed 121 s)
+    stream   3: W_F 17 mean W_R 23.90 Delta_W -6.90 hi +0.09 UNDETERMINED (3 of 200; elapsed 181 s)
+    stream   4: W_F 19 mean W_R 23.95 Delta_W -4.95 hi +2.76 UNDETERMINED (4 of 200; elapsed 228 s)
+    stream   5: W_F 16 mean W_R 23.90 Delta_W -7.90 hi -1.20 HELD (5 of 200; elapsed 289 s)
+    stream   6: W_F 18 mean W_R 24.05 Delta_W -6.05 hi +1.50 UNDETERMINED (6 of 200; elapsed 344 s)
+    stream   7: W_F 19 mean W_R 23.75 Delta_W -4.75 hi +2.49 UNDETERMINED (7 of 200; elapsed 402 s)
+    stream   8: W_F 18 mean W_R 23.85 Delta_W -5.85 hi +1.84 UNDETERMINED (8 of 200; elapsed 457 s)
+    stream   9: W_F 16 mean W_R 24.05 Delta_W -8.05 hi -1.12 HELD (9 of 200; elapsed 519 s)
+    stream  10: W_F 17 mean W_R 24.20 Delta_W -7.20 hi +0.14 UNDETERMINED (10 of 200; elapsed 574 s)
+    stream  11: W_F 17 mean W_R 24.20 Delta_W -7.20 hi +0.37 UNDETERMINED (11 of 200; elapsed 624 s)
+    stream  12: W_F 18 mean W_R 24.15 Delta_W -6.15 hi +1.56 UNDETERMINED (12 of 200; elapsed 683 s)
+    stream  13: W_F 19 mean W_R 24.10 Delta_W -5.10 hi +2.47 UNDETERMINED (13 of 200; elapsed 741 s)
+    stream  14: W_F 18 mean W_R 24.15 Delta_W -6.15 hi +1.25 UNDETERMINED (14 of 200; elapsed 801 s)
+    stream  15: W_F 17 mean W_R 24.50 Delta_W -7.50 hi -0.09 HELD (15 of 200; elapsed 853 s)
+    stream  16: W_F 17 mean W_R 24.00 Delta_W -7.00 hi +0.10 UNDETERMINED (16 of 200; elapsed 913 s)
+    stream  17: W_F 16 mean W_R 23.85 Delta_W -7.85 hi -1.29 HELD (17 of 200; elapsed 975 s)
+    stream  18: W_F 19 mean W_R 24.25 Delta_W -5.25 hi +2.70 UNDETERMINED (18 of 200; elapsed 1032 s)
+    stream  19: W_F 17 mean W_R 24.35 Delta_W -7.35 hi +0.10 UNDETERMINED (19 of 200; elapsed 1090 s)
+    stream  20: W_F 17 mean W_R 24.20 Delta_W -7.20 hi -0.35 HELD (20 of 200; elapsed 1144 s)
+    stream  21: W_F 19 mean W_R 24.25 Delta_W -5.25 hi +2.25 UNDETERMINED (21 of 200; elapsed 1196 s)
+    stream  22: W_F 19 mean W_R 24.20 Delta_W -5.20 hi +2.69 UNDETERMINED (22 of 200; elapsed 1262 s)
+    stream  23: W_F 18 mean W_R 24.20 Delta_W -6.20 hi +1.53 UNDETERMINED (23 of 200; elapsed 1319 s)
+    stream  24: W_F 18 mean W_R 24.30 Delta_W -6.30 hi +1.33 UNDETERMINED (24 of 200; elapsed 1388 s)
+    stream  25: W_F 17 mean W_R 24.35 Delta_W -7.35 hi -0.16 HELD (25 of 200; elapsed 1451 s)
+    stream  26: W_F 16 mean W_R 24.15 Delta_W -8.15 hi -1.32 HELD (26 of 200; elapsed 1517 s)
+    stream  27: W_F 18 mean W_R 24.00 Delta_W -6.00 hi +1.14 UNDETERMINED (27 of 200; elapsed 1578 s)
+    stream  28: W_F 17 mean W_R 24.45 Delta_W -7.45 hi -0.11 HELD (28 of 200; elapsed 1645 s)
+    stream  29: W_F 17 mean W_R 24.20 Delta_W -7.20 hi +0.05 UNDETERMINED (29 of 200; elapsed 1709 s)
+    stream  30: W_F 17 mean W_R 24.40 Delta_W -7.40 hi -0.07 HELD (30 of 200; elapsed 1775 s)
+    stream  31: W_F 18 mean W_R 24.45 Delta_W -6.45 hi +1.29 UNDETERMINED (31 of 200; elapsed 1840 s)
+    stream  32: W_F 17 mean W_R 24.10 Delta_W -7.10 hi -0.05 HELD (32 of 200; elapsed 1906 s)
+    stream  33: W_F 18 mean W_R 23.95 Delta_W -5.95 hi +2.07 UNDETERMINED (33 of 200; elapsed 1969 s)
+    stream  34: W_F 18 mean W_R 24.20 Delta_W -6.20 hi +1.41 UNDETERMINED (34 of 200; elapsed 2034 s)
+    stream  35: W_F 18 mean W_R 24.00 Delta_W -6.00 hi +1.76 UNDETERMINED (35 of 200; elapsed 2100 s)
+    stream  36: W_F 20 mean W_R 24.20 Delta_W -4.20 hi +3.32 UNDETERMINED (36 of 200; elapsed 2168 s)
+    stream  37: W_F 19 mean W_R 24.55 Delta_W -5.55 hi +2.58 UNDETERMINED (37 of 200; elapsed 2231 s)
+    stream  38: W_F 17 mean W_R 23.95 Delta_W -6.95 hi +0.49 UNDETERMINED (38 of 200; elapsed 2298 s)
+    stream  39: W_F 19 mean W_R 24.15 Delta_W -5.15 hi +3.40 UNDETERMINED (39 of 200; elapsed 2362 s)
+    stream  40: W_F 19 mean W_R 24.60 Delta_W -5.60 hi +1.99 UNDETERMINED (40 of 200; elapsed 2432 s)
+    stream  41: W_F 17 mean W_R 24.15 Delta_W -7.15 hi +0.26 UNDETERMINED (41 of 200; elapsed 2495 s)
+    stream  42: W_F 17 mean W_R 24.15 Delta_W -7.15 hi -0.08 HELD (42 of 200; elapsed 2561 s)
+    stream  43: W_F 18 mean W_R 24.25 Delta_W -6.25 hi +1.74 UNDETERMINED (43 of 200; elapsed 2627 s)
+    stream  44: W_F 19 mean W_R 24.25 Delta_W -5.25 hi +2.12 UNDETERMINED (44 of 200; elapsed 2698 s)
+    stream  45: W_F 18 mean W_R 24.35 Delta_W -6.35 hi +1.11 UNDETERMINED (45 of 200; elapsed 2760 s)
+    stream  46: W_F 17 mean W_R 24.25 Delta_W -7.25 hi -0.75 HELD (46 of 200; elapsed 2826 s)
+    stream  47: W_F 16 mean W_R 24.30 Delta_W -8.30 hi -1.77 HELD (47 of 200; elapsed 2894 s)
+    stream  48: W_F 19 mean W_R 24.05 Delta_W -5.05 hi +2.04 UNDETERMINED (48 of 200; elapsed 2962 s)
+    stream  49: W_F 16 mean W_R 24.45 Delta_W -8.45 hi -1.64 HELD (49 of 200; elapsed 3025 s)
+    stream  50: W_F 17 mean W_R 24.45 Delta_W -7.45 hi -0.02 HELD (50 of 200; elapsed 3093 s)
+    stream  51: W_F 17 mean W_R 24.15 Delta_W -7.15 hi -0.07 HELD (51 of 200; elapsed 3163 s)
+    stream  52: W_F 18 mean W_R 23.90 Delta_W -5.90 hi +1.02 UNDETERMINED (52 of 200; elapsed 3227 s)
+    stream  53: W_F 17 mean W_R 24.00 Delta_W -7.00 hi +0.34 UNDETERMINED (53 of 200; elapsed 3290 s)
+    stream  54: W_F 17 mean W_R 24.35 Delta_W -7.35 hi -0.19 HELD (54 of 200; elapsed 3359 s)

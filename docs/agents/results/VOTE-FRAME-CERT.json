@@ -1,0 +1,305 @@
+{
+  "id": "VOTE-FRAME-CERT",
+  "title": "VOTE-FRAME-CERT: for every dual-order cache in the record, which stored vote column is POSITIONAL, which (if any) is CONTESTANT-LABELLED, and is the order key a column ordinal or an `arm` value - asserted ROW BY ROW? (engineering, zero calls; the prerequisite of POSITION-INDEX-ALL)",
+  "question": "A row-level frame certificate per dual-order cache (positional / contestant-labelled columns, order-key kind, evidence, class CERTIFIED-POSITIONAL / CERTIFIED-CONTESTANT / MIXED / AMBIGUOUS / UNCERTIFIABLE), so that no index is computed over mixed frames.",
+  "kind": "engineering",
+  "state": "done",
+  "registration": {
+    "commit": "8adae39 (the registration commit; it adds this record and the programme section, and precedes all code: no script exists for this test at 8adae39)",
+    "program_lines": "docs/judge_v2_program.md L13032-L13109 (heading at L13032)",
+    "program_lines_as_of": "8adae39 (the registration commit); spans re-verified by sed at 88a95d8; resolve by the quoted heading, not by the line number",
+    "heading": "## Registered 2026-09-23 (before any code or call) — VOTE-FRAME-CERT: for every dual-order cache in the record, which stored vote column is POSITIONAL, which (if any) is CONTESTANT-LABELLED, and is the order key a column ordinal or an `arm` value — asserted ROW BY ROW? (engineering, zero calls; the prerequisite of POSITION-INDEX-ALL)",
+    "date": "2026-09-23"
+  },
+  "script": {
+    "path": "tools/analysis/vote_frame_cert.py (MERGED on main at b9a945b, from f6acf1b)",
+    "sha16": "blob:8e1fbf6a7d557c2a82f5769ecea89c1d03f10705 / sha256-lf16:72ceddfe919a982e",
+    "commit": "b9a945b"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_vote_frame_family_rr3.md",
+    "commit": "ae88d3a",
+    "verdict": "READY-WITH-CONDITIONS at f6acf1b (V-C1, V-C2'', V-C5)",
+    "script": "blob:8e1fbf6a7d557c2a82f5769ecea89c1d03f10705 / sha256-lf16:72ceddfe919a982e",
+    "conditions": "V-C1 (unchanged): --run needs the data-steward's independent listing (E1); the coordinator reports it is being produced now. V-C2'' (REPLACES V-C2'; a COUNT check on the certificate text of the real run, verbatim from ae88d3a): `grep -c \"H3 COMBINER CHECK\"` = 3: rubric_ladder.db PASS, pinned blob f03cb302dfb38f5d7cf396af3115736bc4f90b61, \"L307 rejudge_grok.combine_orders: AST-identical to rejudge_grok.combine_orders (a direct call)\"; rubric_swap.db PASS, 3ebf4f4a6e391de479f78ffcde1029530a72a571, \"L187 ... (a direct call)\"; rubric_contrast.db FAIL, \"cannot be pinned\", with the evidence \"PIN TIMING\". `grep -c \"H3 CALL-SITE CHECK PASS\"` = 2, and each of them carries both the order-2 line (\"'v2' bound directly from parse_judge at L306\" / \"at L186\") and the order-1 line (\"'v1' ... at L305\" / \"at L185\"). `grep -c \"H3 CALL-SITE CHECK not reached\"` = 1. `grep -c \"is NOT AST-identical to the recipe\"` = 0, `grep -c \"AST-equivalent\"` = 0, and `grep -c \"rebinds or patches rejudge_grok\"` = 0. The P4 reason line reads \"(2) E-COMB, combiner not verified 1 [of which pin timing 1\". Any other count voids this READY for VOTE-FRAME-CERT. V-C5 (REPLACES V-C4 for D-C): COMB_WRITER stays the CLOSED list of three (rubric_ladder, rubric_swap, rubric_contrast). Any addition to it, or any reuse of the instrument on another E-COMB cache (no raw text), requires a READY that runs tamper_adv.py, callsite_adv.py, rj_history.py and writer_tamper_scan.py (the writer and its transitive local imports at the pin) with 0 false certificates outside the ruled limits, unless D-C' is fixed first. V-C4 DISCHARGED for D-A and D-B. x2 a stated limit, absent on the record (flip rates 0.137 / 0.136 / 0.144). L4 LOW (mutate3/mutate4 counts do not reproduce; nothing weakened).",
+    "supersession_chain": "14edeb4 (d237e56) -> bc2ea7b (84ab7e3) -> 776a2dd (5579eb7; merged 8cd0f0e) -> ae88d3a (f6acf1b; merged b9a945b)",
+    "record": "docs/judge_v2_program.md L14529-L14549",
+    "v_c1": "MET 2026-09-23: the data-steward's independent listing, docs/agents/results/evidence/VOTE-FRAME-CERT_E1_steward_listing.txt (sha256 e332d73905b95412c0a6e89a017a62843a0fdfaa05ce62f0352481bd43ae6eba; path lines 010fda4c0217a27a), 62 files incl. 7 under _backup/; E1 scored file for file against it (docs/judge_v2_program.md L14572-L14589)"
+  },
+  "go": "n/a: ZERO judge calls, far below the 4,000-match rule; no plan amendment is owed. The author's standing authorisation of 2026-09-23 to schedule and start further tests without waiting for approval (relayed by the orchestrator) is recorded as the DECISION TO SCHEDULE. Operational gates: an instrument written against this registration, a committed adversarial-reviewer READY, a zero-call --dry-run that writes nothing, and a run outside any construction window (rule 7).",
+  "run": {
+    "outcome_file": "experiment_results/vote_frame_cert.txt and experiment_results/vote_frame_cert.json (experiment_results/vote_frame_cert.txt blob:8db4403fbfa1c53f28a1f4672b781c119420c00b / sha256-lf16:5e3af71cfd97e759 / sha256-crlf16:06876dacff71dd85 (the working tree holds the CRLF rendering); experiment_results/vote_frame_cert.json blob:5ec19826a1b2bb33eccbe2810b389051906dd8c0 / sha256-lf16:48e5f5a3d4dd02d0 / sha256-crlf16:c68a655ac64ae06d (working tree CRLF))",
+    "outcome_commit": "c731836",
+    "calls": 0,
+    "cce": 0,
+    "pool": "n/a (a frame census over 62 caches; pools printed per cache, not asserted)",
+    "date": "2026-09-23"
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-23_vote_frame_cert_post.md",
+    "commit": "abf4db5",
+    "verdict": "CERTIFICATE HELD CONFIRMED; every deciding count reproduced to the digit; P1, P2, P3, P5 CONFIRMED; P4 PARTLY; the RX class of the _backup copy an instrument artefact (D1 / D2); D3-D8 recorded"
+  },
+  "criteria": [
+    {
+      "id": "E1",
+      "text": "the enumeration (fixed rule: every SQLite file under experiment_results/ and the repo root whose schema has two or more per-order vote columns or an order-valued key column) printed with count, sizes, sha256_16, matching the data-steward's independent listing file for file; FAILED on any mismatch",
+      "result": "HELD",
+      "value": "62 files, matching the committed steward listing file for file (outcome L391; review claim 1)",
+      "denominator": "62 enumerated SQLite files (_backup/ included)"
+    },
+    {
+      "id": "E2",
+      "text": "every enumerated cache receives exactly one class with its evidence counts (E-RAW re-parse of stored raw responses, else E-COMB re-derivation of the stored combined column under both hypotheses; 100% of informative rows)",
+      "result": "HELD",
+      "value": "62 of 62 carry exactly one of six classes with counts (outcome L392); QUALIFIED (review PARTLY): a presence check; the RX copy's class is outside the registered definition (D1 / D2)",
+      "denominator": "every row of every enumerated cache (census)"
+    },
+    {
+      "id": "E3",
+      "text": "SELFTEST, both branches executed: six synthetic caches (wide positional, wide transposed, long by arm, mixed, uncertifiable, degenerate) each classed correctly",
+      "result": "HELD",
+      "value": "selftest 240 checks, 0 failed, python and -O (outcome L393); coverage gap D6 (no unmapped-basename name-labelled LONG fixture)",
+      "denominator": "6 synthetic caches"
+    },
+    {
+      "id": "E4",
+      "text": "NO WRITE: size and mtime of every enumerated file (and -wal / -shm) unchanged before / after",
+      "result": "HELD",
+      "value": "size and mtime unchanged on every enumerated file (outcome L394); extended by the review: sha256_16 62 / 62 equal, no -wal / -journal",
+      "denominator": "every enumerated file"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "between 25 and 60 dual-order caches enumerated (point 40)",
+      "result": "HELD",
+      "value": "60 dual-order caches in 25-60, AT THE UPPER EDGE (outcome L397); 6 byte-identical _backup copies among them: 54 distinct contents; 53 of record outside _backup/ (beside, deciding nothing)",
+      "denominator": "60 dual-order caches (62 enumerated minus 2 NOT-DUAL-ORDER)"
+    },
+    {
+      "id": "P2",
+      "text": "at least 80% CERTIFIED-POSITIONAL",
+      "result": "HELD",
+      "value": "54 / 60 = 0.900 >= 0.80 (outcome L398); on distinct content 49 / 54 = 0.907",
+      "denominator": "60 dual-order caches"
+    },
+    {
+      "id": "P3",
+      "text": "0 MIXED",
+      "result": "HELD",
+      "value": "0 MIXED of 60 (outcome L399)",
+      "denominator": "60 dual-order caches"
+    },
+    {
+      "id": "P4",
+      "text": "at least 1 UNCERTIFIABLE",
+      "result": "HELD",
+      "value": "HELD, PARTLY: 2 printed (outcome L400), 1 after removing the RX artefact (rubric_contrast.db, pin timing); by reason (1) registered definition 0, (2) E-COMB combiner not verified 1 [pin timing 1] (L402-L403); HELD under D7 on one pin-timing exclusion, 0 under the registered definition (D3)",
+      "denominator": "60 dual-order caches"
+    },
+    {
+      "id": "P5",
+      "text": "bfcl_judged_pilot.db: long frame keyed by arm, CERTIFIED-POSITIONAL on both arm values; canary_baseline_pass1.db / pass2.db CERTIFIED-POSITIONAL",
+      "result": "HELD",
+      "value": "bfcl_judged_pilot LONG by arm, CERTIFIED-POSITIONAL on rev (fwd 570/570, rev 584/584 positional); both canaries CERTIFIED-POSITIONAL (outcome L401)",
+      "denominator": "three named caches"
+    }
+  ],
+  "falsifier": {
+    "text": "No scientific claim. A MIXED cache, or a cache whose certified frame contradicts the frame a recorded readout assumed, FLAGS that readout for re-read by insertion (AGREE-ORDER position shares, POSITION-DECOMP direction, POSITION-FULL cross-tier direction, ORDER-1 order-specific boards) and is excluded from POSITION-INDEX-ALL.",
+    "fired": false,
+    "reading": "NOT FIRED: 0 MIXED; no certified frame contradicts a recorded readout's assumption (every cache a readout treated as name-labelled is CONTESTANT by content); no consumer readout flagged (docs/judge_v2_program.md L14601-L14647)"
+  },
+  "numbers_of_record": {
+    "premise": "positional-only storage is the CONVENTION: rejudge_grok.py L200-L206 computes the transposition and discards it; 39 scripts reference vote2 / vote2_raw; bfcl_judged_pilot.py stores a long frame keyed by arm",
+    "classes": "CERTIFIED-POSITIONAL 54, CERTIFIED-CONTESTANT 4 (arena13, newcomer_placement, newcomer_placement_steps, placebo), MIXED 0, AMBIGUOUS 0, UNCERTIFIABLE 2 (rubric_contrast pin timing; _backup newcomer_placement_steps RX artefact), NOT-DUAL-ORDER 2 (leaf_powered, refgated) of 62 enumerated (outcome L389)",
+    "dual_order": "60 (62 minus 2 NOT-DUAL-ORDER); 54 distinct contents; 53 outside _backup/",
+    "contestant_frames": "rev / reversed arm transposed: arena13 1776, placebo 585, newcomer_placement 746, newcomer_placement_steps 380; 0 positional (review claims 3-6)",
+    "e_comb": "rubric_ladder 3812/3812 positional, rubric_swap 4006/4006, rubric_contrast 10478/10478 (UNCERTIFIABLE by pin timing: first write 47 s before the writer's earliest commit) (review claims 8-10)",
+    "p4_by_reason": "R1 (registered definition) 0; R2 E-COMB combiner not verified 1 [pin timing 1]; RX 1 (the _backup copy, artefact)",
+    "rx_copy": "_backup/newcomer_placement_steps_2026-09-19_complete.db sha256_16 292fdf095f527ce1, byte-identical to the CERTIFIED-CONTESTANT original; content fwd 387/387, rev 380/380 contestant",
+    "e4_extended": "sha256_16 62 / 62 equal to the run-time value; no -wal / -journal beside any of the 62"
+  },
+  "sentence_of_record": "VOTE-FRAME-CERT post-run review (2026-09-23, zero calls): every deciding count re-computed independently reproduces to the digit. That covers the 4 CERTIFIED-CONTESTANT caches (names in both arms; rev arm 1776 / 585 / 746 / 380 transposed, 0 positional), the 3 E-COMB caches (3812 / 4006 / 10478 positional, 0 contestant), 8 sampled POSITIONAL caches including the Kotlin board and grok_calib, P5 (bfcl fwd 570/570 and rev 584/584 positional; both canaries positional), and the 2 NOT-DUAL-ORDER caches. The sha256_16 of all 62 caches equals the certificate's. The certificate is HELD. One class is an instrument artefact: _backup/newcomer_placement_steps_2026-09-19_complete.db is byte-identical to the CERTIFIED-CONTESTANT original and was printed UNCERTIFIABLE under an unregistered reason (RX), because the instrument's name profile is keyed by file basename. Its content reproduces the original's frame exactly. Ruling (1)'s premise that a byte-identical copy gets its original's class is corrected for this pair. P4 stays HELD on rubric_contrast's pin-timing exclusion alone (0 under the registered definition). No index consequence follows, because _backup/ is excluded by rule. [run c731836, review abf4db5, zero calls; denominators: 62 caches enumerated, 60 dual-order (enumerated minus 2 NOT-DUAL-ORDER), 54 distinct contents among them; P4 HELD under D7 on ONE pin-timing exclusion, 0 under the registered definition (R1); the RX class of the _backup copy is an INSTRUMENT ARTEFACT, not a frame finding]",
+  "chips": [
+    "REGISTERED 2026-09-23, BEFORE ANY CODE",
+    "CERTIFICATE HELD (E1-E4)",
+    "4 CONTESTANT",
+    "P4 HELD, PARTLY (D7 PIN-TIMING EXCLUSION; R1 = 0)",
+    "RX ARTEFACT (_BACKUP COPY; RULED R6 2026-09-25)",
+    "ZERO CALLS",
+    "ENGINEERING; SCOREABLE (CENSUS)"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-23",
+      "by": "the registrar (ledger v134 commit; insertion only, zero calls)",
+      "text": "registration.commit resolved from PENDING to 8adae39 and ledger.version from PENDING to v134; nothing else in this record moves."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the coordinator's relay of the build at e4b5911, before any real-data run (insertion only, zero calls)",
+      "text": "BUILT (e4b5911). Programme L13691-L13746, ruling (4): a sixth class NOT-DUAL-ORDER (row-level: no key under two order values), outside the five, not a kind of UNCERTIFIABLE; E2 reads six classes; P1-P4 read over the dual-order caches only; source prediction (not a finding): four caches expected contestant-labelled (arena13, placebo, newcomer_placement, newcomer_placement_steps), bearing on P2. Readings recorded: P5 on the rev arm (fwd AMBIGUOUS by construction); MIXED if any table MIXED or certified tables disagree."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar (insertion only, zero calls)",
+      "text": "READY review 14edeb4: NOT READY (blockers B1 (order-1 contradiction demoted to a warning; must be MIXED) and B2; H3 ruled here; M1-M3). Script now at d237e56, tools/analysis/vote_frame_cert.py LF 3217ee2d78dd4421. H3 ruled (programme L13967-L14002): an E-COMB-only certificate requires a pinned per-cache source check of the writer's combiner, else UNCERTIFIABLE."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the re-review bc2ea7b (insertion only, zero calls)",
+      "text": "READY of record bc2ea7b: READY-WITH-CONDITIONS for tools/analysis/vote_frame_cert.py at 84ab7e3 (blob:384f26b75bfbf162f0d3efc0d0ecd381f66a344f / sha256-lf16:a426fddc03ce7601). Conditions: V-C1 --run needs the data-steward's independent listing (E1), else refuses; V-C2 exactly three 'H3 COMBINER CHECK' lines (rubric_ladder PASS at f03cb302dfb38f5d, rubric_swap PASS at 3ebf4f4a6e391de4, rubric_contrast FAIL 'cannot be pinned', UNCERTIFIABLE) and 0 'AST-equivalent', else the READY is void; V-C3 discharged by the registrar's D4 / D7 / P4-by-reason rulings (programme L14201-L14246). Rulings (programme L14201-L14246): D2 H3 extended to the call-site argument (option (a) for the instrument; option (b), the reviewer's data-flow reading, the record for the three writers of record); D4 duplicate-key LONG tables UNCERTIFIABLE; D7 pin rule kept, P4 printed by reason, rubric_contrast UNCERTIFIABLE by pin timing not frame. The builder is fixing D1, D3, D5 (new pins then need the READY's re-check)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar (insertion only, zero calls)",
+      "text": "Build efbf376 (D2(a) call-site check, D3, D4, D5, D7 implemented; D1 not, pending the H3(b) amendment): tools/analysis/vote_frame_cert.py blob:51d0d2a9bd439749c4a3c90a285c8654cb6db2aa / sha256-lf16:ddf1c3566175cf9b, verified by the registrar. H3(b) AMENDED (programme L14248-L14278): the 'AST-equivalent' arm is withdrawn; a combiner is verified only if AST-identical to rejudge_grok.combine_orders at the pinned blob, or a direct call to it; stated limits: a correct differently written combiner (C6), an unrelated combine_text helper, an aliased import 'co' all read UNCERTIFIABLE (false fails, never false passes). The READY of record bc2ea7b covers the 84ab7e3 pins only, so the state returns to built until the READY's re-check of the final build."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the delta re-review 776a2dd and the merge 8cd0f0e (insertion only, zero calls)",
+      "text": "READY of record 776a2dd (READY-WITH-CONDITIONS); merged 8cd0f0e (blob:57dca54498e5b574073cc2c4ddc4d2b2d3933dd8 / sha256-lf16:fb114fecd879a6ca, verified by the registrar). Conditions: V-C1 (the data-steward's independent listing); V-C2' (replaces V-C2; a COUNT check on the certificate text of the real run): grep -c \"H3 COMBINER CHECK\" = 3: rubric_ladder.db PASS, pinned blob f03cb302dfb38f5d7cf396af3115736bc4f90b61, \"L307 rejudge_grok.combine_orders: AST-identical to rejudge_grok.combine_orders (a direct call)\"; rubric_swap.db PASS, 3ebf4f4a6e391de479f78ffcde1029530a72a571, \"L187 ... (a direct call)\"; rubric_contrast.db FAIL, \"cannot be pinned\". grep -c \"H3 CALL-SITE CHECK PASS\" = 2 (ladder \"'v2' bound directly from parse_judge at L306\"; swap \"at L186\") and grep -c \"H3 CALL-SITE CHECK not reached\" = 1. grep -c \"NOT the recipe's REF_COMBINE_ORDERS\" = 0 and grep -c \"AST-equivalent\" = 0. The P4 reason line shows \"(2) E-COMB, combiner not verified 1 [of which pin timing 1 ...]\". Any other count voids this READY for VOTE-FRAME-CERT. V-C4: before any E-COMB cache other than these three is certified, or the instrument is reused, D-A, D-B and D-C are fixed and re-reviewed; if the builder fixes D-A (and D-C) now, the pins change and a delta check of those hunks is needed; the verdicts carry over if h3_adv, callsite_adv and rj_history show 0 false certificates.. Rulings (programme L14383-L14413): D-A clarified within 94731da; D-B the call-site check extended to order 1; D-C noted; x2 a stated limit."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (V-C4 delta check ae88d3a, relayed by the coordinator)",
+      "text": "READY-WITH-CONDITIONS at f6acf1b (V-C1, V-C2'', V-C5). V-C1 (unchanged): --run needs the data-steward's independent listing (E1); the coordinator reports it is being produced now. V-C2'' (REPLACES V-C2'; a COUNT check on the certificate text of the real run, verbatim from ae88d3a): `grep -c \"H3 COMBINER CHECK\"` = 3: rubric_ladder.db PASS, pinned blob f03cb302dfb38f5d7cf396af3115736bc4f90b61, \"L307 rejudge_grok.combine_orders: AST-identical to rejudge_grok.combine_orders (a direct call)\"; rubric_swap.db PASS, 3ebf4f4a6e391de479f78ffcde1029530a72a571, \"L187 ... (a direct call)\"; rubric_contrast.db FAIL, \"cannot be pinned\", with the evidence \"PIN TIMING\". `grep -c \"H3 CALL-SITE CHECK PASS\"` = 2, and each of them carries both the order-2 line (\"'v2' bound directly from parse_judge at L306\" / \"at L186\") and the order-1 line (\"'v1' ... at L305\" / \"at L185\"). `grep -c \"H3 CALL-SITE CHECK not reached\"` = 1. `grep -c \"is NOT AST-identical to the recipe\"` = 0, `grep -c \"AST-equivalent\"` = 0, and `grep -c \"rebinds or patches rejudge_grok\"` = 0. The P4 reason line reads \"(2) E-COMB, combiner not verified 1 [of which pin timing 1\". Any other count voids this READY for VOTE-FRAME-CERT. V-C5 (REPLACES V-C4 for D-C): COMB_WRITER stays the CLOSED list of three (rubric_ladder, rubric_swap, rubric_contrast). Any addition to it, or any reuse of the instrument on another E-COMB cache (no raw text), requires a READY that runs tamper_adv.py, callsite_adv.py, rj_history.py and writer_tamper_scan.py (the writer and its transitive local imports at the pin) with 0 false certificates outside the ruled limits, unless D-C' is fixed first. V-C4 DISCHARGED for D-A and D-B. x2 a stated limit, absent on the record (flip rates 0.137 / 0.136 / 0.144). L4 LOW (mutate3/mutate4 counts do not reproduce; nothing weakened). docs/judge_v2_program.md L14529-L14549."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (the data-steward's E1 listing, relayed by the coordinator)",
+      "text": "V-C1 MET. Ruling (1): _backup/ stays in E1's universe as registered and built (no file excluded by hand); the listing does not change; POSITION-INDEX-ALL already excludes _backup/ by rule (EXCLUDE_PREFIXES) and its post-run review checks that entered caches have pairwise distinct sha256_16. Ruling (2): refgated.db is NOT-DUAL-ORDER under ruling (4), already registered (card / base are conditions, not order values), not R5; 15 dual-order LONG tables. P1 scored as registered over 60 dual-order caches (expected HELD at the bound), 53 of record printed beside. Notes: 13 WIDE condition arms never order keys; bfcl_result / multiswe_result and 77 ratings DBs outside the rule; 11 gitignored caches without backup listed for the author. docs/judge_v2_program.md L14572-L14589."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (run c731836; post-run review abf4db5)",
+      "text": "OUTCOME: CERTIFICATE HELD (E1-E4); P1, P2, P3, P5 HELD; P4 HELD, PARTLY; falsifier not fired. The _backup copy's RX class is an INSTRUMENT ARTEFACT (basename-keyed name profile). Ruling (1)'s premise bracketed [CORRECTED] in place. RX added to V-C5's reuse conditions; VFC-NAME-PROFILE-BY-CONTENT queued. docs/judge_v2_program.md L14601-L14647."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (READY 9d3e261 on the fixes; merge 0c66174)",
+      "text": "vote_frame_cert fixes merged at 0c66174 (tools/analysis/vote_frame_cert.py blob:aab89f37eb3ee7c50a8ff888c05d1409f64522a2 / sha256-lf16:a985eff263414fd9 / sha256-crlf16:e42ab00a95d931be); READY-WITH-CONDITIONS C1-C5; NAME-PROFILE CONFIRMED, DC-PRIME PARTLY (7 new vectors 7/7 false). C3 DISCLOSURE: the lines of experiment_results/vote_frame_cert.txt (c731836) that WOULD MOVE if the certificate were re-derived with the build merged at 0c66174 (tools/analysis/vote_frame_cert.py blob:aab89f37eb3ee7c50a8ff888c05d1409f64522a2 / sha256-lf16:a985eff263414fd9 / sha256-crlf16:e42ab00a95d931be): L1 the script sha (72ceddfe919a982e -> a985eff263414fd9); L154-L157 the _backup newcomer_placement_steps copy UNCERTIFIABLE (RX) -> CERTIFIED-CONTESTANT, 387/387; L389 the classes 54/4/0/0/2/2 -> 54/5/0/0/1/2; L400 the P4 count 2 -> 1; L403-L404 the RX reason dropped. NO VERDICT MOVES: E1-E4 and P1-P5 stay HELD (P4 still >= 1 on the pin-timing exclusion). The outcome file is NOT rewritten and stays the certificate of record (VFC_PIN_LF 72ceddfe unless a new certificate is written); POSITION-INDEX-ALL and TIE-MECHANICS re-derive byte-identically under the new build. V-C5 stays; RX unruled, ruling before any reuse. docs/judge_v2_program.md L15566-L15584."
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (VFC-RX-RULING, the arena-specialist's ruling recorded verbatim, sha256 116854c2f1bcf750edbee3479900ca9b9920e373324d68323a03aea3323300a2; zero calls)",
+      "text": "RX RULED: the SIXTH registered UNCERTIFIABLE reason R6 \"stored labels unresolvable (a name-profile gap: instrument knowledge, not frame)\"; trigger ONE OR MORE unresolvable labels on the deciding tally (closes abf4db5 D4); precedence MIXED before R6, R6 before CERTIFIED / AMBIGUOUS; the WIDE secondary with unresolvable labels prints \"UNCERTIFIABLE (R6), secondary, n resolved of m informative\", never CERTIFIED; no silent defaults (R-7 no default reason, R-8 unit_votes refuses on None, R-9 label_space \"unresolved\"). NO VERDICT MOVES: E1-E4 and P1-P5 stand; P4 \"HELD, PARTLY\" stands; the 6 WIDE secondary lines (causal_length x4, x12_crossdomain arxiask / oracle) would print R6; VFC_PIN_LF stays 72ceddfe. Code: tools/analysis/vote_frame_cert.py only (plus VFC-FIXES-2's own D5 in position_index_all.py); no collision with the pilot or INDUCE-3 pins. docs/judge_v2_program.md L17171-L17328 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls) — VFC-RX-RULING: the arena-specialist's ruling on RX ...\" (L17171-L17328, _as_of the commit that writes them, parent 971fd0b, re-grepped))"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (VFC-FIXES-2 merge record; zero calls; insertion only)",
+      "text": "VFC-FIXES-2 PART (i) READY (f387d58, build 930ccc7) and MERGED at f76a93b: the instrument on main is now vote_frame_cert.py blob:1a3d0bb5576b5c18c15c42e3ee8da09967303dca / sha256-lf16:b45b75db7d98103e / sha256-crlf16:3b44739e161d0d86 (R-1..R-9 and D1-D5 in code). NOTHING OF RECORD MOVES: the certificate c731836 (vote_frame_cert.txt 8db4403f, .json 5ec19826), E1-E4, P1-P5 and VFC_PIN_LF 72ceddfe stand. REUSE GATED on VFC-FIXES-2's (ii)/(iii) (not shown). docs/judge_v2_program.md L20127-L20162 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — VFC-FIXES-2 PART (i) READY (f387d58, build 930ccc7, after NOT READY a3da968); ...\"), _as_of the commit that writes it, parent f76a93b, re-grepped."
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (VFC-FIXES-2 (ii)/(iii) build / pin ruling; zero calls; insertion only)",
+      "text": "the delta checks (ii)/(iii) that gate reuse of vote_frame_cert.py will run on the MERGE COMMIT f76a93b (b2; pin blob:1a3d0bb5 / sha256-lf16:b45b75db7d98103e) under R2.6-b2 of docs/reviews/RULING_vfc_ii_iii_pin.md at 93cc7de (blob:7858fa2ac2f31df5fc0e4c349f609bffa1821a03; file bytes LF = the LF of record, sha256 087685415c0e67539a5d53ac3ecbaa5e48bcd407bf67b61cf0d749bcc15b1088); recorded at docs/judge_v2_program.md L20391-L20431 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run; BEFORE any leg of (ii) / (iii)) — VFC-FIXES-2 (ii)/(iii) BUILD / PIN RULING RECORDED: (b2), R2.6 RE-ISSUED AS R2.6-b2 ...\"; _as_of the commit that writes it, parent 55a6ce1, re-grepped); not run; the certificate of record c731836 and VFC_PIN_LF 72ceddfe stand; reuse still gated; ledger v294 (a bracket in this row's observed cell)"
+    },
+    {
+      "date": "2026-09-26",
+      "by": "registrar (VFC-FIXES-2 (ii)/(iii) harness v4 READY + merge; zero calls; insertion only; before any leg)",
+      "text": "the harness of the delta checks (ii)/(iii) is READY (docs/reviews/READY_vfc_harness_v4.md e256c23, on the RV4-1 delta 5385c17 confirmed by a driver re-run: 62/62 cases, 29/29 mutants) and MERGED by path at ea68f47; pin experiment_results/vfc_fixes_2/harness/rerun_vf4.py blob:8db1d2e740bd127b2bf18e81c7e35ae306cc65f4 / sha256-lf16:818cfa3b66ba8b3a / sha256-crlf16:66a2ed54862eab15; P1, P2, P4 (arena-specialist 2a340dd: '' is NOT NULL, a unit with '' on its deciding tally is UNCERTIFIABLE R6; an all-'' R6 move is an ordinary R6 finding and (ii) is scored) and P5 MET; only P3 (E3 selftests on the f76a93b archive) remains. Not run. NOTHING OF RECORD MOVES: certificate c731836 and VFC_PIN_LF 72ceddfe stand; reuse still gated. Recorded at docs/judge_v2_program.md L20433-L20476 (section \"## Registrar's record 2026-09-26 (insertion only; zero calls; nothing run; BEFORE any leg of (ii) / (iii)) — VFC-FIXES-2 (ii)/(iii) HARNESS v4 READY ...\"; _as_of the commit that writes it, parent 2a340dd, re-grepped); ledger v295 (a bracket in this row's observed cell; no chip change)."
+    },
+    {
+      "date": "2026-09-26",
+      "by": "registrar (VFC-FIXES-2 (ii)/(iii); zero calls; insertion only)",
+      "text": "CERTIFICATE OF RECORD c731836 STANDS, NOT RE-ISSUED; VFC_PIN_LF 72ceddfe stands. Under the fixed instrument b45b75db (VFC-FIXES-2 (ii), a zero-write re-derivation, docs/reviews/POSTRUN_vfc_ii_iii.md (ef045a1; blob:f472aba63fecff11de867a8e154a20ea0ecd10d2) VALID): the _backup copy of newcomer_placement_steps reads CERTIFIED-CONTESTANT (order-1 387 / 387), not UNCERTIFIABLE (RX); the six E-COMB secondaries read UNCERTIFIABLE (R6), DESCRIPTIVE ONLY (111/1024, 187/1048, 182/993, 140/972, 29/279, 36/288; contestant-name labels, 0 ''); classes would read 54 / 5 / 0 / 0 / 1 / 2; reason (6) = 0; the OTHER line retired. No verdict moves: E1-E4 and P1, P2, P3, P5 unchanged; P4 prints 1 and STAYS 'HELD, PARTLY'. Consumers unaffected, READ FROM SOURCE (position_index_all.py L177; plan() reads primary classes), not shown by running them. REUSE LICENSED: REUSE LICENSED: vote_frame_cert.py blob:1a3d0bb5 / sha256-lf16:b45b75db7d98103e by VOTE-FRAME-CERT, POSITION-INDEX-ALL and TIE-MECHANICS (consumers position_index_all.py bcbaf609 / 9c78d485f37f442a, tie_mechanics.py 7f88d2ac / d6a1a0409a0fc06e); any edit to the 15-module closure voids it; certificate c731836 NOT re-issued; VFC_PIN_LF 72ceddfe stands; V-C5 in force. Programme line-end brackets at L14612, L14618, L17300, L17321; docs/judge_v2_program.md L20558-L20593 (section \"## VFC-FIXES-2 (ii)/(iii) (2026-09-26, 0 calls) — VALID (post-run review ef045a1): (ii) PASS, (iii) PASS; P3 MET ...\"; _as_of the commit that writes it, parent c400c30, re-grepped). Ledger v297 (a bracket in the observed cell; no chip change)."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: fixture pointer (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM pointer 2026-09-27: ENGINEERING FIXTURE use (voice 4 of the ruling): the code-reproduction / byte-identity verdict stands as a fixture; the judged agreement numbers on its family caches are p2dca judged family — history, not evidence (RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "any position, strength or fidelity number (it certifies frames only)",
+    "the frame of a cache it cannot certify (UNCERTIFIABLE / AMBIGUOUS at any budget)",
+    "that the 11 gitignored, unbacked-up caches will survive (kotlin_c0d3f708cbc3930e, gen_arena_grok, aggregate, arena13, arenav3, arxiask, leaf_powered, oracle, pairnoref, placebo, refgated): an author-owned .gitignore matter",
+    "[post-run review abf4db5] It does not re-run the H3 AST checks. They were spot-checked only: the call lines at the pinned commits and the pin timing of rubric_contrast.",
+    "[post-run review abf4db5] It does not check the 46 unsampled CERTIFIED-POSITIONAL caches beyond their sha, size and mtime identity to the certificate.",
+    "[post-run review abf4db5] It does not show that my parser equals `rejudge_grok.parse_judge` on every string. It was written independently to the same rules and agreed with every stored vote in the recomputed tables. It does not show that it would agree on inputs not present here.",
+    "[post-run review abf4db5] It does not open the six WAL-carrying caches, snapshots_frozen.db, or any WAL tail. E1's shared blind spot is stated in section 3.",
+    "[post-run review abf4db5] It does not check a NOT-DUAL-ORDER cache's order beyond the writer's source line and the stored columns (for refgated, the prompts are not stored).",
+    "[post-run review abf4db5] It does not check the pools each cache belongs to. The registration prints pools and does not assert them.",
+    "[post-run review abf4db5] It does not re-score any consumer readout (AGREE-ORDER, POSITION-DECOMP, POSITION-FULL, ORDER-1). No sign-inversion defect was found that would require it: every cache a readout treated as name-labelled is CONTESTANT by content.",
+    "[post-run review abf4db5] It does not show that row-level duplication is absent for the two E-COMB-only caches (no raw text to compare)."
+  ],
+  "ledger": {
+    "row_id": "VOTE-FRAME-CERT",
+    "version": "v297 (2026-09-26: bracket in the observed cell: VFC-FIXES-2 (ii)/(iii) PASS, reuse licensed, certificate not re-issued; no chip change) | v289 (bracket in the observed cell: VFC-FIXES-2 part (i) READY and merged at f76a93b; reuse gated; no chip change); v259 (bracket in the observed cell: VFC-RX-RULING; chip RX ARTEFACT (_BACKUP COPY; UNRULED REASON) -> RX ARTEFACT (_BACKUP COPY; RULED R6 2026-09-25)); v171 (adjudicated: chips replaced, observed cell carries the outcome; audit OK) | v295 (2026-09-26: harness v4 READY + pin recorded; P4 met; a bracket in the observed cell; no chip change); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "BFCL-JUDGED-PILOT",
+    "CANARY-BASELINE"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing and reopens nothing; posts nothing; proposes no recipe change"
+  },
+  "queue_items": [
+    "VOTE-FRAME-CERT"
+  ],
+  "support": {
+    "deciding_denominator": "every row of every enumerated cache (census)",
+    "deff_and_source": "not applicable (no sampling); the design",
+    "n_eff": "not applicable",
+    "se_arithmetic": "none; deterministic",
+    "mde_80": "not applicable; threshold 100% of informative rows",
+    "verdict_lines": "SCOREABLE (deterministic engineering assertion)",
+    "structural": "UNCERTIFIABLE (no raw, no combined column) and AMBIGUOUS (all informative rows degenerate) at any budget"
+  },
+  "sources": [
+    "docs/judge_v2_program.md, this registration section",
+    "tools/analysis/rejudge_grok.py at c052e79, L200-L206 (combine_orders)",
+    "tools/analysis/bfcl_judged_pilot.py at c052e79, L894-L903 (read-write open_cache; verdicts PRIMARY KEY (mid, arm))",
+    "grep -l -E 'vote2|vote_rev|vote2_raw' tools/analysis/*.py at c052e79: 39 files",
+    "docs/agents/queue.json item VOTE-FRAME-CERT (blocker text: the experiment-manager's premise correction)",
+    "docs/reviews/READY_vote_frame_family_rr3.md (ae88d3a); docs/judge_v2_program.md L14529-L14549",
+    "docs/agents/results/evidence/VOTE-FRAME-CERT_E1_steward_listing.txt (sha256 e332d73905b95412c0a6e89a017a62843a0fdfaa05ce62f0352481bd43ae6eba); docs/judge_v2_program.md L14572-L14589",
+    "docs/reviews/2026-09-23_vote_frame_cert_post.md (abf4db5)",
+    "experiment_results/vote_frame_cert.txt / .json (c731836)",
+    "docs/judge_v2_program.md L14601-L14647",
+    "docs/judge_v2_program.md L15566-L15584",
+    "docs/reviews/READY_vote_frame_fixes.md (9d3e261)",
+    "docs/judge_v2_program.md L17171-L17328 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls) — VFC-RX-RULING: the arena-specialist's ruling on RX ...\" (L17171-L17328, _as_of the commit that writes them, parent 971fd0b, re-grepped)) (VFC-RX-RULING verbatim; census reproduced with the ruling's own command on experiment_results/vote_frame_cert.json blob:5ec19826)",
+    "docs/judge_v2_program.md L20127-L20162 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — VFC-FIXES-2 PART (i) READY (f387d58, build 930ccc7, after NOT READY a3da968); ...\"), _as_of the commit that writes it, parent f76a93b, re-grepped",
+    "docs/judge_v2_program.md L20433-L20476 (section \"## Registrar's record 2026-09-26 (insertion only; zero calls; nothing run; BEFORE any leg of (ii) / (iii)) — VFC-FIXES-2 (ii)/(iii) HARNESS v4 READY ...\"; _as_of the commit that writes it, parent 2a340dd, re-grepped)",
+    "docs/judge_v2_program.md L20558-L20593 (section \"## VFC-FIXES-2 (ii)/(iii) (2026-09-26, 0 calls) — VALID (post-run review ef045a1): (ii) PASS, (iii) PASS; P3 MET ...\"; _as_of the commit that writes it, parent c400c30, re-grepped)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "ready_history": [
+    {
+      "file": "docs/reviews/READY_vote_frame_family_rr2.md",
+      "commit": "776a2dd",
+      "verdict": "READY-WITH-CONDITIONS",
+      "script": "tools/analysis/vote_frame_cert.py at 5579eb7, merged to main 8cd0f0e, blob:57dca54498e5b574073cc2c4ddc4d2b2d3933dd8 / sha256-lf16:fb114fecd879a6ca",
+      "conditions": "V-C1 (the data-steward's independent listing); V-C2' (replaces V-C2; a COUNT check on the certificate text of the real run): grep -c \"H3 COMBINER CHECK\" = 3: rubric_ladder.db PASS, pinned blob f03cb302dfb38f5d7cf396af3115736bc4f90b61, \"L307 rejudge_grok.combine_orders: AST-identical to rejudge_grok.combine_orders (a direct call)\"; rubric_swap.db PASS, 3ebf4f4a6e391de479f78ffcde1029530a72a571, \"L187 ... (a direct call)\"; rubric_contrast.db FAIL, \"cannot be pinned\". grep -c \"H3 CALL-SITE CHECK PASS\" = 2 (ladder \"'v2' bound directly from parse_judge at L306\"; swap \"at L186\") and grep -c \"H3 CALL-SITE CHECK not reached\" = 1. grep -c \"NOT the recipe's REF_COMBINE_ORDERS\" = 0 and grep -c \"AST-equivalent\" = 0. The P4 reason line shows \"(2) E-COMB, combiner not verified 1 [of which pin timing 1 ...]\". Any other count voids this READY for VOTE-FRAME-CERT. V-C4: before any E-COMB cache other than these three is certified, or the instrument is reused, D-A, D-B and D-C are fixed and re-reviewed; if the builder fixes D-A (and D-C) now, the pins change and a delta check of those hunks is needed; the verdicts carry over if h3_adv, callsite_adv and rj_history show 0 false certificates.",
+      "supersession_chain": "14edeb4 (d237e56) -> bc2ea7b (84ab7e3) -> 776a2dd (5579eb7; merged 8cd0f0e)"
+    }
+  ],
+  "expected_counts_for_run": {
+    "raw_enumeration": 62,
+    "not_dual_order": "2 (x12_crossdomain/leaf_powered.db; x12_crossdomain/refgated.db, ruling (4))",
+    "dual_order": "60 (7 of them _backup/ files) -> P1 expected HELD at its upper bound 25 <= 60 <= 60",
+    "beside_P1_deciding_nothing": "dual-order caches of record (outside _backup/) 53; distinct contents among the 60: 54",
+    "dual_order_LONG_tables": 15,
+    "P4_reason_line": "unchanged: (2) E-COMB, combiner not verified 1 [of which pin timing 1",
+    "R5_from_refgated": 0,
+    "status": "expectations for the run-operator and reviewer, not criteria; a mismatch is investigated and explained by insertion",
+    "source": "docs/judge_v2_program.md L14572-L14589"
+  },
+  "reuse_conditions": "V-C5 (COMB_WRITER closed at three; any addition or reuse on another E-COMB cache needs a READY running tamper_adv, callsite_adv, rj_history and writer_tamper_scan with 0 false certificates, unless D-C' is fixed) PLUS, from docs/judge_v2_program.md L14601-L14647: RX must be RULED by the registrar before ANY reuse (AMBIGUOUS per registration L13086, or a refusal), with VFC-NAME-PROFILE-BY-CONTENT (D1 / D2 / D6) landed and a delta READY [2026-09-26 registrar: MET for vote_frame_cert.py blob:1a3d0bb5 / sha256-lf16:b45b75db7d98103e: RX RULED (VFC-RX-RULING), VFC-FIXES-2 (i) READY f387d58, (ii) and (iii) PASS (post-run review ef045a1 VALID): REUSE LICENSED on the pinned closure; V-C5 (COMB_WRITER closed at three; any addition or reuse on another E-COMB cache needs its READY) STAYS IN FORCE. docs/judge_v2_program.md L20558-L20593 (section \"## VFC-FIXES-2 (ii)/(iii) (2026-09-26, 0 calls) — VALID (post-run review ef045a1): (ii) PASS, (iii) PASS; P3 MET ...\"; _as_of the commit that writes it, parent c400c30, re-grepped)]",
+  "plain_description": {
+    "sq": "Data hygiene",
+    "what": "An engineering audit of every stored dual-order judging cache, row by row. It certifies whether each vote column records the screen position (left/right) or the named model, so that no statistic mixes the two.",
+    "why": "Position-bias and order analyses are wrong if they mix position-labelled and model-labelled votes.",
+    "information": "Result (no new calls): the certificate holds and was independently reproduced to the digit. No cache mixes frames. One cache could not be certified because of commit timing. One backup copy was misclassified because of its filename, an instrument artefact. It certifies frames only, not any bias number, and 11 caches are not backed up.",
+    "written": "2026-10-07"
+  }
+}

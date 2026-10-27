@@ -1,0 +1,278 @@
+{
+  "id": "REF-FORM-BY-CELL",
+  "title": "REF-FORM-BY-CELL: on the quantitative anchors, does a reference of a stronger FORM (a program-of-thought solve, executed locally) raise verification fidelity where the cached grok-reasoning solve is wrong? (solve stage run; judged stage conditional on C1, not run)",
+  "question": "On the four bareq512_s42 quantitative anchors (Math, Physics, Chemistry, Engineering), is a reference produced by a different PROCESS (the solver writes a Python program, the program is EXECUTED in a sandbox, the printed value is mapped to the option letter) more often right than the cached grok-4-1-fast-reasoning solve on the PoT-eligible questions, and does the unchanged STACK-v2 judge follow it? The REFERENCE form of the specialised-judge hypothesis (the prompt form is closed).",
+  "kind": "solve",
+  "state": "done",
+  "registration": {
+    "commit": "d2f5393",
+    "program_lines": "docs/judge_v2_program.md L7034-L7361 (registration, engineering note, registrar's check; brackets by insertion L7112 and L7127 added 2026-09-19 at 2cae68a) [re-lined 2026-09-22: batch-1 lines were read at 9c1f37b-era HEAD and shifted by +6 by later insertions]",
+    "program_lines_as_of": "6aa2a0d",
+    "heading": "## Registered 2026-09-18 (before any code or call) — REF-FORM-BY-CELL: on the quantitative anchors, does a reference of a stronger FORM (a program-of-thought solve, executed locally) raise verification fidelity where the cached grok-reasoning solve is wrong? (judged; needs the author's go; bill stated below)",
+    "outcome_heading": [
+      "L7632: ## REF-FORM-BY-CELL (2026-09-19, solve stage; 597 program-of-thought solves under Amendment 5, the 12-solve pilot inside the count, 0 judge calls; the judged st"
+    ],
+    "date": "2026-09-18"
+  },
+  "script": {
+    "path": "tools/analysis/pot_ref.py (solve stage; with tools/analysis/pot_runner.py and tools/analysis/refform_cell.py, the latter never launched)",
+    "sha16": "04f2db60d121b61e",
+    "commit": "3783956"
+  },
+  "ready": null,
+  "go": "docs/plan_2026-09-15.md Amendment 5 (4ce6825): the author's 'Go' for the solve stage (<= 600 solves, ~6,000 cce) and the judged stage CONDITIONAL on C1 HELD (<= 3,200 judge calls, lapsed with C1 FAILED); Docker runner chosen",
+  "run": {
+    "outcome_file": "experiment_results/judge_solve/pot_ref_outcome.txt",
+    "outcome_commit": "9322e44",
+    "calls": "597 grok-4-1-fast-reasoning solves (the 12-solve pilot inside the count); 0 judge calls",
+    "cce": "~5,970 of the ~6,000 authorised (solve stage); judged stage 0",
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-19",
+    "other_files": [
+      "experiment_results/judge_solve/pot_ref_PILOT.txt (074eb3d)",
+      "experiment_results/judge_solve/grok-reasoning-pot.db (the PoT vintage, 597 rows; UNTRACKED and not ignored; not the reference of record)"
+    ]
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-18_night_batch.md section REF-FORM-BY-CELL solve stage",
+    "commit": "074eb3d",
+    "verdict": "every printed number CONFIRMED to the digit; C1 FAILED, F1 fires, judged stage not run; defects D1-D9 (27 stop-truncations unguarded, HIGH; 0.777 is an instrument floor, HIGH; break 8135 a pick() artefact, corrected 3:2; the +2pp bar unreachable under the registration's own bands; no READY before the pilot, process)"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "the form is a lever on the REFERENCE: PoT reference-correct among YIELDED eligible questions exceeds the incumbent's on the same questions by >= 2pp pooled, fix : break by exact McNemar p < 0.05",
+      "result": "FAILED",
+      "value": "+0.0pp (0.963 vs 0.963), fix 3 : break 3, p 1.0; corrected reading (checker D3, pick() artefact on q 8135 removed) fix 3 : break 2, +0.2pp, p 1.0; FAILED under either",
+      "denominator": "482 yielded of 597 PoT-eligible questions (Math 196 / Physics 174 / Chemistry 151 / Engineering 76) of the four bareq512_s42 quantitative anchors"
+    },
+    {
+      "id": "C2",
+      "text": "the judge transcribes it: on the FIXED matches arm P minus control (convention A) >= +0.40 with a question-clustered CI excluding 0; on the BROKEN matches the mirror <= -0.40",
+      "result": "n/a",
+      "value": "NOT SCORED (judged stage not run: F1 fired)",
+      "denominator": "would have been the DIFF stratum of the 1,364 key-decidable x12 MAIN eligible matches"
+    },
+    {
+      "id": "C3",
+      "text": "a cell gain that could ship: pooled QUANT4 deployment-reading gain >= the session floor AND >= +1.0pp with CI excluding 0 under BOTH conventions; per-cell on Math / Physics / Chemistry only, Engineering descriptive",
+      "result": "n/a",
+      "value": "NOT SCORED (judged stage not run: F1 fired)",
+      "denominator": "1,364 key-decidable x12 MAIN eligible matches (Engineering 76 q < 120: descriptive)"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P-yield",
+      "text": "yield 0.80-0.92 of eligible",
+      "result": "HELD",
+      "value": "0.807 (482 / 597); usable-response yield 482 / 570 = 0.846 ex the 27 stop-truncations",
+      "denominator": "597 eligible"
+    },
+    {
+      "id": "P-degenerate",
+      "text": "degenerate programs <= 5%",
+      "result": "HELD",
+      "value": "0.030 = 18 / 597 (checker's corrected static_check count 17 / 597 = 0.028, HELD either way)",
+      "denominator": "597 eligible"
+    },
+    {
+      "id": "P-Math",
+      "text": "PoT reference-correct among yielded, Math 0.95-0.98",
+      "result": "HELD",
+      "value": "0.976",
+      "denominator": "169 yielded of 196"
+    },
+    {
+      "id": "P-Physics",
+      "text": "PoT reference-correct among yielded, Physics 0.92-0.96",
+      "result": "FAILED",
+      "value": "0.977 (above the band)",
+      "denominator": "133 yielded of 174"
+    },
+    {
+      "id": "P-Chemistry",
+      "text": "PoT reference-correct among yielded, Chemistry 0.88-0.93",
+      "result": "FAILED",
+      "value": "0.969 (above the band)",
+      "denominator": "128 yielded of 151"
+    },
+    {
+      "id": "P-Engineering",
+      "text": "PoT reference-correct among yielded, Engineering 0.80-0.88 (descriptive row)",
+      "result": "HELD",
+      "value": "0.865 (descriptive; 76 q < 120, UNDETERMINED-by-support as a cell)",
+      "denominator": "52 yielded of 76"
+    },
+    {
+      "id": "P-fix",
+      "text": "fix rate on incumbent-wrong eligible questions 0.25-0.40 (against CoT's 0.12)",
+      "result": "FAILED",
+      "value": "3 / 18 = 0.167",
+      "denominator": "18 incumbent-wrong among the 482 yielded"
+    },
+    {
+      "id": "P-break",
+      "text": "break rate 0.01-0.03",
+      "result": "FAILED",
+      "value": "3 / 464 = 0.006 (corrected 2 / 464 = 0.004, FAILED)",
+      "denominator": "464 incumbent-right among the 482 yielded"
+    },
+    {
+      "id": "P-gain-yielded",
+      "text": "pooled among-yielded gain +1 to +3pp (C1 HELD at the low edge)",
+      "result": "FAILED",
+      "value": "+0.0pp",
+      "denominator": "482 yielded"
+    },
+    {
+      "id": "P-deploy",
+      "text": "deployment reading (no-yield = wrong) -3 to +2pp",
+      "result": "FAILED",
+      "value": "-14.7pp (0.777 vs 0.925); the figure is an instrument floor (checker D2)",
+      "denominator": "597 eligible questions"
+    },
+    {
+      "id": "P-gemini",
+      "text": "gemini agreement of the PoT letter within +-3pp of the incumbent's",
+      "result": "HELD",
+      "value": "+0.0pp (0.967 / 0.967, n 481)",
+      "denominator": "482 yielded questions, per-contestant agreement"
+    },
+    {
+      "id": "P-judged",
+      "text": "judged-stage predictions (fixed-match gain +0.45 to +0.65; broken-match loss -0.45 to -0.65; no-yield -0.08 to -0.14; SAME-floor and control-vs-cache discordance 4-8%; pooled QUANT4 deployment gain -1.5 to +1.5pp; fallback +0.5 to +1.5pp; Engineering the only cell above +2pp)",
+      "result": "n/a",
+      "value": "NOT SCORED (judged stage not run: F1 fired)",
+      "denominator": "n/a"
+    }
+  ],
+  "falsifier": {
+    "text": "F1: C1 FAILED - the form is not a lever on this corpus's quantitative side (the incumbent's residual errors are not execution errors); the line closes at the solve bill, no judge call is made. F2: C1 HELD and C2 FAILED would overturn ORACLE's stratum reading (+0.573) and CONSENSUS-FIT's REF dominance. F3: C1 and C2 HELD, C3 FAILED - the lever is bounded by the reference-wrong share (ceiling +3.5pp).",
+    "fired": true,
+    "which": "F1 fired; F2 and F3 not reached (judged stage not run)"
+  },
+  "numbers_of_record": {
+    "eligible_set_of_record": "597 PoT-eligible questions (Math 196 / Physics 174 / Chemistry 151 / Engineering 76) by the script's regex; 1,364 key-decidable x12 MAIN matches; 82 reference-wrong matches; ceiling +3.49pp (the design-time 461 / 1,064 / 61 / +3.4pp were a different, conservative regex, superseded by the L7121 bracket)",
+    "solves_and_guard": "597 of 597 cached (12-solve pilot inside the count); finish_reason stop 597; content_filter + length 0 of 597 (guard OK)",
+    "status_table_QUANT4": "picked 482 / no_pick 94 / degenerate 18 / error 2 / blocked 1; yield 0.807 (Math 0.862, Physics 0.764, Chemistry 0.848, Engineering 0.684); usable-response yield 482 / 570 = 0.846",
+    "among_yielded": "PoT 464 / 482 = 0.963; incumbent 464 / 482 = 0.963 on the same questions; fix 3 (q 9188 / 9330 / 11678) / break 3 (8003 / 8135 / 11878), McNemar p 1.0; corrected 3 / 2 (+0.2pp) with the 8135 pick() artefact removed",
+    "per_cell_among_yielded": "PoT_y Math 0.976 / Physics 0.977 / Chemistry 0.969 / Engineering 0.865; incumbent on yielded 0.988 / 0.970 / 0.977 / 0.827; fix / break Math 0 / 2 (p 0.50), Physics 1 / 0 (p 1.00), Chemistry 0 / 1 (p 1.00), Engineering 2 / 0 (p 0.50)",
+    "deployment_reading": "PoT_d 0.777 vs incumbent 0.925 (-14.7pp) on 597 eligible: an INSTRUMENT FLOOR (27 stop-truncations; hand sample of 20 no_pick = 7 truncations, 3 unmappable, 10 correct values the picker failed to map); judge-level deployment reading not measured",
+    "CoT_comparator": "grok-reasoning-cot.db on the same questions 0.915 pooled (fix 10 / break 16); per cell 0.980 / 0.902 / 0.914 / 0.776",
+    "vacuity_of_the_form": "PoT letter == incumbent letter on 473 / 482 = 98.1% of yielded (the same model's CoT re-solve 96.5%); of the 18 incumbent-wrong yielded 12 repeat the identical wrong letter, 3 differ, 3 fixed",
+    "bar_reachability": "+2pp needed >= 10 of 18 fixed with none broken; the registered fix band 0.25-0.40 and break band 0.01-0.03 give -1.9 to +0.5pp (checker D4); yield is selective: incumbent right on 0.963 of yielded vs 0.765 of the 115 non-yielded; 27 of the 45 incumbent-wrong eligible did not yield",
+    "stop_truncations": "27 of 597 (4.5%; Engineering 14 of 76), finish_reason 'stop', 13-171 completion tokens, unclosed code fence; 15 in the run's last 25 min; cached as no-yield, outside the guard; re-post = 27 calls (~270 cce) pending the author's word, not done",
+    "range_option_artefact": "60 / 597 questions (10%) have non-discriminating leading numbers; 48% no_pick there vs 12% elsewhere",
+    "R2_leakage": "per-contestant agreement PoT vs incumbent on the 482 yielded within +-0.007 for every contestant; frontier delta +0.002 (gemini 0.967 / 0.967; arx 0.925 / 0.925; iask 0.908 / 0.908) against REF-QUAL gate (3)'s 0.03 bar: NULL",
+    "judged_stage": "0 of the <= 3,200 authorised judge calls posted; no refform_cell.db, no refform_cell_outcome.txt, no refform_cell_PILOT.txt",
+    "bill": "597 reasoning solves ~5,970 cce of ~6,000 authorised; sandbox execution free; nothing further authorised",
+    "repost_of_the_27_stop_truncations_2026_09_19": "SUPPLEMENTARY (pot_ref_outcome_repost.txt, 71c6b24; the outcome of record is unchanged): 27 of 27 flagged rows re-posted once (27 grok-4-1-fast-reasoning calls, ~270 cce, spent 2026-09-19 13:42:18); statuses picked 9 / truncated 15 / no_pick 2 / error 1; 9 yield of 27, 6 right of 9, fix 2 / break 0 against the incumbent. Pooled QUANT4 on the 597 eligible before -> after: truncated 27 -> 15 (4.5% -> 2.5%), picked 482 -> 491, yield 0.807 -> 0.822, PoT_d 0.777 -> 0.787, PoT among yielded 0.963 -> 0.957 vs incumbent 0.953 on the same 491, C1 +0.0pp -> +0.4pp (fix 3 : break 3 p 1.0000 -> fix 5 : break 3 p 0.7266) STILL FAILED, usable-response yield 482/570 = 0.846 -> 491/582 = 0.844; per-cell yield after Math 0.862 / Physics 0.782 / Chemistry 0.854 / Engineering 0.750, Engineering truncations 14 -> 7."
+  },
+  "sentence_of_record": "REF-FORM-BY-CELL solve stage (597 PoT-eligible questions of the four bareq512_s42 quantitative anchors, one grok-4-1-fast-reasoning program each, executed in the pinned Docker sandbox; 1,364 key-decidable x12 MAIN matches, ceiling +3.5pp): the program-of-thought reference yields a letter on 482 (0.807; 0.846 of the 570 non-truncated responses) and is right on 464 of them, exactly the incumbent's 464 of 482 on the same questions (fix 3 / break 3, McNemar p = 1.0; fix 3 / break 2 once the one pick() artefact on range options is removed, +0.2pp): C1 FAILED, F1 fires, the judged stage is not run. The executed program agrees with the incumbent's letter on 98.1% of yielded questions, more than the same model's CoT re-solve does (96.5%), and repeats the incumbent's exact wrong letter on 12 of its 18 errors: the incumbent's residual errors on MMLU-Pro's quantitative side are modelling errors, not arithmetic, and the +2pp bar needed >= 10 of those 18 fixed with none broken, which the registration's own fix/break bands never allowed. The deployment figure 0.777 (no-yield = wrong) is an instrument floor: 27 responses (4.5%; Engineering 14 of 76) are provider truncations with finish_reason 'stop' cached as no-yield, and most sampled no_pick programs computed the right value that the 2% picker, the LaTeX exponent parser, or the option format failed to map.",
+  "chips": [
+    "C1 FAILED (0.963 vs 0.963, 3:3 p 1.0; 3:2 CORRECTED)",
+    "F1 FIRED, JUDGED STAGE NOT RUN",
+    "FORM = SAME CHAIN (98.1% AGREEMENT; 12/18 IDENTICAL WRONG)",
+    "YIELD 0.807 (0.846 EX-TRUNCATION; 27 STOP-TRUNCATIONS UNGUARDED)",
+    "DEPLOYABLE 0.777 IS A FLOOR",
+    "+2pp BAR UNREACHABLE UNDER OWN BANDS",
+    "NO READY BEFORE THE PILOT (PROCESS)",
+    "R2 LEAKAGE NULL",
+    "SANDBOX PIN CONFIRMED"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-18",
+      "by": "the registrar at registration (programme L7323, d2f5393)",
+      "text": "7.8% is 36 of 461 eligible QUESTIONS; the eligible-MATCH share is 61 of 1,064 = 5.7%; the ceiling +3.4pp, computed on matches, is unaffected."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "REF-FORM-BY-CELL solve stage (programme L7106, 2cae68a)",
+      "text": "the no-yield list omits a class the run produced: 27 of 597 responses (4.5%; Engineering 14 of 76) are provider truncations with finish_reason 'stop' (13-171 completion tokens, an unclosed code fence, text ending mid-identifier), cached as no-yield (no_pick) and outside the content_filter + length guard, which read 0 of 597; an unregistered failure class; re-posting them (27 calls, ~270 cce) needs the author's word and has not been done. Usable-response yield 482 / 570 = 0.846 against the printed 0.807."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "REF-FORM-BY-CELL solve stage (programme L7121, 2cae68a)",
+      "text": "the count of record is the script's regex, as this registration fixed: 597 eligible questions (Math 196 / Physics 174 / Chemistry 151 / Engineering 76), 1,364 key-decidable x12 MAIN matches, 82 reference-wrong matches, ceiling +3.49pp (--dry-run at 3783956). The design-time 461 / 1,064 / 61 / +3.4pp were a different, conservative regex and are superseded; the ceiling's reading is unchanged. The registrar's earlier bracket '7.8% is 36 of 461 questions' reads 45 of 597 = 7.5% of eligible questions and 82 / 1,364 = 6.0% of eligible matches on the set of record."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "checker D3 (docs/reviews/2026-09-18_night_batch.md, 074eb3d), recorded in the outcome section and the ledger chip",
+      "text": "break 8135 is a pick() artefact on range options (the program computes 197 correctly, pick maps to the leading 200): corrected fix 3 / break 2, +0.2pp among yielded; C1 still FAILED. Both readings are of record."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "POT-AUTH-RESOLVE (registrar, phase A of the night of 2026-09-23, zero calls; programme outcome section, bracket after 'no-yield list ... is bracketed with this class.', plus brackets on defect D1, on the Files paragraph and on the registration's L7112 bracket)",
+      "text": "The contradiction between tools/analysis/pot_ref.py L44 ('re-post authorised by the author \"you can repost them\"') and the programme's 'NEEDS THE AUTHOR'S WORD: pending, not done' is a contradiction of TIME, not of fact: the outcome section was committed at 2cae68a (2026-09-19 02:27:44 +0200) when the re-post was pending; the author's sentence was given later that day; the 27 rows were re-posted ONCE at 2026-09-19 13:42:18 and committed at 71c6b24 (13:44:25 +0200) with the supplementary readout experiment_results/judge_solve/pot_ref_outcome_repost.txt. READING OF RECORD: the author's sentence authorises exactly those 27 rows, one re-post each, and nothing else (no second re-post, no other row or cache, not the judged stage, which lapsed with C1 FAILED). Those 27 calls were spent on 2026-09-19 and are NOT charged against the 14,000-call ceiling of plan Amendment 9 (2026-09-23). CONSEQUENCE: the queue item POT-REPOST-27 is CLOSED AS ALREADY DONE and spends 0 calls on the night of 2026-09-23; --repost-truncated is never launched again; the 15 rows that truncated a second time keep status 'truncated' and are never posted a third time (enforced by 'WHERE question_id = ? AND repost_of IS NULL'); these calls are never folded into another cache. RESULT of the re-post (supplementary, the outcome of record pot_ref_outcome.txt 9322e44 unchanged and write-once): picked 9 / truncated-again 15 / no_pick 2 / error 1; 9 yield, 6 right, fix 2 / break 0; pooled QUANT4 truncated 27 -> 15 (4.5% -> 2.5% of 597), yield 0.807 -> 0.822, PoT_d 0.777 -> 0.787, among-yielded PoT 0.963 -> 0.957 vs incumbent 0.953 on the same 491, C1 +0.0pp -> +0.4pp, fix 3:3 p 1.0000 -> fix 5:3 p 0.7266, STILL FAILED; usable-response yield 0.846 -> 491/582 = 0.844; 56% second-truncation rate vs a 4.5% base = the class is question-conditioned. NEW PROCESS DEFECT D10 (MEDIUM): the authorisation that caused 27 calls lived only in a script docstring and a commit message, in no amendment and in no programme sentence, which is why the queue asked for the same 27 calls again four days later. RULE ADOPTED AND APPLIED BACKWARD: an author's go that causes a call is quoted in the plan as an amendment or in the programme section it spends against, in the same commit as the spend."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "CORRECTIONS_2026-09-23 (registrar)",
+      "text": "[CORRECTED 2026-09-23 by the registrar (line pointer only, zero calls; no number, no criterion and no sentence moves): registration.program_lines names docs/judge_v2_program.md L7034, and that was exact when it was written. After commit cd83eac inserted four one-line correction brackets mid-file (hunks @@ -3911,0 / -6535,0 / -6692,0 / -6949,0 @@), the heading of record \"## Registered 2026-09-18 (before any code or call) — REF-FORM-BY-CELL: on the quantitative anchors, does a reference of a stronger FORM (a p ...\" stands at L7038, +4; the whole span shifts by the same +4. Verified at HEAD by sed -n '7038p' docs/judge_v2_program.md. The map for every such pointer is the programme's \"## Line-shift map, appended 2026-09-23\" section: +0 up to old L3911, +1 to L6535, +2 to L6692, +3 to L6949, +4 below. The recorded span is left standing beside this bracket, not rewritten.]"
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "any judged number (C2, C3, F2, F3 unscored; no transcription reading; no cell gain; no session floor)",
+    "the fallback reading (never computed; never an arm)",
+    "anything about a stronger solver MODEL per cell (REF-QUAL-KIMI's gates (3) / (4) stand as the bar; not tested here)",
+    "the PoT form's yield as a property of the form (0.846 of usable responses yielded; most misses are instrument-side)",
+    "Engineering as a cell (76 q, descriptive)",
+    "any leaf-level statement",
+    "any board, profile, tier, band or reference-of-record change (grok-reasoning-pot.db is a vintage on 597 questions, NOT the reference of record; no board is refit from it)",
+    "a promotion of any form to the recipe",
+    "that the re-post changed any verdict: C1 stays FAILED (+0.4pp, p 0.7266), F1 still fires, the judged stage still did not run, and the outcome of record pot_ref_outcome.txt (9322e44) is write-once and unchanged; the supplementary readout is not a second outcome"
+  ],
+  "ledger": {
+    "row_id": "REF-FORM-BY-CELL",
+    "version": "v115; [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "REF-QUAL-KIMI-JSON",
+    "DESIGN-PROBES",
+    "REF-QUALITY-MONITOR",
+    "ORACLE",
+    "CONSENSUS-FIT",
+    "PAIR-NOREF",
+    "REF-CHECKLIST",
+    "RECIPE-GROK",
+    "REGEN",
+    "STAGE3-MATH-CAPFREE",
+    "ANCHOR-FREE-REDRAW",
+    "TOPIC-DIFFICULTY",
+    "GROK-CALIB"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "the reference FORM per cell on MMLU-Pro's quantitative anchors (with JUDGE-BY-CELL: 'specialise the judge by cell' CLOSED for the judge MODEL and the reference FORM after the prompt form; open only as a stronger solver MODEL per cell under REF-QUAL's gates (1) (3) (4), naming REF-QUAL-KIMI-JSON as the result it would overturn; programme note L7754-L7763). Not one of CONTEXT.md section 5's listed closed lines; the registration reopens none of them (registrar's check L7277-L7296)."
+  },
+  "sources": [
+    "docs/judge_v2_program.md L7028-L7355 (registration d2f5393; brackets L7106 / L7121 / L7323): question, hygiene, criteria, predictions, falsifiers, bill, go condition",
+    "docs/judge_v2_program.md L7626-L7763 (outcome section, 2cae68a): every number, the scored criteria and predictions, defects D1-D9, does-not-show, the sentence of record, the registrar's note on closure",
+    "docs/reviews/2026-09-18_night_batch.md section REF-FORM-BY-CELL solve stage (074eb3d): CONFIRMED status, findings, sentence of record, chips",
+    "experiment_results/judge_solve/pot_ref_outcome.txt (9322e44): the outcome of record; pot_ref_PILOT.txt (074eb3d)",
+    "docs/plan_2026-09-15.md Amendment 5 (4ce6825): the go",
+    "docs/test_ledger.html row REF-FORM-BY-CELL (v115): chips verbatim, evidence cell (d2f5393 registration, 3783956 tooling, 4ce6825, 9322e44, 074eb3d, 2cae68a)",
+    "script sha16 = sha256 of tools/analysis/pot_ref.py at 3783956, first 16 hex (identity, computed by the registrar 2026-09-20; no READY exists for this test: checker D5)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' lines to grep -n regardless of line drift; line numbers re-lined 2026-09-22 as of programme HEAD 6aa2a0d (shift +6 from the batch-1 reading)",
+    "experiment_results/judge_solve/pot_ref_outcome_repost.txt (71c6b24): every figure of the 2026-09-19 re-post quoted in the 2026-09-23 bracket",
+    "git history read 2026-09-23 (POT-AUTH-RESOLVE): commit 2cae68a 2026-09-19 02:27:44 +0200 (the outcome section, 'pending'), commit 71c6b24 2026-09-19 13:44:25 +0200 (the re-post, 'authorised by the author'); tools/analysis/pot_ref.py L44 and L358 (the quoted sentence); docs/plan_2026-09-15.md has no amendment for it (defect D10)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "On 597 quantitative questions (math, physics, chemistry, engineering), the reference model wrote a Python program that was executed in a sandbox, and its answer was compared with the usual cached reasoning reference.",
+    "why": "It tests whether a stronger kind of reference (computed, not reasoned) would help the judge in quantitative cells.",
+    "information": "More correct answers would justify a per-cell reference form and a judged follow-up. No gain closes the idea. Result: done; the judged stage was never run. The program-based reference was right on exactly as many questions as the usual one (464 of 482). The two agreed 98% of the time and often repeated the same mistakes, so the remaining errors are modelling errors, not arithmetic slips. The idea is closed for this corpus. Older question family, later ruled 'history, not evidence'.",
+    "written": "2026-10-07"
+  }
+}

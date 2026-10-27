@@ -1,0 +1,186 @@
+{
+  "id": "INTENT-S0-CARD-PROTOCOL",
+  "title": "INTENT-S0-CARD-PROTOCOL (prompt arm only; K1-K5 fixed): at each embedder's EMBED-DIM-SLICE-selected slice, does gemma's fine edge over qwen3 survive card-conformant prompts (CP1), and do card prompts raise qwen3's fine NMI over RAW (CP2)? (zero calls; Ollama re-embedding; REGISTERED)",
+  "question": "At each embedder's EMBED-DIM-SLICE-selected slice, does gemma's fine-level edge over qwen3 survive card-conformant prompts on both sides (CP1), and do card prompts raise qwen3's fine NMI over RAW (CP2)?",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "the commit that writes this record (parent ce0d0f17)",
+    "program_lines": "docs/judge_v2_program.md L22655-L22680",
+    "program_lines_as_of": "the commit that writes them, parent ce0d0f17, re-grepped",
+    "date": "2026-10-01",
+    "heading": "## Registered 2026-10-01 (before any code or call) — INTENT-S0-CARD-PROTOCOL: at each embedder's EMBED-DIM-SLICE-selected slice, ...",
+    "provenance": "docs/agents/plans/2026-10-02_next_registrations.md (ce0d0f17), registered as drafted on the orchestrator's brief of 2026-10-01"
+  },
+  "script": {
+    "path": "tools/analysis/card_protocol_writer.py + tools/analysis/card_protocol.py; prompts experiment_configs/card_protocol_prompts.json; pins experiment_configs/card_protocol_pins.json (qwen3_card, gemma_card filled 2026-10-02 by the registrar, C-CP-3; nomic_card null)",
+    "sha16": "writer sha256-lf16:55d93334997fc685 (blob:2788d7214df86dd8aabdb67d9b1b373ba3ec49fe); readout sha256-lf16:a41f1c2c2693c320 (blob:cdcc1dbb4ece15b150988f43913e757432e90e77); prompts sha256-lf16:19c3d1f888ba3a99 (blob:5b54f82e52b8f8586f9a2a805bdf0d48903ddde2); pins sha256-lf16:b292be4514a98d25 (blob:732097b4e8c4429bb7b3e77db66dd07742792592); LF of record (copied from the review)",
+    "commit": "eba0efe2 (merge by path of card-proto b3b1a9ad)",
+    "card_pins": "qwen3_card intent_emb_qwen3_card.db sha256-bytes e8dd85afc2afc0752fce019d7fb4ad127a7d06e094cf604401b82efb1f22a1ac; gemma_card intent_emb_gemma_card.db sha256-bytes 9396cb1bbb2352cbc2b9de895fb19a03ae41326373db3f58d7c67bf2f9366039 (both 57,350 texts COMPLETE; qwen3 one resume at 51,008, T4 PASS; nomic_card null, D4); pins file git blob:b0ab92b7e13b0dd5ff470fe1c57cd349dcc99186 (LF)"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_card_proto.md",
+    "commit": "7e8890c6",
+    "scope": "writer passes qwen3 card, gemma card (serial; nomic NOT run) from main under C-CP-1 (MET by the registrar's bracket) and C-CP-2; readout --run after both CARD files COMPLETE and pinned, under C-CP-3..C-CP-5 (CARD pins owed after the writer passes) [2026-10-02 registrar: C-CP-3 MET, CARD pins filled in experiment_configs/card_protocol_pins.json; --run waits on C-CP-4 then C-CP-5]"
+  },
+  "go": "n/a (0 calls, 0 cce)",
+  "run": {
+    "outcome_file": "experiment_results/card_protocol/outcome.txt (blob:aaea249035098adffcf0a0ec9b28fd286049e99a, LF, git hash-object; readout_run.txt, nmi_card.csv, s_card.csv)",
+    "outcome_commit": "3898a2ec",
+    "calls": 0,
+    "cce": 0,
+    "pool": "none (S0's intent DBs; pins sha256-bytes qwen3_card e8dd85afc2afc075, gemma_card 9396cb1bbb2352cb, qwen3 9e100e04fc91b137, gemma b187b82f90ce9837, ingest 487e0093719c184c, unchanged before/after, per the outcome and the review)",
+    "date": "2026-10-02",
+    "script": "tools/analysis/card_protocol.py blob:cdcc1dbb4ece15b150988f43913e757432e90e77; writer blob:2788d7214df86dd8aabdb67d9b1b373ba3ec49fe (LF; = READY pins per the review)"
+  },
+  "review": {
+    "file": "docs/reviews/POSTRUN_card_protocol.md",
+    "commit": "5b6d7fc3",
+    "verdict": "VALID with wording conditions W1-W6 (applied by the registrar); 60 fits reproduced (max diff 4.9e-07); data checks hold (Banking77 swings survive alignment and a k-means-free nearest-centroid check); D-1 LOW (stale CB9 printed line, bracketed; no prediction changes status); D-2 LOW (wording, W3)"
+  },
+  "criteria": [
+    {
+      "id": "CP1",
+      "text": "DECIDING; POINT AND INTERVAL: per corpus D_card = NMI_EVAL(gemma, CARD, d_g*) - NMI_EVAL(qwen3, CARD, d_q*) at K_f; BETTER iff D_card > bar AND CI > 0; WORSE symmetric; else NEITHER; bar = max(MDE80, in-run seed spreads). REOPEN-CANDIDATE iff gemma BETTER on >= 2 of 3; KEEP iff <= 1; KEEP-STRONG iff WORSE on >= 2 of 3. SCOREABLE as a classification (MASSIVE DESCRIPTIVE-ONLY; CLINC, Banking77 SCOREABLE)",
+      "result": "HELD",
+      "value": "KEEP-STRONG (MASSIVE and CLINC WORSE; MASSIVE DESCRIPTIVE-ONLY at its prediction): D_card MASSIVE -0.03238, 95% BASIC [-0.03801, -0.02619], bar 0.01120 WORSE; CLINC -0.03388 [-0.03861, -0.03196], bar 0.01262 WORSE; Banking77 +0.11826 [+0.11690, +0.12971], bar 0.01991 BETTER. KEEP robust without MASSIVE (reviewer RM1); KEEP-STRONG needs MASSIVE (W2); KEEP reads 'not shown'. Scope: fine-level k-means NMI on the three intent corpora; qwen3 at d 1024 Q4_K_M (\"quantisation: Q4_K_M ~ Q8_0 (EMBED-QUANT); above Q8_0 untested\"); one task line for qwen3, not tuned per corpus; gemma's card clustering prompt; nomic NOT READ (D4)",
+      "denominator": "EVAL fine: MASSIVE 4,946 / 4,923; CLINC 6,672 / 6,672; Banking77 3,908 / 3,905",
+      "result_note": "a total classification, scored (KEEP-STRONG); F-CP1 NOT FIRED"
+    },
+    {
+      "id": "CP2",
+      "text": "DECIDING; pooled: D-bar = mean over corpora of qwen3 CARD - RAW at d_q*; HELD iff D-bar > bar_pool AND lower CI > 0; HURTS iff D-bar < -bar_pool AND upper CI < 0; else NOT SHOWN. SCOREABLE, thin",
+      "result": "HELD",
+      "value": "NOT SHOWN (pooled point inside the seed-spread bar by 0.0006; interval below 0): D-bar -0.01499, 95% BASIC [-0.01885, -0.01319], bar_pool 0.01560 (spread term; MDE80 0.00401); never 'hurts' (W4). Per corpus qwen3 CARD - RAW +0.04875 MASSIVE / -0.00308 CLINC / -0.09064 Banking77, descriptive, corpus-dependent, no per-corpus criterion registered (W3). Scope: fine-level k-means NMI on the three intent corpora; qwen3 at d 1024 Q4_K_M (\"quantisation: Q4_K_M ~ Q8_0 (EMBED-QUANT); above Q8_0 untested\"); one task line for qwen3, not tuned per corpus; gemma's card clustering prompt; nomic NOT READ (D4)",
+      "denominator": "as CP1",
+      "result_note": "a total classification, scored NOT SHOWN; F-CP2 FIRED"
+    },
+    {
+      "id": "CP3",
+      "text": "DESCRIPTIVE: S under CARD (MASSIVE, K 60), ceiling-normalised",
+      "result": "n/a",
+      "value": "DESCRIPTIVE-ONLY: S(gemma CARD) - S(qwen3 CARD) -0.06580, 95% percentile [-0.07709, -0.05462]; R qwen3 CARD 0.7199, gemma CARD 0.5471",
+      "denominator": "3,222 variants / 3,207 components"
+    },
+    {
+      "id": "CP4",
+      "text": "DESCRIPTIVE: nomic CARD rows; gemma CARD - RAW",
+      "result": "n/a",
+      "value": "DESCRIPTIVE-ONLY: gemma CARD - RAW -0.01692 / -0.03452 / -0.01623; nomic NOT READ (D4: not run)",
+      "denominator": "as CP1"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "CP1-P",
+      "text": "D_card MASSIVE +0.010 [-0.010, +0.030]; CLINC -0.025 [-0.040, -0.010]; Banking77 +0.035 [+0.015, +0.055]; KEEP 0.75 (KEEP-STRONG 0.10), REOPEN-CANDIDATE 0.25 [CORRECTED 2026-10-01 by INTENT-S0-CARD-PROTOCOL (registrar; C-CP-1 / D1 of READY_card_proto 7e8890c6; pre-data): DS1 moved MASSIVE's P3 +0.0113 > 0.01; under the registered rule (CP1 = P3 - 0.012, width +-0.020) MASSIVE D_card +0.021 [+0.001, +0.041]; CLINC, Banking77, criterion, bars, (f) word and verdict probabilities unchanged; MASSIVE DESCRIPTIVE-ONLY]",
+      "result": "FAILED",
+      "value": "MASSIVE -0.03238 FAILED (against the 4ef4faad bracket +0.021 [+0.001, +0.041], and against the registered +0.010 [-0.010, +0.030]; D-1); CLINC -0.03388 HELD; Banking77 +0.11826 FAILED; Brier KEEP 0.0625, KEEP-STRONG 0.8100, REOPEN-CANDIDATE 0.0625",
+      "denominator": "3 corpora; EVAL fine 4,946 / 6,672 / 3,908"
+    },
+    {
+      "id": "CP2-P",
+      "text": "D-bar +0.020 [0.000, +0.040]; HELD 0.45, HURTS 0.05",
+      "result": "FAILED",
+      "value": "D-bar -0.01499 outside [0.000, +0.040]; Brier HELD 0.2025, HURTS 0.0025",
+      "denominator": "3 corpora pooled"
+    },
+    {
+      "id": "CP3-P",
+      "text": "gemma S - qwen3 S under CARD +0.04 [+0.01, +0.07]",
+      "result": "FAILED",
+      "value": "-0.06580 outside [+0.01, +0.07]",
+      "denominator": "3,222 variants / 3,207 components"
+    }
+  ],
+  "falsifier": {
+    "text": "F-CP1 fires iff CP1 REOPEN-CANDIDATE (overturns 'protocol explains S0's gemma edge'); F-CP2 fires iff CP2 NOT SHOWN or HURTS (withdraws 'qwen3 run RAW' as a candidate mechanism; HURTS: RAW better for qwen3)",
+    "fired": true,
+    "result": "F-CP2 FIRED: withdraws 'qwen3 is instruction-aware and was run RAW' as a candidate MECHANISM for S0's qwen3 rows, POOLED only; it stays a disclosure; on MASSIVE the card prompt reverses the sign of the gemma-qwen3 contrast (W5). F-CP1 NOT FIRED"
+  },
+  "numbers_of_record": {
+    "support": "DEFF (Kish, measured in S0) 1.0093 / 1.0000 / 1.0015; n_eff 4,900 / 6,672 / 3,902; SE(D) transported 0.00289 / 0.00137 / 0.00247; CP2 SE 0.00135; MDE80 CP1 0.0081 / 0.0038 / 0.0069, CP2 0.0038; planning bars 0.0246 / 0.0094 / 0.0143, bar_pool 0.0161 (bars of record in-run)",
+    "prompts": "qwen3 'Instruct: Given a user utterance to a virtual assistant, identify the user's intent\\nQuery:' + text; gemma 'task: clustering | query: ' + text; nomic 'clustering: ' + text",
+    "CP1_D_card": "MASSIVE -0.03238 [-0.03801, -0.02619] bar 0.01120 WORSE; CLINC -0.03388 [-0.03861, -0.03196] bar 0.01262 WORSE; Banking77 +0.11826 [+0.11690, +0.12971] bar 0.01991 BETTER (95% BASIC, B 2000; EVAL 4,946 / 6,672 / 3,908); verdict KEEP-STRONG (MASSIVE DESCRIPTIVE-ONLY at its prediction)",
+    "CP2_D_bar": "-0.01499 [-0.01885, -0.01319] vs bar_pool 0.01560 -> NOT SHOWN (95% BASIC joint bootstrap; per corpus +0.04875 / -0.00308 / -0.09064, descriptive)",
+    "support_as_run": "Kish DEFF 1.0093 / 1.0000 / 1.0015; n_eff 4,900 / 6,672 / 3,902; SE 0.00300 / 0.00169 / 0.00329, CP2 0.00143; MDE80 0.00840 / 0.00472 / 0.00922, CP2 0.00401",
+    "nearest_centroid_check": "(reviewer, k-means-free, EVAL accuracy) Banking77 qwen3 RAW 0.8866 -> CARD 0.8055, gemma 0.9335 -> 0.9168; MASSIVE qwen3 0.8607 -> 0.8908, gemma 0.8908 -> 0.8668",
+    "CP3": "-0.06580 [-0.07709, -0.05462] (3,222 variants / 3,207 components)",
+    "CP4": "gemma CARD - RAW -0.01692 / -0.03452 / -0.01623; nomic NOT READ"
+  },
+  "sentence_of_record": "INTENT-S0-CARD-PROTOCOL (2026-10-02, 0 calls; run 3898a2ec, post-run review 5b6d7fc3 VALID): under card prompts gemma minus qwen3 fine NMI is -0.03238 MASSIVE, -0.03388 CLINC, +0.11826 Banking77 (EVAL 4,946 / 6,672 / 3,908): CP1 KEEP-STRONG (MASSIVE and CLINC WORSE; MASSIVE DESCRIPTIVE-ONLY at its prediction); card prompts did not raise qwen3's fine NMI pooled over the three corpora (D-bar -0.01499 [-0.01885, -0.01319] vs bar 0.01560: NOT SHOWN, inside the seed-spread bar by 0.0006, interval below 0); F-CP2 fired, F-CP1 not. [Scope: fine-level k-means NMI on the three intent corpora; qwen3 at d 1024 Q4_K_M (\"quantisation: Q4_K_M ~ Q8_0 (EMBED-QUANT); above Q8_0 untested\"); one task line for qwen3, not tuned per corpus; gemma's card clustering prompt; nomic NOT READ (D4). The embedder evidence is MIXED (EMBED-DIM-SLICE REOPEN-CANDIDATE, RAW protocol, vs CP1 KEEP-STRONG, card protocol); D3's revisit condition is not met; D3 stays the author's. The prompt effect is corpus-dependent (+0.049 / -0.003 / -0.091, descriptive); never 'hurts'. F-CP2 withdraws the RAW-run mechanism POOLED only; on MASSIVE the card prompt reverses the sign of the contrast. The Banking77 swings are embedding effects (nearest-centroid check); their cause is untested.]",
+  "chips": [
+    "READY 2026-10-01 (writer passes qwen3 / gemma; nomic NOT RUN); readout after the CARD pins (C-CP-3..C-CP-5) [plan]",
+    "CP1 SCOREABLE AS A CLASSIFICATION; CP2 SCOREABLE (THIN); AFTER EMBED-DIM-SLICE [plan]",
+    "VALID (POST-RUN 5b6d7fc3); RUN 3898a2ec: CP1 KEEP-STRONG (MASSIVE AND CLINC WORSE; MASSIVE DESCRIPTIVE-ONLY AT ITS PREDICTION); CP2 NOT SHOWN (POOLED); F-CP2 FIRED, F-CP1 NOT FIRED [ok]",
+    "EMBEDDER EVIDENCE MIXED (EMBED-DIM-SLICE REOPEN-CANDIDATE vs CP1 KEEP-STRONG); D3 REVISIT NOT MET; PROMPT EFFECT CORPUS-DEPENDENT, NOT SHOWN, NEVER &ldquo;HURTS&rdquo;; NOMIC NOT READ [warn]"
+  ],
+  "brackets": [
+    {
+      "date": "2026-10-01",
+      "by": "registrar (orchestrator's brief; READY_card_proto 7e8890c6 C-CP-1, C-CP-3, D3, D4)",
+      "text": "pre-data, inline in the registration: C-CP-1 shifted CP1 point MASSIVE +0.021 [+0.001, +0.041]; D3 READING AGAINST D3: EMBED-QUANT done, NOT-A-CONFOUND at Q4_K_M -> Q8_0; D4 orchestrator's ruling: nomic not run this pass, CP4 nomic prints NOT READ (nomic_card null); CB1 two new scripts importing S0 + EA unchanged; CB2 / CW2 route parity on RAW, T3/T4 on CARD, cos(CARD, RAW) printed with no bar; CW1 no transform on card arms (nomic layer-norm moot); CW3 T1 tag digest = S0 RAW file digest (stricter). docs/judge_v2_program.md L22856-L22860 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data) — INTENT-S0-CARD-PROTOCOL READY (docs/reviews/READY_card_proto.md, 7e8890c6) and merge eba0efe2: ...\"; _as_of the commit that writes it, parent eba0efe2, re-grepped)"
+    },
+    {
+      "date": "2026-10-02",
+      "by": "registrar (orchestrator's brief; READY_card_proto 7e8890c6 C-CP-3)",
+      "text": "pre-data: C-CP-3 MET, qwen3_card intent_emb_qwen3_card.db sha256-bytes e8dd85afc2afc0752fce019d7fb4ad127a7d06e094cf604401b82efb1f22a1ac; gemma_card intent_emb_gemma_card.db sha256-bytes 9396cb1bbb2352cbc2b9de895fb19a03ae41326373db3f58d7c67bf2f9366039 (both 57,350 texts COMPLETE; qwen3 one resume at 51,008, T4 PASS; nomic_card null, D4); copied from the writer logs experiment_results/card_protocol/writer_qwen3_go2.log, writer_gemma_go.log (0e67a6b7), re-hashed equal; CB1/CB2/CW1-CW3 confirmed bracketed (4ef4faad). docs/judge_v2_program.md L22881-L22885 (section \"## Registrar's record 2026-10-02 (insertion only; zero calls; nothing run; pre-data) — INTENT-S0-CARD-PROTOCOL C-CP-3 MET: both CARD files pinned; READY for the readout --run under C-CP-4\"; _as_of the commit that writes it, parent 0e67a6b7, re-grepped)"
+    },
+    {
+      "date": "2026-10-02",
+      "by": "registrar (POSTRUN_card_protocol.md 5b6d7fc3, D-1)",
+      "text": "[CORRECTED 2026-10-02 by INTENT-S0-CARD-PROTOCOL: the outcome's printed 'CB9: scored as registered, no shifted-points bracket' is stale; CP1-P MASSIVE scored against the 4ef4faad bracket +0.021 [+0.001, +0.041]: -0.03238, FAILED (same status as against the registered point); no prediction changes status; outcome.txt not edited] docs/judge_v2_program.md L23050-L23060 (section \"## INTENT-S0-CARD-PROTOCOL (2026-10-02, 0 calls) — VALID (post-run review docs/reviews/POSTRUN_card_protocol.md, 5b6d7fc3): CP1 KEEP-STRONG ...\"; _as_of the commit that writes it, parent 5b6d7fc3, re-grepped)"
+    }
+  ],
+  "does_not_show": [
+    "quantisation effects",
+    "capability text",
+    "parity (no TOST)",
+    "that MASSIVE's NEITHER is explanation",
+    "any change to the embedder of record (D3 is the author's)",
+    "which embedder is better: the evidence is mixed (W1); the embedder of record is unchanged",
+    "that card prompts hurt qwen3 or do not matter (pooled NOT SHOWN; per-corpus values descriptive)",
+    "why the Banking77 qwen3 CARD drop happens (conjecture only)",
+    "other task lines, per-corpus prompts, other slices, precision above Q8_0, nomic (NOT READ)"
+  ],
+  "ledger": {
+    "row_id": "INTENT-S0-CARD-PROTOCOL",
+    "version": "v338 (2026-10-02: OUTCOME bracket, two chips) | v335 (2026-10-01: chip REGISTERED -> READY)"
+  },
+  "depends_on": [
+    "INTENT-TRANSFER-S0",
+    "INTENT-S0-SLOTSWAP-MECH",
+    "EMBED-DIM-SLICE"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "value": false,
+    "text": "closes nothing; CONTEXT §5 lines not touched"
+  },
+  "cost": {
+    "calls": 0,
+    "cce": 0,
+    "ollama": "~2-5 h (unsourced; the dry-run's 500-text probe prices it)",
+    "cpu": "~1 h"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L22655-L22680 (section \"## Registered 2026-10-01 (before any code or call) — INTENT-S0-CARD-PROTOCOL: at each embedder's EMBED-DIM-SLICE-selected slice, ...\"; _as_of the commit that writes it, parent ce0d0f17, re-grepped)",
+    "docs/agents/plans/2026-10-02_next_registrations.md (ce0d0f17)",
+    "docs/judge_v2_program.md L22856-L22860 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data) — INTENT-S0-CARD-PROTOCOL READY (docs/reviews/READY_card_proto.md, 7e8890c6) and merge eba0efe2: ...\"; _as_of the commit that writes it, parent eba0efe2, re-grepped)",
+    "docs/reviews/READY_card_proto.md (7e8890c6)",
+    "docs/judge_v2_program.md L22881-L22885 (section \"## Registrar's record 2026-10-02 (insertion only; zero calls; nothing run; pre-data) — INTENT-S0-CARD-PROTOCOL C-CP-3 MET: both CARD files pinned; READY for the readout --run under C-CP-4\"; _as_of the commit that writes it, parent 0e67a6b7, re-grepped)",
+    "experiment_results/card_protocol/writer_qwen3_go.log, writer_qwen3_go2.log, writer_gemma_go.log (0e67a6b7)",
+    "experiment_results/card_protocol/outcome.txt (3898a2ec)",
+    "docs/reviews/POSTRUN_card_protocol.md (5b6d7fc3)",
+    "docs/judge_v2_program.md L23050-L23060 (section \"## INTENT-S0-CARD-PROTOCOL (2026-10-02, 0 calls) — VALID (post-run review docs/reviews/POSTRUN_card_protocol.md, 5b6d7fc3): CP1 KEEP-STRONG ...\"; _as_of the commit that writes it, parent 5b6d7fc3, re-grepped)"
+  ],
+  "last_update": "2026-10-02",
+  "plain_description": {
+    "sq": "SQ5 Invariance",
+    "what": "On three user-intent datasets (MASSIVE, CLINC, Banking77), re-embeds the questions with each embedder's recommended task prompt. It then compares how well k-means clusters match the fine intent labels for gemma against qwen3, and qwen3 with prompts against qwen3 without.",
+    "why": "It asks whether the embedder choice, and the way inputs are prompted, changes the taxonomy the method discovers.",
+    "information": "It shows whether gemma's earlier edge is real or due to unfair prompting, and whether prompts help qwen3. Result: done and valid. With proper prompts, gemma does worse than qwen3 on MASSIVE and CLINC and better on Banking77, so the evidence on which embedder is better is mixed. The embedder of record is unchanged (the author's decision). Prompts did not raise qwen3's clustering quality when pooled across corpora (not shown). The effect varies by corpus and is descriptive; it does not show that prompts hurt.",
+    "written": "2026-10-07"
+  }
+}

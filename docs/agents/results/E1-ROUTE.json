@@ -1,0 +1,220 @@
+{
+  "id": "E1-ROUTE",
+  "title": "E1-ROUTE: the JVM working-copy route for EMBEDDER-CROSS-FLAT E1 (RP09): per run, a pin-checked throwaway copy of the pinned nomic DIR arm file; no JVM open of a pinned or source embedding file (C-ET2-1) (engineering; zero calls; REGISTERED)",
+  "question": "Can EMBEDDER-CROSS-FLAT E1's JVM builds read a pinned nomic arm file only through a per-run WORKING COPY, pin-checked before the launch and re-checked after it, so that no JVM ever opens a pinned or source embedding file, with both branches of every guard proved by execution?",
+  "kind": "engineering",
+  "state": "done",
+  "registration": {
+    "commit": "the commit that writes this record (parent c09c0ac)",
+    "program_lines": "docs/judge_v2_program.md L22182-L22206",
+    "program_lines_as_of": "the commit that writes them, parent c09c0ac, re-grepped",
+    "date": "2026-09-30",
+    "heading": "## Registered 2026-09-30 (before any code or call) \u2014 E1-ROUTE: can EMBEDDER-CROSS-FLAT E1's JVM builds read a pinned nomic arm file only through a per-run WORKING COPY ...",
+    "provenance": "C-ET2-1 HIGH (docs/reviews/READY_emb_target2.md, f66c360); the orchestrator's E1 route ruling (docs/judge_v2_program.md L21981-L21995 _as_of c09c0ac, 'E1 ROUTE'); the orchestrator's brief of 2026-09-30"
+  },
+  "script": {
+    "path": "tools/analysis/e1_route_launch.py (+ 3 src/main files)",
+    "sha16": "blob:7eaba3b1 (LF; READY_backfill '## Pins')",
+    "commit": "6b3f0b1 (branch e1-route, unmerged)"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_e1_route2.md",
+    "commit": "29e19199",
+    "verdict": "conditional READY (launcher blob:ba865deb)",
+    "source": "POSTRUN_e1_route_L1.md header",
+    "earlier": {
+      "file": "docs/reviews/READY_backfill_2026-09-30.md",
+      "commit": "b938c14",
+      "at": "6b3f0b1 (unmerged)",
+      "verdict": "NOT READY: B-E1-1 (sidecar-blind re-hash), B-E1-2 (no L1 short-stop TOML; af_clean_s42.toml would write the tree of record's outputDir); C-E1-3..5",
+      "source": "READY_backfill_2026-09-30.md '## VERDICT'"
+    }
+  },
+  "go": "n/a (0 calls, 0 cce; no author decision)",
+  "run": {
+    "outcome_file": "operator logs experiment_results/e1_route/L1_ops_20261002/ (L1_transcript.log, L2_refusals.log, operator.log)",
+    "outcome_commit": "a96c7ae6",
+    "calls": 0,
+    "cce": 0,
+    "pool": "none read",
+    "date": "2026-10-02"
+  },
+  "review": {
+    "file": "docs/reviews/POSTRUN_e1_route_L1.md",
+    "commit": "c2468c2a",
+    "verdict": "VALID: C1-C5 HELD (C3 by the reviewer's vmfMu reading, D-PR-1); F1 NOT fired; P6 HELD"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "PIN-BEFORE: a one-byte mutant of the scratch DIR copy REFUSED (rc 2) before any copy or JVM launch; the unmutated copy ADMITTED",
+      "result": "HELD",
+      "value": "PIN-BEFORE: one-byte mutant REFUSED (i), rc 2, 0 java, no working file; unmutated copy ADMITTED (POSTRUN c2468c2a)",
+      "denominator": "2 branches"
+    },
+    {
+      "id": "C2",
+      "text": "NO JVM OPEN OF A PROTECTED FILE: in L1 all 9 members of P (4 DIR arm files, 2 source per-model DBs, main embeddings_cache.db in file and per-table views, snapshots_frozen.db) and the scratch copy unchanged, no sidecar, manifest file = the working path; in L2 9 of 9 targets refused before launch",
+      "result": "HELD",
+      "value": "L1 9 files x 2 moments equal, 0 sidecars, manifest path = working path; L2 9 of 9 refused (POSTRUN c2468c2a)",
+      "denominator": "9 files x 2 moments + 9 targets"
+    },
+    {
+      "id": "C3",
+      "text": "WITNESS AND MANIFEST: vmfMu cos >= 0.99 vs the nomic arm, vector length = the arm file's, misses 0, manifest embedding_cache_source_sha256 = the pin",
+      "result": "HELD",
+      "value": "HELD on the reviewer's embedder_guard reading (copy min 1.0000, arm 0.9999, qwen3 control 0.0104 REFUSE); 768 dims; misses 0; manifest source sha = pin (D-PR-1: the build prints no guard) (POSTRUN c2468c2a)",
+      "denominator": "4 checks, 1 build"
+    },
+    {
+      "id": "C4",
+      "text": "INERT WHEN ABSENT: no embedding_cache_file / source key when the property is absent (new test, executed); src/main diff = the declared files only",
+      "result": "HELD",
+      "value": "manifest keys absent when unset (test 4/4, READY D7); src/main diff = 3 declared files (POSTRUN c2468c2a)",
+      "denominator": "1 test + 1 diff"
+    },
+    {
+      "id": "C5",
+      "text": "MUTANTS: 4 of 4 declared launcher mutants KILLED",
+      "result": "HELD",
+      "value": "4 of 4 mutants KILLED (re-run by the reviewer) (POSTRUN c2468c2a)",
+      "denominator": "4 mutants"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "C1 HELD: 0.95",
+      "result": "HELD",
+      "value": "event occurred (POSTRUN c2468c2a)",
+      "denominator": ""
+    },
+    {
+      "id": "P2",
+      "text": "C2 HELD: 0.75",
+      "result": "HELD",
+      "value": "event occurred (POSTRUN c2468c2a)",
+      "denominator": ""
+    },
+    {
+      "id": "P3",
+      "text": "C3 HELD: 0.90",
+      "result": "HELD",
+      "value": "event occurred (POSTRUN c2468c2a)",
+      "denominator": ""
+    },
+    {
+      "id": "P4",
+      "text": "C4 HELD: 0.92",
+      "result": "HELD",
+      "value": "event occurred (POSTRUN c2468c2a)",
+      "denominator": ""
+    },
+    {
+      "id": "P5",
+      "text": "C5 4 of 4 KILLED: 0.95",
+      "result": "HELD",
+      "value": "event occurred (POSTRUN c2468c2a)",
+      "denominator": ""
+    },
+    {
+      "id": "P6",
+      "text": "L1 wall <= 10 min at 12 threads: 0.80",
+      "result": "HELD",
+      "value": "event occurred (POSTRUN c2468c2a)",
+      "denominator": ""
+    }
+  ],
+  "falsifier": {
+    "text": "F1 fires iff C2 FAILS with C1 met and L1 valid (a protected file changed although the JVM was given only the working path): overturns the orchestrator's route and the reading that f667d6b's property governs the only embedding file the JVM opens; E1 stays NOT READY; no recorded number moves.",
+    "fired": false
+  },
+  "numbers_of_record": {},
+  "sentence_of_record": "E1-ROUTE (engineering; zero calls): the JVM working-copy route held: L1 / L2 VALID (POSTRUN c2468c2a; C1-C5 HELD, C3 by the reviewer's embedder_guard reading, D-PR-1; F1 NOT fired), E1 builds N-raw and N-card VALID (POSTRUN ba32fbc6), E1 readout VALID (POSTRUN ddc14496; its science recorded on EMBEDDER-CROSS-FLAT) [no protected file changed in L1 and in every E1 build; engineering only, no science claim]",
+  "chips": [
+    "plan: REGISTERED (engineering; zero calls)",
+    "DONE: L1 / L2 VALID (C1&ndash;C5 HELD), BUILDS VALID, READOUT VALID; ENGINEERING ONLY"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-30",
+      "by": "registrar (registration; zero calls)",
+      "text": "REGISTERED before any code. Support (f): C1-C5 SCOREABLE (exact counts, hash equalities); 'the JVM never opens a pinned file' in general DESCRIPTIVE-ONLY beyond the legs run. (g): C2 reachable only if the property is the JVM's only embedding-file open and the construction's cache writes do not land in P."
+    },
+    {
+      "date": "2026-10-01",
+      "by": "registrar",
+      "text": "BUILT 6b3f0b1; READY_backfill b938c14 NOT READY (B-E1-1, B-E1-2 BLOCKERS). State registered -> built. docs/judge_v2_program.md L22230-L22240 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data) \u2014 INTENT-TRANSFER-S0 embedding DBs pinned (f4ad285); ...\"; _as_of the commit that writes it, parent f4ad285, re-grepped)"
+    },
+    {
+      "date": "2026-10-02",
+      "by": "registrar (D-PR-1 of POSTRUN_e1_route_L1 c2468c2a)",
+      "text": "C3's 'the vmfMu guard prints' cannot be produced by the build path; read as the reviewer's embedder_guard.guard_file reading on the build's snapshot, for L1 and E1; E1's FLAT prints [EMB-GUARD] itself. Programme L22192 bracket; record section L23543-L23547."
+    },
+    {
+      "date": "2026-10-02",
+      "by": "registrar (POSTRUN_e1_route_builds ba32fbc6)",
+      "text": "E1 builds N-raw and N-card VALID (builds). B-PB-1: N-card's in-run JVM numbers (3,599 / 62.91% / 1.31%) never quoted or compared; the 47 unrouted are unlinked p2dca placeholder ids, nothing voided; C-PB-2: the arm files' queries tables cover 5,706 of the 8,125 fit ids (readout hazard); E1's registered criteria NOT SCORED until an E1 readout exists. programme L23549-L23553 (_as_of the commit that writes it, parent ba32fbc6); docs/reviews/POSTRUN_e1_route_builds.md (ba32fbc6)"
+    },
+    {
+      "date": "2026-10-02",
+      "by": "registrar",
+      "text": "PRE-DATA R-1 (READY_e1_readout bcb7f2f8): D1 flatLeaf top-1 = FLAT M1 per question, majority from the 8,324 train texts, each tree in its own embedder; D2 the Wald paired interval decides, exact McNemar p beside, never deciding; D5 P4 endpoints inclusive; D3 N-card SECONDARY, scores nothing, labelled 'D3 majority, 8,242 of 8,324'. section \"## Registrar's record 2026-10-02 (insertion only; zero calls; nothing run; pre-data) \u2014 E1 readout READY (READY_e1_readout.md, bcb7f2f8) R-1 brackets D ...\" (L23555-L23559, _as_of the commit that writes it, parent bcb7f2f8)"
+    },
+    {
+      "date": "2026-10-03",
+      "by": "registrar",
+      "text": "readout VALID (ddc14496): FILING HELD-WORSE, F-E1 FIRES (recorded in EMBEDDER-CROSS-FLAT); C-PR-1 resolved by the author's WAL checkpoint (0,0,0); E1-ROUTE running -> done. docs/judge_v2_program.md L23651-L23658 (section \"## EMBEDDER-CROSS-FLAT E1 / E1-ROUTE readout (2026-10-02, 0 calls) \u2014 VALID ...\"; _as_of the commit that writes it, parent ddc14496)"
+    },
+    {
+      "date": "2026-10-04",
+      "by": "registrar (consistency check 2026-10-04; zero calls)",
+      "text": "the 'chips' list had drifted from the ledger row's chips (wording or replaced chips); the chips of record are the ledger's, copied verbatim into 'chips_ledger_verbatim' (ledger v379); 'chips' is kept as history."
+    }
+  ],
+  "does_not_show": [
+    "anything yet: registered, not built",
+    "E1's science (FLAT / FILING) stays under EMBEDDER-CROSS-FLAT"
+  ],
+  "ledger": {
+    "row_id": "E1-ROUTE",
+    "version": "v353 (2026-10-03: done bracket) | v348 (2026-10-02: bracket, builds VALID) | v347 (2026-10-02: bracket, chip L1 VALID) | v320 (2026-10-01: bracket and chip, registrar's record) | v319 (2026-09-30: new row, PLAN chip)"
+  },
+  "depends_on": [
+    "EMBEDDER-PLUMBING (the f667d6b property; merged)",
+    "EMBEDDER-CROSS-FLAT (arm pins; experiment_configs/embedder_cross_arm_pins.json blob:c7eb60fd)",
+    "THREAD-CAP (12-thread JVM runs)"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing; reopens nothing (engineering)"
+  },
+  "cost": {
+    "calls_expected": 0,
+    "cce_expected": 0,
+    "machine": "L0 selftest / mutants minutes (CPU); L1 one short construction in one rule-7 window (minutes at 12 threads, unsourced)",
+    "agent": "engine-coder ~1-2 h + READY"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L22182-L22206 (section \"## Registered 2026-09-30 (before any code or call) \u2014 E1-ROUTE: can EMBEDDER-CROSS-FLAT E1's JVM builds read a pinned nomic arm file only through a per-run WORKING COPY ...\"; _as_of the commit that writes it, parent c09c0ac, re-grepped)",
+    "docs/judge_v2_program.md L22172-L22180 (section \"## Registrar's record 2026-09-30 (insertion only; zero calls; nothing run; pre-data) \u2014 the author's 15-hour request and the schedule's research checkpoints A/B/C (c09c0ac); ...\"; _as_of the commit that writes it, parent c09c0ac, re-grepped)",
+    "docs/reviews/READY_emb_target2.md (f66c360) C-ET2-1",
+    "docs/judge_v2_program.md L22230-L22240 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data) \u2014 INTENT-TRANSFER-S0 embedding DBs pinned (f4ad285); ...\"; _as_of the commit that writes it, parent f4ad285, re-grepped)",
+    "docs/reviews/POSTRUN_e1_route_L1.md (c2468c2a)",
+    "docs/judge_v2_program.md L23543-L23547"
+  ],
+  "last_update": "2026-10-04",
+  "chips_ledger_verbatim": [
+    "warn: BUILT 6b3f0b1; NOT READY (B-E1-1, B-E1-2)",
+    "ok: DONE: L1 / L2 VALID (C1\u2013C5 HELD), BUILDS VALID, READOUT VALID; ENGINEERING ONLY"
+  ],
+  "plain_description": {
+    "sq": "Engineering/infrastructure",
+    "what": "An engineering check. The tree-building program (a JVM) must read embedding files only through a throwaway working copy that is hash-checked before and after each run. Pinned and source embedding files must never be opened directly.",
+    "why": "The embedder-comparison experiment needs proof that building a tree cannot silently modify the frozen embedding files that other results rely on.",
+    "information": "Success means the embedder-comparison builds can be trusted not to corrupt pinned data. A failure would block those builds. Result: done. The route held: no protected file changed in the trial run or in any of the embedder-comparison builds. Engineering only, no science claim.",
+    "written": "2026-10-07"
+  }
+}

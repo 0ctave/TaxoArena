@@ -1,0 +1,131 @@
+{
+  "id": "PROMPT-AUDIT",
+  "title": "PROMPT-AUDIT: is the eval set's own ranking, the ground truth everything validates against, confounded by prompt configuration? (zero calls)",
+  "question": "Four readouts: (1) catalogue by declared shot count; (2) within-family spreads; (3) the CONTROLLED paired estimate from REGEN (same model, same questions, two prompts); (4) the frontier gaps smaller than it. Prediction: a 3-5pp prompt effect, leaving arx/iask (0.017) unsafe.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "12640bc",
+    "program_lines": "docs/judge_v2_program.md L997-L1015",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-14 (before running, ZERO calls) — PROMPT-AUDIT: is the ground truth itself prompt-confounded?",
+    "outcome_heading": [
+      "L1016: - **PROMPT-AUDIT (2026-09-14, zero calls): the ground truth is NOT materially prompt-confounded, and Probe C's alarm was mine to retract.** (interim at 39% of REGEN; superseded)",
+      "L1100: - **REGEN OUTCOME (2026-09-14) ...** ('PROMPT-AUDIT UPDATED with the completed run': -0.010 +- 0.004 over 3,430)"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "tools/analysis/prompt_audit.py",
+    "sha16": "54cf939cd458863a (at 21cd7b3)",
+    "commit": "21cd7b3 (later 1ee0f5c / a7db10d / 13f2142)"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/prompt_audit.txt (regenerated on the completed REGEN run so the artifact and the row agree)",
+    "outcome_commit": "21cd7b3",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-14"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the self-correction of Probe C (an unpaired comparison across different subsets) is recorded in the outcome",
+    "commit": "35b093a",
+    "verdict": "GROUND TRUTH CLEARED; the earlier 4.6pp alarm RETRACTED"
+  },
+  "criteria": [
+    {
+      "id": "(3)",
+      "text": "CONTROLLED ESTIMATE: the paired difference of the same model on the same questions under two prompts, with SE and flip counts",
+      "result": "DELIVERED",
+      "value": "FINAL on the completed run: 0.860 vs 0.850 on 3,430 shared questions, -0.010 +- 0.004 (105 flips vs 71); the interim on 1,344 read -0.006 +- 0.006; Probe C's 4.6pp came from comparing a full-pool accuracy against a partial running one and was wrong",
+      "denominator": "3,430 paired questions"
+    },
+    {
+      "id": "(1)",
+      "text": "CATALOGUE by declared configuration",
+      "result": "DELIVERED",
+      "value": "the declared 0-shot and 2-shot entries have NO traces (length 0): prediction-only rows, never arena contestants; the frontier the arena ranks (gemini-3.1-pro_5-shots, arx_0314, iask_pro, gpt-4o) has only gemini declaring a configuration, its mean trace 882 chars beside iask 1,303 and gpt-4o 1,474",
+      "denominator": "the eval roster"
+    },
+    {
+      "id": "(2)",
+      "text": "WITHIN-FAMILY spreads",
+      "result": "DELIVERED",
+      "value": "dominated by model differences (gemini-3.1 vs 1.5 = 0.215; Llama and Qwen families 0.18-0.23 across sizes); the cleanest same-model pair (claude-3-5-sonnet-20241022 vs claude-3.5-sonnet) differs by 0.009",
+      "denominator": "the eval roster"
+    },
+    {
+      "id": "(4)",
+      "text": "IMPACT: frontier gaps smaller than the controlled estimate",
+      "result": "DELIVERED",
+      "value": "against the FINAL 0.010 yardstick every frontier gap is safe (gemini/arx 0.079, iask/gpt-4o 0.067); arx/iask at 0.017 is 1.7x it and is reported as marginal",
+      "denominator": "frontier gaps"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "a prompt effect in the 3-5pp range, leaving arx/iask unsafe",
+      "result": "FAILED",
+      "value": "-0.010 +- 0.004; arx/iask marginal at 1.7x, not unsafe",
+      "denominator": "3,430"
+    }
+  ],
+  "falsifier": {
+    "text": "frontier gaps smaller than the prompt effect are unsafe",
+    "fired": false,
+    "note": "untestable remainder for the limitations: whether gemini's declared 5-shot setup inflates its 0.913 cannot be answered from a static eval set"
+  },
+  "numbers_of_record": {
+    "controlled": "-0.010 +- 0.004 (3,430 q; 105 vs 71 flips); interim -0.006 +- 0.006 (1,344); retracted Probe C 4.6pp",
+    "catalogue": "0-shot / 2-shot entries have no traces; frontier traces gemini 882 / iask 1,303 / gpt-4o 1,474 chars",
+    "family": "gemini-3.1 vs 1.5 0.215; cleanest same-model pair 0.009",
+    "impact": "arx/iask 0.017 = 1.7x the effect (marginal); all other frontier gaps safe"
+  },
+  "sentence_of_record": "PROMPT-AUDIT (2026-09-14, zero calls): the ground truth is NOT materially prompt-confounded; the controlled paired estimate, FINAL on the completed REGEN run, is -0.010 +- 0.004 on 3,430 shared questions (105 flips vs 71), not the 4.6pp Probe C claimed (an unpaired comparison across different subsets, retracted); the declared 0-shot / 2-shot entries have no traces and were never arena contestants; within-family spreads are model differences; against the 0.010 yardstick every frontier gap is safe, arx/iask at 0.017 (1.7x) reported as marginal; whether gemini's 5-shot setup inflates its 0.913 remains untestable from a static eval set.",
+  "chips": [
+    "GROUND TRUTH CLEARED",
+    "earlier 4.6pp alarm RETRACTED"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-14",
+      "by": "REGEN OUTCOME (programme L1100; the [SUPERSEDED 2026-09-14] note at L1018-L1021)",
+      "text": "the completed run gives -0.010 +- 0.004 over 3,430 paired questions; the 1,344-question figure was the 39% interim; prompt_audit.txt regenerated on the completed run."
+    }
+  ],
+  "does_not_show": [
+    "that gemini's declared 5-shot setup does not inflate its 0.913 (untestable here)",
+    "a prompt effect for any prompt change other than the one tested"
+  ],
+  "ledger": {
+    "row_id": "PROMPT-AUDIT",
+    "version": "v63 (21cd7b3; the observed cell updated with the completed run at v68)"
+  },
+  "depends_on": [
+    "REGEN",
+    "FRONTIER",
+    "ARXIASK"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L997-L1046 (registration 12640bc, interim outcome 21cd7b3) and L1100-L1114 (final numbers, 35b093a)",
+    "experiment_results/x12_crossdomain/prompt_audit.txt (21cd7b3, regenerated)",
+    "docs/test_ledger.html row PROMPT-AUDIT (v63 / v68): chips verbatim, observed cell, evidence (prompt_audit.py, prompt_audit.txt, 12640bc)",
+    "script sha16 = sha256 of tools/analysis/prompt_audit.py at 21cd7b3, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (rubric_v2_design.md / multi_corpus_design.md lines as of their last commits named in sources)"
+  ],
+  "last_update": "2026-09-22",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Measures how much the prompt setup changes a model's score on the evaluation set. The same model answers the same 3,430 questions under two prompts. It also catalogues which prompt setups the leaderboard entries declare. No judge calls.",
+    "why": "The eval set's ranking is the ground truth everything is validated against, so it must not be an artefact of prompt choices.",
+    "information": "A large prompt effect would make close frontier gaps unreliable. A small one would make them safe. Result: the ground truth is not materially affected by the prompt. The effect is about 1 point (-0.010 ± 0.004), not the 4.6 points an earlier faulty probe claimed. All frontier gaps are safe, with arx vs iask marginal. Whether gemini's 5-shot setup inflates its score cannot be tested here.",
+    "written": "2026-10-07"
+  }
+}

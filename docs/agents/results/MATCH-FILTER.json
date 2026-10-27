@@ -1,0 +1,107 @@
+{
+  "id": "MATCH-FILTER",
+  "title": "MATCH-FILTER: ship the answer-disagreement rule as a scheduler OPTION that degrades cleanly where no extractable answer exists (engineering, zero calls)",
+  "question": "TOML key matchFilter, default 'none' (the historical path byte for byte); 'answerDisagreement' cuts a (cell, pair)'s candidates to questions where the two models' own predictions differ, applied at all three question-choice sites, reading NO answer key; gates: tests green, stage-0a replay bit-identical with the filter off, a zero-judge-call demonstration of the effect.",
+  "kind": "engineering",
+  "state": "done",
+  "registration": {
+    "commit": "7155bea",
+    "program_lines": "docs/judge_v2_program.md L1047-L1071 (the shipped-option record; the rule itself came from SCHEDULING L894)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "- **MATCH FILTER shipped as an option (2026-09-14).** `matchFilter` TOML key, default `\"none\"` which is the historical path byte for byte ...",
+    "outcome_heading": [
+      "L1047: the same bullet"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "MatchFilter.kt; MatchFilterTest.kt; MatchFilterPlanHarness.kt",
+    "sha16": "n/a (Kotlin engineering)",
+    "commit": "7155bea (implementation, landed under a wrong commit message: a staging error, disclosed); 0a76596 (plan-only harness)"
+  },
+  "ready": null,
+  "go": "n/a (0 judge calls)",
+  "run": {
+    "outcome_file": "docs/judge_v2_program.md L1047-L1071 (the record; the plan-only harness demonstration at 0a76596)",
+    "outcome_commit": "3535d56",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-14",
+    "other_files": [
+      "MatchFilterPlanHarness (zero judge calls, key blanked): 3,451 of 20,448 frontier question-pairs = 16.9%; run-wide 42,300 -> 38,910 matches"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); gates: 307 tests (11 new) green; stage-0a replay bit-identical with the filter off (same P7 drift lines); pool re-pinned",
+    "commit": "3535d56",
+    "verdict": "SHIPPED"
+  },
+  "criteria": [
+    {
+      "id": "gates",
+      "text": "tests green; stage-0a replay bit-identical with the filter off; a zero-judge-call demonstration of the effect",
+      "result": "HELD",
+      "value": "307 tests (11 new); replay bit-identical, same P7 drift lines; pool re-pinned; zero-call demo with the key blanked: on the frontier it offers 3,451 of 20,448 question-pairs = 16.9%, reproducing the SCHEDULING probe independently in Kotlin; run-wide matches fall only 42,300 -> 38,910 (across 12 models most pairs already disagree; on the frontier the gain is better matches, not fewer)",
+      "denominator": "the frontier's 20,448 question-pairs; the run-wide schedule"
+    },
+    {
+      "id": "degradation",
+      "text": "degrades cleanly where no extractable answer exists",
+      "result": "HELD",
+      "value": "missing prediction => kept; starved slot => unfiltered fallback, logged per slot; no usable predictions => declares itself INERT and behaves as 'none'",
+      "denominator": "the three question-choice sites"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "PROFILE-R-FILTERED (2026-09-18) later found the filter does not preserve the anchor profile's reliability (0.7183 -> 0.5613); the filter's board safety (FILTER-BOARD) and the placement protocol's use of it stand"
+  },
+  "numbers_of_record": {
+    "tests": "307 (11 new)",
+    "replay": "bit-identical with the filter off",
+    "demo": "frontier 3,451 / 20,448 = 16.9%; run-wide 42,300 -> 38,910",
+    "provenance": "implementation 7155bea (wrong message), harness 0a76596"
+  },
+  "sentence_of_record": "MATCH-FILTER (2026-09-14): SHIPPED as a scheduler option: matchFilter TOML key, default 'none' (the historical path byte for byte); 'answerDisagreement' cuts a (cell, pair)'s candidates to questions where the two models' own predictions differ, at all three question-choice sites, reading no answer key; degrades cleanly (missing prediction kept; starved slot falls back unfiltered, logged; no usable predictions declares itself INERT); 307 tests green, stage-0a replay bit-identical with the filter off; the zero-call demonstration reproduces the SCHEDULING probe independently in Kotlin (16.9% of frontier question-pairs offered).",
+  "chips": [
+    "SHIPPED"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-18",
+      "by": "PROFILE-R-FILTERED",
+      "text": "the filter halves neither the newcomer profile bill nor preserves the anchor profile's reliability (0.5613 vs 0.7183); board safety and the placement protocol's use stand."
+    }
+  ],
+  "does_not_show": [
+    "that the filter preserves the anchor profile's reliability (PROFILE-R-FILTERED: it does not)"
+  ],
+  "ledger": {
+    "row_id": "MATCH-FILTER",
+    "version": "v64 (3535d56)"
+  },
+  "depends_on": [
+    "SCHEDULING",
+    "FILTER-BOARD",
+    "PROFILE-R-FILTERED"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L1047-L1071 (3535d56)",
+    "docs/test_ledger.html row MATCH-FILTER (v64): chips verbatim, observed cell, evidence (MatchFilter.kt, MatchFilterTest.kt, MatchFilterPlanHarness.kt, 7155bea, 0a76596)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)"
+  ],
+  "last_update": "2026-09-22",
+  "plain_description": {
+    "sq": "SQ4 Price",
+    "what": "Engineering, no calls. Added a scheduler option that only sends a question to the judge when the two models gave different final answers. It needs no answer key, is off by default, and falls back cleanly when answers cannot be extracted. Checked with tests and a bit-identical replay with the option off.",
+    "why": "It turns the SCHEDULING finding into a usable feature that cuts judge spend on matches that carry no signal.",
+    "information": "It shows the cheaper scheduling can ship without changing past results. Result: done, shipped. 307 tests pass, the replay with the filter off is identical, and it reproduces the 16.9% figure from SCHEDULING. Later caveat: the filter lowers the reliability of the per-subject capability profile (0.72 to 0.56), so it does not suit that use.",
+    "written": "2026-10-07"
+  }
+}

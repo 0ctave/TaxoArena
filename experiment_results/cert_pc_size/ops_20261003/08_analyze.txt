@@ -1,0 +1,53 @@
+  ok   main --analyze (the run-of-record wiring)
+  ok   all CERTIFIED: every printed line, write-once
+  ok   PS1 boundaries 4 / 3 / 2 / 1 / 0 of 5; F-PS; tie at k 14
+  ok   C0 gate: 1 fails -> CERTIFIED, 2 fail -> NOT EVALUABLE (precedence), equality, P1 / P2 NOT SCORED
+  ok   DEGENERATE 19 / 20; infeasible; degenerate + C0 -> gate
+  ok   sizes read separately (PS1 486, PS2 441, 264 descriptive)
+  ok   P3 medians HELD / FAILED
+  ok   IDENTITY refusals
+  ok   refusals
+  ok   allocation, draw, site file
+  ok   helpers
+[PCS] selftest: 11 / 11 passed
+pool: none (no DB opened)
+[PCS] CERT-PC-SIZE outcome (tools/analysis/cert_pc_size.py blob de39c6488e0dca7dded489f34cbae291af5d3dd5; cert_positive_control.py blob e0751d7c6fe50b0a588cbb1160eee0b3e99ce8a1 imported). Zero calls.
+registration: docs/judge_v2_program.md "## Registered 2026-10-03 (before any code or call) — CERT-PC-SIZE: ..." L23722-L23750 (as registered, 02256ca6)
+arm: snapshot 20261001_094311_Headless_Run_Auto_ge; site file sha256 231db2e0e11974b28f19244753a1c0a1a5b5c4f96ff695fead2599fe78cfe737; reps 300; sliceDim 512; sepBar 0.0145; dropTop 0; whiten false; minClusterSize 55; C0 seed base 20261002; threads 12; embeddings_cache.db per-table hashes before == after
+builder's readings PCS-1..PCS-7 (docstring); registration queries Q-1 (gate precedence) and Q-2 (degenerate counts toward the gate) to the registrar
+IDENTITY: full-size root n 6993, declared 0.107803 (registered 0.107803), k_d 0 of 300 (registered 0); null seeded by n00000001; null p95 0.041626 / max 0.042414 (PC1 of record 0.041626 / 0.042414: equal)
+IDENTITY: REPRODUCED (precondition held)
+SUPPORT (a) deciding denominator: 5 subsamples per deciding size (n 486 PS1, n 441 PS2), each a site with 300 null replicates; (b) DEFF 1.0 by construction (independent generator draws; no item-level resampling, no G14 two-stage machinery: D-PR-1 does not apply); (c) n_eff = 300 replicates per subsample, 5 subsamples per size; (d) SE of an exceedance proportion at the bar sqrt(0.05 x 0.95 / 300) = 0.0126 per subsample; (e) MDE80 = 2.80 x SE = 0.0352 per subsample; (g) floor 1/301 = 0.0033 << 0.05; NULL-INFEASIBLE below n 110, DEGENERATE below 20 reached replicates
+SUPPORT: no matches and no questions: wrong(established), the tie conventions A / B and a question-clustered bootstrap are N/A to a null exceedance count
+LIKE WITH LIKE: | site | partition | k | n | population |
+  | PC1 (of record) | declared labels | 14 | 6,993 | member root |
+  | PS subsamples (this test) | declared labels, stratified | 14 | 486 / 441 / 264 | member root, subsampled |
+  | G12 TOP sites (of record) | data-driven splits inside one anchor | 2-3 | 264-778 | one declared anchor |
+  size-matched to G12, NOT k-matched (14 vs 2-3) nor population-matched (all categories vs one anchor); C0 guards the statistic's k-comparability per subsample
+  PS_n486_d1  n 486: declared 0.108987; null p05 0.041177 / p50 0.045745 / p95 0.056704 / max 0.060895; k_d   0 of 300, p_d 1/301 = 0.003322; C0 p95 0.002562 (comparable); reached 300; deflated k 0 (p95 0.022827) -> CERTIFIED
+  PS_n486_d2  n 486: declared 0.112115; null p05 0.038891 / p50 0.044753 / p95 0.055705 / max 0.060631; k_d   0 of 300, p_d 1/301 = 0.003322; C0 p95 0.002632 (comparable); reached 300; deflated k 0 (p95 0.023417) -> CERTIFIED
+  PS_n486_d3  n 486: declared 0.106584; null p05 0.039251 / p50 0.044125 / p95 0.054464 / max 0.059598; k_d   0 of 300, p_d 1/301 = 0.003322; C0 p95 0.002412 (comparable); reached 300; deflated k 0 (p95 0.023479) -> CERTIFIED
+  PS_n486_d4  n 486: declared 0.108733; null p05 0.039248 / p50 0.044073 / p95 0.054442 / max 0.059229; k_d   0 of 300, p_d 1/301 = 0.003322; C0 p95 0.002462 (comparable); reached 300; deflated k 0 (p95 0.024241) -> CERTIFIED
+  PS_n486_d5  n 486: declared 0.116460; null p05 0.039645 / p50 0.044819 / p95 0.055332 / max 0.060949; k_d   0 of 300, p_d 1/301 = 0.003322; C0 p95 0.002205 (comparable); reached 300; deflated k 0 (p95 0.024883) -> CERTIFIED
+  PS_n441_d1  n 441: declared 0.109913; null p05 0.041575 / p50 0.046133 / p95 0.056530 / max 0.061619; k_d   0 of 300, p_d 1/301 = 0.003322; C0 p95 0.003103 (comparable); reached 300; deflated k 0 (p95 0.024944) -> CERTIFIED
+  PS_n441_d2  n 441: declared 0.109947; null p05 0.038875 / p50 0.044597 / p95 0.051837 / max 0.058590; k_d   0 of 300, p_d 1/301 = 0.003322; C0 p95 0.002865 (comparable); reached 300; deflated k 0 (p95 0.024346) -> CERTIFIED
+  PS_n441_d3  n 441: declared 0.103843; null p05 0.037821 / p50 0.044327 / p95 0.053499 / max 0.060615; k_d   0 of 300, p_d 1/301 = 0.003322; C0 p95 0.002474 (comparable); reached 300; deflated k 0 (p95 0.024626) -> CERTIFIED
+  PS_n441_d4  n 441: declared 0.112311; null p05 0.040557 / p50 0.045689 / p95 0.055279 / max 0.062084; k_d   0 of 300, p_d 1/301 = 0.003322; C0 p95 0.002728 (comparable); reached 300; deflated k 0 (p95 0.024918) -> CERTIFIED
+  PS_n441_d5  n 441: declared 0.113371; null p05 0.039750 / p50 0.044899 / p95 0.054814 / max 0.062095; k_d   0 of 300, p_d 1/301 = 0.003322; C0 p95 0.003074 (comparable); reached 300; deflated k 0 (p95 0.024544) -> CERTIFIED
+  PS_n264_d1  n 264: declared 0.118311; null p05 0.032374 / p50 0.047489 / p95 0.054820 / max 0.059615; k_d   0 of 300, p_d 1/301 = 0.003322; C0 p95 0.004715 (comparable); reached 300; deflated k 0 (p95 0.032248) -> CERTIFIED
+  PS_n264_d2  n 264: declared 0.112570; null p05 0.032533 / p50 0.037943 / p95 0.051666 / max 0.056363; k_d   0 of 300, p_d 1/301 = 0.003322; C0 p95 0.003962 (comparable); reached 300; deflated k 0 (p95 0.030684) -> CERTIFIED
+  PS_n264_d3  n 264: declared 0.108559; null p05 0.031013 / p50 0.035615 / p95 0.048377 / max 0.053696; k_d   0 of 300, p_d 1/301 = 0.003322; C0 p95 0.004021 (comparable); reached 300; deflated k 0 (p95 0.032159) -> CERTIFIED
+  PS_n264_d4  n 264: declared 0.112532; null p05 0.030071 / p50 0.034994 / p95 0.049785 / max 0.055941; k_d   0 of 300, p_d 1/301 = 0.003322; C0 p95 0.004300 (comparable); reached 300; deflated k 0 (p95 0.030011) -> CERTIFIED
+  PS_n264_d5  n 264: declared 0.108864; null p05 0.030109 / p50 0.035633 / p95 0.048757 / max 0.053578; k_d   0 of 300, p_d 1/301 = 0.003322; C0 p95 0.004012 (comparable); reached 300; deflated k 0 (p95 0.031399) -> CERTIFIED
+PS1 (n 486): CERTIFIED-AT-SIZE; certified 5, not certified 0, NOT EVALUABLE 0 (C0 0, degenerate / infeasible 0) of 5 (gate first: PCS-5)
+PS2 (n 441): CERTIFIED-AT-SIZE; certified 5, not certified 0, NOT EVALUABLE 0 (C0 0, degenerate / infeasible 0) of 5 (gate first: PCS-5)
+DESCRIPTIVE (n 264, no criterion): certified 5, not certified 0, NOT EVALUABLE 0 (C0 0, degenerate / infeasible 0) of 5
+VERDICT LINE re-stated at the run (Support (f)): at n 486 the median declared statistic 0.108987 vs the median null p95 0.055332 (the pilot guess was about 0.11 vs 0.07)
+F-PS: NOT FIRED (PS1 CERTIFIED-AT-SIZE). F-TAX N-1 and F2 stand.
+READING (PS1 CERTIFIED-AT-SIZE): N-1's empty set reads 'the tree's data-driven depth-1 splits are less separated than the declared level at the same n' (size-matched to G12, NOT k-matched: 14 vs 2-3 groups; NOT population-matched: all categories vs one anchor)
+P1 PS1 readings (CERTIFIED-AT-SIZE 0.55, MIXED 0.20, NOT-CERTIFIED-AT-SIZE 0.25): outcome CERTIFIED-AT-SIZE, Brier (3-way sum) 0.3050
+P2 PS2 CERTIFIED-AT-SIZE (p 0.50): event yes (PS2 CERTIFIED-AT-SIZE), Brier 0.2500
+P3 n 486 median declared statistic 0.11 [0.09, 0.14]: HELD (0.108987); median null p95 0.07 [0.05, 0.10]: HELD (0.055332)
+P4 C0 comparable on every subsample (p 0.85): event yes (15 of 15 comparable), Brier 0.0225
+DOES NOT SHOW: a certificate of any tree site; power for 2-3-way splits (k not matched) or within one anchor (population not matched); other members, draws, slices or recipes; that the categories are geometric clusters; a mode test (MIX-LRT-SITE closed)
+[PCS] wrote Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\experiment_results/cert_pc_size\outcome.txt and Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\experiment_results/cert_pc_size\pcs_sites.csv (write-once)

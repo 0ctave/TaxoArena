@@ -1,0 +1,124 @@
+{
+  "id": "PERF-8-MEMO",
+  "title": "PERF-8-MEMO: cross-iteration proposal memo (perf review 2026-09-09 item #8): implemented behind a fail-closed TOML flag, then the two-config replay (zero calls)",
+  "question": "Implement proposalMemo = off | shadow | on (off by default and byte-identical when off; exact-content key over edge lists in walk order and the query multiset by text; shadow mode counting every mismatch class; hits / misses / lossyShadowed / notStored in the manifest); validate by a two-config replay (off vs on) with a byte-identical DAG required; does the memo deliver the ~37% of phase 4 the review estimated?",
+  "kind": "engineering",
+  "state": "done",
+  "registration": {
+    "commit": "3d7e6c7",
+    "program_lines": "docs/judge_v2_program.md (lines as of 5dc8a06) L4197-L4201 (Blocks 3-4 landed: memo implemented, replay NOT YET RUN); by reference L3603 (PERF-8 in the construction block)",
+    "date": "2026-09-16",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Blocks 3-4 engineering landed (2026-09-16, zero calls) — SPLIT-FUNCTION-IMPL + TRAIN-ONLY-TREE, H9-REM flag, PERF-8 memo",
+    "outcome_heading": [
+      "L4224: ## PERF-8 REPLAY (2026-09-16, zero calls) — the exact-content proposal memo is SAFE (DAG byte-identical) and USELESS (0 hits, +49 s): kept OFF"
+    ]
+  },
+  "script": {
+    "path": "ProposalMemo.kt; experiment_configs/perf8/{shadow,on}_s42.toml; docs/perf_review_2026-09-09.md item 8",
+    "sha16": "n/a (engineering; no Python script of record)",
+    "commit": "3d7e6c7 (merged 2c3a2e6); replay 2d24fcd"
+  },
+  "ready": null,
+  "go": "n/a (0 calls; two label-free constructions)",
+  "run": {
+    "outcome_file": "docs/judge_v2_program.md L4224-L4235 ('PERF-8 REPLAY', the replay record; the manifests under experiment_results/ carry the counts; no separate outcome file)",
+    "outcome_commit": "2d24fcd",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (o0's config)",
+    "date": "2026-09-16",
+    "other_files": [
+      "run manifests of the shadow and on replays (hits / misses / invalidations / state changes / shadow mismatches / not_stored_side_effects / digest cost)",
+      "ProposalMemoKeyTest 9/9, ProposalMemoReplayTest 11/11"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the adversarial code review of the worktree (MERGEABLE after two MEDIUM fixes: child-order in the key; ACCEPTED-vs-stored counted in shadow) is the check of record",
+    "commit": "2c3a2e6",
+    "verdict": "MERGEABLE; replay: DAG byte-identical (SAFE) and 0 hits, +49 s (USELESS): item #8 CLOSED NEGATIVE"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "validation = two-config replay (off vs on) + DAG diff, byte-identical DAG required",
+      "result": "HELD",
+      "value": "shadow and on: final DAG byte-identical to o0 (152 nodes, 86 leaves, sorted-node sha equal; Top-1 identical 77.19%)",
+      "denominator": "o0's construction, seed 42"
+    },
+    {
+      "id": "C2",
+      "text": "the purpose: the ~37% of phase 4 the review estimated",
+      "result": "FAILED",
+      "value": "hits 0, misses 3,417, invalidations 3,275, state changes 141, shadow mismatches 0, not_stored_side_effects 86; digest cost 48,957 / 49,047 ms; wall 133 s in either mode vs o0's 89 s (a measured 55% overhead)",
+      "denominator": "3,417 lookups"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "(the perf review's estimate) ~37% of phase 4 saved",
+      "result": "FAILED",
+      "value": "0 hits: an exact key over the full proposal inputs changes every iteration; the 37% was the lossy memo's hit rate, already ruled out by the false-hit incident",
+      "denominator": "3,417 lookups"
+    }
+  ],
+  "falsifier": {
+    "text": "the byte-identity gate (a non-identical DAG would void the memo)",
+    "fired": false,
+    "note": "gate PASSES; purpose FAILS; proposalMemo stays off; item #8 CLOSED NEGATIVE with a measured 55% overhead as its number"
+  },
+  "numbers_of_record": {
+    "replay": "final DAG byte-identical to o0 in shadow and on (152 nodes, 86 leaves; Top-1 77.19%); hits 0, misses 3,417, invalidations 3,275, state changes 141, shadow mismatches 0, not_stored_side_effects 86 (the splitter's per-k dasguptaDeltaNorm write), digest cost 48,957 / 49,047 ms; wall 133 s vs 89 s",
+    "documented_limit": "the splitter's per-k dasguptaDeltaNorm write defeats memoization at multi-k sites (safely), so the realised saving may be well under the 37% estimate"
+  },
+  "sentence_of_record": "PERF-8 REPLAY (2026-09-16, zero calls): the exact-content proposal memo is SAFE (DAG byte-identical) and USELESS (0 hits, +49 s): kept OFF. An exact key over the full proposal inputs changes every time the graph changes, and the graph changes every iteration, so 3,275 of 3,417 lookups are invalidated before they can hit; the review's 37% was the lossy memo's hit rate, which the false-hit incident already ruled out. proposalMemo stays 'off' (the default); the flag and its tests remain as the safe form of the experiment; item #8 is CLOSED NEGATIVE; the memo's digest cost is a measured 55% overhead on this build.",
+  "chips": [
+    "MEMO IMPLEMENTED",
+    "REPLAY: DAG BYTE-IDENTICAL",
+    "0 HITS, +49 s: CLOSED NEGATIVE"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-16",
+      "by": "ledger v107 (the [REPLAY 2026-09-16] insertion in the observed cell)",
+      "text": "shadow and on: final DAG byte-identical to o0 (152 nodes, 86 leaves, Top-1 77.19% identical); hits 0, misses 3,417, invalidations 3,275, side-effect refusals 86, digest 49 s; wall 133 s vs o0's 89 s; proposalMemo stays off; item #8 closed negative with a measured 55% overhead as its number."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "INCONSISTENCIES-PASS (registrar, zero calls; insertion only)",
+      "text": "NO-FILE 2026-09-23 by INCONSISTENCIES-PASS (registrar, zero calls; insertion only): no separate outcome file; the readout of record is the programme section '## PERF-8 REPLAY (2026-09-16, zero calls) — the exact-content proposal memo is SAFE (DAG byte-identical) and USELESS (0 hits, +49 s): kept OFF'; the build manifests under experiment_results/ carry the counts. [ledger: evidence cell of row PERF-8-MEMO, v132]"
+    }
+  ],
+  "does_not_show": [
+    "any saving from memoization on this build",
+    "a lossy memo (ruled out by the false-hit incident)"
+  ],
+  "ledger": {
+    "row_id": "PERF-8-MEMO",
+    "version": "v107 (row added v106 at fd21fec; [REPLAY] v107) [v132 2026-09-23: INCONSISTENCIES-PASS insertion in this row]"
+  },
+  "depends_on": [
+    "H9-REM-FLAG"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "the proposal memo (CONTEXT.md section 5: PERF-8); item #8 CLOSED NEGATIVE"
+  },
+  "sources": [
+    "docs/judge_v2_program.md (lines as of 5dc8a06) L4197-L4201 (Blocks 3-4 landed, c0f5ff7; memo implemented 3d7e6c7, merged 2c3a2e6)",
+    "docs/judge_v2_program.md (lines as of 5dc8a06) L4224-L4235 (PERF-8 REPLAY record 2d24fcd): the replay counts, the reading, the decision",
+    "docs/test_ledger.html row PERF-8-MEMO (v106 fd21fec; [REPLAY] v107): chips verbatim, observed cell, evidence (ProposalMemo.kt, docs/perf_review_2026-09-09.md item 8, 3d7e6c7, 2c3a2e6)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' lines (grep -n them regardless of line drift); line numbers are as of programme HEAD 5dc8a06"
+  ],
+  "last_update": "2026-09-23",
+  "plain_description": {
+    "sq": "Engineering/infrastructure",
+    "what": "The test added an optional cache of split proposals to the tree-building engine, off by default, then rebuilt the tree with it off and on. It checked that the tree comes out identical and measured the time saved.",
+    "why": "A performance review estimated the cache could save about 37% of one build phase.",
+    "information": "It shows whether this speed-up is real and safe. Result: done. Safe, since the tree is byte-identical, but useless: 0 cache hits, because the graph changes every iteration, and the build is 49 seconds slower (55% overhead). The cache stays off and the item is closed as negative.",
+    "written": "2026-10-07"
+  }
+}

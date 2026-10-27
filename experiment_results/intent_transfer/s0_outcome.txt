@@ -1,0 +1,155 @@
+INTENT-TRANSFER-S0 outcome (tools/analysis/intent_transfer_s0.py, blob f662ceb19738f515972871f5963f5dcfc764a271)
+pool of record: none read (the study's own DBs only)
+zero judge calls; no construction
+CENSUS: EVAL {"banking77": 3908, "clinc": 6672, "clinc_oos": 1350, "massive": 4946} vs planned {"banking77": 3925, "clinc": 6750, "clinc_oos": 1350, "massive": 4890}: WITHIN 5%
+pins: re-checked before and after, unchanged: {'ingest_db': '487e0093719c184c', 'qwen3': '9e100e04fc91b137', 'nomic': '4aafd6c7fa5f779e', 'gemma': 'b187b82f90ce9837'}
+registration: docs/judge_v2_program.md "## Registered 2026-09-29 (before any code or call) — INTENT-TRANSFER-S0: ..." L22092-L22134 _as_of 44ab46f; kind zero-call (R-5)
+builder's readings B1-B8 (printed for the registrar; see the script's docstring): B1 C1 spread = max(spread_qwen3, spread_e); B2 C1a per family; B3 C2 / C4 qwen3 256 seed 0; B4 C2 bootstrap stratified; B5 D5 500 MASSIVE + 500 CLINC; B6 D4 ALPHA 0.1, TRAIN cell prior, kappa grid 1..1000 x 61; B7 every swappable slot swapped; B8 'qwen3 BETTER than both' = both families WORSE
+ATTRIBUTION: MASSIVE 1.1 en-US (FitzGerald et al., 2022), Amazon Science, CC BY 4.0, https://github.com/alexa/massive
+ATTRIBUTION: CLINC150 / oos-eval, data_oos_plus (Larson et al., 2019), Clinc Inc., CC BY 3.0, https://github.com/clinc/oos-eval
+ATTRIBUTION: BANKING77 (Casanueva et al., 2020), PolyAI, CC BY 4.0, https://github.com/PolyAI-LDN/task-specific-datasets
+== SUPPORT (planning values of the draft beside the measured ones) ==
+  C1 massive: EVAL in-scope n 4946 (planned 4890), components 4923, Kish DEFF 1.0093 (declared 1.05), n_eff 4900
+  C1 clinc: EVAL in-scope n 6672 (planned 6750), components 6672, Kish DEFF 1.0000 (declared 1.05), n_eff 6672
+  C1 banking77: EVAL in-scope n 3908 (planned 3925), components 3905, Kish DEFF 1.0015 (declared 1.05), n_eff 3902
+  C2: OOS EVAL n 1350 (planned 1350), components 1350, Kish DEFF 1.0000; in-scope as C1 clinc; R-2: EVERY kept CLINC OOS row (hash sides {"EVAL": 408, "GATE": 136, "TRAIN": 806}, all read as EVAL; 0 OOS rows dropped by a collision)
+  C3 massive: K_f 60 cells (unit = cell; SE_z 1/sqrt(K-3) = 0.132, rho-MDE80 ~ 0.37)
+  C3 clinc: K_f 150 cells (unit = cell; SE_z 1/sqrt(K-3) = 0.082, rho-MDE80 ~ 0.23)
+  C3 banking77: K_f 77 cells (unit = cell; SE_z 1/sqrt(K-3) = 0.116, rho-MDE80 ~ 0.33)
+  C1 banking77 fine nomic: n 3908, clusters 3905, DEFF 1.0015, n_eff 3902; bootstrap SE(D) 0.00284 (planned 0.004), MDE80 0.00796 (planned 0.0112), spread 0.01648 (planned 0.010), bar 0.01648
+  C1 banking77 fine gemma: n 3908, clusters 3905, DEFF 1.0015, n_eff 3902; bootstrap SE(D) 0.00247 (planned 0.004), MDE80 0.00693 (planned 0.0112), spread 0.01434 (planned 0.010), bar 0.01434
+  C1 clinc coarse nomic: n 6672, clusters 6672, DEFF 1.0000, n_eff 6672; bootstrap SE(D) 0.00429 (planned 0.004), MDE80 0.01202 (planned 0.0112), spread 0.13023 (planned 0.010), bar 0.13023
+  C1 clinc coarse gemma: n 6672, clusters 6672, DEFF 1.0000, n_eff 6672; bootstrap SE(D) 0.00406 (planned 0.004), MDE80 0.01137 (planned 0.0112), spread 0.13622 (planned 0.010), bar 0.13622
+  C1 clinc fine nomic: n 6672, clusters 6672, DEFF 1.0000, n_eff 6672; bootstrap SE(D) 0.00145 (planned 0.004), MDE80 0.00406 (planned 0.0112), spread 0.00968 (planned 0.010), bar 0.00968
+  C1 clinc fine gemma: n 6672, clusters 6672, DEFF 1.0000, n_eff 6672; bootstrap SE(D) 0.00137 (planned 0.004), MDE80 0.00383 (planned 0.0112), spread 0.00942 (planned 0.010), bar 0.00942
+  C1 massive coarse nomic: n 4946, clusters 4923, DEFF 1.0093, n_eff 4900; bootstrap SE(D) 0.00478 (planned 0.004), MDE80 0.01339 (planned 0.0112), spread 0.03858 (planned 0.010), bar 0.03858
+  C1 massive coarse gemma: n 4946, clusters 4923, DEFF 1.0093, n_eff 4900; bootstrap SE(D) 0.00447 (planned 0.004), MDE80 0.01250 (planned 0.0112), spread 0.04419 (planned 0.010), bar 0.04419
+  C1 massive fine nomic: n 4946, clusters 4923, DEFF 1.0093, n_eff 4900; bootstrap SE(D) 0.00317 (planned 0.004), MDE80 0.00887 (planned 0.0112), spread 0.02463 (planned 0.010), bar 0.02463
+  C1 massive fine gemma: n 4946, clusters 4923, DEFF 1.0093, n_eff 4900; bootstrap SE(D) 0.00289 (planned 0.004), MDE80 0.00809 (planned 0.0112), spread 0.02463 (planned 0.010), bar 0.02463
+  C2: n_in 6672, n_OOS 1350, DEFF 1.0000; Hanley-McNeil SE (A, n_pos in-scope, n_neg OOS; C-7) 0.00152 x sqrt(DEFF) = 0.00152, MDE80 0.00426; the registered order (counts swapped, conservative) 0.00304 x sqrt(DEFF) = 0.00304 (registered 0.0059, MDE80 0.017); bootstrap SE 0.00198 (the stratified bootstrap decides)
+  C3 massive: cells scored 57 (excluded < 10 EVAL: 3), SE_z 0.1361, bootstrap draws undefined 0
+  C3 clinc: cells scored 145 (excluded < 10 EVAL: 5), SE_z 0.0839, bootstrap draws undefined 0
+  C3 banking77: cells scored 76 (excluded < 10 EVAL: 1), SE_z 0.1170, bootstrap draws undefined 0
+  C4: n 3222 variants, clusters 3207, DEFF 1.0093, n_eff 3192, bootstrap SE 0.00748 (planned 0.0053), MDE80 0.02094 (planned 0.015)
+TRAIN-ONLY: 460 fits audited (452 on TRAIN, 8 on GATE), 0 with an EVAL row, 0 OOS rows, 0 dropped rows (fit_rows refuses otherwise)
+== S0-C1 (k-means NMI against gold, EVAL; slice 256 decides, 512 printed) ==
+  banking77 fine K=77 n=3908: NMI seed-mean qwen3 0.8399 nomic 0.7855 gemma 0.8962; ARI seed-mean qwen3 0.5911 nomic 0.4895 gemma 0.7188
+    D(nomic, fine) = -0.05443, 95% BASIC CI [-0.06237, -0.05140] (decides, C-1); bias b = +0.00237 (b/SE +0.84), bias-corrected D - b = -0.05680; percentile CI [-0.05746, -0.04649] (descriptive); SE 0.00284, MDE80 0.00796, spread max(qwen3 0.01434, nomic 0.01648), per-seed-D spread 0.00908, bar 0.01648 -> WORSE
+    D(gemma, fine) = +0.05628, 95% BASIC CI [+0.05341, +0.06298] (decides, C-1); bias b = -0.00189 (b/SE -0.77), bias-corrected D - b = +0.05817; percentile CI [+0.04958, +0.05914] (descriptive); SE 0.00247, MDE80 0.00693, spread max(qwen3 0.01434, gemma 0.01400), per-seed-D spread 0.01539, bar 0.01434 -> BETTER
+  clinc coarse K=10 n=6672: NMI seed-mean qwen3 0.5761 nomic 0.4850 gemma 0.5340; ARI seed-mean qwen3 0.4249 nomic 0.3390 gemma 0.3766
+    D(nomic, coarse) = -0.09114, 95% BASIC CI [-0.09969, -0.08252] (decides, C-1); bias b = -0.00003 (b/SE -0.01), bias-corrected D - b = -0.09111; percentile CI [-0.09976, -0.08259] (descriptive); SE 0.00429, MDE80 0.01202, spread max(qwen3 0.05243, nomic 0.13023), per-seed-D spread 0.10480, bar 0.13023 -> NEITHER
+    D(gemma, coarse) = -0.04216, 95% BASIC CI [-0.04981, -0.03407] (decides, C-1); bias b = -0.00034 (b/SE -0.08), bias-corrected D - b = -0.04182; percentile CI [-0.05026, -0.03451] (descriptive); SE 0.00406, MDE80 0.01137, spread max(qwen3 0.05243, gemma 0.13622), per-seed-D spread 0.13851, bar 0.13622 -> NEITHER
+  clinc fine K=150 n=6672: NMI seed-mean qwen3 0.9280 nomic 0.9026 gemma 0.9211; ARI seed-mean qwen3 0.7361 nomic 0.6780 gemma 0.7155
+    D(nomic, fine) = -0.02539, 95% BASIC CI [-0.02972, -0.02400] (decides, C-1); bias b = +0.00149 (b/SE +1.03), bias-corrected D - b = -0.02688; percentile CI [-0.02678, -0.02106] (descriptive); SE 0.00145, MDE80 0.00406, spread max(qwen3 0.00942, nomic 0.00968), per-seed-D spread 0.01209, bar 0.00968 -> WORSE
+    D(gemma, fine) = -0.00691, 95% BASIC CI [-0.01015, -0.00475] (decides, C-1); bias b = +0.00052 (b/SE +0.38), bias-corrected D - b = -0.00743; percentile CI [-0.00907, -0.00367] (descriptive); SE 0.00137, MDE80 0.00383, spread max(qwen3 0.00942, gemma 0.00229), per-seed-D spread 0.00714, bar 0.00942 -> NEITHER
+  massive coarse K=18 n=4946: NMI seed-mean qwen3 0.6553 nomic 0.6437 gemma 0.7906; ARI seed-mean qwen3 0.4638 nomic 0.4775 gemma 0.6623
+    D(nomic, coarse) = -0.01164, 95% BASIC CI [-0.02166, -0.00303] (decides, C-1); bias b = +0.00096 (b/SE +0.20), bias-corrected D - b = -0.01259; percentile CI [-0.02024, -0.00161] (descriptive); SE 0.00478, MDE80 0.01339, spread max(qwen3 0.03858, nomic 0.03429), per-seed-D spread 0.05936, bar 0.03858 -> NEITHER
+    D(gemma, coarse) = +0.13529, 95% BASIC CI [+0.12821, +0.14564] (decides, C-1); bias b = -0.00157 (b/SE -0.35), bias-corrected D - b = +0.13686; percentile CI [+0.12494, +0.14237] (descriptive); SE 0.00447, MDE80 0.01250, spread max(qwen3 0.03858, gemma 0.04419), per-seed-D spread 0.03769, bar 0.04419 -> BETTER
+  massive fine K=60 n=4946: NMI seed-mean qwen3 0.7642 nomic 0.6990 gemma 0.7976; ARI seed-mean qwen3 0.5037 nomic 0.3846 gemma 0.5437
+    D(nomic, fine) = -0.06521, 95% BASIC CI [-0.07370, -0.06137] (decides, C-1); bias b = +0.00233 (b/SE +0.74), bias-corrected D - b = -0.06754; percentile CI [-0.06905, -0.05672] (descriptive); SE 0.00317, MDE80 0.00887, spread max(qwen3 0.02463, nomic 0.02017), per-seed-D spread 0.01967, bar 0.02463 -> WORSE
+    D(gemma, fine) = +0.03340, 95% BASIC CI [+0.02974, +0.04115] (decides, C-1); bias b = -0.00201 (b/SE -0.70), bias-corrected D - b = +0.03541; percentile CI [+0.02565, +0.03706] (descriptive); SE 0.00289, MDE80 0.00809, spread max(qwen3 0.02463, gemma 0.01757), per-seed-D spread 0.02592, bar 0.02463 -> BETTER
+  [512] banking77 fine: D(nomic) -0.06495 basic [-0.07264, -0.06210]; D(gemma) +0.04674 basic [+0.04374, +0.05302] (printed, not deciding)
+  [512] clinc coarse: D(nomic) -0.06436 basic [-0.07211, -0.05647]; D(gemma) +0.00586 basic [-0.00083, +0.01296] (printed, not deciding)
+  [512] clinc fine: D(nomic) -0.01479 basic [-0.01871, -0.01351]; D(gemma) -0.00230 basic [-0.00536, -0.00031] (printed, not deciding)
+  [512] massive coarse: D(nomic) -0.02684 basic [-0.03608, -0.01912]; D(gemma) +0.13049 basic [+0.12368, +0.14086] (printed, not deciding)
+  [512] massive fine: D(nomic) -0.05652 basic [-0.06506, -0.05310]; D(gemma) +0.04212 basic [+0.03868, +0.04941] (printed, not deciding)
+== S0-C2 (CLINC OOS; qwen3 256, K 150, seed 0 decides) ==
+  A = 0.97437, 95% CI [0.97043, 0.97813] (stratified component bootstrap, B 2000); n_in 6672, n_OOS 1350; FPR95 0.1578 at the GATE threshold 0.74326 (GATE TPR 0.9503, n_GATE 2333; EVAL TPR 0.9601)
+  per seed A: [0.97437, 0.97263, 0.97601, 0.97446, 0.97649]; supervised TRAIN-centroid A 0.97640; K 50 / 100 / 300 (seed 0): {50: '0.94509', 100: '0.96529', 300: '0.97972'}; nomic 0.97201, gemma 0.97443 (K 150 seed 0)
+== S0-C3 (Spearman rho of the TRAIN margin vs EVAL purity over cells; qwen3 256 seed 0; cell bootstrap B 2000) ==
+  massive: rho 0.2705, 95% CI [-0.0154, 0.5102], cells 57 (excluded < 10 EVAL: 3); seeds 1-4: ['0.2046', '0.3162', '0.3025', '0.3400']
+  clinc: rho 0.4107, 95% CI [0.2652, 0.5405], cells 145 (excluded < 10 EVAL: 5); seeds 1-4: ['0.3369', '0.3428', '0.3231', '0.2614']
+  banking77: rho 0.3945, 95% CI [0.1741, 0.5834], cells 76 (excluded < 10 EVAL: 1); seeds 1-4: ['0.3939', '0.5047', '0.4900', '0.3465']
+== S0-C4 (MASSIVE slot swap; qwen3 256, K 60, seed 0 decides) ==
+  S = 0.75978, 95% CI [0.74566, 0.77419], n 3222 variants (EVAL items 4946, with a slot 3310; excluded: no alternative 56, TRAIN collision 32, unchanged 0; annot/text mismatch 0)
+  B7 swapped slots (every swappable slot, the design's reading): per variant 'swapped of slots' {"1 of 1": 2094, "1 of 2": 52, "1 of 3": 1, "2 of 2": 798, "2 of 3": 25, "3 of 3": 185, "3 of 4": 6, "4 of 4": 51, "4 of 5": 1, "5 of 5": 8, "7 of 7": 1}; slot types swapped [('date', 776), ('place_name', 443), ('event_name', 422), ('person', 372), ('time', 320), ('media_type', 210), ('business_name', 152), ('weather_descriptor', 128), ('food_type', 119), ('timeofday', 105), ('relation', 100), ('currency_name', 93), ('list_name', 92), ('definition_word', 89), ('artist_name', 88), ('device_type', 87), ('transport_type', 81), ('news_topic', 80), ('business_type', 77), ('house_place', 76), ('player_setting', 72), ('music_genre', 54), ('radio_name', 54), ('song_name', 47), ('order_type', 40), ('game_name', 39), ('color_type', 37), ('audiobook_name', 36), ('meal_type', 35), ('personal_info', 32)]
+  beside: supervised-centroid label stability 0.83426; kNN-1 label stability 0.82930; random same-intent co-filing 0.6924 (3222 pairs); seeds 1-4 S [0.73867, 0.75109, 0.74798, 0.77219]
+== DESCRIPTIVE (never scored; each with n) ==
+  D1 massive gemma coarse n 4946: centroid acc 0.9236, kNN-15 acc 0.9430; k-means NMI/ARI at 0.5x/1x/2x: {0.5: (9, '0.7106', '0.5744'), 1.0: (18, '0.7906', '0.6623'), 2.0: (36, '0.7680', '0.5076')}
+  D1 massive gemma fine n 4946: centroid acc 0.8878, kNN-15 acc 0.8985; k-means NMI/ARI at 0.5x/1x/2x: {0.5: (30, '0.7681', '0.5117'), 1.0: (60, '0.7976', '0.5437'), 2.0: (120, '0.7882', '0.4432')}
+  D1 massive nomic coarse n 4946: centroid acc 0.8352, kNN-15 acc 0.8900; k-means NMI/ARI at 0.5x/1x/2x: {0.5: (9, '0.5759', '0.4859'), 1.0: (18, '0.6437', '0.4775'), 2.0: (36, '0.6543', '0.3730')}
+  D1 massive nomic fine n 4946: centroid acc 0.8011, kNN-15 acc 0.8168; k-means NMI/ARI at 0.5x/1x/2x: {0.5: (30, '0.6627', '0.3834'), 1.0: (60, '0.6990', '0.3846'), 2.0: (120, '0.6880', '0.3008')}
+  D1 massive qwen3 coarse n 4946: centroid acc 0.8668, kNN-15 acc 0.9068; k-means NMI/ARI at 0.5x/1x/2x: {0.5: (9, '0.6000', '0.4356'), 1.0: (18, '0.6553', '0.4638'), 2.0: (36, '0.6966', '0.4296')}
+  D1 massive qwen3 fine n 4946: centroid acc 0.8490, kNN-15 acc 0.8567; k-means NMI/ARI at 0.5x/1x/2x: {0.5: (30, '0.7285', '0.4951'), 1.0: (60, '0.7642', '0.5037'), 2.0: (120, '0.7530', '0.3961')}
+  D1 massive TF-IDF -> SVD-256 floor, k-means NMI seed-mean: {'coarse': '0.3121', 'fine': '0.4589'}
+  D1 clinc gemma coarse n 6672: centroid acc 0.8605, kNN-15 acc 0.9841; k-means NMI/ARI at 0.5x/1x/2x: {0.5: (5, '0.3967', '0.2458'), 1.0: (10, '0.5340', '0.3766'), 2.0: (20, '0.5984', '0.3976')}
+  D1 clinc gemma fine n 6672: centroid acc 0.9582, kNN-15 acc 0.9633; k-means NMI/ARI at 0.5x/1x/2x: {0.5: (75, '0.8543', '0.4835'), 1.0: (150, '0.9211', '0.7155'), 2.0: (300, '0.9224', '0.7428')}
+  D1 clinc nomic coarse n 6672: centroid acc 0.8389, kNN-15 acc 0.9729; k-means NMI/ARI at 0.5x/1x/2x: {0.5: (5, '0.3812', '0.2436'), 1.0: (10, '0.4850', '0.3390'), 2.0: (20, '0.5545', '0.3607')}
+  D1 clinc nomic fine n 6672: centroid acc 0.9408, kNN-15 acc 0.9348; k-means NMI/ARI at 0.5x/1x/2x: {0.5: (75, '0.8482', '0.4759'), 1.0: (150, '0.9026', '0.6780'), 2.0: (300, '0.8948', '0.6628')}
+  D1 clinc qwen3 coarse n 6672: centroid acc 0.8554, kNN-15 acc 0.9820; k-means NMI/ARI at 0.5x/1x/2x: {0.5: (5, '0.4653', '0.3011'), 1.0: (10, '0.5761', '0.4249'), 2.0: (20, '0.6053', '0.4015')}
+  D1 clinc qwen3 fine n 6672: centroid acc 0.9682, kNN-15 acc 0.9630; k-means NMI/ARI at 0.5x/1x/2x: {0.5: (75, '0.8661', '0.4988'), 1.0: (150, '0.9280', '0.7361'), 2.0: (300, '0.9209', '0.7383')}
+  D1 clinc TF-IDF -> SVD-256 floor, k-means NMI seed-mean: {'coarse': '0.1697', 'fine': '0.7007'}
+  D1 banking77 gemma fine n 3908: centroid acc 0.9353, kNN-15 acc 0.9455; k-means NMI/ARI at 0.5x/1x/2x: {0.5: (38, '0.8192', '0.4798'), 1.0: (77, '0.8962', '0.7188'), 2.0: (154, '0.8845', '0.6733')}
+  D1 banking77 nomic fine n 3908: centroid acc 0.8475, kNN-15 acc 0.9020; k-means NMI/ARI at 0.5x/1x/2x: {0.5: (38, '0.7272', '0.3712'), 1.0: (77, '0.7855', '0.4895'), 2.0: (154, '0.8068', '0.4996')}
+  D1 banking77 qwen3 fine n 3908: centroid acc 0.8797, kNN-15 acc 0.9232; k-means NMI/ARI at 0.5x/1x/2x: {0.5: (38, '0.7768', '0.4249'), 1.0: (77, '0.8399', '0.5911'), 2.0: (154, '0.8426', '0.5702')}
+  D1 banking77 TF-IDF -> SVD-256 floor, k-means NMI seed-mean: {'fine': '0.5625'}
+  D2 clinc qwen3: H 0.1429 (average-link on 150 gold fine centroids cut at K_c 10, 10 clusters), random p95 0.0161 (1000 reps)
+  D2 clinc nomic: H 0.2713 (average-link on 150 gold fine centroids cut at K_c 10, 10 clusters), random p95 0.0161 (1000 reps)
+  D2 clinc gemma: H 0.2867 (average-link on 150 gold fine centroids cut at K_c 10, 10 clusters), random p95 0.0161 (1000 reps)
+  D2 massive qwen3: H 0.4040 (average-link on 60 gold fine centroids cut at K_c 18, 18 clusters), random p95 0.0370 (1000 reps)
+  D2 massive nomic: H 0.4690 (average-link on 60 gold fine centroids cut at K_c 18, 18 clusters), random p95 0.0370 (1000 reps)
+  D2 massive gemma: H 0.8763 (average-link on 60 gold fine centroids cut at K_c 18, 18 clusters), random p95 0.0370 (1000 reps)
+  D3 banking77: n 3908, errors 470, within-coarse share nan; top-20 confusable pairs [('card_payment_wrong_exchange_rate|wrong_exchange_rate_for_cash_withdrawal', 17), ('beneficiary_not_allowed|failed_transfer', 16), ('balance_not_updated_after_bank_transfer|transfer_not_received_by_recipient', 12), ('card_payment_not_recognised|direct_debit_payment_not_recognised', 12), ('pending_transfer|transfer_timing', 12), ('cash_withdrawal_charge|wrong_exchange_rate_for_cash_withdrawal', 11), ('top_up_failed|top_up_reverted', 11), ('automatic_top_up|top_up_limits', 9), ('cash_withdrawal_not_recognised|compromised_card', 9), ('unable_to_verify_identity|verify_my_identity', 9), ('card_arrival|card_delivery_estimate', 8), ('card_payment_fee_charged|extra_charge_on_statement', 8), ('declined_card_payment|declined_transfer', 8), ('exchange_via_app|fiat_currency_support', 8), ('pending_top_up|top_up_failed', 8), ('balance_not_updated_after_bank_transfer|pending_transfer', 7), ('balance_not_updated_after_bank_transfer|transfer_timing', 7), ('card_payment_not_recognised|compromised_card', 7), ('compromised_card|lost_or_stolen_card', 7), ('declined_transfer|failed_transfer', 7)]
+  D3 clinc: n 6672, errors 212, within-coarse share 0.6038; top-20 confusable pairs [('change_ai_name|change_user_name', 17), ('pto_balance|pto_used', 13), ('todo_list|todo_list_update', 7), ('last_maintenance|oil_change_when', 6), ('time|timezone', 6), ('user_name|what_is_your_name', 5), ('cancel|no', 3), ('change_user_name|make_call', 3), ('damaged_card|report_lost_card', 3), ('directions|distance', 3), ('meal_suggestion|recipe', 3), ('order|shopping_list', 3), ('redeem_rewards|rewards_balance', 3), ('report_fraud|report_lost_card', 3), ('alarm|reminder_update', 2), ('apr|interest_rate', 2), ('bill_due|expiration_date', 2), ('calendar_update|schedule_meeting', 2), ('change_ai_name|make_call', 2), ('change_language|translate', 2)]
+  D3 massive: n 4946, errors 747, within-coarse share 0.3119; top-20 confusable pairs [('general_quirky|qa_factoid', 38), ('calendar_query|calendar_set', 28), ('calendar_query|recommendation_events', 23), ('general_quirky|qa_definition', 23), ('general_quirky|weather_query', 21), ('general_quirky|news_query', 19), ('music_settings|play_music', 18), ('play_music|play_radio', 18), ('calendar_query|datetime_query', 17), ('calendar_set|general_quirky', 14), ('transport_query|transport_ticket', 14), ('general_greet|general_quirky', 13), ('datetime_convert|datetime_query', 12), ('calendar_query|general_quirky', 11), ('music_likeness|play_music', 11), ('recommendation_locations|transport_query', 11), ('qa_definition|qa_factoid', 10), ('general_quirky|recommendation_movies', 9), ('news_query|qa_factoid', 8), ('play_audiobook|play_music', 8)]
+  D4 banking77 n 3908: kappa 63.096; hard acc 0.7244, soft acc 0.7267; Brier soft 0.3633, hard 0.3784; selective precision at 80% / 90% / 100% coverage 0.8106 / 0.7688 / 0.7267
+  D4 clinc n 6672: kappa 70.795; hard acc 0.7912, soft acc 0.7941; Brier soft 0.2557, hard 0.2620; selective precision at 80% / 90% / 100% coverage 0.8786 / 0.8308 / 0.7941
+  D4 massive n 4946: kappa 56.234; hard acc 0.7507, soft acc 0.7663; Brier soft 0.3326, hard 0.3556; selective precision at 80% / 90% / 100% coverage 0.8436 / 0.8007 / 0.7663
+  D5 clinc: 500 synthetic pairs (seeded concatenation, not natural text): both-intent top-2 recall 0.2460, per-intent 0.5670; entropy AUROC pair vs 6672 singles 0.8063
+  D5 massive: 500 synthetic pairs (seeded concatenation, not natural text): both-intent top-2 recall 0.2000, per-intent 0.5420; entropy AUROC pair vs 4946 singles 0.7375
+  D6 banking77: token-length quintile edges [7.0, 9.0, 11.0, 14.0]; (quintile, n, centroid acc) [(0, 688, '0.8576'), (1, 854, '0.9169'), (2, 757, '0.9207'), (3, 706, '0.8853'), (4, 903, '0.8228')]
+  D6 clinc: token-length quintile edges [6.0, 7.0, 9.0, 11.0]; (quintile, n, centroid acc) [(0, 1187, '0.9638'), (1, 813, '0.9631'), (2, 1831, '0.9694'), (3, 1316, '0.9643'), (4, 1525, '0.9764')]
+  D6 massive: token-length quintile edges [4.0, 6.0, 7.0, 9.0]; (quintile, n, centroid acc) [(0, 597, '0.7203'), (1, 1211, '0.8737'), (2, 731, '0.8700'), (3, 1137, '0.8734'), (4, 1270, '0.8520')]
+  D7 HWU64 <-> MASSIVE-en twin count: NOT RUN (R-3: conditional on an author admission of HWU64; the steward's, never computed here)
+  near-copies banking77: 569 of 3908 EVAL items have a TRAIN neighbour at cos >= 0.98 (qwen3 512); disclosed, not removed
+  near-copies clinc: 1110 of 8022 EVAL items have a TRAIN neighbour at cos >= 0.98 (qwen3 512); disclosed, not removed
+  near-copies massive: 274 of 4946 EVAL items have a TRAIN neighbour at cos >= 0.98 (qwen3 512); disclosed, not removed
+== CRITERIA (verdict words; the draft's logic, verbatim) ==
+S0-C1a (fine dependence): HELD -- corpora with a WORSE fine family: 3 of 3 ['massive', 'clinc', 'banking77'] (nomic ['massive', 'clinc', 'banking77'], gemma []) (HELD iff >= 2 of 3 corpora; FAILED iff fewer than 2 corpora with a WORSE fine family: the registered fail observable, the orchestrator's C-4 ruling)
+R-1 banking77 fine, nomic: SCOREABLE (measured SE 0.00284 vs <= 0.0071; spread 0.01648 vs <= 0.020); C1a is scored as written
+R-1 clinc fine, nomic: SCOREABLE (measured SE 0.00145 vs <= 0.0071; spread 0.00968 vs <= 0.020); C1a is scored as written
+R-1 massive fine, nomic: DESCRIPTIVE-ONLY (measured SE 0.00317 vs <= 0.0071; spread 0.02463 vs <= 0.020); C1a is scored as written
+R-4 gemma's fine WORSE clause is DESCRIPTIVE-ONLY at its prediction (-0.010 inside the 0.0112 bar); it is counted in C1a as written
+S0-C1a per-family reading (>= 1 family WORSE on >= 2 of 3 corpora; NOT OF RECORD since the C-4 ruling): HELD
+S0-C1b (coarse): NOT FIRED -- 0 of 2 families WORSE at the coarse level on MASSIVE and on CLINC (a non-fire is never parity)
+S0-C2 (OOS, CLINC): HELD (HELD iff lower(A) >= 0.85; FAILED iff upper(A) < 0.85)
+S0-C3 (label-free cell margin vs gold purity): HELD -- lower(rho) > 0 on ['clinc', 'banking77']; upper(rho) <= 0 on [] (HELD iff >= 2 of 3 positive; FAILED iff >= 2 of 3 non-positive)
+S0-C4 (slot-swap stability, MASSIVE): FAILED (HELD iff lower(S) >= 0.80; FAILED iff upper(S) < 0.80)
+== FALSIFIERS ==
+F1: NOT FIRED -- C1a FAILED: E0b's 'the fine structure is embedder-dependent' is not reproduced against a known answer on 2 of 3 corpora; that clause narrows to MMLU-Pro and one draw
+F1': NOT FIRED -- C1b FIRES: the coarse 'not shown worse' of E0b does not generalise
+F2: NOT FIRED -- C2 FAILED: label-free no-match is not an out-of-scope detector on the canonical known-answer corpus; stage 3 is declined and the framework may not describe no-match as scope detection
+F3: NOT FIRED -- C3 FAILED: a label-free margin carries no sign of a flat cell's meaning; label-free cells get no self-diagnostic, and S1 (declared cells) is strengthened
+F4: FIRED -- C4 FAILED: flat cells are not stable addresses under slot swaps on the easiest known answer; every filing rate of record (81.6%) must carry 'surface-sensitive, untested on capability text'
+== PREDICTIONS (a numeric prediction HELD iff the point lies in its 80% interval; a probability scored on its event, Brier beside) ==
+  P1 massive coarse NMI (qwen3 256, seed mean) 0.6553 vs 0.68 [0.58, 0.78]: HELD
+  P1 massive fine NMI (qwen3 256, seed mean) 0.7642 vs 0.78 [0.72, 0.84]: HELD
+  P1 clinc coarse NMI (qwen3 256, seed mean) 0.5761 vs 0.50 [0.38, 0.62]: HELD
+  P1 clinc fine NMI (qwen3 256, seed mean) 0.9280 vs 0.90 [0.86, 0.93]: HELD
+  P1 banking77 fine NMI (qwen3 256, seed mean) 0.8399 vs 0.80 [0.74, 0.85]: HELD
+  P2 massive fine D(nomic) -0.0652 vs -0.025 [-0.050, +0.000]: FAILED
+  P2 massive fine D(gemma) +0.0334 vs -0.010 [-0.035, +0.015]: FAILED
+  P2 clinc fine D(nomic) -0.0254 vs -0.020 [-0.040, +0.000]: HELD
+  P2 clinc fine D(gemma) -0.0069 vs -0.010 [-0.035, +0.015]: HELD
+  P2 banking77 fine D(nomic) -0.0544 vs -0.030 [-0.060, -0.005]: HELD
+  P2 banking77 fine D(gemma) +0.0563 vs -0.010 [-0.035, +0.015]: FAILED
+  P2 C1a HELD: predicted p 0.55, outcome YES, Brier 0.2025
+  P2 C1b NOT FIRED: predicted p 0.65, outcome YES, Brier 0.1225
+  P2 qwen3 BETTER than both at fine on >= 2 of 3 (B8): predicted p 0.40, outcome NO, Brier 0.1600
+  P3 A 0.9744 vs 0.88 [0.80, 0.94]: FAILED
+  P3 FPR95 0.1578 vs 0.45 [0.30, 0.65]: FAILED
+  P3 supervised-centroid A 0.9764 (predicted 0.91, a point; printed)
+  P3 C2 HELD: predicted p 0.65, outcome YES, Brier 0.1225
+  P4 massive rho 0.2705 vs 0.45 [0.20, 0.65]: HELD
+  P4 clinc rho 0.4107 vs 0.50 [0.35, 0.62]: HELD
+  P4 banking77 rho 0.3945 vs 0.45 [0.25, 0.62]: HELD
+  P4 C3 HELD: predicted p 0.75, outcome YES, Brier 0.0625
+  P5 S 0.7598 vs 0.90 [0.85, 0.95]: FAILED
+  P5 C4 HELD: predicted p 0.85, outcome NO, Brier 0.7225
+  P5 kNN-1 label stability < supervised-centroid stability: predicted p 0.60, outcome YES, Brier 0.1600
+  P6 D2 H(massive) 0.4040 vs 0.45 [0.25, 0.65], random p95 0.0370: HELD
+  P6 D2 H(clinc) 0.1429 vs 0.55 [0.30, 0.75], random p95 0.0161: FAILED
+  P6 D3 within-scenario share of MASSIVE confusion 0.3119 (>= 0.55): FAILED
+  P6 D4 selective filing at 80% coverage vs 100% on MASSIVE +0.0773 (>= +0.05): HELD
+  mean Brier over the 7 probability predictions: 0.2218
+DOES NOT SHOW: the construction (no build); capability, judges, routing gain or any policy; that a gold coarse level is the right taxonomy; transfer to benchmark questions; embedder parity (no TOST); a second split draw; natural multi-intent text (D5 is synthetic); OOS on real traffic; any card-conformant protocol (RAW only)

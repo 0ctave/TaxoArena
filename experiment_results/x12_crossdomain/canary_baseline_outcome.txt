@@ -1,0 +1,34 @@
+=== CANARY-BASELINE: the frozen 300-match canary set (hash 50af669ac6997f9f) judged under STACK-v2 / grok-4-1-fast-non-reasoning, dual order ===
+  pool p2dca21ab5f4ef3ae | set experiment_results\x12_crossdomain\canary_set.json | script sha256[:16] 9f075b898366ea7e | pass 1 cache canary_baseline_pass1.db | pass 2 cache canary_baseline_pass2.db
+  temperature of record: omitted (provider default; plan Amendment 1 D2) | max_tokens of record: 8192 | judge of record: grok-4-1-fast-non-reasoning (deployed, D1)
+  pass 1: 300 of 300 judged | protocol of record: STACK-v2 | judge grok-4-1-fast-non-reasoning (azure chat complet... | max_tokens 8192 | temperature omitted | started 2026-09-16 01:44:16 | resumed 1 | script sha 729e4325d523237a
+  pass 1 deployment fingerprint over 600 calls (expected azure:grok-4-1-fast-non-reasoning): not recorded (pre-rule)
+  pass 2: 300 of 300 judged | protocol of record: STACK-v2 | judge grok-4-1-fast-non-reasoning (azure chat complet... | max_tokens 8192 | temperature omitted | started 2026-09-22 10:53:59 | resumed 1 | script sha 976207e2bb8934c3
+  pass 2 deployment fingerprint over 600 calls (expected azure:grok-4-1-fast-non-reasoning): {'azure:grok-4-1-fast-non-reasoning': 600}
+  GUARD pass 1                 0 of 300 verdicts unparsed or non-terminated (0.0%) -> OK
+  GUARD pass 2                 0 of 300 verdicts unparsed or non-terminated (0.0%) -> OK
+  GUARD paired (both passes)   0 of 600 verdicts unparsed or non-terminated (0.0%) -> OK
+
+  PASS 1 descriptives (valid verdicts only):
+    contested n=150 | tie 0.280 | flip 0.193 | key-decidable n= 65: accuracy ties-wrong 0.769, ties-half 0.815
+    cross     n=150 | tie 0.220 | flip 0.173 | key-decidable n= 78: accuracy ties-wrong 0.923, ties-half 0.949
+    all       n=300 | tie 0.250 | flip 0.183 | key-decidable n=143: accuracy ties-wrong 0.853, ties-half 0.888
+
+  PASS 2 descriptives (valid verdicts only):
+    contested n=150 | tie 0.273 | flip 0.180 | key-decidable n= 65: accuracy ties-wrong 0.785, ties-half 0.823
+    cross     n=150 | tie 0.187 | flip 0.140 | key-decidable n= 78: accuracy ties-wrong 0.949, ties-half 0.962
+    all       n=300 | tie 0.230 | flip 0.160 | key-decidable n=143: accuracy ties-wrong 0.874, ties-half 0.899
+
+  FLOOR = share of paired matches whose dual-order verdict (TIE on flip) differs between the passes; 95% interval and SE from a
+  question-clustered bootstrap (2000 draws, seed 42); DEFF = clustered variance / binomial variance.
+    contested n=150 matches on 146 questions | floor 0.087  95% CI [0.041, 0.140]  SE 0.0247  DEFF 1.16 | agreement 0.913 | decisive-only disagreement 0.000 (n=102) | per-order raw vote disagreement 0.110
+    cross     n=150 matches on 143 questions | floor 0.087  95% CI [0.046, 0.135]  SE 0.0230  DEFF 1.00 | agreement 0.913 | decisive-only disagreement 0.000 (n=113) | per-order raw vote disagreement 0.087
+    all       n=300 matches on 279 questions | floor 0.087  95% CI [0.056, 0.122]  SE 0.0170  DEFF 1.09 | agreement 0.913 | decisive-only disagreement 0.000 (n=215) | per-order raw vote disagreement 0.098
+    CONVENTION A (INVALID or non-terminated in either pass = disagreement; denominators 150 / 150 / 300): contested 13/150 = 0.087, cross 13/150 = 0.087, all 26/300 = 0.087; pairs dropped by the script 0 (pass 1 INVALID 0, pass 2 INVALID 0); convention B as printed above.  [INSERTED 2026-09-22 by the post-run review, rule (iv) 96bd3d7]
+
+  ALARM (Stage 9 arm A, one-sided at 3 SE against the measured floor): floor 0.087 | at n=300 (one epoch) threshold 0.138 | at n~1,000 (three epochs pooled, same DEFF) threshold 0.115
+ALARM STATE: NO ALARM
+  [INSERTED 2026-09-22 by the post-run review, rule (ii) 96bd3d7: contested floor 0.087 <= 0.114 under both conventions; ALARM is live from epoch 2; the MDE literal below is registration text at 0.057: at the measured floor 1.96 x SE = 3.3pp at n = 300 (DEFF 1.09), 1.8pp at n ~ 1,000; the one-epoch alarm at 0.138 needs a +5.1pp drift; --analyze rewrites this file in mode "w" and must not be re-run on it before the script prints these lines itself]
+  CRITERION (registered): measured floor and agreement with interval -> READ
+  PREDICTION: contested floor 4-6% -> 0.087, outside; cross-tier lower than contested -> 0.087 vs 0.087, does not hold
+  (a single pass pair of 300 has MDE 1.96 x SE = 3.3pp at the measured floor 0.087, and 1.8pp at n ~ 1,000 at the same DEFF; the one-sided 3-SE alarm at n=300 fires at 0.138, a +5.1pp drift; the strata compare at n=150 each and are descriptive, not a test)

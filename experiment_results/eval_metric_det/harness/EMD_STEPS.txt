@@ -1,0 +1,102 @@
+EVAL-METRIC-DETERMINISM - operator step list for the five registered legs (registration docs/judge_v2_program.md
+L20311-L20389, 55a6ce1; P2 kept at L20382, 8bf15da). Zero calls. For the READY reviewer; nothing here runs before the
+READY. PowerShell unless marked. Every script refuses rather than overwrites (write-once outputs).
+[RE-CUT 2026-09-30/10-01 on branch eval-metric-det3 (READY_backfill_2026-09-30 b938c14, B-EM-1 / B-EM-2): BASE = main 2f080e0,
+FIX = 6569cd3 (77f7cb8 cherry-picked; same four blobs); the harness lives on the branch (pin it by blob from the branch tip);
+every leg's bootRun carries -PjvmThreads=12 and the leg check requires the THREAD-CAP witness (TC). V1 refuses if main's
+src/main / build files / config move after BASE: if E1-ROUTE (e1-route2: EmbeddingCache.kt, DiagnosticsBundle.kt,
+HeadlessBenchmarkRunner.kt, build.gradle.kts) merges first, this branch must be re-cut again before the window.]
+
+Variables:
+  $M   = Z:\FAC\TUBerlin\THESIS\TaxoArena
+  $W   = $M\.claude\worktrees
+  $H   = $W\eval-metric-det3\experiment_results\eval_metric_det\harness     (the pinned harness; the legs never run it)
+  $SPR = C:\Users\octav\AppData\Local\Temp\claude\Z--FAC-TUBerlin-THESIS-TaxoArena\7c10e5cb-d16b-4a0e-864a-f3a6151d835b\scratchpad
+  $SPE = $SPR\emd                                                             (created by hand; holds the pins only)
+  $ST  = $SPE\run_emd_1                                                       (created by emd_prep pre, never by hand)
+  BASE = 2f080e079f79c62c3a38337005438c6a310be81b     FIX = 6569cd31ead59b2f822ab5c2b91347443e1cd378
+  THE ROOT STRINGS: pass every leg root as the SAME literal string ($W\emd-<L>) to emd_prep, emd_leg_check and
+  emd_compare; the verdict refuses a readout made on a root string other than the prepared one.
+
+S0. Pins and hygiene (before the window).
+  - Get-FileHash -Algorithm SHA256 on $H\emd_common.py, emd_compare.py, emd_leg_check.py, emd_prep.py, emd_legrun.cmd,
+    emd_w1.ps1, emd_selftest.py, emd_mutants.py: each equal to the READY's table (name the kind: the working-tree bytes).
+  - powershell -NoProfile -File $H\emd_w1.ps1        must end "[W] GO" (exit 0): W1 FREE on main's embeddings_cache.db and
+    ag_news_smoke_cache_v1.db, no FOREIGN java.exe / python.exe (a python with --selftest in its command line is ADMITTED and
+    printed; anything else: WAIT, re-run, never kill), free RAM >= 12 GB.
+  - python $H\emd_selftest.py --selftest               expect "184 of 184 cases as expected" (exit 0).
+  - mkdir $SPE ; python $H\emd_prep.py pins $M $SPE\pins_before.json      (main's L6 pins, both views; write-once)
+
+S1. Worktrees (git only; run nothing inside them).
+  git -C $M worktree add --detach .claude/worktrees/emd-P1 2f080e079f79c62c3a38337005438c6a310be81b
+  git -C $M worktree add --detach .claude/worktrees/emd-R1 6569cd31ead59b2f822ab5c2b91347443e1cd378
+  git -C $M worktree add --detach .claude/worktrees/emd-R2 6569cd31ead59b2f822ab5c2b91347443e1cd378
+  git -C $M worktree add --detach .claude/worktrees/emd-P2 2f080e079f79c62c3a38337005438c6a310be81b
+  git -C $M worktree add --detach .claude/worktrees/emd-R3 6569cd31ead59b2f822ab5c2b91347443e1cd378
+  git -C $M worktree add --detach .claude/worktrees/emd-suite 6569cd31ead59b2f822ab5c2b91347443e1cd378
+  git -C $M worktree add --detach .claude/worktrees/emd-base8 2f080e079f79c62c3a38337005438c6a310be81b
+
+S2. THE RULE-7 WINDOW OPENS (the orchestrator announces it; no git write touches src/ inside it). V1 and V2.
+  powershell -NoProfile -File $H\emd_w1.ps1                                   -> GO
+  python $H\emd_prep.py pre $M $W\emd-P1 $W\emd-R1 $W\emd-R2 $W\emd-P2 $W\emd-R3 $ST
+      must print "[V1] PASS" and "[V2] PASS: all five legs (P1, R1, R2, P2, R3) hold byte-identical copies (ag e3415684318c937c /
+      emb 52229e1ebfdda76e)"; creates $ST, $ST\classlists, emd_prep.txt, emd_prep.json. Exit 1 = refused (failed precondition).
+
+S3-S7. The five legs, IN THIS ORDER: P1, R1, R2, P2, R3. For each leg <L>:
+  powershell -NoProfile -File $H\emd_w1.ps1 [-Admit "<pids>"]                  -> GO (prints W1, the admitted PIDs, RAM >= 12 GB)
+  cmd /c "$H\emd_legrun.cmd" <L> "$W\emd-<L>" "$ST"                           -> "[RUN] ...leg<L>_bootrun.log EXIT 0"
+  python $H\emd_leg_check.py <L> $W\emd-<L> $ST\leg<L>_bootrun.log $ST         -> "[LEG <L>] ALL PER-LEG CHECKS PASS" (exit 0)
+      including "[TC <L>] <n> [THREAD-CAP] line(s), witness ['requested=12 availableProcessors=12'] ... -> PASS".
+      expected X1 (V3): P1 / P2 "0 .class file(s) contain canonicalByRawText"; R1 / R2 / R3 ">= 1" (the build's count: 3,
+      AdditionalMetricsKt, HierarchicalMetricsKt, TaxonomyMetrics); writes $ST\leg_<L>.json and the class lists
+      $ST\classlists\leg<L>_canonicalByRawText.txt / leg<L>_all.txt (V10-style, BEFORE any removal); appends $ST\emd_disc.txt.
+  After P1 only: Get-CimInstance Win32_Process -Filter "Name='java.exe'" | select ProcessId,CommandLine  -> record the
+  Gradle daemon and Kotlin daemon PIDs started by P1; pass them as -Admit "pid,pid" to emd_w1.ps1 for R1..R3 and S9 (the
+  legs share the daemon, as in D9b D6). A java.exe not in that list is FOREIGN: WAIT.
+  A leg check exit 1 VOIDS the run (a failed precondition): stop, keep everything, report.
+
+S8. Pair readouts (after the five legs, BEFORE any removal; exit 0 = 0 differ, 3 = differs, 2 = refusal).
+  python $H\emd_compare.py c1 $W\emd-R1 $W\emd-R2 $ST R1 R2
+  python $H\emd_compare.py c1 $W\emd-R1 $W\emd-R3 $ST R1 R3
+  python $H\emd_compare.py c1 $W\emd-R2 $W\emd-R3 $ST R2 R3
+  python $H\emd_compare.py c3 $W\emd-P1 $W\emd-R1 $ST P1 R1
+  python $H\emd_compare.py c4 $W\emd-R1 $W\emd-R2 $ST R1 R2
+  python $H\emd_compare.py c4 $W\emd-R1 $W\emd-R3 $ST R1 R3
+  python $H\emd_compare.py c4 $W\emd-R2 $W\emd-R3 $ST R2 R3
+
+S9. C2 (the suite on FIX; the golden test on BASE), still inside the window, W guard first (-Admit the daemon PIDs).
+  cd $W\emd-suite ; .\gradlew.bat cleanTest test --offline --no-build-cache > $ST\suite_fix.log 2>&1
+      (RE-MEASURE OWED at BASE 2f080e0 / FIX 6569cd3; at 8bf15da / eef090a it was "459 tests completed, 2 failed": MrlRoutingTest.testMrlConfigDefaults, TraceEnvelopeUnwrapTest blank-trace;
+      Gradle exits non-zero because of them). Copy-Item -Recurse $W\emd-suite\build\test-results\test $ST\xml_fix
+      [RE-MEASURED 2026-10-01 (engine-coder; a fresh detached worktree of FIX 6569cd3, --no-daemon, no build/ before):
+      "515 tests completed, 2 failed" (MrlRoutingTest.testMrlConfigDefaults, TraceEnvelopeUnwrapTest blank-trace; XML totals
+      515 / 0 skipped / 2 failures / 0 errors); EvalMetricDeterminismTest 8 testcases, 0 failures; evidence
+      experiment_results/eval_metric_det/jvm_premeasure_2026-10-01/. A pre-READY measurement, not the window's S9.]
+  git -C $W\emd-base8 checkout 6569cd31ead59b2f822ab5c2b91347443e1cd378 -- src/test/kotlin/taxonomy/EvalMetricDeterminismTest.kt
+  git -C $W\emd-base8 diff --cached --name-status 2f080e079f79c62c3a38337005438c6a310be81b     (must be exactly "A <the test>")
+  cd $W\emd-base8 ; .\gradlew.bat cleanTest test --offline --no-build-cache --tests taxonomy.EvalMetricDeterminismTest > $ST\golden_base.log 2>&1
+      (RE-MEASURE OWED on BASE 2f080e0; at 8bf15da it was "8 tests completed, 7 failed": tdcSampledPermutationInvariant among them; BUILD FAILED is the expected result)
+  Copy-Item $W\emd-base8\build\test-results\test\TEST-taxonomy.EvalMetricDeterminismTest.xml $ST\xml_base.xml
+      [RE-MEASURED 2026-10-01 on BASE 2f080e0 (fresh detached worktree, --no-daemon; staged diff exactly "A <the test>", blob
+      45d8f0ab): "8 tests completed, 7 failed", tdcSampledPermutationInvariant and tripletAccuracyPermutationInvariant among them,
+      mainFixtureIsNonDegenerate passed; BUILD FAILED as expected. X1 at FIX 6569cd3: 3 .class files contain canonicalByRawText
+      (AdditionalMetricsKt, HierarchicalMetricsKt, TaxonomyMetrics) of 1,334 = X1_DECLARED_COUNT 3, unchanged (B-EM-1 (5)).
+      BASE needs no rebase: git diff --name-only 2f080e0 main(2b8f809a) -- src/main build.gradle.kts settings.gradle.kts
+      gradle.properties gradle/ config/ src/test is empty.]
+
+S10. THE WINDOW CLOSES: cd $W\emd-suite ; .\gradlew.bat --stop ; no java.exe may remain (Get-CimInstance ... java.exe).
+
+S11. Evidence (before any removal). For each leg <L>: Copy-Item -Recurse $W\emd-<L>\experiment_results\topic_partition\ag_news_smoke_s42
+  $ST\evidence_<L>\outputDir ; git -C $W\emd-<L> status --short > $ST\evidence_<L>\status_short.txt (then convert nothing).
+  Git bash: cd <$ST as /c/...> && find . -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS
+
+S12. V9: python $H\emd_prep.py pins $M $SPE\pins_after.json
+         python $H\emd_prep.py post $SPE\pins_before.json $SPE\pins_after.json $ST        -> "[V9] MET" (exit 0)
+
+S13. THE VERDICT: python $H\emd_compare.py verdict $ST $ST\xml_fix $ST\xml_base.xml $ST\emd_verdict.txt
+  exit 0 DONE, MERGEABLE (the words: "MECHANISM SHOWN" iff TDC(P1) != TDC(P2) in both files, else the registered fallback);
+  3 F1 / F2 / joined; 5 VOID; 6 C2 VOID (a READY defect); 2 INSTRUMENT REFUSAL, including the UNMAPPED cells U1-U3 that the
+  registration does not map (they go to the registrar; nothing is chosen in code).
+
+S14. Removal (only after S11-S13): git -C $M worktree remove --force .claude/worktrees/emd-<X> for P1 R1 R2 P2 R3 suite base8;
+  if a path is too long: cmd /c rd /s /q "\\?\<path>" then git -C $M worktree prune ; git worktree list names none of them.

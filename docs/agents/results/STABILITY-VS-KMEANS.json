@@ -1,0 +1,190 @@
+{
+ "id": "STABILITY-VS-KMEANS",
+ "title": "STABILITY-VS-KMEANS: triplet disagreement between the four AF MMLU-Pro re-draw trees vs matched-data, matched-leaf-count, shape-matched hierarchical k-means baselines (bisecting; flat + average-link on centroids; 5 seeds) on the 2,772 common items (zero calls; REGISTERED 2026-10-05)",
+ "question": "Are the re-draw trees more stable than generic hierarchies given the same data perturbation, leaf count and shape?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "8e681387",
+  "program_lines": "docs/judge_v2_program.md L24625-L24637",
+  "program_lines_as_of": "a00ceecc (re-grepped in the commit that writes the 2026-10-05 brackets; the span is unchanged in length)",
+  "date": "2026-10-05",
+  "heading": "## Registered 2026-10-05 (before any code or call) — STABILITY-VS-KMEANS: on the 2,772 common items of the four anchor-free MMLU-Pro re-draw trees, do the trees disagree with one another less ...",
+  "provenance": "the author's \"Start them\" (relayed in the orchestrator's brief of 2026-10-05); registrar's record docs/judge_v2_program.md L24618-L24623",
+  "commit_note": "registration commit 8e681387 (copied from git log; the placeholder of the registration record is filled)"
+ },
+ "script": {
+  "path": "tools/analysis/stability_vs_kmeans.py",
+  "sha16": "blob:a67bbf0a673cffab (LF, of record; sha256-lf16:5c38f16c67067202, sha256-crlf16:c828548555108def beside; copied from the outcome header and the review)",
+  "commit": "6cd3509f (merged by path from branch stability-vs-kmeans 96ea8650); first build 174347a1 (blob b278a7a9)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_stability_vs_kmeans.md",
+  "commit": "6bb2cfc3",
+  "verdict": "READY (delta review of fix 96ea8650, blob a67bbf0a); conditions C-1 P6 unprinted (scored by hand), C-2 RB wiring untested (ST1 word checked by hand post-run), C-3 realised RB MDE by hand; earlier NOT READY a00ceecc (B-1 bracketed pre-data)"
+ },
+ "go": "the author's \"Start them\" (2026-10-05; zero calls, no 4k-match go needed)",
+ "run": {
+  "outcome_file": "E:/TaxoArena_backup_2026-10-05_stability_vs_kmeans/stability_vs_kmeans_outcome.txt (sha256 eb1118a764da53bbdc9f716c980b48b9fea7ff3ded86988cc8ccf23dc98c6361; write-once, never committed; 41 lines = lines 2-42 of E:/TaxoArena_tmp/svk_run.log; SHA256SUMS.txt 3/3 OK with postrun_review/recheck.py 02b5b727..., boot.py 5ad897a2...)",
+  "outcome_commit": "run from main (code merged 6cd3509f); outcome not committed",
+  "calls": 0,
+  "cce": 0,
+  "pool": "pool reader (rule 7): pool_guard OK p2dca21ab5f4ef3ae on the staged copy; pd610c9a, p19d9f47, p8a29 read (id-disjoint scope); no EVAL quantity",
+  "date": "2026-10-05, rc 0"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_stability_vs_kmeans.md",
+  "commit": "13933eb4",
+  "blob": "ab45eed0 (LF)",
+  "verdict": "VALID; ST1 NEITHER confirmed by hand; W-1, W-2 (HIGH, words); C-1 P6 FAILED; C-3 realised Support; L-2 (LOW)"
+ },
+ "criteria": [
+  {
+   "id": "ST1",
+   "text": "DECIDING (interval decides): D_b = mean tree-pair triplet disagreement - mean crossed-seed baseline-pair disagreement over the 6 re-draw pairs; MORE-STABLE iff the 95% upper bound < 0 for BOTH BKM and KM-AL; LESS-STABLE iff the lower bound > 0 for at least one; NEITHER otherwise. Bootstrap B 2,000 resampling re-draws (paired), seeds (crossed, per baseline) and triplets. Verdict line SCOREABLE (DEFF 3.0 declared; SE 0.0333; MDE80 0.093); structural floor MDE80 >= 0.049 (4 re-draws) [CORRECTED 2026-10-05 pre-data: MORE-STABLE also requires ST1-RB (below); both clauses must hold]",
+   "result": "FAILED",
+   "value": "NEITHER (MORE-STABLE refuted: BKM D +0.0113 [-0.0249, +0.0419] upper bound >= 0, the only blocking clause; KM-AL D -0.2131 [-0.2650, -0.1580]; no D lower bound > 0, so not LESS-STABLE)",
+   "denominator": "4 re-draws / 6 tree pairs; 150 crossed seed pairs per baseline; 100,000 triplets on 2,772 items",
+   "note": "result field: FAILED = MORE-STABLE (the registered hypothesis) not reached; the ST1 word of record is NEITHER"
+  },
+  {
+   "id": "ST1-RB",
+   "text": "DECIDING conjunct of MORE-STABLE (added pre-data 2026-10-05, B-1 option (a), the orchestrator's choice flagged for the author; interval decides): the 95% upper bound of D_b^RB < 0 for BOTH BKM and KM-AL, D_b^RB = D_b with each pair's disagreement on the triplets resolved in both hierarchies of that pair, same replicate weights. FAILS: an upper bound of D_b^RB >= 0 against either baseline. Support: tree RB SD 0.0135 (review's six values), baseline SD 0.040 declared, DEFF 3.0, SE 0.0299, MDE80 0.084, SCOREABLE; floor 0.027. Option (b) (both-unresolved as agreement / as disagreement) printed DESCRIPTIVE only.",
+   "result": "HELD",
+   "value": "both RB upper bounds < 0: BKM D_RB -0.0320 [-0.0589, -0.0047]; KM-AL D_RB -0.2562 [-0.2990, -0.2042] (L-1: BKM bound about -0.001 with the lattice understatement; does not decide ST1)",
+   "denominator": "4 re-draws / 6 tree pairs; 150 crossed seed pairs per baseline; per pair the triplets resolved in both"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "KM-AL baseline mean 0.29 [0.18, 0.40]; D_KM-AL -0.22 [-0.33, -0.10]",
+   "result": "HELD",
+   "value": "KM-AL baseline 0.2814 in [0.18, 0.40]; D_KM-AL -0.2131 in [-0.33, -0.10]",
+   "denominator": "6 re-draw pairs"
+  },
+  {
+   "id": "P2",
+   "text": "BKM baseline mean 0.22 [0.10, 0.35]; D_BKM -0.15 [-0.28, -0.03]",
+   "result": "FAILED",
+   "value": "BKM baseline 0.0570 not in [0.10, 0.35]; D_BKM +0.0113 not in [-0.28, -0.03]",
+   "denominator": "6 re-draw pairs"
+  },
+  {
+   "id": "P3",
+   "text": "ST1 MORE-STABLE 0.65, NEITHER 0.30, LESS-STABLE 0.05 (Brier) [2026-10-05: scored on the joined ST1 word (both clauses)]",
+   "result": "FAILED",
+   "value": "NEITHER occurred, modal MORE-STABLE did not; Brier 0.9150",
+   "denominator": "-"
+  },
+  {
+   "id": "P4",
+   "text": "(descriptive) shape matching moves the KM-AL baseline mean by 0.02 [0.00, 0.05]",
+   "result": "HELD",
+   "value": "0.0005 (collapsed 0.2814 vs full binary 0.2810) in [0.00, 0.05]",
+   "denominator": "6 re-draw pairs"
+  },
+  {
+   "id": "P5",
+   "text": "(descriptive) MASSIVE pair: tree disagreement 0.10 [0.03, 0.20]; D_KM-AL -0.15 [-0.30, 0.00]",
+   "result": "HELD",
+   "value": "MASSIVE tree 0.0939 in [0.03, 0.20]; D_KM-AL -0.2144 in [-0.30, 0.00]",
+   "denominator": "1 pair (M-AF, M-AF-s2)"
+  },
+  {
+   "id": "P6",
+   "text": "(added pre-data 2026-10-05; informed by the review's tree RB values) D^RB_KM-AL -0.26 [-0.37, -0.14]; D^RB_BKM -0.19 [-0.32, -0.07]",
+   "result": "FAILED",
+   "value": "scored by hand (C-1; not printed): D^RB_KM-AL -0.2562 in [-0.37, -0.14] HELD; D^RB_BKM -0.0320 not in [-0.32, -0.07] FAILED",
+   "denominator": "6 re-draw pairs"
+  }
+ ],
+ "falsifier": {
+  "text": "F-ST fires iff ST1 is not MORE-STABLE: SITE-SUPPORT's descriptive 0.0684 vs 0.3243 is then attributed to the unlike data and shape of that comparison, not to the trees.",
+  "fired": true,
+  "note": "FIRED; the attribution clause ('unlike data and shape') is refuted by the run (W-1) and bracketed; read instead: \"SITE-SUPPORT's 0.0684 vs 0.3243 is not read as a tree property. On matched data and shape the gap persists against agglomerative-on-centroids k-means but vanishes against bisecting k-means. It reflects the baseline construction, and about 0.07 of it is unresolved-triplet credit.\""
+ },
+ "numbers_of_record": {
+  "ST1_BKM_D": "+0.0113 [-0.0249, +0.0419] (95% percentile, B 2,000; 6 tree pairs from 4 re-draws, 150 crossed seed pairs; 100,000 triplets on |C| 2,772); bootstrap SD 0.0181",
+  "ST1_BKM_D_RB": "-0.0320 [-0.0589, -0.0047]; bootstrap SD 0.0137 (resolved in both; trees leave 0.0806-0.1021 unresolved vs BKM 0.0003-0.0004)",
+  "ST1_KMAL_D": "-0.2131 [-0.2650, -0.1580]; bootstrap SD 0.0262",
+  "ST1_KMAL_D_RB": "-0.2562 [-0.2990, -0.2042]; bootstrap SD 0.0225",
+  "means": "trees 0.0683 (6 pairs; RB 0.0244); BKM 0.0570; KM-AL 0.2814",
+  "option_b_descriptive": "both-unresolved as disagreement: BKM D +0.0830 [+0.0579, +0.1078]; KM-AL -0.1415 [-0.1833, -0.0914]",
+  "LOO": "BKM -0.0104/+0.0128/+0.0159/+0.0271; KM-AL -0.2373/-0.2120/-0.1998/-0.2032",
+  "linkage_diagnostic": "post-hoc, descriptive, review diagnostic: Ward 0.2807 (D -0.212), complete 0.3512 (D -0.283), average-link 0.2814",
+  "MASSIVE_descriptive": "one pair, conditional bootstrap: tree 0.0939; BKM 0.2756, D -0.1817 [-0.2857, -0.0961]; KM-AL 0.3083, D -0.2144 [-0.2379, -0.1920]",
+  "support_realised": "n_eff 2; MDE80 D_RB 0.038 (BKM) / 0.063 (KM-AL) vs 0.084 registered; D 0.051 / 0.073 vs 0.093; DEFF re-measured (BKM D) about 1.9 vs 3.0 declared",
+  "P3_brier": "0.9150"
+ },
+ "sentence_of_record": "STABILITY-VS-KMEANS (2026-10-05, 0 calls) — VALID; ST1 NEITHER, F-ST FIRED. On MMLU-Pro the anchor-free trees are as stable as bisecting spherical k-means at matched data, leaf count and shape, not more; their edge on jointly resolved triplets is bought by leaving about 12% of triplets unresolved. The trees are more stable than agglomerative hierarchies built on flat k-means centroids (average, Ward or complete linkage; D about -0.21 to -0.28), but this is not a tree property: bisecting k-means matches them. [POSTRUN docs/reviews/POSTRUN_stability_vs_kmeans.md, 13933eb4, W-1 / W-2; Ward and complete post-hoc, descriptive, review diagnostic; not chaining; MASSIVE one pair, descriptive, not a counterweight; P6 FAILED; outcome not committed, sha256 eb1118a7...]",
+ "chips": [
+  "REGISTERED 2026-10-05, BEFORE ANY CODE",
+  "VALID (POST-RUN 13933eb4): ST1 NEITHER (BKM D UPPER BOUND +0.0419); F-ST FIRED",
+  "W-1 / W-2: NOT MORE STABLE THAN BISECTING K-MEANS (RB EDGE ONLY WHERE THE TREES RESOLVE); MORE STABLE THAN AGGLOMERATIVE-ON-CENTROIDS, NOT A TREE PROPERTY; NOT CHAINING; MASSIVE ONE PAIR, DESCRIPTIVE"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-05",
+   "by": "registrar (pre-data; docs/reviews/READY_stability_vs_kmeans.md (a00ceecc; reviewed blob:b278a7a9, LF), NOT READY on B-1)",
+   "text": "B-1 option (a) ADOPTED (the orchestrator's choice under the autonomous go, flagged for the author): conjunct ST1-RB on MORE-STABLE; option (b) descriptive; the '(ii) SHAPE ... removed here' clause WITHDRAWN (trees 0.0806-0.1021 unresolved vs 0.0003-0.0009 for the collapsed baselines; both-unresolved 0.0580-0.0852 per tree pair score as agreement); SVK-R1 confirmed, SVK-R2 fixed now (seeds resampled per re-draw, shared by its copies), SVK-R3..R7 accepted (R7 about half the source of B-1); unresolved and both-unresolved shares printed per arm; M-1 selftest fix (fixture tree with a different internal count; mutant R5 in MUTANTS) owed by the engine-coder; Support for ST1-RB SE 0.0299, MDE80 0.084, SCOREABLE; P6 added. Disclosure: SITE-SUPPORT's descriptive 0.0684 vs 0.3243 is inflated by about 0.07 in favour of the trees. Brackets on QUESTION AND KIND, INSTRUMENT, READOUTS AND CRITERIA, SUPPORT, PREDICTIONS (L24627, L24629, L24631-L24633) and registrar's record L24667-L24671 (_as_of the commit that writes it, parent a00ceecc, re-grepped)."
+  },
+  {
+   "date": "2026-10-05",
+   "by": "registrar (POSTRUN 13933eb4)",
+   "text": "outcome recorded: ST1 NEITHER, F-ST FIRED in the W-1 / W-2 words; OUTCOME brackets on READOUTS AND CRITERIA (L24631) and PREDICTIONS (L24633); W-1 CORRECTED bracket on FALSIFIER (L24634): the 'unlike data and shape' attribution refuted, read instead \"SITE-SUPPORT's 0.0684 vs 0.3243 is not read as a tree property. On matched data and shape the gap persists against agglomerative-on-centroids k-means but vanishes against bisecting k-means. It reflects the baseline construction, and about 0.07 of it is unresolved-triplet credit.\"; SITE-SUPPORT READOUTS AND CRITERIA (L24355) disclosure now points here; outcome section docs/judge_v2_program.md L24701-L24712 ('## STABILITY-VS-KMEANS (2026-10-05, 0 calls) — VALID (POSTRUN 13933eb4): ...'; _as_of the commit that writes it, parent 13933eb4, re-grepped). C-1 P6 FAILED; C-3 realised MDE80 0.038 / 0.063 vs 0.084, n_eff 2, DEFF about 1.9 vs 3.0."
+  }
+ ],
+ "does_not_show": [
+  "that the trees are LESS stable than bisecting k-means (no D lower bound > 0)",
+  "a tree property in either direction (the KM-AL gap is the baseline's construction)",
+  "the resolved-in-both edge alone (selective; never quoted without the about 12% coverage gap)",
+  "a corpus contrast from MASSIVE (one pair, descriptive)",
+  "correctness, any EVAL / routing / filing quantity, or the certificate's value (SITE-SUPPORT F-SS stands)",
+  "content-closed re-draws (three id-only); other re-draws, embedders or CLINC"
+ ],
+ "ledger": {
+  "row_id": "STABILITY-VS-KMEANS",
+  "version": "v396 (2026-10-05: OUTCOME bracket, NULL + WARN chips) | v393 (2026-10-05: bracket + BUILT / NOT READY chip) | v392 (2026-10-05: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "SITE-SUPPORT",
+  "ANCHOR-FREE-REDRAW",
+  "INTENT-TRANSFER-S1 (MASSIVE M-AF, M-AF-s2; descriptive arm)"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; no judge, rubric, reference, frontier, temperature, LR / BIC (MIX-LRT-SITE untouched)"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "CPU about 1 h (50 baseline fits, bootstrap 2,000)",
+  "agent_hours": "about 3 h",
+  "reads_pool": true
+ },
+ "outputs": "never committed: stored on E: with SHA256SUMS.txt; temp under E:/TaxoArena_tmp via scratch_dir",
+ "sources": [
+  "docs/judge_v2_program.md L24625-L24637 (_as_of the commit that writes them, parent 07bc237f, re-grepped)",
+  "docs/judge_v2_program.md L24618-L24623 (registrar's record; _as_of the commit that writes them, parent 07bc237f, re-grepped)",
+  "the orchestrator's brief of 2026-10-05 (the author's \"Start them\")",
+  "docs/reviews/READY_stability_vs_kmeans.md (a00ceecc; reviewed blob:b278a7a9, LF) (B-1 shares, SVK readings, M-1, pins copied)",
+  "docs/judge_v2_program.md L24627, L24629, L24631-L24633 brackets and ## Registrar's record 2026-10-05 (insertion only; zero calls; nothing run; pre-data) — STABILITY-VS-KMEANS NOT READY (READY_stability_vs_kmeans a00ceecc, B-1): ... L24667-L24671 (_as_of the commit that writes it, parent a00ceecc, re-grepped)",
+  "docs/reviews/READY_stability_vs_kmeans.md delta (6bb2cfc3); merge 6cd3509f",
+  "docs/reviews/POSTRUN_stability_vs_kmeans.md (13933eb4; blob ab45eed0, LF): every number above copied (outcome numbers as confirmed there; P6, C-3 and the linkage diagnostic from the review)",
+  "E:/TaxoArena_backup_2026-10-05_stability_vs_kmeans/stability_vs_kmeans_outcome.txt (sha256 eb1118a7...)",
+  "docs/judge_v2_program.md L24701-L24712 ('## STABILITY-VS-KMEANS (2026-10-05, 0 calls) — VALID (POSTRUN 13933eb4): ...'; _as_of the commit that writes it, parent 13933eb4, re-grepped); brackets L24631, L24633, L24634, L24355 (same _as_of)"
+ ],
+ "last_update": "2026-10-05",
+ "label_status": "trees [LF] (single-corpus anchor-free, not federated); baselines [LF]; labels never read",
+ "plain_description": {
+  "sq": "SQ3 Taxonomy",
+  "what": "How consistently four label-free MMLU-Pro tree re-draws group the same question triples. They are compared with hierarchical k-means baselines that use the same data, the same leaf count and the same shape (bisecting k-means, and flat k-means followed by merging), with 5 seeds.",
+  "why": "It checks whether the trees' stability is a special property of the tree, or just what any comparable clustering would give.",
+  "information": "Result (no new calls): the trees are as stable as bisecting k-means, not more. Their apparent edge comes from leaving about 12% of triples unresolved. They are more stable than merge-based hierarchies, but bisecting k-means matches them, so this is not a tree property. The registered falsifier fired, and an earlier larger stability gap is no longer read as a tree property.",
+  "written": "2026-10-07"
+ }
+}

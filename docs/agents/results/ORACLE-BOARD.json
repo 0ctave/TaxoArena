@@ -1,0 +1,108 @@
+{
+  "id": "ORACLE-BOARD",
+  "title": "ORACLE-BOARD: what is the ceiling of ANY reference on the x12 schedule? (zero calls; the answer key used as the verdict)",
+  "question": "STACK-v2's x12 schedule re-scored with the KEY as the verdict (decidable pairs -> the correct model wins; non-decidable -> tie): 12-model rho vs key accuracy and top-cluster violations; the ceiling any reference could reach on this schedule.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "f8c3af5",
+    "program_lines": "docs/judge_v2_program.md L594-L604 (registration, with ROUTER-REGRET-MMLU) and L613-L616 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-11 01:30 (zero calls) — ROUTER-REGRET-MMLU and ORACLE-BOARD (descriptive baselines for the fusion chapter)",
+    "outcome_heading": [
+      "L613: - **ORACLE-BOARD (2026-09-11 01:40, zero calls): the ceiling of any reference on the x12 schedule is ρ 1.000, 0 violations**"
+    ],
+    "date": "2026-09-11"
+  },
+  "script": {
+    "path": "tools/analysis/router_regret.py (shared with ROUTER-REGRET-MMLU)",
+    "sha16": "e5bc248de8d8e747 (at f8c3af5)",
+    "commit": "f8c3af5"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/router_regret_outcome.txt",
+    "outcome_commit": "f8c3af5",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-11"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); descriptive baseline",
+    "commit": "1ee0f5c",
+    "verdict": "CEILING: rho 1.000, 0 violations; the number every judge result is read against"
+  },
+  "criteria": [
+    {
+      "id": "readout",
+      "text": "descriptive upper bound: 12-model rho vs key accuracy and top-cluster violations with the key as verdict",
+      "result": "DELIVERED",
+      "value": "rho 1.000, 0 top-4 violations, top-4 exactly the key order (on the 9,144 x12 matches); against x12 v1 (0.951 / 2) and STACK-v2 (0.972 / 1): the deployed judge recovers 43% of the remaining distance to the oracle in rho and half the top-4 disorder",
+      "denominator": "9,144 x12 MAIN matches; 12 models"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "rho ~ 0.99, 0 violations",
+      "result": "HELD",
+      "value": "1.000 / 0",
+      "denominator": "12 models"
+    }
+  ],
+  "falsifier": {
+    "text": "none (descriptive)",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "ceiling": "rho 1.000, 0 violations, top-4 = the key order",
+    "comparators": "x12 v1 0.951 / 2 violations; STACK-v2 0.972 / 1; the judge recovers 43% of the remaining rho distance and half the top-4 disorder"
+  },
+  "sentence_of_record": "ORACLE-BOARD (2026-09-11, zero calls): the ceiling of any reference on the x12 schedule is rho 1.000, 0 violations (key as verdict on the 9,144 matches; top-4 exactly the key order); x12 v1 0.951 / 2, STACK-v2 0.972 / 1: the deployed judge recovers 43% of the remaining distance to the oracle in rho and half the top-4 disorder. This is the number every judge result should be read against.",
+  "chips": [
+    "CEILING"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a reachable target for any judge (an oracle bound)"
+  ],
+  "ledger": {
+    "row_id": "ORACLE-BOARD",
+    "version": "v77 (1ee0f5c; the outcome dates 2026-09-11); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "STACK-v2",
+    "ARENA-V2",
+    "ORACLE"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "the frontier order (CONTEXT.md section 5: FRONTIER, AGGREGATE, ORACLE); ORACLE-BOARD is the key-as-verdict bound FRAMEWORK builds on (rho 1.000)"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L594-L604 (registration f8c3af5) and L613-L616 (outcome)",
+    "experiment_results/x12_crossdomain/router_regret_outcome.txt (f8c3af5)",
+    "docs/test_ledger.html row ORACLE-BOARD (v77): chips verbatim, evidence (router_regret_outcome.txt)",
+    "script sha16 = sha256 of tools/analysis/router_regret.py at f8c3af5 (its only commit), first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (rubric_v2_design.md / multi_corpus_design.md lines as of their last commits named in sources)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Re-scores the recorded 12-model arena schedule with the answer key as the verdict: the correct model wins, and undecidable pairs are ties. It then compares this with the real judge boards. No calls.",
+    "why": "Sets the best result any judge or reference could reach on this schedule, so judge results have a fair yardstick.",
+    "information": "Tells how much of the gap to the truth the deployed judge closes. Result: the ceiling is a perfect order (rank correlation 1.0, top 4 exactly right). The deployed judge recipe closes about 43% of the remaining gap in rank correlation and half the top-4 disorder. This is a bound, not a reachable target, and it comes from an older judged set now classed as history.",
+    "written": "2026-10-07"
+  }
+}

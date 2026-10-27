@@ -1,0 +1,280 @@
+{
+  "id": "CERT-UNDER-FILTER",
+  "title": "CERT-UNDER-FILTER: does the answer-disagreement filter bias the separation certificate's edges AGAINST the key, beyond what its loss of support explains - the zero-call refit FRAMEWORK L95 names as a precondition before the filtered schedule is the default? (zero calls; x12 board rebuilt on the filtered subset with a mandatory random same-size control per edge)",
+  "question": "On the x12 board (9,142 verdicts, 14 anchors, 920 edges, 809 established / 26 against the key on U), compare the filtered board F (convention A, the deployed filter: 6,066 of 9,142 kept) with a random same-size control R per (anchor, pair) cell (K = 20): Delta_W = W_F - mean W_R, the selection effect on direction at equal support.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "88a95d8 (the registration commit; it adds this record and the programme section, and precedes all code: no script exists for this test at 88a95d8)",
+    "program_lines": "docs/judge_v2_program.md L13229-L13360 (heading at L13229)",
+    "program_lines_as_of": "88a95d8 (the registration commit); spans re-verified by sed at 88a95d8; resolve by the quoted heading, not by the line number",
+    "heading": "## Registered 2026-09-23 (before any code or call) — CERT-UNDER-FILTER: does the answer-disagreement filter bias the separation certificate's edges AGAINST the key, beyond what its loss of support explains — the zero-call refit FRAMEWORK L95 names as a precondition before the filtered schedule is the default? (zero calls; x12 board rebuilt on the filtered subset with a mandatory random same-size control per edge)",
+    "date": "2026-09-23"
+  },
+  "script": {
+    "path": "tools/analysis/cert_under_filter.py (MERGED on main at 4610a17, from 073f0cc)",
+    "sha16": "blob:f7d59019c3d65128687df46aebdcb798b43c3062 / sha256-lf16:0db2026f17b559a1 (sha256-crlf16:b144a7d4377acfd3 reference only); build() source pin 128baa007a44a219 (sha16 of LF source); scipy Brent environment pin INNER_MINTOL 1e-11",
+    "commit": "4610a17"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_cert_under_filter_rr.md",
+    "commit": "0bfe920",
+    "verdict": "READY-WITH-CONDITIONS at 073f0cc (all five 8bbe6ce conditions MET without bypass; dry-run G1 920/809/26, G2 6,066/9,142 and 5,276/8,352, G3 PASS, one immutable stack-cache open; blind pass 43/43 brent/brent/brent, 0 unresolved, max error x4 2.15e-14)",
+    "script": "tools/analysis/cert_under_filter.py at 073f0cc, merged to main 4610a17, blob:f7d59019c3d65128687df46aebdcb798b43c3062 / sha256-lf16:0db2026f17b559a1",
+    "conditions": "(L1) the scipy Brent launch pin RECORDED as an environment pin of the build()-pin kind, fail-closed (docs/judge_v2_program.md L14489-L14507); (L-a) rule-7 window, the -wal of stack_v2_promptv2_x12all.db, mmlu_pro_dataset_cache_v2.db and snapshots.db absent or 0 B, printed before --run; (L-b) --run --workers N from the MAIN checkout root holding the three DBs of record; (L-c) the outcome prints the exact witness 43 c3_fit calls, fits == assessments, and the connection log with the single immutable stack-cache open; (L-d) the post-run review re-measures DEFF (planned 1.6, break-even 1.82) and prints n_eff and the MDE beside C1's interval. LOW notes L2-L5 (L5: bareq512_s42 id-only chip, already carried).",
+    "ruling": "docs/judge_v2_program.md L14489-L14507"
+  },
+  "go": "n/a: ZERO judge calls, far below the 4,000-match rule; no plan amendment is owed. The author's standing authorisation of 2026-09-23 to schedule and start further tests without waiting for approval (relayed by the orchestrator) is recorded as the DECISION TO SCHEDULE. Operational gates: an instrument written against this registration, a committed adversarial-reviewer READY, a zero-call --dry-run that writes nothing, and a run outside any construction window (rule 7).",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/cert_under_filter_outcome.txt (blob:91ad6fa8df9565a123b195e6997bb81b746142e2 / sha256-lf16:0a50f05ae38fc3c5 / sha256-crlf16:bc11eeb065608767; working tree LF (sha256 = the LF rendering))",
+    "outcome_commit": "b4b1688",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (routed set 3,445 = the pool; x12 board of record 9,142 verdicts on 2,811 qids)",
+    "date": "2026-09-23"
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-23_cert_under_filter_post.md",
+    "commit": "605675c",
+    "verdict": "NUMBERS CONFIRMED to the digit; C1 HELD stands as registered but MARGINAL (15/20 direction streams cross; LOAO 8/13; t12 +0.92); reading REFUTED as worded; D-1..D-8; exposure UNDETERMINED"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "SELECTION EFFECT ON DIRECTION, the one barred endpoint: Delta_W = W_F - mean over 20 R draws of W_R, W = established edges (fixed from U: 809) whose arm-board direction is against the key. Deciding: 14-anchor cluster-bootstrap interval (anchors resampled whole; B 2000, seed 42; point +- 1.96 x SE). BAR 0. HELD (no adverse selection; F moves edges toward the key vs random at equal support) iff wholly below 0; FAILED (adverse) iff wholly above 0; UNDETERMINED iff it contains 0. SCOREABLE with a thin margin (MDE 15.0 edges at transported DEFF 1.6 vs prediction -16; break-even DEFF 1.82). [RULED 2026-09-23 (R2, R5): direction = majority sign over the arm's bootstrap boards; C1 UNDETERMINED (BY TRIGGER: SUPPORT) iff fewer than 12 of 14 anchors remain, evaluated first.]",
+      "result": "HELD",
+      "value": "HELD AS REGISTERED, MARGINAL: Delta_W = 17 - 24.15 = -7.15; 13-anchor cluster bootstrap B 2000 seed 42 [-14.22, -0.08] (SE 3.606) (outcome L98-L99). Beside, deciding nothing: upper end >= 0 on 15 of 20 alternate arm direction streams (Delta_W -4.75 to -8.05, mean -6.56); unbiased small-cluster SE upper +0.11, t12 +0.92 (p 0.078); ICC DEFF 1.636 -> +0.09; two-stage -0.004; observed 7.15 below the MDE 10.10; convention B -3.80 [-11.94, +4.34] UNDETERMINED",
+      "denominator": "752 established edges in 13 anchor clusters (809 in 14 registered; Business below the 200-row floor, removed as registered)"
+    },
+    {
+      "id": "C2",
+      "text": "SAFETY AT 0.975, DESCRIPTIVE-ONLY: wrong(established) among ORDERED edges under widener + decline per arm, against the nominal sum(1 - c~) and against R and U (U LOAO 646 / 3(2), nominal 1.28). Only about a 4x miscalibration is detectable at nominal ~1.3.",
+      "result": "UNDETERMINED",
+      "value": "DESCRIPTIVE-ONLY as registered: F_A widener + decline 586 called, wrong(established) 1(1), nominal 1.11; U 610 / 1(1) / 1.08; status UNDETERMINED at nominal < 3 (outcome L122)",
+      "denominator": "edges ordered at c~ >= 0.975 per arm"
+    },
+    {
+      "id": "C3",
+      "text": "b1 IDENTIFICATION ON F, DESCRIPTIVE-ONLY, registered expecting UNDETERMINED: profile delta-deviance vs 3.84 and 14-anchor cluster bootstrap P(b1 <= 0), beside U's 5.16 and 0.0315-0.0367. [RULED 2026-09-23 (R1): no trigger on C3; W_F <= 14 printed as a descriptive flag.]",
+      "result": "UNDETERMINED",
+      "value": "U: b1 +2.2274, ddev 5.41, P 0.0267 (the tests disagree); F: b1 -0.2511, ddev 0.01, P 0.7167 (b1 = 0 not rejected); descriptive (outcome L165, L168); D-6: all 20 R_A draws b1 +0.90 to +5.64",
+      "denominator": "752 established edges; events U 26, F 17"
+    },
+    {
+      "id": "C4",
+      "text": "DENSITY: per anchor under F, edges with zero kept matches and whether the comparison graph stays connected; a disconnected anchor is UNDETERMINED by construction for C1-C3 (removed from their denominators and counted) and recorded as a finding about deployed density. No bar.",
+      "result": "n/a",
+      "value": "printed, no bar (defines the C1-C3 denominators): 17 of 920 zero-kept, 0 disconnect, Business below the 200-row floor (outcome L68); scored through P6",
+      "denominator": "14 anchors; 920 edges"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "W_F = 14 [6, 22]",
+      "result": "HELD",
+      "value": "W_F 17 in [6, 22] (L224)",
+      "denominator": "752 established"
+    },
+    {
+      "id": "P2",
+      "text": "mean W_R = 30 [24, 38]",
+      "result": "HELD",
+      "value": "HELD AT THE EDGE: mean W_R 24.15 in [24, 38], by 0.15 (L225); fails on 6 of 20 alternate direction streams",
+      "denominator": "752 established"
+    },
+    {
+      "id": "P3",
+      "text": "Delta_W = -16 [-26, -6]; C1 HELD",
+      "result": "HELD",
+      "value": "HELD AT THE EDGE: Delta_W -7.15 in [-26, -6], by 1.15, C1 HELD (L226); fails on 6 of 20 alternate direction streams",
+      "denominator": "752 established"
+    },
+    {
+      "id": "P4",
+      "text": "C2: F's wrong(established) at 0.975 in [0, 4] (point 1) against a nominal in [1.0, 2.0]",
+      "result": "HELD",
+      "value": "F wrong(established) 1 in [0, 4], nominal 1.11 in [1.0, 2.0] (L227)",
+      "denominator": "ordered edges"
+    },
+    {
+      "id": "P5",
+      "text": "C3: delta-deviance < 3.84 (UNDETERMINED) [RULED 2026-09-23 (R1): scored only on a computed delta-deviance; UNDETERMINED, never HELD, if none can be computed.] [RULED 2026-09-23: 'b1 unidentified' = (quasi-)complete separation in A, detected before the fit.] [RULED 2026-09-23: 'b1 unidentified' also covers singular observed information at the optimum (flat profile), with the stated round-off tolerance.]",
+      "result": "HELD",
+      "value": "C3 delta-deviance 0.01 < 3.84 (L228)",
+      "denominator": "F's established edges"
+    },
+    {
+      "id": "P6",
+      "text": "C4: 0 anchors disconnect; zero-kept edges 15 [5, 40] of 920",
+      "result": "HELD",
+      "value": "0 anchors disconnect; 17 zero-kept edges in [5, 40] (L229)",
+      "denominator": "14 anchors / 920 edges"
+    }
+  ],
+  "falsifier": {
+    "text": "C1 FAILED overturns FILTER-BOARD's 'strictly safe' AT THE CERTIFICATE LEVEL (its rho / top-4 readout stands) and FORBIDS making the filtered schedule the default under the current widener parameters (bracketed into FRAMEWORK L95 and the MATCH-FILTER row). C1 HELD discharges the L95 precondition ON DIRECTION ONLY (C2 and C3 stay descriptive; the default switch remains the author's decision). C1 UNDETERMINED leaves the precondition UNMET. NOT OVERTURNED: PROFILE-R-FILTERED's reliability numbers, A-REDEFINE-REFIT's consistency PASS, UNFILTERED-ADOPT's criteria, the board of record, any published edge.",
+    "fired": false,
+    "reading": "NOT FIRED: C1 HELD discharges the L95 precondition on direction only, at the registered seeds and marginally; the default switch is not supported by this run (D-6) and stays the author's decision (docs/judge_v2_program.md L14649-L14687)"
+  },
+  "numbers_of_record": {
+    "arms": "U all 9,142; F convention A 6,066 of 9,142 (missing prediction kept, as the shipped MatchFilter); convention B 5,276 of 8,352 beside; R per-cell random same-size, K = 20, Random(1000 + k)",
+    "relayed_count_note": "the relayed '5,276 of 9,142' mixes the conventions: 5,276 is convention B's numerator, whose base is 8,352",
+    "parameter_pair": "primary the eval-side refit b0 -3.2172 / b1 +3.2921 (A-REDEFINE-REFIT); beside b0 -3.2326 / b1 +3.3133 (FRAMEWORK L95) and the 920 refit b0 -3.0438 / b1 +3.1980",
+    "C1": "Delta_W = W_F 17 - mean W_R 24.15 = -7.15 over 752 established edges in 13 anchors; [-14.22, -0.08] (13-anchor cluster bootstrap, B 2000, seed 42, SE 3.606); percentile [-14.80, -0.65] (decides nothing)",
+    "C1_direction_streams": "20 alternate arm streams: W_F 16-19, Delta_W -4.75 to -8.05 (21-stream mean -6.56, sd 1.06); upper end >= 0 on 15 of 20 (review D-1)",
+    "C1_conventions": "unbiased cluster SE 3.704 -> [-14.41, +0.11]; t12 -> [-15.22, +0.92], p 0.078; ICC DEFF 1.636, n_eff 459.5 -> +0.09; two-stage SE 3.646 -> -0.004 (review D-3, D-4)",
+    "support_measured": "SE_iid 2.889; DEFF 1.558 (ratio) / 1.636 (ICC); n_eff 482.8 / 459.5; MDE 10.10 edges; the observed |Delta_W| 7.15 is BELOW the MDE",
+    "loao_and_edges": "leave-one-anchor-out: 8 of 13 intervals contain 0; Psychology d_a -3.00 of -7.15; edge level 3 vs 8, p 0.23",
+    "convention_B": "Delta_W 24 - 27.80 = -3.80, [-11.94, +4.34], UNDETERMINED, decides nothing",
+    "C3": "U b1 +2.2274 ddev 5.41 P 0.0267; F b1 -0.2511 ddev 0.01 P 0.7167; R_A b1 +0.90 to +5.64 (20 of 20 identified)",
+    "exposure": "74 exposed qids (69 judged, 201 of 9,142 rows) in the data path; excluded: Delta_W -3.45 [-12.70, +5.80] at seed 42, 21-stream mean -4.90 (HELD 0 of 21); anchor-matched random exclusions -1.56 +- 1.66, the exposed +0.96 above 10 of 10 controls: UNDETERMINED"
+  },
+  "sentence_of_record": "CERT-UNDER-FILTER (zero calls; x12 board of record, 752 established edges in 13 anchors, Business below the 200-row floor under the deployed filter and removed as registered; recomputed to the digit by the reviewer): under convention A the filter's selection points W_F = 17 established edges against the key, against a mean of 24.15 over 20 same-support random draws. ΔW is −7.15, and the registered 13-anchor cluster-bootstrap interval is [−14.22, −0.08] (SE 3.606; measured DEFF 1.56 to 1.64, n_eff 460 to 483, MDE 10.1), so C1 HELD. It is marginal: the interval's upper end stays below 0 for all 20 alternate cluster-bootstrap seeds at both B 2,000 and B 20,000, but crosses 0 for 15 of 20 alternate arm question-bootstrap streams (ΔW −4.75 to −8.05, mean −6.56), under a small-cluster t interval (+0.92), and in 8 of 13 leave-one-anchor-out fits. Psychology carries −3.00 of the −7.15, and at the edge level the split is 3 vs 8 (p 0.23). Convention B reads UNDETERMINED (−3.80 [−11.94, +4.34]). The L95 precondition is discharged on direction only, at the registered seeds; under F the widener's agreement slope is not identified (b1 −0.25, ddev 0.01, against b1 > +0.90 in all 20 random draws). [run b4b1688, review 605675c, zero calls; denominators: 752 established edges in 13 anchor clusters (809 in 14 registered; Business below build()'s 200-row floor under the deployed filter, removed as registered, R2(a) / R4(c)); C1 decided by the INTERVAL (registered: 13-anchor cluster bootstrap, B 2,000, seed 42); HELD, MARGINAL: the interval's upper end is >= 0 on 15 of 20 alternate arm-bootstrap direction streams; the observed |Delta_W| 7.15 is below the MDE 10.10; the outcome's reading 'no adverse selection bias' is QUALIFIED to a net count shift only]",
+  "chips": [
+    "REGISTERED 2026-09-23, BEFORE ANY CODE",
+    "C1 HELD, MARGINAL: HELD ON 49/200 DIRECTION STREAMS AT BOOTSTRAP SEED 42 (33-83 OVER SEEDS 1-100)",
+    "READING QUALIFIED (NET COUNT SHIFT ONLY)",
+    "C3 UNDETERMINED (U AND F; P5 HELD)",
+    "P1-P6 HELD (P2, P3 AT THE EDGE)",
+    "SPLIT EXPOSURE UNDETERMINED (74 QIDS; ANCHOR MAP ID-ONLY)",
+    "ZERO CALLS",
+    "C1 SCOREABLE (THIN MARGIN)"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-23",
+      "by": "the registrar (ledger v134 commit; insertion only, zero calls)",
+      "text": "registration.commit resolved from PENDING to 88a95d8 and ledger.version from PENDING to v134; nothing else in this record moves."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the coordinator's relay of the build at 4946646 (cert_under_filter.py LF 0a92a422ee1a715e), before any real-data run (insertion only, zero calls)",
+      "text": "Five builder choices ruled (programme L13576-L13642): R1 no trigger on C3 (W_F <= 14 printed as a descriptive flag); P5 scored only on a computed ddev, UNDETERMINED (never HELD) if none. R2 ONE C1 trigger REGISTERED: UNDETERMINED (BY TRIGGER: SUPPORT) iff fewer than 12 of 14 anchors remain (disconnected or below the 200-row floor), evaluated first. R3 the refusing stack_judge stub admitted on three execution-verified conditions. R4 the pinned copy of build()'s per-anchor loop admitted (source-hash pin 128baa007a44a219 asserted at launch; bit-identity selftest; deviations enumerated). R5 the MAJORITY sign over each arm's bootstrap boards is primary (the parenthetical 'point fit' was a registrar's transcription error; G1's 26 is build()'s right field). R6 readings: C3 bootstrap conventions, 'R majority' (>10 of 20, printed counts only) and the primary pair ADMITTED; WAL-reported-not-refused REFUSED (a non-empty -wal refuses under immutable=1); convention B's control drawn from U minus missing-prediction rows."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar (insertion only, zero calls)",
+      "text": "R6's WAL ruling generalised in ROUTER-CLEAN-POLICY's rulings (programme L13644-L13689): whatever the open mode, a non-empty -wal beside any input DB refuses the run at launch. Nothing in this test's rulings changes."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, before any real-data run (insertion only, zero calls)",
+      "text": "R1 completed (programme L13883-L13923): 'b1 unidentified' = (quasi-)complete separation of the wrong / right established edges in the widener's covariate A (max of one group's A <= min of the other's), detected deterministically on the data before any fit, never by a threshold on a fitted value; with zero events or a non-finite ddev it makes the fit NO FIT, P5 UNDETERMINED, any returned ddev and b1 printed as descriptive; |b1| and the profile curvature are printed beside every fit, deciding nothing. The same definition applies to C3 on every arm. Builder readings confirmed: R2(a) per convention; R3's refusal on every non-dunder attribute. Build now at 4cd0bfa (LF 409da54119dde59f, as relayed)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar (insertion only, zero calls)",
+      "text": "embeddings_cache.db's non-empty WAL (5,537,312 bytes, T1b build 04:34) was audited content-neutral and checkpointed (TRUNCATE) by the coordinator after a backup; the -wal is 0 bytes; nothing any reader sees moved (programme L14004-L14032). The standing non-empty-WAL launch refusal no longer blocks this test on that file; every input's -wal is still checked at launch."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, before any real-data run (insertion only, zero calls)",
+      "text": "CORRECTION (the coordinator's): the synthetic +720 / ddev 1.06 fit that motivated c669926 is NOT separated (A ranges overlap: wrong 0.382-0.634, right 0.320-0.640); it is a flat likelihood (profile curvature 0). RULING (programme L14034-L14069): 'b1 unidentified' extended by SINGULAR OBSERVED INFORMATION: I = -l''(b1*) by central second difference with h = 1e-4 x max(1, |b1*|); unidentified iff I <= 0 or I x h^2 <= 16 x eps x max(1, |l(b1*)|), eps = 2^-52 (the second difference's round-off bound 4 eps |l| with a 4x margin for the inner re-maximisation, registered here). The flat case reads UNIDENTIFIED, the curvature-0.17 set stays identified. P5 UNDETERMINED and C3 NO FIT under it; optimiser values descriptive. Build at 0f44893 (as relayed)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the NOT-READY review acd054a (insertion only, zero calls)",
+      "text": "Rulings (programme L14342-L14381): D1 R3(iii) re-ruled - the input cache stack_v2_promptv2_x12all.db is opened exactly once, by load_real, immutable, after the -wal check (the literal 'never opened' was the registrar's drafting defect; the earlier READYs missed a vacuous selftest check that scored the refusal of the instrument's own input as a pass); D2 an inner-search failure or non-finite I is NO FIT for that fit, never a refusal; D5 INNER_MARGIN removed, the one registered constant is 16, the inner error printed as descriptive. Readings: choice 2 within the registration; choice 3 a reading. D7 disclosure (pool_guard's plain mode=ro open left a 0-byte -wal and a -shm beside mmlu_pro_dataset_cache_v2.db; content unchanged) -> POOL-GUARD-IMMUTABLE queued. D8: the anchor map from bareq512_s42 is id-disjoint only (chip)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (re-review 0bfe920, relayed by the coordinator)",
+      "text": "READY-WITH-CONDITIONS at 073f0cc, merged 4610a17. The scipy Brent launch refusal is RECORDED as an environment pin of the build()-pin kind: it fires before any data is read, cannot void a computed C1, and is fail-closed (a rename of the private attribute gives an unnamed ImportError / AttributeError at launch, admitted; either refusal is a failed precondition). Launch and record conditions (L-a)-(L-d); L2-L5 LOW. State READY. docs/judge_v2_program.md L14489-L14507."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (run b4b1688; post-run review 605675c)",
+      "text": "OUTCOME: C1 HELD as registered, MARGINAL (flips on 15/20 direction streams); the printed reading 'no adverse selection bias' REFUTED as worded and QUALIFIED to a net count shift; C2 descriptive; C3 UNDETERMINED on U and F; P1-P6 HELD (P2, P3 at the edge); falsifier not fired. D-7 bracketed at L14493; D-8 queued; exposure UNDETERMINED, added to the author's rebuild-or-disclose item. docs/judge_v2_program.md L14649-L14687."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (CERT-DIRECTION-STREAM outcome)",
+      "text": "C1's recorded verdict DOES NOT MOVE; its qualifier is sized on both streams: HELD on 49 of 200 direction streams at bootstrap seed 42 (59 / 200 at the exact SE; 33-83 across bootstrap seeds 1-100). The chip is re-worded to name both streams (the earlier '15/20' figure was the review's first 20 streams). docs/judge_v2_program.md L15267-L15300."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "the filter's effect on x20 or on the merged board (x12 only)",
+    "any newcomer or placement claim",
+    "the safety of the operating point at a usable power (C2 DESCRIPTIVE-ONLY)",
+    "a new (b0, b1) for deployment (C3 DESCRIPTIVE-ONLY)",
+    "anything about grok's board",
+    "[post-run review 605675c] That the filter has no adverse selection on any edge or anchor. Two established edges go right→wrong under F, 3 are wrong in F and not in the R majority, and 4 of 13 anchors have d_a > 0.",
+    "[post-run review 605675c] A direction effect robust to the Monte-Carlo stream that fixes the edge signs (15 of 20 alternate streams read UNDETERMINED).",
+    "[post-run review 605675c] That the deployed widener's (b0, b1) is valid under the filtered schedule. C3 is descriptive, and F's b1 is −0.25.",
+    "[post-run review 605675c] Safety at the operating point (C2 is descriptive: 1 wrong(established) against a nominal of 1.11).",
+    "[post-run review 605675c] Anything about x20, the merged board, grok's board or newcomers.",
+    "[post-run review 605675c] That split exposure (the 74 twin / induction / labelling / ladder qids, 201 rows) is neutral or drives the result. Excluding it moves ΔW by +0.96 against anchor-matched random controls at −1.56 ± 1.66; that is undetermined, and the ID-ONLY chip stays.",
+    "[post-run review 605675c] A per-anchor or per-edge claim of any kind."
+  ],
+  "ledger": {
+    "row_id": "CERT-UNDER-FILTER",
+    "version": "v172 (adjudicated: chips replaced, observed cell carries the outcome; audit OK); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "A-REDEFINE-REFIT",
+    "UNFILTERED-ADOPT",
+    "PROFILE-R-FILTERED",
+    "FILTER-BOARD",
+    "MATCH-FILTER",
+    "AGREE-ORDER",
+    "KEY-TIE-DECLINE"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing and reopens nothing: MATCH-FILTER is a shipped option, not a closed line; SELECTIVE-ORDER (closed) concerns skipping an order and is not touched; a variant of recorded results (A-REDEFINE-REFIT, PROFILE-R-FILTERED, FILTER-BOARD) that names what it would overturn and its new mechanism (a filtered board with a per-edge random same-size control)."
+  },
+  "queue_items": [
+    "CERT-UNDER-FILTER"
+  ],
+  "support": {
+    "deciding_denominator": "809 established edges (fixed from U) in 14 anchor clusters; Kish about 57.8; variance carried by about 45-50 boundary edges (declared pilot)",
+    "deff_and_source": "1.6 planning, TRANSPORTED from the b1 identification on the same 26 events / 14 anchors (A-REDEFINE-REFIT: LR z 2.27 vs cluster-bootstrap z 1.86-1.79 -> 1.49-1.61; UNFILTERED-ADOPT 1.15-1.58); pessimistic 3.0; the relayed worst case 'n_eff about 14' = DEFF about 58, recorded, not planned on",
+    "n_eff": "stated through the SE: i.i.d. variance is concentrated on boundary edges",
+    "se_arithmetic": "SE_iid = sqrt(sum d_e^2) = sqrt(18) = 4.24 edges (declared pilot); x sqrt(1.6) = 5.37; pessimistic x sqrt(3.0) = 7.35",
+    "mde_80": "C1 15.0 edges (20.6 pessimistic); C2 needs a true mean about 5.5 events at nominal about 1.3 (about 4x)",
+    "verdict_lines": "C1 SCOREABLE (16 > 15.0; break-even DEFF 1.82; thin margin stated); C2 DESCRIPTIVE-ONLY; C3 DESCRIPTIVE-ONLY (expected UNDETERMINED); C4 descriptive",
+    "structural": "board fixed, zero-call, 14 anchors bound the cluster bootstrap; C3's structural tension: the better F works on direction, the fewer events identify b1 (unidentifiable at <= 14 events on this board); a disconnected anchor unreachable at any budget of this schedule"
+  },
+  "sources": [
+    "docs/judge_v2_program.md, this registration section; L3675 (the A-REDEFINE-REFIT bullet)",
+    "docs/design/FRAMEWORK.md L95 (Stage 6; the precondition) and L357 (FRAMEWORK item 2)",
+    "docs/agents/results/A-REDEFINE-REFIT.json (0.997; 809 / 26; delta-deviance 5.16; P(b1 <= 0) 0.0315-0.0367; b0 -3.2172 / b1 +3.2921)",
+    "docs/agents/results/UNFILTERED-ADOPT.json (920 set; 8-seed P 0.017-0.035; LOAO 646 / 3(2) / nominal 1.28)",
+    "docs/agents/results/PROFILE-R-FILTERED.json numbers_of_record filter_counts (6,066 of 9,142 = 66.4%; 5,276 of 8,352 = 63.2%)",
+    "docs/agents/results/MATCH-FILTER.json ('missing prediction => kept')",
+    "docs/agents/results/AGREE-ORDER.json (beta_len AGREE +2.81 vs DISAGREE +0.32)",
+    "docs/agents/queue.json item CERT-UNDER-FILTER",
+    "docs/reviews/READY_cert_under_filter_rr.md (0bfe920); docs/judge_v2_program.md L14489-L14507",
+    "docs/reviews/2026-09-23_cert_under_filter_post.md (605675c)",
+    "experiment_results/x12_crossdomain/cert_under_filter_outcome.txt (b4b1688)",
+    "docs/judge_v2_program.md L14649-L14687",
+    "docs/judge_v2_program.md L15267-L15300",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "ready_history": [
+    {
+      "file": "docs/reviews/READY_cert_under_filter_sing.md",
+      "commit": "acd054a",
+      "verdict": "NOT-READY at 889091d (D1 BLOCKER; D2, D5 need rulings; D3, D4, D6 conditions)",
+      "script": "tools/analysis/cert_under_filter.py at 889091d, blob:11c9435f20bce1db6332c2d2b62dc7c572b6ee29 / sha256-lf16:d371597bae00eb18",
+      "conditions": "re-review conditions (programme L14342-L14381): (1) D1 fix + an unbypassed dry-run reproducing G1 920/809/26, G2 6,066/9,142 and 5,276/8,352, G3 PASS with the one immutable open in the connection log; (2) D2 NO FIT mapping, each branch executed and given an id (D4); (3) a |b1*| < 1 selftest fit requiring h == 1e-4 (D3); (4) an exact execution-witness count (D6); (5) a blind real-data pass fitting all 43 arms, printing only the inner path and margin"
+    }
+  ],
+  "lesson": "A registered decision should integrate over, or pin and report, every random stream that feeds it, not only the one inside the interval (D-1: the arm direction stream moved the verdict on 15 of 20 alternates while the interval's own seed was robust) (docs/judge_v2_program.md L14649-L14687) [EXTENDED 2026-09-24 (CERT-DIRECTION-STREAM review 597bf99, D1; docs/judge_v2_program.md L15267-L15300): the cluster-bootstrap seed is a second stream: c1_stats re-seeds default_rng(42) on every call, so the 200 direction streams shared ONE bootstrap draw; k is 49 / 200 at seed 42, 59 / 200 at the exact SE, 33-83 across bootstrap seeds 1-100. A registered decision integrates over EVERY random stream feeding it, the bootstrap seed included, or uses the exact variance.]",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "The deployed filter drops matches where both answers agree, which keeps about two thirds of the 9,142 verdicts. On the 12-model board, it compares how many certified 'A beats B' edges point against the answer key under that filter with random subsets of the same size.",
+    "why": "Before making the filtered schedule the default, the separation certificate must not get biased toward wrong orderings just because of which matches the filter keeps.",
+    "information": "Fewer wrong edges than in random subsets means the filter is safe on direction. More wrong edges would forbid making it the default. Result: done. Under the filter, 17 certified edges pointed against the key, against an average of 24.15 for random subsets of the same size. The interval was just below zero, so the check held, but only marginally. It became uncertain under many alternative random streams: it held on only about a quarter to a third of 200 direction streams. One subject, psychology, carries much of the effect. The other counting convention was undetermined. This settles direction only, and the default switch stays the author's decision. This belongs to the older question pool, which is now ruled history, not evidence.",
+    "written": "2026-10-07"
+  }
+}

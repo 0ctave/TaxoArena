@@ -1,0 +1,142 @@
+{
+  "id": "POSITION-FULL",
+  "title": "POSITION-FULL: balance the remaining 1,200 cross-tier matches: does the newcomer fall to 2nd once ALL of arm A is dual order? (1,196 calls)",
+  "question": "ARENA-13 arm A's cross-tier matches re-judged with the opponent presented first, bringing all 1,800 to dual order; same judge, ensemble reference, rubric and mechanics; (1) newcomer places 2nd or 3rd; (2) tau >= 0.90; (3) is position weaker off the frontier; (4) was the POSITION-DECOMP imputation calibrated; (5) new-pair accuracy vs the 0.85 bar.",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "1838bf2",
+    "program_lines": "docs/judge_v2_program.md L1562-L1591 (registration) and L1592-L1648 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-14 (before any call) — POSITION-FULL: balance the remaining 1,200 cross-tier matches",
+    "outcome_heading": [
+      "L1592: - **POSITION-FULL OUTCOME (2026-09-14): position is a FRONTIER phenomenon and nothing else, the newcomer still"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "tools/analysis/position_decomp.py --cross",
+    "sha16": "95bf53ed6a3aceb2 (at 1838bf2)",
+    "commit": "1838bf2"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (1,196 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/positionfull_outcome.txt",
+    "outcome_commit": "18bcc5f",
+    "calls": 1196,
+    "cce": "not stated",
+    "pool": "ARENA-13 arm A's 1,200 cross-tier matches",
+    "date": "2026-09-14"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); SELECTIVE-ORDER (2026-09-14) corrected the generalisation of (3) (the frontier / cross-tier cut is within answer-disagreeing pairs); PLACEBO-ENTRY closed the residue (+0.045, CI includes zero)",
+    "commit": "7ce80d4",
+    "verdict": "(1) (5) FAIL; (2) PASS; (3) POSITION IS A FRONTIER PHENOMENON (later restated by SELECTIVE-ORDER as: the flip rate measures the absence of decisive evidence)"
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "newcomer places 2nd or 3rd",
+      "result": "FAILED",
+      "value": "still 1st, theta +1.934 vs gemini +1.889; the gap ran +0.301 -> +0.087 -> +0.045, so order carried 85% of it and the residue is not position",
+      "denominator": "13-model board, all 1,800 dual order"
+    },
+    {
+      "id": "(2)",
+      "text": "tau >= 0.90",
+      "result": "HELD",
+      "value": "0.970",
+      "denominator": "12 originals"
+    },
+    {
+      "id": "(3)",
+      "text": "is position weaker off the frontier",
+      "result": "HELD",
+      "value": "cross-tier flip 0.055, below the 0.057 test-retest floor, against the frontier's 0.182, and no direction (-0.011, p = 0.12) against -0.135: position sensitivity is a property of CONTESTED matches",
+      "denominator": "1,200 cross-tier vs 600 frontier"
+    },
+    {
+      "id": "(4)",
+      "text": "was the imputation calibrated",
+      "result": "FAILED",
+      "value": "forecast -0.326 and 2nd place in 100% of draws; realised +0.045: right sign, wrong size by 7x; report such forecasts as sign-only",
+      "denominator": "200 draws"
+    },
+    {
+      "id": "(5)",
+      "text": "new-pair accuracy vs the 0.85 bar",
+      "result": "FAILED",
+      "value": "0.793 under dual order, down from 0.837: the tie convention, not worse judging",
+      "denominator": "new-pair key-decidable"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "residue: the reference-construction confound is bounded small (the ensemble endorses newcomer 247 : opponent 234); quality-not-in-the-key and trace style are not separable without another REGEN-scale run (later dissolved by PLACEBO-ENTRY)"
+  },
+  "numbers_of_record": {
+    "board": "theta +1.934 vs +1.889; tau 0.970; gap +0.301 -> +0.087 -> +0.045 (85% order)",
+    "cross_tier": "flip 0.055 (floor 0.057) vs frontier 0.182; direction -0.011 (p 0.12) vs -0.135",
+    "accuracy": "0.793 dual vs 0.837 single",
+    "endorsement": "247 : 234"
+  },
+  "sentence_of_record": "POSITION-FULL (2026-09-14, 1,196 calls): the result worth the calls: cross-tier flip 0.055, below the 0.057 test-retest floor, against the frontier's 0.182, and no direction (-0.011, p = 0.12) against -0.135: position sensitivity is a property of CONTESTED matches, not of the judge; (1) FAIL: still 1st, theta +1.934 vs gemini +1.889, the gap +0.301 -> +0.087 -> +0.045, so order carried 85% of it; (2) tau 0.970; (4) the imputation was right in sign and wrong in size by 7x; (5) 0.793 under dual order, down from 0.837, the tie convention. [SELECTIVE-ORDER 2026-09-14: the frontier / cross-tier split is a cut WITHIN answer-disagreeing pairs; the flip rate measures the absence of decisive evidence, and there is no cheap subset to skip.]",
+  "chips": [
+    "(1)(5) FAIL",
+    "(2) PASS",
+    "(3) POSITION IS A FRONTIER PHENOMENON"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-14",
+      "by": "SELECTIVE-ORDER (MY ERROR, recorded there)",
+      "text": "the frontier / cross-tier split is a cut WITHIN answer-disagreeing pairs (every ARENA-13 match was filtered) and was generalised across a boundary the data never crossed; corrected statement: the flip rate measures the ABSENCE OF DECISIVE EVIDENCE, whatever its source; there is no cheap subset to skip."
+    },
+    {
+      "date": "2026-09-14",
+      "by": "PLACEBO-ENTRY (4)",
+      "text": "the newcomer's dual-order theta gap to gemini is +0.045 with a bootstrap CI of [-0.068, +0.186]; there is no residue to explain."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "single order as safe off the frontier (SELECTIVE-ORDER: it is not)",
+    "a mis-ranked newcomer (unresolved at this budget)"
+  ],
+  "ledger": {
+    "row_id": "POSITION-FULL",
+    "version": "v70 (18bcc5f); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "POSITION-DECOMP",
+    "ARENA-13",
+    "SELECTIVE-ORDER",
+    "PLACEBO-ENTRY"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L1562-L1648 (1838bf2 / 18bcc5f)",
+    "experiment_results/x12_crossdomain/positionfull_outcome.txt (18bcc5f)",
+    "docs/test_ledger.html row POSITION-FULL (v70): chips verbatim, observed cell, evidence",
+    "script sha16 = sha256 of tools/analysis/position_decomp.py at 1838bf2, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Re-judges the remaining 1,200 matches between models of different strength with the answers shown in the opposite order, so all matches are judged in both orders (1,196 calls). It checks whether the newcomer model's ranking holds and how much answer order sways the judge.",
+    "why": "It asks whether the judge's preference for the answer shown first is distorting rankings, and where that bias shows up.",
+    "information": "It shows where order bias matters and whether a single order is safe. Result: done. Flips between orders are rare in matches between models of clearly different strength. They sit at the level of judge noise, compared with 18% among top models. Order carried about 85% of the newcomer's lead, but it still ranks first. The gap is not distinguishable from zero. A later correction: the bias tracks matches that lack decisive evidence, not \"frontier versus not\", so there is no cheap subset that can safely be judged in one order only. This belongs to the older question pool.",
+    "written": "2026-10-07"
+  }
+}

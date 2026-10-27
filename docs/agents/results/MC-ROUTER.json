@@ -1,0 +1,101 @@
+{
+  "id": "MC-ROUTER",
+  "title": "MC-ROUTER: multi-corpus stage 2: is there anything to route on a union of task families? (key-only, zero calls)",
+  "question": "multicorpus_cache_v1.db (MMLU-Pro, BBH, MATH, GPQA, MuSR, IFEval; 21,606 questions x 18 open models; 52 strata); per-(source, domain) 0.30 split seed 42; best model by train-side accuracy at global / source / domain granularity; reserved-side accuracy with query-level bootstrap; criterion fixed in the script before running: routed-by-source beats best single by > 2 SE.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "a53f57e",
+    "program_lines": "docs/multi_corpus_design.md L247-L266 ('Stage 2 result'); the criterion fixed in tools/analysis/multicorpus_router.py's docstring before running; no programme section",
+    "program_lines_as_of": "docs/multi_corpus_design.md at 4ec8f18",
+    "heading": "## Stage 2 result (2026-09-11, zero calls) — there IS something to route on a multi-corpus union",
+    "outcome_heading": [
+      "docs/multi_corpus_design.md L247: the same section"
+    ],
+    "date": "2026-09-11"
+  },
+  "script": {
+    "path": "tools/analysis/multicorpus_router.py (with tools/analysis/multicorpus_db.py)",
+    "sha16": "3f7b3d411e3db57f (at a53f57e)",
+    "commit": "a53f57e"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/multicorpus/router_regret_mc6.txt",
+    "outcome_commit": "bb636c1",
+    "calls": 0,
+    "cce": 0,
+    "pool": "per-(source, domain) 0.30 split seed 42 on the union (n = 6,481 reserved)",
+    "date": "2026-09-11"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); disclosure: the DB build summary printed best-model-per-corpus before the readout ran; the criterion predates both; the MATH strict-extraction artefact disclosed with the sensitivity",
+    "commit": "bb636c1",
+    "verdict": "REAL (+4.0 / +5.0pp); MATH artefact disclosed"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "routed-by-source beats the best single model by > 2 query-level bootstrap SE on the reserved side",
+      "result": "HELD",
+      "value": "best single (Qwen2.5-72B) 0.553 +- 0.006; routed by source 0.593 (+0.040 +- 0.006); by domain 0.604 (+0.050 +- 0.005); oracle 0.907; best model differs per source (Qwen2.5-32B / InternLM2.5-20B / Llama-3.1-70B / Command-R+ / Llama-3.3-70B / Qwen2.5-72B); 25 of 52 domains differ from their source's best; sensitivity: without MATH (best single 0.008 there under strict exact_match: a formatting artefact) +0.013 / +0.027, still > 2 SE; without MATH and MMLU-Pro +0.042 / +0.069",
+      "denominator": "6,481 reserved questions; 18 models"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "on MMLU-Pro alone the same machinery gives 0.000 (ROUTER-REGRET-MMLU); the oracle gap (0.30) is the ceiling for any router; MATH-FIX (2026-09-11/12) later corrected the MATH artefact"
+  },
+  "numbers_of_record": {
+    "reserved": "best single 0.553 +- 0.006; by source 0.593; by domain 0.604; oracle 0.907",
+    "gain": "+0.040 +- 0.006 (source); +0.050 +- 0.005 (domain); without MATH +0.013 / +0.027; without MATH and MMLU-Pro +0.042 / +0.069",
+    "headline": "routing by task family and domain recovers 2.7 to 5.0 points over the best single model depending on the MATH treatment, real in every variant"
+  },
+  "sentence_of_record": "MC-ROUTER (2026-09-11, zero calls): there IS something to route on a multi-corpus union: best single (Qwen2.5-72B) 0.553, routed by source 0.593, by domain 0.604, oracle 0.907; the router gain +0.040 / +0.050 is REAL (> 2 SE); the best model differs per source and 25 of 52 domains differ from their source's best; sensitivity: without MATH (the best single scores 0.008 there under strict extraction, a formatting artefact) +1.3 / +2.7pp, still real; routing by task family and domain recovers 2.7 to 5.0 points depending on the MATH treatment; on MMLU-Pro alone the same machinery recovers 0.000.",
+  "chips": [
+    "REAL (+4.0 / +5.0pp)",
+    "MATH artefact disclosed"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-11/12",
+      "by": "MATH-FIX",
+      "text": "the MATH strict-extraction artefact corrected (eval_results_mathfix); MC-E2E's re-run with the overlay reads +2.7pp (range +2.1-3.4)."
+    }
+  ],
+  "does_not_show": [
+    "a routing gain on MMLU-Pro alone (0.000)",
+    "the oracle gap (0.30) as reachable"
+  ],
+  "ledger": {
+    "row_id": "MC-ROUTER",
+    "version": "v46 (bb636c1)"
+  },
+  "depends_on": [
+    "ROUTER-REGRET-MMLU",
+    "MC-BUILD",
+    "MATH-FIX",
+    "MC-E2E"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/multi_corpus_design.md L247-L266 (bb636c1)",
+    "experiment_results/multicorpus/router_regret_mc6.txt (bb636c1)",
+    "docs/test_ledger.html row MC-ROUTER (v46): chips verbatim, evidence (multicorpus_router.py, router_regret_mc6.txt, multicorpus_db.py, a53f57e)",
+    "script sha16 = sha256 of tools/analysis/multicorpus_router.py at a53f57e, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)"
+  ],
+  "last_update": "2026-09-22",
+  "plain_description": {
+    "sq": "SQ1 Use",
+    "what": "On a union of six benchmarks (21,606 questions, 18 open models), it picks the best model per benchmark or per subject on the training side, and compares accuracy on the held-out side with the best single model and with a perfect per-question oracle. Answer keys only.",
+    "why": "Asks whether a multi-benchmark mix has anything to gain from routing, after MMLU-Pro alone showed none.",
+    "information": "A real gain justifies the routing line of the thesis. Result: yes, there is something to route. Routing by benchmark or by subject gains about 4 to 5 points over the best single model (0.553), and this is beyond noise. A MATH answer-formatting artefact inflated this, and after the fix the gain is about +2.7 points. The perfect oracle (0.907) is a ceiling, not a reachable target. On MMLU-Pro alone the gain is zero.",
+    "written": "2026-10-07"
+  }
+}

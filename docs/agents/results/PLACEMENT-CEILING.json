@@ -1,0 +1,178 @@
+{
+  "id": "PLACEMENT-CEILING",
+  "title": "PLACEMENT-CEILING: is the newcomer band at 400 matches a key-tie band or a budget band? (zero calls; plan A6; decides whether C6 PLACEMENT-CURVE is worth its 3,200 calls)",
+  "question": "NEWCOMER-PLACEMENT-LIVE banded claude-3-5-sonnet-20241022 to key tiers 1..7 and gpt-4o-mini to 4..6 at 400 matches each and FAILED the <= 2-tier criterion (22). Claim under test: the band is a KEY-TIE band (positions the key cannot order at the 0.017 gap, or inside the frontier band), not a BUDGET band (positions the arena could have separated with more matches). If budget is the band, PLACEMENT-CURVE (3,200 calls) is worth registering; if not, it is declined at zero calls.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "3d4536e",
+    "program_lines": "docs/judge_v2_program.md L6094-L6163; pre-run bracket L6386 (af176a2): band read INCLUSIVE of the bounding certified anchors' tiers, sub-class (iii-c), (i) on the 2,811-question tier key, conventions PRIMARY / A / B, the decomposition verdict-independent and known pre-run, the registrar's addition scored as the full-span fraction < 0.5, full-precision key accuracies [re-lined 2026-09-22: batch-1 lines were read at 9c1f37b-era HEAD and shifted by +6 by later insertions]",
+    "program_lines_as_of": "6aa2a0d",
+    "heading": "## Registered 2026-09-18 (before any code or call) — PLACEMENT-CEILING: is the newcomer band at 400 matches a key-tie band or a budget band? (zero calls; plan docs/agents/plans/2026-09-17_continual_capability_profile_leads.md A6; lens arena_profile.md L5; decides whether C6 PLACEMENT-CURVE is worth its 3,200 calls)",
+    "outcome_heading": [
+      "L6679: ## PLACEMENT-CEILING (2026-09-18, zero judge calls) — at 400 matches the 7 / 3 newcomer bands decompose as sonnet (i) key-tie 1 + (ii) frontier 3 + (iii) separa"
+    ],
+    "date": "2026-09-18"
+  },
+  "script": {
+    "path": "tools/analysis/placement_ceiling.py",
+    "sha16": "8fe92a98b789bf7d (as printed in the outcome section L6679; the LF sha256 of the file at eb5791c is fd9a890eb4e552b6)",
+    "commit": "eb5791c"
+  },
+  "ready": null,
+  "go": "n/a (0 calls; window W2 pool reader)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/placement_ceiling_outcome.txt",
+    "outcome_commit": "17a4434",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-18",
+    "other_files": [
+      "experiment_results/x12_crossdomain/placement_ceiling_bands.csv (17a4434)",
+      "experiment_results/x12_crossdomain/placement_ceiling_curve.csv (17a4434)",
+      "experiment_results/x12_crossdomain/placement_ceiling_run.log"
+    ]
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-18_night_batch.md section PLACEMENT-CEILING",
+    "commit": "17a4434 (file last at 074eb3d)",
+    "verdict": "numbers CONFIRMED (certificates replayed, C1 decomposition under PRIMARY / A / B, the curve from _curve.csv); the relay's P3 reading corrected (P3 overall FAILED); sonnet's [7, 7] curve is flat BY DESIGN (bounding anchors certify at 25 q, mid anchors at 0.505 / 0.510 cannot certify at any n; 33 / 300 default-bound draws and 14 / 300 narrower-by-chance draws inside it); falsifier FIRED for sonnet on (iii-b) / (iii-c) with (iii-a) = 0"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "the decomposition (i) key-tie + (ii) frontier + (iii) separable sums to the band width per newcomer under both conventions: 7 for sonnet and 3 for gpt-4o-mini, with the incumbent list per component",
+      "result": "HELD",
+      "value": "sonnet (11 band incumbents; identical under PRIMARY / A / B): (i) 1 [t3 arx_3, |dkey| 0.002] + (ii) 3 [t1 gemini, t2 arx_0314 / iask_pro, t4 gpt-4o] + (iii) 3 [t5 deepseek iii-b (gap 0.0199), t6 gpt-4o-mini / claude-3-5-haiku / Llama-3.1-70B iii-b, t7 Qwen1.5-110B iii-b / Qwen1.5-72B-Chat iii-c] = 7; (iii) split iii-a 0 / iii-b 5 / iii-c 1; gpt-4o-mini (4 incumbents): (ii) 1 [t4 gpt-4o] + (iii) 1 [t5 deepseek] + (i) 1 [t6 haiku 0.002 / Llama-70B 0.003] = 3; the pool-key flag changes no component by count",
+      "denominator": "the band's incumbents on the 19-model board of record; key tiers = eval_results over the 2,811 judged questions, 46-model roster, 14 tiers at the 0.017 gap"
+    },
+    {
+      "id": "C2",
+      "text": "the resolution curve at 100 / 200 / 300 / 400 question-pairs per newcomer with [p5, p95] over B >= 300 draws, and the power column for every (iii-a) anchor",
+      "result": "DELIVERED",
+      "value": "sonnet 7 [7, 7] at every size (full-span draws 0.000; key-contradicted 0; FLAT BY DESIGN per the reviewer: 33 / 300 default-bound draws at 25 q, 14 / 300 narrower by chance); gpt-4o-mini 6 [4, 13] / 4 [3, 6] / 4 [3, 6] / 3 [3, 3]; 400 = the recorded 7 / 3 by identity; power column: sonnet vs gpt-4o 0.505 (sd 0.046) would need 31,001 question-pairs to certify at 0.975, vs arx_3 0.510 / 0.044 -> 7,549; (iii-a) anchors none",
+      "denominator": "300 question-stratified draws per size (seed 42), the same four anchors, the recorded rule at B = 2,000 per draw"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "(plan A6) sonnet's width is entirely (i) + (ii), i.e. (iii) = 0 tiers",
+      "result": "FAILED",
+      "value": "(iii) 3",
+      "denominator": "sonnet's 7-tier band"
+    },
+    {
+      "id": "P2",
+      "text": "(plan A6) gpt-4o-mini's 3 tiers = the 0.631 / 0.629 / 0.628 cluster (its own tier, (i)) plus one tier on each side (tier 6 -> (i); tiers 4 and 5 -> (ii) or (iii))",
+      "result": "HELD",
+      "value": "t4 (ii), t5 (iii), t6 (i); one neighbour in (iii), so the falsifier does not fire for gpt-4o-mini",
+      "denominator": "gpt-4o-mini's 3-tier band"
+    },
+    {
+      "id": "P3",
+      "text": "(plan A6) budget narrows the band by at most 1 tier from 100 to 400 question-pairs (both newcomers)",
+      "result": "FAILED",
+      "value": "sonnet 7 - 7 = 0 HELD; gpt-4o-mini 6 - 3 = 3 FAILED; overall FAILED (the relay's first reading HELD corrected by the reviewer, D1)",
+      "denominator": "median width at 100 vs 400 question-pairs, 300 draws"
+    },
+    {
+      "id": "P4",
+      "text": "(registrar's blind addition) at 100 question-pairs the p95 width for sonnet reaches the full 19-model span in fewer than half the draws (scored as the full-14-tier-span fraction < 0.5)",
+      "result": "HELD",
+      "value": "0.000; vacuous as the bracket expected; the p95 width is the informative number (7 for sonnet, 13 for gpt-4o-mini at 25 q)",
+      "denominator": "300 draws at 25 q / anchor"
+    }
+  ],
+  "falsifier": {
+    "text": "(iii) >= 2 tiers for either newcomer: overturns NEWCOMER-PLACEMENT-LIVE's reading 'the width comes from where the bisection lands, not from judge error' for that newcomer; budget IS the band there and PLACEMENT-CURVE becomes worth registering. Does not overturn the FAIL of criterion (22), the placements' directions or the contained key tiers.",
+    "fired": true,
+    "note": "FIRED for claude-3-5-sonnet-20241022 under PRIMARY, A and B ((iii) 3; gpt-4o-mini 1, not fired); read with the pre-run bracket: the budget is bisection STEPS ((iii-a) = 0; no match posted against any tier-5 / 6 incumbent), which more matches at the same four anchors cannot supply, so PLACEMENT-CURVE as priced (2 x 800 at the same anchors) is DECLINED and a further-step placement design is the registration to write (-> PLACEMENT-STEPS)"
+  },
+  "numbers_of_record": {
+    "cache": "newcomer_placement.db mode=ro: schedule 800; verdicts 1,600 = 2 newcomers x 4 anchors x 100 q x 2 orders; 1 content_filter row, 1,599 stop",
+    "certificates_replayed_PRIMARY": "sonnet (own tier 3, key 0.782): above Qwen1.5-72B-Chat (t7) 0.910 sd 0.026 (2,000 / 0); UNSEPARATED from gpt-4o (t4) 0.505 sd 0.046 n 99 (1,069 / 851); below gemini-3.1-pro (t1) 0.225 (0 / 2,000); UNSEPARATED from arx_3 (t3) 0.510 sd 0.044 (1,153 / 758) -> tiers 1..7; gpt-4o-mini (own tier 6, 0.631): above Qwen1.5-72B 0.710; below arx_0314 (t2) 0.170; above claude-3-5-haiku (t6) 0.595 (1,964 / 29); below gpt-4o (t4) 0.360 (1 / 1,998) -> tiers 4..6; A and B reproduce both intervals",
+    "decomposition_sonnet": "(i) 1 + (ii) 3 + (iii) 3 = 7; (iii) iii-a 0 / iii-b 5 / iii-c 1",
+    "decomposition_gpt-4o-mini": "(ii) 1 + (iii) 1 + (i) 1 = 3; the remaining (iii) tier is deepseek at key gap 0.0199 vs 0.017 (inside the key's SE ~0.013, D4): one further step decides it",
+    "structural_floor": "sonnet's residual (i) + (ii) = 4 tiers (frontier band t1 / t2 / t4 + key tie t3) fails criterion (22) at any budget; further steps can remove at most the 3 (iii) tiers",
+    "resolution_curve": "sonnet 7 [7, 7] at 25 / 50 / 75 / 100 q per anchor; gpt-4o-mini 6 [4, 13] / 4 [3, 6] / 4 [3, 6] / 3 [3, 3]",
+    "power_column": "sonnet vs gpt-4o 0.505 at sd 0.046 -> 31,001 question-pairs to certify at 0.975; vs arx_3 0.510 / 0.044 -> 7,549",
+    "pool_key_flag": "arx_3 |d| 0.002 -> 0.011; deepseek vs gpt-4o-mini 0.0199 -> 0.0239; no component changes by count"
+  },
+  "sentence_of_record": "PLACEMENT-CEILING: at 400 matches the 7 / 3 bands decompose as sonnet (i) 1 + (ii) 3 + (iii) 3 and gpt-4o-mini (ii) 1 + (iii) 1 + (i) 1 (C1 HELD under all conventions). Sonnet's 3 (iii) tiers are incumbents never judged against (5 iii-b, 1 certified bounding anchor): a bisection-STEPS shortfall, not a matches shortfall; the curve is 7 at every n from 25 to 100 q/anchor because the bounding anchors certify at 25 q and the mid anchors sit at 0.505 / 0.510. Further steps can remove at most those 3 tiers; the residual (i) + (ii) = 4 tiers (frontier band t1/t2/t4 + key tie t3) is structural and fails criterion (22) at any budget. gpt-4o-mini's band shrank with n (median 6 -> 4 -> 4 -> 3; P3 FAILED) and its remaining (iii) tier is deepseek at key gap 0.0199 vs 0.017: one further step decides it. PLACEMENT-CURVE as priced (2 x 800 matches at the same anchors) cannot narrow sonnet and is declined; a further-step placement design is the registration to write.",
+  "chips": [
+    "C1 HELD (ALL CONVENTIONS)",
+    "P1 FAILED; FALSIFIER FIRED (SONNET iii-b/iii-c, iii-a 0)",
+    "P2 HELD",
+    "P3 FAILED (GPT-4O-MINI 6 -> 3; SONNET FLAT BY DESIGN)",
+    "STEPS SHORTFALL OVER A STRUCTURAL FLOOR OF 4 TIERS",
+    "PLACEMENT-CURVE AS PRICED DECLINED"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-18",
+      "by": "the pre-run review, before --run (programme L6380, af176a2)",
+      "text": "(1) the band is read INCLUSIVE of the tiers of the bounding certified anchors (the only reading reproducing 7 / 3); a certified bounding anchor that is neither (i) nor (ii) is sub-class (iii-c), named, not dropped. (2) Component (i) is read on the key the tiers are built on (eval_results over the 2,811 merged-board judged questions), the pool-wide 3,445 key printed beside with a flag. (3) Conventions PRIMARY (ties 1/2, the unusable row excluded) / A / B; 'ties / INVALID wrong' has no meaning for a newcomer win share and is withdrawn. (4) The decomposition is verdict-independent given the certificate and the tier map and is known before the run: sonnet (i) 1 + (ii) 3 + (iii) 3; gpt-4o-mini (ii) 1 + (iii) 1 + (i) 1; P1 therefore FAILS and the falsifier FIRES for sonnet on (iii-b) / (iii-c) with zero (iii-a): 'budget IS the band' means further bisection STEPS, and the registered consequence is read as 'a further-step placement design is worth registering', NOT PLACEMENT-CURVE as priced. (5) The registrar's addition is scored as the full-14-tier-span fraction at 100 question-pairs < 0.5. (6) The script uses full-precision key accuracies."
+    },
+    {
+      "date": "2026-09-18",
+      "by": "the outcome section (3dd0900), consequence: NEWCOMER-PLACEMENT-LIVE bracketed (ledger v114)",
+      "text": "NEWCOMER-PLACEMENT-LIVE's 'the width comes from where the bisection lands, not from judge error' is overturned for sonnet: budget IS the band there, but the budget is bisection STEPS; PLACEMENT-CURVE as priced declined at zero calls."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "CORRECTIONS_2026-09-23 (registrar)",
+      "text": "[CORRECTED 2026-09-23 by the registrar (line pointer only, zero calls; no number, no criterion and no sentence moves): registration.program_lines names docs/judge_v2_program.md L6094, and that was exact when it was written. After commit cd83eac inserted four one-line correction brackets mid-file (hunks @@ -3911,0 / -6535,0 / -6692,0 / -6949,0 @@), the heading of record \"## Registered 2026-09-18 (before any code or call) — PLACEMENT-CEILING: is the newcomer band at 400 matches a key-tie band or a budget band? ...\" stands at L6095, +1; the whole span shifts by the same +1. Verified at HEAD by sed -n '6095p' docs/judge_v2_program.md. The map for every such pointer is the programme's \"## Line-shift map, appended 2026-09-23\" section: +0 up to old L3911, +1 to L6535, +2 to L6692, +3 to L6949, +4 below. The recorded span is left standing beside this bracket, not rewritten.]"
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "any order inside the frontier band",
+    "a judged tier map (the tiers here are the key's at 0.017, TIER-HONEST, not the judged [9, 9, 2])",
+    "a placement protocol change (the bisection is re-read on its own verdicts)",
+    "what a further step would return (no match exists against deepseek or the tier-6 cluster for sonnet)",
+    "that criterion (22) can be met for a frontier newcomer at any budget (it cannot: the 4-tier floor)"
+  ],
+  "ledger": {
+    "row_id": "PLACEMENT-CEILING",
+    "version": "v114; [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "NEWCOMER-PLACEMENT-LIVE",
+    "ARENA-13",
+    "FRONTIER-FIT",
+    "FRONTIER",
+    "PLACEBO-ENTRY",
+    "TIER-HONEST",
+    "TIER-HONEST-X20"
+  ],
+  "supersedes": null,
+  "superseded_by": "PLACEMENT-STEPS (the further-step design this outcome named; registered and run 2026-09-19)",
+  "closed_line": {
+    "closed": true,
+    "what": "PLACEMENT-CURVE as priced (2 newcomers x 800 matches x 2 at the same four anchors, 3,200 calls) DECLINED at zero calls; criterion (22) for a frontier newcomer is unreachable at any budget (the 4-tier structural floor). Not a CONTEXT.md section 5 line."
+  },
+  "sources": [
+    "docs/judge_v2_program.md L6088-L6157 (registration 3d4536e) and the pre-run bracket L6380 (af176a2): question, hygiene, instrument (a)-(d), criteria, predictions, falsifier",
+    "docs/judge_v2_program.md L6673-L6751 (outcome section, 3dd0900): every number, the replayed certificates, C1-C2, P1-P3 and the registrar's addition scored, the falsifier's reading, defects D1-D4, does-not-show, the sentence of record",
+    "docs/reviews/2026-09-18_night_batch.md section PLACEMENT-CEILING (17a4434; file last at 074eb3d): CONFIRMED status, the P3 correction, the flat-by-design reading and the 33 / 300 and 14 / 300 curve artefacts, chips",
+    "experiment_results/x12_crossdomain/placement_ceiling_outcome.txt, _bands.csv, _curve.csv (17a4434)",
+    "docs/test_ledger.html row PLACEMENT-CEILING (v114): chips verbatim, evidence (3d4536e, af176a2, eb5791c, 17a4434, 3dd0900)",
+    "script sha: the outcome section prints 'script sha 8fe92a98b789bf7d' (copied); the LF sha256 of tools/analysis/placement_ceiling.py at eb5791c is fd9a890eb4e552b6 (computed by the registrar 2026-09-20 for identity; the two differ as CRLF vs LF renderings, cf. the ARM-B-VINTAGE READY note)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' lines to grep -n regardless of line drift; line numbers re-lined 2026-09-22 as of programme HEAD 6aa2a0d (shift +6 from the batch-1 reading)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ4 Price",
+    "what": "Two newcomer models were placed on the leaderboard with 400 matches each and landed in wide bands (7 and 3 tiers). The test decomposed each band into tiers the answer key itself cannot separate and tiers that were simply never tested. No calls were made.",
+    "why": "It decides whether a costlier placement run (3,200 calls) would narrow the bands.",
+    "information": "If the band came from too few matches, the paid run would be worth it. If it came from ties or untested steps, it would not. Result: done. For Claude-3.5-Sonnet, 3 tiers were never matched against; that is a shortfall of placement steps, not of match count. The other 4 tiers are a structural floor at any budget. The paid run as priced was declined, and a step-based placement design was proposed instead. Later ruled history rather than evidence, because it ran on the older question pool.",
+    "written": "2026-10-07"
+  }
+}

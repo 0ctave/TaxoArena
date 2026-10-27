@@ -1,0 +1,31 @@
+=== POSITION-DECOMP: the same frontier matches with the opponent presented FIRST (600 matches) ===
+
+  (1) POSITION, on the 299 matches where DECOMP measured the noise floor on the very same questions:
+      flip rate between the two ORDERS      0.124
+      test-retest noise, same prompt twice  0.057   (DECOMP)
+      POSITION SENSITIVITY                  0.067   bootstrap 95% CI [+0.030, +0.107]
+      -> position is real and larger than the judge's own stochasticity
+      (flip rate over all 600 frontier matches, for comparison: 0.182)
+
+  (2) DIRECTION: the new contestant's win rate presented FIRST 0.695 | presented SECOND 0.560 (-0.135)
+      discordant first-only 91 : second-only 10 | McNemar p=1.698e-17
+
+  (3) BOARD with dual-order TIE-on-flip verdicts on the 600 frontier matches (single order elsewhere):
+      1. grok-4-1-fast-reasoning            theta +1.985 | key 0.849   <- new
+      2. gemini-3.1-pro_5-shots             theta +1.898 | key 0.913
+      3. iask_pro                           theta +1.879 | key 0.817
+      4. arx_0314                           theta +1.397 | key 0.834
+      5. gpt-4o-2024-08-06                  theta +1.276 | key 0.750
+      the new contestant places 1 (ARENA-13 single order: 1st, theta +2.156; key rank 2nd)
+
+  (4) AMENDMENT RULE fixed before the run: theta below gemini's once the frontier is order-balanced
+      -> attribute ARENA-13 (1) to the single-order design.
+      theta new +1.985 vs gemini +1.898 -> NOT attributed to position: the over-ranking survives order balancing, so quality-not-in-the-key or trace style remain
+
+  (5) SENSITIVITY, not registered - what if the 1,200 CROSS-TIER matches were order-balanced too?
+      They are still single order with the new contestant in slot A, so the position effect measured
+      above has NOT been removed from them. Imputing their reversed verdicts from the transition
+      rates observed on the frontier (200 draws):
+      the new contestant places 1st in 0% of draws | theta gap to gemini median -0.326, 90% range [-0.367, -0.288]
+      CAVEAT: cross-tier pairs are less contested than frontier pairs, so their true flip rate is
+      probably lower and this is an UPPER bound on the correction. Settling it costs 1,200 calls.

@@ -1,0 +1,131 @@
+{
+  "id": "KTD-CHECK",
+  "title": "KTD-CHECK: FRAMEWORK item 1: the independent check KEY-TIE-DECLINE never had; do the record's integers reproduce and what is the residue? (zero calls)",
+  "question": "Independent recompute of KEY-TIE-DECLINE from its registration: the composed widener + decline rule at 0.90-0.995 on the merged pooled board (190 pairs) and the merged per-anchor edges (2,538), with the x12 cross-checks (891 edges); established counts by McNemar on the anchor's JUDGED questions; seed sweep (builder seed 43 + the checker's 10 own-RNG seeds).",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "eaf1dbf",
+    "program_lines": "docs/judge_v2_program.md L3603-L3611 (by reference; docs/design/FRAMEWORK.md L354 item 1); the Block 1 record bullet at L3665",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-15 (before any run) — BY REFERENCE: the 26 tests in docs/design/FRAMEWORK.md \"Tests to register before shipping\" (commit 8d77f7b), with the criteria, predictions and call counts stated there, scheduled in docs/plan_2026-09-15.md",
+    "outcome_heading": [
+      "L3662: ## Block 1 record (2026-09-15/16, zero calls) — FRAMEWORK items 1-12, 14-16: fourteen zero-call tests built, each adversarially checked; verdicts of record below (checker's number wins where it refutes the builder)",
+      "L3665: - **KTD-CHECK (2026-09-15, zero calls): PASS as registered; the integers are the record's draw and the per-anchor residue sits on a knife edge.**"
+    ],
+    "date": "2026-09-15"
+  },
+  "script": {
+    "path": "tools/analysis/ktd_check.py",
+    "sha16": "424895327b40c9a9",
+    "commit": "7076615"
+  },
+  "ready": null,
+  "go": "n/a (0 calls; Block 1)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/ktd_check.txt",
+    "outcome_commit": "7076615",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (pool_guard.assert_pool_of_record() first; union pool paeec37aa28063c75 by explicit id where used)",
+    "date": "2026-09-15/16"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); each Block 1 test was 'adversarially checked' at build time and the checker's number wins where it refutes the builder (Block 1 record header L3662-L3663); the checker-confirmed defects are listed in the bullet",
+    "commit": "7076615",
+    "verdict": ""
+  },
+  "criteria": [
+    {
+      "id": "C1a",
+      "text": "pooled widener + decline 0.975 = 150/190, 0 wrong",
+      "result": "HELD",
+      "value": "150 kept (widener 153, decline surrenders 3), 0(0) wrong at every threshold 0.90-0.995; undominated set = the six L11 names (checker CONFIRMED)",
+      "denominator": "190 merged pooled pairs"
+    },
+    {
+      "id": "C1b",
+      "text": "per-anchor = 1,714/2,538, 4(4) wrong",
+      "result": "HELD",
+      "value": "1,714 kept (widener 1,783 / 13(4)), residue 4(4) = 0.23%; across-tier surrendered 61/1,769 = 3.4%: PASS at the record's seed; checker PARTLY: over 11 draws pooled 150-151 / 0 wrong every time, per-anchor 1,713-1,720 with 4 wrong in 9/11 and 5 in 2/11 (Law arx_0314 vs claude-3-5-sonnet has c = 0.974973 at seed 42, 2.7e-5 under the cutoff)",
+      "denominator": "2,538 merged per-anchor edges; 11 draws"
+    },
+    {
+      "id": "C1c",
+      "text": "record cross-checks equal",
+      "result": "HELD",
+      "value": "x12 651/1(1), 712/4(4), 739/8(4), 665/2(1); pooled raw 3(1)->1; per-anchor raw 14(4)->4; board of record 6/7 3(1) | 176/183 5(4): all equal (CONFIRMED)",
+      "denominator": "891 x12 edges; the boards of record"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "reproduces, with the residue anchors read as Law x3 + Philosophy x1",
+      "result": "HELD",
+      "value": "Law Llama-3.1-70B vs gpt-4o-mini (51:22, p 0.0009), vs deepseek-v2.5 (54:25, p 0.0015), vs Qwen1.5-72B (59:29, p 0.0018), Philosophy Llama-3.1-70B vs gpt-4o-mini (22:8, p 0.0161); all Llama-3.1-70B (the modal residue over seeds)",
+      "denominator": "4 residue edges of 2,538"
+    }
+  ],
+  "falsifier": {
+    "text": "none beyond the reproduction criterion (registered by reference)",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "pooled": "150 kept / 0(0) wrong at 0.90-0.995; over 11 draws 150-151 / 0",
+    "per_anchor": "1,714 kept / 4(4) wrong = 0.23%; over 11 draws 1,713-1,720 with 4 wrong in 9/11, 5 in 2/11 (0.23-0.29%)",
+    "knife_edge": "Law arx_0314 vs claude-3-5-sonnet (established wrong, 34:16 p 0.0153, raw 1.000) widener c = 0.974973 at seed 42, 2.7e-5 under the cutoff",
+    "residue": "Law Llama-3.1-70B vs gpt-4o-mini 51:22 p 0.0009, vs deepseek-v2.5 54:25 p 0.0015, vs Qwen1.5-72B 59:29 p 0.0018; Philosophy Llama-3.1-70B vs gpt-4o-mini 22:8 p 0.0161; in every residue edge the KEY winner is Llama-3.1-70B and the judge UNDER-rates it (FRAMEWORK L97 had the direction backwards)",
+    "x20_note": "the x20 cache holds 157 duplicate (pair, qid) groups and 302 order-reversed re-judgings, counted as distinct verdicts"
+  },
+  "sentence_of_record": "KTD-CHECK (2026-09-15, zero calls): PASS as registered; the integers are the record's draw and the per-anchor residue sits on a knife edge. Pooled widener + decline at 0.975 reproduces 150/190, 0(0) wrong at every threshold; per anchor 1,714/2,538 with 4(4) wrong (0.23%) at the record's seed, 4-5 wrong over 11 draws (0.23-0.29%): the framework must carry '0 wrong pooled, 4-5 wrong per anchor' and read 'all four Llama-3.1-70B' as the modal residue. The prediction (Law x3 + Philosophy x1, all Llama-3.1-70B) is MET; FRAMEWORK L97 had the residue's direction backwards (the KEY winner is Llama-3.1-70B; the judge UNDER-rates it).",
+  "chips": [
+    "PASS AS REGISTERED",
+    "C1b PARTLY (checker): 4-5 WRONG PER ANCHOR OVER SEEDS"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-16",
+      "by": "Block 1 record corrections for LEDGER-CONSISTENCY (programme L3839; FRAMEWORK L97 bracketed at a75df45)",
+      "text": "FRAMEWORK L97: residue direction and tiers corrected; '4-5 wrong per anchor, 0.23-0.29%' carried."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "that 'independent' is more than a re-typing of systematic_budget.build with the same seed, draw order, ddof and BT engine (the seed sweep is the claim-level evidence)",
+    "a filter-dependent residue (the gap >= 0.02 filter drops 122 merged cells, none established)"
+  ],
+  "ledger": {
+    "row_id": "KTD-CHECK",
+    "version": "v103 (684be03); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "KEY-TIE-DECLINE",
+    "SYSTEMATIC-BUDGET",
+    "TIER-HONEST-X20"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L3603-L3611 (by-reference registration eaf1dbf) and docs/design/FRAMEWORK.md L354 item 1: criterion, prediction, call count",
+    "docs/judge_v2_program.md L3665 ff. (Block 1 record bullet, 7076615): the criterion table, predictions scored, checker-confirmed defects, script and output",
+    "experiment_results/x12_crossdomain/ktd_check.txt (7076615)",
+    "docs/test_ledger.html row KTD-CHECK (v103 684be03): chips verbatim, design / criteria / observed cells, evidence",
+    "script sha16 = sha256 of tools/analysis/ktd_check.py at 7076615 (its first commit), first 16 hex (identity, computed by the registrar 2026-09-22; later edited at 13f2142 for the pool_guard change)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' heading and the '- **ID (...)**' bullet line inside the Block 1 record, to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "An independent recomputation of an earlier result. That result combined a confidence-widening rule with a 'decline to call' rule for deciding which model is better, both overall and per subject. The check also reruns it with 11 random seeds (no judge calls).",
+    "why": "The earlier result had never been independently checked, and the framework quoted its error counts.",
+    "information": "Matching numbers confirm the record; differences would correct it. Result: it reproduces. Overall, 150 of 190 pairs are called with 0 wrong. Per subject, 1,714 of 2,538 are called with 4 to 5 wrong (about 0.25%) depending on the seed, so the residue sits on a knife edge. The check also corrected the direction of the residual error in the framework: the judge under-rates the Llama-3.1-70B model. Ruled history rather than evidence (older question pool).",
+    "written": "2026-10-07"
+  }
+}

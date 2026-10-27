@@ -1,0 +1,666 @@
+[POOL-PIN] active reserved pool p2dca21ab5f4ef3ae == pool of record (pool_guard.assert_pool_of_record); questions addressed by explicit id
+=== POOLED-RESTATE (FRAMEWORK item 4 / review verify item 7): widener vs agreement gate on the pooled board, established pairs, judged denominator, Llama-3.1-8B/command-r excluded, gate out of fold over 5 seeds ===
+  operating point 0.975 | established = McNemar p < 0.05 via systematic_budget.mcnemar_edge over {'POOLED': judged questions}
+  KEY DENOMINATOR: the 2,811 JUDGED questions for accuracy, agreement and McNemar on both boards (never the 3,445 pool).
+  widener SHIPPED = tau(A) = exp(-3.2326 +3.3133*A) (budget_transfer.B0/B1, x12 per-anchor fit, cold) | LBO-REFIT = per pair, refit on the board's per-anchor edges touching neither endpoint
+  gate = raw certificate AND A < t; grid t in 0.30, 0.35, 0.40, 0.45, 0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95 plus 1.00 (no gate); OOF = leave-both-endpoints-out threshold choice
+  rule M = matched correct surrenders (closest on training pairs); rule B = fewest training wrong at surrenders <= widener's; rule W = fewest surrenders at wrong <= widener's (the v87 'strictly dominates' direction); rule P = rule M trained on the per-anchor raw-called edges touching neither endpoint (the LBO widener's own population)
+
+  DATA: x12 9142 verdicts on 2811 questions, 12 models | merged x12+x20 21536 verdicts on 2811 questions, 20 models | Meta-Llama-3-70B-Instruct absent from both
+  per-anchor fit populations: x12 891 edges (gap >= 0.02, ktd_x12_edges.pkl) | merged 2538 edges (ktd_merged_edges.pkl); both from the seed-42 per-anchor bootstrap, one seed only
+  CHECK vectorised fit vs systematic_budget.fit on the 891 edges: sb (-3.2326, +3.3133) | vec (-3.2326, +3.3133) | shipped (-3.2326, +3.3133) -> OK  [4s]
+  CHECK nll at the shipped point: sb 103.066459 | vec 103.066459
+  CHECK merged seed 42 vs key_tie_decline's pooled table: max |diff| in p/m/s/A = 0.00e+00 -> IDENTICAL; raw 0.975 called 179 wrong 8(5) (KTD: 179 / 8(5))
+  CHECK x12 seed 43 vs systematic_budget.txt: raw 63 called / 1 wrong -> budget 57 / 0 (record 63/1 -> 57/0); arx/iask budget c 0.7805 A 0.880 (record 0.7805, 0.880) -> OK
+  LBO-REFIT parameters: x12 board, full refit b1 +3.3133, per-pair b1 range [+0.824, +10.604] on 599-615 edges | merged board, full refit b1 +2.4507, per-pair b1 range [+1.866, +5.038] on 2022-2057 edges  [0s]
+
+=== PRIMARY: the pooled 20-model MERGED board of record (190 pairs, 400 draws) ===
+
+--- MERGED-190 | seed 42 ---
+  pairs 190 | established (McNemar p < 0.05 over the 2811 judged questions) 183 | excluded pair unestablished
+  Llama-3.1-8B vs command-r: key 0.3686 vs 0.3703 (gap -0.0018, McNemar 430:435 p=0.8918) | arena p(8B ahead)=0.0000 c_raw=1.0000 widener c=0.9611 A=0.391 -> arena right on the judged denominator; REMOVED from every count below
+  established pairs after exclusion 183, wrong-direction 8 | raw certificate at 0.975 on them: called 173, wrong 5
+  the established wrong pairs the raw certificate calls (these are what a rule must remove):
+    arx_0314                   vs iask_pro                   A=0.880 c_raw=1.0000 |m|=0.561 s=0.065 shipped c=0.7785 LBO c=0.7682 (b1=+2.400) McNemar 144:99 p=0.0047
+    arx_0314                   vs claude-3-5-sonnet-20241022 A=0.822 c_raw=1.0000 |m|=0.280 s=0.070 shipped c=0.6786 LBO c=0.6654 (b1=+2.324) McNemar 262:124 p=0.0000
+    deepseek-chat-v2_5         vs gpt-4o-mini                A=0.682 c_raw=1.0000 |m|=0.347 s=0.064 shipped c=0.8172 LBO c=0.7739 (b1=+2.918) McNemar 312:256 p=0.0209
+    claude-3-5-haiku-20241022  vs deepseek-chat-v2_5         A=0.650 c_raw=1.0000 |m|=0.295 s=0.069 shipped c=0.8019 LBO c=0.7525 (b1=+2.464) McNemar 298:361 p=0.0157
+    Qwen1.5-14B-Chat           vs c4ai-command-r-v01         A=0.444 c_raw=0.9950 |m|=0.181 s=0.065 shipped c=0.8374 LBO c=0.7987 (b1=+3.343) McNemar 346:401 p=0.0481
+  IN SAMPLE on the 173 raw-called established pairs:  rule                          called  wrong  corr.surr
+    raw certificate                                        173      5          0
+    widener SHIPPED (b0 -3.2326 b1 +3.3133)                150      0         18
+    widener LBO-REFIT (per-pair refit)                     139      0         29
+    gate A < 0.30                                           19      0        149
+    gate A < 0.35                                           31      0        137
+    gate A < 0.40                                           65      0        103
+    gate A < 0.45                                           90      1         79
+    gate A < 0.50                                          106      1         63
+    gate A < 0.55                                          119      1         50
+    gate A < 0.60                                          128      1         41
+    gate A < 0.65                                          138      1         31
+    gate A < 0.70                                          158      3         13
+    gate A < 0.75                                          163      3          8
+    gate A < 0.80                                          164      3          7
+    gate A < 0.85                                          171      4          1
+    gate A < 0.90                                          173      5          0
+    gate A < 0.95                                          173      5          0
+    gate A < 1.00 (no gate)                                173      5          0
+  FULL BOARD context (189 pairs after exclusion; wrong as all(established); decline = drop unestablished):
+    raw                    called 178 wrong  8(5) | + decline: called 173 wrong 5(5)
+    widener SHIPPED        called 153 wrong  1(0) | + decline: called 150 wrong 0(0)
+    widener LBO-REFIT      called 142 wrong  1(0) | + decline: called 139 wrong 0(0)
+    gate A < 0.70          called 162 wrong  5(3) | + decline: called 158 wrong 3(3)
+    gate A < 0.75          called 167 wrong  5(3) | + decline: called 163 wrong 3(3)
+    gate A < 0.80          called 168 wrong  5(3) | + decline: called 164 wrong 3(3)
+    gate A < 0.85          called 176 wrong  7(4) | + decline: called 171 wrong 4(4)
+    gate A < 0.90          called 178 wrong  8(5) | + decline: called 173 wrong 5(5)
+  OUT OF FOLD (leave-both-endpoints-out threshold; grid 0.05 primary, 0.01 sensitivity; rule P trains on the 2538 per-anchor edges):
+    widener    rule   grid    called  wrong  corr.surr | widener  wrong  corr.surr | chosen t
+    SHIPPED    M      0.05       150      2         20 |              0         18 | 0.65 x11, 0.70 x162
+    SHIPPED    M      0.01       151      2         19 |              0         18 | 0.66 x1, 0.67 x4, 0.68 x34, 0.69 x115, 0.70 x19
+    SHIPPED    B      0.05       170      5          3 |              0         18 | 0.80 x139, 0.85 x16, 1.00 x18
+    SHIPPED    B      0.01       170      5          3 |              0         18 | 0.68 x4, 0.82 x138, 0.87 x14, 1.00 x17
+    SHIPPED    W      0.05        91      1         78 |              0         18 | 0.40 x141, 0.65 x30, 0.80 x2
+    SHIPPED    W      0.01       104      1         65 |              0         18 | 0.44 x141, 0.65 x28, 0.68 x2, 0.82 x2
+    SHIPPED    P      0.05       158      3         13 |              0         18 | 0.70 x173
+    SHIPPED    P      0.01       153      3         18 |              0         18 | 0.67 x2, 0.68 x9, 0.69 x32, 0.70 x78, 0.71 x48, 0.72 x4
+    LBO-REFIT  M      0.05       137      1         32 |              0         29 | 0.60 x7, 0.65 x166
+    LBO-REFIT  M      0.01       136      1         33 |              0         29 | 0.61 x1, 0.62 x3, 0.63 x8, 0.64 x28, 0.65 x31, 0.66 x35, 0.67 x49, 0.68 x18
+    LBO-REFIT  B      0.05       146      3         25 |              0         29 | 0.65 x48, 0.80 x106, 0.85 x8, 1.00 x11
+    LBO-REFIT  B      0.01       148      3         23 |              0         29 | 0.65 x42, 0.68 x102, 0.82 x27, 0.87 x1, 1.00 x1
+    LBO-REFIT  W      0.05        91      1         78 |              0         29 | 0.40 x141, 0.65 x30, 0.80 x2
+    LBO-REFIT  W      0.01       104      1         65 |              0         29 | 0.44 x141, 0.65 x28, 0.68 x2, 0.82 x2
+    LBO-REFIT  P      0.05       142      1         27 |              0         29 | 0.60 x1, 0.65 x143, 0.70 x29
+    LBO-REFIT  P      0.01       141      2         29 |              0         29 | 0.63 x13, 0.64 x43, 0.65 x39, 0.66 x37, 0.67 x19, 0.68 x14, 0.69 x5, 0.70 x1, 0.71 x1, 0.72 x1
+
+--- MERGED-190 | seed 137 ---
+  pairs 190 | established (McNemar p < 0.05 over the 2811 judged questions) 183 | excluded pair unestablished
+  Llama-3.1-8B vs command-r: key 0.3686 vs 0.3703 (gap -0.0018, McNemar 430:435 p=0.8918) | arena p(8B ahead)=0.0000 c_raw=1.0000 widener c=0.9660 A=0.391 -> arena right on the judged denominator; REMOVED from every count below
+  established pairs after exclusion 183, wrong-direction 9 | raw certificate at 0.975 on them: called 175, wrong 5
+  the established wrong pairs the raw certificate calls (these are what a rule must remove):
+    arx_0314                   vs iask_pro                   A=0.880 c_raw=1.0000 |m|=0.562 s=0.066 shipped c=0.7789 LBO c=0.7687 (b1=+2.400) McNemar 144:99 p=0.0047
+    arx_0314                   vs claude-3-5-sonnet-20241022 A=0.822 c_raw=1.0000 |m|=0.278 s=0.069 shipped c=0.6774 LBO c=0.6644 (b1=+2.324) McNemar 262:124 p=0.0000
+    deepseek-chat-v2_5         vs gpt-4o-mini                A=0.682 c_raw=1.0000 |m|=0.344 s=0.064 shipped c=0.8150 LBO c=0.7718 (b1=+2.918) McNemar 312:256 p=0.0209
+    claude-3-5-haiku-20241022  vs deepseek-chat-v2_5         A=0.650 c_raw=1.0000 |m|=0.288 s=0.068 shipped c=0.7967 LBO c=0.7478 (b1=+2.464) McNemar 298:361 p=0.0157
+    Qwen1.5-14B-Chat           vs c4ai-command-r-v01         A=0.444 c_raw=0.9925 |m|=0.178 s=0.068 shipped c=0.8328 LBO c=0.7946 (b1=+3.343) McNemar 346:401 p=0.0481
+  IN SAMPLE on the 175 raw-called established pairs:  rule                          called  wrong  corr.surr
+    raw certificate                                        175      5          0
+    widener SHIPPED (b0 -3.2326 b1 +3.3133)                150      0         20
+    widener LBO-REFIT (per-pair refit)                     139      0         31
+    gate A < 0.30                                           19      0        151
+    gate A < 0.35                                           31      0        139
+    gate A < 0.40                                           66      0        104
+    gate A < 0.45                                           91      1         80
+    gate A < 0.50                                          107      1         64
+    gate A < 0.55                                          121      1         50
+    gate A < 0.60                                          130      1         41
+    gate A < 0.65                                          140      1         31
+    gate A < 0.70                                          160      3         13
+    gate A < 0.75                                          165      3          8
+    gate A < 0.80                                          166      3          7
+    gate A < 0.85                                          173      4          1
+    gate A < 0.90                                          175      5          0
+    gate A < 0.95                                          175      5          0
+    gate A < 1.00 (no gate)                                175      5          0
+  FULL BOARD context (189 pairs after exclusion; wrong as all(established); decline = drop unestablished):
+    raw                    called 180 wrong  8(5) | + decline: called 175 wrong 5(5)
+    widener SHIPPED        called 153 wrong  1(0) | + decline: called 150 wrong 0(0)
+    widener LBO-REFIT      called 142 wrong  1(0) | + decline: called 139 wrong 0(0)
+    gate A < 0.70          called 164 wrong  5(3) | + decline: called 160 wrong 3(3)
+    gate A < 0.75          called 169 wrong  5(3) | + decline: called 165 wrong 3(3)
+    gate A < 0.80          called 170 wrong  5(3) | + decline: called 166 wrong 3(3)
+    gate A < 0.85          called 178 wrong  7(4) | + decline: called 173 wrong 4(4)
+    gate A < 0.90          called 180 wrong  8(5) | + decline: called 175 wrong 5(5)
+  OUT OF FOLD (leave-both-endpoints-out threshold; grid 0.05 primary, 0.01 sensitivity; rule P trains on the 2538 per-anchor edges):
+    widener    rule   grid    called  wrong  corr.surr | widener  wrong  corr.surr | chosen t
+    SHIPPED    M      0.05       145      1         26 |              0         20 | 0.65 x44, 0.70 x131
+    SHIPPED    M      0.01       148      2         24 |              0         20 | 0.65 x1, 0.66 x3, 0.67 x17, 0.68 x65, 0.69 x89
+    SHIPPED    B      0.05       172      5          3 |              0         20 | 0.80 x141, 0.85 x16, 1.00 x18
+    SHIPPED    B      0.01       164      3          9 |              0         20 | 0.68 x25, 0.82 x129, 0.87 x6, 1.00 x15
+    SHIPPED    W      0.05        92      1         79 |              0         20 | 0.40 x143, 0.65 x30, 0.80 x2
+    SHIPPED    W      0.01       105      1         66 |              0         20 | 0.44 x143, 0.65 x28, 0.68 x2, 0.82 x2
+    SHIPPED    P      0.05       160      3         13 |              0         20 | 0.70 x175
+    SHIPPED    P      0.01       155      3         18 |              0         20 | 0.67 x2, 0.68 x9, 0.69 x32, 0.70 x78, 0.71 x50, 0.72 x4
+    LBO-REFIT  M      0.05       137      1         34 |              0         31 | 0.60 x31, 0.65 x144
+    LBO-REFIT  M      0.01       138      1         33 |              0         31 | 0.59 x2, 0.61 x2, 0.62 x12, 0.63 x20, 0.64 x21, 0.65 x49, 0.66 x31, 0.67 x30, 0.68 x8
+    LBO-REFIT  B      0.05       148      3         25 |              0         31 | 0.65 x78, 0.80 x87, 0.85 x3, 1.00 x7
+    LBO-REFIT  B      0.01       150      3         23 |              0         31 | 0.65 x68, 0.68 x82, 0.82 x23, 0.87 x1, 1.00 x1
+    LBO-REFIT  W      0.05        92      1         79 |              0         31 | 0.40 x143, 0.65 x30, 0.80 x2
+    LBO-REFIT  W      0.01       105      1         66 |              0         31 | 0.44 x143, 0.65 x28, 0.68 x2, 0.82 x2
+    LBO-REFIT  P      0.05       144      1         27 |              0         31 | 0.60 x1, 0.65 x145, 0.70 x29
+    LBO-REFIT  P      0.01       143      2         29 |              0         31 | 0.63 x13, 0.64 x44, 0.65 x40, 0.66 x37, 0.67 x19, 0.68 x14, 0.69 x5, 0.70 x1, 0.71 x1, 0.72 x1
+
+--- MERGED-190 | seed 2048 ---
+  pairs 190 | established (McNemar p < 0.05 over the 2811 judged questions) 183 | excluded pair unestablished
+  Llama-3.1-8B vs command-r: key 0.3686 vs 0.3703 (gap -0.0018, McNemar 430:435 p=0.8918) | arena p(8B ahead)=0.0000 c_raw=1.0000 widener c=0.9663 A=0.391 -> arena right on the judged denominator; REMOVED from every count below
+  established pairs after exclusion 183, wrong-direction 9 | raw certificate at 0.975 on them: called 175, wrong 5
+  the established wrong pairs the raw certificate calls (these are what a rule must remove):
+    arx_0314                   vs iask_pro                   A=0.880 c_raw=1.0000 |m|=0.557 s=0.069 shipped c=0.7769 LBO c=0.7667 (b1=+2.400) McNemar 144:99 p=0.0047
+    arx_0314                   vs claude-3-5-sonnet-20241022 A=0.822 c_raw=1.0000 |m|=0.281 s=0.072 shipped c=0.6788 LBO c=0.6656 (b1=+2.324) McNemar 262:124 p=0.0000
+    deepseek-chat-v2_5         vs gpt-4o-mini                A=0.682 c_raw=1.0000 |m|=0.343 s=0.066 shipped c=0.8143 LBO c=0.7712 (b1=+2.918) McNemar 312:256 p=0.0209
+    claude-3-5-haiku-20241022  vs deepseek-chat-v2_5         A=0.650 c_raw=1.0000 |m|=0.292 s=0.068 shipped c=0.7998 LBO c=0.7505 (b1=+2.464) McNemar 298:361 p=0.0157
+    Qwen1.5-14B-Chat           vs c4ai-command-r-v01         A=0.444 c_raw=0.9950 |m|=0.185 s=0.068 shipped c=0.8415 LBO c=0.8031 (b1=+3.343) McNemar 346:401 p=0.0481
+  IN SAMPLE on the 175 raw-called established pairs:  rule                          called  wrong  corr.surr
+    raw certificate                                        175      5          0
+    widener SHIPPED (b0 -3.2326 b1 +3.3133)                150      0         20
+    widener LBO-REFIT (per-pair refit)                     139      0         31
+    gate A < 0.30                                           19      0        151
+    gate A < 0.35                                           31      0        139
+    gate A < 0.40                                           66      0        104
+    gate A < 0.45                                           91      1         80
+    gate A < 0.50                                          107      1         64
+    gate A < 0.55                                          121      1         50
+    gate A < 0.60                                          130      1         41
+    gate A < 0.65                                          140      1         31
+    gate A < 0.70                                          160      3         13
+    gate A < 0.75                                          165      3          8
+    gate A < 0.80                                          166      3          7
+    gate A < 0.85                                          173      4          1
+    gate A < 0.90                                          175      5          0
+    gate A < 0.95                                          175      5          0
+    gate A < 1.00 (no gate)                                175      5          0
+  FULL BOARD context (189 pairs after exclusion; wrong as all(established); decline = drop unestablished):
+    raw                    called 180 wrong  8(5) | + decline: called 175 wrong 5(5)
+    widener SHIPPED        called 153 wrong  1(0) | + decline: called 150 wrong 0(0)
+    widener LBO-REFIT      called 142 wrong  1(0) | + decline: called 139 wrong 0(0)
+    gate A < 0.70          called 164 wrong  5(3) | + decline: called 160 wrong 3(3)
+    gate A < 0.75          called 169 wrong  5(3) | + decline: called 165 wrong 3(3)
+    gate A < 0.80          called 170 wrong  5(3) | + decline: called 166 wrong 3(3)
+    gate A < 0.85          called 178 wrong  7(4) | + decline: called 173 wrong 4(4)
+    gate A < 0.90          called 180 wrong  8(5) | + decline: called 175 wrong 5(5)
+  OUT OF FOLD (leave-both-endpoints-out threshold; grid 0.05 primary, 0.01 sensitivity; rule P trains on the 2538 per-anchor edges):
+    widener    rule   grid    called  wrong  corr.surr | widener  wrong  corr.surr | chosen t
+    SHIPPED    M      0.05       145      1         26 |              0         20 | 0.65 x44, 0.70 x131
+    SHIPPED    M      0.01       148      2         24 |              0         20 | 0.65 x1, 0.66 x3, 0.67 x17, 0.68 x65, 0.69 x89
+    SHIPPED    B      0.05       172      5          3 |              0         20 | 0.80 x141, 0.85 x16, 1.00 x18
+    SHIPPED    B      0.01       164      3          9 |              0         20 | 0.68 x25, 0.82 x129, 0.87 x6, 1.00 x15
+    SHIPPED    W      0.05        92      1         79 |              0         20 | 0.40 x143, 0.65 x30, 0.80 x2
+    SHIPPED    W      0.01       105      1         66 |              0         20 | 0.44 x143, 0.65 x28, 0.68 x2, 0.82 x2
+    SHIPPED    P      0.05       160      3         13 |              0         20 | 0.70 x175
+    SHIPPED    P      0.01       155      3         18 |              0         20 | 0.67 x2, 0.68 x9, 0.69 x32, 0.70 x78, 0.71 x50, 0.72 x4
+    LBO-REFIT  M      0.05       137      1         34 |              0         31 | 0.60 x31, 0.65 x144
+    LBO-REFIT  M      0.01       138      1         33 |              0         31 | 0.59 x2, 0.61 x2, 0.62 x12, 0.63 x20, 0.64 x21, 0.65 x49, 0.66 x31, 0.67 x30, 0.68 x8
+    LBO-REFIT  B      0.05       148      3         25 |              0         31 | 0.65 x78, 0.80 x87, 0.85 x3, 1.00 x7
+    LBO-REFIT  B      0.01       150      3         23 |              0         31 | 0.65 x68, 0.68 x82, 0.82 x23, 0.87 x1, 1.00 x1
+    LBO-REFIT  W      0.05        92      1         79 |              0         31 | 0.40 x143, 0.65 x30, 0.80 x2
+    LBO-REFIT  W      0.01       105      1         66 |              0         31 | 0.44 x143, 0.65 x28, 0.68 x2, 0.82 x2
+    LBO-REFIT  P      0.05       144      1         27 |              0         31 | 0.60 x1, 0.65 x145, 0.70 x29
+    LBO-REFIT  P      0.01       143      2         29 |              0         31 | 0.63 x13, 0.64 x44, 0.65 x40, 0.66 x37, 0.67 x19, 0.68 x14, 0.69 x5, 0.70 x1, 0.71 x1, 0.72 x1
+
+--- MERGED-190 | seed 7 ---
+  pairs 190 | established (McNemar p < 0.05 over the 2811 judged questions) 183 | excluded pair unestablished
+  Llama-3.1-8B vs command-r: key 0.3686 vs 0.3703 (gap -0.0018, McNemar 430:435 p=0.8918) | arena p(8B ahead)=0.0000 c_raw=1.0000 widener c=0.9662 A=0.391 -> arena right on the judged denominator; REMOVED from every count below
+  established pairs after exclusion 183, wrong-direction 9 | raw certificate at 0.975 on them: called 174, wrong 5
+  the established wrong pairs the raw certificate calls (these are what a rule must remove):
+    arx_0314                   vs iask_pro                   A=0.880 c_raw=1.0000 |m|=0.564 s=0.064 shipped c=0.7797 LBO c=0.7694 (b1=+2.400) McNemar 144:99 p=0.0047
+    arx_0314                   vs claude-3-5-sonnet-20241022 A=0.822 c_raw=1.0000 |m|=0.277 s=0.072 shipped c=0.6766 LBO c=0.6636 (b1=+2.324) McNemar 262:124 p=0.0000
+    deepseek-chat-v2_5         vs gpt-4o-mini                A=0.682 c_raw=1.0000 |m|=0.346 s=0.070 shipped c=0.8156 LBO c=0.7726 (b1=+2.918) McNemar 312:256 p=0.0209
+    claude-3-5-haiku-20241022  vs deepseek-chat-v2_5         A=0.650 c_raw=1.0000 |m|=0.291 s=0.066 shipped c=0.7997 LBO c=0.7504 (b1=+2.464) McNemar 298:361 p=0.0157
+    Qwen1.5-14B-Chat           vs c4ai-command-r-v01         A=0.444 c_raw=1.0000 |m|=0.174 s=0.066 shipped c=0.8281 LBO c=0.7898 (b1=+3.343) McNemar 346:401 p=0.0481
+  IN SAMPLE on the 174 raw-called established pairs:  rule                          called  wrong  corr.surr
+    raw certificate                                        174      5          0
+    widener SHIPPED (b0 -3.2326 b1 +3.3133)                150      0         19
+    widener LBO-REFIT (per-pair refit)                     140      0         29
+    gate A < 0.30                                           19      0        150
+    gate A < 0.35                                           31      0        138
+    gate A < 0.40                                           65      0        104
+    gate A < 0.45                                           90      1         80
+    gate A < 0.50                                          106      1         64
+    gate A < 0.55                                          120      1         50
+    gate A < 0.60                                          129      1         41
+    gate A < 0.65                                          139      1         31
+    gate A < 0.70                                          159      3         13
+    gate A < 0.75                                          164      3          8
+    gate A < 0.80                                          165      3          7
+    gate A < 0.85                                          172      4          1
+    gate A < 0.90                                          174      5          0
+    gate A < 0.95                                          174      5          0
+    gate A < 1.00 (no gate)                                174      5          0
+  FULL BOARD context (189 pairs after exclusion; wrong as all(established); decline = drop unestablished):
+    raw                    called 179 wrong  8(5) | + decline: called 174 wrong 5(5)
+    widener SHIPPED        called 153 wrong  1(0) | + decline: called 150 wrong 0(0)
+    widener LBO-REFIT      called 143 wrong  1(0) | + decline: called 140 wrong 0(0)
+    gate A < 0.70          called 163 wrong  5(3) | + decline: called 159 wrong 3(3)
+    gate A < 0.75          called 168 wrong  5(3) | + decline: called 164 wrong 3(3)
+    gate A < 0.80          called 169 wrong  5(3) | + decline: called 165 wrong 3(3)
+    gate A < 0.85          called 177 wrong  7(4) | + decline: called 172 wrong 4(4)
+    gate A < 0.90          called 179 wrong  8(5) | + decline: called 174 wrong 5(5)
+  OUT OF FOLD (leave-both-endpoints-out threshold; grid 0.05 primary, 0.01 sensitivity; rule P trains on the 2538 per-anchor edges):
+    widener    rule   grid    called  wrong  corr.surr | widener  wrong  corr.surr | chosen t
+    SHIPPED    M      0.05       148      1         22 |              0         19 | 0.65 x23, 0.70 x151
+    SHIPPED    M      0.01       151      2         20 |              0         19 | 0.65 x1, 0.66 x1, 0.67 x9, 0.68 x52, 0.69 x106, 0.70 x5
+    SHIPPED    B      0.05       171      5          3 |              0         19 | 0.80 x140, 0.85 x16, 1.00 x18
+    SHIPPED    B      0.01       168      4          5 |              0         19 | 0.68 x10, 0.82 x137, 0.87 x11, 1.00 x16
+    SHIPPED    W      0.05        91      1         79 |              0         19 | 0.40 x142, 0.65 x30, 0.80 x2
+    SHIPPED    W      0.01       104      1         66 |              0         19 | 0.44 x142, 0.65 x28, 0.68 x2, 0.82 x2
+    SHIPPED    P      0.05       159      3         13 |              0         19 | 0.70 x174
+    SHIPPED    P      0.01       154      3         18 |              0         19 | 0.67 x2, 0.68 x9, 0.69 x32, 0.70 x78, 0.71 x49, 0.72 x4
+    LBO-REFIT  M      0.05       138      1         32 |              0         29 | 0.60 x7, 0.65 x167
+    LBO-REFIT  M      0.01       137      1         33 |              0         29 | 0.61 x1, 0.62 x3, 0.63 x8, 0.64 x29, 0.65 x34, 0.66 x38, 0.67 x42, 0.68 x19
+    LBO-REFIT  B      0.05       147      3         25 |              0         29 | 0.65 x50, 0.80 x105, 0.85 x9, 1.00 x10
+    LBO-REFIT  B      0.01       149      3         23 |              0         29 | 0.65 x43, 0.68 x103, 0.82 x26, 0.87 x1, 1.00 x1
+    LBO-REFIT  W      0.05        91      1         79 |              0         29 | 0.40 x142, 0.65 x30, 0.80 x2
+    LBO-REFIT  W      0.01       104      1         66 |              0         29 | 0.44 x142, 0.65 x28, 0.68 x2, 0.82 x2
+    LBO-REFIT  P      0.05       143      1         27 |              0         29 | 0.60 x1, 0.65 x144, 0.70 x29
+    LBO-REFIT  P      0.01       142      2         29 |              0         29 | 0.63 x13, 0.64 x44, 0.65 x39, 0.66 x37, 0.67 x19, 0.68 x14, 0.69 x5, 0.70 x1, 0.71 x1, 0.72 x1
+
+--- MERGED-190 | seed 31337 ---
+  pairs 190 | established (McNemar p < 0.05 over the 2811 judged questions) 183 | excluded pair unestablished
+  Llama-3.1-8B vs command-r: key 0.3686 vs 0.3703 (gap -0.0018, McNemar 430:435 p=0.8918) | arena p(8B ahead)=0.0000 c_raw=1.0000 widener c=0.9630 A=0.391 -> arena right on the judged denominator; REMOVED from every count below
+  established pairs after exclusion 183, wrong-direction 9 | raw certificate at 0.975 on them: called 175, wrong 5
+  the established wrong pairs the raw certificate calls (these are what a rule must remove):
+    arx_0314                   vs iask_pro                   A=0.880 c_raw=1.0000 |m|=0.563 s=0.068 shipped c=0.7792 LBO c=0.7689 (b1=+2.400) McNemar 144:99 p=0.0047
+    arx_0314                   vs claude-3-5-sonnet-20241022 A=0.822 c_raw=1.0000 |m|=0.282 s=0.067 shipped c=0.6793 LBO c=0.6661 (b1=+2.324) McNemar 262:124 p=0.0000
+    deepseek-chat-v2_5         vs gpt-4o-mini                A=0.682 c_raw=1.0000 |m|=0.338 s=0.063 shipped c=0.8114 LBO c=0.7684 (b1=+2.918) McNemar 312:256 p=0.0209
+    claude-3-5-haiku-20241022  vs deepseek-chat-v2_5         A=0.650 c_raw=1.0000 |m|=0.284 s=0.063 shipped c=0.7940 LBO c=0.7450 (b1=+2.464) McNemar 298:361 p=0.0157
+    Qwen1.5-14B-Chat           vs c4ai-command-r-v01         A=0.444 c_raw=0.9925 |m|=0.184 s=0.068 shipped c=0.8404 LBO c=0.8021 (b1=+3.343) McNemar 346:401 p=0.0481
+  IN SAMPLE on the 175 raw-called established pairs:  rule                          called  wrong  corr.surr
+    raw certificate                                        175      5          0
+    widener SHIPPED (b0 -3.2326 b1 +3.3133)                150      0         20
+    widener LBO-REFIT (per-pair refit)                     139      0         31
+    gate A < 0.30                                           19      0        151
+    gate A < 0.35                                           31      0        139
+    gate A < 0.40                                           66      0        104
+    gate A < 0.45                                           91      1         80
+    gate A < 0.50                                          107      1         64
+    gate A < 0.55                                          121      1         50
+    gate A < 0.60                                          130      1         41
+    gate A < 0.65                                          140      1         31
+    gate A < 0.70                                          160      3         13
+    gate A < 0.75                                          165      3          8
+    gate A < 0.80                                          166      3          7
+    gate A < 0.85                                          173      4          1
+    gate A < 0.90                                          175      5          0
+    gate A < 0.95                                          175      5          0
+    gate A < 1.00 (no gate)                                175      5          0
+  FULL BOARD context (189 pairs after exclusion; wrong as all(established); decline = drop unestablished):
+    raw                    called 180 wrong  8(5) | + decline: called 175 wrong 5(5)
+    widener SHIPPED        called 153 wrong  1(0) | + decline: called 150 wrong 0(0)
+    widener LBO-REFIT      called 142 wrong  1(0) | + decline: called 139 wrong 0(0)
+    gate A < 0.70          called 164 wrong  5(3) | + decline: called 160 wrong 3(3)
+    gate A < 0.75          called 169 wrong  5(3) | + decline: called 165 wrong 3(3)
+    gate A < 0.80          called 170 wrong  5(3) | + decline: called 166 wrong 3(3)
+    gate A < 0.85          called 178 wrong  7(4) | + decline: called 173 wrong 4(4)
+    gate A < 0.90          called 180 wrong  8(5) | + decline: called 175 wrong 5(5)
+  OUT OF FOLD (leave-both-endpoints-out threshold; grid 0.05 primary, 0.01 sensitivity; rule P trains on the 2538 per-anchor edges):
+    widener    rule   grid    called  wrong  corr.surr | widener  wrong  corr.surr | chosen t
+    SHIPPED    M      0.05       145      1         26 |              0         20 | 0.65 x44, 0.70 x131
+    SHIPPED    M      0.01       148      2         24 |              0         20 | 0.65 x1, 0.66 x3, 0.67 x17, 0.68 x65, 0.69 x89
+    SHIPPED    B      0.05       172      5          3 |              0         20 | 0.80 x141, 0.85 x16, 1.00 x18
+    SHIPPED    B      0.01       164      3          9 |              0         20 | 0.68 x25, 0.82 x129, 0.87 x6, 1.00 x15
+    SHIPPED    W      0.05        92      1         79 |              0         20 | 0.40 x143, 0.65 x30, 0.80 x2
+    SHIPPED    W      0.01       105      1         66 |              0         20 | 0.44 x143, 0.65 x28, 0.68 x2, 0.82 x2
+    SHIPPED    P      0.05       160      3         13 |              0         20 | 0.70 x175
+    SHIPPED    P      0.01       155      3         18 |              0         20 | 0.67 x2, 0.68 x9, 0.69 x32, 0.70 x78, 0.71 x50, 0.72 x4
+    LBO-REFIT  M      0.05       137      1         34 |              0         31 | 0.60 x31, 0.65 x144
+    LBO-REFIT  M      0.01       138      1         33 |              0         31 | 0.59 x2, 0.61 x2, 0.62 x12, 0.63 x20, 0.64 x21, 0.65 x49, 0.66 x31, 0.67 x30, 0.68 x8
+    LBO-REFIT  B      0.05       148      3         25 |              0         31 | 0.65 x78, 0.80 x87, 0.85 x3, 1.00 x7
+    LBO-REFIT  B      0.01       150      3         23 |              0         31 | 0.65 x68, 0.68 x82, 0.82 x23, 0.87 x1, 1.00 x1
+    LBO-REFIT  W      0.05        92      1         79 |              0         31 | 0.40 x143, 0.65 x30, 0.80 x2
+    LBO-REFIT  W      0.01       105      1         66 |              0         31 | 0.44 x143, 0.65 x28, 0.68 x2, 0.82 x2
+    LBO-REFIT  P      0.05       144      1         27 |              0         31 | 0.60 x1, 0.65 x145, 0.70 x29
+    LBO-REFIT  P      0.01       143      2         29 |              0         31 | 0.63 x13, 0.64 x44, 0.65 x40, 0.66 x37, 0.67 x19, 0.68 x14, 0.69 x5, 0.70 x1, 0.71 x1, 0.72 x1
+
+=== SECONDARY: the pooled 66-pair x12 board on which v87 ADOPTED SPLIT was scored (300 draws) ===
+
+--- X12-66 | seed 43 ---
+  pairs 66 | established (McNemar p < 0.05 over the 2811 judged questions) 65 | excluded pair unestablished
+  Llama-3.1-8B vs command-r: key 0.3686 vs 0.3703 (gap -0.0018, McNemar 430:435 p=0.8918) | arena p(8B ahead)=0.0000 c_raw=1.0000 widener c=0.9638 A=0.391 -> arena right on the judged denominator; REMOVED from every count below
+  established pairs after exclusion 65, wrong-direction 2 | raw certificate at 0.975 on them: called 62, wrong 1
+  the established wrong pairs the raw certificate calls (these are what a rule must remove):
+    arx_0314                   vs iask_pro                   A=0.880 c_raw=1.0000 |m|=0.567 s=0.077 shipped c=0.7805 LBO c=0.8778 (b1=+2.201) McNemar 144:99 p=0.0047
+  IN SAMPLE on the 62 raw-called established pairs:  rule                          called  wrong  corr.surr
+    raw certificate                                         62      1          0
+    widener SHIPPED (b0 -3.2326 b1 +3.3133)                 57      0          4
+    widener LBO-REFIT (per-pair refit)                      56      0          5
+    gate A < 0.30                                           11      0         50
+    gate A < 0.35                                           18      0         43
+    gate A < 0.40                                           33      0         28
+    gate A < 0.45                                           42      0         19
+    gate A < 0.50                                           44      0         17
+    gate A < 0.55                                           44      0         17
+    gate A < 0.60                                           45      0         16
+    gate A < 0.65                                           50      0         11
+    gate A < 0.70                                           57      0          4
+    gate A < 0.75                                           58      0          3
+    gate A < 0.80                                           59      0          2
+    gate A < 0.85                                           60      0          1
+    gate A < 0.90                                           62      1          0
+    gate A < 0.95                                           62      1          0
+    gate A < 1.00 (no gate)                                 62      1          0
+  FULL BOARD context (65 pairs after exclusion; wrong as all(established); decline = drop unestablished):
+    raw                    called  62 wrong  1(1) | + decline: called  62 wrong 1(1)
+    widener SHIPPED        called  57 wrong  0(0) | + decline: called  57 wrong 0(0)
+    widener LBO-REFIT      called  56 wrong  0(0) | + decline: called  56 wrong 0(0)
+    gate A < 0.70          called  57 wrong  0(0) | + decline: called  57 wrong 0(0)
+    gate A < 0.75          called  58 wrong  0(0) | + decline: called  58 wrong 0(0)
+    gate A < 0.80          called  59 wrong  0(0) | + decline: called  59 wrong 0(0)
+    gate A < 0.85          called  60 wrong  0(0) | + decline: called  60 wrong 0(0)
+    gate A < 0.90          called  62 wrong  1(1) | + decline: called  62 wrong 1(1)
+  OUT OF FOLD (leave-both-endpoints-out threshold; grid 0.05 primary, 0.01 sensitivity; rule P trains on the 891 per-anchor edges):
+    widener    rule   grid    called  wrong  corr.surr | widener  wrong  corr.surr | chosen t
+    SHIPPED    M      0.05        60      0          1 |              0          4 | 0.70 x26, 0.75 x23, 0.80 x3, 0.85 x10
+    SHIPPED    M      0.01        56      0          5 |              0          4 | 0.64 x1, 0.67 x7, 0.69 x1, 0.70 x26, 0.77 x16, 0.81 x2, 0.86 x8, 0.87 x1
+    SHIPPED    B      0.05        62      1          0 |              0          4 | 0.85 x43, 1.00 x19
+    SHIPPED    B      0.01        62      1          0 |              0          4 | 0.87 x43, 1.00 x19
+    SHIPPED    W      0.05        62      1          0 |              0          4 | 0.85 x43, 1.00 x19
+    SHIPPED    W      0.01        62      1          0 |              0          4 | 0.87 x43, 1.00 x19
+    SHIPPED    P      0.05        57      0          4 |              0          4 | 0.70 x10, 0.75 x52
+    SHIPPED    P      0.01        58      0          3 |              0          4 | 0.70 x4, 0.71 x4, 0.72 x1, 0.73 x7, 0.74 x16, 0.75 x14, 0.76 x10, 0.77 x6
+    LBO-REFIT  M      0.05        51      0         10 |              0          5 | 0.60 x1, 0.65 x9, 0.70 x24, 0.75 x17, 0.80 x5, 0.85 x6
+    LBO-REFIT  M      0.01        53      0          8 |              0          5 | 0.64 x1, 0.65 x2, 0.66 x2, 0.67 x10, 0.69 x11, 0.70 x16, 0.77 x13, 0.81 x5, 0.86 x2
+    LBO-REFIT  B      0.05        62      1          0 |              0          5 | 0.85 x43, 1.00 x19
+    LBO-REFIT  B      0.01        62      1          0 |              0          5 | 0.87 x43, 1.00 x19
+    LBO-REFIT  W      0.05        62      1          0 |              0          5 | 0.85 x43, 1.00 x19
+    LBO-REFIT  W      0.01        62      1          0 |              0          5 | 0.87 x43, 1.00 x19
+    LBO-REFIT  P      0.05        58      0          3 |              0          5 | 0.70 x15, 0.75 x42, 0.80 x5
+    LBO-REFIT  P      0.01        58      0          3 |              0          5 | 0.69 x2, 0.71 x5, 0.72 x8, 0.73 x12, 0.74 x12, 0.75 x5, 0.76 x6, 0.77 x6, 0.78 x4, 0.79 x2
+
+--- X12-66 | seed 137 ---
+  pairs 66 | established (McNemar p < 0.05 over the 2811 judged questions) 65 | excluded pair unestablished
+  Llama-3.1-8B vs command-r: key 0.3686 vs 0.3703 (gap -0.0018, McNemar 430:435 p=0.8918) | arena p(8B ahead)=0.0000 c_raw=1.0000 widener c=0.9650 A=0.391 -> arena right on the judged denominator; REMOVED from every count below
+  established pairs after exclusion 65, wrong-direction 2 | raw certificate at 0.975 on them: called 62, wrong 1
+  the established wrong pairs the raw certificate calls (these are what a rule must remove):
+    arx_0314                   vs iask_pro                   A=0.880 c_raw=1.0000 |m|=0.563 s=0.070 shipped c=0.7793 LBO c=0.8769 (b1=+2.201) McNemar 144:99 p=0.0047
+  IN SAMPLE on the 62 raw-called established pairs:  rule                          called  wrong  corr.surr
+    raw certificate                                         62      1          0
+    widener SHIPPED (b0 -3.2326 b1 +3.3133)                 57      0          4
+    widener LBO-REFIT (per-pair refit)                      56      0          5
+    gate A < 0.30                                           11      0         50
+    gate A < 0.35                                           18      0         43
+    gate A < 0.40                                           33      0         28
+    gate A < 0.45                                           42      0         19
+    gate A < 0.50                                           44      0         17
+    gate A < 0.55                                           44      0         17
+    gate A < 0.60                                           45      0         16
+    gate A < 0.65                                           50      0         11
+    gate A < 0.70                                           57      0          4
+    gate A < 0.75                                           58      0          3
+    gate A < 0.80                                           59      0          2
+    gate A < 0.85                                           60      0          1
+    gate A < 0.90                                           62      1          0
+    gate A < 0.95                                           62      1          0
+    gate A < 1.00 (no gate)                                 62      1          0
+  FULL BOARD context (65 pairs after exclusion; wrong as all(established); decline = drop unestablished):
+    raw                    called  62 wrong  1(1) | + decline: called  62 wrong 1(1)
+    widener SHIPPED        called  57 wrong  0(0) | + decline: called  57 wrong 0(0)
+    widener LBO-REFIT      called  56 wrong  0(0) | + decline: called  56 wrong 0(0)
+    gate A < 0.70          called  57 wrong  0(0) | + decline: called  57 wrong 0(0)
+    gate A < 0.75          called  58 wrong  0(0) | + decline: called  58 wrong 0(0)
+    gate A < 0.80          called  59 wrong  0(0) | + decline: called  59 wrong 0(0)
+    gate A < 0.85          called  60 wrong  0(0) | + decline: called  60 wrong 0(0)
+    gate A < 0.90          called  62 wrong  1(1) | + decline: called  62 wrong 1(1)
+  OUT OF FOLD (leave-both-endpoints-out threshold; grid 0.05 primary, 0.01 sensitivity; rule P trains on the 891 per-anchor edges):
+    widener    rule   grid    called  wrong  corr.surr | widener  wrong  corr.surr | chosen t
+    SHIPPED    M      0.05        60      0          1 |              0          4 | 0.70 x26, 0.75 x23, 0.80 x3, 0.85 x10
+    SHIPPED    M      0.01        56      0          5 |              0          4 | 0.64 x1, 0.67 x7, 0.69 x1, 0.70 x26, 0.77 x16, 0.81 x2, 0.86 x8, 0.87 x1
+    SHIPPED    B      0.05        62      1          0 |              0          4 | 0.85 x43, 1.00 x19
+    SHIPPED    B      0.01        62      1          0 |              0          4 | 0.87 x43, 1.00 x19
+    SHIPPED    W      0.05        62      1          0 |              0          4 | 0.85 x43, 1.00 x19
+    SHIPPED    W      0.01        62      1          0 |              0          4 | 0.87 x43, 1.00 x19
+    SHIPPED    P      0.05        57      0          4 |              0          4 | 0.70 x10, 0.75 x52
+    SHIPPED    P      0.01        58      0          3 |              0          4 | 0.70 x4, 0.71 x4, 0.72 x1, 0.73 x7, 0.74 x16, 0.75 x14, 0.76 x10, 0.77 x6
+    LBO-REFIT  M      0.05        51      0         10 |              0          5 | 0.60 x1, 0.65 x9, 0.70 x24, 0.75 x17, 0.80 x5, 0.85 x6
+    LBO-REFIT  M      0.01        53      0          8 |              0          5 | 0.64 x1, 0.65 x2, 0.66 x2, 0.67 x10, 0.69 x11, 0.70 x16, 0.77 x13, 0.81 x5, 0.86 x2
+    LBO-REFIT  B      0.05        62      1          0 |              0          5 | 0.85 x43, 1.00 x19
+    LBO-REFIT  B      0.01        62      1          0 |              0          5 | 0.87 x43, 1.00 x19
+    LBO-REFIT  W      0.05        62      1          0 |              0          5 | 0.85 x43, 1.00 x19
+    LBO-REFIT  W      0.01        62      1          0 |              0          5 | 0.87 x43, 1.00 x19
+    LBO-REFIT  P      0.05        58      0          3 |              0          5 | 0.70 x15, 0.75 x42, 0.80 x5
+    LBO-REFIT  P      0.01        58      0          3 |              0          5 | 0.69 x2, 0.71 x5, 0.72 x8, 0.73 x12, 0.74 x12, 0.75 x5, 0.76 x6, 0.77 x6, 0.78 x4, 0.79 x2
+
+--- X12-66 | seed 2048 ---
+  pairs 66 | established (McNemar p < 0.05 over the 2811 judged questions) 65 | excluded pair unestablished
+  Llama-3.1-8B vs command-r: key 0.3686 vs 0.3703 (gap -0.0018, McNemar 430:435 p=0.8918) | arena p(8B ahead)=0.0000 c_raw=1.0000 widener c=0.9650 A=0.391 -> arena right on the judged denominator; REMOVED from every count below
+  established pairs after exclusion 65, wrong-direction 2 | raw certificate at 0.975 on them: called 63, wrong 1
+  the established wrong pairs the raw certificate calls (these are what a rule must remove):
+    arx_0314                   vs iask_pro                   A=0.880 c_raw=1.0000 |m|=0.558 s=0.075 shipped c=0.7772 LBO c=0.8745 (b1=+2.201) McNemar 144:99 p=0.0047
+  IN SAMPLE on the 63 raw-called established pairs:  rule                          called  wrong  corr.surr
+    raw certificate                                         63      1          0
+    widener SHIPPED (b0 -3.2326 b1 +3.3133)                 56      0          6
+    widener LBO-REFIT (per-pair refit)                      56      0          6
+    gate A < 0.30                                           11      0         51
+    gate A < 0.35                                           18      0         44
+    gate A < 0.40                                           33      0         29
+    gate A < 0.45                                           42      0         20
+    gate A < 0.50                                           44      0         18
+    gate A < 0.55                                           44      0         18
+    gate A < 0.60                                           45      0         17
+    gate A < 0.65                                           51      0         11
+    gate A < 0.70                                           58      0          4
+    gate A < 0.75                                           59      0          3
+    gate A < 0.80                                           60      0          2
+    gate A < 0.85                                           61      0          1
+    gate A < 0.90                                           63      1          0
+    gate A < 0.95                                           63      1          0
+    gate A < 1.00 (no gate)                                 63      1          0
+  FULL BOARD context (65 pairs after exclusion; wrong as all(established); decline = drop unestablished):
+    raw                    called  63 wrong  1(1) | + decline: called  63 wrong 1(1)
+    widener SHIPPED        called  56 wrong  0(0) | + decline: called  56 wrong 0(0)
+    widener LBO-REFIT      called  56 wrong  0(0) | + decline: called  56 wrong 0(0)
+    gate A < 0.70          called  58 wrong  0(0) | + decline: called  58 wrong 0(0)
+    gate A < 0.75          called  59 wrong  0(0) | + decline: called  59 wrong 0(0)
+    gate A < 0.80          called  60 wrong  0(0) | + decline: called  60 wrong 0(0)
+    gate A < 0.85          called  61 wrong  0(0) | + decline: called  61 wrong 0(0)
+    gate A < 0.90          called  63 wrong  1(1) | + decline: called  63 wrong 1(1)
+  OUT OF FOLD (leave-both-endpoints-out threshold; grid 0.05 primary, 0.01 sensitivity; rule P trains on the 891 per-anchor edges):
+    widener    rule   grid    called  wrong  corr.surr | widener  wrong  corr.surr | chosen t
+    SHIPPED    M      0.05        53      0          9 |              0          6 | 0.60 x1, 0.65 x10, 0.70 x41, 0.75 x5, 0.85 x6
+    SHIPPED    M      0.01        55      0          7 |              0          6 | 0.64 x1, 0.65 x3, 0.66 x3, 0.67 x8, 0.69 x22, 0.70 x26
+    SHIPPED    B      0.05        63      1          0 |              0          6 | 0.85 x44, 1.00 x19
+    SHIPPED    B      0.01        63      1          0 |              0          6 | 0.87 x44, 1.00 x19
+    SHIPPED    W      0.05        63      1          0 |              0          6 | 0.85 x44, 1.00 x19
+    SHIPPED    W      0.01        63      1          0 |              0          6 | 0.87 x44, 1.00 x19
+    SHIPPED    P      0.05        58      0          4 |              0          6 | 0.70 x10, 0.75 x53
+    SHIPPED    P      0.01        59      0          3 |              0          6 | 0.70 x4, 0.71 x4, 0.72 x1, 0.73 x8, 0.74 x16, 0.75 x14, 0.76 x10, 0.77 x6
+    LBO-REFIT  M      0.05        52      0         10 |              0          6 | 0.60 x1, 0.65 x13, 0.70 x32, 0.75 x12, 0.85 x5
+    LBO-REFIT  M      0.01        54      0          8 |              0          6 | 0.64 x2, 0.65 x4, 0.66 x3, 0.67 x13, 0.69 x13, 0.70 x21, 0.77 x7
+    LBO-REFIT  B      0.05        63      1          0 |              0          6 | 0.85 x44, 1.00 x19
+    LBO-REFIT  B      0.01        63      1          0 |              0          6 | 0.87 x44, 1.00 x19
+    LBO-REFIT  W      0.05        63      1          0 |              0          6 | 0.85 x44, 1.00 x19
+    LBO-REFIT  W      0.01        63      1          0 |              0          6 | 0.87 x44, 1.00 x19
+    LBO-REFIT  P      0.05        59      0          3 |              0          6 | 0.70 x15, 0.75 x43, 0.80 x5
+    LBO-REFIT  P      0.01        59      0          3 |              0          6 | 0.69 x2, 0.71 x5, 0.72 x8, 0.73 x12, 0.74 x12, 0.75 x6, 0.76 x6, 0.77 x6, 0.78 x4, 0.79 x2
+
+--- X12-66 | seed 7 ---
+  pairs 66 | established (McNemar p < 0.05 over the 2811 judged questions) 65 | excluded pair unestablished
+  Llama-3.1-8B vs command-r: key 0.3686 vs 0.3703 (gap -0.0018, McNemar 430:435 p=0.8918) | arena p(8B ahead)=0.0000 c_raw=1.0000 widener c=0.9716 A=0.391 -> arena right on the judged denominator; REMOVED from every count below
+  established pairs after exclusion 65, wrong-direction 2 | raw certificate at 0.975 on them: called 62, wrong 1
+  the established wrong pairs the raw certificate calls (these are what a rule must remove):
+    arx_0314                   vs iask_pro                   A=0.880 c_raw=1.0000 |m|=0.562 s=0.069 shipped c=0.7787 LBO c=0.8764 (b1=+2.201) McNemar 144:99 p=0.0047
+  IN SAMPLE on the 62 raw-called established pairs:  rule                          called  wrong  corr.surr
+    raw certificate                                         62      1          0
+    widener SHIPPED (b0 -3.2326 b1 +3.3133)                 56      0          5
+    widener LBO-REFIT (per-pair refit)                      56      0          5
+    gate A < 0.30                                           11      0         50
+    gate A < 0.35                                           18      0         43
+    gate A < 0.40                                           33      0         28
+    gate A < 0.45                                           42      0         19
+    gate A < 0.50                                           44      0         17
+    gate A < 0.55                                           44      0         17
+    gate A < 0.60                                           45      0         16
+    gate A < 0.65                                           50      0         11
+    gate A < 0.70                                           57      0          4
+    gate A < 0.75                                           58      0          3
+    gate A < 0.80                                           59      0          2
+    gate A < 0.85                                           60      0          1
+    gate A < 0.90                                           62      1          0
+    gate A < 0.95                                           62      1          0
+    gate A < 1.00 (no gate)                                 62      1          0
+  FULL BOARD context (65 pairs after exclusion; wrong as all(established); decline = drop unestablished):
+    raw                    called  62 wrong  1(1) | + decline: called  62 wrong 1(1)
+    widener SHIPPED        called  56 wrong  0(0) | + decline: called  56 wrong 0(0)
+    widener LBO-REFIT      called  56 wrong  0(0) | + decline: called  56 wrong 0(0)
+    gate A < 0.70          called  57 wrong  0(0) | + decline: called  57 wrong 0(0)
+    gate A < 0.75          called  58 wrong  0(0) | + decline: called  58 wrong 0(0)
+    gate A < 0.80          called  59 wrong  0(0) | + decline: called  59 wrong 0(0)
+    gate A < 0.85          called  60 wrong  0(0) | + decline: called  60 wrong 0(0)
+    gate A < 0.90          called  62 wrong  1(1) | + decline: called  62 wrong 1(1)
+  OUT OF FOLD (leave-both-endpoints-out threshold; grid 0.05 primary, 0.01 sensitivity; rule P trains on the 891 per-anchor edges):
+    widener    rule   grid    called  wrong  corr.surr | widener  wrong  corr.surr | chosen t
+    SHIPPED    M      0.05        54      0          7 |              0          5 | 0.60 x1, 0.65 x5, 0.70 x38, 0.75 x10, 0.85 x8
+    SHIPPED    M      0.01        54      0          7 |              0          5 | 0.64 x1, 0.66 x3, 0.67 x8, 0.69 x11, 0.70 x31, 0.77 x4, 0.86 x4
+    SHIPPED    B      0.05        62      1          0 |              0          5 | 0.85 x43, 1.00 x19
+    SHIPPED    B      0.01        62      1          0 |              0          5 | 0.87 x43, 1.00 x19
+    SHIPPED    W      0.05        62      1          0 |              0          5 | 0.85 x43, 1.00 x19
+    SHIPPED    W      0.01        62      1          0 |              0          5 | 0.87 x43, 1.00 x19
+    SHIPPED    P      0.05        57      0          4 |              0          5 | 0.70 x10, 0.75 x52
+    SHIPPED    P      0.01        58      0          3 |              0          5 | 0.70 x4, 0.71 x4, 0.72 x1, 0.73 x7, 0.74 x16, 0.75 x14, 0.76 x10, 0.77 x6
+    LBO-REFIT  M      0.05        51      0         10 |              0          5 | 0.60 x1, 0.65 x9, 0.70 x24, 0.75 x17, 0.80 x5, 0.85 x6
+    LBO-REFIT  M      0.01        53      0          8 |              0          5 | 0.64 x1, 0.65 x2, 0.66 x2, 0.67 x10, 0.69 x11, 0.70 x16, 0.77 x13, 0.81 x5, 0.86 x2
+    LBO-REFIT  B      0.05        62      1          0 |              0          5 | 0.85 x43, 1.00 x19
+    LBO-REFIT  B      0.01        62      1          0 |              0          5 | 0.87 x43, 1.00 x19
+    LBO-REFIT  W      0.05        62      1          0 |              0          5 | 0.85 x43, 1.00 x19
+    LBO-REFIT  W      0.01        62      1          0 |              0          5 | 0.87 x43, 1.00 x19
+    LBO-REFIT  P      0.05        58      0          3 |              0          5 | 0.70 x15, 0.75 x42, 0.80 x5
+    LBO-REFIT  P      0.01        58      0          3 |              0          5 | 0.69 x2, 0.71 x5, 0.72 x8, 0.73 x12, 0.74 x12, 0.75 x5, 0.76 x6, 0.77 x6, 0.78 x4, 0.79 x2
+
+--- X12-66 | seed 31337 ---
+  pairs 66 | established (McNemar p < 0.05 over the 2811 judged questions) 65 | excluded pair unestablished
+  Llama-3.1-8B vs command-r: key 0.3686 vs 0.3703 (gap -0.0018, McNemar 430:435 p=0.8918) | arena p(8B ahead)=0.0000 c_raw=1.0000 widener c=0.9645 A=0.391 -> arena right on the judged denominator; REMOVED from every count below
+  established pairs after exclusion 65, wrong-direction 2 | raw certificate at 0.975 on them: called 62, wrong 1
+  the established wrong pairs the raw certificate calls (these are what a rule must remove):
+    arx_0314                   vs iask_pro                   A=0.880 c_raw=1.0000 |m|=0.554 s=0.073 shipped c=0.7754 LBO c=0.8728 (b1=+2.201) McNemar 144:99 p=0.0047
+  IN SAMPLE on the 62 raw-called established pairs:  rule                          called  wrong  corr.surr
+    raw certificate                                         62      1          0
+    widener SHIPPED (b0 -3.2326 b1 +3.3133)                 56      0          5
+    widener LBO-REFIT (per-pair refit)                      56      0          5
+    gate A < 0.30                                           11      0         50
+    gate A < 0.35                                           18      0         43
+    gate A < 0.40                                           33      0         28
+    gate A < 0.45                                           42      0         19
+    gate A < 0.50                                           44      0         17
+    gate A < 0.55                                           44      0         17
+    gate A < 0.60                                           45      0         16
+    gate A < 0.65                                           50      0         11
+    gate A < 0.70                                           57      0          4
+    gate A < 0.75                                           58      0          3
+    gate A < 0.80                                           59      0          2
+    gate A < 0.85                                           60      0          1
+    gate A < 0.90                                           62      1          0
+    gate A < 0.95                                           62      1          0
+    gate A < 1.00 (no gate)                                 62      1          0
+  FULL BOARD context (65 pairs after exclusion; wrong as all(established); decline = drop unestablished):
+    raw                    called  62 wrong  1(1) | + decline: called  62 wrong 1(1)
+    widener SHIPPED        called  56 wrong  0(0) | + decline: called  56 wrong 0(0)
+    widener LBO-REFIT      called  56 wrong  0(0) | + decline: called  56 wrong 0(0)
+    gate A < 0.70          called  57 wrong  0(0) | + decline: called  57 wrong 0(0)
+    gate A < 0.75          called  58 wrong  0(0) | + decline: called  58 wrong 0(0)
+    gate A < 0.80          called  59 wrong  0(0) | + decline: called  59 wrong 0(0)
+    gate A < 0.85          called  60 wrong  0(0) | + decline: called  60 wrong 0(0)
+    gate A < 0.90          called  62 wrong  1(1) | + decline: called  62 wrong 1(1)
+  OUT OF FOLD (leave-both-endpoints-out threshold; grid 0.05 primary, 0.01 sensitivity; rule P trains on the 891 per-anchor edges):
+    widener    rule   grid    called  wrong  corr.surr | widener  wrong  corr.surr | chosen t
+    SHIPPED    M      0.05        54      0          7 |              0          5 | 0.60 x1, 0.65 x5, 0.70 x38, 0.75 x10, 0.85 x8
+    SHIPPED    M      0.01        54      0          7 |              0          5 | 0.64 x1, 0.66 x3, 0.67 x8, 0.69 x11, 0.70 x31, 0.77 x4, 0.86 x4
+    SHIPPED    B      0.05        62      1          0 |              0          5 | 0.85 x43, 1.00 x19
+    SHIPPED    B      0.01        62      1          0 |              0          5 | 0.87 x43, 1.00 x19
+    SHIPPED    W      0.05        62      1          0 |              0          5 | 0.85 x43, 1.00 x19
+    SHIPPED    W      0.01        62      1          0 |              0          5 | 0.87 x43, 1.00 x19
+    SHIPPED    P      0.05        57      0          4 |              0          5 | 0.70 x10, 0.75 x52
+    SHIPPED    P      0.01        58      0          3 |              0          5 | 0.70 x4, 0.71 x4, 0.72 x1, 0.73 x7, 0.74 x16, 0.75 x14, 0.76 x10, 0.77 x6
+    LBO-REFIT  M      0.05        51      0         10 |              0          5 | 0.60 x1, 0.65 x9, 0.70 x24, 0.75 x17, 0.80 x5, 0.85 x6
+    LBO-REFIT  M      0.01        53      0          8 |              0          5 | 0.64 x1, 0.65 x2, 0.66 x2, 0.67 x10, 0.69 x11, 0.70 x16, 0.77 x13, 0.81 x5, 0.86 x2
+    LBO-REFIT  B      0.05        62      1          0 |              0          5 | 0.85 x43, 1.00 x19
+    LBO-REFIT  B      0.01        62      1          0 |              0          5 | 0.87 x43, 1.00 x19
+    LBO-REFIT  W      0.05        62      1          0 |              0          5 | 0.85 x43, 1.00 x19
+    LBO-REFIT  W      0.01        62      1          0 |              0          5 | 0.87 x43, 1.00 x19
+    LBO-REFIT  P      0.05        58      0          3 |              0          5 | 0.70 x15, 0.75 x42, 0.80 x5
+    LBO-REFIT  P      0.01        58      0          3 |              0          5 | 0.69 x2, 0.71 x5, 0.72 x8, 0.73 x12, 0.74 x12, 0.75 x5, 0.76 x6, 0.77 x6, 0.78 x4, 0.79 x2
+
+=== CRITERION: fewer established wrong calls at matched correct surrenders, out of fold (grid 0.05) ===
+  MERGED-190:
+    seed     42 SHIPPED    rule M: widener wrong 0 (surr 18) vs OOF gate wrong 2 (surr 20) -> widener FEWER
+    seed     42 SHIPPED    rule B: widener wrong 0 (surr 18) vs OOF gate wrong 5 (surr 3) -> widener FEWER
+    seed     42 SHIPPED    rule P: widener wrong 0 (surr 18) vs OOF gate wrong 3 (surr 13) -> widener FEWER
+    seed     42 LBO-REFIT  rule M: widener wrong 0 (surr 29) vs OOF gate wrong 1 (surr 32) -> widener FEWER
+    seed     42 LBO-REFIT  rule B: widener wrong 0 (surr 29) vs OOF gate wrong 3 (surr 25) -> widener FEWER
+    seed     42 LBO-REFIT  rule P: widener wrong 0 (surr 29) vs OOF gate wrong 1 (surr 27) -> widener FEWER
+    seed    137 SHIPPED    rule M: widener wrong 0 (surr 20) vs OOF gate wrong 1 (surr 26) -> widener FEWER
+    seed    137 SHIPPED    rule B: widener wrong 0 (surr 20) vs OOF gate wrong 5 (surr 3) -> widener FEWER
+    seed    137 SHIPPED    rule P: widener wrong 0 (surr 20) vs OOF gate wrong 3 (surr 13) -> widener FEWER
+    seed    137 LBO-REFIT  rule M: widener wrong 0 (surr 31) vs OOF gate wrong 1 (surr 34) -> widener FEWER
+    seed    137 LBO-REFIT  rule B: widener wrong 0 (surr 31) vs OOF gate wrong 3 (surr 25) -> widener FEWER
+    seed    137 LBO-REFIT  rule P: widener wrong 0 (surr 31) vs OOF gate wrong 1 (surr 27) -> widener FEWER
+    seed   2048 SHIPPED    rule M: widener wrong 0 (surr 20) vs OOF gate wrong 1 (surr 26) -> widener FEWER
+    seed   2048 SHIPPED    rule B: widener wrong 0 (surr 20) vs OOF gate wrong 5 (surr 3) -> widener FEWER
+    seed   2048 SHIPPED    rule P: widener wrong 0 (surr 20) vs OOF gate wrong 3 (surr 13) -> widener FEWER
+    seed   2048 LBO-REFIT  rule M: widener wrong 0 (surr 31) vs OOF gate wrong 1 (surr 34) -> widener FEWER
+    seed   2048 LBO-REFIT  rule B: widener wrong 0 (surr 31) vs OOF gate wrong 3 (surr 25) -> widener FEWER
+    seed   2048 LBO-REFIT  rule P: widener wrong 0 (surr 31) vs OOF gate wrong 1 (surr 27) -> widener FEWER
+    seed      7 SHIPPED    rule M: widener wrong 0 (surr 19) vs OOF gate wrong 1 (surr 22) -> widener FEWER
+    seed      7 SHIPPED    rule B: widener wrong 0 (surr 19) vs OOF gate wrong 5 (surr 3) -> widener FEWER
+    seed      7 SHIPPED    rule P: widener wrong 0 (surr 19) vs OOF gate wrong 3 (surr 13) -> widener FEWER
+    seed      7 LBO-REFIT  rule M: widener wrong 0 (surr 29) vs OOF gate wrong 1 (surr 32) -> widener FEWER
+    seed      7 LBO-REFIT  rule B: widener wrong 0 (surr 29) vs OOF gate wrong 3 (surr 25) -> widener FEWER
+    seed      7 LBO-REFIT  rule P: widener wrong 0 (surr 29) vs OOF gate wrong 1 (surr 27) -> widener FEWER
+    seed  31337 SHIPPED    rule M: widener wrong 0 (surr 20) vs OOF gate wrong 1 (surr 26) -> widener FEWER
+    seed  31337 SHIPPED    rule B: widener wrong 0 (surr 20) vs OOF gate wrong 5 (surr 3) -> widener FEWER
+    seed  31337 SHIPPED    rule P: widener wrong 0 (surr 20) vs OOF gate wrong 3 (surr 13) -> widener FEWER
+    seed  31337 LBO-REFIT  rule M: widener wrong 0 (surr 31) vs OOF gate wrong 1 (surr 34) -> widener FEWER
+    seed  31337 LBO-REFIT  rule B: widener wrong 0 (surr 31) vs OOF gate wrong 3 (surr 25) -> widener FEWER
+    seed  31337 LBO-REFIT  rule P: widener wrong 0 (surr 31) vs OOF gate wrong 1 (surr 27) -> widener FEWER
+    established pairs 183/183/183/183/183, raw-called established 173/175/175/174/175
+  X12-66:
+    seed     43 SHIPPED    rule M: widener wrong 0 (surr 4) vs OOF gate wrong 0 (surr 1) -> TIE
+    seed     43 SHIPPED    rule B: widener wrong 0 (surr 4) vs OOF gate wrong 1 (surr 0) -> widener FEWER
+    seed     43 SHIPPED    rule P: widener wrong 0 (surr 4) vs OOF gate wrong 0 (surr 4) -> TIE
+    seed     43 LBO-REFIT  rule M: widener wrong 0 (surr 5) vs OOF gate wrong 0 (surr 10) -> TIE
+    seed     43 LBO-REFIT  rule B: widener wrong 0 (surr 5) vs OOF gate wrong 1 (surr 0) -> widener FEWER
+    seed     43 LBO-REFIT  rule P: widener wrong 0 (surr 5) vs OOF gate wrong 0 (surr 3) -> TIE
+    seed    137 SHIPPED    rule M: widener wrong 0 (surr 4) vs OOF gate wrong 0 (surr 1) -> TIE
+    seed    137 SHIPPED    rule B: widener wrong 0 (surr 4) vs OOF gate wrong 1 (surr 0) -> widener FEWER
+    seed    137 SHIPPED    rule P: widener wrong 0 (surr 4) vs OOF gate wrong 0 (surr 4) -> TIE
+    seed    137 LBO-REFIT  rule M: widener wrong 0 (surr 5) vs OOF gate wrong 0 (surr 10) -> TIE
+    seed    137 LBO-REFIT  rule B: widener wrong 0 (surr 5) vs OOF gate wrong 1 (surr 0) -> widener FEWER
+    seed    137 LBO-REFIT  rule P: widener wrong 0 (surr 5) vs OOF gate wrong 0 (surr 3) -> TIE
+    seed   2048 SHIPPED    rule M: widener wrong 0 (surr 6) vs OOF gate wrong 0 (surr 9) -> TIE
+    seed   2048 SHIPPED    rule B: widener wrong 0 (surr 6) vs OOF gate wrong 1 (surr 0) -> widener FEWER
+    seed   2048 SHIPPED    rule P: widener wrong 0 (surr 6) vs OOF gate wrong 0 (surr 4) -> TIE
+    seed   2048 LBO-REFIT  rule M: widener wrong 0 (surr 6) vs OOF gate wrong 0 (surr 10) -> TIE
+    seed   2048 LBO-REFIT  rule B: widener wrong 0 (surr 6) vs OOF gate wrong 1 (surr 0) -> widener FEWER
+    seed   2048 LBO-REFIT  rule P: widener wrong 0 (surr 6) vs OOF gate wrong 0 (surr 3) -> TIE
+    seed      7 SHIPPED    rule M: widener wrong 0 (surr 5) vs OOF gate wrong 0 (surr 7) -> TIE
+    seed      7 SHIPPED    rule B: widener wrong 0 (surr 5) vs OOF gate wrong 1 (surr 0) -> widener FEWER
+    seed      7 SHIPPED    rule P: widener wrong 0 (surr 5) vs OOF gate wrong 0 (surr 4) -> TIE
+    seed      7 LBO-REFIT  rule M: widener wrong 0 (surr 5) vs OOF gate wrong 0 (surr 10) -> TIE
+    seed      7 LBO-REFIT  rule B: widener wrong 0 (surr 5) vs OOF gate wrong 1 (surr 0) -> widener FEWER
+    seed      7 LBO-REFIT  rule P: widener wrong 0 (surr 5) vs OOF gate wrong 0 (surr 3) -> TIE
+    seed  31337 SHIPPED    rule M: widener wrong 0 (surr 5) vs OOF gate wrong 0 (surr 7) -> TIE
+    seed  31337 SHIPPED    rule B: widener wrong 0 (surr 5) vs OOF gate wrong 1 (surr 0) -> widener FEWER
+    seed  31337 SHIPPED    rule P: widener wrong 0 (surr 5) vs OOF gate wrong 0 (surr 4) -> TIE
+    seed  31337 LBO-REFIT  rule M: widener wrong 0 (surr 5) vs OOF gate wrong 0 (surr 10) -> TIE
+    seed  31337 LBO-REFIT  rule B: widener wrong 0 (surr 5) vs OOF gate wrong 1 (surr 0) -> widener FEWER
+    seed  31337 LBO-REFIT  rule P: widener wrong 0 (surr 5) vs OOF gate wrong 0 (surr 3) -> TIE
+    established pairs 65/65/65/65/65, raw-called established 62/62/63/62/62
+  the v87 direction (rule W, matched wrong, fewer correct surrenders):
+    MERGED-190 seed     42 SHIPPED   : at matched wrong: widener surr 18 (wrong 0) vs OOF gate surr 78 (wrong 1) -> widener fewer surrenders
+    MERGED-190 seed     42 LBO-REFIT : at matched wrong: widener surr 29 (wrong 0) vs OOF gate surr 78 (wrong 1) -> widener fewer surrenders
+    MERGED-190 seed    137 SHIPPED   : at matched wrong: widener surr 20 (wrong 0) vs OOF gate surr 79 (wrong 1) -> widener fewer surrenders
+    MERGED-190 seed    137 LBO-REFIT : at matched wrong: widener surr 31 (wrong 0) vs OOF gate surr 79 (wrong 1) -> widener fewer surrenders
+    MERGED-190 seed   2048 SHIPPED   : at matched wrong: widener surr 20 (wrong 0) vs OOF gate surr 79 (wrong 1) -> widener fewer surrenders
+    MERGED-190 seed   2048 LBO-REFIT : at matched wrong: widener surr 31 (wrong 0) vs OOF gate surr 79 (wrong 1) -> widener fewer surrenders
+    MERGED-190 seed      7 SHIPPED   : at matched wrong: widener surr 19 (wrong 0) vs OOF gate surr 79 (wrong 1) -> widener fewer surrenders
+    MERGED-190 seed      7 LBO-REFIT : at matched wrong: widener surr 29 (wrong 0) vs OOF gate surr 79 (wrong 1) -> widener fewer surrenders
+    MERGED-190 seed  31337 SHIPPED   : at matched wrong: widener surr 20 (wrong 0) vs OOF gate surr 79 (wrong 1) -> widener fewer surrenders
+    MERGED-190 seed  31337 LBO-REFIT : at matched wrong: widener surr 31 (wrong 0) vs OOF gate surr 79 (wrong 1) -> widener fewer surrenders
+    X12-66     seed     43 SHIPPED   : at matched wrong: widener surr 4 (wrong 0) vs OOF gate surr 0 (wrong 1) -> GATE fewer surrenders
+    X12-66     seed     43 LBO-REFIT : at matched wrong: widener surr 5 (wrong 0) vs OOF gate surr 0 (wrong 1) -> GATE fewer surrenders
+    X12-66     seed    137 SHIPPED   : at matched wrong: widener surr 4 (wrong 0) vs OOF gate surr 0 (wrong 1) -> GATE fewer surrenders
+    X12-66     seed    137 LBO-REFIT : at matched wrong: widener surr 5 (wrong 0) vs OOF gate surr 0 (wrong 1) -> GATE fewer surrenders
+    X12-66     seed   2048 SHIPPED   : at matched wrong: widener surr 6 (wrong 0) vs OOF gate surr 0 (wrong 1) -> GATE fewer surrenders
+    X12-66     seed   2048 LBO-REFIT : at matched wrong: widener surr 6 (wrong 0) vs OOF gate surr 0 (wrong 1) -> GATE fewer surrenders
+    X12-66     seed      7 SHIPPED   : at matched wrong: widener surr 5 (wrong 0) vs OOF gate surr 0 (wrong 1) -> GATE fewer surrenders
+    X12-66     seed      7 LBO-REFIT : at matched wrong: widener surr 5 (wrong 0) vs OOF gate surr 0 (wrong 1) -> GATE fewer surrenders
+    X12-66     seed  31337 SHIPPED   : at matched wrong: widener surr 5 (wrong 0) vs OOF gate surr 0 (wrong 1) -> GATE fewer surrenders
+    X12-66     seed  31337 LBO-REFIT : at matched wrong: widener surr 5 (wrong 0) vs OOF gate surr 0 (wrong 1) -> GATE fewer surrenders
+  sensitivity, 0.01 grid (rules M, B and P), cells where the reading differs from the 0.05 grid:
+    none - every cell reads the same on the 0.01 grid
+
+=== VERDICT (scored on the PRIMARY board; 5 seeds x 2 widener variants x 3 rules = 30 cells) ===
+  primary board: criterion holds in 30 of 30 cells; at the seed of record under the shipped widener and rule M: holds
+  secondary (66-pair) board: criterion holds in 10 of 30 cells; a cell where the OOF gate has FEWER wrong than the widener: none
+  -> PASS
+  PREDICTION 'widener + decline': HELD on the board of record; on the 66-pair object the widener and the out-of-fold gate TIE at 0 established wrong in at least one cell, so 'fewer' is not met there and neither rule 'strictly dominates' the other on that object
+  on established pairs the key-tie decline is the identity, so these numbers are 'widener + decline' vs 'gate + decline'; the
+  full-board rows show the decline's own effect (it removes the unestablished wrong calls on both bases).

@@ -1,0 +1,105 @@
+{
+  "id": "SPLIT-RATIO-SEEDS",
+  "title": "SPLIT-RATIO-SEEDS: does the certification plateau below 0.20 replicate across seeds? (builds + site nulls, zero calls)",
+  "question": "r10 and r20 at seeds 137 and 2048 (own splits, label-free, structural only), builds + site-nulls; 0.30 already had three seeds (8 / 11 / 11); the plateau holds if mean(0.10) - mean(0.20) is within the seed SD (~2) and both exceed mean(0.30) by > 1 SD; prediction 0.10 ~ 0.20 ~ 13-15.",
+  "kind": "build",
+  "state": "done",
+  "registration": {
+    "commit": "5b14962",
+    "program_lines": "docs/judge_v2_program.md L515-L520 (registration) and L543-L551 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-10 21:05 (before any build) — SPLIT-RATIO-SEEDS: does the certification plateau replicate?",
+    "outcome_heading": [
+      "L543: - **SPLIT-RATIO-SEEDS (2026-09-10 21:50): the certification plateau below 0.20 REPLICATES.** Three seeds per ..."
+    ],
+    "date": "2026-09-10"
+  },
+  "script": {
+    "path": "experiment_configs/splitratio/r{10,20}_s{137,2048}.toml (builds); site nulls; readout in experiment_results/splitratio/chain.log",
+    "sha16": "n/a (construction chain)",
+    "commit": "5b14962 / 4dfa56c"
+  },
+  "ready": null,
+  "go": "n/a (0 LLM calls; four label-free constructions + site nulls)",
+  "run": {
+    "outcome_file": "experiment_results/splitratio/chain.log (untracked chain log; the numbers are in the programme bullet and the ledger row)",
+    "outcome_commit": "4dfa56c",
+    "calls": 0,
+    "cce": 0,
+    "pool": "own splits per seed (structural only; not the pool of record)",
+    "date": "2026-09-10"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); structural evidence only",
+    "commit": "4dfa56c",
+    "verdict": "PLATEAU HOLDS; prediction met exactly"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "mean(0.10) - mean(0.20) within the seed SD (~2) and both > mean(0.30) + 1 SD",
+      "result": "HELD",
+      "value": "certified 0.10: 16 / 14 / 12 (mean 14.0, sd 1.6); 0.20: 12 / 15 / 12 (13.0, sd 1.4); 0.30: 8 / 11 / 11 (10.0, sd 1.4); leaves 107 / 103 / 86; mean(0.10) - mean(0.20) = +1.0 within SD; both > mean(0.30) + SD = 11.6: HOLDS",
+      "denominator": "three seeds per ratio (42 / 137 / 2048)"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "0.10 ~ 0.20 ~ 13-15",
+      "result": "HELD",
+      "value": "14.0 / 13.0",
+      "denominator": "three seeds"
+    }
+  ],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "certified structure saturates at ~13-14 sites once >= 80% of the corpus is train-side; leaves keep scaling; the 0.30 split stays (SPLIT-RATIO)"
+  },
+  "numbers_of_record": {
+    "certified": "0.10: 16/14/12 (14.0 +- 1.6); 0.20: 12/15/12 (13.0 +- 1.4); 0.30: 8/11/11 (10.0 +- 1.4)",
+    "leaves": "107 / 103 / 86"
+  },
+  "sentence_of_record": "SPLIT-RATIO-SEEDS (2026-09-10): the certification plateau below 0.20 REPLICATES: certified 0.10: 16/14/12 (mean 14.0, sd 1.6); 0.20: 12/15/12 (13.0, sd 1.4); 0.30: 8/11/11 (10.0, sd 1.4); mean(0.10) - mean(0.20) = +1.0 within the SD and both exceed mean(0.30) + SD = 11.6; prediction met exactly; certified structure saturates at ~13-14 sites once >= 80% of the corpus is train-side while leaves keep scaling.",
+  "chips": [
+    "PLATEAU HOLDS"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-23",
+      "by": "INCONSISTENCIES-PASS (registrar, zero calls; insertion only)",
+      "text": "NO-FILE 2026-09-23 by INCONSISTENCIES-PASS (registrar, zero calls; insertion only): experiment_results/splitratio/chain.log is on disk but gitignored (*.log) and untracked; the readout of record is the programme bullet '- **SPLIT-RATIO-SEEDS (2026-09-10 21:50): the certification plateau below 0.20 REPLICATES.**'. [ledger: evidence cell of row SPLIT-RATIO-SEEDS, v132]"
+    }
+  ],
+  "does_not_show": [
+    "a change to the split of record (0.30 stays; certification plateaus below 0.20)"
+  ],
+  "ledger": {
+    "row_id": "SPLIT-RATIO-SEEDS",
+    "version": "v43 (4dfa56c) [v132 2026-09-23: INCONSISTENCIES-PASS insertion in this row]"
+  },
+  "depends_on": [
+    "SPLIT-RATIO",
+    "D1",
+    "EPOCH-NULL",
+    "ANCHOR-FREE-REDRAW"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L515-L520 and L543-L551 (5b14962 / 4dfa56c)",
+    "experiment_results/splitratio/chain.log (untracked)",
+    "docs/test_ledger.html row SPLIT-RATIO-SEEDS (v43): chips verbatim, evidence (experiment_configs/splitratio/, chain.log, 5b14962)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)"
+  ],
+  "last_update": "2026-09-23",
+  "plain_description": {
+    "sq": "SQ3 Taxonomy",
+    "what": "Rebuilds label-free trees with 10% and 20% of the data held out, with extra random seeds. It counts how many tree splits pass the certification test against a null, compared with the usual 30% held-out split. No calls.",
+    "why": "Checks whether an earlier finding (certified structure stops growing once enough data is on the training side) is robust to the seed.",
+    "information": "Decides whether the 30% held-out split should change. Result: the plateau replicates. About 13 to 14 certified splits at 10% and 20%, against about 10 at 30%, while the number of leaves keeps growing. The 30% split stays.",
+    "written": "2026-10-07"
+  }
+}

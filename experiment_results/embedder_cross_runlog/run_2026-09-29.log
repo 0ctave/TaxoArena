@@ -1,0 +1,122 @@
+== RUN LOG embedder_cross writes, run-operator, main f3d9c9f, Tue Sep 29 15:40:00     2026
+blob embedder_arms: c8940349ea410eef0bb69c30ecea81a0e4208820 (HEAD: c8940349ea410eef0bb69c30ecea81a0e4208820)
+-- processes
+ollama app.exe               41712 Console                    1    45ÿ776 Ko
+ollama.exe                   41912 Console                    1    61ÿ324 Ko
+java.exe                     50188 Console                    1 1ÿ043ÿ728 Ko
+java.exe                     20756 Console                    1 2ÿ566ÿ976 Ko
+java.exe                     44496 Console                    1   757ÿ372 Ko
+-- source -wal/-journal
+-rw-r--r-- 1 octav 197609 38023168 Sep 29 11:52 embeddings_cache_embeddinggemma_latest.db
+-rw-r--r-- 1 octav 197609 59899904 Sep 27 16:25 embeddings_cache_nomic-embed-text_latest.db
+-- source sha256 BEFORE
+3e9ce57772160749e0b5ea0267713286ca4109444d5a6b676e877a5b0501df29 *embeddings_cache_embeddinggemma_latest.db
+53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95 *embeddings_cache_nomic-embed-text_latest.db
+-- DIR before
+total 33
+drwxr-xr-x 1 octav 197609   0 Sep 29 12:30 ./
+drwxr-xr-x 1 octav 197609   0 Sep 29 15:40 ../
+-rw-r--r-- 1 octav 197609 281 Sep 29 12:30 gemma_raw_embed_missing.log
+-- pool guard
+pool p2dca21ab5f4ef3ae OK: experiment_configs/reserved_pool_frozen_p2dca.json hashes to it; reserved_pool rows in mmlu_pro_dataset_cache_v2.db agree
+  keys=14 ids=3599 judgeable=3445 sentinels=154 corpus_set=MMLU_PRO (mmlu-pro-v2) origin=20260727_042523_Headless_Run_Auto_ge
+rc=0
+-- free RAM
+26,7
+
+== W1 DRY: python tools/analysis/embedder_arms.py --embed-missing gemma_raw --expect-missing 3504 --target-dir experiment_results/embedder_cross
+[THREADS] OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+[EMB-ARMS] --target-dir: source Z:\FAC\TUBerlin\THESIS\TaxoArena\embeddings_cache_embeddinggemma_latest.db sha256 3e9ce57772160749e0b5ea0267713286ca4109444d5a6b676e877a5b0501df29 -> copy Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\embedder_cross\embeddings_cache_embeddinggemma_latest.db (absent; written only with --go)
+[EMB-ARMS] arm gemma_raw: 11687 needed texts, 3504 missing from Z:\FAC\TUBerlin\THESIS\TaxoArena\embeddings_cache_embeddinggemma_latest.db (expected 3504)
+[EMB-ARMS] dry: nothing posted, nothing written (add --go)
+rc=0
+total 33
+drwxr-xr-x 1 octav 197609   0 Sep 29 12:30 ./
+drwxr-xr-x 1 octav 197609   0 Sep 29 15:40 ../
+-rw-r--r-- 1 octav 197609 281 Sep 29 12:30 gemma_raw_embed_missing.log
+
+== THREAD-CAP: ollama_affinity.ps1 -Threads 12 -Apply
+[THREAD-CAP] ollama route (ii) requested=12 mask=0xFFF logicalProcessors=24
+[THREAD-CAP] pid=41912 name=ollama affinity=0xFFF (set)
+[THREAD-CAP] pid=41712 name=ollama app affinity=0xFFF (set)
+rc=0
+
+== W1 GO attempt 1: rc=1, ValueError: unknown url type: '0.0.0.0/api/embed' (full: experiment_results/embedder_cross_runlog/incident_w1/w1_gemma_raw_go.log)
+ROOT CAUSE: user env OLLAMA_HOST=0.0.0.0 (server bind form) read by embedder_arms.py L126 as the client URL; crash in route_parity before any copy/post succeeded
+state after: DIR unchanged:
+total 33
+drwxr-xr-x 1 octav 197609   0 Sep 29 12:30 ./
+drwxr-xr-x 1 octav 197609   0 Sep 29 15:40 ../
+-rw-r--r-- 1 octav 197609 281 Sep 29 12:30 gemma_raw_embed_missing.log
+gemma source sha256 after attempt 1: 3e9ce57772160749e0b5ea0267713286ca4109444d5a6b676e877a5b0501df29 *embeddings_cache_embeddinggemma_latest.db
+remedy: per-process OLLAMA_HOST=http://127.0.0.1:11434 (the script's documented default host); no code change
+-- preflight GET /api/version
+{"version":"0.34.4"}
+
+== W1 GO attempt 2 (OLLAMA_HOST=http://127.0.0.1:11434): see w1_gemma_raw_go.log, rc=0
+-- DIR after W1
+total 52793
+drwxr-xr-x 1 octav 197609        0 Sep 29 15:42 ./
+drwxr-xr-x 1 octav 197609        0 Sep 29 15:40 ../
+-rw-r--r-- 1 octav 197609 54022144 Sep 29 15:42 embeddings_cache_embeddinggemma_latest.db
+-rw-r--r-- 1 octav 197609      743 Sep 29 15:42 embeddings_cache_embeddinggemma_latest.db.provenance.json
+-rw-r--r-- 1 octav 197609      281 Sep 29 12:30 gemma_raw_embed_missing.log
+-- sha256 after W1
+3e9ce57772160749e0b5ea0267713286ca4109444d5a6b676e877a5b0501df29 *embeddings_cache_embeddinggemma_latest.db
+28f2e3a41e77312ff5c92d798b95e6ea2acdb8b6591b2eab1c677fa1d5367867 *experiment_results/embedder_cross/embeddings_cache_embeddinggemma_latest.db
+ls: cannot access 'experiment_results/embedder_cross/*.db-*': No such file or directory
+-rw-r--r-- 1 octav 197609 38023168 Sep 29 11:52 embeddings_cache_embeddinggemma_latest.db
+
+== W2 DRY: --embed-card gemma_card --target-dir experiment_results/embedder_cross
+[THREADS] OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+[EMB-ARMS] --target-dir: source Z:\FAC\TUBerlin\THESIS\TaxoArena\embeddings_cache_embeddinggemma_latest.db sha256 3e9ce57772160749e0b5ea0267713286ca4109444d5a6b676e877a5b0501df29 -> NEW card file Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\embedder_cross\embeddings_cache_embeddinggemma_latest__card.db (absent; written only with --go)
+[EMB-ARMS] arm gemma_card: 11687 needed texts -> Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\embedder_cross\embeddings_cache_embeddinggemma_latest__card.db (queries rows copied from Z:\FAC\TUBerlin\THESIS\TaxoArena\embeddings_cache_embeddinggemma_latest.db)
+[EMB-ARMS] dry: nothing posted, nothing written (add --go)
+rc=0
+total 52793
+drwxr-xr-x 1 octav 197609        0 Sep 29 15:42 ./
+drwxr-xr-x 1 octav 197609        0 Sep 29 15:40 ../
+-rw-r--r-- 1 octav 197609 54022144 Sep 29 15:42 embeddings_cache_embeddinggemma_latest.db
+-rw-r--r-- 1 octav 197609      743 Sep 29 15:42 embeddings_cache_embeddinggemma_latest.db.provenance.json
+-rw-r--r-- 1 octav 197609      281 Sep 29 12:30 gemma_raw_embed_missing.log
+
+== W2 GO: rc=1, urllib.error.HTTPError: HTTP Error 400: Bad Request (full: incident_w2/w2_gemma_card_go.log; Ollama server.log copied to incident_w2/ollama_server.log, its line 53813: 400 POST /api/embed 15:43:27)
+ROOT CAUSE (incident_w2/probe2.py, same texts/order/BATCH, re-posted to local Ollama): batch 66 at text 2112: HTTP 400 {"error":"Post \"http://127.0.0.1:51176/tokenize\": dial tcp 127.0.0.1:51176: connectex: Only one usage of each socket address (protocol/network address/port) is normally permitted."}; every text of that batch then embedded singly OK -> Windows ephemeral-port exhaustion inside Ollama (server->runner /tokenize per input), transient, not content; embedder_arms has no retry
+-- TIME_WAIT sockets now: 14922
+
+Plage de ports dynamique du protocole tcp
+-------------------------------------------
+Port de dÃ©marrage   : 49152
+Nombre de portsÂ     : 16384
+
+-- DIR after W2 (partial card file, no provenance; per W-2 a rerun REFUSES until removed by hand; NOT removed)
+total 71677
+drwxr-xr-x 1 octav 197609        0 Sep 29 15:43 ./
+drwxr-xr-x 1 octav 197609        0 Sep 29 15:40 ../
+-rw-r--r-- 1 octav 197609 54022144 Sep 29 15:42 embeddings_cache_embeddinggemma_latest.db
+-rw-r--r-- 1 octav 197609      743 Sep 29 15:42 embeddings_cache_embeddinggemma_latest.db.provenance.json
+-rw-r--r-- 1 octav 197609 19333120 Sep 29 15:43 embeddings_cache_embeddinggemma_latest__card.db
+-rw-r--r-- 1 octav 197609      281 Sep 29 12:30 gemma_raw_embed_missing.log
+bfac36c4487dcd578b11544ed8dde897cf89cb1c05fa2ca905f3ce653dd6f8dc *experiment_results/embedder_cross/embeddings_cache_embeddinggemma_latest__card.db
+28f2e3a41e77312ff5c92d798b95e6ea2acdb8b6591b2eab1c677fa1d5367867 *experiment_results/embedder_cross/embeddings_cache_embeddinggemma_latest.db
+3e9ce57772160749e0b5ea0267713286ca4109444d5a6b676e877a5b0501df29 *embeddings_cache_embeddinggemma_latest.db
+53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95 *embeddings_cache_nomic-embed-text_latest.db
+
+== W4 DRY (nomic_raw count only): --embed-missing nomic_raw --expect-missing 0 --target-dir experiment_results/embedder_cross
+[THREADS] OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+[EMB-ARMS] --target-dir: source Z:\FAC\TUBerlin\THESIS\TaxoArena\embeddings_cache_nomic-embed-text_latest.db sha256 53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95 -> copy Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\embedder_cross\embeddings_cache_nomic-embed-text_latest.db (absent; written only with --go)
+[EMB-ARMS] arm nomic_raw: 11687 needed texts, 0 missing from Z:\FAC\TUBerlin\THESIS\TaxoArena\embeddings_cache_nomic-embed-text_latest.db (expected 0)
+[EMB-ARMS] dry: nothing posted, nothing written (add --go)
+rc=0
+total 71677
+drwxr-xr-x 1 octav 197609        0 Sep 29 15:43 ./
+drwxr-xr-x 1 octav 197609        0 Sep 29 15:40 ../
+-rw-r--r-- 1 octav 197609 54022144 Sep 29 15:42 embeddings_cache_embeddinggemma_latest.db
+-rw-r--r-- 1 octav 197609      743 Sep 29 15:42 embeddings_cache_embeddinggemma_latest.db.provenance.json
+-rw-r--r-- 1 octav 197609 19333120 Sep 29 15:43 embeddings_cache_embeddinggemma_latest__card.db
+-rw-r--r-- 1 octav 197609      281 Sep 29 12:30 gemma_raw_embed_missing.log
+
+== sequence STOPPED after W2 incident (W3 nomic_card and W4 nomic_raw --go not run); git status check:
+ M config/application.yml
+?? experiment_configs/reserved_pool_frozen_pf844849e133cda4e_20ng.json
+?? experiment_configs/smoke12_preflight.toml

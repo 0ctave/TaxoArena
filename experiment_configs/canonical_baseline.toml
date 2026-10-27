@@ -1,0 +1,133 @@
+# ══════════════════════════════════════════════════════════════════════════
+#  outputDir: experiment_results/canonical_baseline
+#  canonical_baseline.toml — THE BASELINE ARTIFACT
+#
+#  This is the reference construction run. Everything downstream (arena,
+#  rubrics, Chapter 6 figures) should be built against this output, and any
+#  future construction change should be reported as a diff from it.
+#
+#  ── Configuration provenance ──────────────────────────────────────────────
+#  minClusterSize = 30   DERIVED, not tuned. The arena needs >=12 held-out
+#                        queries per leaf; 12 / 0.3 test ratio ~= 40 routed,
+#                        so the floor is 30. This is the binding constraint on
+#                        granularity: of 35 unique nodes blocked from
+#                        splitting, 29 (83%) die here and only 6 on the
+#                        separation bar.
+#  proposalSeparationBar = 0.025
+#                        Between two measured nulls. The isotropic null p95 is
+#                        0.0209 and p99 0.0213, so the previous 0.020 sat on
+#                        the noise ceiling and admitted splits from inside it.
+#                        The within-domain null (0.068-0.130) is an upper bound
+#                        rather than an estimate — it bootstraps a population
+#                        that already contains the sub-topics — and a probe at
+#                        0.07 collapsed the taxonomy to 17 nodes with Top-1
+#                        72.41%. 0.025 also lies inside the L9 swept range.
+#  descentMargin = 0.12  Load-bearing. At 0 the taxonomy halves (104 -> 57
+#                        leaves), 756 queries residualise, and Top-1 falls to
+#                        68.89%. The Jensen bound assumes mu_v is the
+#                        normalised mass-weighted mean of its children; mu_v is
+#                        fitted independently, and delta absorbs that gap.
+#  acceptanceZ = 0.0     Legacy tau gate. The z-gate is implemented and
+#                        measured but NOT canonical: it costs ~5 leaves and
+#                        0.09pt Top-1 and buys no stability (CV 19.5% ->
+#                        20.6%, paired slope +0.03 +/- 0.10).
+#  enableRefitGate=false Ablation only. Gating the refit terminates provably
+#                        but reaches J 0.24303 vs 0.24714 and Top-1 73.33% vs
+#                        74.19%, because the gate is whole-tree and freezes
+#                        every node's parameters.
+#  seed = 42             splitSeed unset, so the split seed equals the
+#                        construction seed, matching every measured run.
+#                        NOTE: construction is deterministic at a fixed split —
+#                        the construction seed alone changes nothing. Seeds
+#                        vary the DATA SAMPLE, so cross-seed spread is sample
+#                        variance, not initialisation variance.
+#
+#  ── Expected output (from experiment_results/cal_iso/s42) ─────────────────
+#    167 nodes / 104 leaves, BridgeCount 0, ResidualCount 0, OrphanCount 0
+#    J = 0.247136, structural fixed point at iteration 4
+#    held-out Top-1 74.19% [72.73, 75.60], ECE 0.1996, AvgMatch 1.153
+#    flat argmax over the same leaves: 75.98%  (routing loss ~1.8pt)
+#    k-means at matched k: 74.25%             (partition gain ~2.1pt)
+#
+#  ── Caveats that ship with this artifact ──────────────────────────────────
+#  * WARD_BASELINE_* is BROKEN. Its leaf-support file is byte-identical to
+#    KMEANS's and its purity is fine (0.777) but Top-1 is 8.12%, ~chance over
+#    14 domains. A scoring-path bug, not a clustering result. Do not report it.
+#  * enableLabeling = false deliberately. LLM post-pass labeling runs after
+#    construction but before the validation exports, so a labeling failure
+#    destroys the metrics — which happened on 2026-07-25. Labels are cosmetic
+#    for every metric here; generate them on the frozen snapshot afterwards.
+#  * Cross-seed leaf count is 78.6 +/- 15.3 (63-104) and matched-k ARI is
+#    0.69. Structure is far less stable than accuracy (Top-1 74.42 +/- 0.43).
+#    That is a property of the corpus, not of the algorithm.
+#
+#  Freeze check: fixed_point_certificate.txt must read CERTIFIED : true.
+# ══════════════════════════════════════════════════════════════════════════
+
+datasetType   = "MMLU_PRO"
+
+models        = [
+    "gpt-4o-2024-08-06",
+    "claude-3-5-sonnet-20241022",
+    "gemini-1.5-pro-002",
+    "deepseek-chat-v2_5",
+    "Meta-Llama-3_1-70B-Instruct",
+    "Qwen1.5-72B-Chat",
+    "gpt-4o-mini",
+    "claude-3-5-haiku-20241022",
+    "Mixtral-8x7B-Instruct-v0.1",
+    "c4ai-command-r-v01",
+    "Qwen1.5-14B-Chat",
+    "Meta-Llama-3_1-8B-Instruct",
+    "gemini-1.5-flash-002",
+    "Llama-2-70b-hf",
+    "Llama-2-13b-hf",
+    "Meta-Llama-3-70B-Instruct"
+]
+
+category      = ""      # "" = all 14 MMLU-Pro domains
+queryLimit    = 0       # 0 = no cap; use the full corpus
+outputDir     = "experiment_results/canonical_baseline"
+testRatio     = 0.3     # 70/30 stratified; the 30% pool is arena-reserved
+seed          = 42
+
+# ── Pipeline / evaluation switches ──────────────────────────────────────────
+runPipeline        = true
+runBenchmark       = false
+runTrickle         = true          # produces the ECE/routing metrics
+runBaselines       = true          # k-means / Ward / random null at matched k
+enableFinalMetrics = true
+enableLabeling     = false         # see caveats above
+judgeInduction     = false         # judges are induced in the arena step
+
+# ── Construction mode ───────────────────────────────────────────────────────
+dagMode = "DAG_MAX"      # historical name: selects residualRouting,
+                         # residualSplitGate and stableQuestionIds. Carries no
+                         # polyhierarchy setting — cross-linking is gone.
+
+# ── Formalism parameters ─────────────────────────────────────────────────────
+maxDepth              = 8
+minClusterSize        = 30
+proposalSeparationBar = 0.025
+tau                   = 1e-6
+acceptanceZ           = 0.0    # legacy gate; z-gate measured but not canonical
+enableRefitGate       = false  # ablation only
+
+# ── Unified Trickle Routing & Soft-Membership ──────────────────────────────
+membershipFloor       = 0.25
+routingBeamGamma      = 0.2
+descentMargin         = 0.12
+
+effectiveSupportFloor = 2.0
+defaultKappaPrior     = 10.0
+
+numIterations         = 50
+maxLeafAssignments    = 5
+
+# ── Merging / convergence ────────────────────────────────────────────────────
+fusionSimilarityThreshold = 0.90
+enableGtWarmStart         = false
+
+# ── Diagnostics ──────────────────────────────────────────────────────────────
+enableProfiling           = true   # enables [J-TRACK], [DJ-SE], [MU-GAP],
+                                   # [NO-SPLIT] and the fixed-point certificate

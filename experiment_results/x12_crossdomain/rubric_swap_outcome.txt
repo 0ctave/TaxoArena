@@ -1,0 +1,19 @@
+=== PRIMARY (a): cell vs swap_random, S_main key-decidable ===
+n=959 | acc cell 0.770 vs random 0.749 | discordant 39:19 | one-sided McNemar p = 0.0060 PASS
+=== PRIMARY (b): monotonicity on shared subset (n_dec=475) ===
+acc cell 0.779 >= sibling 0.764 >= random 0.762 : PASS
+=== SECONDARY: length instruction (S_len, paired n=1010) ===
+beta_len cell +0.278 vs length-instructed +0.285 | delta -0.007 CI95 [+0.000, +0.021] NOT SUPPORTED
+descriptive top-4 under length arm (n=285): iask_pro > gemini-3.1-pro_5-shots > gpt-4o-2024-08-06 > arx_0314
+
+── OUTCOME NOTES (2026-09-07) ──
+PRIMARY CONFIRMED: both registered parts pass. Rubric specificity is real
+(placebo objection closed); value concentrates at cell level (sibling ~ random).
+SECONDARY NOT SUPPORTED: the length-discipline clause left beta_len unchanged
+(+0.278 vs +0.285). Verbosity bias is not fixable by instruction; design-level
+mitigation (length-matched sampling / covariate adjustment) is the path.
+Implementation wart, disclosed: the printed point estimate uses each arm's full
+sample while the bootstrap CI pairs on the intersection; the registered criterion
+(CI excluding 0) is unaffected and fails either way.
+beta_len here (+0.28/1k) is on the |dlen|>=400-enriched sample; the full-sample
+figure remains +0.39/1k. Judge spend: 4,200 matches x 2 orders, 0 invalid.

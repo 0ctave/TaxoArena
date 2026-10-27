@@ -1,0 +1,37 @@
+=== DECOMP: what the ARENA-13 +7.9pp is actually made of (598 paired frontier matches, zero calls) ===
+  the new contestant's win rate: ensemble reference 0.697 | its own reference 0.776 (+0.079)
+
+  reference composition - which side each reference endorses:
+    endorses NEW       ensemble  247 (0.413) | grok/self  411 (0.687)
+    endorses OPP       ensemble  234 (0.391) | grok/self  118 (0.197)
+    endorses NEITHER   ensemble  117 (0.196) | grok/self   69 (0.115)
+
+  (1) STRATUM SAME - the two references give the SAME letter, so the two prompts are BYTE-IDENTICAL:
+      n=299 (50.0% of the matches) | the arms disagree on 17 of them = 0.057
+      win rate ensemble 0.779 | self 0.763 (-0.017) | 5:10 | McNemar p=0.3018
+      READ: this is the judge's TEST-RETEST noise at temperature - the same prompt twice. Every paired
+      comparison in the programme sits on top of it, and it had never been measured until now.
+
+  (2) STRATUM DIFF - the references point at different answers, n=299 (50.0%):
+      win rate ensemble 0.615 | self 0.789 (+0.174) | 79:27 | McNemar p=4.328e-07
+
+  (3) KITAGAWA decomposition of the +0.079 gap:
+      cell               ensemble arm  n / win rate   self arm  n / win rate      
+      endorses NEW         247  0.939                    411  0.927
+      endorses OPP         234  0.440                    118  0.390
+      endorses NEITHER     117  0.701                     69  0.536
+      COMPOSITION (which side the reference endorses)  +0.116   = 148% of the gap
+      RESIDUAL    (everything else, i.e. self-preference) -0.037   = -48% of the gap
+      bootstrap 95% CI (2,000 paired resamples): composition [+0.092, +0.142] | residual [-0.063, -0.011]
+
+  (4) CELL-MATCHED - only matches where BOTH references endorse the same side, n=314:
+      win rate ensemble 0.768 | self 0.755 (-0.013) | 6:10 | McNemar p=0.4545
+        endorses NEW       n= 205 | ensemble 0.951 self 0.917 (-0.034) | 0:7 | p=0.01562
+        endorses OPP       n=  80 | ensemble 0.388 self 0.400 (+0.013) | 4:3 | p=1
+        endorses NEITHER   n=  29 | ensemble 0.517 self 0.586 (+0.069) | 2:0 | p=0.5
+
+  VERDICT under the rule fixed before looking: residual -0.037, cell-matched McNemar p=0.4545
+  -> AMEND: the ARENA-13 claim becomes REFERENCE-AGREEMENT LEAKAGE, not self-preference. A shared
+     reference inflates whichever contestant mirrors it; vendor identity need not enter.
+     Here the residual points AGAINST self-preference: conditioning on which side the reference
+     endorses, the new contestant does no better under its own reference, and slightly worse.

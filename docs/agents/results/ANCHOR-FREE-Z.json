@@ -1,0 +1,133 @@
+{
+  "id": "ANCHOR-FREE-Z",
+  "title": "ANCHOR-FREE-Z: the acceptance gate on the anchor-free tree (EXPLORATORY sweep, zero judge calls)",
+  "question": "The largest anchor-free leaf (549 train queries, engineering / chemistry / physics) refused every split at z = 1.55 against the registered acceptanceZ = 2.0. Does lowering the gate to 1.5 and 1.0 buy structure the geometry supports, or only leaves?",
+  "kind": "build",
+  "state": "done",
+  "registration": {
+    "commit": "29f8b19",
+    "program_lines": "docs/judge_v2_program.md (lines as of 5dc8a06) L4388-L4398",
+    "date": "2026-09-17",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-17 (before running) — ANCHOR-FREE-Z: the acceptance gate on the anchor-free tree (EXPLORATORY sweep, zero judge calls)",
+    "outcome_heading": [
+      "L4400: ## ANCHOR-FREE-Z (2026-09-17, zero judge calls) — the gate at 1.5 splits the 549 leaf and buys 6 leaves, one certified site and 0.8pp; z = 1.0 adds nothing beyond 1.5"
+    ]
+  },
+  "script": {
+    "path": "tools/analysis/anchor_free_readout.py (arms experiment_configs/anchorfree/af_z{15,10}_s42.toml)",
+    "sha16": "203b62c09b7cfd36",
+    "commit": "e355764"
+  },
+  "ready": null,
+  "go": "n/a (0 judge calls; two constructions + two 300-rep site nulls)",
+  "run": {
+    "outcome_file": "experiment_results/anchorfree/anchor_free_z15_readout.txt",
+    "outcome_commit": "2a8bb5e",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae routed for purity; tree on the p8a29 split (structural evidence only)",
+    "date": "2026-09-17",
+    "other_files": [
+      "experiment_results/anchorfree/anchor_free_z10_readout.txt (2a8bb5e)",
+      "experiment_results/anchorfree/site_null_af_z{15,10}_s42.csv"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the adversarial check of record is the one the programme names: EXPLORATORY, DESCRIPTIVE row; no adversarial recomputation recorded; the numbers are the readout's own",
+    "commit": "2a8bb5e",
+    "verdict": "descriptive; adjudicates nothing; the z = 2.0 tree stays the anchor-free tree of record"
+  },
+  "criteria": [
+    {
+      "id": "readout",
+      "text": "EXPLORATORY: no criterion; leaves, depth, largest leaf, purity, certified sites and the certified share of newly accepted sites, key-only leaf information, key profile R",
+      "result": "DELIVERED",
+      "value": "z 2.0 / 1.5 / 1.0: leaves 81 / 87 / 87 (nodes 150 / 160 / 160, depth 7); largest leaf 549 / 305 / 305; purity 0.715 / 0.723 / 0.723; certified 16 of 69 / 17 of 73 / 17 of 73; key-only +13.19 / +13.23 / +13.23 per 1000 (paired +0.03 [-0.21, +0.27]); key profile R at leaves 0.829 / 0.840 / 0.840; leaves matched to z=2.0 80 of 81 / 80 of 81; three of the four new splits below their own null",
+      "denominator": "readout against the z = 2.0 anchor-free tree of record; 300-rep site nulls"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "the 549 leaf splits at z = 1.5",
+      "result": "HELD",
+      "value": "largest leaf 305",
+      "denominator": "af_z15"
+    },
+    {
+      "id": "P2",
+      "text": "leaves rise into the high 80s / 90s",
+      "result": "HELD",
+      "value": "87",
+      "denominator": "af_z15 / af_z10"
+    },
+    {
+      "id": "P3",
+      "text": "purity moves under 1pp",
+      "result": "HELD",
+      "value": "+0.8pp",
+      "denominator": "3,445 pool q"
+    },
+    {
+      "id": "P4",
+      "text": "certified sites do NOT rise (the new splits are below their own null)",
+      "result": "FAILED",
+      "value": "MISSED by one: 16 -> 17 (three of the four new splits below their own null, one clears it)",
+      "denominator": "69 -> 73 sites"
+    },
+    {
+      "id": "P5",
+      "text": "key-only leaf information within 1 / 1000",
+      "result": "HELD",
+      "value": "+0.03 [-0.21, +0.27]",
+      "denominator": "10,925 keyed q"
+    }
+  ],
+  "falsifier": {
+    "text": "none (EXPLORATORY; adjudicates nothing)",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "table": "z 2.0 / 1.5 / 1.0: leaves 81 / 87 / 87; largest leaf 549 / 305 / 305; purity 0.715 / 0.723 / 0.723; certified 16 of 69 / 17 of 73 / 17 of 73; key-only +13.19 / +13.23 / +13.23; key profile R 0.829 / 0.840 / 0.840; matched 80 of 81",
+    "builds": "116 / 116 s; z = 1.0 differs from 1.5 only in centroid detail (below 1.5 the minimum cell size 55 and the pair-separation bar bind, not z)"
+  },
+  "sentence_of_record": "ANCHOR-FREE-Z (2026-09-17, zero judge calls): the gate at 1.5 splits the 549 leaf and buys 6 leaves, one certified site and 0.8pp; z = 1.0 adds nothing beyond 1.5. Lowering the gate to 1.5 is cheap and mostly harmless here (one real site, three noise splits), and lowering it further does nothing. EXPLORATORY; adjudicates nothing; the z = 2.0 tree stays the anchor-free tree of record.",
+  "chips": [
+    "DESCRIPTIVE",
+    "z=1.5: 549 LEAF SPLITS, +6 LEAVES, +1 CERTIFIED, +0.8pp",
+    "z=1.0 ADDS NOTHING"
+  ],
+  "brackets": [],
+  "does_not_show": [
+    "anything adjudicated (descriptive sweep)",
+    "a change to the tree of record"
+  ],
+  "ledger": {
+    "row_id": "ANCHOR-FREE-Z",
+    "version": "v110 (3b7518a)"
+  },
+  "depends_on": [
+    "ANCHOR-FREE",
+    "H9-EXT"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md (lines as of 5dc8a06) L4388-L4398 (registration 29f8b19): question, arms, readouts, prediction",
+    "docs/judge_v2_program.md (lines as of 5dc8a06) L4400-L4419 (outcome section 2a8bb5e): the table, the prediction scored, the reading",
+    "experiment_results/anchorfree/anchor_free_z15_readout.txt and anchor_free_z10_readout.txt (2a8bb5e)",
+    "docs/test_ledger.html row ANCHOR-FREE-Z (v110): chips verbatim, evidence (af_z{15,10}_s42.toml, readouts, site nulls, 29f8b19, 2a8bb5e)",
+    "script sha16 = sha256 of tools/analysis/anchor_free_readout.py at e355764, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' lines (grep -n them regardless of line drift); line numbers are as of programme HEAD 5dc8a06"
+  ],
+  "last_update": "2026-09-22",
+  "plain_description": {
+    "sq": "SQ3 Taxonomy",
+    "what": "Rebuilds the tree discovered without declared categories, with the bar a split must clear to be accepted lowered from 2.0 to 1.5 and to 1.0. It reports leaves, the biggest leaf, purity and how many splits pass the significance certificate. No judge calls.",
+    "why": "One big leaf (549 engineering/chemistry/physics questions) refused every split, and the question was whether a looser bar finds real structure or just makes more leaves.",
+    "information": "If new splits pass the certificate, the bar was too strict. If they don't, the bar is fine and the extra leaves are noise. Result: exploratory only. A bar of 1.5 splits the big leaf and adds 6 leaves, one certified split (three of the four new splits look like noise) and +0.8 points of purity. A bar of 1.0 adds nothing more. The original tree (bar 2.0) stays the tree of record.",
+    "written": "2026-10-07"
+  }
+}

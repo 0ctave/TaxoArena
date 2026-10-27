@@ -1,0 +1,474 @@
+{
+ "code": {
+  "tools/analysis/split_side.py": {
+   "blob": "05224b5a4b76e74353bc3931ec69f0b14f0e340b",
+   "sha256-crlf16": "0cc90adcd2122d5e",
+   "sha256-lf16": "19501df01e3d6285"
+  },
+  "tools/ingest/judgebench_ingest.py": {
+   "blob": "a2b0878fe75a00720095cebd72a8bf791a7d0a83",
+   "sha256-lf16": "eeb4286b619ab6bc"
+  }
+ },
+ "corpus_db": {
+  "bytes": 3416064,
+  "counts": {
+   "claude": {
+    "category": {
+     "coding": 31,
+     "knowledge": 154,
+     "math": 34,
+     "reasoning": 51
+    },
+    "label": {
+     "A>B": 143,
+     "B>A": 127
+    },
+    "longer_is_correct": {
+     "all": "118 / 270 = 0.437",
+     "coding": "14 / 31 = 0.452",
+     "knowledge": "68 / 154 = 0.442",
+     "math": "14 / 34 = 0.412",
+     "reasoning": "22 / 51 = 0.431"
+    },
+    "response_model": {
+     "claude-3-5-sonnet-20240620": 270
+    },
+    "rows": 270,
+    "side_v2_by_category": {
+     "coding": {
+      "NOT_IN_SPLIT (none)": 31
+     },
+     "knowledge": {
+      "EVAL (stem_before_A)": 41,
+      "GATE (stem_before_A)": 13,
+      "TRAIN (stem_before_A)": 100
+     },
+     "math": {
+      "NOT_IN_SPLIT (none)": 34
+     },
+     "reasoning": {
+      "NOT_IN_SPLIT (none)": 51
+     }
+    },
+    "unique_questions": 269
+   },
+   "gpt": {
+    "category": {
+     "coding": 42,
+     "knowledge": 154,
+     "math": 56,
+     "reasoning": 98
+    },
+    "label": {
+     "A>B": 193,
+     "B>A": 157
+    },
+    "longer_is_correct": {
+     "all": "161 / 350 = 0.460",
+     "coding": "23 / 42 = 0.548",
+     "knowledge": "68 / 154 = 0.442",
+     "math": "29 / 56 = 0.518",
+     "reasoning": "41 / 98 = 0.418"
+    },
+    "response_model": {
+     "gpt-4o-2024-05-13": 350
+    },
+    "rows": 350,
+    "side_v2_by_category": {
+     "coding": {
+      "NOT_IN_SPLIT (none)": 42
+     },
+     "knowledge": {
+      "EVAL (stem_before_A)": 44,
+      "GATE (stem_before_A)": 18,
+      "TRAIN (stem_before_A)": 92
+     },
+     "math": {
+      "NOT_IN_SPLIT (none)": 56
+     },
+     "reasoning": {
+      "NOT_IN_SPLIT (none)": 98
+     }
+    },
+    "unique_questions": 350
+   }
+  },
+  "file": "judgebench_corpus_v1.db",
+  "file_sha256": "a2ca40b8d4b06126c8b61f6d1f2c2c5a2cd65ad844b542599dedf79efcf2f498",
+  "meta": {
+   "excluded_inputs": "EXCLUDED input for any construction, labelling, induction, rubric fit, selection or policy fit (HYGIENE (c)); knowledge rows are mixed-side, disclosed (rule 12)",
+   "hf_repo": "ScalerLab/JudgeBench",
+   "hf_revision": "57dd5e0b9817d07f05ec8f45a91b2ce1e310e308",
+   "normaliser_version": "norm-v1",
+   "schema": "judgebench-corpus-v1",
+   "side_export": "data_v2/manifests/REG_ARCHV2-SPLIT-2_2929bd46aa271d883050bfe735f96e621ed55fd2_side.tsv",
+   "side_export_header": "# taxoarena-side-export-v1 table_sha=75b4662eacf9adeb3aa44046e99c61712952668dd489a4933148fe9c5951117b rows=20544 split_sha256=a4e8a1362818c424d2fa5fd8b290726a80eb82d3ee5cdec354212c81da61a37d",
+   "side_rule": "knowledge: split_side.stem_key(text before the first '\\n(A) '); other: whole question, then first paragraph; 'i:' + key looked up in the side export; NOT_IN_SPLIT when absent",
+   "source_claude_bytes": "920039",
+   "source_claude_path": "data/claude-00000-of-00001.jsonl",
+   "source_claude_sha256": "3b70504588e400613bf5744a20a345da8701b7150be9a30c9db0e6f3d7b70a62",
+   "source_gpt_bytes": "1960188",
+   "source_gpt_path": "data/gpt-00000-of-00001.jsonl",
+   "source_gpt_sha256": "d5106306b38dead1b2e964ecf5534a3e7b2fc4b8d3b8da327599edfcebd76042",
+   "test": "JUDGEBENCH-REASONING-SIDE"
+  },
+  "questions_in_both_splits": 91,
+  "sqlite_version": "3.39.4",
+  "tables": {
+   "meta": {
+    "rows": 15,
+    "table_sha256": "41f2bf1d86e6e3e5b2208d8d23f01b428c9386a4450606e84fb36d44461db0cf"
+   },
+   "pairs": {
+    "rows": 620,
+    "table_sha256": "eee0193c4abf8f0003d319a9e7a04f3ba5a641d6498b4ea75d1832d9ab9b2064"
+   }
+  }
+ },
+ "hygiene": "The corpus DB and both verdict caches are EXCLUDED inputs for any construction, labelling, induction, rubric fit, selection or policy fit (HYGIENE (c)). Knowledge rows are mixed-side, disclosed (rule 12).",
+ "kind_of_hashes": "file_sha256 / table_sha256 = sha256 hex of the bytes (tables: repr(row) + LF per row ORDER BY key); code pins: blob = git blob id of the LF rendering, sha256-lf16 / sha256-crlf16 = first 16 hex",
+ "owed_checks": {
+  "corpus_db_file_sha256": "a2ca40b8d4b06126c8b61f6d1f2c2c5a2cd65ad844b542599dedf79efcf2f498",
+  "i_overlap_8token": {
+   "rule": "judge_v2.induction._tokens (\\w+ casefolded), k = 8; probe = the 350 GPT-split questions verbatim (answer-format suffix included); a question counts as hit when any 8-token run of it occurs in any text of the source",
+   "sources": {
+    "mc6:BBH": {
+     "control_fired": true,
+     "gpt_questions_hit_by_category": {},
+     "non_knowledge_hits(pair_id, max shingles in one text)": [],
+     "texts_streamed": 37471
+    },
+    "mc6:GPQA": {
+     "control_fired": true,
+     "gpt_questions_hit_by_category": {},
+     "non_knowledge_hits(pair_id, max shingles in one text)": [],
+     "texts_streamed": 5960
+    },
+    "mc6:IFEVAL": {
+     "control_fired": true,
+     "gpt_questions_hit_by_category": {},
+     "non_knowledge_hits(pair_id, max shingles in one text)": [],
+     "texts_streamed": 541
+    },
+    "mc6:MATH": {
+     "control_fired": true,
+     "gpt_questions_hit_by_category": {
+      "coding": 1,
+      "knowledge": 3,
+      "math": 5
+     },
+     "non_knowledge_hits(pair_id, max shingles in one text)": [
+      [
+       "05b84cf4-8994-51d8-9685-4c1c997780f1",
+       2
+      ],
+      [
+       "3df69193-bfc2-5941-b0d6-103eb292aa76",
+       1
+      ],
+      [
+       "9d94bfdf-55a6-506d-a64d-1f7951381e60",
+       1
+      ],
+      [
+       "c0ce2554-eafc-5ddd-8c32-677e4fce563e",
+       1
+      ],
+      [
+       "c74d8fde-41a2-527e-95ab-705a625e053c",
+       10
+      ],
+      [
+       "d3c9f4fb-13a9-50f9-859a-3dbf42e8b866",
+       2
+      ]
+     ],
+     "texts_streamed": 1324
+    },
+    "mc6:MMLU_PRO": {
+     "control_fired": true,
+     "gpt_questions_hit_by_category": {
+      "coding": 2,
+      "knowledge": 151,
+      "math": 2
+     },
+     "non_knowledge_hits(pair_id, max shingles in one text)": [
+      [
+       "0c330e4b-97db-5a89-a2c2-7513ec918421",
+       1
+      ],
+      [
+       "309a5084-bce2-5bf1-b3d3-6fa9449ae2f8",
+       1
+      ],
+      [
+       "3df69193-bfc2-5941-b0d6-103eb292aa76",
+       1
+      ],
+      [
+       "c74d8fde-41a2-527e-95ab-705a625e053c",
+       1
+      ]
+     ],
+     "texts_streamed": 126024
+    },
+    "mc6:MUSR": {
+     "control_fired": true,
+     "gpt_questions_hit_by_category": {},
+     "non_knowledge_hits(pair_id, max shingles in one text)": [],
+     "texts_streamed": 2954
+    },
+    "mmlu-pro-v2:mmlu_pro": {
+     "control_fired": true,
+     "gpt_questions_hit_by_category": {
+      "coding": 2,
+      "knowledge": 151,
+      "math": 2
+     },
+     "non_knowledge_hits(pair_id, max shingles in one text)": [
+      [
+       "0c330e4b-97db-5a89-a2c2-7513ec918421",
+       1
+      ],
+      [
+       "309a5084-bce2-5bf1-b3d3-6fa9449ae2f8",
+       1
+      ],
+      [
+       "3df69193-bfc2-5941-b0d6-103eb292aa76",
+       1
+      ],
+      [
+       "c74d8fde-41a2-527e-95ab-705a625e053c",
+       1
+      ]
+     ],
+     "texts_streamed": 125673
+    },
+    "rubric:ARCH-V2-INDUCE-RUBRIC-1": {
+     "control_fired": true,
+     "gpt_questions_hit_by_category": {},
+     "non_knowledge_hits(pair_id, max shingles in one text)": [],
+     "texts_streamed": 1
+    },
+    "rubric:ARCH-V2-INDUCE-RUBRIC-2": {
+     "control_fired": true,
+     "gpt_questions_hit_by_category": {},
+     "non_knowledge_hits(pair_id, max shingles in one text)": [],
+     "texts_streamed": 1
+    }
+   }
+  },
+  "ii_pool_membership": {
+   "pool": "pv2_41dbd3dbcd399df0",
+   "pool_row": {
+    "n_components": 3400,
+    "n_items": 3492,
+    "pool_id": "pv2_41dbd3dbcd399df0",
+    "scope": "mmlu-pro-v2"
+   },
+   "splits": {
+    "claude": {
+     "counts": {
+      "EVAL in_pool=True": 41,
+      "GATE in_pool=False": 13,
+      "TRAIN in_pool=False": 100
+     },
+     "side_vs_pool_disagreements": []
+    },
+    "gpt": {
+     "counts": {
+      "EVAL in_pool=True": 44,
+      "GATE in_pool=False": 18,
+      "TRAIN in_pool=False": 92
+     },
+     "side_vs_pool_disagreements": []
+    }
+   },
+   "view_sha256": "e35b7518878205837bfd16266dfdd8a6e76a226ed67957796d1d33cb72b5e369"
+  },
+  "iii_options_key_map": {
+   "board_of_record_judged_qids(x12all distinct valid qid)": 2811,
+   "excluded_model": "Meta-Llama-3-70B-Instruct",
+   "key": "boundary_disagreement.okey (JSON option list, whitespace-stripped); never question_text",
+   "p2dca_judgeable_ids": 3445,
+   "pool": "p2dca21ab5f4ef3ae",
+   "splits": {
+    "claude": {
+     "board_pair_ids": [
+      "09f91a0b-f769-56af-a191-3ed83f705504",
+      "1ecf95ed-55a1-56b0-9971-13dbe52bcc84",
+      "39a96169-92fd-5027-be7e-e31926ecc033",
+      "40a0f1d8-fbfe-53e3-947f-3ead7276284e",
+      "429ad667-0c08-5c77-9fc3-a264dfa770fe",
+      "4b1566d0-5d99-5e46-8883-2f9c155ed9a6",
+      "4f11e097-9e66-5d11-a40c-094f513471ac",
+      "4f912a80-4b06-5c52-8c09-46ab9dac3f50",
+      "5241073a-b9e6-5f61-967e-f50171cdfc2b",
+      "575b2175-e75b-5f1a-ba75-8fa7a1e44f90",
+      "74581892-e3c1-5ef1-8eca-46a1d4ed710a",
+      "76eabdfb-15f8-5b97-907e-85149dfc2983",
+      "8a434591-3536-5802-9480-1ed7d9cd60ac",
+      "8cbbf68f-d729-5a61-92e2-bb6f4480666f",
+      "90a99d74-d437-519b-87e4-877b1991f143",
+      "9461f002-1439-51fd-9531-36f752f3f1e4",
+      "96d3b510-63de-5bc7-bdb5-5d53fce4e864",
+      "97c53ddb-0acc-56a1-9216-bb6727e8f586",
+      "a74d50f7-9e44-5428-969c-89c74c5bd0ea",
+      "a761a9d8-0d7d-5e2a-8f9d-0961e6a22ad9",
+      "ada72612-ba5d-56c3-83fe-3fd89d07e7be",
+      "b15ac8fa-9ff6-5b4b-b0ed-b4975b712bb4",
+      "b37bde81-c51d-5677-895a-90e7ea82769c",
+      "b3f4a62f-a237-5310-8c00-f291e00d3c3a",
+      "bd3f5285-a513-58b1-8bd5-66f3d65435e2",
+      "c1a433d6-bad7-5a75-bd5e-1e3748b57324",
+      "c42511bf-0b43-5395-8a2b-f8748c6afdbf",
+      "ccefb115-4203-5168-afe6-e991d1ee7120",
+      "dc1df9a6-ac72-5834-bf91-c324da3d88ed",
+      "eb39387a-e83c-5cc7-92f7-189a5e71bf26",
+      "ec0cbbbf-0551-5778-b946-943c3f24f0a1"
+     ],
+     "counts": {
+      "board_by_side[EVAL]": 10,
+      "board_by_side[GATE]": 1,
+      "board_by_side[TRAIN]": 20,
+      "board_of_record_judged": 31,
+      "in_p2dca_by_side[EVAL]": 12,
+      "in_p2dca_by_side[GATE]": 1,
+      "in_p2dca_by_side[TRAIN]": 24,
+      "in_p2dca_judgeable": 37,
+      "keyed_eval": 154,
+      "keyed_eval_ambiguous(>1 id)": 5,
+      "keyed_mmlu_pro_row": 154
+     },
+     "knowledge_rows": 154
+    },
+    "gpt": {
+     "board_pair_ids": [
+      "000ad3d2-6b2a-5bee-baf2-fdf780b4e068",
+      "01fb6121-e025-5251-a55f-f903c79e4ec6",
+      "0f999ea7-10a1-5b85-a175-b86d50338266",
+      "129dfd5d-5786-57e3-8548-df0d26a42659",
+      "12ab4b20-e60b-59ca-b20b-500b12900def",
+      "138e503c-b09d-5d19-82ff-0b5ddc3e7bf6",
+      "1c76021c-cb8e-5477-8f7e-88855d6dd547",
+      "2d989dfb-7cf0-549e-945c-3dd060d1fad5",
+      "2daba22f-aca4-5206-a3cb-a0ff0203d831",
+      "352e1a45-3dcb-5fb0-9c38-a6b7f674a084",
+      "37577e35-cf0b-5880-97a1-857736d76651",
+      "3ca30a63-18e2-5f42-b7ec-433617b85cd6",
+      "4e13a976-9009-5501-87c2-bd1b20c0b84f",
+      "50e6565c-07f5-57d6-80d8-028498a1251b",
+      "57ee26c0-cc5d-5c32-b782-c7b5e5da5730",
+      "585e5a43-454b-56f7-aba3-fb4e22938020",
+      "5b13ebd9-3880-5331-bfcf-ac5ab4bed92a",
+      "5e29323a-13d7-5bb1-814b-1b38db3dfc50",
+      "6f1bd679-4ba1-51ba-b65d-c7463e2134bf",
+      "81ec57f2-483f-515f-93ff-78a8910b2153",
+      "8609c463-a567-5b57-838f-12e3dac9fa8b",
+      "8aaa1627-21b0-520f-b698-67cd5d77dbc9",
+      "8de34479-e94c-5c30-9146-da3d92f7223c",
+      "97e2c15b-92c8-5934-bf37-c46fbf095930",
+      "9e079604-2288-52ba-9d89-4868ccd34200",
+      "9fbc9238-47af-5656-ac85-cf5b0c00fd8f",
+      "a3f45559-827d-53c5-9f1b-200ea1876ac8",
+      "a6f94de7-dee6-579b-852a-1be7ca389cd2",
+      "b7bbea2c-8e83-50be-a385-70d16a0d507c",
+      "b82d8f3f-f994-5775-b1b1-13420519ca81",
+      "ba87d469-ec2e-5a8f-95e8-b3065f20b584",
+      "c67cf264-33f9-5730-aeea-a7364756a96b",
+      "ca91b783-54e9-5fb6-9c30-a7ebf3ee7258",
+      "d61248f3-8e80-5097-8892-10c086a492d2",
+      "d9cc990f-fb19-521e-a8fa-68f3325f8730",
+      "dcfbadd5-4b7c-5ffd-b66d-5cb0a380605d",
+      "ea56946d-14fb-5016-9550-1216f26856f5",
+      "ef607538-1628-5cce-bc92-093ff755586d"
+     ],
+     "counts": {
+      "board_by_side[EVAL]": 13,
+      "board_by_side[GATE]": 4,
+      "board_by_side[TRAIN]": 21,
+      "board_of_record_judged": 38,
+      "in_p2dca_by_side[EVAL]": 14,
+      "in_p2dca_by_side[GATE]": 5,
+      "in_p2dca_by_side[TRAIN]": 26,
+      "in_p2dca_judgeable": 45,
+      "keyed_eval": 154,
+      "keyed_eval_ambiguous(>1 id)": 3,
+      "keyed_mmlu_pro_row": 154
+     },
+     "knowledge_rows": 154
+    }
+   }
+  },
+  "produced_by": {
+   "tools/analysis/split_side.py": {
+    "blob": "05224b5a4b76e74353bc3931ec69f0b14f0e340b",
+    "sha256-crlf16": "0cc90adcd2122d5e",
+    "sha256-lf16": "19501df01e3d6285"
+   },
+   "tools/ingest/judgebench_ingest.py": {
+    "blob": "a2b0878fe75a00720095cebd72a8bf791a7d0a83",
+    "sha256-lf16": "eeb4286b619ab6bc"
+   }
+  },
+  "reads": {
+   "data_v2/REG_ARCHV2-SPLIT-2_2929bd46aa271d883050bfe735f96e621ed55fd2/eval_view_REG.db": "e35b7518878205837bfd16266dfdd8a6e76a226ed67957796d1d33cb72b5e369",
+   "experiment_results/x12_crossdomain/stack_v2_promptv2_x12all.db": "eb0bec2795f3e5a011c63d64598408c234d08d1e88a7ae4c72fd17d195fe2d28",
+   "judgebench_corpus_v1.db": null,
+   "mmlu_pro_dataset_cache_v2.db": "4f65414f7625a1e7da44cc599bbf4a951e8866f472fa9532f09ee103953efa73",
+   "multicorpus_cache_v1.db": "ad66e30a0eb4abd6539c17a4edc5aad840b6f74331f009895befa6567e770577"
+  },
+  "w1_w5": {
+   "admitted_pids": [
+    53020,
+    2196,
+    53432,
+    36784,
+    56996,
+    55800,
+    2580,
+    54332,
+    51444,
+    49588,
+    22032,
+    24032,
+    14252,
+    35936
+   ],
+   "free_ram_gb": 28.8,
+   "probes": {
+    "eval_view_REG.db": "FREE",
+    "judgebench_corpus_v1.db": "FREE",
+    "mmlu_pro_dataset_cache_v2.db": "FREE",
+    "multicorpus_cache_v1.db": "FREE",
+    "stack_v2_promptv2_x12all.db": "FREE"
+   }
+  },
+  "wall_seconds": 18.2
+ },
+ "registration": "docs/judge_v2_program.md L17330-L17533 (verbatim L17335-L17498), commit 6134573",
+ "side_export": {
+  "file": "data_v2/manifests/REG_ARCHV2-SPLIT-2_2929bd46aa271d883050bfe735f96e621ed55fd2_side.tsv",
+  "rows": 20544,
+  "table_sha": "75b4662eacf9adeb3aa44046e99c61712952668dd489a4933148fe9c5951117b"
+ },
+ "sources": {
+  "claude": {
+   "bytes": 920039,
+   "path": "data/claude-00000-of-00001.jsonl",
+   "revision": "57dd5e0b9817d07f05ec8f45a91b2ce1e310e308",
+   "sha256": "3b70504588e400613bf5744a20a345da8701b7150be9a30c9db0e6f3d7b70a62",
+   "url": "https://huggingface.co/datasets/ScalerLab/JudgeBench/resolve/57dd5e0b9817d07f05ec8f45a91b2ce1e310e308/data/claude-00000-of-00001.jsonl"
+  },
+  "gpt": {
+   "bytes": 1960188,
+   "path": "data/gpt-00000-of-00001.jsonl",
+   "revision": "57dd5e0b9817d07f05ec8f45a91b2ce1e310e308",
+   "sha256": "d5106306b38dead1b2e964ecf5534a3e7b2fc4b8d3b8da327599edfcebd76042",
+   "url": "https://huggingface.co/datasets/ScalerLab/JudgeBench/resolve/57dd5e0b9817d07f05ec8f45a91b2ce1e310e308/data/gpt-00000-of-00001.jsonl"
+  }
+ },
+ "test": "JUDGEBENCH-REASONING-SIDE"
+}

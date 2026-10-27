@@ -1,0 +1,174 @@
+{
+ "id": "TREE-BACKOFF",
+ "title": "TREE-BACKOFF: does empirical-Bayes back-off of AF-U leaf accuracies toward their ancestors (tau on GATE) route the union EVAL better than flat-leaf routing, k-means + Ward-on-centroids beside? (zero calls; REGISTERED 2026-10-06)",
+ "question": "Does the tree's hierarchy improve a routing decision on the content-closed v2 union split?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "9bff7e39",
+  "program_lines": "docs/judge_v2_program.md L24814-L24826",
+  "program_lines_as_of": "9bff7e39 (as registered); brackets appended to L24818, L24820, L24821 in the commit that writes this update (parent 4eefac21), re-grepped; OUTCOME brackets appended to L24820, L24821, L24822 in the commit that writes the outcome (parent ab78c74f), re-grepped",
+  "date": "2026-10-06",
+  "heading": "## Registered 2026-10-06 (before any code or call) — TREE-BACKOFF: ...",
+  "provenance": "the author's \"start 1 to 4\" (2026-10-06, in the chat; the four tests of the orchestrator's brief of 2026-10-06); registrar's record docs/judge_v2_program.md L24808-L24812; deciding clause, Support and predictions the registrar's, pre-data"
+ },
+ "script": {
+  "path": "tools/analysis/tree_backoff.py (imports union_route_common.py d5473976, union_cells_io.py 92a04543, union_af_route.py bf3f17db, v2_declared_cells.py f0f56805, escalation_curve.py 0acfb0cc unchanged; git blobs, LF)",
+  "sha16": "sha256-lf16:420538b917e9c2c6 (blob:da80c57e927c6ebf8a1db9e2f0420c96c1514519, LF of record; sha256-crlf16:6615742b83315791 beside; copied from READY_tree-backoff 4eefac21)",
+  "commit": "e787a555 (branch tree-backoff, parent 9bff7e39); merged by path 4303f24d (1 path; git hash-object on main = da80c57e, POSTRUN 9be0e7c3)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_tree-backoff.md (section '## VERDICT: READY (no blocker)')",
+  "commit": "4eefac21"
+ },
+ "go": "n/a (0 calls; the 4k-match rule not engaged); the author's \"start 1 to 4\" (2026-10-06, in the chat; the four tests of the orchestrator's brief of 2026-10-06)",
+ "run": {
+  "outcome_file": "experiment_results/archv2/tree_backoff/outcome.txt (sha256 13c08450ebf9b9a57f98cfd4d2fb6819560c6cf89e2e244c608d267da8ea5be6, LF file, 171 lines; write-once, never committed); backup E:/TaxoArena_backup_2026-10-06_tree-backoff (SHA256SUMS 6 / 6 OK, review)",
+  "outcome_commit": "outcome not committed (run from main after merge 4303f24d)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "pv2_1575de61bb20e977 (content-closed under CK-CLOSE-v2, residual disclosed); view sha256 before = after (gen c2930c60..., eval e35b7518...); [TB-IDENTITY] passed; busy evidence files 0-byte, first check on the pre-fix busy.ps1 (PR-3); the earlier failed attempts were API network errors (ENOTFOUND), with no data read (the orchestrator's brief of 2026-10-06)",
+  "date": "2026-10-06"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_tree-backoff.md",
+  "commit": "9be0e7c3",
+  "verdict": "VALID; BO1 HIERARCHY-HELPS as registered, MARGINAL; reproduced to the digit by own code (D_B +0.00897, tau* 100, every GATE count); own two-stage SE 0.00435-0.00456 vs 0.00441, Wald lower bound > 0 in 4 / 4 runs, percentile reaches 0; words W-1..W-4; PR-1 / PR-2 MEDIUM, PR-3 / PR-4 LOW"
+ },
+ "criteria": [
+  {
+   "id": "BO1",
+   "text": "DECIDING, the POINT AND the INTERVAL jointly, one clause: D_B = acc(tree back-off) - acc(tree flat-leaf) on EVAL; HIERARCHY-HELPS iff D_B > 0 AND 95% two-stage lower bound > 0; HIERARCHY-HURTS iff D_B < 0 AND upper bound < 0; NEITHER otherwise (tau* = 0 on GATE -> NEITHER, 'GATE chose no shrinkage'). Secondary D_TK (tree back-off minus k-means back-off) ruled DESCRIPTIVE. Verdict line DESCRIPTIVE-ONLY at the prediction (D_B +0.30pp < MDE80 0.71pp)",
+   "result": "HELD",
+   "value": "HIERARCHY-HELPS (marginal) [SC]: D_B +0.90pp (+0.00897), two-stage 95% [+0.03pp, +1.76pp] (+0.00033, +0.01761); realised SE 0.0044; percentile [-0.02pp, +1.68pp] reaches 0; tau* 100 on GATE (1249 vs 1248 at tau 200; at tau 200 the interval reaches 0, W-2); TF 0.62011, TB 0.62908. HELD = the registered word HIERARCHY-HELPS, not refuted at the planned n",
+   "denominator": "5,907 EVAL items / 5,404 CK-CLOSE components (Kish 1.311); one tree"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "tau*(AF-U) in [5, 100]; P(tau* = 0) 0.15",
+   "result": "HELD",
+   "value": "tau* 100 in [5, 100]; P(tau* = 0) 0.15, Brier 0.0225",
+   "denominator": "GATE 1,944 key-complete items"
+  },
+  {
+   "id": "P2",
+   "text": "D_B +0.30pp [-0.30, +0.90]",
+   "result": "HELD",
+   "value": "+0.897pp in [-0.30, +0.90] (at the band's edge)",
+   "denominator": "5,907 EVAL items / 5,404 CK-CLOSE components (Kish 1.311)"
+  },
+  {
+   "id": "P3",
+   "text": "BO1: HIERARCHY-HELPS 0.15, NEITHER 0.80, HIERARCHY-HURTS 0.05 (Brier)",
+   "result": "n/a",
+   "value": "observed HIERARCHY-HELPS (forecast 0.15); Brier 1.3650 as printed (three-class sum); one-sided on the observed class 0.7225 (the record's convention, PR-4)",
+   "denominator": "5,907 EVAL items / 5,404 CK-CLOSE components (Kish 1.311)"
+  },
+  {
+   "id": "P4",
+   "text": "descriptive: D_KB +0.30pp [-0.30, +0.90]; D_TK -0.40pp [-1.40, +0.60]",
+   "result": "HELD",
+   "value": "x2: D_KB +0.24pp in [-0.30, +0.90]; D_TK +0.21pp in [-1.40, +0.60]",
+   "denominator": "5,907 EVAL items / 5,404 CK-CLOSE components (Kish 1.311)"
+  },
+  {
+   "id": "P5",
+   "text": "descriptive: share of EVAL picks changed under TB 0.15 [0.05, 0.35]; BBH carries more than half of |D_B|, probability 0.55",
+   "result": "PARTIAL",
+   "value": "share changed 0.24733 in [0.05, 0.35] HELD; BBH carries > half FALSE (BBH +0.00186 of +0.00897), Brier 0.3025 (PARTIAL = one leg HELD, one FALSE)",
+   "denominator": "5,907 EVAL items / 5,404 CK-CLOSE components (Kish 1.311)"
+  },
+  {
+   "id": "P6",
+   "text": "descriptive (weak regions, c 0.10, best single): AF-U any-depth region EVAL gap -0.10 [-0.20, -0.03], within 0.03 of the KF flat region's gap, probability 0.60",
+   "result": "PARTIAL",
+   "value": "band HELD (AF-U any-depth gap -0.18779 in [-0.20, -0.03]); within 0.03 of KF FALSE (|difference| 0.03750, KF -0.22529), Brier 0.3600 (PARTIAL = one leg HELD, one FALSE)",
+   "denominator": "5,907 EVAL items / 5,404 CK-CLOSE components (Kish 1.311)"
+  }
+ ],
+ "falsifier": {
+  "text": "F-BO fires iff BO1 reads HIERARCHY-HURTS: back-off toward the tree's ancestors routes worse than leaves alone; overturns the hierarchy-use premise (docs/literature/2026-10-03_tree_uses.md) for this roster, split and tree; 'the hierarchy helps routing' sentences withdrawn. NEITHER is not 'no value'",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "support": "DEFF 1.302 measured two-stage (ESCALATION-RC RC1, policy vs modified policy on the same AF-U cells; transport escalation -> back-off; ESCALATION-CURVE's 1.202 lower, larger kept); n_eff 4,537; SE(D_B) 0.255pp (i.i.d. 0.223pp x 1.141); MDE80 0.71pp; DESCRIPTIVE-ONLY at the prediction; structural: |D_B| <= share of changed picks (about 0.15)",
+  "BO1": "HIERARCHY-HELPS (marginal) [SC]",
+  "D_B": "+0.90pp (+0.00897), two-stage 95% [+0.03pp, +1.76pp]; realised SE 0.0044; percentile [-0.02pp, +1.68pp]; EVAL 5,907 items / 5,404 components",
+  "tau_star": "100 on GATE (1,944 items): 1249 correct vs 1248 at tau 200; D_B at tau 200 +0.75pp, interval reaches 0",
+  "by_source": "MMLU_PRO +1.33pp [+0.11, +2.55] (n 3,376); BBH +0.64pp [-0.89, +2.17] (n 1,716; +0.00186 of +0.00897); MUSR -1.75pp (n 229); NO_XSRC +0.80pp [-0.06, +1.67] (n 5,716)",
+  "support_realised": "SE_2stage 0.441pp (registered 0.255), variance ratio 2.205 (registered 1.302, transported; outcome prints 2.208), n_eff 2,679 (registered 4,537; outcome prints 2,676), MDE80 1.23pp (registered 0.71pp); component-only DEFF 0.985",
+  "descriptive": "D_TK +0.21pp [-0.57, +0.98]; D_KB +0.24pp [-0.35, +0.83]; D_B - D_KB +0.66pp [-0.23, +1.54] (shape- and filing-confounded, W-3)"
+ },
+ "sentence_of_record": "TREE-BACKOFF (2026-10-06, 0 calls) — VALID; BO1 HIERARCHY-HELPS, marginally. Empirical-Bayes back-off of AF-U leaf accuracies toward their ancestors (tau* = 100, chosen on GATE) routes EVAL +0.90pp better than AF-U's flat-leaf policy (two-stage 95% [+0.03pp, +1.76pp]; the percentile interval [-0.02, +1.68] reaches 0; realised SE 0.44pp against the registered 0.26pp; MDE80 1.23pp). F-BO not fired. [POSTRUN docs/reviews/POSTRUN_tree-backoff.md, 9be0e7c3, W-2..W-4: tau 100 beats tau 200 by one GATE item and at tau 200 the interval reaches 0; the gain comes from MMLU_PRO (+1.33pp), not BBH (P5 FALSE); D_TK and D_B - D_KB are confounded by shape and filing, not a comparison of hierarchy quality; all arms [SC]; one tree, one draw, one roster, qwen3; EVAL 5,907 items / 5,404 components.]",
+ "chips": [
+  "REGISTERED 2026-10-06, BEFORE ANY CODE",
+  "VALID (POST-RUN 9be0e7c3): BO1 HIERARCHY-HELPS (marginal) [SC]; F-BO NOT FIRED",
+  "W-1..W-4: D_B +0.90pp [+0.03, +1.76], REALISED SE 0.0044; TAU* 100 BEATS TAU 200 BY ONE GATE ITEM, AT TAU 200 THE INTERVAL REACHES 0; GAIN FROM MMLU_PRO (+1.33pp), NOT BBH (P5 FALSE); D_TK / D_B − D_KB CONFOUNDED BY SHAPE AND FILING"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-06",
+   "by": "registrar (READY_tree-backoff 4eefac21, READY, no blocker)",
+   "text": "pre-data brackets in the registration: INSTRUMENT L24818 (instrument = tree_backoff.py blob:da80c57e, LF; crlf16 6615742b; build e787a555, not merged; readings R1 pseudo-cells under the union root, 0 EVAL pseudo items; R4 GATE cell = modal AF leaf, K cells by declared source; R10 weak regions no minimum size, ties to the larger node then by name: CONFIRMED as stated in the docstring L41-L72), READOUTS AND CRITERIA L24820 (D-1 MEDIUM: D_TK and D_B - D_KB read post-run as shape-confounded (AF-U multiway depth 8 vs K-WARD binary depth 10) and filing-asymmetric (UNION-AF-ROUTE D-4), not a comparison of hierarchy quality; C-3: NO_XSRC count reconciled with the registered 191), SUPPORT L24821 (D-2 LOW: DEFF seed range 1.29-1.46, POSTRUN_escalation_rc L38; at 1.46 SE 0.271pp, MDE80 0.76pp; C-2: realised DEFF / n_eff / MDE80 beside BO1 against 1.302 / 4,537 / 0.71pp). BO1, Support, predictions and the verdict line unchanged; registrar's record L24897-L24903"
+  },
+  {
+   "date": "2026-10-06",
+   "by": "registrar (POSTRUN 9be0e7c3, VALID)",
+   "text": "OUTCOME brackets in the registration: READOUTS AND CRITERIA L24820 (BO1, F-BO, W-1..W-4, C-1), SUPPORT L24821 (C-2 realised, C-3, PR-1), PREDICTIONS L24822 (P1-P6, PR-4 Brier convention); outcome section docs/judge_v2_program.md L24936-L24948 (_as_of the commit that writes it, parent ab78c74f, re-grepped). PR-1 (transported DEFF too small; future registrations take the ratio 2.2 or a TRAIN-only pilot) and PR-3 (busy check since extended to the new scripts, per the orchestrator's brief) relayed. the earlier failed attempts were API network errors (ENOTFOUND), with no data read (the orchestrator's brief of 2026-10-06)"
+  }
+ ],
+ "does_not_show": [
+  "a robust or clear gain (marginal; significant at tau 100 only, one GATE item ahead of tau 200; percentile interval reaches 0)",
+  "a gain from BBH (P5 FALSE), or one that survives without the 191 cross-source filings (+0.80pp [-0.06, +1.67])",
+  "that the tree's hierarchy beats k-means', or any comparison of hierarchy quality (W-3)",
+  "a label-free gain (every arm [SC])",
+  "judged decisions; other rosters, draws, embedders or splits",
+  "any sub-anchor profile (no per-leaf board, interval or row)"
+ ],
+ "ledger": {
+  "row_id": "TREE-BACKOFF",
+  "version": "v413 (2026-10-06: OUTCOME bracket; READY chip replaced by VALID ok + W warn chips) | v409 (2026-10-06: READY chip beside the REGISTERED chip; pre-data bracket in the observed cell)"
+ },
+ "depends_on": [
+  "UNION-AF-ROUTE (AF-U, K_s, U1 identity)",
+  "ROUTE-SOURCE-NULL (SRC arm)",
+  "ESCALATION-RC (SE / DEFF transport)",
+  "ESCALATION-CURVE (GATE set; DEFF beside)",
+  "CELL-FLIPS (BBH concentration; best single)"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; sub-anchor profiles (PROFILE-TREE-ROBUST, KEY-SUBANCHOR-SCALE) checked: per-leaf accuracies are policy inputs only, no per-leaf profile published; no judge, rubric, GMM LR / BIC"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "cpu": "CPU minutes to about 1 h; pool reader (rule 7 slot); engine-coder about 4 h"
+ },
+ "outputs": "never committed; sha256-pinned on E:/TaxoArena_backup_<date>_<tag> with SHA256SUMS.txt; temp via scratch_dir.py",
+ "label_status": "every arm [SC] (AF-U federated per source; per-source k-means; source policy)",
+ "sources": [
+  "docs/judge_v2_program.md L24814-L24826 (_as_of the commit that writes them, parent 4c764a1e, re-grepped)",
+  "docs/judge_v2_program.md L24808-L24812 (registrar's record)",
+  "the orchestrator's brief of 2026-10-06; the author's \"start 1 to 4\" (2026-10-06, in the chat; the four tests of the orchestrator's brief of 2026-10-06)",
+  "docs/agents/results/UNION-AF-ROUTE.json, ROUTE-SOURCE-NULL.json, ESCALATION-RC.json, ESCALATION-CURVE.json, CELL-FLIPS.json (transported SEs, identity digits, prior results)",
+  "docs/reviews/READY_tree-backoff.md (commit 4eefac21): pins, verdict, conditions, defects, brackets owed",
+  "docs/judge_v2_program.md L24897-L24903 (registrar's record, _as_of the commit that writes it, parent 4eefac21, re-grepped)",
+  "docs/reviews/POSTRUN_tree-backoff.md (commit 9be0e7c3): verdict, deciding numbers, words W-1..W-4, Support realised, defects",
+  "experiment_results/archv2/tree_backoff/outcome.txt (sha256 13c08450..., not committed): points, intervals, predictions",
+  "docs/judge_v2_program.md L24936-L24948 (outcome section, _as_of the commit that writes it, parent ab78c74f, re-grepped)"
+ ],
+ "last_update": "2026-10-06",
+ "consequence": "registered: the hierarchy enters the router-card policy as a CANDIDATE for a new registration only; a confirmation registers tau with selection propagated (GATE resampled) and Support built on the realised variance ratio 2.2",
+ "plain_description": {
+  "sq": "SQ1 Use",
+  "what": "No calls. On the content-closed combined dataset, the test compared routing by each leaf's own model accuracies with routing that blends small leaves' estimates toward their parent nodes (empirical-Bayes 'back-off'). A k-means hierarchy was run alongside.",
+  "why": "It asks whether the tree's hierarchy itself (not just its leaves) improves the decision of which model to send a question to.",
+  "information": "A gain supports the claim that the hierarchy is useful. A loss would withdraw 'the hierarchy helps routing'. Result: done, marginal gain of +0.9 points (range +0.03 to +1.76). The gain depends on the chosen blending strength (one item decided it; at the next setting the range touches zero). It comes from MMLU-Pro, not BBH, and uses source labels. It does not show the tree's hierarchy beats k-means'.",
+  "written": "2026-10-07"
+ }
+}

@@ -1,0 +1,44 @@
+[
+ {
+  "label": "plain",
+  "raw": "{\"critique_a\":\"a\",\"critique_b\":\"b\",\"comparison\":\"c\",\"winner\":\"Model A\",\"confidence\":0.9}",
+  "winner": "Model A",
+  "confidence": 0.9
+ },
+ {
+  "label": "fenced, lowercase, string confidence",
+  "raw": "```json\n{\"winner\": \"model b\", \"confidence\": \"0.75\"}\n```",
+  "winner": "Model B",
+  "confidence": 0.75
+ },
+ {
+  "label": "braces inside prose",
+  "raw": "prose before {\"winner\":\"TIE\",\"confidence\":0.4} prose after",
+  "winner": "TIE",
+  "confidence": 0.4
+ },
+ {
+  "label": "draw synonym",
+  "raw": "{\"winner\":\"Draw\",\"confidence\":0.5}",
+  "winner": "TIE",
+  "confidence": 0.5
+ },
+ {
+  "label": "unparseable",
+  "raw": "no json here at all",
+  "winner": "INVALID",
+  "confidence": 0.0
+ },
+ {
+  "label": "latex escapes",
+  "raw": "{\"winner\":\"Model A\",\"confidence\":0.8,\"comparison\":\"uses \\\\alpha and \\( x \\)\"}",
+  "winner": "Model A",
+  "confidence": 0.8
+ },
+ {
+  "label": "think block stripped before parse",
+  "raw": "<think>reasoning</think>\n{\"winner\":\"Model B\",\"confidence\":0.7}",
+  "winner": "Model B",
+  "confidence": 0.7
+ }
+]

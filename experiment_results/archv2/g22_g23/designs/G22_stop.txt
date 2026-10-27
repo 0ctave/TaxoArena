@@ -1,0 +1,52 @@
+[POOL] p2dca21ab5f4ef3ae: pool_guard.assert_pool_of_record PASSED (the id file and the reserved_pool rows both hash to it; the guard's own read-only open of the eval DB is not in the DB-open log below)
+=== ARCH-V2 G22 SIMULATOR, leg stop: RUN UNDER THE REGISTRATION ARCH-V2-G22 at d6129cf (programme L15208-L15265), master ARCHV2-G22-REC-1, R 1000 ===
+  argv: tools/analysis/archv2_g22_sim.py --leg stop --token experiment_results/archv2/g22_g23/G22_validity_v2.txt.validity_v2.json --workers 6 --out experiment_results/archv2/g22_g23/designs/G22_stop.txt
+  master 'ARCHV2-G22-REC-1' | data root Z:\FAC\TUBerlin\THESIS\TaxoArena | started 2026-09-24 16:12:08
+  instrument identity (git blob / sha256-lf16 of the LF rendering; working tree state):
+    archv2_g22_sim.py                  blob:72b0197805dbd77816db23453a0a92cab38ac86f sha256-lf16:fee6e27a207fbbea (CRLF sha256-crlf16:016c382dfc765844)
+    archv2_arena/__init__.py           blob:210bd76eaff44916ea9d85b0d6dcccd711d85154 sha256-lf16:ae6a0736954a8674 (CRLF sha256-crlf16:2f57cabe6c394809)
+    archv2_arena/streams.py            blob:30c23f9700a1309cda059c76bfe6fcbc6c41d64b sha256-lf16:315a30993d340650 (CRLF sha256-crlf16:bd52a16174d485b7)
+    archv2_arena/ro.py                 blob:98cfb84a58e7844e24b73ba301c2792cddc61b7c sha256-lf16:23d4f38710e3007f (CRLF sha256-crlf16:297117b2176e7cd7)
+    archv2_arena/bt.py                 blob:8ee2e28b4fe9097f68b462562adaedea92f54813 sha256-lf16:138bd034706eb2e1 (CRLF sha256-crlf16:b9c25ce1f79d1875)
+    archv2_arena/cert.py               blob:d150ec9c3084352354bd83c4b106f7936f11d036 sha256-lf16:11e2ec7e76e0b495 (CRLF sha256-crlf16:1a5f2a861058b6d1)
+    archv2_arena/verdict_model.py      blob:418d979e3ca632340f739a9449180e653932bddf sha256-lf16:c87ef3a34e7b3a7f (CRLF sha256-crlf16:969bb9949e54a638)
+    archv2_arena/data.py               blob:7de0b135028ba96eab24b2ba998a62dd74e03247 sha256-lf16:78d3947f51dc8596 (CRLF sha256-crlf16:769163d4f95b4437)
+    archv2_arena/design.py             blob:4959cb525c8d07a26d19358c3f98342d5b28b3d2 sha256-lf16:becd63768eedb8fc (CRLF sha256-crlf16:c0e5c5ffd6dcd994)
+    archv2_arena/g22.py                blob:c21e0a33867aca0e15fe1c135089a931f0c8e580 sha256-lf16:3d178b1bc6d7207d (CRLF sha256-crlf16:6fa3240835058d32)
+    archv2_arena/report.py             blob:51639563bdd47d48e0ec8b1673eee0e7b865653a sha256-lf16:da954a3c4d1b833f (CRLF sha256-crlf16:50e5e1884a1eb849)
+    archv2_arena/synth.py              blob:02db84ba5d3ee2c819bddc1be4455ec0e186b5ca sha256-lf16:b64657775ffa4422 (CRLF sha256-crlf16:3633804b08d6b3f1)
+    archv2_arena/selftest_g22.py       blob:608dc869a455bf0c9d811fa39e263b994ef5c513 sha256-lf16:513713722fa3eeba (CRLF sha256-crlf16:590cb0db47b40464)
+    archv2_arena/selftest_g22_v2.py    blob:bb1143cae99cfdc09d42d26b5f62ebbdef5c0ec3 sha256-lf16:9c8d993ddc3bc09f (CRLF sha256-crlf16:5b8d345f2d21a9c9)
+    archv2_arena/g23.py                blob:ff6a1201db9321c4379e933f1b4c9d34e4047410 sha256-lf16:882540d6ff955471 (CRLF sha256-crlf16:86d19c819e1019cc)
+    archv2_arena/selftest_g22_rebind.py blob:69d1e569867691d1787b3cbdcd89ebede19817cc sha256-lf16:a87ea1646bbf4dee (CRLF sha256-crlf16:8b90c6c6e65ade12)
+  inputs (size, mtime; -wal / -journal sizes):
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\mmlu_pro_dataset_cache_v2.db | 974917632 B | mtime 2026-09-19 16:30:10 | -wal 0 B
+  rosters: mmlu46 46
+  category data check (MMLU-Pro eval_results): 6624 question ids carry more than one normalised category; the anchor is the modal value
+  supply: manifest worktree-agent-a11f8bf63949fabe0:data_v2/manifests/DEV_DEV-20260923-ED1.json (DEV_DEV-20260923-ED1, DEV, NOT OF RECORD): eval_units {'mc6-2026-09-11': 6483, 'mmlu-pro-v2': 4002}, ALLOCATED IN PROPORTION TO STRATUM SIZES (arithmetic, not the split's per-anchor counts)
+    mmlu: 14 strata, 4002 EVAL questions: biology 237, business 262, chemistry 378, computer science 137, economics 281, engineering 322, health 271, history 127, law 366, math 450, other 308, philosophy 167, physics 432, psychology 264
+
+=== (e) THE KEY-BLIND STOP: P(MISCALIBRATED | calibrated simulated judge) ===
+  design: 46 models x 14 strata x N 2; stage 1 = 7 strata drawn stratified by size (biology, business, chemistry, computer science, economics, engineering, math); key-blind statistic = frozen-pair nominal (-3.3172, +3.3001) on stage 1; rule (memo section 4): frozen >= 9 + margin -> stop and read on stage 1; else projected (x 14/7) >= 4.5 -> stage 2 and read on all; else no status (rate UB only)
+  COUNT: the ALL-LABEL count (a builder limit of record, d6129cf); it reads under ruling (3)'s caveat.
+  CALIBRATED WORLD: every edge's wrong label ~ Bernoulli(Phi(-|m| / sqrt(s^2 + tau(A)^2))) under the frozen pair (the widener is TRUE); the read refits the widener LOAO on those labels and applies calibration_status.status_word(LOAO nominal, all-label wrong among called). The KEY WORLD (the simulated judge's own labels) is printed beside, deciding nothing.
+  the validity token of record: PASS AT THE BOUNDARY (D9 realised on H2 u_raw_wrong) | token_digest (in full) 3069666d0f5e553ad61bd9cb8f178e2771d6fd683f63f01b8b35435cf56cdfc0
+  READINGS ADMISSIBLE ONLY AS (ruling 2 (i)): readings of a post-hoc-specified simulator that passed at the boundary and is NOT CENTRED on the record, validated on grok_calib's 12-model, 14-anchor board only, EXTRAPOLATED to the 46-model roster and to a proportionally ALLOCATED EVAL supply (the DEV manifest; the real split is not drawn); a MEETS read on P(nominal >= 9) is 'optimistic by construction'
+  BIAS (ruling 2 (iii), 56751fa): the simulator over-calls wrong: raw-wrong medians 13 / 18 vs 7 / 8 (full board), 11 / 13 vs 3 / 3 (H2); LOAO called 7-15% low; LOAO nominal 6-18% high; the PRIMARY here is the LOAO nominal, so P(nominal >= 9) and the (d) identification rate (more wrong events) are OPTIMISTIC; the direction for the stop leg is NOT DETERMINED
+  margin 0.0: read at stage 1 960, at full 40, no status 0 | P(MISCALIBRATED | calibrated) = 20 / 1000 = 0.020, Wilson [0.013, 0.031] vs 0.05 (registered bar, ARCH-V2-G22 at d6129cf (programme L15208-L15265)): MEETS | key world words {'NOT DETECTABLY MISCALIBRATED': 876, 'MISCALIBRATED': 124}
+  margin 1.0: read at stage 1 210, at full 790, no status 0 | P(MISCALIBRATED | calibrated) = 21 / 1000 = 0.021, Wilson [0.014, 0.032] vs 0.05 (registered bar, ARCH-V2-G22 at d6129cf (programme L15208-L15265)): MEETS | key world words {'NOT DETECTABLY MISCALIBRATED': 847, 'MISCALIBRATED': 153}
+  margin 2.0: read at stage 1 1, at full 999, no status 0 | P(MISCALIBRATED | calibrated) = 24 / 1000 = 0.024, Wilson [0.016, 0.035] vs 0.05 (registered bar, ARCH-V2-G22 at d6129cf (programme L15208-L15265)): MEETS | key world words {'NOT DETECTABLY MISCALIBRATED': 846, 'MISCALIBRATED': 154}
+  margin 3.0: read at stage 1 0, at full 1000, no status 0 | P(MISCALIBRATED | calibrated) = 24 / 1000 = 0.024, Wilson [0.016, 0.035] vs 0.05 (registered bar, ARCH-V2-G22 at d6129cf (programme L15208-L15265)): MEETS | key world words {'NOT DETECTABLY MISCALIBRATED': 846, 'MISCALIBRATED': 154}
+  map frozen-pair nominal -> LOAO-refit nominal (key world, all 14 strata): ratio median 1.325 [1.194, 1.479]; least-squares slope 0.260
+
+  EXECUTION WITNESS (new code paths): {'edges_fast.boards': 4200000, 'edges_fast.edges': 14407567, 'records.stored': 1000}
+  DB OPENS (all through pool_guard.open_ro: -wal/-journal refused, then mode=ro&immutable=1): 1
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\mmlu_pro_dataset_cache_v2.db
+  RANDOM STREAMS (master 'ARCHV2-G22-REC-1'): 19002 named streams, log sha256 701e26e91cca22df1799e0801da5d1048778f1f33f5a979f29671d96c3bd7af2 (full list in the .streams.tsv beside this file); seed = sha256(master|name)[:8] big-endian unless 'of record'
+    designs/D1-full/part0/strata                                 17239027136541329359  numpy.PCG64
+    stop/rep0000/biology/qboot                                   17616568310656073428  numpy.PCG64
+    stop/rep0000/business/qboot                                   6429515383425249334  numpy.PCG64
+    stop/rep0000/calibrated-labels                                1414948474908760401  numpy.PCG64
+    stop/rep0000/chemistry/qboot                                  8700584534356430821  numpy.PCG64
+    stop/rep0000/computer science/qboot                          10757069071963731272  numpy.PCG64
+    ... 18996 more

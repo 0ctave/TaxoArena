@@ -1,0 +1,132 @@
+{
+  "id": "REF-CONF",
+  "title": "REF-CONF: can a reference that reports its own confidence let the judge discount weak hints? (B7 mitigation; ~2.8k solves + 7,912 judge calls)",
+  "question": "GENERATION: grok-reasoning re-solves the 2,812 x12 questions returning {answer, confidence}; registered gate AUC >= 0.65 and >= 15pp accuracy gap. JUDGING: STACK-v2 with the new reference shown WITHOUT vs WITH its confidence, both arms fresh, grok non-reasoning, R3's 1,980 matches; PRIMARY conf > base on key-decidable p < 0.05; SECONDARY ref-wrong gain >= +3pp with ref-correct loss < 1pp; prediction +0.5 to +1.5pp.",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "b208803",
+    "program_lines": "docs/judge_v2_program.md L402-L415 (registration), L440-L446 (gate outcome) and L447-L458 (judging outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-10 15:30 (before any call) — REF-CONF, a reference that reports its own confidence",
+    "outcome_heading": [
+      "L440: - **REF-CONF gate (2026-09-10 17:10): PASS.** 2,801 confidence-reporting references (11 content-filter",
+      "L447: - **REF-CONF judging (2026-09-10 18:35): PRIMARY FAIL, SECONDARY FAIL — a confidence annotation does not"
+    ],
+    "date": "2026-09-10"
+  },
+  "script": {
+    "path": "tools/analysis/refconf.py (judging; judge_solve_map.py --confidence for the gate, a311c91679371d7a at 5823292)",
+    "sha16": "5b2e872e9283ea17 (at 5823292)",
+    "commit": "5823292"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (2,812 solves + 7,912 judge calls); 3,956 arena matches, i.e. UNDER the rule, whose denominator is matches; the 2,812 reference solves are not arena matches and do not enter the count; no go was owed (registrar 2026-09-23; corrects INCONSISTENCIES 8eeddaf item 9).",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/refconf_grok_outcome.txt",
+    "outcome_commit": "2eb6a78",
+    "calls": "2,812 solves (2,801 references) + 7,912 judge calls",
+    "cce": "not stated",
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-10",
+    "other_files": [
+      "experiment_results/judge_solve/refconf_gate.txt (5823292)",
+      "experiment_results/x12_crossdomain/refconf_grok.db",
+      "grok-reasoning_conf.db"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/)",
+    "commit": "2eb6a78",
+    "verdict": "GATE PASS; judging NULL (-0.5pp, p = 0.53); B7 mitigation line closed"
+  },
+  "criteria": [
+    {
+      "id": "gate",
+      "text": "AUC >= 0.65 and >= 15pp accuracy gap",
+      "result": "HELD",
+      "value": "2,801 references, accuracy 0.855 = plain reference (94% same letter); AUC 0.796; acc 0.964 at conf 100, 0.795 at 90-99, 0.455 at 80-89, 0.179 below 70",
+      "denominator": "2,801 references on the x12 pool"
+    },
+    {
+      "id": "PRIMARY",
+      "text": "conf > base on key-decidable at p < 0.05",
+      "result": "FAILED",
+      "value": "944 decidable: conf 0.858 vs base 0.863 (18:23, -0.5pp, p = 0.53)",
+      "denominator": "944 key-decidable R3 pairs"
+    },
+    {
+      "id": "SECONDARY",
+      "text": "ref-wrong gain >= +3pp with ref-correct loss < 1pp",
+      "result": "FAILED",
+      "value": "ref-wrong 0.328 vs 0.336 (n = 134); ref-correct 0.946 vs 0.951; top cluster -1.9 n.s.",
+      "denominator": "134 ref-wrong; 944"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "+0.5 to +1.5pp",
+      "result": "FAILED",
+      "value": "-0.5pp",
+      "denominator": "944"
+    }
+  ],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "the judge follows a wrong reference 2 in 3 times whether or not told the solver was unsure; B7 mitigation line closed (with J2-D, gated reference); only a more accurate reference helps; the confidence signal itself was reused by ABSTAIN (also negative)"
+  },
+  "numbers_of_record": {
+    "gate": "AUC 0.796; 0.964 / 0.795 / 0.455 / 0.179 at conf 100 / 90-99 / 80-89 / < 70",
+    "judging": "0.858 vs 0.863 (18:23, p = 0.53); ref-wrong 0.328 vs 0.336; ref-correct 0.946 vs 0.951"
+  },
+  "sentence_of_record": "REF-CONF (2026-09-10): gate PASS (2,801 references, accuracy 0.855, AUC 0.796, 0.964 at conf 100 down to 0.179 below 70); judging NULL: 944 decidable, conf 0.858 vs base 0.863 (18:23, p = 0.53); ref-wrong 0.328 vs 0.336 (n = 134); ref-correct 0.946 vs 0.951. The judge follows a wrong reference 2 in 3 times whether or not told the solver was unsure; the B7 mitigation line is closed (with J2-D and the gated reference); only a more accurate reference helps.",
+  "chips": [
+    "GATE PASS",
+    "NULL (−0.5pp, p=0.53)"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a second-reference gate on confidence (untested here; ABSTAIN tried the abstention form and failed)"
+  ],
+  "ledger": {
+    "row_id": "REF-CONF",
+    "version": "v41 (2eb6a78); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "STACK-v2",
+    "J2-D",
+    "ABSTAIN",
+    "REF-SC"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "confidence gating / B7 mitigation (CONTEXT.md section 5: ENSEMBLE-REF, J2-D, REF-CONF, ABSTAIN)"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L402-L415, L440-L458 (b208803 / 5823292 / 2eb6a78)",
+    "experiment_results/x12_crossdomain/refconf_grok_outcome.txt (2eb6a78)",
+    "experiment_results/judge_solve/refconf_gate.txt (5823292)",
+    "docs/test_ledger.html row REF-CONF (v41): chips verbatim, observed cell, evidence",
+    "script sha16 = sha256 of tools/analysis/refconf.py at 5823292, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "A strong model re-solves about 2,800 questions and reports its confidence. The judge then sees this reference answer with or without the confidence, over about 2,000 matches (about 7,900 judge calls).",
+    "why": "Judges tend to follow a wrong reference answer. The test asks whether telling the judge the reference was unsure helps it ignore weak hints.",
+    "information": "It shows whether confidence signals can protect the judge from bad references. Result: done. The confidence itself was informative (AUC 0.80), but showing it to the judge changed nothing. The judge follows a wrong reference about 2 times in 3 either way. This line of fixes is closed; only a more accurate reference helps. This belongs to the older question pool, which is now ruled history, not evidence.",
+    "written": "2026-10-07"
+  }
+}

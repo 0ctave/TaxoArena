@@ -1,0 +1,47 @@
+=== FORMAT-REF: does the reference dominate GRADING as much as it dominates COMPARING? ===
+
+  (a) PAIRWISE grok, with reference                    n= 1974, ties  462
+      KEY +0.996 +- 0.154 | REF +2.242 +- 0.160 | ratio  2.25  bootstrap 95% CI [1.70, 3.26]
+  (b) POINTWISE grok, with reference                   n= 1971, ties  711
+      KEY +0.258 +- 0.157 | REF +2.322 +- 0.166 | ratio  9.01  bootstrap 95% CI [-47.77, 110.58]
+  (c) POINTWISE grok, NO reference (negative control)  n= 1970, ties  688
+      KEY +0.814 +- 0.112 | REF +0.507 +- 0.111 | ratio  0.62  bootstrap 95% CI [0.34, 1.01]
+  (d) PAIRWISE Mistral, with reference                 n= 1974, ties  426
+      KEY +0.992 +- 0.145 | REF +1.968 +- 0.148 | ratio  1.98  bootstrap 95% CI [1.49, 2.81]
+
+  (3) NEGATIVE CONTROL: with no reference in the prompt the REF coefficient is +0.507 +- 0.111 (z=+4.6).
+      OUTSIDE the registered +-0.2 band. The REF contrast picks up signal even when the judge never
+      saw a reference, so it is partly a proxy for question difficulty or for consensus among
+      models, and the CONSENSUS-FIT coefficient is an upper bound rather than a clean estimate.
+
+  DIAGNOSTIC: the two contrasts are correlated, because the reference is right most of the time.
+      (a) PAIRWISE grok, with reference                    corr(KEY, REF) 0.770 | agree on 0.896 of matches
+      (b) POINTWISE grok, with reference                   corr(KEY, REF) 0.769 | agree on 0.896 of matches
+      (c) POINTWISE grok, NO reference (negative control)  corr(KEY, REF) 0.769 | agree on 0.896 of matches
+      (d) PAIRWISE Mistral, with reference                 corr(KEY, REF) 0.770 | agree on 0.896 of matches
+      Where KEY lands near zero the RATIO explodes and its bootstrap interval is meaningless; the
+      paired contrasts below therefore compare the COEFFICIENTS and their difference REF-KEY, which
+      stay well behaved. This supersedes the ratio as the registered statistic - the registration
+      named a quantity that turns out to be undefined in one of the four arms.
+
+  (2) FORMAT CONTRAST - the same matches judged both ways, paired on the 1971 matches both arms judged:
+      pairwise, with reference     KEY +0.994 | REF +2.240 | REF-KEY +1.246
+      pointwise, with reference    KEY +0.258 | REF +2.322 | REF-KEY +2.064
+      delta KEY      -0.736  95% CI [-1.088, -0.440]   <- excludes zero
+      delta REF      +0.082  95% CI [-0.219, +0.419]
+      delta REF-KEY  +0.818  95% CI [+0.311, +1.389]   <- excludes zero
+
+  (2b) THE REFERENCE TOGGLE - the one manipulation in this set that is clean, paired on the 1969 matches both arms judged:
+      pointwise, NO reference      KEY +0.817 | REF +0.509 | REF-KEY -0.307
+      pointwise, with reference    KEY +0.257 | REF +2.320 | REF-KEY +2.063
+      delta KEY      -0.560  95% CI [-0.862, -0.289]   <- excludes zero
+      delta REF      +1.811  95% CI [+1.507, +2.121]   <- excludes zero
+      delta REF-KEY  +2.371  95% CI [+1.843, +2.976]   <- excludes zero
+
+  ROBUSTNESS - committed verdicts only, ties dropped from each arm:
+      pairwise  n=1509 KEY +1.408 | REF +3.101 | REF-KEY +1.693
+      pointwise n=1260 KEY +0.235 | REF +3.094 | REF-KEY +2.859
+      -> the KEY gap survives when abstentions are removed
+
+  (4) JUDGE FAMILY, same recipe and same matches: grok ratio 2.25 vs Mistral ratio 1.98
+      KEY grok +0.996 +- 0.154 vs Mistral +0.992 +- 0.145 | REF grok +2.242 +- 0.160 vs Mistral +1.968 +- 0.148

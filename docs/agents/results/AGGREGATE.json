@@ -1,0 +1,135 @@
+{
+  "id": "AGGREGATE",
+  "title": "AGGREGATE: is the dual-order TIE rule protective or lossy, and can an order-symmetric tie-break recover the frontier order? (392 calls)",
+  "question": "The 49 tied questions in each of the deployed-grok-reference and oracle-reference runs, with two order-symmetric tie-breaks: REPLICATE (two further calls, one per order, majority of four) and GRADE (pointwise grades, higher wins); (1) accuracy on the ties against 0.000 by convention; (2) overall accuracy; (3) arx win rate at p < 0.05; (4) residual ties.",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "1dbb895",
+    "program_lines": "docs/judge_v2_program.md L1428-L1458 (registration) and L1531-L1561 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-14 (before any call) — AGGREGATE: the tie rule is the largest untested lever",
+    "outcome_heading": [
+      "L1531: - **AGGREGATE OUTCOME (2026-09-14): abstentions are resolvable and worth +8.0pp, but they do NOT recover the"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "tools/analysis/aggregate_ties.py",
+    "sha16": "421f5c62d0009fd8 (at 9cc9853)",
+    "commit": "9cc9853"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (392 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/aggregate_outcome.txt",
+    "outcome_commit": "9cc9853",
+    "calls": 392,
+    "cce": "not stated",
+    "pool": "the 49 tied questions per reference condition (302 discriminating questions)",
+    "date": "2026-09-14"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); ARENA-V3-COMPILED (2026-09-14) took the REPLICATE tie-break to board scale (+2.2pp, correct-given-committed falls)",
+    "commit": "e7fa044",
+    "verdict": "(1) (2) +8.0pp in both reference conditions; (3) ORDER STILL NOT RECOVERED in all four cells"
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "accuracy on the ties against 0.000 by convention",
+      "result": "HELD",
+      "value": "REPLICATE settles 28-32 of 49 ties at 0.750 (grok ref) and 0.857 (oracle), close to the 0.929 the judge reaches on verdicts it already commits to; GRADE resolves more at 0.686",
+      "denominator": "49 ties x 2 conditions"
+    },
+    {
+      "id": "(2)",
+      "text": "overall accuracy",
+      "result": "HELD",
+      "value": "+8.0pp in both conditions (0.612 -> 0.692; 0.777 -> 0.857) for two extra calls on the 16% of matches that tie (~16% more judge calls)",
+      "denominator": "302"
+    },
+    {
+      "id": "(3)",
+      "text": "arx win rate at p < 0.05",
+      "result": "FAILED",
+      "value": "arx 0.496-0.533, p 0.29-0.95 in all four cells: the tie-break resolves the EASY ties and leaves an arx-favouring tail (after REPLICATE under the oracle 21 ties remain and the key makes arx the winner on 0.857 of them)",
+      "denominator": "four cells"
+    },
+    {
+      "id": "(4)",
+      "text": "residual ties",
+      "result": "DELIVERED",
+      "value": "21 remain under the oracle after REPLICATE; neither tie-break shows length preference (~50%)",
+      "denominator": "49"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "the oracle cell recovers the order",
+      "result": "FAILED",
+      "value": "not in any cell",
+      "denominator": "four cells"
+    }
+  ],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "three levers sized: perfect reference +16.4, order balancing 13.5, tie resolution +8.0, accuracy 0.612 -> 0.857, and the order is still not recovered: ordering two models 1.7pp apart is beyond an LLM judge on this corpus; the best accuracy-per-call result in the programme, shippable as a scheduler rule"
+  },
+  "numbers_of_record": {
+    "replicate": "28-32 of 49 settled at 0.750 (grok) / 0.857 (oracle); GRADE 0.686",
+    "overall": "+8.0pp: 0.612 -> 0.692; 0.777 -> 0.857; ~16% more calls",
+    "order": "arx 0.496-0.533, p 0.29-0.95; 21 residual oracle ties, arx wins 0.857 of them"
+  },
+  "sentence_of_record": "AGGREGATE (2026-09-14, 392 calls): the abstentions were not unresolvable, they were unresolved: REPLICATE settles 28-32 of 49 ties at 0.750 (grok reference) and 0.857 (oracle), +8.0pp overall in both conditions (0.612 -> 0.692; 0.777 -> 0.857) for ~16% more judge calls, the best accuracy-per-call result in the programme and shippable as a scheduler rule; but (3) FAILS in all four cells (arx 0.496-0.533, p 0.29-0.95): the tie-break resolves the easy ties and leaves an arx-favouring tail; GRADE does not beat REPLICATE; three levers sized (perfect reference +16.4, order balancing 13.5, tie resolution +8.0) and the order is still not recovered: ordering two models 1.7pp apart is beyond an LLM judge on this corpus.",
+  "chips": [
+    "(1)(2) +8.0pp",
+    "(3) ORDER STILL NOT RECOVERED"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "the frontier order (closed by rule)",
+    "a tie-break that improves correct-given-committed (ARENA-V3-COMPILED: it falls 0.918 -> 0.903)"
+  ],
+  "ledger": {
+    "row_id": "AGGREGATE",
+    "version": "v70 (9cc9853); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "ORACLE",
+    "ARXIASK",
+    "RK-1b",
+    "ARENA-V3-COMPILED",
+    "PAIR-NOREF"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "the frontier order (CONTEXT.md section 5: FRONTIER, AGGREGATE, ORACLE)"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L1428-L1458 and L1531-L1561 (1dbb895 / 9cc9853)",
+    "experiment_results/x12_crossdomain/aggregate_outcome.txt (9cc9853)",
+    "docs/test_ledger.html row AGGREGATE (v70): chips verbatim, observed cell, evidence",
+    "script sha16 = sha256 of tools/analysis/aggregate_ties.py at 9cc9853, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "The judge sees each pair of answers twice, once in each order. When the two readings disagree it records a tie. This test took the 49 ties in two earlier runs and tried two ways to break them fairly: ask the judge twice more and take the majority, or have it grade each answer separately.",
+    "why": "It checks whether those ties hide real information the judge throws away, and whether resolving them would let the judge recover the true order of the strongest models.",
+    "information": "If the ties can be settled correctly, the judge becomes more accurate for only a few extra calls. If the strongest-model order still does not come out right, judge noise is not the only obstacle. Result: done. Asking twice more settles most ties correctly and raises overall accuracy by about 8 points for about 16% more calls. It does not recover the order of the strongest models: ordering two models 1.7 points apart is beyond this judge on this corpus. Later ruled history rather than evidence, because it ran on the older question pool.",
+    "written": "2026-10-07"
+  }
+}

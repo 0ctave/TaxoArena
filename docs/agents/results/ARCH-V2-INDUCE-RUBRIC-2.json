@@ -1,0 +1,316 @@
+{
+  "id": "ARCH-V2-INDUCE-RUBRIC-2",
+  "title": "ARCH-V2-INDUCE-RUBRIC-2: re-induce ONE MCQ rubric artefact from the same 40 TRAIN inputs of record with a corrected induction prompt (jv2-induce-4) and a zero-call V5 FITNESS gate (recipe component)",
+  "question": "Mint the MCQ rubric artefact that fills E-J's $rubric slot for mmlu-pro-v2 matches (ARCH-V2-PILOT-K46 and stage 1), replacing the NOT ADOPTED INDUCE-RUBRIC-1 artefact; it grades final-answer correctness and does not condition on response form (no rubric-value claim)",
+  "kind": "build",
+  "state": "done",
+  "registration": {
+    "commit": "7e13897 (the registration commit: it adds this record and the programme sections, before any code or call; the builder PARENT)",
+    "program_lines": "docs/judge_v2_program.md L16326-L16348",
+    "program_lines_as_of": "7e13897",
+    "date": "2026-09-24",
+    "ruling_lines": "docs/judge_v2_program.md L16274-L16324 (the judge-design-specialist's F1 ruling, relayed condensed by the orchestrator)",
+    "followup_ruling_lines": "docs/judge_v2_program.md L16350-L16475 (section \"## Registrar's record 2026-09-24 (insertion only; zero calls; BEFORE the builder applies it) — the judge-design-specialist's FOLLOW-UP RULING F1b (VERBATIM) on the ARCH-V2-INDUCE-RUBRIC-2 build a02a9c1 ...\"; lines _as_of the commit that writes them, parent 3cc505f, re-grepped); brackets at L16332 (INSTRUMENT), L16339 (V5), L16340 (conditions), L16341 (SUPPORT (g)), L16343 (FALSIFIER), and L16318 (the F1 ruling's notes)"
+  },
+  "script": {
+    "path": "tools/analysis/judge_v2/induce_run_2.py (THE INSTRUMENT), with judge_v2/induction.py (jv2-induce-4), judge_v2/induce_fitness.py (V5 jv2-v5-3), judge_v2/induce_run_2_selftest.py, judge_v2/induce_cache_2.py, tools/analysis/accepted_tests_ledger.py (CEILINGS -2 = 6); on main at 0f8df35 (merged by path from 27ad75c)",
+    "sha16": "induce_run_2.py blob:286c750ee1c23550d0337840dbb8c8e17ed13617 / sha256-lf16:4788c861b9a57947 / sha256-crlf16:2229ce9693ea4d5d; induce_fitness.py blob:28638dcfcd7f464404af6e085d2de99d32ada70d / sha256-lf16:d90fb9b4b4fd9bee / sha256-crlf16:6eed82f6e976dec7; induce_run_2_selftest.py blob:658e6a26685ac3da70d76d6079788c6392392977 / sha256-lf16:bbff2203938e5a1b / sha256-crlf16:e75ef2a64c84ad86; induction.py blob:19eb10fae855f858c45b5da588080c85badb0096 / sha256-lf16:ae104501a564bf62 / sha256-crlf16:7acbf09317a733a1; induce_cache_2.py blob:9edfc767160a6f0e4ef49f5caa12b0ded61c6939 / sha256-lf16:e49bdf0a0076c4ab / sha256-crlf16:0e98093b25e9694b; accepted_tests_ledger.py blob:463262220c059f659a8c4110683af39739df5590 / sha256-lf16:605c6d384db939c1 / sha256-crlf16:a1970f2b4a03c420 (LF of record; the main working tree is CRLF for all six)",
+    "commit": "0f8df35 (main; byte-identical to 27ad75c on all 6 paths)",
+    "superseded": "a02a9c1 (induction.py c73a0d9d, induce_fitness.py 8f2868e5, induce_run_2.py db216eb1, selftest 5c720cf5; F1b NOT READY); 4dcfd3e (induce_fitness.py 88329c6f, induce_run_2.py a211c95a, selftest a658f2df; NOT READY H1); never pinned of record"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_induce_rubric_2.md",
+    "commit": "eeb1dec",
+    "at": "27ad75c",
+    "section": "# DELTA READY review: ARCH-V2-INDUCE-RUBRIC-2 at 27ad75c (inserted 2026-09-24 above the 4dcfd3e review, which stands below unchanged)",
+    "review_blob": "blob:8acb343a2070f3c1359b5b6da02d4fcf72075de4 / sha256-lf16:c1fb4f75e8422afe",
+    "verdict": "READY for --run with conditions C1-C3 (none moves a pin): C1 the V5 held-out figures beside REGEX_LIST 7b5af1d5; C2 known limits D1-D4 (+ D5 LOW) and the post-run reader's specific checks; C3 the stage-'judge' bracket at the HYGIENE line; all recorded at docs/judge_v2_program.md L16477-L16503 (section \"## Registrar's record 2026-09-24 (insertion only; zero calls; BEFORE --run) — ARCH-V2-INDUCE-RUBRIC-2 delta READY eeb1dec (at 27ad75c): READY for --run with conditions C1-C3 ...\"; lines _as_of the commit that writes them, parent 4a4ecfb, re-grepped); brackets at L16218 (the -1 INSTRUMENT OF RECORD), L16330 (HYGIENE, C3), L16332 (INSTRUMENT, pins), L16339 (V5, C1 and C2), L16340 (conditions MET, D5)",
+    "merge": "0f8df35 (pathspec commit from 27ad75c; 6 of 6 blobs identical, re-derived by the registrar)",
+    "heldout_commit": "4a4ecfb (experiment_results/archv2/induce_rubric_2_ready_heldout/heldout.json sha256 4b44076086d53856ce6cba4651b9128cc068d69aae71c1f59e3075a845d94e29)",
+    "earlier": [
+      {
+        "file": "docs/reviews/READY_induce_rubric_2.md",
+        "commit": "d3e9716",
+        "at": "4dcfd3e",
+        "section": "# READY review: ARCH-V2-INDUCE-RUBRIC-2 at 4dcfd3e",
+        "verdict": "NOT READY for --run: H1 HIGH (V5 false positives on fit rubrics, 8/14 own probes, 7/24 neutrality paraphrases; the unbackstopped direction); M1 MEDIUM (false negatives 13/16, backstopped); L1-L6 LOW; C-V5-neg / C-V5-pos / C-V5-probe met; Q1 / Q3 exact; REGEX_LIST a9040d5d superseded before any call"
+      }
+    ],
+    "launch": "(1) TAXOARENA_DATA_ROOT=Z:\\FAC\\TUBerlin\\THESIS\\TaxoArena python tools/analysis/judge_v2/induce_run_2.py --dry-run (must print INDUCTION_SYSTEM 67b62162..., V5 7b5af1d5... jv2-v5-3 12 form patterns, sorted-set 99484486... / ordered 89bed256... REPRODUCED, payload ac02ed756a855c58...; any difference is a FAILED PRECONDITION); (2) TAXOARENA_DATA_ROOT=Z:\\FAC\\TUBerlin\\THESIS\\TaxoArena python tools/analysis/judge_v2/induce_run_2.py --run --go --expect-payload-sha ac02ed756a855c5839eb2390bc1eeca0adbeec078a450d5f15b50b043686d8ac; from the main checkout at 4a4ecfb or later with the six paths unchanged; API environment exported; nothing else reading or writing the SPLIT-2 views; experiment_results/archv2/induce_rubric_2/ absent"
+  },
+  "go": "n/a: at most 6 invocations (<= 3 attempts + <= 3 transport errors), 1 expected; under the 4,000-match rule; within the day cap",
+  "run": {
+    "outcome_file": "experiment_results/archv2/induce_rubric_2/outcome.txt",
+    "outcome_commit": "541e2ae",
+    "calls": 1,
+    "calls_note": "1 invocation of <= 6 (logical call_judge_full invocations, CANARY D2); attempt cache 1 invocation / 1 attempt / 0 transport / 3 events, day ledger 1 row (calls 1, ts 2026-09-24 22:41:39; day total 3,432), run stdout '1 attempt(s) with a reply, 0 transport error(s)': agree (re-derived read-only by the registrar)",
+    "cce": null,
+    "pool": "gen_view_REG.db (SPLIT-2) TRAIN, mmlu-pro-v2 x MC_LETTER (sha256_bytes c2930c60...); eval_view e35b7518... opened only after the reply (V2)",
+    "date": "2026-09-24",
+    "from": "main at 0a77ac2 (git diff --quiet 0a77ac2 541e2ae -- tools/ docs/ src/ passes)",
+    "attempt_1": "finish_reason 'stop', response id d23d6906-16f8-47aa-926e-b5d613fe8f69, provider azure:grok-4-1-fast-non-reasoning, 120 completion tokens, reply sha256 094a3a98251245f59b52372575468cf4d48336e578b8ac1e1a69493e0a865f0d, class VALID",
+    "files": {
+      "experiment_results/archv2/induce_rubric_2/rubric_mcq_ARCH-V2-INDUCE-RUBRIC-2.json": "blob:6f7773129c3d69e67f0fb728d78eba6bd96ad9fe / sha256-lf 45a14aac1805999ac58e7588083dd04fc26cf9e62fe17d7cea4ed6f2809900e9 / sha256-crlf16:38328c979e606115 (working tree LF, 0 CR)",
+      "experiment_results/archv2/induce_rubric_2/outcome.txt": "blob:8a8a082827a8809478673fa9d7059a4630f745de / sha256-lf cc8d163e9467e3c80df5d4acb94b2ced111baf7ee9f934cfc59612d287ebc635 / sha256-crlf16:3e9cb4dc40a061db (working tree LF, 0 CR)",
+      "experiment_results/archv2/induce_rubric_2/input_variant_ids.json": "blob:c4e92a46f52e72d7ea3d963a4c5ba289cae8f556 / sha256-lf 852264c9ebc69dfe94a08a16d0a5a97ab14637638575900a371e9d3f9cf952fc / sha256-crlf16:1e4d5ba52f5c8195 (working tree LF, 0 CR)",
+      "experiment_results/archv2/induce_rubric_2/induce_rubric_2_run.txt": "blob:423bbf9298e6926fd28ca106e59c8f56c4a8d399 / sha256-lf e7acb5871d579e7b9243d671dad4b2c0518198df05f18b46e6be0421eab45224 / sha256-crlf16:8952d77c7d90d61e (working tree CRLF, 46 CR)",
+      "experiment_results/archv2/induce_rubric_2/induce_rubric_2_dryrun.txt": "blob:38eb966b7a293c2e7f3fb3603f16d87fc12faffa / sha256-lf cccff1c3053e6a61a324b617fa9790ed57f7916eb32046c60149073b25ab5e6a / sha256-crlf16:29964d2ae728ee28 (working tree CRLF, 35 CR)",
+      "experiment_results/archv2/induce_rubric_2/attempts.db": "COMMITTED (binary) blob:883d1dac2af317713ec338db478d3925ca9ab30c / sha256 of the bytes eb05e0e6267cbddd88e063db7c05d61df7a5fd146a5e08548ac1c74c71054658 (= the blob); backup E:\\TaxoArena_backup_2026-09-24\\induce_rubric_2\\attempts.db sha256 EQUAL (recomputed); E: is the same physical disk",
+      "experiment_results/day_calls_2026-09-24.json": "blob:2885bc10ee1fde29655771ad98d68da421ef2c71 / sha256-lf 74fc2f99ad20f9f4053b39b311eb9ede2bfce4fb41a6716721f98189a7e48c85 / working tree sha256-crlf16:8b96846e7b8c2e31 (CRLF, 91 CR, no final newline)"
+    },
+    "order_witness": "the attempts.db event table (seq): 1 launch 20:41:09.499296Z; 2 reply_committed 20:41:29.376176Z; 3 eval_view_opened 20:41:31.074854Z (the witness of record; L2 two clocks carried)"
+  },
+  "review": {
+    "file": "docs/reviews/POSTRUN_induce_rubric_2.md",
+    "commit": "c3aecfc",
+    "verdict": "run VALID (claims 1-18 CONFIRMED); FITNESS READING UNFIT: U1 BLOCKER (adoption, not validity: clause 1 defines correctness as matching the reference letter), U2 HIGH (explanation-presence reward, ties suppressed); M1-M3 MEDIUM; L1-L5 LOW -> NOT ADOPTED; the $rubric slot to THE AUTHOR; never a 4th attempt"
+  },
+  "criteria": [
+    {
+      "id": "V1",
+      "text": "verbatim audit (SHINGLE 8) of the reply of record vs the 40 inputs' stems and options; FAILS if hits >= 1",
+      "result": "HELD",
+      "value": "PASS, 0 hits (the review: own matcher, two tokenizers, 81 / 107 rubric grams)",
+      "denominator": "the reply of record vs the 40 inputs"
+    },
+    {
+      "id": "V2",
+      "text": "leak check against EVAL key material after the reply only; FAILS if hits >= 1 (artefact NOT OF RECORD; never a formal failure, never a re-post)",
+      "result": "HELD",
+      "value": "PASS, 0 hits (the review: 9,899 eval_view variants / 89,110 texts at k = 8, 7, 6, 5; EVAL answer texts 4,246 distinct / 2,800 >= 12 chars (instrument 2,704, L5); 1,095 references)",
+      "denominator": "the reply of record vs EVAL key material of the split of record"
+    },
+    {
+      "id": "V3",
+      "text": "content-key counts; FAILS if any selected input is not TRAIN or any EVAL hit > 0",
+      "result": "HELD",
+      "value": "PASS: candidate rows 7,441, distinct 7,441, duplicates 0, GATE refused 1,929, other non-TRAIN 0, EVAL hits 0, not TRAIN 0; TRAIN 40 / 40",
+      "denominator": "the 40 selected inputs"
+    },
+    {
+      "id": "V4",
+      "text": "artefact written mode x, committed, artefact_sha256 and rubric_sha256 pinned; FAILS if not mode x or not committed",
+      "result": "HELD",
+      "value": "PASS: mode x, committed 541e2ae; artefact_sha256 475b68536c8e0f771ba82b71370f28bb4defe91fbe11315eb64953bd00b71eea, rubric_sha256 ace41ede9b19974aaa6c29881aff2e17dae353c0ce05f5d0e246bd3edf2a49e0",
+      "denominator": "the artefact"
+    },
+    {
+      "id": "V5",
+      "text": "FITNESS (zero calls, deterministic, on every reply): (a) >= 1 match of the registered final-answer-correctness regex AND (b) 0 matches of the registered form-conditioning regex list; FAILS if (a) = 0 or (b) >= 1; a V5 failure is a formal failure (consumes an attempt); regexes pinned by the builder, their sha256 by the registrar before the READY; registrar's conditions C-V5-neg (FAILS on the INDUCE-RUBRIC-1 rubric ef9c9e87) and C-V5-pos (PASSES on a fit control carrying the neutrality clause) [CORRECTED 2026-09-24 by the judge-design-specialist's follow-up ruling F1b, before READY: NOT READY as built at a02a9c1 (in the specialist's probe, 11 of 11 paraphrased format rubrics B1-B11 PASS and 1 fit rubric F2 FAILS). V5 becomes (a) AND (b) AND (c): (c) a NEW REQUIRED positive reasoning criterion (a reasoning-quality term within 60 characters of a reasoning noun, in one clause). Also required: guard clauses split at but/however/whereas/yet; CUE additions (do not prefer/favour, not preferred, neither helps nor hurts); wider penalty and reward families; an unguarded EXCLUSIVITY pattern (no bare 'only'); condition C-V5-probe, under which B1-B11 must FAIL and F1-F5 must PASS, pinned verbatim in induce_run_2_selftest beside C-V5-neg and C-V5-pos, and any miss refuses the READY. SCOPE: a lexical screen only; the reviewer's fitness reading is the backstop, and a post-run UNFIT reading means NOT ADOPTED, with the slot going to the author, never a 4th attempt. REGEX_LIST_SHA256 is re-pinned after the fix. Source: docs/judge_v2_program.md L16350-L16475 (section \"## Registrar's record 2026-09-24 (insertion only; zero calls; BEFORE the builder applies it) — the judge-design-specialist's FOLLOW-UP RULING F1b (VERBATIM) on the ARCH-V2-INDUCE-RUBRIC-2 build a02a9c1 ...\"; lines _as_of the commit that writes them, parent 3cc505f, re-grepped)]",
+      "result": "HELD",
+      "value": "PASS (jv2-v5-3, 7b5af1d5...): (a) 5 matches, (b) 0 form matches, (c) 2 matches; a PASS on wording by a WEAK SCREEN (held-out FN 13/17); the registered fitness reading is UNFIT (U1, U2)",
+      "denominator": "each reply (<= 3 attempts)"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "the first attempt is valid, V5 included (point probability 0.8); HELD iff attempt 1 is VALID",
+      "result": "HELD",
+      "value": "1 attempt, class VALID",
+      "denominator": "attempts"
+    },
+    {
+      "id": "P2",
+      "text": "V1-V5 pass; HELD iff 5 of 5 PASS",
+      "result": "HELD",
+      "value": "5 of 5 PASS",
+      "denominator": "V1-V5"
+    }
+  ],
+  "falsifier": {
+    "text": "three formal failures (UNDETERMINED) overturn the ruling's plan to fill the slot by a corrected re-induction; the slot goes to THE AUTHOR (empty slot, GENERIC_RUBRIC or other); a V2 failure also sends the slot to the author [NOTED 2026-09-24, F1b: the falsifier is unchanged; a post-run reviewer reading of UNFIT is a second route to the author beside V2 (NOT ADOPTED; never a 4th attempt; not a formal failure)] [OUTCOME 2026-09-24: NOT FIRED (0 formal failures in 1 attempt); the second route to the author (post-run UNFIT reading) IS TAKEN, which is not a formal failure]",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "invocations": "1 of <= 6 (attempt cache, day ledger and stdout agree)",
+    "artefact_sha256": "475b68536c8e0f771ba82b71370f28bb4defe91fbe11315eb64953bd00b71eea (content pin; induction.load_artefact)",
+    "rubric_sha256": "ace41ede9b19974aaa6c29881aff2e17dae353c0ce05f5d0e246bd3edf2a49e0 (UTF-8, 570 chars)",
+    "reply_sha256": "094a3a98251245f59b52372575468cf4d48336e578b8ac1e1a69493e0a865f0d (attempt 1; = json.dumps({'rubric': rubric}) default separators)",
+    "payload_sha256": "ac02ed756a855c5839eb2390bc1eeca0adbeec078a450d5f15b50b043686d8ac (30,719 bytes; = the READY pin)",
+    "attempts_db_sha256": "eb05e0e6267cbddd88e063db7c05d61df7a5fd146a5e08548ac1c74c71054658 (bytes = blob 883d1dac; = the E: backup)",
+    "v0_reference_error": "133 of 1,027 reference-bearing EVAL variants = 12.95% (Wilson 95% 11.03-15.14%); 7 stage-1 anchors 58 / 515 = 11.3% (review B2 iii; eval_view e35b7518..., mmlu-pro-v2, vintage grok-reasoning-v0)",
+    "clause1_departs_from_key": "8.91% of 379,323 key-decidable reference-bearing answer-disagreeing pairs: WRONG winner 3.40% (12,882), advantage erased 5.51% (20,911); aligned 91.01% (345,238); pair-weighted, not the pilot's realised mix (review B2 iii)",
+    "wrong_reference_agreement_by_model": "0.218 (Mistral-7B-Instruct-v0.2) to 0.508 (arx_0314) on the 133 wrong-reference questions (binomial SE about 0.043 per model; review B2 iv)",
+    "all_empty_models": "6 of 46 ACTIVE models, 21,465 of 165,369 eval_view mmlu-pro-v2 responses (12.98%); in 255 of 1,035 pairs per anchor, 0 of 66 ARENA12 pairs (review B3; re-derived by the registrar)"
+  },
+  "sentence_of_record": "ARCH-V2-INDUCE-RUBRIC-2 (2026-09-24, 1 invocation of <= 6; run 541e2ae, VALID by post-run review c3aecfc): one MCQ rubric artefact (population mmlu-pro-v2 TRAIN, the same 40 inputs) was induced on the first attempt with V1-V5 PASS, artefact_sha256 475b6853... / rubric_sha256 ace41ede... [a RECIPE COMPONENT: no rubric-value or accuracy claim; FITNESS READING UNFIT: clause 1 defines correctness as matching the reference letter (the v0 reference is wrong on 133 of 1,027 variants) and clause 2 rewards having reasoning and suppresses ties; NOT ADOPTED, the $rubric slot goes to the author, never a fourth attempt]",
+  "chips": [
+    "REGISTERED 2026-09-24, BEFORE ANY CODE",
+    "RAN ONCE 541e2ae; VALID (POST-RUN c3aecfc)",
+    "V1-V5 PASS; P1 P2 HELD; FALSIFIER NOT FIRED",
+    "FITNESS UNFIT (U1 BLOCKER, U2 HIGH): NOT ADOPTED; AUTHOR CHOSE A THIRD INDUCTION",
+    "V5 A WEAK SCREEN: HELD-OUT FP 2/18, FN 13/17",
+    "1 INVOCATION OF &le; 6",
+    "RECIPE COMPONENT; NO SUPPORT LINE"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-24",
+      "by": "registrar (the judge-design-specialist's F1 ruling, relayed condensed by the orchestrator)",
+      "text": "REGISTERED before any code on the F1 ruling (option (iii)). Selection reused unchanged (seed ARCH-V2-INDUCE-SELECT-1; sorted-set 99484486...; exclusion list 68c0b960...); no new random draw. docs/judge_v2_program.md L16326-L16348 (section \"## Registered 2026-09-24 (before any code or call; zero calls) — ARCH-V2-INDUCE-RUBRIC-2: re-induce ONE MCQ rubric artefact ...\"; lines _as_of the commit that writes them, parent e78811b, re-grepped)"
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar",
+      "text": "The registration commit is 7e13897 (programme L16274-L16324 ruling, L16326-L16348 registration, _as_of 7e13897, re-grepped); the builder branches from it."
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (the judge-design-specialist's follow-up ruling F1b on build a02a9c1, recorded VERBATIM; source file sha256 5e32b03344697797d2ed4fd31223acef8842daf002697d8bbb5d6aabddcc311d verified)",
+      "text": "F1b RECORDED BEFORE THE BUILDER APPLIES IT (zero calls; insertion only). Build a02a9c1 (branch worktree-agent-ac04323cdcce696f8, not merged) is NOT READY. Q1: the INDUCTION_SYSTEM clause is corrected before READY to the D5 fact (the judge sees the stem only), using the ruling's exact OLD/NEW text; the original error is the F1 ruling's wording, carried into 7e13897 verbatim. Q2: the example options are unchanged. Q3: a fail-closed refusal of corpus_type != 'mcq' under jv2-induce-4. V5 NOT READY as built (11 of 11 paraphrased format rubrics pass, 1 fit rubric fails): changes 1-7 ((c) required; contrastive split; CUE additions; wider families; an unguarded EXCLUSIVITY pattern; the probe corpus B1-B11 FAIL / F1-F5 PASS pinned in the selftest; the scope statement). Pins that move, by READY-stage pre-call brackets: INDUCTION_SYSTEM sha, payload sha, induction.py blob, REGEX_LIST_SHA256. Unchanged: the seed, the 40 inputs, the attempt limit, the <= 6 ceiling, the predictions and the falsifier. Author not needed. docs/judge_v2_program.md L16350-L16475 (section \"## Registrar's record 2026-09-24 (insertion only; zero calls; BEFORE the builder applies it) — the judge-design-specialist's FOLLOW-UP RULING F1b (VERBATIM) on the ARCH-V2-INDUCE-RUBRIC-2 build a02a9c1 ...\"; lines _as_of the commit that writes them, parent 3cc505f, re-grepped); brackets at L16332 (INSTRUMENT), L16339 (V5), L16340 (conditions), L16341 (SUPPORT (g)), L16343 (FALSIFIER), and L16318 (the F1 ruling's notes)"
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (delta READY eeb1dec by the adversarial-reviewer; conditions C1-C3; relayed by the orchestrator, every pin re-derived on main except the payload and the user turn)",
+      "text": "READY TO RUN. Build merged by path at 0f8df35 (6 blobs = 27ad75c); held-out set 4a4ecfb. First READY d3e9716 NOT READY on H1. C1: V5 held-out FP 2/18 (11.1%, Wilson 3.1-32.8%), FN 13/17 (76.5%); v5-2 3/18, 14/17; in-sample 0/0; V5 a weak screen. C2: D1-D4 (+ D5) known limits and the post-run reader's checks. C3: the stage-'judge' bracket verbatim at the HYGIENE line (L16330). L5: the -1 selftest refuses on main by design; the -1 instrument reproduces at 3cc505f only (bracket L16218). L3-L6 recorded. Superseded before any call: a02a9c1 (73d9ed4e / b72b4681 / cfcb9ca4), 4dcfd3e (a9040d5d). Cost unchanged. docs/judge_v2_program.md L16477-L16503 (section \"## Registrar's record 2026-09-24 (insertion only; zero calls; BEFORE --run) — ARCH-V2-INDUCE-RUBRIC-2 delta READY eeb1dec (at 27ad75c): READY for --run with conditions C1-C3 ...\"; lines _as_of the commit that writes them, parent 4a4ecfb, re-grepped); brackets at L16218 (the -1 INSTRUMENT OF RECORD), L16330 (HYGIENE, C3), L16332 (INSTRUMENT, pins), L16339 (V5, C1 and C2), L16340 (conditions MET, D5)"
+    },
+    {
+      "date": "2026-09-24",
+      "by": "registrar (outcome; post-run review c3aecfc by the adversarial-reviewer; every pin re-derived by the registrar)",
+      "text": "RAN ONCE 541e2ae (1 invocation of <= 6): attempt 1 VALID; V1-V5 PASS; P1, P2 HELD; falsifier NOT FIRED; artefact 475b6853... / rubric ace41ede... / reply 094a3a98... / attempts.db eb05e0e6... (committed; = the E: backup). FITNESS READING UNFIT: U1 BLOCKER (the reference letter is the criterion; v0 wrong on 133/1,027 = 12.95%; wrong winner on 3.40%, advantage erased on 5.51% of key-decidable reference-bearing disagreeing pairs; 0.218-0.508 by contestant), U2 HIGH (explanation-presence reward, ties suppressed; 6 all-empty models, none in ARENA12). NOT ADOPTED; the $rubric slot to THE AUTHOR; never a 4th attempt; PILOT-K46 open item 1 blocks on the author; open item 4 (all-empty contestants) opened. M3 forward note: V5 (a) does not check what correctness is measured against; the held-out set lacked reference-deference and pro-explanation classes. docs/judge_v2_program.md L16505-L16606 (section \"## ARCH-V2-INDUCE-RUBRIC-2 (2026-09-24, 1 invocation of <= 6; run 541e2ae) — VALID (post-run review c3aecfc) ...\"; lines _as_of the commit that writes them, parent c3aecfc, re-grepped); brackets at L15920 (PILOT-K46 Roster, open item 4), L15953 (PILOT-K46 open item 1), L16339 (V5, M3 forward note), L16344 (COST AND CONSEQUENCE, NOT ADOPTED)"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (AUTHOR decision, relayed by the orchestrator; zero calls)",
+      "text": "The $rubric slot: \"Third induction\". A NEW registration ARCH-V2-INDUCE-RUBRIC-3 (prompt: the reference may be wrong, answers may be empty, ties allowed; V5 widened, carrying M3; up to 6 calls; no guarantee of fitness), the route CONSEQUENCE (2) leaves open, not a re-roll of this registration; GENERIC_RUBRIC reinstatement and the empty slot DECLINED. This artefact stays VALID, of record, NOT ADOPTED. docs/judge_v2_program.md L16734-L16785 (section \"## Author's decisions 2026-09-25 (recorded by the registrar; zero calls) — (1) the ARCH-V2-PILOT-K46 $rubric slot: \"Third induction\" ...\"; lines _as_of the commit that writes them, parent 885e481, re-grepped); brackets at L15920 (PILOT-K46 Roster, open item 4), L15953 (PILOT-K46 open item 1), L16573 and L16574 (INDUCE-RUBRIC-2 CONSEQUENCE (2), (3)), L16595 (open item 4 OWNER AND FORM); plan Amendment 21"
+    }
+  ],
+  "does_not_show": [
+    "any rubric value or accuracy effect (recipe component only)",
+    "that the -2 rubric is neutral with respect to verdicts: GENERIC_SYSTEM + the induced rubric is UNMEASURED until G17 / G21",
+    "that the -2 rubric is valid or fit before V1-V5 are scored by the run",
+    "that a V5 PASS means a rubric is fit: V5 is a lexical screen and the F1b probe corpus is the specialist's, not exhaustive (F1b); the reviewer's fitness reading is the backstop",
+    "the final V5 regex text (the builder writes it after F1b; the READY checks it against the pinned corpus) [RESOLVED 2026-09-24 by the registrar: the final text is jv2-v5-3, REGEX_LIST 7b5af1d5..., checked by the READY eeb1dec]",
+    "that V5 is a good screen: held-out FN 13/17 = 76.5% (C1); a V5 PASS is weak evidence of fitness",
+    "that the payload ac02ed75 was re-derived by the registrar (reviewer-reproduced twice; the run checks it by --expect-payload-sha)",
+    "the realised effect of this rubric on any verdict, tie rate, nu or beta (nothing was judged; GENERIC_SYSTEM + rubric UNMEASURED)",
+    "that a V5 PASS means fitness: the rubric passed V5 and was read UNFIT (M3: V5 (a) does not check what correctness is measured against)",
+    "a recomputation of CONSENSUS-FIT or ORACLE (cited by the review from the x12 object, not SPLIT-2)",
+    "the pilot's realised pair mix: the 3.40% / 5.51% shares are pair-weighted over all eligible pairs",
+    "the size of U2's effect, or of the all-empty contestants' effect, on the judge",
+    "which slot content the author will choose",
+    "the integrity of the E: backup beyond its sha equality"
+  ],
+  "ledger": {
+    "row_id": "ARCH-V2-INDUCE-RUBRIC-2",
+    "version": "v254 (bracket + chip: the author chose a third induction); v252 (outcome: RAN ONCE / VALID / V1-V5 PASS / FITNESS UNFIT, NOT ADOPTED, slot to the author; chips replaced, bracket in the observed cell); v251 READY; v250 F1b; row created v249"
+  },
+  "depends_on": [
+    "ARCH-V2-INDUCE-RUBRIC-1",
+    "ARCH-V2-INDUCE-SELECT-1",
+    "ARCH-V2-E-J",
+    "ARCH-V2-SPLIT-DRAW-2"
+  ],
+  "supersedes": "ARCH-V2-INDUCE-RUBRIC-1's artefact for forward use (once minted and VALID); INDUCTION_SYSTEM 4c4bf36f... and INDUCTION_USER_TEMPLATE 7ed21eba... for forward use [OUTCOME 2026-09-24: the -2 artefact is NOT ADOPTED (fitness UNFIT), so it supersedes nothing for forward use; neither induced artefact fills the slot]",
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing; reopens nothing (CONTEXT.md §5 'Rubric text at every granularity' is a rubric-VALUE line; this item makes no value claim and mints the component required by the author's decision 2026-09-23 (2)) [OUTCOME 2026-09-24: closes nothing; the induced-rubric route to the slot now waits on the author]"
+  },
+  "support": "N/A with reasons (the registration's SUPPORT section): one artefact, deterministic PASS/FAIL gates, no estimate, no DEFF, no SE, no MDE; structural leg (g): V5 reachable iff C-V5-pos passes and the prompt elicits a fit rubric (P1)",
+  "registered_seeds": {
+    "selection": "ARCHV2-INDUCE-1:5abb79f55c3719d122b5310151f975493609f37b (ARCH-V2-INDUCE-SELECT-1, L15515-L15528), REUSED; no new draw"
+  },
+  "pins": {
+    "selection_sorted_set_sha256": "99484486d75774b379bd35713063022a8c05b8949b7b2d61045f95670d9abe50 (reused; ordered 89bed2562c1f8575ed0dbfd5b9980216aa346ef26d5837fbe574b7b775ef132a)",
+    "audit_list": "experiment_results/archv2/induce_rubric_1_audit/overlap_exclusions_split2.json list_sha256 68c0b960a4a7bedc76db079cdc2e0f01d5ef0b2fc4304f5486706cb27b71418a (reused)",
+    "gen_view": "sha256_bytes c2930c609c67d6c7e1f8b8fbcd8f6f1970478a28f844d086d0b0db169d10c0ec (split of record 5a3e756)",
+    "eval_view": "sha256_bytes e35b7518878205837bfd16266dfdd8a6e76a226ed67957796d1d33cb72b5e369 (opened only after the reply, V2)",
+    "manifest": "data_v2/manifests/REG_ARCHV2-SPLIT-2_2929bd46aa271d883050bfe735f96e621ed55fd2.json sha256 912eaa5fed6910b8b485124cd4fdfea1440055dc4f253eea1f168efddb841ad8",
+    "model": "grok-4-1-fast-non-reasoning via call_judge_full; cap 8192; temperature omitted",
+    "INDUCTION_VERSION": "jv2-induce-4",
+    "INDUCTION_SYSTEM_sha256": "TO BE PINNED (registrar bracket after the builder reports) [2026-09-24 F1b: the a02a9c1 value 73d9ed4e7c4f78e3... (builder-reported, never pinned of record) MOVES: Q1 replaces one sentence. OLD 'The judge sees the question with its lettered options, a reference solution that may be wrong, and the two responses in full. ' NEW 'The judge sees the question text without its options list, a reference solution that may be wrong (given as one option letter with that option's text), and the two responses in full, each followed, when its chosen letter can be read, by that letter with its option's text. ' (the fact of record: the D5 ruling, stem only, L15732-L15739; the error came from the F1 ruling's wording, carried into 7e13897 verbatim). To be pinned by a READY-stage pre-call bracket] [PINNED 2026-09-24 by the registrar, delta READY eeb1dec: 67b621624d63e416e985c440db713ca23e550598c5f93d9ce580f2ffbb891ebf (1,124 chars; re-derived on main); docs/judge_v2_program.md L16477-L16503 (section \"## Registrar's record 2026-09-24 (insertion only; zero calls; BEFORE --run) — ARCH-V2-INDUCE-RUBRIC-2 delta READY eeb1dec (at 27ad75c): READY for --run with conditions C1-C3 ...\"; lines _as_of the commit that writes them, parent 4a4ecfb, re-grepped); brackets at L16218 (the -1 INSTRUMENT OF RECORD), L16330 (HYGIENE, C3), L16332 (INSTRUMENT, pins), L16339 (V5, C1 and C2), L16340 (conditions MET, D5)]",
+    "INDUCTION_USER_TEMPLATE_sha256": "TO BE PINNED (registrar bracket after the builder reports) [2026-09-24 F1b: Q2 leaves the user template unchanged (examples pipe-joined, sorted, unlettered); builder-reported a02a9c1 value 8f098049e6af71fd... is not yet pinned of record] [PINNED 2026-09-24 by the registrar, delta READY eeb1dec: 8f098049e6af71fd509fc80d760ed7a4f29013cc21a93de3283737dc6cbfd53a (197 chars; re-derived on main); docs/judge_v2_program.md L16477-L16503 (section \"## Registrar's record 2026-09-24 (insertion only; zero calls; BEFORE --run) — ARCH-V2-INDUCE-RUBRIC-2 delta READY eeb1dec (at 27ad75c): READY for --run with conditions C1-C3 ...\"; lines _as_of the commit that writes them, parent 4a4ecfb, re-grepped); brackets at L16218 (the -1 INSTRUMENT OF RECORD), L16330 (HYGIENE, C3), L16332 (INSTRUMENT, pins), L16339 (V5, C1 and C2), L16340 (conditions MET, D5)]",
+    "V5_regex_list_sha256": "TO BE PINNED (registrar bracket after the builder reports) [2026-09-24 F1b: the a02a9c1 value cfcb9ca43043f3656712af2677aecaa570bd99d6ee680ad46eb33ab09f0bcc71 (builder-reported, never pinned of record) MOVES with the V5 changes 1-5; to be re-pinned by a READY-stage pre-call bracket] [PINNED 2026-09-24 by the registrar, delta READY eeb1dec: 7b5af1d513df318031d77a14b7c8673051a075957ca97ffcc287cdfdc516fa54 (jv2-v5-3, 12 form patterns, 18 CUE entries, IGNORECASE; re-derived on main); a9040d5d (4dcfd3e) and cfcb9ca4 (a02a9c1) superseded before any call; docs/judge_v2_program.md L16477-L16503 (section \"## Registrar's record 2026-09-24 (insertion only; zero calls; BEFORE --run) — ARCH-V2-INDUCE-RUBRIC-2 delta READY eeb1dec (at 27ad75c): READY for --run with conditions C1-C3 ...\"; lines _as_of the commit that writes them, parent 4a4ecfb, re-grepped); brackets at L16218 (the -1 INSTRUMENT OF RECORD), L16330 (HYGIENE, C3), L16332 (INSTRUMENT, pins), L16339 (V5, C1 and C2), L16340 (conditions MET, D5)]",
+    "payload_sha256": "TO BE PINNED (dry-run; the READY) [2026-09-24 F1b: the a02a9c1 dry-run value b72b4681156ef21429260fc13365c5117df04adf73869dcdc2527a09f26f076f (30,572 bytes; builder-reported, never pinned of record) MOVES with Q1; to be pinned by a READY-stage pre-call bracket] [PINNED 2026-09-24 by the registrar, delta READY eeb1dec: ac02ed756a855c5839eb2390bc1eeca0adbeec078a450d5f15b50b043686d8ac (30,719 bytes; reviewer-reproduced at 4dcfd3e and 27ad75c, bodies byte-identical; not re-derived by the registrar, who opens no view; checked by --expect-payload-sha); docs/judge_v2_program.md L16477-L16503 (section \"## Registrar's record 2026-09-24 (insertion only; zero calls; BEFORE --run) — ARCH-V2-INDUCE-RUBRIC-2 delta READY eeb1dec (at 27ad75c): READY for --run with conditions C1-C3 ...\"; lines _as_of the commit that writes them, parent 4a4ecfb, re-grepped); brackets at L16218 (the -1 INSTRUMENT OF RECORD), L16330 (HYGIENE, C3), L16332 (INSTRUMENT, pins), L16339 (V5, C1 and C2), L16340 (conditions MET, D5)]",
+    "superseded_prompt_pins": "INDUCTION_SYSTEM 4c4bf36f61f43f37f0057ce31e96b086528735aae338a60c1e19432a009823e7, INDUCTION_USER_TEMPLATE 7ed21eba7b9b9e13222b275400d0808706a1a4217b7f30db87391ea2fb9f7481 (INDUCE-RUBRIC-1)",
+    "induction_py": "TO BE PINNED (blob: / sha256-lf16:) after F1b; the a02a9c1 blob:c73a0d9d52d730454d3ca6a14fe7292c0a47be94 MOVES (Q1 and the Q3 guard: under jv2-induce-4, corpus_type != 'mcq' refused fail-closed with the message \"jv2-induce-4's INDUCTION_SYSTEM is MCQ-specific; other corpus types need their own registration\") [PINNED 2026-09-24 by the registrar, delta READY eeb1dec: blob:19eb10fae855f858c45b5da588080c85badb0096 / sha256-lf16:ae104501a564bf62 / sha256-crlf16:7acbf09317a733a1; docs/judge_v2_program.md L16477-L16503 (section \"## Registrar's record 2026-09-24 (insertion only; zero calls; BEFORE --run) — ARCH-V2-INDUCE-RUBRIC-2 delta READY eeb1dec (at 27ad75c): READY for --run with conditions C1-C3 ...\"; lines _as_of the commit that writes them, parent 4a4ecfb, re-grepped); brackets at L16218 (the -1 INSTRUMENT OF RECORD), L16330 (HYGIENE, C3), L16332 (INSTRUMENT, pins), L16339 (V5, C1 and C2), L16340 (conditions MET, D5)]",
+    "CONTRACT_DESCRIPTIONS_sha256": "d40c4b0ae9b6829157d99609cfa8b92486fad109f6b588f0ff8deb210672b416 (canonical JSON: sort_keys, ensure_ascii; re-derived on main)",
+    "user_turn_sha256": "a66db2209ac1b4efc360f08f9bdb0962fbf3a8000d1841d69f879d896b45f1d6 (dry-run; reviewer-reproduced)",
+    "CONTROL_FIT_TEXT_sha256": "a7b8ebb0d36b069204703095eb8531a2565bf0e347ccff820bde94c9f590aef0 (C-V5-pos; re-derived on main)",
+    "C_V5_probe_corpus_sha256": "329cd697fd457924b5437e754bbb2c2c6d935cb40a10b65f370da7a5d4740490 (B1-B11 / F1-F5; re-derived on main)",
+    "READY_probe_corpus_sha256": "30fecaffeca205de42ea08f7a257032df73bcbda0ea78f6d7b639a6c59537327 (B12-B29 / F6-F19 / F20-F43; re-derived on main)",
+    "instrument": "tools/analysis/judge_v2/induce_run_2.py blob:286c750ee1c23550d0337840dbb8c8e17ed13617 / sha256-lf16:4788c861b9a57947",
+    "heldout_set": "experiment_results/archv2/induce_rubric_2_ready_heldout/heldout.json sha256 4b44076086d53856ce6cba4651b9128cc068d69aae71c1f59e3075a845d94e29 (blob:e8f377caf4209682c8cf6ed384a34b9e24bc500e; 18 fit / 17 unfit; frozen before the reviewer read jv2-v5-3; commit 4a4ecfb)"
+  },
+  "cost": {
+    "invocations_max": 6,
+    "attempts_max": 3,
+    "transport_errors_max": 3,
+    "calls_expected": 1
+  },
+  "disclosures": [
+    "1. INDUCE-RUBRIC-1's artefact is VALID, of record, NOT ADOPTED; it grades output format; no verdict uses it",
+    "2. the cause is the registered prompt (no response description, opaque contract id, unlettered sorted options); V1-V4 formal only; ruling (2) specified no fitness check",
+    "3. the -2 fix rests on the corpus contract, not EVAL rows; the EVAL response count is diagnostic only",
+    "4. PILOT-K46 open item 1 re-opened until the -2 shas are pinned; C0(c) pins re-derived",
+    "5. GENERIC_SYSTEM + the induced rubric remains UNMEASURED until G17 / G21",
+    "carried: the four INDUCE-RUBRIC-1 selection disclosures (the selection is the same)"
+  ],
+  "sources": [
+    "docs/judge_v2_program.md L16274-L16324 (section \"## Registrar's record 2026-09-24 (insertion only; zero calls; BEFORE any code) — the judge-design-specialist's RULING on ARCH-V2-INDUCE-RUBRIC-1 F1 HIGH (relayed CONDENSED by the orchestrator, not verbatim) ...\"; lines _as_of the commit that writes them, parent e78811b, re-grepped)",
+    "docs/judge_v2_program.md L16326-L16348 (section \"## Registered 2026-09-24 (before any code or call; zero calls) — ARCH-V2-INDUCE-RUBRIC-2: re-induce ONE MCQ rubric artefact ...\"; lines _as_of the commit that writes them, parent e78811b, re-grepped)",
+    "docs/reviews/POSTRUN_induce_rubric_1.md (60c8e6b), F1",
+    "docs/judge_v2_program.md L15964-L15973 (the INDUCE-RUBRIC-1 registration, whose terms carry over)",
+    "docs/judge_v2_program.md L16350-L16475 (section \"## Registrar's record 2026-09-24 (insertion only; zero calls; BEFORE the builder applies it) — the judge-design-specialist's FOLLOW-UP RULING F1b (VERBATIM) on the ARCH-V2-INDUCE-RUBRIC-2 build a02a9c1 ...\"; lines _as_of the commit that writes them, parent 3cc505f, re-grepped) (the specialist's follow-up ruling F1b, verbatim; source file F1b_ruling_induce2_build.md sha256 5e32b033...311d)",
+    "git: a02a9c1 (commit message = the builder's reported values; tree = the a02a9c1 blob identities)",
+    "docs/reviews/READY_induce_rubric_2.md (d3e9716 at 4dcfd3e: NOT READY; eeb1dec at 27ad75c: READY with C1-C3); blob:8acb343a2070f3c1359b5b6da02d4fcf72075de4",
+    "git: 0f8df35 (merge by path), 4a4ecfb (held-out set); pins re-derived by the registrar on main 4a4ecfb (git rev-parse / cat-file / hash-object; Python evaluation of the module constants; induce_fitness.v5 over heldout.json)",
+    "docs/judge_v2_program.md L16477-L16503 (section \"## Registrar's record 2026-09-24 (insertion only; zero calls; BEFORE --run) — ARCH-V2-INDUCE-RUBRIC-2 delta READY eeb1dec (at 27ad75c): READY for --run with conditions C1-C3 ...\"; lines _as_of the commit that writes them, parent 4a4ecfb, re-grepped); brackets at L16218 (the -1 INSTRUMENT OF RECORD), L16330 (HYGIENE, C3), L16332 (INSTRUMENT, pins), L16339 (V5, C1 and C2), L16340 (conditions MET, D5)",
+    "docs/reviews/POSTRUN_induce_rubric_2.md (c3aecfc), sections \"## VERDICT\", \"## PINS FOR THE REGISTRAR\", \"## PART B: THE REGISTERED FITNESS READING\", \"## FINDINGS BY SEVERITY\"",
+    "experiment_results/archv2/induce_rubric_2/outcome.txt (541e2ae)",
+    "experiment_results/archv2/induce_rubric_2/attempts.db (541e2ae; opened mode=ro&immutable=1)",
+    "experiment_results/day_calls_2026-09-24.json (541e2ae)",
+    "docs/judge_v2_program.md L16505-L16606 (section \"## ARCH-V2-INDUCE-RUBRIC-2 (2026-09-24, 1 invocation of <= 6; run 541e2ae) — VALID (post-run review c3aecfc) ...\"; lines _as_of the commit that writes them, parent c3aecfc, re-grepped); brackets at L15920 (PILOT-K46 Roster, open item 4), L15953 (PILOT-K46 open item 1), L16339 (V5, M3 forward note), L16344 (COST AND CONSEQUENCE, NOT ADOPTED)",
+    "author decision 2026-09-25 relayed by the orchestrator, recorded in docs/judge_v2_program.md L16734-L16785 (section \"## Author's decisions 2026-09-25 (recorded by the registrar; zero calls) — (1) the ARCH-V2-PILOT-K46 $rubric slot: \"Third induction\" ...\"; lines _as_of the commit that writes them, parent 885e481, re-grepped); brackets at L15920 (PILOT-K46 Roster, open item 4), L15953 (PILOT-K46 open item 1), L16573 and L16574 (INDUCE-RUBRIC-2 CONSEQUENCE (2), (3)), L16595 (open item 4 OWNER AND FORM); plan Amendment 21"
+  ],
+  "last_update": "2026-09-25 (registrar: author decision on the slot, \"Third induction\" (INDUCE-RUBRIC-3 drafted); ledger v254)",
+  "v5_generalisation": "C1 (delta READY eeb1dec; docs/judge_v2_program.md L16477-L16503 (section \"## Registrar's record 2026-09-24 (insertion only; zero calls; BEFORE --run) — ARCH-V2-INDUCE-RUBRIC-2 delta READY eeb1dec (at 27ad75c): READY for --run with conditions C1-C3 ...\"; lines _as_of the commit that writes them, parent 4a4ecfb, re-grepped); brackets at L16218 (the -1 INSTRUMENT OF RECORD), L16330 (HYGIENE, C3), L16332 (INSTRUMENT, pins), L16339 (V5, C1 and C2), L16340 (conditions MET, D5)): on the held-out set 4b440760... (18 fit, 17 unfit), V5 jv2-v5-3 FP 2 / 18 = 11.1% (Wilson 95% CI 3.1-32.8%; H-F5, H-F16), FN 13 / 17 = 76.5%; jv2-v5-2 on the same set FP 3 / 18, FN 14 / 17; the builder's 0 / 0 on the 58 pinned texts is in-sample only. V5 is a WEAK SCREEN; the registered post-run fitness reading is the substantive check",
+  "known_limits": [
+    "KL1-KL4: the selftest's known limits, unchanged",
+    "D1 (MEDIUM, FN): the \"short correct\" exemption lets a brevity reward through",
+    "D2 (MEDIUM, FN): a verb-first reward after a concessive passes (\"Prefer, even when both are correct, the shorter response\")",
+    "D3 (MEDIUM, FN, pre-existing): a narrowed CUE still excuses its whole clause: an anti-explanation / anti-reasoning rule excused by \"ignore / regardless of <form word>\" passes, as does a format demand not built on the word \"letter\"",
+    "D4 (LOW, FP): \"irrelevant\" in the reasoning clause fails (c) (= KL1)",
+    "D5 (LOW): the pinned B29 is truncated and fails on (a), vacuous for the (c)-negation mutant; B28 carries the kill; fix at the next touch",
+    "POST-RUN READER (C2): check the rubric of record specifically for a brevity reward, an anti-explanation or anti-reasoning rule excused by an \"ignore / regardless of\" clause, and a format demand that avoids the word \"letter\"; UNFIT = NOT ADOPTED, the slot to the author, never a fourth attempt"
+  ],
+  "verdict": "VALID",
+  "fitness": "UNFIT",
+  "adoption": "NOT ADOPTED [2026-09-25: stays NOT ADOPTED; the author chose a third induction (ARCH-V2-INDUCE-RUBRIC-3)]",
+  "forward_notes": [
+    "M3 (review c3aecfc; bracket on the registration's V5 line L16339): V5 (a) certifies that correctness is named and does not check what it is measured against; the READY held-out set held no reference-deference and no pro-explanation class; any future induction adds both classes to the screen and to a held-out set frozen before the regexes are read (suggested: 'match(es)? the reference', 'reference letter', 'agree(s)? with the reference')"
+  ],
+  "findings": {
+    "U1": "BLOCKER (adoption): reference as the criterion",
+    "U2": "HIGH: explanation-presence reward; ties suppressed",
+    "M1": "MEDIUM: 'Response 1 / 2' vs 'Model A / B'; 'Response 2 otherwise' positional default; disclosed",
+    "M2": "MEDIUM: clause 1 undefined on reference-NONE matches (about 71%; 1,027 of 3,673 variants carry v0); disclosed",
+    "M3": "MEDIUM (forward): V5 screen scope",
+    "L1": "LOW carried: posted_at == committed_at; gap 0.025 s, no hidden retry",
+    "L2": "LOW carried: two clocks; the event table is the witness",
+    "L3": "LOW: the stage-'judge' bracket exists at L16330",
+    "L4": "LOW: 'fidelity to option meanings' asks about options the judge does not see",
+    "L5": "LOW: V2 answer-text denominator 2,800 vs 2,704 (normalisation); 0 hits under both"
+  },
+  "author_decision_owed": [
+    "the $rubric slot after the UNFIT reading (empty slot, GENERIC_RUBRIC 67f843eb... or other; never a 4th attempt) [DECIDED 2026-09-25: \"Third induction\" (a NEW registration ARCH-V2-INDUCE-RUBRIC-3)]"
+  ],
+  "author_decisions": [
+    {
+      "date": "2026-09-25",
+      "item": "the $rubric slot",
+      "choice": "Third induction",
+      "text": "DECIDED 2026-09-25 by THE AUTHOR (Q \"Which rubric goes in the judge's rubric slot for the 46-model pilot? …\" -> \"Third induction\"): a NEW registration ARCH-V2-INDUCE-RUBRIC-3 (prompt: the reference may be wrong, answers may be empty, ties allowed; V5 widened; up to 6 calls; no guarantee of fitness), DRAFTED, NOT registered; GENERIC_RUBRIC reinstatement and the empty slot DECLINED; keeps the decision 2026-09-23 (2) (re-induced from the generation side)",
+      "record": "docs/judge_v2_program.md L16734-L16785 (section \"## Author's decisions 2026-09-25 (recorded by the registrar; zero calls) — (1) the ARCH-V2-PILOT-K46 $rubric slot: \"Third induction\" ...\"; lines _as_of the commit that writes them, parent 885e481, re-grepped); brackets at L15920 (PILOT-K46 Roster, open item 4), L15953 (PILOT-K46 open item 1), L16573 and L16574 (INDUCE-RUBRIC-2 CONSEQUENCE (2), (3)), L16595 (open item 4 OWNER AND FORM); plan Amendment 21"
+    }
+  ],
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "An LLM wrote a grading guide (a rubric) for multiple-choice questions from the same 40 training examples, using a corrected prompt and an automatic screen for unwanted wording. The aim was a rubric for the new judge design.",
+    "why": "The judge needs a rubric that does not bias its verdicts, and the first attempt had been rejected.",
+    "information": "A fit rubric could go into the new judge. An unfit one shows that the induction step or the screen is still flawed. Result: done. The rubric passed every automatic check on the first try, but a reviewer judged it unfit: it defines correctness as matching a reference answer that is itself wrong on 133 of 1,027 items, and it rewards visible reasoning. It was not adopted, and this registration will not be re-tried. The author then registered a separate new induction with a revised prompt. It makes no claim about rubric value or accuracy, and it shows that the automatic screen is weak evidence of fitness.",
+    "written": "2026-10-07"
+  }
+}

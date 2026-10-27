@@ -1,0 +1,137 @@
+{
+  "id": "FORMAT-REF",
+  "title": "FORMAT-REF: is GRADING less reference-dominated than COMPARING, and is the 2.7:1 a property of the format, the judge family, or the recipe? (zero calls)",
+  "question": "The CONSENSUS-FIT logistic refitted on four existing caches over the same R3 matches: pairwise grok, pointwise grok, pointwise grok with NO reference (negative control), pairwise Mistral; registered: pointwise ratio strictly below pairwise; the no-reference REF coefficient within +-0.2 of zero; grok ~ Mistral.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "1dbb895",
+    "program_lines": "docs/judge_v2_program.md L1380-L1403 (registration) and L1459-L1502 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-14 (before looking at any result, ZERO calls) — FORMAT-REF: is GRADING less reference-dominated than COMPARING?",
+    "outcome_heading": [
+      "L1459: - **FORMAT-REF OUTCOME (2026-09-14, zero calls): my prediction FALSIFIED, the negative control FAILED, and what"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "tools/analysis/format_ref.py",
+    "sha16": "1b6ad9ba445ddd24 (at e4b6167)",
+    "commit": "e4b6167"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/formatref_outcome.txt",
+    "outcome_commit": "e4b6167",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-14"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); PAIR-NOREF (2026-09-14) tested the displacement toggle in the pairwise format (NOT replicated; the claim narrowed)",
+    "commit": "e4b6167",
+    "verdict": "PREDICTION FALSIFIED; CONTROL FAILED; (4) PASS (recipe, not model); the clean toggle +1.811 / -0.560 is the finding"
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "pointwise ratio strictly below pairwise",
+      "result": "FAILED",
+      "value": "pointwise weights correctness LESS (delta KEY -0.736) at equal REF (delta REF +0.082): MORE reference-dominated, the opposite of the prediction; survives dropping ties (KEY 1.408 vs 0.235, REF 3.101 vs 3.094); the registered RATIO is undefined as KEY -> 0 (arm b CI [-47.8, +110.6]) and is superseded by paired coefficient differences (statistical amendment)",
+      "denominator": "the same R3 matches, four caches"
+    },
+    {
+      "id": "(2)",
+      "text": "the no-reference REF coefficient within +-0.2 of zero",
+      "result": "FAILED",
+      "value": "NEGATIVE CONTROL FAILS: with no reference in the prompt the REF contrast still scores +0.507 (z = 4.6), so it is partly a difficulty / consensus proxy and CONSENSUS-FIT's 2.7:1 is an upper bound",
+      "denominator": "pointwise no-reference cache"
+    },
+    {
+      "id": "clean toggle",
+      "text": "same format, same 1,969 matches, reference on or off",
+      "result": "DELIVERED",
+      "value": "showing a reference raises REF by +1.811 [+1.507, +2.121] and LOWERS KEY by -0.560 [-0.862, -0.289]: a reference does not add to the judge's own reasoning, it displaces it (why accuracy collapses to 0.226 when the reference is wrong)",
+      "denominator": "1,969 matches"
+    },
+    {
+      "id": "(4)",
+      "text": "grok ~ Mistral",
+      "result": "HELD",
+      "value": "recipe not model: grok KEY +0.996 vs Mistral +0.992",
+      "denominator": "pairwise caches"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "pointwise less reference-dominated",
+      "result": "FAILED",
+      "value": "more",
+      "denominator": "four caches"
+    }
+  ],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "tension for the paper: pointwise gives the better BOARD while tracking correctness less per match; PAIR-NOREF: the displacement is pointwise-only"
+  },
+  "numbers_of_record": {
+    "toggle": "REF +1.811 [+1.507, +2.121]; KEY -0.560 [-0.862, -0.289]",
+    "format": "delta KEY -0.736; delta REF +0.082; without ties KEY 1.408 vs 0.235, REF 3.101 vs 3.094",
+    "control": "REF +0.507 (z 4.6) with no reference",
+    "recipe": "grok KEY +0.996 vs Mistral +0.992"
+  },
+  "sentence_of_record": "FORMAT-REF (2026-09-14, zero calls): the negative control FAILS (with no reference in the prompt the REF contrast still scores +0.507, z = 4.6, so CONSENSUS-FIT's 2.7:1 is an upper bound); the clean toggle (same format, same 1,969 matches, reference on or off) gives the causal figure: showing a reference raises REF by +1.811 [+1.507, +2.121] and LOWERS KEY by -0.560 [-0.862, -0.289], a reference displaces the judge's own reasoning; FORMAT: pointwise weights correctness LESS (delta KEY -0.736) at equal REF, the opposite of the registered prediction; (4) recipe not model: grok KEY +0.996 vs Mistral +0.992; the registered RATIO is undefined as KEY -> 0 and is superseded by paired coefficient differences.",
+  "chips": [
+    "PREDICTION FALSIFIED",
+    "CONTROL FAILED",
+    "(4) PASS"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-14",
+      "by": "PAIR-NOREF",
+      "text": "displacement does NOT replicate in the pairwise format (delta KEY -0.022 [-0.240, +0.191], CI excludes the pointwise -0.560): a reference displaces the judge's assessment when it GRADES and merely outweighs it when it COMPARES."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "displacement in the pairwise format (PAIR-NOREF: not replicated)",
+    "the ratio as a statistic (undefined as KEY -> 0)"
+  ],
+  "ledger": {
+    "row_id": "FORMAT-REF",
+    "version": "v70 (e4b6167); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "CONSENSUS-FIT",
+    "POINTWISE",
+    "PAIR-NOREF"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L1380-L1403 and L1459-L1502 (1dbb895 / e4b6167)",
+    "experiment_results/x12_crossdomain/formatref_outcome.txt (e4b6167)",
+    "docs/test_ledger.html row FORMAT-REF (v70): chips verbatim, observed cell, evidence",
+    "script sha16 = sha256 of tools/analysis/format_ref.py at e4b6167, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "No calls. A regression was refitted on existing verdict caches for the same matches: pairwise and pointwise (single-answer grading) formats, two judge families (grok, Mistral), and a version with no reference answer in the prompt as a control.",
+    "why": "It asks why the judge follows the reference answer more than actual correctness: is it the format, the judge model, or the recipe?",
+    "information": "It separates 'the judge copies the reference' from 'the judge reasons for itself', and shows whether the result depends on the judge model. Result: done, descriptive. The control failed, so the earlier 2.7:1 'reference beats correctness' ratio is an upper bound. In the grading format, showing a reference made the judge lean on it more and on its own assessment less. A follow-up found this displacement does not happen in the pairwise format. grok and Mistral behaved almost identically, so it is the recipe, not the model. Note: older question pool, ruled 'history, not evidence'.",
+    "written": "2026-10-07"
+  }
+}

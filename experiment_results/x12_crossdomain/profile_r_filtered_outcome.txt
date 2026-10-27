@@ -1,0 +1,127 @@
+pool of record: p2dca21ab5f4ef3ae
+=== PROFILE-R-FILTERED: does the anchor profile's reliability survive the answer-disagreement filter? ===
+  registered 2026-09-18 (commit 5bd56bb); zero calls; caches mode=ro; RUN
+
+--- DATA CHECK (the object, before any stratum is read) ---
+  x12 cache stack_v2_promptv2_x12all.db: 9142 valid verdicts (pinned 9142), 2811 judged q
+  x20 cache stack_v2_promptv2_x20.db: 12394 valid verdicts (pinned 12394), 2646 judged q; never read alone (0 verdicts on the 66 original pairs)
+  merged board: 21536 verdicts (pinned 21536), 20 models, Meta-Llama-3-70B-Instruct absent
+  pool p2dca21ab5f4ef3ae: 2811 routed + judged questions, all in the reserved pool; 14 anchors with the recorded counts
+
+--- THE FILTER (eval_results.pred of the two contestants; the shipped MatchFilter.kt rule; no key read) ---
+  non-letter / missing prediction values seen on the 20-model roster (value: rows): None: 16084
+  cache  matches    AGREE  DISAGREE UNDETERMINED | conv A kept (missing = kept) | conv B kept (missing excluded)    
+  x12       9142     3076      5276          790 |   6066 of   9142 =  66.4%       |   5276 of   8352 (both present) =  63.2%
+  x20      12394     5846      5166         1382 |   6548 of  12394 =  52.8%       |   5166 of  11012 (both present) =  46.9%
+  merged   21536                                 |  12614 of  21536 =  58.6%       |  10442 of  19364 (both present) =  53.9%
+  normalisation check: matches whose verdict differs between the shipped rule (trim, case-insensitive, whole string) and the
+  record's first-character rule: x12 0, x20 0
+  RECONCILIATION against the two prior readings (x12, 9,142):
+    AGGREGATE arm B kept 5,276 (both present and differ, first character): this script's DISAGREE count = 5276 (equal)
+    TOPIC-DIFFICULTY 34.3% same predicted letter -> 65.7% differing (~6,007): this script's AGREE share = 33.6% (same letter);
+    1 - AGREE share = 66.4% = convention A's kept share (DISAGREE + UNDETERMINED = 6066): the two prior figures differ by the
+    790 matches with a missing prediction (kept by the shipped rule, dropped by AGGREGATE's). Convention A's 6066 of 9142
+    (66.4%) is the number of record for THIS test. The 57.7% vs 65.7% gap is the missing-prediction convention; the residual
+    -0.7 pp between this script's same-letter share and TOPIC-DIFFICULTY's 34.3% (~60 matches) is NOT explained here and is
+    left for the checker (candidate: TOPIC-DIFFICULTY's match set or prediction column differs).
+    x20: same letter 47.2% (TOPIC-DIFFICULTY 48.2%, residual -1.0 pp), UNDETERMINED 1382, conv A kept 52.8%
+  KEY DENOMINATOR per anchor (judged questions; unfiltered / conv A q_distinct / conv B q_distinct; kept matches A / B):
+    Philosophy          132 /  114 (0.86) /  110 (0.83)   matches   784 /   441 (0.56) /   411 (0.52)   <- support rule: q_distinct < 120 under A
+    Psychology          260 /  201 (0.77) /  199 (0.77)   matches  1934 /   877 (0.45) /   852 (0.44)
+    Economics           178 /  145 (0.81) /  138 (0.78)   matches  1394 /   684 (0.49) /   618 (0.44)
+    Other               211 /  182 (0.86) /  182 (0.86)   matches  1798 /   909 (0.51) /   881 (0.49)
+    Business            174 /  143 (0.82) /  133 (0.76)   matches   695 /   416 (0.60) /   339 (0.49)
+    Math                304 /  295 (0.97) /  275 (0.90)   matches  2881 /  1929 (0.67) /  1306 (0.45)
+    Computer science    162 /  156 (0.96) /  149 (0.92)   matches  1490 /   895 (0.60) /   748 (0.50)
+    Law                 271 /  259 (0.96) /  257 (0.95)   matches  1425 /   993 (0.70) /   945 (0.66)
+    Health              129 /  116 (0.90) /  112 (0.87)   matches  1210 /   578 (0.48) /   547 (0.45)   <- support rule: q_distinct < 120 under A
+    Biology             181 /  138 (0.76) /  126 (0.70)   matches  1605 /   753 (0.47) /   645 (0.40)
+    History             119 /  100 (0.84) /   96 (0.81)   matches   900 /   464 (0.52) /   435 (0.48)   <- support rule: q_distinct < 120 under A
+    Chemistry           269 /  260 (0.97) /  231 (0.86)   matches  1754 /  1222 (0.70) /   778 (0.44)
+    Engineering         162 /  153 (0.94) /  146 (0.90)   matches   936 /   618 (0.66) /   493 (0.53)
+    Physics             259 /  249 (0.96) /  245 (0.95)   matches  2730 /  1835 (0.67) /  1444 (0.53)
+  (History is 119 UNFILTERED, below the 120 support rule before any filter: it reads UNDETERMINED-by-support under any filter.)
+
+=== REPRODUCTION GATE: unfiltered merged board R on the fixed halvings ===
+  R = 0.7183 (r 0.5604, halving SD 0.0300, 40 halvings) vs recorded 0.7183: REPRODUCED; jackknife re-halved [0.6076, 0.8291] (recorded [0.6076, 0.8291]), fixed [0.6102, 0.8264]
+  key, 20 models, unfiltered: R = 0.9139 (recorded 0.9139)
+  per-anchor R_prof points on the fixed halvings vs PROFILE-INTERVAL-ALL C2 (14 anchors): all 14 reproduced to 4 dp
+
+=== C1: board-level R, filtered vs unfiltered (instrument: profile_reliability.reliability, 40 halvings, Random(7), model-demeaned, SB) ===
+  board                              anchors  q_total        r    R(SB)  jk RE-HALVED 95%   jk FIXED 95%       halvSD
+  unfiltered merged (recorded 0.7183)     14     2811   0.5604   0.7183  [0.6076, 0.8291]   [0.6102, 0.8264]   0.0300
+  filtered conv A (missing kept)         14     2511   0.3902   0.5613  [0.3385, 0.7842]   [0.3377, 0.7850]   0.0440
+    key, 20 models, same filtered q      14     2511            0.8618   (descriptive; unfiltered key-20 0.9139)
+  filtered conv B (missing excluded)     14     2399   0.2884   0.4477  [0.2183, 0.6772]   [0.1914, 0.7041]   0.0404
+    key, 20 models, same filtered q      14     2399            0.8534   (descriptive; unfiltered key-20 0.9139)
+  denominators: the 14 anchors' filtered judged questions (listed in the filter table above); anchors below 50 filtered questions
+  cannot be halved and are absent from that board (count printed in 'anchors').
+  per-anchor leave-one-out R, conv A (re-halved): drop Math 0.4917, drop Physics 0.5110, drop Chemistry 0.5423, drop Philosophy 0.5530, drop Law 0.5560, drop Psychology 0.5690, drop History 0.5705, drop Other 0.5718, drop Business 0.5806, drop Engineering 0.5883, drop Health 0.5917, drop Biology 0.5951, drop Economics 0.5979, drop Computer science 0.6012
+  per-anchor leave-one-out R, conv B (re-halved): drop Math 0.3841, drop Physics 0.3923, drop Law 0.4029, drop Psychology 0.4424, drop Other 0.4430, drop History 0.4452, drop Chemistry 0.4465, drop Philosophy 0.4495, drop Business 0.4680, drop Computer science 0.4696, drop Economics 0.4743, drop Biology 0.4807, drop Engineering 0.4850, drop Health 0.4863
+
+=== C2: per-anchor class under the filter (profile reading; class on the LOWER of the recentred question bootstrap B = 125 x 16 and the
+    delete-one-question jackknife on 10 fixed halvings), beside PROFILE-INTERVAL-ALL C2's recorded merged classes; support rule q_distinct < 120 ===
+
+  --- filtered, convention A ---
+  anchor              q_u  q_f  recorded (PROFILE-INTERVAL-ALL C2) |   R_prof boot95 recentred    bias jackknife 95%     low      class (filtered)         step |  key R_f R_raw   
+  Health              129  116  -0.0710 FAIL                   |  -0.0851 [-0.3627, 0.1263] -0.071 [-0.9896, 0.8194]  -0.9896 UNDETERMINED-by-support     - |   0.6224   0.9329
+  Economics           178  145  0.1431 FAIL                    |  -0.2469 [-0.5224, -0.0130] +0.057 [-1.1765, 0.6826]  -1.1765 FAIL                        0 |   0.6672   0.9518
+  Computer science    162  156  0.3054 FAIL                    |  -0.1523 [-0.3677, 0.0719] +0.086 [-1.3605, 1.0558]  -1.3605 FAIL                        0 |   0.4206   0.9668
+  Biology             181  138  0.3987 FAIL                    |  -0.1835 [-0.4502, 0.0124] +0.051 [-1.2726, 0.9057]  -1.2726 FAIL                        0 |   0.6487   0.9550
+  Engineering         162  153  0.6866 FAIL                    |  -0.1911 [-0.4745, 0.0636] -0.005 [-1.1245, 0.7424]  -1.1245 FAIL                        0 |   0.8253   0.9600
+  History             119  100  0.7063 PASS-WITH-INTERVAL      |   0.5980 [0.4312, 0.7155] -0.252 [0.3672, 0.8287]   0.3672 UNDETERMINED-by-support     - |   0.5919   0.9347
+  Other               211  182  0.7090 PASS-WITH-INTERVAL      |   0.4769 [0.2905, 0.6097] -0.184 [0.0836, 0.8702]   0.0836 FAIL                        1 |   0.7958   0.9536
+  Philosophy          132  114  0.7334 PASS-WITH-INTERVAL      |   0.6047 [0.4607, 0.7322] -0.269 [0.3528, 0.8566]   0.3528 UNDETERMINED-by-support     - |   0.6496   0.9244
+  Chemistry           269  260  0.7604 PASS-WITH-INTERVAL      |   0.7766 [0.6758, 0.8466] -0.214 [0.6537, 0.8995]   0.6537 PASS-WITH-INTERVAL          0 |   0.9269   0.9835
+  Business            174  143  0.7701 PASS-WITH-INTERVAL      |   0.3440 [0.1345, 0.5300] -0.298 [-0.1698, 0.8577]  -0.1698 FAIL                        1 |   0.8492   0.9366
+  Psychology          260  201  0.7882 PASS-WITH-INTERVAL      |   0.4515 [0.2385, 0.6104] -0.181 [0.0720, 0.8310]   0.0720 FAIL                        1 |   0.8218   0.9514
+  Law                 271  259  0.7923 PASS-WITH-INTERVAL      |   0.7351 [0.6575, 0.8006] -0.161 [0.5921, 0.8781]   0.5921 PASS-WITH-INTERVAL          0 |   0.8849   0.9703
+  Math                304  295  0.8833 PASS                    |   0.8810 [0.8331, 0.9271] -0.140 [0.8250, 0.9370]   0.8250 PASS                        0 |   0.9465   0.9809
+  Physics             259  249  0.9148 PASS                    |   0.8690 [0.8116, 0.9211] -0.170 [0.8101, 0.9278]   0.8101 PASS                        0 |   0.8493   0.9881
+  classes conv A: {'UNDETERMINED-by-support': 3, 'FAIL': 7, 'PASS': 2, 'PASS-WITH-INTERVAL': 2} (recorded unfiltered: PASS 2 / PASS-WITH-INTERVAL 7 / FAIL 5)
+
+  --- filtered, convention B ---
+  anchor              q_u  q_f  recorded (PROFILE-INTERVAL-ALL C2) |   R_prof boot95 recentred    bias jackknife 95%     low      class (filtered)         step |  key R_f R_raw   
+  Health              129  112  -0.0710 FAIL                   |  -0.4022 [-0.6830, -0.1768] +0.184 [-1.7220, 0.9176]  -1.7220 UNDETERMINED-by-support     - |   0.6043   0.9250
+  Economics           178  138  0.1431 FAIL                    |  -0.1608 [-0.4674, 0.0880] +0.019 [-1.2282, 0.9067]  -1.2282 FAIL                        0 |   0.6927   0.9469
+  Computer science    162  149  0.3054 FAIL                    |  -0.0232 [-0.2640, 0.1431] +0.020 [-1.2904, 1.2440]  -1.2904 FAIL                        0 |   0.4491   0.9634
+  Biology             181  126  0.3987 FAIL                    |  -0.3506 [-0.6015, -0.0886] +0.204 [-1.6389, 0.9378]  -1.6389 FAIL                        0 |   0.5472   0.9449
+  Engineering         162  146  0.6866 FAIL                    |  -0.5408 [-0.8920, -0.3125] +0.246 [-2.1491, 1.0676]  -2.1491 FAIL                        0 |   0.7964   0.9436
+  History             119   96  0.7063 PASS-WITH-INTERVAL      |   0.5707 [0.4221, 0.6841] -0.263 [0.2349, 0.9066]   0.2349 UNDETERMINED-by-support     - |   0.5752   0.9301
+  Other               211  182  0.7090 PASS-WITH-INTERVAL      |   0.4084 [0.2397, 0.5500] -0.124 [-0.1166, 0.9333]  -0.1166 FAIL                        1 |   0.7954   0.9436
+  Philosophy          132  110  0.7334 PASS-WITH-INTERVAL      |   0.4318 [0.2353, 0.5888] -0.212 [0.0943, 0.7694]   0.0943 UNDETERMINED-by-support     - |   0.6922   0.9184
+  Chemistry           269  231  0.7604 PASS-WITH-INTERVAL      |   0.5342 [0.3635, 0.6697] -0.193 [0.1917, 0.8766]   0.1917 FAIL                        1 |   0.8873   0.9762
+  Business            174  133  0.7701 PASS-WITH-INTERVAL      |   0.2044 [0.0064, 0.3790] -0.177 [-0.4787, 0.8874]  -0.4787 FAIL                        1 |   0.8724   0.9259
+  Psychology          260  199  0.7882 PASS-WITH-INTERVAL      |   0.3475 [0.1554, 0.5039] -0.115 [-0.1980, 0.8929]  -0.1980 FAIL                        1 |   0.8291   0.9496
+  Law                 271  257  0.7923 PASS-WITH-INTERVAL      |   0.7676 [0.6872, 0.8503] -0.198 [0.6559, 0.8792]   0.6559 PASS-WITH-INTERVAL          0 |   0.9003   0.9728
+  Math                304  275  0.8833 PASS                    |   0.8325 [0.7745, 0.8809] -0.184 [0.7472, 0.9178]   0.7472 PASS                        0 |   0.9442   0.9747
+  Physics             259  245  0.9148 PASS                    |   0.8304 [0.7585, 0.8988] -0.206 [0.7487, 0.9120]   0.7487 PASS                        0 |   0.8428   0.9847
+  classes conv B: {'UNDETERMINED-by-support': 3, 'FAIL': 8, 'PASS': 2, 'PASS-WITH-INTERVAL': 1} (recorded unfiltered: PASS 2 / PASS-WITH-INTERVAL 7 / FAIL 5)
+
+=== PREDICTIONS, REGISTRAR'S ADDITION AND FALSIFIER (convention A = the shipped scheduler's rule, PRIMARY; B beside) ===
+  --- convention A: R_f = 0.5613, re-halved jk [0.3385, 0.7842], fixed jk [0.3377, 0.7850], halving SD 0.0440; delta vs 0.7183 = -0.1570 ---
+    P1 |R_f - 0.7183| <= 0.05 at the point: FAILED
+    P2 no anchor moves more than one class step (supported anchors only): HELD; movers: Psychology PASS-WITH-INTERVAL -> FAIL (1), Other PASS-WITH-INTERVAL -> FAIL (1), Business PASS-WITH-INTERVAL -> FAIL (1)
+    P3 >= 3 anchors UNDETERMINED by support (q_distinct < 120): HELD (3: Philosophy 114, Health 116, History 100)
+    registrar's addition, the filtered jackknife interval still reaches 0.70 (class FAIL): HELD (literal containment of 0.70: yes)
+    FALSIFIER R_f < 0.60 at the point: FIRES
+  --- convention B: R_f = 0.4477, re-halved jk [0.2183, 0.6772], fixed jk [0.1914, 0.7041], halving SD 0.0404; delta vs 0.7183 = -0.2706 ---
+    P1 |R_f - 0.7183| <= 0.05 at the point: FAILED
+    P2 no anchor moves more than one class step (supported anchors only): HELD; movers: Psychology PASS-WITH-INTERVAL -> FAIL (1), Other PASS-WITH-INTERVAL -> FAIL (1), Business PASS-WITH-INTERVAL -> FAIL (1), Chemistry PASS-WITH-INTERVAL -> FAIL (1)
+    P3 >= 3 anchors UNDETERMINED by support (q_distinct < 120): HELD (3: Philosophy 110, Health 112, History 96)
+    registrar's addition, the filtered jackknife interval still reaches 0.70 (class FAIL): FAILED (literal containment of 0.70: no)
+    FALSIFIER R_f < 0.60 at the point: FIRES
+
+=== VERDICT LINES ===
+  C1: unfiltered R 0.7183 [0.6076, 0.8291] (recorded 0.7183 [0.6076, 0.8291], reproduced); filtered conv A R 0.5613 [0.3385, 0.7842], conv B 0.4477 [0.2183, 0.6772];
+      key-20 on the same filtered questions: conv A 0.8618, conv B 0.8534 (unfiltered 0.9139); kept matches: x12 6066 / 9142, x20 6548 / 12394 (conv A)
+  C2 conv A: {'UNDETERMINED-by-support': 3, 'FAIL': 7, 'PASS': 2, 'PASS-WITH-INTERVAL': 2}; UNDETERMINED-by-support: Philosophy, Health, History
+  C2 conv B: {'UNDETERMINED-by-support': 3, 'FAIL': 8, 'PASS': 2, 'PASS-WITH-INTERVAL': 1}; UNDETERMINED-by-support: Philosophy, Health, History
+  P1 FAILED | P2 HELD | P3 HELD | registrar's addition HELD (FAIL) | FALSIFIER FIRES   [convention A, primary]
+  conv B beside: P1 FAILED | P2 HELD | P3 HELD | registrar's addition FAILED (FAIL) | falsifier FIRES
+  CONSEQUENCE (registered): the filter destroys the profile; the newcomer's profile-coverage bill is NOT halved; FRAMEWORK L189 step 5
+  keeps ~1,550 unfiltered matches per model; L405 'untested' -> 'tested, FAIL' by insertion. FILTER-BOARD, ORACLE and NEWCOMER-PLACEMENT-LIVE stand.
+  No model's theta or position was read; only R was compared (PLACEBO-ENTRY: the theta scale is ~13%% wider under the filter).
+  KEY DENOMINATOR restated: each anchor's JUDGED questions of pool p2dca21ab5f4ef3ae (unfiltered 119-304; filtered as printed), halved; the
+  per-half profile is the 20-model BT fit (rj.mm_fit via judge_free_tests.board_from, prior 0.5) on that half's (kept) verdicts.
+  McNEMAR-ESTABLISHED RULE: no wrong-direction count exists here; stated, not applied.

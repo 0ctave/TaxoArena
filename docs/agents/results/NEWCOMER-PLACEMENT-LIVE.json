@@ -1,0 +1,134 @@
+{
+  "id": "NEWCOMER-PLACEMENT-LIVE",
+  "title": "NEWCOMER-PLACEMENT-LIVE: FRAMEWORK item 22: two real newcomers absent from x12 (claude-3-5-sonnet-20241022, frontier-adjacent; gpt-4o-mini, mid-board) placed live by the ARENA-13 protocol at the registered budget (1,600 calls)",
+  "question": "Each newcomer placed by 4 anchors chosen by sequential bisection of the 19-incumbent board of record (peer newcomer excluded), 100 pool questions per anchor = 800 matches, answer-disagreement filter, CACHED_SOLVE grok-reasoning reference (D5), STACK-v2 on grok-4-1-fast-non-reasoning: does the certificate interval span <= 2 adjacent key tiers and contain the key tier for both, with the frontier newcomer BANDED and no top-tier rank? Falsifier: an interval wider than 2 tiers (then 400 matches is not a placement budget).",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "eaf1dbf",
+    "program_lines": "docs/judge_v2_program.md L3603-L3611 (by reference; FRAMEWORK L378 item 22; newcomers fixed at registration L3605-L3606); the registered protocol restated at L3855-L3861; D5 reference fix at the Block 2 dry-run 1e3b1ea",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-15 (before any run) — BY REFERENCE: the 26 tests in docs/design/FRAMEWORK.md \"Tests to register before shipping\" (commit 8d77f7b), with the criteria, predictions and call counts stated there, scheduled in docs/plan_2026-09-15.md",
+    "outcome_heading": [
+      "L3854: ## NEWCOMER-PLACEMENT-LIVE (2026-09-16, 1,600 calls) — FRAMEWORK item 22: FAIL by the registered falsifier; 400 matches is not a placement budget; the bisection itself is sound"
+    ],
+    "date": "2026-09-15"
+  },
+  "script": {
+    "path": "tools/analysis/newcomer_placement.py",
+    "sha16": "e68713dadefba8b0 (at the Block 2 dry-run commit 1e3b1ea)",
+    "commit": "1e3b1ea (later edited 0ba096f 'newcomer retry freezes decided steps', 7076615, 2976bc4, 13f2142, 7d11c4e)"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (800 matches per newcomer, 1,600 calls); Amendment 1 D2 (temperature omitted) and D5 (CACHED_SOLVE grok-reasoning reference in place of ARENA-13's in-roster ensemble, which ENSEMBLE-REF rules out and which contained each newcomer's sibling)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/newcomer_placement_outcome.txt",
+    "outcome_commit": "7076615",
+    "calls": 1600,
+    "cce": "not stated in the programme",
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-16",
+    "other_files": [
+      "experiment_results/x12_crossdomain/newcomer_placement.db (gitignored; 1,600 verdict rows, 1 content_filter row)"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the Block 2 dry-run review fixed D5 before any call; the placement was later decomposed at zero calls by PLACEMENT-CEILING (docs/reviews/2026-09-18_night_batch.md, 17a4434) and re-read by PLACEMENT-STEPS (2026-09-19)",
+    "commit": "1e3b1ea",
+    "verdict": "FAIL by the registered falsifier (7 and 3 tiers); bisection sound, key tier contained; [PLACEMENT-CEILING: sonnet's width is a bisection-STEPS shortfall over a 4-tier structural floor; 'not judge error' holds for the floor and is overturned for the 3 separable tiers]"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "the certificate interval spans <= 2 adjacent key tiers and contains the key tier for both; the frontier newcomer is BANDED with no top-tier rank",
+      "result": "FAILED",
+      "value": "claude-3-5-sonnet: certified above Qwen1.5-72B and below gemini at 0.975 (0 opposite draws each), UNSEPARATED from gpt-4o (0.505 [0.414, 0.591]) and arx_3 (0.510 [0.420, 0.590]); key-tier interval 1..7 (7 tiers), own key tier 3 contained; gpt-4o-mini: certified above Qwen1.5-72B and claude-3-5-haiku (36 opposite draws of 2,000), below arx_0314 and gpt-4o (2 opposite draws); interval 4..6 (3 tiers), own key tier 6 contained: FAIL for both (7 > 2, 3 > 2); class BANDED, PROVISIONAL, no top-tier rank",
+      "denominator": "PRIMARY readout single-source per-anchor win share with ties 1/2, question-clustered bootstrap B = 2,000; 100 pool questions per anchor; key tiers at the 0.017 gap"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "(FRAMEWORK's synthetic estimate) ~800 cce bands a newcomer",
+      "result": "FAILED",
+      "value": "measured: at 400 matches a mid-board newcomer bands to 3 tiers, a frontier-adjacent one to the whole frontier (7 tiers); the framework's estimate was synthetic (its one real newcomer ended UNRESOLVED)",
+      "denominator": "2 newcomers x 800 matches"
+    }
+  ],
+  "falsifier": {
+    "text": "interval wider than 2 tiers: 400 matches is not a placement budget",
+    "fired": true,
+    "note": "FIRED for both (7 and 3 tiers) [CORRECTED 2026-09-18 by PLACEMENT-CEILING: sonnet's 3 separable tiers are incumbents never judged against, a bisection-STEPS shortfall over a structural 4-tier floor (frontier t1/t2/t4 + key tie t3) that fails criterion (22) at any budget; gpt-4o-mini's band shrinks with n (6 -> 4 -> 4 -> 3); PLACEMENT-CURVE as priced declined; a further-step design (PLACEMENT-STEPS) is the registration to write]"
+  },
+  "numbers_of_record": {
+    "run": "800 matches per newcomer, 1,600 calls; 1 unusable row (Azure content-filter 400 on a History match, cached INVALID, 0.2%); guard OK; key-decidable judge accuracy 0.765 / 0.817",
+    "bisection_steps": "claude-3-5-sonnet above Qwen1.5-72B (88:6), above gpt-4o (41:40), below gemini (19:74), above arx_3 (40:38); gpt-4o-mini above Qwen1.5-72B (64:22), below arx_0314 (10:76), above claude-3-5-haiku (47:28), below gpt-4o (26:54)",
+    "certificates": "sonnet: above Qwen1.5-72B / below gemini certified (0 opposite draws), unseparated from gpt-4o 0.505 [0.414, 0.591] and arx_3 0.510 [0.420, 0.590]; interval 1..7, own tier 3; gpt-4o-mini: above Qwen1.5-72B and haiku (36 of 2,000 opposite), below arx_0314 and gpt-4o (2 opposite); interval 4..6, own tier 6",
+    "secondary_mixed_fit": "merged-fit theta +1.421 [+1.249, +1.611] position band [3, 6] and +0.706 [+0.526, +0.891] band [7, 9]; withheld-x20 comparators +1.745 / +0.869 agree in order (never the verdict)",
+    "decomposition_PLACEMENT-CEILING": "sonnet (i) key-tie 1 [t3 arx_3] + (ii) frontier 3 [t1, t2, t4] + (iii) separable 3 [t5, t6, t7; 5 iii-b, 1 iii-c, 0 iii-a]; gpt-4o-mini (ii) 1 + (iii) 1 + (i) 1; resolution curve sonnet 7 [7, 7] at every n, gpt-4o-mini 6 -> 4 -> 4 -> 3"
+  },
+  "sentence_of_record": "NEWCOMER-PLACEMENT-LIVE (2026-09-16, 1,600 calls): FRAMEWORK item 22: FAIL by the registered falsifier; 400 matches is not a placement budget; the bisection itself is sound. Both placements are directionally right and contain the key tier; the width comes from where the bisection lands, not from judge error: claude-3-5-sonnet sits in the frontier band the record refuses to order (FRONTIER-FIT, rule 8), gpt-4o-mini's 3-tier interval is the tier-6 cluster (0.631 / 0.629 / 0.628) plus one tier each side; at 400 matches a mid-board newcomer bands to 3 tiers, a frontier-adjacent one to the whole frontier. [CORRECTED 2026-09-18 by PLACEMENT-CEILING: the 7 / 3 bands decompose as sonnet (i) 1 + (ii) 3 + (iii) 3 and gpt-4o-mini (ii) 1 + (iii) 1 + (i) 1; sonnet's (iii) tiers are incumbents NEVER JUDGED AGAINST: a bisection-STEPS shortfall over a STRUCTURAL FLOOR of 4 tiers that fails criterion (22) at any budget, so 'not judge error' holds for the 4-tier floor and is overturned for the 3 (iii) tiers; the resolution curve is 7 [7, 7] for sonnet at every n and 6 -> 4 -> 4 -> 3 for gpt-4o-mini; PLACEMENT-CURVE as priced is DECLINED; a further-step placement design is the registration to write.]",
+  "chips": [
+    "FAIL BY THE FALSIFIER (7 AND 3 TIERS)",
+    "BISECTION SOUND, KEY TIER CONTAINED"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-18",
+      "by": "PLACEMENT-CEILING (ledger observed cell, v114; programme section PLACEMENT-CEILING, 3dd0900; FRAMEWORK L378 item 22 bracketed)",
+      "text": "the 7 / 3 bands decompose (key tiers at 0.017; PRIMARY / A / B identical) as sonnet (i) key-tie 1 [t3 arx_3] + (ii) frontier 3 [t1, t2, t4] + (iii) separable 3 [t5 deepseek, t6 gpt-4o-mini / haiku / Llama-70B, t7 Qwen1.5-110B and the certified bounding anchor Qwen1.5-72B]; gpt-4o-mini (ii) 1 [t4] + (iii) 1 [t5 deepseek] + (i) 1 [t6 haiku, Llama-70B]. Sonnet's (iii) tiers are incumbents NEVER JUDGED AGAINST (5 iii-b, 1 iii-c, 0 unseparated judged anchors): a bisection-STEPS shortfall over a STRUCTURAL FLOOR of 4 tiers that fails criterion (22) at any budget; 'the width comes from where the bisection lands, not from judge error' holds for the 4-tier floor and is overturned for the 3 (iii) tiers (the falsifier fired for sonnet). The resolution curve is 7 [7, 7] for sonnet at every n (bounding anchors certify from 25 q; the mid anchors at 0.505 / 0.510 cannot certify at any n: 31,001 / 7,549 question-pairs) and 6 -> 4 -> 4 -> 3 for gpt-4o-mini, whose remaining (iii) tier is deepseek at key gap 0.0199 vs 0.017. PLACEMENT-CURVE as priced cannot narrow sonnet and is DECLINED; a further-step placement design is the registration to write."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "PLACEMENT-STEPS (record docs/agents/results/PLACEMENT-STEPS.json; ledger v117)",
+      "text": "one further bisection step per separable tier removes the separable tiers: placement cost is 400 + 100 per separable tier per newcomer; the residual is the structural floor (i) + (ii); criterion (22) is reachable for mid-board newcomers, not for a frontier newcomer."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "INCONSISTENCIES-PASS (registrar, zero calls; insertion only)",
+      "text": "PIN (OPEN) 2026-09-23 by INCONSISTENCIES-PASS (registrar, zero calls; insertion only): 'Block 2 scripts edited mid-window'. tools/analysis/newcomer_placement.py was dry-run at 1e3b1ea (2026-09-16 01:43:55) and EDITED at 0ba096f (01:52:46) before this run's outcome commit 7076615 (02:31:47) (0ba096f changed the --retry-unusable logic: decided steps frozen, the cap of record kept), and edited again IN the outcome commit 7076615. LF sha16 of the script: 1e3b1ea e68713dadefba8b0, 0ba096f e460a379cefd7e2c, 7076615 7be4338c21206bb8 (git show <commit>:<path> | sha256sum). Which version posted the verdicts is NOT determinable from the record; the script pins its own sha in the cache's meta at first launch, so a read-only read of that meta value (not done: no DB was opened in this pass) settles it the way C5-1 settled GROK-CALIB. The pin may be of the CRLF working-tree rendering (INCONSISTENCIES class 5)."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a placement budget at 400 matches (the falsifier fired)",
+    "a top-tier rank for the frontier newcomer (BANDED by rule)",
+    "the mixed-fit position bands as a verdict (secondary only)"
+  ],
+  "ledger": {
+    "row_id": "NEWCOMER-PLACEMENT-LIVE",
+    "version": "v114 (row added v103 at 684be03; observed cell bracketed v114 by PLACEMENT-CEILING) [v132 2026-09-23: INCONSISTENCIES-PASS insertion in this row]; [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "ARENA-13",
+    "ENSEMBLE-REF",
+    "FRONTIER-FIT",
+    "TIER-HONEST",
+    "KEY-TIE-DECLINE"
+  ],
+  "supersedes": null,
+  "superseded_by": "PLACEMENT-CEILING (the decomposition) and PLACEMENT-STEPS (the further-step design)",
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L3603-L3611 (by-reference registration eaf1dbf; the two newcomers fixed at L3605-L3606) and docs/design/FRAMEWORK.md L378 item 22; docs/plan_2026-09-15.md Amendment 1 D2 / D5; docs/judge_v2_program.md L3613-L3623 (Block 2 launch record: the D5 fix)",
+    "docs/judge_v2_program.md L3854-L3883 (outcome section 7076615): registered, run, bisection steps, PRIMARY readout, criterion, reading, secondary",
+    "docs/judge_v2_program.md section PLACEMENT-CEILING (3dd0900) and the PLACEMENT-STEPS record: the brackets",
+    "experiment_results/x12_crossdomain/newcomer_placement_outcome.txt (7076615)",
+    "docs/test_ledger.html row NEWCOMER-PLACEMENT-LIVE (v103 684be03; bracketed v114): chips verbatim, observed-cell bracket, evidence (outcome, newcomer_placement.db gitignored)",
+    "script sha16 = sha256 of tools/analysis/newcomer_placement.py at 1e3b1ea, first 16 hex (identity, computed by the registrar 2026-09-22; the retry fix 0ba096f landed during the run window)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' (or '- **ID ...**' bullet) lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ4 Price",
+    "what": "Places two new models (claude-3-5-sonnet, gpt-4o-mini) live into the existing 19-model leaderboard. Each is compared against 4 incumbents chosen by bisection, with 100 questions each: 400 matches per newcomer, 1,600 calls.",
+    "why": "Tests whether a new model can be ranked cheaply, within 2 adjacent tiers, without re-running the whole arena.",
+    "information": "A tight interval would make 400 matches a valid, cheap placement budget. Result: done, failed by the registered falsifier. Both placements point the right way and contain the true tier, but the intervals are too wide (7 and 3 tiers). A later re-analysis split the width into two parts. Part comes from frontier models the record refuses to order, a floor that no budget can remove for a frontier newcomer. Part comes from incumbents the newcomer was never judged against, which more bisection steps would remove. So 400 matches is not a placement budget. This belongs to the older question pool, which is now ruled history, not evidence.",
+    "written": "2026-10-07"
+  }
+}

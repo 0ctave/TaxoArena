@@ -1,0 +1,46 @@
+[EMBED-QUANT] pool of record: none read (S0's DBs and the Q8 file); zero calls; no embeddings; no GATE row
+[EMBED-QUANT] heavy foreign processes: none
+[EMBED-QUANT] registration heading '(before any code or call) — EMBED-QUANT:' in judge_v2_program.md: PRESENT
+[EMBED-QUANT] selection Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\embed_dim_slice\selection.json sha256 (LF rendering) f1b508cfa889021e6a4d8dac5e82a2188399373996818db0d622aad076bf400d [PIN OK]
+[EMBED-QUANT] d_q* = 1024 (registered 1024; no slice is reselected)
+[INTENT-S0] pin intent_transfer_corpora_v1.db: sha256 487e0093719c184c98bca53bc9bc61c193559690abb206d77010fd77f81c09a2 [PIN OK]
+[INTENT-S0] raw provenance amazon-massive-dataset-1.1.tar.gz: sha256 4cba5faa11c71437928e17cb1b9b3d8b8e727e7ea363a3a9a8045e19c0491577 [PIN OK]
+[INTENT-S0] raw provenance banking77_test.csv: sha256 d12d6e3bc4c3103966ae786dc435913c0c563dfa328f5a3646d0e62cfeeb474d [PIN OK]
+[INTENT-S0] raw provenance banking77_train.csv: sha256 b06e26ac675513959a63135f11b94ea7786ed02da65db93a5650d8838cbc664b [PIN OK]
+[INTENT-S0] raw provenance clinc_data_oos_plus.json: sha256 bfcca9ae515623541dc1983c94c4ed7cae9d26b42ae47d74b972e51bb6f7a21f [PIN OK]
+[INTENT-S0] raw provenance clinc_domains.json: sha256 b947b579d3b8e74b06f93b01083d8efaff2888b43a3e362533bd88a6e1211b3a [PIN OK]
+[INTENT-S0] pin intent_emb_qwen3.db: sha256 9e100e04fc91b137a075b8abedbc87d2b29a6dc2244c5f242b1c587004a4ee74 [PIN OK]
+[EMBED-QUANT] pin intent_emb_qwen3_q8.db: sha256 771666bc8563d972f6c3fea4d987925365cdcb0ce7f56815a8436d0a9fd26266 [PIN OK]
+[INTENT-S0] qwen3: 57350 of 57350 texts have a 4096-d vector (dims seen {4096: 57350})
+[INTENT-S0] qwen3_q8: 57350 of 57350 texts have a 4096-d vector (dims seen {4096: 57350})
+[EMBED-QUANT] IDENTITY: Q4 @1024 seeds 0-4 seed-mean EVAL fine NMI 0.76554 / 0.92810 / 0.84900 (EMBED-DIM-SLICE 0.76554 / 0.92810 / 0.84900), seed spread 0.01428 / 0.00417 / 0.01043 (EMBED-DIM-SLICE 0.01428 / 0.00417 / 0.01043)
+EMBED-QUANT outcome (tools/analysis/embed_quant.py blob 3930cf4bc5e77bebd38309c74cf4ecf8eeba74d0; writer embed_quant_writer.py blob 1b2abdc8617f84f3cfd00c9778e3bbb94ae63d6f; S0 machinery intent_transfer_s0.py blob f662ceb19738f515972871f5963f5dcfc764a271, imported unchanged)
+registration: docs/judge_v2_program.md "## Registered 2026-10-01 (before any code or call) — EMBED-QUANT: is qwen3-embedding's Q4_K_M quantisation a confound ..." L22738-L22760 _as_of 28b4032b; kind zero-call CPU reader
+zero judge calls; zero embeddings; no build; no GATE row; pool of record: none read; pins re-checked before and after, unchanged: {'ingest_db': '487e0093719c184c', 'q4': '9e100e04fc91b137', 'q8': '771666bc8563d972'}
+arms: Q4 qwen3-embedding:latest (intent_emb_qwen3.db) vs Q8 qwen3-embedding:8b-q8_0 (intent_emb_qwen3_q8.db); slice d_q* 1024 from selection.json sha256 f1b508cfa889021e6a4d8dac5e82a2188399373996818db0d622aad076bf400d; seeds 0-19; EVAL read 6 times (once per arm per corpus)
+builder's readings: QB1 two new scripts importing S0 unchanged (not a flag on embedder_arms.py / a --quant arm on embed_dim_slice.py); QB2 the 0.998 route-parity bar on the writer's same-model repeatability and resume parity, cos(Q8, Q4) printed with no bar; QB3 SE_boot = SD of the paired draws, BASIC interval descriptive; QB4 S0's C1 fine bootstrap stream, paired; QB5 EQ2 per corpus over its kept rows' texts, overall over the set; QB6 P1 one-vs-rest Briers, P2 inclusive interval
+TRAIN-ONLY: 120 fits audited (120 on TRAIN, 0 on GATE), 0 with an EVAL row, 0 OOS rows, 0 dropped rows (fit_rows refuses otherwise)
+IDENTITY: Q4 @1024 seeds 0-4 seed-mean EVAL fine NMI 0.76554 / 0.92810 / 0.84900 (EMBED-DIM-SLICE 0.76554 / 0.92810 / 0.84900), seed spread 0.01428 / 0.00417 / 0.01043 (EMBED-DIM-SLICE 0.01428 / 0.00417 / 0.01043) -> REPRODUCED
+SUPPORT massive: n 4946 EVAL items in 4923 components, Kish DEFF 1.0093, n_eff 4900; SE_boot 0.00093 (B 2000), seed term sqrt(var_seed/20) 0.00205, SE_total 0.00226; 90% half-width 0.00371; TOST MDE80 2.487 x SE_total 0.00561; DIFFERENT MDE delta + 0.842 x SE_total 0.01618; delta_c 0.01428; at the predicted |D_q| 0.003: delta - |D| 0.01128 >= 2.487 x SE_total -> SCOREABLE
+SUPPORT clinc: n 6672 EVAL items in 6672 components, Kish DEFF 1.0000, n_eff 6672; SE_boot 0.00041 (B 2000), seed term sqrt(var_seed/20) 0.00151, SE_total 0.00157; 90% half-width 0.00258; TOST MDE80 2.487 x SE_total 0.00390; DIFFERENT MDE delta + 0.842 x SE_total 0.00549; delta_c 0.00417; at the predicted |D_q| 0.003: delta - |D| 0.00117 < 2.487 x SE_total -> DESCRIPTIVE-ONLY
+SUPPORT banking77: n 3908 EVAL items in 3905 components, Kish DEFF 1.0015, n_eff 3902; SE_boot 0.00076 (B 2000), seed term sqrt(var_seed/20) 0.00170, SE_total 0.00186; 90% half-width 0.00306; TOST MDE80 2.487 x SE_total 0.00463; DIFFERENT MDE delta + 0.842 x SE_total 0.01199; delta_c 0.01043; at the predicted |D_q| 0.003: delta - |D| 0.00743 >= 2.487 x SE_total -> SCOREABLE
+EQ1 massive: D_q = Q8 0.76602 - Q4 0.76571 = +0.00030 (seeds 0-19; denominator 4946 EVAL items); delta_c 0.01428 (Q4 seeds 0-4); SE_total 0.00226; 90% [-0.00340, +0.00401]; 95% [-0.00412, +0.00473]; BASIC bootstrap 95% [-0.00166, +0.00201] (descriptive); 20-seed spreads Q4 0.02729 / Q8 0.02690 (descriptive) -> EQUIVALENT
+EQ1 clinc: D_q = Q8 0.92873 - Q4 0.92783 = +0.00090 (seeds 0-19; denominator 6672 EVAL items); delta_c 0.00417 (Q4 seeds 0-4); SE_total 0.00157; 90% [-0.00168, +0.00348]; 95% [-0.00218, +0.00397]; BASIC bootstrap 95% [+0.00009, +0.00168] (descriptive); 20-seed spreads Q4 0.01715 / Q8 0.01638 (descriptive) -> EQUIVALENT
+EQ1 banking77: D_q = Q8 0.84643 - Q4 0.84552 = +0.00091 (seeds 0-19; denominator 3908 EVAL items); delta_c 0.01043 (Q4 seeds 0-4); SE_total 0.00186; 90% [-0.00215, +0.00397]; 95% [-0.00274, +0.00456]; BASIC bootstrap 95% [-0.00037, +0.00262] (descriptive); 20-seed spreads Q4 0.02329 / Q8 0.02267 (descriptive) -> EQUIVALENT
+EQ1 VERDICT: NOT-A-CONFOUND (EQUIVALENT on 3 of 3, DIFFERENT on 0 of 3)
+F-EQ: NOT FIRED
+CONSEQUENCE: the quantisation half of EMBED-DIM-SLICE's W2 confound line is discharged for qwen3 at d_q* 1024 only (prompts stay until CP1)
+EQ2 (DESCRIPTIVE-ONLY) cos(Q8, Q4) per text after slice 1024 + renormalise: all 57350 texts median 0.992032 min 0.873615 (text sha256-16 09d0c489ac396cb4)
+EQ2 massive: 16425 texts median 0.992396 min 0.930274
+EQ2 clinc: 23841 texts median 0.992212 min 0.873615
+EQ2 banking77: 13083 texts median 0.991429 min 0.934049
+P1 NOT-A-CONFOUND p 0.70: event TRUE, Brier 0.0900
+P1 CONFOUND-CANDIDATE p 0.10: event FALSE, Brier 0.0100
+P1 MIXED p 0.20: event FALSE, Brier 0.0400
+P2 massive: |D_q| 0.00030 vs 0.003 [0.000, 0.010] -> HELD
+P2 clinc: |D_q| 0.00090 vs 0.003 [0.000, 0.010] -> HELD
+P2 banking77: |D_q| 0.00091 vs 0.003 [0.000, 0.010] -> HELD
+P2: HELD on 3 of 3
+P3 median cos(Q8, Q4) at 1024 >= 0.98 p 0.85: median 0.992032, event TRUE, Brier 0.0225
+DOES NOT SHOW: anything about F16 or full precision (Q8_0 is itself quantised); gemma's precision (BF16, untested); slices other than 1024 or card prompts; MMLU-Pro or capability text; that gemma is a better embedder or any change to the embedder of record (D3 is the author's); parity on CLINC if it reads NEITHER
+[EMBED-QUANT] wrote Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\embed_quant\outcome.txt (write-once, of record)

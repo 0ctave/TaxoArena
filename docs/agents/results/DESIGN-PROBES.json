@@ -1,0 +1,155 @@
+{
+  "id": "DESIGN-PROBES",
+  "title": "DESIGN-PROBES: six probes opened by relaxing three design constraints: drop the anchors, rank per TIER with cost as a router axis, redirect 'specific judges' from prose to references (zero calls)",
+  "question": "Flat-vs-descent routing on the pool of record (ANCHOR-VALUE); per-cell reference accuracy for two reference sets (REF-BY-CELL); tier recovery at four coarsenesses and five budgets (TIER-RECOVERY); tier-then-cheapest on MMLU-Pro and on the six-corpus union (TIER-ROUTER, TIER-ROUTER-U); a bootstrap self-tiering of the board (TIER-HONEST); registered before looking: does the anchor layer earn its place; does reference accuracy vary enough to select on; how cheap is a tier partition; what does tier-and-cost routing buy.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "d8591c7",
+    "program_lines": "docs/judge_v2_program.md L2074-L2115 (registration of the probes) and L2116-L2188 (outcome: SIX PROBES ON THE RELAXED CONSTRAINTS)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-14 (before looking at any result, ZERO calls) — four probes opened by the relaxed design constraints",
+    "outcome_heading": [
+      "L2116: - **SIX PROBES ON THE RELAXED CONSTRAINTS (2026-09-14, zero calls): two clean answers, one clean negative, one",
+      "L2120: **ANCHOR-VALUE: the anchors do not earn their place, and dropping them costs nothing.**",
+      "L2143: **TIER-ROUTER-U: on the six-corpus union the idea works, and well.**",
+      "L2154: **TIER-RECOVERY: the first version of this test was the ordering problem in a costume, and failed.**"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "tools/analysis/newcontext_probes.py (811987f088d3cbe2) and tier_design_probes.py (8c73d87db922d9fb)",
+    "sha16": "as named (at 69605b0)",
+    "commit": "69605b0"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/newcontext_probes.txt and tier_design_probes.txt",
+    "outcome_commit": "69605b0",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (3,445 pool questions); the union pool (6,482 questions, 18 models) for TIER-ROUTER-U",
+    "date": "2026-09-14"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); COST-AXES-INGEST (Block 1, 2026-09-16) reproduced TIER-ROUTER-U byte-for-byte and found the record regex mis-sizes three models; TIER-HONEST-X20 and ANCHOR-FREE followed",
+    "commit": "7076615",
+    "verdict": "ANCHORS DROPPABLE; TIER-ROUTING WORKS (union); TIERS ARE NOT A FREE ESCAPE"
+  },
+  "criteria": [
+    {
+      "id": "ANCHOR-VALUE",
+      "text": "does the anchor layer earn its place in routing",
+      "result": "DELIVERED",
+      "value": "flat nearest-leaf routing beats the deployed anchor descent on category purity, 0.764 vs 0.753, on the corpus whose own categories ARE the anchors; with the union's 81.6 vs 72.1 that is two corpora in the same direction: the anchor layer is a reporting convenience, not a routing mechanism",
+      "denominator": "3,445 pool questions"
+    },
+    {
+      "id": "REF-BY-CELL",
+      "text": "does reference accuracy vary enough to select on",
+      "result": "DELIVERED",
+      "value": "per-cell reference SELECTION gains +0.0000 (grok-reasoning beats mistral in all 13 anchors), but grok's own accuracy spans 0.727-0.952 across cells: the design must TRACK reference quality per cell rather than choose between references",
+      "denominator": "13 anchors"
+    },
+    {
+      "id": "TIER-ROUTER",
+      "text": "tier-then-cheapest on MMLU-Pro",
+      "result": "DELIVERED",
+      "value": "nothing to route: best single, per-anchor best and tier-then-cheapest are byte-identical (0.9126, 882 chars) because gemini wins every anchor AND is the cheapest in its tier",
+      "denominator": "MMLU-Pro"
+    },
+    {
+      "id": "TIER-ROUTER-U",
+      "text": "on the six-corpus union",
+      "result": "DELIVERED",
+      "value": "tier-then-smallest reaches 0.6143 against per-cell best 0.6169 at 83% of the parameters, and beats best-single 0.5543 by 6.0pp at 53% of the size",
+      "denominator": "6,482 union questions, 18 models"
+    },
+    {
+      "id": "TIER-RECOVERY",
+      "text": "how cheap is a tier partition",
+      "result": "DELIVERED",
+      "value": "0% exact recovery of the key's tier partition at every coarseness and budget (ARI peaks 0.54): the test was the ordering problem in a costume and was rebuilt",
+      "denominator": "four coarsenesses x five budgets"
+    },
+    {
+      "id": "TIER-HONEST",
+      "text": "bootstrap self-tiering",
+      "result": "DELIVERED",
+      "value": "across-tier pairs separated 62/64 at 95% with 0 wrong directions, within-tier pairs 2 of 2: the arena is 100% sure iask beats arx and the key says the opposite; self-tiering yields 10 tiers with 2 cross-tier key inversions; a bootstrap CI on a BT strength is confidently wrong exactly where the judge is systematically biased",
+      "denominator": "12-model board"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "a tiered product needs an uncertainty estimate carrying systematic error: the 5.7% test-retest floor, the per-cell reference accuracy, and the free answer-agreement signal are the three candidates already measured"
+  },
+  "numbers_of_record": {
+    "anchor_value": "flat 0.764 vs descent 0.753 (MMLU-Pro); union 81.6 vs 72.1",
+    "ref_by_cell": "selection +0.0000; grok 0.727-0.952 across cells",
+    "tier_router": "MMLU-Pro byte-identical 0.9126; union 0.6143 vs 0.6169 (83% params), +6.0pp over 0.5543 at 53% size",
+    "tier_recovery": "0% exact; ARI peak 0.54",
+    "tier_honest": "62/64 across-tier; 2/2 within-tier (iask > arx wrong); 10 self-tiers, 2 inversions"
+  },
+  "sentence_of_record": "DESIGN-PROBES (2026-09-14, zero calls): ANCHOR-VALUE: flat nearest-leaf routing beats the anchor descent on category purity (0.764 vs 0.753; union 81.6 vs 72.1), the anchor layer is a reporting convenience, not a routing mechanism; REF-BY-CELL: per-cell reference selection gains +0.0000 but grok's accuracy spans 0.727-0.952 across cells, so the design must TRACK reference quality per cell; TIER-ROUTER: nothing to route on MMLU-Pro (byte-identical 0.9126); TIER-ROUTER-U: on the union tier-then-smallest reaches 0.6143 vs per-cell best 0.6169 at 83% of the parameters and beats best-single by 6.0pp at 53% of the size; TIER-RECOVERY: 0% exact recovery (ARI peaks 0.54), the ordering problem in a costume; TIER-HONEST: across-tier pairs separated 62/64 with 0 wrong directions while the arena is 100% sure iask beats arx and the key says the opposite: a bootstrap CI on a BT strength is confidently wrong exactly where the judge is systematically biased.",
+  "chips": [
+    "ANCHORS DROPPABLE",
+    "TIER-ROUTING WORKS (union)",
+    "TIERS ARE NOT A FREE ESCAPE"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-16",
+      "by": "COST-AXES-INGEST (FRAMEWORK Block 1)",
+      "text": "in-sample TIER-ROUTER-U reproduced byte-for-byte (0.5543 / 0.6169 / 0.6143 at 72.0 / 46.1 / 38.3 B); the record regex mis-sizes Phi-3.5-mini, command-r-plus and Mixtral."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "INCONSISTENCIES-PASS (registrar, zero calls; insertion only)",
+      "text": "NAME 2026-09-23 by INCONSISTENCIES-PASS (registrar, zero calls; insertion only): registered as FOUR probes ('## Registered 2026-09-14 (before looking at any result, ZERO calls) — four probes opened by the relaxed design constraints': TIER-RECOVERY, ANCHOR-VALUE, REF-BY-CELL, TIER-ROUTER); the outcome bullet reports SIX. TIER-ROUTER-U and TIER-HONEST are NOT in that registration and were added in the same zero-call session after it; TIER-HONEST was later registered and replicated as TIER-HONEST-X20. Nothing renamed. [ledger: observed cell of row DESIGN-PROBES, v132]"
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: mixed row (legs) (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM (legs) 2026-09-27: REF-BY-CELL, TIER-RECOVERY and TIER-HONEST are p2dca judged family — history, not evidence; ANCHOR-VALUE and TIER-ROUTER(-U) are not (RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "an uncertainty estimate that carries systematic error (named as the open need)",
+    "anchor-free construction itself (ANCHOR-FREE followed)"
+  ],
+  "ledger": {
+    "row_id": "DESIGN-PROBES",
+    "version": "v81 (69605b0) [v132 2026-09-23: INCONSISTENCIES-PASS insertion in this row]; [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "MC-ROOT",
+    "TIER-HONEST-X20",
+    "ANCHOR-FREE",
+    "COST-AXES-INGEST",
+    "REF-QUALITY-MONITOR",
+    "ARM-B"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L2074-L2188 (d8591c7 / 69605b0)",
+    "experiment_results/x12_crossdomain/newcontext_probes.txt and tier_design_probes.txt (69605b0)",
+    "docs/test_ledger.html row DESIGN-PROBES (v81): chips verbatim, observed cell, evidence",
+    "script sha16 = sha256 of tools/analysis/newcontext_probes.py / tier_design_probes.py at 69605b0 (first commit), first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ1 Use",
+    "what": "Six quick probes on cached data. Two compare routing that goes straight to the nearest leaf with routing that descends through the category layer. One measures per-cell accuracy of the reference answers. Three try grouping models into tiers and routing to the cheapest model in a tier. No calls.",
+    "why": "It tests whether three design choices earn their place: the category layer, choosing a reference model, and ranking models strictly.",
+    "information": "Each probe tells the design what to keep or drop. Result: descriptive only. Straight-to-leaf routing is slightly better (0.764 vs 0.753, and 81.6 vs 72.1 on the six-corpus union), so the category layer helps reporting, not routing. Picking a reference per cell gains nothing, but reference accuracy varies (0.73 to 0.95), so it must be tracked. Tier-then-cheapest on the union nearly matches the best per cell with 83% of the parameters. Tiers are not recovered exactly. Bootstrap tiers can be confidently wrong where the judge is biased. Two of the six probes were added after the registration. The reference-per-cell, tier-recovery and bootstrap-tier legs were later ruled 'history, not evidence'. The routing and tier-router legs were not.",
+    "written": "2026-10-07"
+  }
+}

@@ -1,0 +1,132 @@
+{
+  "id": "KEY-SUBANCHOR-SCALE",
+  "title": "KEY-SUBANCHOR-SCALE: is sub-anchor structure dead for taxonomy reasons or data reasons? (zero calls, KEY only)",
+  "question": "On the full keyed set (11,205 questions per tree: 7,797 train from node.queryIds + 3,408 reserved), bareq512_s42 (87 leaves, 129 q/leaf) vs abt2d512_s42 (47 leaves, 238 q/leaf): the (model, anchor)-demeaned cross-tree r on the most-changed Jaccard third of questions at full size against its within-anchor null 95th; the trend with cell size (full / 50% / 25%); whether the extrapolated 900-1,500 q/leaf requirement is on the trend line.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "60cb7f3",
+    "program_lines": "docs/judge_v2_program.md L3312 (section) and L3353-L3365 (D. KEY-SUBANCHOR-SCALE)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-15 (before any run) — six tests from the big picture after the review. Standing rules from the review apply to all six: every wrong-direction count carries its McNemar-established count on the anchor's judged questions; UNDETERMINED is a registered outcome; the key denominator is named; nulls preserve what the question conditions on; the data object is checked before strata are read into it.",
+    "outcome_heading": [
+      "L3399: ## BIG-PICTURE TESTS A, C, D, E — outcomes (2026-09-15, zero calls). Each built by one agent from the registration at 60cb7f3 and recomputed by an independent checker; every number reproduced; verdict labels corrected by the checker where the builder's rested on an unregistered reading.",
+      "L3435: - **KEY-SUBANCHOR-SCALE (2026-09-15, zero calls): the registered statistic is positive and null-clearing (+0.0828 vs within-anchor null 95th +0.0237), but the checker showed the \"most-changed third\" is 37% nested refinement pairs whose cross-tree r is shared data; on questions whose cell actually changes r is +0.006 to −0.067; the prediction is NOT shown to fail, sub-anchor is NOT reopened; the 900–1,500 q/leaf requirement is not on any trend line.**"
+    ],
+    "date": "2026-09-15"
+  },
+  "script": {
+    "path": "tools/analysis/key_subanchor_scale.py",
+    "sha16": "2e79b9827ace8092",
+    "commit": "22e16f7"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/key_subanchor_scale.txt",
+    "outcome_commit": "22e16f7",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-15"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the independent checker's recomputation recorded inside the outcome bullet (check_*.py scratch scripts named there; 'every number reproduced; verdict labels corrected by the checker where the builder's rested on an unregistered reading')",
+    "commit": "22e16f7",
+    "verdict": "every number reproduced by the independent checker; verdict labels as corrected by the checker"
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "PRIMARY: (model, anchor)-demeaned cross-tree r on the most-changed third of questions at full size vs its within-anchor null 95th",
+      "result": "FAILED",
+      "value": "literal statistic r = +0.0828 (n 3,735) vs null 95th +0.0237 (0 of 200 above): the falsifier's literal condition; checker: 1,378 of the 3,735 (37%) are NESTED pairs (the bareq leaf entirely inside the abt2d leaf; 1,189 exactly nested; shared cell-mates 59.4 vs 24.7 under the null; the within-anchor null produces 0 nested pairs), so the instrument is invalid across trees of different granularity; on questions whose cell genuinely changes: containment < 0.5 (n 1,910) +0.0059 (75 of 200 null reps above); < 0.25 (n 1,239) -0.0665 (below all 200): the substantive reading REFUTED; the prediction HOLDS on genuinely changed cells",
+      "denominator": "3,735 most-changed-third questions; 134,460 pairs; null 200 reps; ARENA12 key"
+    },
+    {
+      "id": "(2)",
+      "text": "the trend of that r with cell size",
+      "result": "UNDETERMINED",
+      "value": "25% (52 q/cell) +0.0607 [2 of 5 draws negative] vs null 95th +0.0296; 50% (92) +0.0691 vs +0.0281; 100% (184) +0.0828 vs +0.0237; slope +0.0122 per doubling; total movement 0.022 across 4x, inside the null's spread (up to 0.040); the trended quantity inherits the nesting artefact",
+      "denominator": "5 draws per fraction"
+    },
+    {
+      "id": "(3)",
+      "text": "whether 900-1,500 q/leaf is on the trend line",
+      "result": "FAILED",
+      "value": "NO: log-linear r(900) +0.1103, r(1,500) +0.1193; SB from the full-size point +0.3066 / +0.4243; 0.70 needs ~3e17 q/leaf; the within-tree split-half reliability of the demeaned key sub-anchor profile is already 0.73 (bareq) / 0.75 (abt2d) while cross-tree r on cross-cutting questions is null or negative: no cell size brings it to 0.70",
+      "denominator": "extrapolation"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "still negative or null on the most-changed third at full size, for both trees: sub-anchor structure is not tree-stable even on the training questions (closed for TAXONOMY reasons)",
+      "result": "HELD",
+      "value": "builder scored FAILED; checker's number wins: on every stratum of genuinely changed cells (containment < 0.5 +0.006 inside the null; < 0.25 -0.067 below it) the statistic is null or negative for both anchor conventions; the prediction is not shown to fail",
+      "denominator": "cross-cutting strata"
+    }
+  ],
+  "falsifier": {
+    "text": "a positive, null-clearing r on the most-changed third at full size reopens sub-anchor as a data question",
+    "fired": false,
+    "note": "its literal condition is met by the Jaccard-tercile statistic, but the tercile is an invalid 'most-changed' instrument across trees of different granularity and the within-anchor null does not preserve what the stratum conditions on (both standing rules); the substantive claim is not established; sub-anchor stays closed for taxonomy reasons; the Jaccard tercile must be replaced by a containment stratum before this line is reopened"
+  },
+  "numbers_of_record": {
+    "primary": "+0.0828 vs null 95th +0.0237 (max +0.0455); middle third +0.3730; least-changed +0.8186; all +0.4332",
+    "nesting": "37% nested pairs (1,378 of 3,735; 1,189 exact); shared cell-mates 59.4 vs 24.7; contingency-preserving nulls median r_low +0.130 / +0.061 / +0.156",
+    "cross_cutting": "containment < 0.5 (n 1,910) +0.0059; < 0.25 (n 1,239) -0.0665",
+    "trend": "+0.0607 / +0.0691 / +0.0828 at 25 / 50 / 100%; fixed-cell thinning +0.0356 / +0.0684 / +0.0828",
+    "bridge": "reserved-only (3,408 q) most-changed third -0.0189 vs null 95th +0.0329 (reproduces PROFILE-TREE-ROBUST's -0.071 reading); train-only +0.0805 vs +0.0269: the positive signal lives on the train side where the nesting is",
+    "data": "11,205 q per tree; queryIds = sha256(rawText)[:16] verified for 8,278 train hashes; 339 + 51 + 7 dropped; 79 absent texts (0.9%)"
+  },
+  "sentence_of_record": "KEY-SUBANCHOR-SCALE (2026-09-15, zero calls): the registered statistic is positive and null-clearing (+0.0828 vs within-anchor null 95th +0.0237), but the checker showed the 'most-changed third' is 37% nested refinement pairs whose cross-tree r is shared data (positive by construction; the null cannot produce them); on questions whose cell actually changes r is +0.006 (containment < 0.5, inside the null) to -0.067 (< 0.25, below it); the prediction is NOT shown to fail, sub-anchor is NOT reopened (closed for TAXONOMY reasons on this evidence); the 900-1,500 q/leaf requirement is not on any trend line (within-tree split-half reliability is already 0.73-0.75 while cross-tree r on cross-cutting questions is null or negative). The Jaccard tercile must be replaced by a containment stratum before this line is reopened.",
+  "chips": [
+    "FALSIFIER MET ON AN INVALID INSTRUMENT",
+    "SUB-ANCHOR STAYS CLOSED",
+    "(3) NO"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-15",
+      "by": "the independent checker (check_kss_*.py), recorded in the outcome bullet (22e16f7)",
+      "text": "HIGH: the most-changed tercile is 37% nested pairs, positive by construction, and the null cannot produce them; HIGH: the inference 'a null-clearing r is not shared data' from Jaccard means 0.070 vs 0.107 is false; MEDIUM: 'prediction FAILED' asserted, not shown; r(900) / r(1500) extrapolate a shared-data quantity."
+    }
+  ],
+  "does_not_show": [
+    "a reopened sub-anchor line (closed for taxonomy reasons)",
+    "a valid most-changed stratum across trees of different granularity (needs containment)",
+    "a cell size that brings cross-tree r to 0.70"
+  ],
+  "ledger": {
+    "row_id": "KEY-SUBANCHOR-SCALE",
+    "version": "v98 (22e16f7)"
+  },
+  "depends_on": [
+    "PROFILE-TREE-ROBUST",
+    "F6",
+    "H10"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "sub-anchor profiles (CONTEXT.md section 5: PROFILE-TREE-ROBUST, KEY-SUBANCHOR-SCALE)"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L3312 / L3353-L3365 (D. KEY-SUBANCHOR-SCALE) (registration 60cb7f3): question, criteria, prediction, falsifier",
+    "docs/judge_v2_program.md L3435 ff. (outcome bullet, 22e16f7): the criterion table, predictions scored, the checker's recomputation and defects",
+    "experiment_results/x12_crossdomain/key_subanchor_scale.txt (22e16f7)",
+    "docs/test_ledger.html row KEY-SUBANCHOR-SCALE (v98 (22e16f7)): chips verbatim, design / criteria / observed cells, evidence",
+    "script sha16 = sha256 of tools/analysis/key_subanchor_scale.py at 22e16f7, first 16 hex (identity, computed by the registrar 2026-09-22; later edited at 13f2142 for the pool_guard change)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' or '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06"
+  ],
+  "last_update": "2026-09-22",
+  "plain_description": {
+    "sq": "SQ3 Taxonomy",
+    "what": "Compares two trees of different granularity on about 11,200 answer-key questions. On questions whose cell changes most between the trees, it asks whether model strengths below the topic level agree across trees. It also checks how this changes with cell size. No judge calls.",
+    "why": "Asks whether structure below the topic level failed because the taxonomy is not real or only because cells had too few questions.",
+    "information": "Agreement that grows with more data would reopen the sub-topic line as a data problem. Null or negative agreement would close it as a taxonomy problem. Result: the registered statistic was positive, but a checker showed this came from nested cells, which agree by construction. On questions whose cell really changes, agreement is null or negative. The prediction is not shown to fail, but the sub-topic line stays closed for taxonomy reasons on this evidence. The measure must be redone before the line is reopened.",
+    "written": "2026-10-07"
+  }
+}

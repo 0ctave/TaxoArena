@@ -1,0 +1,27 @@
+Figure 4 (SQ5). Per-split filing gap of the nomic_raw anchor-free tree minus the qwen3 tree on MMLU-Pro.
+
+E1 is the af_clean_s42 split (n 3,445; a descriptive 4th point, never pooled into SD1). Splits 1-3 are three re-drawn CK-CLOSE splits, each on its own held-out set (3,598 / 3,522 / 3,500); whiskers are the recorded paired Wald 95% intervals. The dotted line is the recorded Gbar of the three re-draws; SD1 reads NEITHER because |Gbar| lies inside spread_N.
+
+Record IDs: EMBEDDER-CROSS-FLAT E1, E1-SPLIT-DRAWS SD1
+
+Plotted values (pp; whiskers = the recorded 95% interval; read from the record, nothing recomputed):
+- EMBEDDER-CROSS-FLAT E1 | E1: af_clean_s42 split (descriptive 4th point) | [LF] | -4.56 [-6.17, -2.94] | DESCRIPTIVE
+    source: docs/agents/results/EMBEDDER-CROSS-FLAT.json numbers_of_record['E1_FILING']: "top-1 -0.0456, Wald 95% [-0.0617, -0.0294]"
+    source: verdict needle "N-raw minus af_clean_s42 flatLeaf top-1" found in docs/agents/results/EMBEDDER-CROSS-FLAT.json numbers_of_record['E1_FILING']
+- E1-SPLIT-DRAWS G1 | Re-drawn split 1 | [LF] | -17.23 [-18.97, -15.49] | SD1 NEITHER
+    source: docs/agents/results/E1-SPLIT-DRAWS.json numbers_of_record['G']: "G1 -0.1723 [-0.1897, -0.1549]"
+    source: verdict needle "SD1 NEITHER" found in docs/agents/results/E1-SPLIT-DRAWS.json sentence_of_record
+- E1-SPLIT-DRAWS G2 | Re-drawn split 2 | [LF] | -4.94 [-6.60, -3.28] | SD1 NEITHER
+    source: docs/agents/results/E1-SPLIT-DRAWS.json numbers_of_record['G']: "G2 -0.0494 [-0.0660, -0.0328]"
+    source: verdict needle "SD1 NEITHER" found in docs/agents/results/E1-SPLIT-DRAWS.json sentence_of_record
+- E1-SPLIT-DRAWS G3 | Re-drawn split 3 | [LF] | -7.94 [-9.55, -6.33] | SD1 NEITHER
+    source: docs/agents/results/E1-SPLIT-DRAWS.json numbers_of_record['G']: "G3 -0.0794 [-0.0955, -0.0633]"
+    source: verdict needle "SD1 NEITHER" found in docs/agents/results/E1-SPLIT-DRAWS.json sentence_of_record
+- source: docs/agents/results/E1-SPLIT-DRAWS.json numbers_of_record['Gbar']: "-0.1004"
+- source: docs/agents/results/E1-SPLIT-DRAWS.json numbers_of_record['spreads']: "spread_N 0.1315"
+
+Sentences of record (verbatim, last bracket wins):
+- EMBEDDER-CROSS-FLAT: EMBEDDER-CROSS-FLAT E0b (2026-09-29, 0 calls; post-run review 6d39a40 VALID): at k 14, flat vMF partitions in two other embedding families are not shown worse than qwen3's beyond max(MDE, spread) on key information (M2 F6 on 10,925 keyed: nomic_raw +0.350e-3 [-0.213e-3, +0.890e-3], gemma_raw +2.173e-3 [+1.510e-3, +2.866e-3]) nor, for nomic, on purity (M1' (D2) -0.0180 [-0.0293, -0.0064] on 3,445 held-out, inside spread_qwen3 0.0316; P1 HELD); at k 82 nomic's partitions are WORSE on both (M1' -0.0441 [-0.0572, -0.0305]; M2 -2.102e-3 [-2.915e-3, -1.362e-3]); the TF-IDF floor is far worse (M1' -0.2549 [-0.2743, -0.2340]; P2 FAILED on its interval). [Every cross-arm contrast DESCRIPTIVE-ONLY; F1 did not fire (0 of the 2 run families, nomic and gemma, WORSE on M2 at k 14; mxbai not run, not decided; with two families F1 could fire only if both were WORSE); not shown; no support computed; gemma_raw k 14 M1' fires on seed 0 only (mean-over-seeds inside spread); gemma_raw k 82 VOID (ruling (a)); one draw per arm, one corpus (MMLU-Pro), pool p2dca id-disjoint; not parity; E1 not run.]
+- E1-SPLIT-DRAWS: SD1 NEITHER (K = 3; one recipe, one corpus). On each of the 3 content-closed re-draws the nomic_raw anchor-free tree files worse than qwen3: per-split paired Wald intervals wholly below 0 (G -0.1723, -0.0494, -0.0794; P3's event occurred). The spread clause fails: Gbar -0.1004 lies inside spread_N 0.1315, which is set by N_e1sd1 (28 leaves, top-1 0.5545). [F-SD FIRED on its spread clause (abs(Gbar) <= max spread), not on its sign clause (no G_k >= 0).; E1's bracket reads 'at this split only; not stable across 3 content-closed re-draws'; the sign held, only the magnitude varied; one coarse nomic build (N_e1sd1, 28 leaves, under the qwen3-tuned bar 0.025) inflates G_1 and spread_N]
+
+Made by tools/analysis/make_thesis_figures.py (zero calls).

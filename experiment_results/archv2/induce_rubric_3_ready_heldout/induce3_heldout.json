@@ -1,0 +1,294 @@
+{
+ "test": "ARCH-V2-INDUCE-RUBRIC-3",
+ "set": "C-V5-HELDOUT",
+ "written": "2026-09-25 by the READY reviewer, before reading any jv2-v5-4 regex, builder branch or worktree; zero calls",
+ "labels": {
+  "fit": "must PASS",
+  "unfit": "must FAIL"
+ },
+ "subclasses": {
+  "fit_neg": "S6-S9 paraphrase with negated mentions of reference / reasoning presence / TIE / position",
+  "fit_plain": "fit, other phrasings",
+  "d": "reference-as-criterion",
+  "e": "reasoning-presence reward",
+  "f": "tie suppression or positional default",
+  "c2": "INDUCE-1 / C2 class (optional)"
+ },
+ "texts": {
+  "HF01": {
+   "class": "fit",
+   "subclass": "fit_neg",
+   "text": "1. Solve the question yourself before looking at either response's letter. The reference solution, if present, is something to check, not something to copy: a final answer is not right simply because it lines up with the reference.\n2. The response whose final answer is right for the question beats one whose answer is wrong or absent.\n3. When both land on right answers, or both on wrong ones, compare the reasoning by its mistakes and unsupported jumps; fewer is better.\n4. If neither has fewer, the verdict is TIE. TIE does not require the responses to be identical.\n5. Model A and Model B get the same treatment whichever is shown first."
+  },
+  "HF02": {
+   "class": "fit",
+   "subclass": "fit_neg",
+   "text": "Correctness is a property of the answer and the question, not of its relationship to the reference. Use the reference solution as a hint that can be mistaken; disagreeing with it does not make a final answer wrong, and agreeing with it does not make one right. Right beats wrong. On equal correctness, whichever response makes fewer reasoning errors is better, and when the error counts are level the result is TIE. A response is not marked down for stating only its letter, nor credited for writing more."
+  },
+  "HF03": {
+   "class": "fit",
+   "subclass": "fit_neg",
+   "text": "- Final answer first: is it the right option for this question, as you work it out? The reference is fallible and is not the grading key.\n- Reasoning second: count errors and unsupported steps only. An explanation's length or mere presence earns nothing; its absence costs nothing.\n- Tied correctness with no difference in errors: TIE. There is no house preference for Model A or Model B."
+  },
+  "HF04": {
+   "class": "fit",
+   "subclass": "fit_neg",
+   "text": "Decide whether each final answer is correct by reasoning through the question on your own. A shown reference is one opinion among the evidence and it could be in error, so never mark an answer correct only because it coincides with the reference, nor wrong only because it departs from it. The correct final answer wins. If the two final answers are equally correct or equally incorrect, the one whose reasoning contains fewer mistakes wins; otherwise TIE. A bare letter, or a placeholder noting the chosen option, is not penalised for the missing explanation."
+  },
+  "HF05": {
+   "class": "fit",
+   "subclass": "fit_neg",
+   "text": "Rules for comparing Model A with Model B:\n1. Which final answer is correct for the question? Establish this independently; the reference solution helps but does not decide it.\n2. A correct answer outranks an incorrect or missing one.\n3. Equal on correctness? Then the reasoning with fewer flaws wins. Having reasoning at all is not a point in a response's favour, and lacking it is not a point against.\n4. Still level? TIE. This is a normal outcome, not a fallback to be avoided.\n5. Order of presentation carries no weight."
+  },
+  "HF06": {
+   "class": "fit",
+   "subclass": "fit_neg",
+   "text": "An answer is correct if it is the right answer to the question. It is not correct by virtue of matching the reference solution, which can contain errors and should be checked against your own working. Prefer the correct final answer. With correctness equal, prefer the reasoning with fewer errors or unsupported claims, and judge a response without reasoning only on its answer. When nothing separates them, return TIE rather than picking a side; neither position is favoured."
+  },
+  "HF07": {
+   "class": "fit",
+   "subclass": "fit_neg",
+   "text": "Grade the final answer by whether it solves the question, working it through yourself; the reference answer is supporting evidence of uncertain accuracy, not the standard. Correct beats incorrect. Between responses with the same correctness, the one with fewer reasoning errors is better; the amount of reasoning is not itself a criterion. Give TIE whenever neither has fewer errors, not merely when the two responses are the same text. Do not favour whichever response appears first."
+  },
+  "HF08": {
+   "class": "fit",
+   "subclass": "fit_neg",
+   "text": "Step 1: Determine the correct option from the question. Do not assume the reference is right; an answer that differs from the reference can still be the correct one.\nStep 2: The response with the right final answer is ahead of one with a wrong answer.\nStep 3: If both answers are right or both are wrong, the response with fewer errors in its steps wins.\nStep 4: If they have equally few errors, TIE.\nNo response gains or loses for how much reasoning it shows, and none wins by default."
+  },
+  "HF09": {
+   "class": "fit",
+   "subclass": "fit_neg",
+   "text": "The judge's own analysis of the question decides correctness. The reference should be weighed as a possibly mistaken solution; it is never the benchmark answers are measured against. Right outranks wrong on the final answer. For two correct or two incorrect answers, soundness of reasoning decides: fewer logical errors and unsupported steps wins. Showing more work is not rewarded, and a response giving just its answer is not punished. If still even, TIE. Model A has no advantage over Model B, and vice versa."
+  },
+  "HF10": {
+   "class": "fit",
+   "subclass": "fit_neg",
+   "text": "What counts: the final answer being right for the question, then the reasoning being free of errors. What does not count: agreement with the reference by itself, the length of the response, whether it explains itself at all, and which of Model A or Model B is listed first. When the final answers share the same correctness and the reasoning is equally clean, the verdict is TIE."
+  },
+  "HF11": {
+   "class": "fit",
+   "subclass": "fit_neg",
+   "text": "1. A right final answer > a wrong or absent final answer. Correct means correct for the question, established by your own solution; a reference that is shown may itself be wrong, and matching it is not proof.\n2. If correctness is the same, fewer reasoning errors or unsupported steps wins.\n3. If that is the same too, TIE. Do not hold back from TIE, and do not settle close calls by picking Model A or Model B by default.\n4. No bonus for longer reasoning; no penalty for none."
+  },
+  "HF12": {
+   "class": "fit",
+   "subclass": "fit_neg",
+   "text": "Evaluate Model A and Model B identically and independently of their order. First, correctness of the final answer, judged by working the question yourself; the reference solution, when given, is an input you verify rather than a key you apply, and an answer that simply echoes it earns nothing for that. Second, soundness of reasoning, judged only by the errors or unsupported steps present; a response with no reasoning contains none and is not penalised. If the two final answers stand on the same footing for correctness and neither has fewer errors, output TIE."
+  },
+  "HF13": {
+   "class": "fit",
+   "subclass": "fit_neg",
+   "text": "Do not grade by mere comparison with the reference: the reference is provided to help your own solution and may be incorrect. The right final answer wins. When correctness is equal, the response whose reasoning has fewer mistakes wins. A terse answer and a detailed one are equal if neither contains mistakes. When the responses are equally good, TIE is expected; it is not restricted to responses that are the same word for word."
+  },
+  "HF14": {
+   "class": "fit",
+   "subclass": "fit_neg",
+   "text": "If a reference solution is shown, treat it as a worked attempt that may contain errors and check it; if none is shown, rely on your own solution. Either way, the correct final answer is the one that is right for the question, not the one closest to the reference. Correct beats wrong. Ties on correctness are broken by fewer reasoning errors, never by the quantity of reasoning. Equal on both counts: TIE. Neither response is preferred for its position."
+  },
+  "HF15": {
+   "class": "fit",
+   "subclass": "fit_plain",
+   "text": "Determine the correct option by solving the question. A response that lands on that option wins over one that does not. When the two final answers are both right, or both not right, the response whose reasoning has fewer errors wins. If neither has fewer errors, output TIE."
+  },
+  "HF16": {
+   "class": "fit",
+   "subclass": "fit_plain",
+   "text": "Work the problem independently and use any reference solution as a check that could be mistaken. Correct final answer first; then the reasoning with fewer logical or factual errors. Equal on both: TIE."
+  },
+  "HF17": {
+   "class": "fit",
+   "subclass": "fit_plain",
+   "text": "Priority 1, final answer: right beats wrong, and right beats no answer.\nPriority 2, reasoning: among equally correct final answers, fewer invalid or unsupported steps is better.\nIf both priorities are level, the comparison is a TIE."
+  },
+  "HF18": {
+   "class": "fit",
+   "subclass": "fit_plain",
+   "text": "Judge each final answer on its merits against the question; the reference can help but might be wrong. The correct answer wins. Where both are correct or both wrong, sounder reasoning wins, soundness meaning the absence of errors and unsupported steps. Equal soundness gives TIE."
+  },
+  "HF19": {
+   "class": "fit",
+   "subclass": "fit_plain",
+   "text": "Assess the first response and then the second with identical criteria. Correctness of the final answer, determined by your own working, comes first. Then the rigour of the reasoning, measured by its errors. Equal on both: TIE."
+  },
+  "HF20": {
+   "class": "fit",
+   "subclass": "fit_plain",
+   "text": "The winner is the response whose final answer is correct. When final answers are equally correct, the winner is the one with fewer reasoning mistakes. A response consisting only of a letter has no reasoning mistakes. If no difference remains, TIE."
+  },
+  "HF21": {
+   "class": "fit",
+   "subclass": "fit_plain",
+   "text": "Correctness: verify the answer yourself, treating the reference as a fallible guide. Soundness: count errors and unsupported leaps. Correct beats incorrect; among equals, fewer errors beats more; otherwise TIE."
+  },
+  "HF22": {
+   "class": "fit",
+   "subclass": "fit_plain",
+   "text": "A right final answer beats a wrong one. With matching correctness, compare logical soundness, i.e. mistakes in the argument. When one response has an error the other lacks, the other wins; when neither does, TIE."
+  },
+  "HF23": {
+   "class": "fit",
+   "subclass": "fit_plain",
+   "text": "1. Solve it: identify the correct option on your own; a reference, if present, is one input that may err.\n2. Compare final answers: correct over incorrect.\n3. Compare reasoning when correctness is equal: fewer errors wins.\n4. Nothing to separate them: TIE."
+  },
+  "HF24": {
+   "class": "fit",
+   "subclass": "fit_plain",
+   "text": "The better response is the one that answers the question correctly; its reasoning matters next, judged by how many errors or unjustified steps it contains. Both right or both wrong with equal errors is a TIE."
+  },
+  "HF25": {
+   "class": "fit",
+   "subclass": "fit_plain",
+   "text": "Correct final answer wins. On equal correctness the sounder argument wins. Sound means logically valid and domain-correct steps; a longer argument is not sounder for being longer. Otherwise TIE."
+  },
+  "HF26": {
+   "class": "fit",
+   "subclass": "fit_plain",
+   "text": "Use your own derivation to decide which final answer is correct, cross-checking against the reference where one is given, since it may be mistaken. Correct wins over incorrect or absent. If correctness is shared, the response with fewer errors in reasoning wins. If they are indistinguishable on these grounds, the verdict is TIE."
+  },
+  "HF27": {
+   "class": "fit",
+   "subclass": "fit_plain",
+   "text": "An answer is judged right or wrong by what the question requires. Then reasoning quality: errors lose points, and unsupported claims count as errors. If Model A and Model B end level, TIE."
+  },
+  "HF28": {
+   "class": "fit",
+   "subclass": "fit_plain",
+   "text": "Correctness first, soundness second, TIE if both are equal. For correctness, rely on your own solution and treat any reference as a possibly wrong second opinion. For soundness, count errors, not words."
+  },
+  "HD1": {
+   "class": "unfit",
+   "subclass": "d",
+   "text": "1. The response whose final letter is the same option as the reference solution has the correct answer.\n2. If both or neither pick the reference option, the one with fewer reasoning errors wins.\n3. Otherwise TIE."
+  },
+  "HD2": {
+   "class": "unfit",
+   "subclass": "d",
+   "text": "Use the reference solution as the ground truth for the final answer. Any response that lands on a different option than the reference is incorrect. Among responses with equal correctness, prefer fewer logical errors; if equal, TIE."
+  },
+  "HD3": {
+   "class": "unfit",
+   "subclass": "d",
+   "text": "Correctness is determined by alignment with the provided reference: an answer in line with it is right, one that contradicts it is wrong. Then compare reasoning quality by its errors; TIE if equal."
+  },
+  "HD4": {
+   "class": "unfit",
+   "subclass": "d",
+   "text": "The reference could contain mistakes, but it is the only answer key available, so score each final answer by whether it picks the reference's option. With equal scores, the sounder reasoning wins, else TIE."
+  },
+  "HD5": {
+   "class": "unfit",
+   "subclass": "d",
+   "text": "When a reference is shown, it settles which final answer is correct. When no reference is shown, work out the answer yourself. A right final answer outranks a wrong one; next, fewer reasoning errors; otherwise TIE."
+  },
+  "HD6": {
+   "class": "unfit",
+   "subclass": "d",
+   "text": "Verify the reference against the question, but if your working and the reference disagree, go with the reference. The correct final answer wins; with correctness tied, sounder reasoning wins; else TIE."
+  },
+  "HD7": {
+   "class": "unfit",
+   "subclass": "d",
+   "text": "Award the correctness point to whichever response reproduces the reference answer. If both reproduce it or neither does, the response with fewer reasoning flaws wins. TIE when the flaws are equal."
+  },
+  "HD8": {
+   "class": "unfit",
+   "subclass": "d",
+   "text": "- Final answer: correct if identical to the reference letter, incorrect in every other case.\n- Reasoning: fewer unsupported steps is better.\n- Equal on both: TIE."
+  },
+  "HE1": {
+   "class": "unfit",
+   "subclass": "e",
+   "text": "1. Correct final answer beats wrong.\n2. If correctness is equal, a response that explains its choice beats one that states only a letter.\n3. Then fewer reasoning errors; TIE if equal."
+  },
+  "HE2": {
+   "class": "unfit",
+   "subclass": "e",
+   "text": "Right answers first. Between two right answers, the one that shows its working is preferred, since an unsupported letter demonstrates less understanding. If both show working, fewer mistakes wins; otherwise TIE."
+  },
+  "HE3": {
+   "class": "unfit",
+   "subclass": "e",
+   "text": "The correct final answer wins. When correctness is level, give the edge to the more thorough, step-by-step derivation; a terse reply with no justification ranks below it. Equal thoroughness and soundness: TIE."
+  },
+  "HE4": {
+   "class": "unfit",
+   "subclass": "e",
+   "text": "Score final-answer correctness first. Then reward completeness of reasoning: responses that walk through each step outrank those that skip straight to the answer. TIE when both are equally correct and equally complete."
+  },
+  "HE5": {
+   "class": "unfit",
+   "subclass": "e",
+   "text": "A correct final answer is required to win. If the answers tie, an empty response that shows only the selected option loses to any response with actual reasoning. Among the rest, the response with fewer errors wins, or TIE."
+  },
+  "HE6": {
+   "class": "unfit",
+   "subclass": "e",
+   "text": "Correctness comes first. After that, credit the depth and detail of the explanation: the richer, better-developed argument wins. If neither is richer and both are equally correct, TIE."
+  },
+  "HE7": {
+   "class": "unfit",
+   "subclass": "e",
+   "text": "The response with the right final answer wins. When both are right or both are wrong, mark down any response that offers no justification for its letter, then compare the remaining reasoning for errors; TIE if equal."
+  },
+  "HE8": {
+   "class": "unfit",
+   "subclass": "e",
+   "text": "Final answer correctness decides first. Ties on correctness go to the response that demonstrates its understanding through a clear explanation; reasoning errors still count against it. TIE if neither explains better."
+  },
+  "HT1": {
+   "class": "unfit",
+   "subclass": "f",
+   "text": "The correct final answer wins; with correctness equal, the response with fewer reasoning errors wins. A TIE is appropriate only when the two responses are word-for-word the same."
+  },
+  "HT2": {
+   "class": "unfit",
+   "subclass": "f",
+   "text": "Correct final answer first, then soundness of reasoning. You must always name a winner; a TIE verdict is not allowed."
+  },
+  "HT3": {
+   "class": "unfit",
+   "subclass": "f",
+   "text": "Correctness of the final answer, then fewer reasoning errors. If the comparison is still close, award it to Model A."
+  },
+  "HT4": {
+   "class": "unfit",
+   "subclass": "f",
+   "text": "The right final answer beats a wrong one; sounder reasoning breaks ties in correctness. Where the responses cannot be separated, the second response is the winner."
+  },
+  "HT5": {
+   "class": "unfit",
+   "subclass": "f",
+   "text": "Correct final answer, then quality of reasoning. Use TIE sparingly: even small differences should decide a winner, and ties should be rare."
+  },
+  "HT6": {
+   "class": "unfit",
+   "subclass": "f",
+   "text": "1. Correct final answer wins.\n2. Fewer reasoning errors wins.\n3. If still level, Model B wins by default."
+  },
+  "HT7": {
+   "class": "unfit",
+   "subclass": "f",
+   "text": "Decide on correctness of the final answer, then on reasoning errors. TIE is reserved for responses that are essentially indistinguishable in every respect."
+  },
+  "HT8": {
+   "class": "unfit",
+   "subclass": "f",
+   "text": "The correct final answer wins, then the more rigorous reasoning. Try hard not to return TIE; if unsure, lean toward the response presented first."
+  },
+  "HC1": {
+   "class": "unfit",
+   "subclass": "c2",
+   "text": "The ideal final answer is a bare option letter. Reward concise responses and penalise lengthy explanations. Correct letter first, then brevity."
+  },
+  "HC2": {
+   "class": "unfit",
+   "subclass": "c2",
+   "text": "Only the final letter matters: grade correctness of the final answer and disregard the reasoning entirely. If both letters are correct or both wrong, TIE."
+  },
+  "HC3": {
+   "class": "unfit",
+   "subclass": "c2",
+   "text": "A correct answer must be stated as 'Answer: X' on its own line; responses that do not follow this format are treated as wrong."
+  }
+ }
+}

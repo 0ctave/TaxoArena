@@ -1,0 +1,20 @@
+{
+ "schema": "intent_transfer_s0_pins/v1",
+ "_note": "The registrar's pins for INTENT-TRANSFER-S0 (tools/ingest/intent_ingest.py, tools/analysis/intent_transfer_s0.py). Committed with nulls: every --run (not --pilot) REFUSES a null or a different pin. Raw files by name; the ingest DB and the three embedding DBs by sha256 of the file bytes (hash kind sha256-bytes). Filled by insertion after the fetch / ingest / --embed --go runs.",
+ "raw": {
+  "amazon-massive-dataset-1.1.tar.gz": "4cba5faa11c71437928e17cb1b9b3d8b8e727e7ea363a3a9a8045e19c0491577",
+  "clinc_data_oos_plus.json": "bfcca9ae515623541dc1983c94c4ed7cae9d26b42ae47d74b972e51bb6f7a21f",
+  "clinc_domains.json": "b947b579d3b8e74b06f93b01083d8efaff2888b43a3e362533bd88a6e1211b3a",
+  "banking77_train.csv": "b06e26ac675513959a63135f11b94ea7786ed02da65db93a5650d8838cbc664b",
+  "banking77_test.csv": "d12d6e3bc4c3103966ae786dc435913c0c563dfa328f5a3646d0e62cfeeb474d"
+ },
+ "ingest_db": "487e0093719c184c98bca53bc9bc61c193559690abb206d77010fd77f81c09a2",
+ "ingest_items_sha256": "540291cc8e2ebfcf2d2768dba2b2026e053e2d643d66bdaf0bcf4b2942da6ab1",
+ "_pinned_2026-09-30": "raw and ingest_db pinned by the registrar from experiment_results/intent_transfer_s0/ingest/ingest.log (run 960decf; sha256-bytes); ingest_items_sha256 from the --manifest line (informational: no reader compares it); emb stays null until --embed --go",
+ "emb": {
+  "qwen3": "9e100e04fc91b137a075b8abedbc87d2b29a6dc2244c5f242b1c587004a4ee74",
+  "nomic": "4aafd6c7fa5f779ee21f152eb7e935774323903b32117f48f6acd24d1ccf11ad",
+  "gemma": "b187b82f90ce98376ba3ffac100157493fd8c5ee52dfa88f707738dde2acf512"
+ },
+ "_pinned_2026-10-01": "emb pinned by the registrar (sha256-bytes) from the '[EMB-ARMS] ... sha256 after' lines of experiment_results/intent_transfer_s0/embed/embed_qwen3_go5.log, embed_nomic_go6.log, embed_gemma_go6.log (f4ad285); 57,350 texts each, COMPLETE; files intent_emb_<e>.db at the repo root; model digests not printed by any log (tags :latest only), not pinned; docs/judge_v2_program.md L22230-L22240 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data) — INTENT-TRANSFER-S0 embedding DBs pinned (f4ad285); ...\"; _as_of the commit that writes it, parent f4ad285, re-grepped)"
+}

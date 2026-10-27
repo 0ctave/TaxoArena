@@ -1,0 +1,128 @@
+{
+  "id": "TEMP-0",
+  "title": "TEMP-0: is the 5.7% test-retest floor a property of LLM judging, or a sampling default nobody set? (598 calls)",
+  "question": "DECOMP's 299 byte-identical-prompt matches re-judged TWICE at temperature 0, everything else byte-identical to the existing arms (found by the ledger audit: no judge call in the campaign had ever set a temperature); (1) disagreement below 0.02 adopts temperature 0; (2) does the verdict distribution shift; (3) power; amended before the 598 calls (n = 10 gate).",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "eeb65ad",
+    "program_lines": "docs/judge_v2_program.md L1787-L1822 (registration), L1823-L1841 (amendment before the 598 calls) and L1842-L1875 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-14 (before any call) — TEMP-0: is the 5.7% test-retest floor a property of LLM judging, or a default we never set?",
+    "outcome_heading": [
+      "L1823: ### TEMP-0 AMENDMENT (2026-09-14, recorded BEFORE the 598 calls and before any scored result)",
+      "L1842: - **TEMP-0 OUTCOME (2026-09-14): the 5.7% floor is NOT an unset default. Temperature 0 changes the judge's"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "tools/analysis/temp0.py",
+    "sha16": "496f2ab69be4ba19 (at 54d8742)",
+    "commit": "54d8742"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (598 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/temp0_outcome.txt",
+    "outcome_commit": "45133af",
+    "calls": 598,
+    "cce": "not stated",
+    "pool": "DECOMP's 299 byte-identical-prompt matches",
+    "date": "2026-09-14"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/)",
+    "commit": "45133af",
+    "verdict": "(1) BAR NOT MET (0.050 vs 0.057, CI includes zero); (2) SAME JUDGE; the +-3pp reading rule is a measured constraint; closes J7"
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "disagreement below 0.02 adopts temperature 0",
+      "result": "FAILED",
+      "value": "0.050 at temperature 0 against 0.057 at the default, difference -0.007, CI [-0.030, +0.017]; the parameter reaches the deployment and changes the PROSE (byte-identical responses 0.000 -> 0.177) but not the DECISION: 82% of temperature-0 pairs still differ in wording and the verdict flips as often",
+      "denominator": "299 matches x 2"
+    },
+    {
+      "id": "(2)",
+      "text": "does the verdict distribution shift",
+      "result": "HELD",
+      "value": "agreement with the default verdicts 0.940, win rate 0.779 under both, 8:8, p = 1.00: a quieter judge in style, not a different one; nothing already measured is invalidated",
+      "denominator": "299"
+    },
+    {
+      "id": "(3)",
+      "text": "power",
+      "result": "DELIVERED",
+      "value": "minimum detectable paired effect 0.019 -> 0.018 at n = 600",
+      "denominator": "n 600"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "0.00-0.03",
+      "result": "FAILED",
+      "value": "0.050",
+      "denominator": "299 x 2"
+    }
+  ],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "the n = 10 amended gate (10/10 vs 8/10) was NOISE: a smoke test cannot see an effect the size of the one under study; the +-3pp reading rule is a measured constraint on LLM-judge experiments, not a deployment artefact; J7 (verdict sampling at temperature 0.7) CLOSED; closed line: temperature 0 (CONTEXT.md section 5)"
+  },
+  "numbers_of_record": {
+    "disagreement": "0.050 (temp 0) vs 0.057 (default); -0.007 [-0.030, +0.017]",
+    "prose": "byte-identical responses 0.000 -> 0.177; 82% still differ",
+    "distribution": "agreement 0.940; win rate 0.779 both; 8:8, p 1.00",
+    "mde": "0.019 -> 0.018 at n 600"
+  },
+  "sentence_of_record": "TEMP-0 (2026-09-14, 598 calls): the 5.7% floor is NOT an unset default: disagreement 0.050 at temperature 0 against 0.057 at the default (-0.007, CI [-0.030, +0.017]); the parameter changes the PROSE (byte-identical responses 0.000 -> 0.177) but not the DECISION; agreement with the default verdicts 0.940, win rate 0.779 under both (8:8, p = 1.00), a quieter judge in style, not a different one, so nothing already measured is invalidated; prediction wrong (0.00-0.03), and the n = 10 amended gate was noise. The +-3pp reading rule is a measured constraint on LLM-judge experiments; the sub-3pp rubric nulls were fought inside a floor no configuration would have removed. Closes J7.",
+  "chips": [
+    "(1) BAR NOT MET",
+    "(2) SAME JUDGE"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a floor below 5% at any temperature setting tried",
+    "a change to any recorded verdict (same judge)"
+  ],
+  "ledger": {
+    "row_id": "TEMP-0",
+    "version": "v70 (45133af); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "DECOMP",
+    "J7",
+    "PROFILE-TREE-ROBUST"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "temperature 0 (CONTEXT.md section 5: TEMP-0); J7 closed"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L1787-L1875 (eeb65ad / 54d8742 / 45133af)",
+    "experiment_results/x12_crossdomain/temp0_outcome.txt (45133af)",
+    "docs/test_ledger.html row TEMP-0 (v70): chips verbatim, observed cell, evidence",
+    "script sha16 = sha256 of tools/analysis/temp0.py at 54d8742, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Re-judges 299 identical matches twice at temperature 0, meaning no sampling randomness (598 calls). It then checks whether the judge's 5.7% disagreement with itself goes away.",
+    "why": "No judge call had ever set a temperature, so the judge's self-disagreement might have been a setting nobody chose, not a property of LLM judging.",
+    "information": "If disagreement vanished, earlier noisy results would need re-reading and a cheap fix would exist. Result: done. Disagreement stayed about the same (5.0% vs 5.7%). Temperature changes the wording of the judge's reply, not its decision. So the roughly 5% noise floor is real, and nothing measured earlier is invalidated. Differences under about 3 points cannot be read reliably. This belongs to the older question pool.",
+    "written": "2026-10-07"
+  }
+}

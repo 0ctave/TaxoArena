@@ -1,0 +1,133 @@
+{
+  "id": "FOREIGN-GATE-D4",
+  "title": "FOREIGN-GATE-D4: FRAMEWORK item 14: does the FOREIGN gate (a leaf's arrival purity against its own train-side purity) trip on D4's absorbed Law regions and not on the Philosophy hosts? (zero calls)",
+  "question": "Replay the FRAMEWORK L53 / RESOLVE L145 FOREIGN gate on the D4 artefacts: C1 the gate trips on the 94%-pure Law regions (11 Law-arm regions at >= 90% Law; strict sliding windows w50 / w100 / w200) under the readings A (host anchor reference), B (literal: the leaf's modal train-side cell), C, and the checker's A2 (anchor reference, the leaf's OWN purity - 2 SD, L53's wording); C2 the gate does not trip on the Philosophy hosts; the headline trip rate.",
+  "kind": "zero-call",
+  "state": "UNDETERMINED",
+  "registration": {
+    "commit": "eaf1dbf",
+    "program_lines": "docs/judge_v2_program.md L3603-L3611 (by reference; docs/design/FRAMEWORK.md L366 item 14); the Block 1 record bullet at L3799",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-15 (before any run) — BY REFERENCE: the 26 tests in docs/design/FRAMEWORK.md \"Tests to register before shipping\" (commit 8d77f7b), with the criteria, predictions and call counts stated there, scheduled in docs/plan_2026-09-15.md",
+    "outcome_heading": [
+      "L3662: ## Block 1 record (2026-09-15/16, zero calls) — FRAMEWORK items 1-12, 14-16: fourteen zero-call tests built, each adversarially checked; verdicts of record below (checker's number wins where it refutes the builder)",
+      "L3799: - **FOREIGN-GATE-D4 (2026-09-15, zero calls): UNDETERMINED; the gate's text is under-specified in two places that flip the outcome; FAIL only under the literal L53 text (modal-cell reference) and under RESOLVE's fixed 0.60; w=200 is never evaluable at leaf level on these artefacts.**"
+    ],
+    "date": "2026-09-15"
+  },
+  "script": {
+    "path": "tools/analysis/foreign_gate_d4.py",
+    "sha16": "2bb4fde41f542e49",
+    "commit": "7076615"
+  },
+  "ready": null,
+  "go": "n/a (0 calls; Block 1)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/foreign_gate_d4.txt",
+    "outcome_commit": "7076615",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (pool_guard.assert_pool_of_record() first; union pool paeec37aa28063c75 by explicit id where used)",
+    "date": "2026-09-15/16"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); each Block 1 test was 'adversarially checked' at build time and the checker's number wins where it refutes the builder (Block 1 record header L3662-L3663); the checker-confirmed defects are listed in the bullet",
+    "commit": "7076615",
+    "verdict": ""
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "trips on the 94%-pure Law regions (11 Law-arm regions at >= 90% Law; strict sliding windows)",
+      "result": "UNDETERMINED",
+      "value": "reading B (literal modal cell) + 0.60: 0/8 at w50, 0/4 at w100 (D4 put Law on the train side, so the mode IS Law); B + purity-2SD 2/8 (noise); reading A (host anchor) + 0.60: 8/8, 4/4, first window, perm-ever 1.00; A with purity redefined as share in the reference cell + 2SD: 0/8 (threshold <= 0); checker's A2 (anchor reference, leaf's OWN purity - 2 SD = L53's wording): 8/8 at w50, 4/4 at w100, first window; w200 0/11 evaluable (largest region 165 arrivals): builder FAIL; checker FAIL under literal B, PASS on every evaluable region under A/0.60, C/0.60, A2",
+      "denominator": "11 Law-arm regions; windows w50 (8 evaluable) / w100 (4) / w200 (0)"
+    },
+    {
+      "id": "C2",
+      "text": "does not trip on the Philosophy hosts",
+      "result": "UNDETERMINED",
+      "value": "0.60 fixed, w50: H1 (4 Philosophy-arm depth-1 anchors, own-name purity 0.40-0.59) 3/4 trip, H2 3/4 evaluable ordinary leaves trip, H3 (the Law arm's Philosophy leaf n00000116, 12 arrivals) never evaluable; w100: H1 3/4, H2 0/0; A2: w50 H1 1/4 (noise), H2 2/4 (leaves genuinely majority-foreign: Philosophy 32/87, Economics 24/52), w100 0/4, 0/0; ordinary Law-arm leaves at 0.60/w50 7/12 trip (Top-1 anchor precision 0.59): builder FAIL; checker FAIL for fixed 0.60 (any reference), PASS at w100 under A2, UNDETERMINED under the Law-arm reading (no evaluable host leaf)",
+      "denominator": "H1 4 anchors / H2 4 leaves / H3 1 leaf"
+    },
+    {
+      "id": "headline",
+      "text": "trip rate (leaves ever tripping / leaves with >= w arrivals; 15/1/0 of 98 and 19/1/0 of 88 have >= 50/100/200)",
+      "result": "DELIVERED",
+      "value": "Law arm 0.60: A 10/15 at w50, 1/1 at w100; B 7/15; purity-2SD 1-2/15; Philosophy arm 7/19; reading-A cost: 36/330 held-out Law filed FOREIGN at w50, 0/330 at w100/200",
+      "denominator": "98 / 88 leaves"
+    },
+    {
+      "id": "combined",
+      "text": "combined criterion per window",
+      "result": "UNDETERMINED",
+      "value": "builder: FAIL under all 9 (reading x threshold) at w50 and w100; A2 (the tenth): w50 C1 8/8 with 3 host-side trips (FAIL by the builder's rule), w100 C1 4/4 and C2 0 on the anchor units with no leaf unit; w200 NOT COMPUTED: checker UNDETERMINED",
+      "denominator": "per window"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "(item 14 states no prediction) RESOLVE L145: 'D4's Law hosts trip this on the first window'",
+      "result": "UNDETERMINED",
+      "value": "CONFIRMED under the anchor reference with either the 0.60 prose threshold or own-purity - 2 SD; REFUTED under the literal modal-cell reference",
+      "denominator": "8 / 4 evaluable regions"
+    }
+  ],
+  "falsifier": {
+    "text": "none (item 14 states no prediction; the design of record must fix the reference cell and the purity definition before the item can be scored)",
+    "fired": false,
+    "note": "robust sub-findings: (a) FRAMEWORK L53 as literally written cannot detect D4 because the absorbed domain sits on the train side; (b) RESOLVE's fixed 0.60 is not specific; a stream-time arrival of a domain absent from the train side is not on disk and remains untested; build-time reading T flags 7/7 Law-modal leaves and 12/12 Law regions with no arrivals, at 13/91 and 3/85 ordinary-leaf false flags"
+  },
+  "numbers_of_record": {
+    "C1_by_reading": "B + 0.60: 0/8 (w50), 0/4 (w100); A + 0.60: 8/8, 4/4; A2: 8/8, 4/4; w200 0/11 evaluable",
+    "C2_by_reading": "0.60 / w50: H1 3/4, H2 3/4, H3 never evaluable; A2 / w50: H1 1/4, H2 2/4; w100 A2 0/4",
+    "headline": "Law arm 0.60: A 10/15 (w50), 1/1 (w100); B 7/15; Philosophy arm 7/19; reading-A cost 36/330 held-out Law filed FOREIGN at w50",
+    "checker_HIGH": "under readings A and C the builder defined purity as the share in the REFERENCE cell, not L53's 'leaf's own train-side purity', driving the threshold to <= 0 on every absorbed leaf and manufacturing 'never trips under the FRAMEWORK form' (not stated as a deviation); H1 applies the per-leaf gate to depth-1 anchor nodes the design never gates"
+  },
+  "sentence_of_record": "FOREIGN-GATE-D4 (2026-09-15, zero calls): UNDETERMINED; the gate's text is under-specified in two places that flip the outcome (the reference cell: anchor name vs modal cell; the purity definition: the leaf's own train-side purity vs the share in the reference cell); FAIL only under the literal L53 text (modal-cell reference, which cannot detect D4 because the absorbed domain sits on the train side) and under RESOLVE's fixed 0.60 (not specific); under the anchor reference with own-purity - 2 SD (the checker's A2) the Law regions trip 8/8 at w50 and 4/4 at w100 on the first window; w200 is never evaluable at leaf level on these artefacts. The design of record must fix the reference cell and the purity definition before the item can be scored.",
+  "chips": [
+    "UNDETERMINED (checker; builder FAIL)",
+    "GATE TEXT UNDER-SPECIFIED IN TWO PLACES"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-16",
+      "by": "Block 1 record corrections for LEDGER-CONSISTENCY (programme L3839: FRAMEWORK L53 and RESOLVE L145 bracketed at a75df45)",
+      "text": "FRAMEWORK L53: the FOREIGN gate reference cell (anchor name, not modal cell) and purity definition (the leaf's own train-side purity) must be fixed; RESOLVE L145 holds under the anchor reference only."
+    }
+  ],
+  "does_not_show": [
+    "a verdict on the gate as written (under-specified)",
+    "a stream-time arrival of a domain absent from the train side (not on disk)",
+    "w200 at leaf level (never evaluable)"
+  ],
+  "ledger": {
+    "row_id": "FOREIGN-GATE-D4",
+    "version": "v103 (684be03)"
+  },
+  "depends_on": [
+    "D4",
+    "SPLIT-FUNCTION-IMPL",
+    "MC-ROOT"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L3603-L3611 (by-reference registration eaf1dbf) and docs/design/FRAMEWORK.md L366 item 14: criterion, prediction, call count",
+    "docs/judge_v2_program.md L3799 ff. (Block 1 record bullet, 7076615): the criterion table, predictions scored, checker-confirmed defects, script and output",
+    "experiment_results/x12_crossdomain/foreign_gate_d4.txt (7076615)",
+    "docs/test_ledger.html row FOREIGN-GATE-D4 (v103 684be03): chips verbatim, design / criteria / observed cells, evidence",
+    "script sha16 = sha256 of tools/analysis/foreign_gate_d4.py at 7076615 (its first commit), first 16 hex (identity, computed by the registrar 2026-09-22; later edited at 13f2142 for the pool_guard change)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' heading and the '- **ID (...)**' bullet line inside the Block 1 record, to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06"
+  ],
+  "last_update": "2026-09-22",
+  "plain_description": {
+    "sq": "SQ3 Taxonomy",
+    "what": "Checks whether a proposed 'foreign arrival' alarm, which compares a leaf's purity on new data with its training purity, fires on Law questions absorbed into another region and not on genuine Philosophy regions. It uses existing artefacts and no calls.",
+    "why": "It tests whether the tree can detect when new kinds of queries arrive in a cell, as the framework design requires.",
+    "information": "Firing on Law but not Philosophy would show the alarm works. Result: undetermined, because the alarm's written definition is ambiguous in two places that flip the outcome. Under one reasonable reading (the reference is the anchor name, with the leaf's own training purity minus 2 SD), the Law regions do trip. The design must fix both definitions before the item can be scored.",
+    "written": "2026-10-07"
+  }
+}

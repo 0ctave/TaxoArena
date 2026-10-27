@@ -1,0 +1,110 @@
+{
+  "id": "FORMAT",
+  "title": "FORMAT: style perturbation (CALM-style; ~1.2k Mistral calls; conditional on prevalence >= 150)",
+  "question": "The 383 key-decidable R3 pairs with exactly one markdown-formatted trace (prevalence recorded before launch): strip the formatting and compare against the cached v1 verdict; a format bias exists iff the correct-verdict rate changes by > 3pp with p < 0.05; the flip rate toward the unformatted side reported; prediction no effect (the L1 pad arm).",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "d38b52c",
+    "program_lines": "docs/judge_v2_program.md L52-L64 (registration; prevalence 383 recorded before launch at d38b52c) and L128-L133 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "### FORMAT — style perturbation (CALM-style; ~1.2k Mistral calls; conditional)",
+    "outcome_heading": [
+      "L128: - **FORMAT (2026-09-10 01:25): no format bias (B5 closed).** 383 key-decidable pairs with exactly one ..."
+    ],
+    "date": "2026-09-09"
+  },
+  "script": {
+    "path": "tools/analysis/format_perturbation.py",
+    "sha16": "1085f3286e615761 (at 1a472dd)",
+    "commit": "1a472dd"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (~1.2k Mistral calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/format_outcome.txt",
+    "outcome_commit": "849fb17",
+    "calls": "~1,200 (383 pairs)",
+    "cce": "not stated",
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-10",
+    "other_files": [
+      "rejudge_mistral_format_stripped.db (cache)",
+      "judge_v2_queue.log"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/)",
+    "commit": "849fb17",
+    "verdict": "NO FORMAT BIAS (B5 closed)"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "a format bias exists iff the correct-verdict rate changes by > 3pp with p < 0.05",
+      "result": "FAILED",
+      "value": "383 key-decidable pairs, 0 errors: stripped 0.786 vs original 0.791 (-0.5pp; 6:8; p 0.79); 0 flips toward the unformatted side; markdown carries no verdict weight for Mistral (the formatted side correct in 70% is model tier, not style)",
+      "denominator": "383 key-decidable pairs with exactly one formatted trace"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "no effect",
+      "result": "HELD",
+      "value": "-0.5pp, p 0.79",
+      "denominator": "383"
+    }
+  ],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "bias B5 (format) closed; FORMAT-REF (2026-09-14) is a different test (grading vs comparing under the reference)"
+  },
+  "numbers_of_record": {
+    "accuracy": "stripped 0.786 vs original 0.791 (-0.5pp; 6:8; p 0.79)",
+    "flips_toward_unformatted": "0",
+    "prevalence": "383 eligible pairs (>= 150 required)"
+  },
+  "sentence_of_record": "FORMAT (2026-09-10, ~1.2k calls): no format bias: on the 383 key-decidable pairs with exactly one markdown-formatted trace, stripped 0.786 vs original 0.791 (-0.5pp; 6:8; p = 0.79); 0 flips toward the unformatted side; markdown carries no verdict weight for Mistral (the formatted side correct in 70% is model tier, not style). B5 closed.",
+  "chips": [
+    "NO FORMAT BIAS"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a format effect on a judge other than Mistral"
+  ],
+  "ledger": {
+    "row_id": "FORMAT",
+    "version": "v22 (849fb17); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "L1",
+    "FORMAT-REF"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L52-L64 and L128-L133 (d38b52c / 849fb17)",
+    "experiment_results/x12_crossdomain/format_outcome.txt (849fb17)",
+    "docs/test_ledger.html row FORMAT (v22): chips verbatim, evidence (format_perturbation.py, rejudge_mistral_format_stripped.db, judge_v2_queue.log, d38b52c)",
+    "script sha16 = sha256 of tools/analysis/format_perturbation.py at 1a472dd, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "It used 383 answer pairs where exactly one answer had markdown formatting. The formatting was stripped and the Mistral judge's verdicts were compared before and after (about 1,200 calls).",
+    "why": "It checks whether the judge rewards formatting style rather than correctness.",
+    "information": "A change of more than 3 points would reveal a format bias. No change would rule it out for this judge. Result: done. No format bias: 0.786 vs 0.791 (p = 0.79) and 0 flips toward the plain answer. This was shown for Mistral only. Older p2dca data family: history, not evidence.",
+    "written": "2026-10-07"
+  }
+}

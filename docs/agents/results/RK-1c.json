@@ -1,0 +1,127 @@
+{
+  "id": "RK-1c",
+  "title": "RK-1c: RK-1b plus two worked neighbours whose solutions are the reasoning model's key-verified solves of TRAIN-side neighbours (never an arena question) (~8k calls)",
+  "question": "As RK-1b; queued behind it on the Mistral endpoint; solves on grok-reasoning (>= 500 verified required); criteria as RK-1b; prediction +1 to +3pp.",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "691b32b lineage (registered in docs/rubric_v2_design.md)",
+    "program_lines": "docs/judge_v2_program.md L435-L439 (outcome bullet)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "- **RK-1c (2026-09-10 16:45): PRIMARY FAIL (+0.8pp, 26:18, p = 0.29), SECONDARY PASS.** Card + verified",
+    "outcome_heading": [
+      "L435: the same bullet"
+    ],
+    "date": "2026-09-10"
+  },
+  "script": {
+    "path": "tools/analysis/rubric_kit2.py (neighbours arm)",
+    "sha16": "a5da4b22d2e7a6f9 (at 691b32b)",
+    "commit": "691b32b"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (~8k calls + 1,667 verified solves); 3,948 matches, i.e. UNDER the rule, whose denominator is matches; the 1,667 reference solves are not arena matches and do not enter the count; no go was owed (registrar 2026-09-23; corrects INCONSISTENCIES 8eeddaf item 9).",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/rk1c_outcome.txt",
+    "outcome_commit": "691b32b",
+    "calls": "~8k (3,948 judged, 0 errors) + solves",
+    "cce": "not stated",
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-10",
+    "other_files": [
+      "rk1c_judge.log"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the ledger audit of 2026-09-14 removed 'rk1c_queue.ps1' from the evidence cell (does not exist in the tree)",
+    "commit": "691b32b",
+    "verdict": "FAIL (+0.8pp, p = 0.29); SECONDARY PASS; RK-2 not triggered; rubric-side line CLOSED"
+  },
+  "criteria": [
+    {
+      "id": "PRIMARY",
+      "text": "+1pp on key-decidable at p < 0.05",
+      "result": "FAILED",
+      "value": "944 decidable: card + neighbours 0.868 vs STACK-v2 0.859 (26:18, +0.8pp, p = 0.29); leakage audit clean; 1,667 verified solves",
+      "denominator": "944 key-decidable R3 pairs"
+    },
+    {
+      "id": "SECONDARY",
+      "text": "quantitative > discursive",
+      "result": "HELD",
+      "value": "quantitative +1.6 vs discursive +0.2; top cluster +1.1 n.s.",
+      "denominator": "944"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "+1 to +3pp",
+      "result": "FAILED",
+      "value": "+0.8pp",
+      "denominator": "944"
+    }
+  ],
+  "falsifier": {
+    "text": "none registered (descriptive / free check)",
+    "fired": false,
+    "note": "worked solutions to other questions add nothing once the judge holds a reference for the judged one; RK-2 not triggered; rubric-side line CLOSED with the data-only card as its one adopted increment"
+  },
+  "numbers_of_record": {
+    "accuracy": "0.868 vs 0.859 (26:18, p = 0.29)",
+    "secondary": "quantitative +1.6 vs discursive +0.2",
+    "solves": "1,667 verified"
+  },
+  "sentence_of_record": "RK-1c (2026-09-10, ~8k calls): FAIL: 944 decidable: card + neighbours 0.868 vs STACK-v2 0.859 (26:18, +0.8pp, p = 0.29); quantitative +1.6 vs discursive +0.2; top cluster +1.1 n.s.; the card alone (RK-1b) was +1.7, so worked solutions to other questions add nothing once the judge holds a reference for the judged one. RK-2 not triggered; the rubric-side line is CLOSED with the data-only card as its one adopted increment.",
+  "chips": [
+    "FAIL (+0.8pp, p=0.29)",
+    "SECONDARY PASS"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-14",
+      "by": "the ledger audit (evidence cell)",
+      "text": "rk1c_queue.ps1 was listed as evidence and does not exist in the tree; removed 2026-09-14."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a worked-neighbour gain"
+  ],
+  "ledger": {
+    "row_id": "RK-1c",
+    "version": "v33 (1b9312f); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "RK-1b",
+    "RK-1",
+    "STACK-v2"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "rubric content / worked solutions (CONTEXT.md section 5)"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L435-L439",
+    "docs/rubric_v2_design.md",
+    "experiment_results/x12_crossdomain/rk1c_outcome.txt (691b32b)",
+    "docs/test_ledger.html row RK-1c (v33): chips verbatim, observed cell, evidence",
+    "script sha16 = sha256 of tools/analysis/rubric_kit2.py at 691b32b, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Adds two worked example solutions from similar training-side questions to the judge's prompt, on top of the cell card, and compares accuracy on 944 matches with a known key. About 8,000 calls.",
+    "why": "It tests whether showing the judge solved neighbouring problems improves its verdicts beyond the cell card.",
+    "information": "A gain would support adding worked examples; no gain closes that line. Result: failed. Accuracy went from 0.859 to 0.868 (+0.8 points, not significant). Once the judge has a reference for the question itself, worked solutions to other questions add nothing, and this line of judge-prompt additions was closed. Ruled history rather than evidence (older question pool).",
+    "written": "2026-10-07"
+  }
+}

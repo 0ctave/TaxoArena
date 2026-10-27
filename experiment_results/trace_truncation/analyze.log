@@ -1,0 +1,52 @@
+[POOL] paeec37aa28063c75 (union pool of record, MATH slice; verified by pool_guard.assert_pool_of_record in every DB-reading mode)
+[POOL] paeec37aa28063c75 verified by pool_guard.assert_pool_of_record
+[ACCOUNT] TRACE-TRUNCATION (outcome): (i) own 2178 (cache 2160, ledgers 2178) + 0 = 2178 of 2184 | (ii) matches 1089 of 4000 | (iii) 4060 + CANARY-EPOCH2-RUNG 0 + TRACE-TRUNCATION 2178 + 0 = 6238 of 14000 | ledger of record for today's posts: Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\day_calls_2026-09-24.json -> OK
+=== TRACE-TRUNCATION | docs/judge_v2_program.md L14972-L15011 (registered 2026-09-23 at fad9ea2, before any code or call); record docs/agents/results/TRACE-TRUNCATION.json ===
+  judge grok-4-1-fast-non-reasoning | cap 8192 | temperature omitted | pool paeec37aa28063c75 | arms original / truncate / pad | THR 300 | pad unit ' ' | script sha256-lf16 633384b658105e1f
+
+(C0) VALIDITY, FIRST (pre-emptive):
+     (a) eligible list = committed evidence = pin               PASS  [EVIDENCE] docs\agents\results\evidence\TRACE-TRUNCATION_pairs.txt sha256-lf 08a0f84f61718b323ecaa433b75085784fd2cf62a9025bb855d4fb8b1615d7a0 (blob:928917eadcbea075d376e1d7ab26a2b7a7a7e37f; git tracked True, clean True) | regenerated 08a0f84f61718b323ecaa433b75085784fd2cf62a9025bb855d4fb8b1615d7a0 | pin 08a0f84f61718b323ecaa433b75085784fd2cf62a9025bb855d4fb8b1615d7a0 -> MATCH
+     (b) posted bodies = re-assembly (identity outside span)    PASS  1080 of 1080 posted rows
+     (c) reference block intact                                 PASS  1080 of 1080 rows
+     (d) pilot truncation guard (<= 5% unusable)                PASS  12 of 12 pilot rows cached, unusable 0.0%
+     (e) fingerprints                                           PASS  {'azure:grok-4-1-fast-non-reasoning': 2160}
+     C0: PASS
+
+DENOMINATOR: 360 pairs judged in all three arms (of 360 eligible), clustered by MATH question (185 questions, Kish mean cluster size 2.483). acc = the share of pairs whose dual-order combined verdict names the checker-correct side.
+  original  convention A 0.983 [0.968, 0.999] | convention B (committed only) 1.000 (n=354)
+  truncate  convention A 0.914 [0.881, 0.947] | convention B (committed only) 0.985 (n=334)
+  pad       convention A 0.853 [0.813, 0.893] | convention B (committed only) 0.984 (n=312)
+
+(C1) THE OUTCOME-JUDGE TEST: drop = acc(original) - acc(truncate) = 0.069, 95% interval [0.039, 0.100] (SE 0.0158, question-clustered bootstrap B 2000, seed 42); bar 0.10; discordant pairs original-only 26 / truncate-only 1
+     C1: UNDETERMINED - the interval contains 0.10 (DESCRIPTIVE-ONLY by the registered support)
+(C2) THE FLOOR: acc(truncate) = 0.914, 95% interval [0.881, 0.947] (SE 0.0169); bar 0.70
+     C2: HELD - the interval lies wholly ABOVE 0.70
+     robustness: C1 / C2 re-read at the 20 further bootstrap seeds 43-62: 11 of 20 change a verdict (43:HELD/HELD, 44:UND/HELD, 45:HELD/HELD, 46:UND/HELD, 47:HELD/HELD, 48:HELD/HELD, 49:HELD/HELD, 50:UND/HELD, 51:HELD/HELD, 52:UND/HELD, 53:UND/HELD, 54:HELD/HELD, 55:HELD/HELD, 56:UND/HELD, 57:HELD/HELD, 58:HELD/HELD, 59:HELD/HELD, 60:UND/HELD, 61:UND/HELD, 62:UND/HELD)
+(C3) THE PAD CONTROL, DESCRIPTIVE: acc(pad) - acc(original) = -0.131 [-0.169, -0.092] (SE 0.0197) -> C1's reading is QUALIFIED as edit-sensitivity, not content-reading (interval excludes 0 and |point| > 0.05)
+     RECORDED LIMIT (b0b5d0d, choice 2): the pad arm restores BYTE (character) length with ASCII spaces, NOT necessarily TOKEN length (a tokenizer may collapse runs of spaces); C3 is DESCRIPTIVE and is read as such.
+(C4) THE NOISE-FLOOR READING, DESCRIPTIVE: drop 0.069 beside the PER-MATCH retest floors of record:
+     CANARY-EPOCH2-RUNG's within-session floor: not recorded before this outcome (experiment_results\x12_crossdomain\canary_epoch2_outcome.txt absent or unreadable)
+     CANARY-BASELINE pass 1 -> 2 (one week apart), per-match combined verdict 0.087 -> the drop is BELOW this floor: not attributed to truncation
+     DECOMP (hours apart), per-match                                          0.057 -> the drop is at or above this floor
+     NO floor is derived from a pooled per-call rate (TIE-MECHANICS, L14415: the 0.098 / 0.057 per-call rates do not give a match-level floor by independence arithmetic).
+
+SUPPORT (measured beside registered). REGISTERED (planning): n 360, Kish 1.353 (POSITION-INDEX-ALL MATH / grok-nr, transported), DEFF 1.18 transported, n_eff 305, declared pilot discordance 0.15, SE C1 0.0214 / C2 0.0193, MDE (2.80 x SE) C1 0.060 / C2 0.054; C1 DESCRIPTIVE-ONLY (0.03 < 0.060), C2 SCOREABLE (0.17 > 0.054); structural: a finite population, C1 descriptive at any budget.
+  MEASURED: n 360 pairs over 185 questions, Kish 2.483 | discordance (b + c) / n = 0.075 | C1: SE_boot 0.0158, SE_iid (match-level paired) 0.0140, DEFF 1.27, n_eff 282.6, MDE 0.044 | C2: SE_boot 0.0169, SE_iid 0.0148, DEFF 1.30, n_eff 276.7, MDE 0.047
+
+PREDICTIONS (registered; scored on the convention-A point):
+  P1 acc(original) 0.95 [0.90, 0.98]                  0.983        -> FAILED
+  P2 acc(truncate) 0.87 [0.80, 0.93]                  0.914        -> HELD
+  P3 drop 0.07 [0.02, 0.12]                           0.069        -> HELD
+  P4 acc(pad) - acc(original) 0.00 [-0.03, +0.03]     -0.131       -> FAILED
+  P5 C1 reads UNDETERMINED                            UND          -> HELD
+  P6 unusable <= 1% of the posted calls               0 / 2160     -> HELD
+
+FALSIFIER: NOT FIRED (C2 HELD, C1 UND).  NOT OVERTURNED in any branch: L1, L1-V, L1-V2, the STACK-v2 recipe of record, H7's closure.
+
+DRIFT (descriptive, never the comparator of record): the original arm's verdict equals STAGE3-MATH-CAPFREE's cached verdict on the same match (the same payload bytes) on 354 of 360 pairs = 0.983
+
+RANDOM STREAMS: selection deterministic (subsample seed 42 only above 360 pairs) | bootstrap B 2000 seed 42, plus seeds 43-62 | judge sampling not seedable (temperature omitted) | posting order fixed (pairs in list order, arms original -> truncate -> pad, order 1 then 2).
+ACCOUNTING (b0b5d0d): (i) TRACE-TRUNCATION 2178 of 2184 calls | (ii) 1089 of 4000 matches | (iii) 4060 + CANARY-EPOCH2-RUNG 0 + TRACE-TRUNCATION 2178 = 6238 of 14000
+HEADER: TRACE-TRUNCATION | cache experiment_results\multicorpus\trace_truncation.db (1080 rows, run_meta started 2026-09-24 10:13:50, pinned script sha 633384b658105e1f) | written 2026-09-24 12:45:52
+
+[ANALYZE] complete cache: wrote experiment_results\multicorpus\trace_truncation_outcome.txt (write-once)

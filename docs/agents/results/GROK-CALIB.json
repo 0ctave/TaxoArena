@@ -1,0 +1,179 @@
+{
+  "id": "GROK-CALIB",
+  "title": "GROK-CALIB: FRAMEWORK item 26, the x12 schedule re-judged by the SHIPPED judge under the recipe, so the shipped judge gets its own calibration board (18,284 calls)",
+  "question": "The x12 MAIN schedule (9,142 matches) re-judged by grok-4-1-fast-non-reasoning under STACK-v2, dual order, cap 8192, temperature omitted, paired match for match with the Mistral verdicts of record: is b1 identified on established labels, is the LOAO utility >= 60%, what is the LOAO wrong count with all(established), and what is the calibration status by the power rule?",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "eaf1dbf",
+    "program_lines": "registered BY REFERENCE at docs/judge_v2_program.md (lines as of 5dc8a06) L3603-L3611 (eaf1dbf, 2026-09-15: the 26 FRAMEWORK tests, docs/design/FRAMEWORK.md 'Tests to register before shipping' at 8d77f7b); FRAMEWORK L382 item 26; the registered criteria and prediction restated at docs/judge_v2_program.md (lines as of 5dc8a06) L3914-L3918; scripts dry-run at 1e3b1ea (Block 2)",
+    "date": "2026-09-15",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-15 (before any run) — BY REFERENCE: the 26 tests in docs/design/FRAMEWORK.md \"Tests to register before shipping\" (commit 8d77f7b), with the criteria, predictions and call counts stated there, schedu",
+    "outcome_heading": [
+      "L3913: ## GROK-CALIB (2026-09-16, 18,284 calls) — FRAMEWORK item 26: prediction HELD in full; the shipped judge now has its own calibration board; calibration UNDETERMINED at the operating point, as on Mistral"
+    ]
+  },
+  "script": {
+    "path": "tools/analysis/grok_calib.py",
+    "sha16": "8396be25d17ef4da",
+    "commit": "1e3b1ea (Block 2 dry-run; later edited at 13f2142 / 706b381)"
+  },
+  "ready": null,
+  "go": "docs/plan_2026-09-15.md L3 / L44: authorised by the author 2026-09-15, 'above the 4k rule, GO given' (~18,300 calls); Amendment 1 D2 temperature omitted, D6 utility over ALL edges",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/grok_calib_outcome.txt",
+    "outcome_commit": "09d71f5",
+    "calls": 18284,
+    "cce": "~20,000 (FRAMEWORK L382 estimate)",
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-16",
+    "other_files": [
+      "experiment_results/x12_crossdomain/grok_calib_systematic_budget.txt (09d71f5)",
+      "experiment_results/x12_crossdomain/grok_calib.db (gitignored; 9,142 verdicts, 2,811 judged q)"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the draw's identification was later refuted as re-draw-fragile by JUDGE-WIRING-BOARD (b8be7e4, v108 bracket) and resolved on the pooled draws by ITEM-26-POOLED (docs/reviews/2026-09-18_night_batch.md, 17a4434; v114 bracket)",
+    "commit": "17a4434",
+    "verdict": "prediction HELD in full on this draw; 'ORDERED-JUDGED available for grok' now rests on the pooled established labels of both draws: identified at the registered bar (6.51) and NOT at a correlation-honest 0.05 (p ~ 0.07), power 0.62 single / <= ~0.8 pooled"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "b1 identified on established labels (delta-deviance vs b1 = 0 > 3.84)",
+      "result": "HELD",
+      "value": "established-label refit b1 +2.7194, delta-deviance 4.47 > 3.84 -> IDENTIFIED on this draw [BRACKET 2026-09-16 JUDGE-WIRING-BOARD: the Kotlin re-draw refits +2.05 / 2.26, NOT identified; re-draw-fragile at ~26 events] [CORRECTED 2026-09-18 by ITEM-26-POOLED: pooled 6.51 >= 3.84 at the registered bar, NOT at a correlation-honest 0.05 (p ~ 0.07)]",
+      "denominator": "891 edges (key gap >= 0.02), 809 established, 40 wrong-direction labels; unfiltered 920 beside"
+    },
+    {
+      "id": "C2",
+      "text": "utility >= 60% (LOAO-called over ALL edges of the population, D6)",
+      "result": "HELD",
+      "value": "667 of 891 called = 74.9% (called / raw-called 91.0% non-deciding); unfiltered 653 of 920 = 71.0%",
+      "denominator": "891 / 920 edges"
+    },
+    {
+      "id": "C3",
+      "text": "LOAO wrong count with all(established)",
+      "result": "DELIVERED",
+      "value": "wrong 2 (established 1), nominal 1.11 (1.8x); out-of-fold nominal over all 891 edges 46.6 vs 40 observed (conservative); 0 edges made more confident; unfiltered 2 (1), nominal 1.24",
+      "denominator": "667 called of 891"
+    },
+    {
+      "id": "C4",
+      "text": "calibration status by the power rule (nominal < 3 -> UNDETERMINED)",
+      "result": "UNDETERMINED",
+      "value": "UNDETERMINED at the operating point, as predicted (2 events against 1.1 nominal): no longer detectably miscalibrated and cannot be called calibrated",
+      "denominator": "667 called"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "calibration UNDETERMINED at the operating point",
+      "result": "HELD",
+      "value": "UNDETERMINED (nominal 1.11 < 3)",
+      "denominator": "667 called"
+    },
+    {
+      "id": "P2",
+      "text": "b1 inside [1.72, 7.87]",
+      "result": "HELD",
+      "value": "+2.72 (established refit); all-label +3.3854",
+      "denominator": "809 established / 891 edges"
+    }
+  ],
+  "falsifier": {
+    "text": "none named beyond the criteria (registered by reference: FRAMEWORK item 26); the headline check carried over from SYSTEMATIC-BUDGET: the budget must WITHDRAW the arx/iask separation",
+    "fired": false,
+    "note": "arx vs iask c 1.0000 -> 0.8004, withdrawn on grok as on Mistral (HELD)"
+  },
+  "numbers_of_record": {
+    "run": "9,142 of 9,142 cached, 0 missing; finish_reason stop 18,283 of 18,284 (one empty second-order response, INVALID); 11 INVALID of 9,142 (0.1%), 8 of 4,507 key-decidable (0.2%): guard PASS; mean 275 completion tokens (p95 365)",
+    "descriptives": "flip 0.154, tie 0.219; key-decidable accuracy 0.849 (ties wrong, n = 4,499) vs Mistral 0.852 on the same schedule; 3-way agreement with Mistral 0.837; both-decisive agreement 0.986 (n = 6,477)",
+    "fit_891": "b0 -3.5451, b1 +3.3854 (Mistral -3.2326 / +3.3133); established-label refit b1 +2.7194, delta-deviance 4.47; raw certificate 733 called / 7 wrong = 0.95% (7.4x nominal)",
+    "LOAO_0.975": "667 of 891 called (74.9%), wrong 2, established 1, nominal 1.11 (1.8x); out-of-fold nominal 46.6 vs 40 observed; unfiltered 920: b0 -3.3172, b1 +3.3001, 653 called (71.0%), 2 (1) wrong, nominal 1.24",
+    "pooled_66_pair_board": "raw 64 called / 1 wrong -> budget 58 / 0; arx vs iask c 1.0000 -> 0.8004, withdrawn",
+    "re_draw_and_pooling": "JUDGE-WIRING-BOARD (Kotlin draw, identical bytes): b1 +2.05, delta-deviance 2.26, NOT identified; ITEM-26-POOLED: pooled 1,620 edge-draws, 46 events = 29 distinct edges (phi 0.735), delta-deviance 6.51, b1 +2.44 [+0.23, +7.99], bar size 0.14 under the correlation-preserving null, p ~ 0.07; power 0.62 single / <= ~0.8 pooled"
+  },
+  "sentence_of_record": "GROK-CALIB (2026-09-16, 18,284 calls): FRAMEWORK item 26: prediction HELD in full; the shipped judge now has its own calibration board; calibration UNDETERMINED at the operating point, as on Mistral. The agreement-shaped widener fitted on the shipped judge reproduces the Mistral shape almost parameter for parameter (b1 +3.39 vs +3.31 all-label; +2.72 vs +2.14 established) and the same operating-point status. Consequence as registered: ORDERED-JUDGED edges are available for grok-4-1-fast-non-reasoning, published at 0.975 with 'calibration UNDETERMINED (power rule)' beside them; the fallback mode of FRAMEWORK Stage 6 ends for this judge. [BRACKET 2026-09-16 by JUDGE-WIRING-BOARD: the Kotlin re-draw of the identical judge on identical bytes refits b1 +2.05 with delta-deviance 2.26, NOT identified, against this draw's 4.47: the identification criterion is re-draw-fragile at ~26 established events.] [CORRECTED 2026-09-18 by ITEM-26-POOLED: 'ORDERED-JUDGED available for grok' now rests on the pooled established labels of both draws: pooled delta-deviance 6.51 >= 3.84, b1 +2.44 [+0.23, +7.99], IDENTIFIED at the registered bar; the 46 pooled events are 29 DISTINCT edges (phi 0.735), so b1 is NOT identified at a correlation-honest 0.05 (p ~ 0.07); power 0.62 on one draw, at most ~0.8 pooled; no grok cell falls to BANDED-JUDGED; LOAO UNDETERMINED per draw.]",
+  "chips": [
+    "b1 IDENTIFIED (+2.72)",
+    "UTILITY 74.9%",
+    "CALIBRATION UNDETERMINED (POWER RULE)",
+    "PREDICTION HELD",
+    "ORDERED-JUDGED AVAILABLE FOR GROK: IDENTIFIED ON THE POOLED DRAWS AT THE REGISTERED BAR (6.51), NOT AT A CORRELATION-HONEST 0.05 (p ~ 0.07; ITEM-26-POOLED)"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-16",
+      "by": "JUDGE-WIRING-BOARD (ledger v108, b8be7e4; programme L4261-L4269)",
+      "text": "the Kotlin re-draw of the identical judge on identical bytes refits b1 +2.05 with delta-deviance 2.26, NOT identified, against this draw's 4.47: the identification criterion is re-draw-fragile at ~26 established events, so 'ORDERED-JUDGED available for grok' rests on this draw until item 26 is amended (pool both draws or state the power)."
+    },
+    {
+      "date": "2026-09-18",
+      "by": "ITEM-26-POOLED (ledger v114 observed cell and the fifth chip; programme section ITEM-26-POOLED, 3dd0900)",
+      "text": "'ORDERED-JUDGED available for grok' now rests on the pooled established labels of both draws (9,123 shared matches, 810 established edges each): pooled delta-deviance 6.51 >= 3.84, b1 +2.44 [+0.23, +7.99] question-clustered, IDENTIFIED at the registered bar. The 46 pooled events are 29 DISTINCT edges (17 wrong in both draws, phi 0.735): under a null preserving that correlation the 3.84 bar has size 0.14 and 6.51 sits at the null's 0.066 quantile, so b1 is NOT identified at a correlation-honest 0.05 (p ~ 0.07); one-row-per-edge refits 3.34 / 3.25. Power 0.62 on one draw, at most ~0.8 pooled. No grok cell falls to BANDED-JUDGED (falsifier < 2.5 silent); LOAO UNDETERMINED per draw (nominal 1.03-1.12)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "CORRECTIONS_2026-09-23 (registrar)",
+      "text": "[CORRECTED 2026-09-23 by the registrar: script.sha16 8396be25d17ef4da is the sha of tools/analysis/grok_calib.py at 1e3b1ea, the Block 2 dry-run commit, and is an IDENTITY, not the run-time pin. The run-time pin was read from the cache at zero calls: sqlite3 \"file:experiment_results/x12_crossdomain/grok_calib.db?mode=ro&immutable=1\" \"select key, value from meta\" returns script_sha256_16 = e168b41c3e7ca4b8 and no script_sha256_16_relaunch, i.e. the file did not change between first launch and the last resume. e168b41c3e7ca4b8 is the LF rendering of the blob at commit 7076615 (2026-09-16 02:31; its CRLF rendering is 6556066d3169e8b1, and the LF shas at 1e3b1ea / 13f2142 / 706b381 are 8396be25d17ef4da / 7a1466c55f550004 / ebc7979c58efa56b, none of which match in either rendering). The script of record for the 18,284 calls of GROK-CALIB is therefore tools/analysis/grok_calib.py at 7076615, sha16 e168b41c3e7ca4b8 (LF); the rendering is named because it is not uniform across this programme — the same idiom recorded a CRLF sha for AGENT-CORPUS-ADMISSION and PLACEMENT-CEILING.]"
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (adversarial review of systematic_budget, C4 (b), relayed by the coordinator; zero calls)",
+      "text": "CONSUMER OF THE A3 CORRECTION (systematic_budget.py's criterion-(1) line; the engine-coder's C1-C3 fix): the side file of record experiment_results/x12_crossdomain/grok_calib_systematic_budget.txt (tracked) still prints, at its line 32, '(1) LOAO calibration, realised at or below nominal: PASS in aggregate (2 wrong vs 1.11 nominal)'. ANY re-run of systematic_budget.py on this cache after the fix changes that line; the file as committed is the reading of record until a registered re-run replaces it, and the aggregate PASS is not to be quoted without SYSTEMATIC-BUDGET's own correction beside it (criterion (1) 'PASS in aggregate' is carried by the edges the certificate never calls; UNDETERMINED at the operating point)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar (insertion only, zero calls; the M2 run verified against its scratch outputs)",
+      "text": "experiment_results/x12_crossdomain/grok_calib_systematic_budget.txt still prints 'PASS in aggregate' at L32 and is NOT regenerated: it stays as written and bracketed (the c052e79 A3-consumer note stands), 'PASS in aggregate' read as refuted. No corrected companion is committed, because no verified corrected output exists for it; one requires the same one-hunk protocol as the main file's M2 run (queue item SB-SIDEFILES-REGEN). Programme L13748-L13782."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a calibrated certificate (UNDETERMINED at the operating point by the power rule)",
+    "an identification that survives a re-draw of the same judge on its own (JUDGE-WIRING-BOARD 2.26)",
+    "an identification at a correlation-honest 0.05 on the pooled draws (ITEM-26-POOLED p ~ 0.07)"
+  ],
+  "ledger": {
+    "row_id": "GROK-CALIB",
+    "version": "v114 (row added v104 at 9049b12; bracketed v108 by JUDGE-WIRING-BOARD, v114 by ITEM-26-POOLED with the fifth chip); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "SYSTEMATIC-BUDGET",
+    "SYSTEMATIC-SIGNAL",
+    "ARENA-V2",
+    "RECIPE-GROK",
+    "JUDGE-TRANSFER",
+    "UNFILTERED-ADOPT",
+    "CANARY-BASELINE"
+  ],
+  "supersedes": "JUDGE-TRANSFER's cold UNDETERMINED ratio (superseded by a fitted board of the judge's own)",
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md (lines as of 5dc8a06) L3603-L3611 (by-reference registration eaf1dbf) and docs/design/FRAMEWORK.md L382 item 26: criteria, prediction, call count; docs/plan_2026-09-15.md L3 / L44 / L105 (the go; D6)",
+    "docs/judge_v2_program.md (lines as of 5dc8a06) L3913-L3945 (outcome section 09d71f5): the run, descriptives, the fit, LOAO, the headline check, the reading and consequence",
+    "docs/judge_v2_program.md (lines as of 5dc8a06) L4261-L4269 (JUDGE-WIRING-BOARD reading (c)) and the ITEM-26-POOLED outcome section: the two brackets",
+    "experiment_results/x12_crossdomain/grok_calib_outcome.txt and grok_calib_systematic_budget.txt (09d71f5)",
+    "docs/test_ledger.html row GROK-CALIB (v104 9049b12; bracketed v108 b8be7e4 and v114): chips verbatim, observed-cell brackets, evidence (grok_calib.py, outcome, budget file, grok_calib.db gitignored, 09d71f5)",
+    "script sha16 = sha256 of tools/analysis/grok_calib.py at 1e3b1ea (the Block 2 dry-run commit before the run), first 16 hex (identity, computed by the registrar 2026-09-22; the run commit for the script is not named in the programme)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' lines (grep -n them regardless of line drift); line numbers are as of programme HEAD 5dc8a06",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Paid run (18,284 calls). The 9,142-match schedule was re-judged with the judge actually shipped (grok-4-1-fast) under the final recipe, both answer orders. Its verdicts were compared match by match with the earlier Mistral verdicts.",
+    "why": "The shipped judge needs its own calibration evidence, not one borrowed from a different judge, before its confident 'A beats B' edges can be published.",
+    "information": "If its error pattern can be estimated, ordered edges can be published for this judge. If not, it stays in a fallback mode. Result: done. The prediction held and the error pattern closely matched Mistral's. Calibration remains undetermined at the operating point. Later corrections: a second run of the same judge did not reproduce the estimate. Pooling both runs passes the registered bar, but not a stricter check that accounts for repeated questions (p about 0.07). Note: older question pool, ruled 'history, not evidence'.",
+    "written": "2026-10-07"
+  }
+}

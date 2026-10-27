@@ -1,0 +1,69 @@
+== g10 2026-10-01T08:19:39+02:00 main 5210a9ec, g10_compare blob 6ee50a6fa94583b5aecabb9f47a94da9dd40e267; cwd pinned worktree; tasklist java: 0
+Traceback (most recent call last):
+  File "Z:\FAC\TUBerlin\THESIS\TaxoArena\tools\analysis\g10_compare.py", line 539, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "Z:\FAC\TUBerlin\THESIS\TaxoArena\tools\analysis\g10_compare.py", line 535, in main
+    return 0 if g10(pairs, a.snapshot_db, a.pointer) == "HELD" else 1
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "Z:\FAC\TUBerlin\THESIS\TaxoArena\tools\analysis\g10_compare.py", line 247, in g10
+    for line in precondition(pairs):
+                ^^^^^^^^^^^^^^^^^^^
+  File "Z:\FAC\TUBerlin\THESIS\TaxoArena\tools\analysis\g10_compare.py", line 232, in precondition
+    cb = json.load(open(os.path.join(rb, "diagnostics", "run_manifest.json"), encoding="utf-8")).get("commit")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/z/FAC/TUBerlin/THESIS/TaxoArena/experiment_results/archv2/rp12/B0p/bbh/seed_42\\diagnostics\\run_manifest.json'
+rc=1
+
+== g10 rerun 2026-10-01T08:19:53+02:00 (first attempt: /z/ paths unreadable by Windows python, FileNotFoundError, no comparison made); Z:/ paths
+[G10] D-8 precondition B0/bbh vs B0p/bbh: one commit 6d04e840f1a23af438e48bbae7699ee9ce4f5971; the TOMLs differ in outputDir only
+[G10] D-8 precondition B0/gpqa vs B0p/gpqa: one commit 6d04e840f1a23af438e48bbae7699ee9ce4f5971; the TOMLs differ in outputDir only
+[G10] D-8 precondition B0/ifeval vs B0p/ifeval: one commit 6d04e840f1a23af438e48bbae7699ee9ce4f5971; the TOMLs differ in outputDir only
+[G10] D-8 precondition B0/math vs B0p/math: one commit 6d04e840f1a23af438e48bbae7699ee9ce4f5971; the TOMLs differ in outputDir only
+[G10] D-8 precondition B0/mmlu_pro_lb vs B0p/mmlu_pro_lb: one commit 6d04e840f1a23af438e48bbae7699ee9ce4f5971; the TOMLs differ in outputDir only
+[G10] D-8 precondition B0/musr vs B0p/musr: one commit 6d04e840f1a23af438e48bbae7699ee9ce4f5971; the TOMLs differ in outputDir only
+[G10] D-8 precondition B0/graft_flatleaf vs B0p/graft_flatleaf: one commit 6d04e840f1a23af438e48bbae7699ee9ce4f5971; the TOMLs differ in outputDir only
+[G10] B0/bbh vs B0p/bbh: DIFFERS on A2 gate_ids.json; A3 validation/MAIN_taxonomy_quality.csv; A4 snapshot row
+[G10] stamp B0/bbh: S1-S4 hold
+[G10] stamp B0p/bbh: S1-S3 hold
+[G10] starved-pass accept count (B0/bbh, descriptive): NOT RECORDED by the engine
+[G10] B0/gpqa vs B0p/gpqa: DIFFERS on A2 gate_ids.json; A3 validation/MAIN_taxonomy_quality.csv; A4 snapshot row
+[G10] stamp B0/gpqa: S1-S4 hold
+[G10] stamp B0p/gpqa: S1-S3 hold
+[G10] starved-pass accept count (B0/gpqa, descriptive): NOT RECORDED by the engine
+[G10] B0/ifeval vs B0p/ifeval: DIFFERS on A2 gate_ids.json; A3 validation/MAIN_taxonomy_quality.csv; A4 snapshot row
+[G10] stamp B0/ifeval: S1-S4 hold
+[G10] stamp B0p/ifeval: S1-S3 hold
+[G10] starved-pass accept count (B0/ifeval, descriptive): NOT RECORDED by the engine
+[G10] B0/math vs B0p/math: DIFFERS on A2 gate_ids.json; A3 validation/MAIN_taxonomy_quality.csv; A4 snapshot row
+[G10] stamp B0/math: S1-S4 hold
+[G10] stamp B0p/math: S1-S3 hold
+[G10] starved-pass accept count (B0/math, descriptive): NOT RECORDED by the engine
+[G10] B0/mmlu_pro_lb vs B0p/mmlu_pro_lb: DIFFERS on A2 gate_ids.json; A3 validation/MAIN_taxonomy_quality.csv; A4 snapshot row
+[G10] stamp B0/mmlu_pro_lb: S1-S4 hold
+[G10] stamp B0p/mmlu_pro_lb: S1-S3 hold
+[G10] starved-pass accept count (B0/mmlu_pro_lb, descriptive): NOT RECORDED by the engine
+[G10] B0/musr vs B0p/musr: DIFFERS on A2 gate_ids.json; A3 validation/MAIN_taxonomy_quality.csv; A4 snapshot row
+[G10] stamp B0/musr: S1-S4 hold
+[G10] stamp B0p/musr: S1-S3 hold
+[G10] starved-pass accept count (B0/musr, descriptive): NOT RECORDED by the engine
+Traceback (most recent call last):
+  File "Z:\FAC\TUBerlin\THESIS\TaxoArena\tools\analysis\g10_compare.py", line 539, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "Z:\FAC\TUBerlin\THESIS\TaxoArena\tools\analysis\g10_compare.py", line 535, in main
+    return 0 if g10(pairs, a.snapshot_db, a.pointer) == "HELD" else 1
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "Z:\FAC\TUBerlin\THESIS\TaxoArena\tools\analysis\g10_compare.py", line 251, in g10
+    diffs = compare(ra, rb, db)
+            ^^^^^^^^^^^^^^^^^^^
+  File "Z:\FAC\TUBerlin\THESIS\TaxoArena\tools\analysis\g10_compare.py", line 142, in compare
+    a, b = artefacts(run_a, db), artefacts(run_b, db)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "Z:\FAC\TUBerlin\THESIS\TaxoArena\tools\analysis\g10_compare.py", line 127, in artefacts
+    lines = [l for l in open(os.path.join(run, "dag_snapshots.jsonl"), encoding="utf-8").read().splitlines() if l.strip()]
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'Z:/FAC/TUBerlin/THESIS/TaxoArena/experiment_results/archv2/rp12/B0/graft_flatleaf/seed_42\\dag_snapshots.jsonl'
+rc=1
+
+== root cause (operator, 2026-10-01T08:20:10+02:00): the graft run dir has no dag_snapshots.jsonl (ls main and worktree B0/graft_flatleaf/seed_42: diagnostics/ headless_run.log judging/ performance_report.json validation/). g10_compare.artefacts L127 opens it unconditionally -> FileNotFoundError on the 7th pair; no 'G10:' verdict line printed. STOP per brief; no other readout run.

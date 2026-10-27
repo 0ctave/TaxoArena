@@ -1,0 +1,75 @@
+START 2026-10-01 08:29:35
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.10/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+Configuration on demand is an incubating feature.
+Calculating task graph as no cached configuration is available for tasks: cleanTest test --tests taxonomy.EvalMetricDeterminismTest
+> Task :checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :cleanTest UP-TO-DATE
+> Task :processResources
+> Task :processTestResources
+
+> Task :compileKotlin
+w: file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/emd3-base/src/main/kotlin/taxonomy/dataset/MMLUDatasetFetcher.kt:892:36 Redundant creation of Json format. Creating instances for each usage can be slow.
+w: file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/emd3-base/src/main/kotlin/taxonomy/runner/HeadlessBenchmarkRunner.kt:2589:48 'fun exec(p0: String!): Process!' is deprecated. Deprecated in Java.
+w: file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/emd3-base/src/main/kotlin/taxonomy/service/TaxonomySnapshotManager.kt:810:40 Redundant creation of Json format. Creating instances for each usage can be slow.
+
+> Task :compileJava NO-SOURCE
+> Task :classes
+> Task :jar
+
+> Task :compileTestKotlin
+w: file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/emd3-base/src/test/kotlin/taxonomy/dataset/V2SplitInertnessTest.kt:114:31 This declaration needs opt-in. Its usage should be marked with '@kotlinx.serialization.ExperimentalSerializationApi' or '@OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)'
+w: file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/emd3-base/src/test/kotlin/taxonomy/dataset/V2SplitInertnessTest.kt:114:54 This declaration needs opt-in. Its usage should be marked with '@kotlinx.serialization.ExperimentalSerializationApi' or '@OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)'
+w: file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/emd3-base/src/test/kotlin/taxonomy/runner/JudgeRecipeConfigTest.kt:114:20 Redundant creation of Json format. Creating instances for each usage can be slow.
+w: file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/emd3-base/src/test/kotlin/taxonomy/service/AzureInferenceJudgeClientTest.kt:91:9 Name contains character(s) that can cause problems on Windows: *
+
+> Task :compileTestJava NO-SOURCE
+> Task :testClasses
+
+> Task :processTestAot
+08:30:17.426 [main] INFO org.springframework.test.context.aot.TestClassScanner -- Scanning for Spring test classes in all packages in classpath roots [Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\emd3-base\build\classes\kotlin\test, Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\emd3-base\build\resources\test]
+
+> Task :compileAotTestKotlin NO-SOURCE
+> Task :processAotTestResources
+> Task :compileAotTestJava
+> Task :aotTestClasses
+
+> Task :test FAILED
+
+EvalMetricDeterminismTest > dendrogramPurityPermutationInvariant() FAILED
+    org.opentest4j.AssertionFailedError at EvalMetricDeterminismTest.kt:164
+
+EvalMetricDeterminismTest > tdcExactBranchPermutationInvariant() FAILED
+    org.opentest4j.AssertionFailedError at EvalMetricDeterminismTest.kt:261
+
+EvalMetricDeterminismTest > goldenValuesOnUnpermutedFixture() FAILED
+    org.opentest4j.AssertionFailedError at EvalMetricDeterminismTest.kt:202
+
+EvalMetricDeterminismTest > tripletAccuracyPermutationInvariant() FAILED
+    org.opentest4j.AssertionFailedError at EvalMetricDeterminismTest.kt:164
+
+EvalMetricDeterminismTest > tieRuleKeepsTheSameRepresentativeUnderBothInputOrders() FAILED
+    org.opentest4j.AssertionFailedError at EvalMetricDeterminismTest.kt:234
+
+EvalMetricDeterminismTest > tdcSampledPermutationInvariant() FAILED
+    org.opentest4j.AssertionFailedError at EvalMetricDeterminismTest.kt:164
+
+EvalMetricDeterminismTest > sphericalSilhouettePermutationInvariant() FAILED
+    org.opentest4j.AssertionFailedError at EvalMetricDeterminismTest.kt:164
+
+8 tests completed, 7 failed
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':test'.
+> There were failing tests. See the report at: file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/emd3-base/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to get full insights.
+
+BUILD FAILED in 48s
+10 actionable tasks: 9 executed, 1 up-to-date
+Configuration cache entry stored.
+EXIT 1
+END 2026-10-01 08:30:24

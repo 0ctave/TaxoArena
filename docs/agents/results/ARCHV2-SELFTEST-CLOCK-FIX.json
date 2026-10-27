@@ -1,0 +1,118 @@
+{
+  "id": "ARCHV2-SELFTEST-CLOCK-FIX",
+  "title": "ARCHV2-SELFTEST-CLOCK-FIX: tools/analysis/archv2_pilot/selftest.py injects the fixture clock (clock=lambda: TODAY at L886) so that all 282 checks run on any date (engineering; zero calls; selftest-only)",
+  "question": "Does passing clock=lambda: TODAY at selftest.py L886 make the archv2 selftest run all 282 checks on any date, with no runtime pin and no package file touched?",
+  "kind": "engineering",
+  "state": "done",
+  "registration": {
+    "commit": "no registration of its own: DRAFTED queue item (finding M2 of JV2-RATE-PROBE's post-run review 6ea4f02) whose gate was its own small review",
+    "program_lines": "docs/judge_v2_program.md L20547 (section \"## JV2-RATE-PROBE (2026-09-26, 398 calls) — VALID (post-run review 6ea4f02): C0 HELD, V5 HELD; N* = 12 ...\", item 9); re-grepped at 83ad26a",
+    "program_lines_as_of": "re-grepped at 83ad26a",
+    "date": "2026-09-26 (queued)"
+  },
+  "script": {
+    "path": "tools/analysis/archv2_pilot/selftest.py (merged on main at 83ad26a by path from 43c047d)",
+    "sha16": "blob:34743f1ed2dd1b30dd2e097a4cb7660f0c1939c2 / sha256-lf16:bcaf589f8c9a755e / sha256-crlf16:02d1cdd8995f43e7 (working tree CRLF); previously blob:82ee9cde74c196970b16d12a57d685bc21ef3e1d / sha256-lf16:8e23ad5f15833b23; package lf16 (common.PACKAGE_FILES, 8 files) unchanged 00bce6429d6dea64 (selftest.py not a package file)",
+    "commit": "83ad26a (merge, parent c0e46f9); build 43c047d (branch archv2-clock-fix)"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_archv2_selftest_clock_fix.md",
+    "commit": "c0e46f9"
+  },
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "docs/judge_v2_program.md L20846-L20862 (section \"## Registrar's record 2026-09-26 (insertion only; zero calls; nothing run) — ARCHV2-SELFTEST-CLOCK-FIX READY (docs/reviews/READY_archv2_selftest_clock_fix.md, c0e46f9: READY, MERGEABLE by path) and MERGED at 83ad26a ...\"; _as_of the commit that writes it, parent 83ad26a, re-grepped) (the merge record, items 1-6; engineering, no outcome file under experiment_results)",
+    "outcome_commit": "83ad26a (the merge, by the orchestrator); the record: the commit that writes it (parent 83ad26a)",
+    "calls": 0,
+    "cce": 0,
+    "pool": "n/a (no DB opened)",
+    "date": "2026-09-26",
+    "post_merge_check": "RELAYED (orchestrator, on main): python tools/analysis/archv2_pilot/selftest.py rc 0 (procedure step 5 requires '282 checks, 0 failed'); not executed by the registrar"
+  },
+  "review": {
+    "file": "docs/reviews/READY_archv2_selftest_clock_fix.md",
+    "commit": "c0e46f9",
+    "verdict": "READY. MERGEABLE, by path, tools/analysis/archv2_pilot/selftest.py only (D1 MEDIUM follow-up, not blocking)"
+  },
+  "criteria": [
+    {
+      "id": "C1-C9",
+      "text": "the builder's claims C1-C9 (one-line diff at L886; pins; L886 the only real-clock site reached; 282/0 on shifted dates; the mutant reproduces 148 + DAY ROLLOVER; not a package file; no runtime pin; 282/0 under python and -O, judge_v2 174, pool rc_wire 16/0, i5 4/0; the worktree queue.json duplicate excluded)",
+      "result": "HELD",
+      "value": "ALL CONFIRMED by the reviewer (READY per-claim table)",
+      "denominator": "9 claims"
+    },
+    {
+      "id": "fake-clock",
+      "text": "0 day-valued real-clock reads at the tip under a harness faking every wall-clock entry point",
+      "result": "HELD",
+      "value": "0 day-valued reads; 282/0 at 2026-12-31, 2027-01-01 (python and -O), 2028-02-29 (-O) and the real date 2026-09-26",
+      "denominator": "every run"
+    },
+    {
+      "id": "post-merge",
+      "text": "selftest on main after the merge exits rc 0",
+      "result": "HELD",
+      "value": "rc 0 (relayed)",
+      "denominator": "1 run"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "none registered (engineering); the READY's discriminator: 282 / 0 on a date other than 2026-09-25",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "diff": "1 file, +3 / -1 (L886 clock=lambda: TODAY and a 2-line comment)",
+    "blobs": "82ee9cde -> 34743f1e (sha256-lf16 8e23ad5f15833b23 -> bcaf589f8c9a755e; sha256-crlf16 02d1cdd8995f43e7 after)",
+    "package_lf16": "00bce6429d6dea64 unchanged (recomputed by the registrar at 83ad26a)",
+    "mutants": "M-revert KILLED (148 + DAY ROLLOVER at 2027-01-01); M-append KILLED; MP-clock KILLED; M-launch-r1, M-launch-pool, M-guard SURVIVE at 282/0 (D1)"
+  },
+  "findings": [
+    "D1 MEDIUM (follow-up, not blocking): the selftest cannot itself detect real-clock reads (3 mutants survive); queue ARCHV2-SELFTEST-CLOCK-TRAP (drafted): a counting trap on ACC.local_day and the day-format strftime plus one check; until it merges, any READY needing date independence runs its own fake-clock pass at a date other than 2026-09-25 and reports the day-valued read count",
+    "D2 LOW: the builder's proof faked two entry points; the review's harness covers all (disclosure only)",
+    "D3 LOW (process): the worktree queue.json duplication (a3df39a's brackets doubled), discarded with the worktree; never git add -A there"
+  ],
+  "sentence_of_record": "ARCHV2-SELFTEST-CLOCK-FIX (2026-09-26, zero calls): READY c0e46f9 and MERGED at 83ad26a by path (tools/analysis/archv2_pilot/selftest.py blob 82ee9cde -> 34743f1e / sha256-lf16:bcaf589f8c9a755e; package lf16 unchanged 00bce6429d6dea64): clock=lambda: TODAY at L886; 282 / 0 on any date (0 day-valued reads under a full fake-clock harness); post-merge rc 0 on main (relayed); M2 of JV2-RATE-PROBE DISCHARGED. [D1 MEDIUM: the selftest cannot itself detect real-clock reads; until ARCHV2-SELFTEST-CLOCK-TRAP merges, a READY needing date independence runs its own fake-clock pass.]",
+  "chips": [],
+  "chips_note": "no row of its own in docs/test_ledger.html (test hygiene, as NOISRESERVED-TEST-ALLOWLIST); recorded at v299 as a bracket in row JV2-RATE-PROBE (whose finding M2 it discharges) and in the version note",
+  "brackets": [
+    {
+      "date": "2026-09-26",
+      "by": "registrar (zero calls; insertion only)",
+      "text": "READY c0e46f9, MERGED at 83ad26a; M2 of JV2-RATE-PROBE DISCHARGED; D1 -> ARCHV2-SELFTEST-CLOCK-TRAP (drafted); citation rule blob:34743f1e / sha256-lf16:bcaf589f8c9a755e. docs/judge_v2_program.md L20846-L20862 (section \"## Registrar's record 2026-09-26 (insertion only; zero calls; nothing run) — ARCHV2-SELFTEST-CLOCK-FIX READY (docs/reviews/READY_archv2_selftest_clock_fix.md, c0e46f9: READY, MERGEABLE by path) and MERGED at 83ad26a ...\"; _as_of the commit that writes it, parent 83ad26a, re-grepped)"
+    }
+  ],
+  "does_not_show": [
+    "the post-merge selftest as executed by the registrar (relayed; no log read)",
+    "that the selftest detects a future real-clock regression (D1: 3 mutants survive)",
+    "anything about the pinned judge_v2 / archv2 runtime blobs (untouched)"
+  ],
+  "ledger": {
+    "row_id": "none of its own (a bracket in row JV2-RATE-PROBE)",
+    "version": "v299 (2026-09-26: merged; M2 discharged; no chip changed)"
+  },
+  "depends_on": [
+    "JV2-RATE-PROBE (finding M2)"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "discharges M2 of JV2-RATE-PROBE; closes no line of CONTEXT.md section 5; D1 stays open as ARCHV2-SELFTEST-CLOCK-TRAP"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L20846-L20862 (section \"## Registrar's record 2026-09-26 (insertion only; zero calls; nothing run) — ARCHV2-SELFTEST-CLOCK-FIX READY (docs/reviews/READY_archv2_selftest_clock_fix.md, c0e46f9: READY, MERGEABLE by path) and MERGED at 83ad26a ...\"; _as_of the commit that writes it, parent 83ad26a, re-grepped)",
+    "docs/reviews/READY_archv2_selftest_clock_fix.md at c0e46f9 (read in full)",
+    "git at 83ad26a: log -1 --format='%H %P' 83ad26a; diff --name-only c0e46f9 83ad26a; rev-parse <c>:tools/analysis/archv2_pilot/selftest.py for c0e46f9, 83ad26a, 43c047d; sha256 of the LF blob and of the working file; package lf16 recomputed",
+    "the orchestrator's relay of 2026-09-26 (post-merge rc 0)"
+  ],
+  "last_update": "2026-09-26 (registrar: READY c0e46f9 and merge 83ad26a recorded; state done; ledger v299)",
+  "plain_description": {
+    "sq": "Engineering/infrastructure",
+    "what": "Changes the self-test of the version-2 architecture pilot tool so it uses a fixed test date instead of the real calendar date. Then checks that all 282 checks pass on any day. No calls.",
+    "why": "Some self-test checks depended on today's date, so the suite could fail or skip checks on the wrong day. Other work needed date-independent tests.",
+    "information": "Passing means the self-test is reproducible whatever the date. Result: done and merged. 282 checks pass, 0 fail, on any date. One limit stays open: the self-test cannot yet catch a future slip back to the real clock. A follow-up trap test was drafted for that.",
+    "written": "2026-10-07"
+  }
+}

@@ -1,0 +1,69 @@
+# TOPIC-PARTITION-20NG arm ng_af_bareq512_s42 (docs/judge_v2_program.md, "Registered 2026-09-22 (before any code or call) -
+# TOPIC-PARTITION-20NG", L10030-L10390, registration commit 6aa2a0d; plan Amendment 8). ZERO judge calls;
+# label-free (enableLabeling false, judgeInduction false, runBenchmark false); embeddings local (Ollama
+# qwen3-embedding). The tree this builds is STRUCTURAL EVIDENCE ONLY; nothing is promoted or judged.
+#
+# T1b = the FRAMEWORK per-corpus pair, anchor-free (registration I3; FW L51-53; the registered D2 bar-equalised pair
+# of experiment_configs/anchorfree/af_bareq512_s42.toml, ONE registered knob-pair, not a sweep): this file =
+# ng_af_s42.toml (T1) + embeddingSliceDim = 512 + proposalSeparationBar = 0.0145 + its own outputDir. Runs AFTER
+# T1's null regardless of T1's result. Its site null runs at -DsliceDim=512 and at its own bar (-DsepBar=0.0145);
+# its certified count is compared with ANCHOR-FREE-CERT arm 4's ONLY if the two nulls agree in bar (the readout
+# prints what arm 4's null used). "512 at 0.025" is never an arm (ANCHOR-FREE-CERT arm 1: 4 leaves).
+#
+# The corpus's own split (testRatio 0.30, seed 42, per label, MMLUDatasetFetcher.splitTrainTest) is the held-out
+# side; reservedPoolFile and pool are ABSENT by registration (the pool id becomes known at build time and is
+# exported with `pool_guard.py --export-snapshot`, then verified with `pool_guard.py --pool <id> --db
+# <corpus db> --id-file <export>`). models = [] (read only inside the benchmark block, runner L708 ff.; no
+# eval row exists for this corpus). No `seeds = [...]`. Own ratings db:
+# -Dranking.db.path=ratings_topic_partition_ng_af_bareq512_s42.db at the repo root (set by tools/chains/topic_partition.sh).
+# Verified at build time from the manifest: anchor_free true, proposal_accept_multiplier 1.0 (key ABSENT),
+# embedding_model qwen3-embedding:latest, and the "[SLICE] embedding slice width" line.
+#
+datasetType   = "TWENTY_NEWSGROUPS"
+corpusDbPath  = "twenty_newsgroups_cache_v1.db"
+
+models        = []
+
+category      = ""
+queryLimit    = 0
+outputDir     = "experiment_results/topic_partition/ng_af_bareq512_s42"
+testRatio     = 0.3
+seed          = 42
+
+# Body = o0_s42.toml (seed 42 = the frozen build's split and construction seed). The ONE
+# instrument key of this registration; o0 differs from this file only by its absence.
+anchorFree = true
+
+embeddingSliceDim = 512
+
+runPipeline        = true
+runBenchmark       = false
+runTrickle         = true
+runBaselines       = false
+enableFinalMetrics = false
+enableLabeling     = false
+judgeInduction     = false
+
+dagMode = "DAG_MAX"
+
+maxDepth              = 8
+minClusterSize        = 55
+proposalSeparationBar = 0.0145
+tau                   = 1e-6
+acceptanceZ           = 2.0
+enableRefitGate       = false
+
+membershipFloor       = 0.25
+routingBeamGamma      = 0.2
+descentMargin         = 0.12
+
+effectiveSupportFloor = 2.0
+defaultKappaPrior     = 10.0
+
+numIterations         = 50
+maxLeafAssignments    = 5
+
+fusionSimilarityThreshold = 0.90
+enableGtWarmStart         = false
+
+enableProfiling           = true

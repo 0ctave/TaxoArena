@@ -1,0 +1,20 @@
+=== RUBRIC-STRATA (EXPLORATORY, post-hoc, zero calls): where can a data card act at all? ===
+  Cached RK-1b verdicts stratified by whether the grok reference was CORRECT on that question.
+
+  Mistral judge
+    reference CORRECT  n=817 | no card 0.930 | + card 0.950 | +0.020 | 10:26 | McNemar p=0.011
+    reference WRONG    n=127 | no card 0.394 | + card 0.394 | +0.000 | 6:6 | McNemar p=1.000
+
+  grok judge
+    reference CORRECT  n=817 | no card 0.936 | + card 0.951 | +0.015 | 7:19 | McNemar p=0.029
+    reference WRONG    n=127 | no card 0.354 | + card 0.354 | +0.000 | 6:6 | McNemar p=1.000
+
+  READING: the card acts ONLY where the reference is already right. Where the reference fails - the
+  stratum where the judge sits at 0.35-0.39 and most needs help - it contributes exactly nothing, on
+  both judge families, with identical 6:6 discordance. A rubric is instructions for reasoning, and
+  FORMAT-REF showed the judge's own reasoning is largely switched off once a reference is present.
+  Where the reference is wrong the judge transcribes something wrong, and instructions have nothing
+  to act on. A rubric cannot substitute for a reference; it can only improve the use of a working one.
+
+  CAVEAT: post-hoc, not registered, and UNDERPOWERED on the stratum that carries the claim - n=127 at
+  a ~0.09 discordance rate gives an MDE of about 5.4pp. REF-GATED-RUBRIC is the confirmation.

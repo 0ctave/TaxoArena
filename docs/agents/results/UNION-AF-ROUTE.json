@@ -1,0 +1,263 @@
+{
+  "id": "UNION-AF-ROUTE",
+  "title": "UNION-AF-ROUTE (RP13, re-scoped per the author's D4): a FRESH anchor-free federated TRAIN-only tree on draw 5a3e756; do its cells route the union roster above the best single model (U1), above per-source k-means (U2 = F-TAX L-1), and equivalently to declared labels within 1pp (U3)? (zero calls; one build; REGISTERED)",
+  "question": "On the content-closed v2 union split (draw 5a3e756), do the cells of a FRESH anchor-free, federated, TRAIN-only tree route the union roster above the best single model, above per-source k-means at matched counts (F-TAX L-1), and equivalently to declared labels within 1pp?",
+  "kind": "build",
+  "state": "done",
+  "registration": {
+    "commit": "the commit that writes this record (parent ce0d0f17)",
+    "program_lines": "docs/judge_v2_program.md L22627-L22653",
+    "program_lines_as_of": "the commit that writes them, parent ce0d0f17, re-grepped",
+    "date": "2026-10-01",
+    "heading": "## Registered 2026-10-01 (before any code or call) — UNION-AF-ROUTE: on the content-closed v2 union split (draw 5a3e756), ...",
+    "provenance": "docs/agents/plans/2026-10-02_next_registrations.md (ce0d0f17), registered as drafted on the orchestrator's brief of 2026-10-01"
+  },
+  "script": {
+    "path": "v2 RP03/G14 reader + AF-cell arm and per-source K comparator (TO BE BUILT, worktree union-af-route); AF-U TOMLs experiment_configs/union_af_route/ (TO BE WRITTEN)",
+    "sha16": null,
+    "commit": null
+  },
+  "ready": {
+    "file": "docs/reviews/READY_union_af_route.md",
+    "commit": "502191e7",
+    "verdict": "build READY under P1-P6 (P2 the author's mmlu_pro WAL checkpoint blocks the launch); reader READY for dry-run"
+  },
+  "go": "n/a (0 calls, 0 cce); the author's D4 \"Disclose + fresh build for RP13\" (plan Amendment 31)",
+  "run": {
+    "outcome_file": "experiment_results/archv2/union_af_route/outcome.txt (232 lines, sha256 e50a8e0f...; write-once) from inputs/ (manifest sha256-lf 53021e26...)",
+    "outcome_commit": "build c23fe5cd (rp13-afu-run2 at 1075b506); readout union_af_route.py bf3f17db at main c6ef6370; AF-U/ and inputs/ committed in this record's commit [CORRECTED 2026-10-03: AF-U/ and inputs/ untracked in d4639c27 under the author's rule; backed up to E:]",
+    "calls": 0,
+    "cce": 0,
+    "pool": "pv2_1575de61bb20e977 (B0-2 check rc 0)",
+    "date": "2026-10-03"
+  },
+  "review": {
+    "file": "docs/reviews/POSTBUILD_union_af_route.md; docs/reviews/POSTRUN_union_af_route.md",
+    "commit": "589c04ae",
+    "verdict": "VALID (build and readout); Q1, Q2, D-4, D-PR-1, D-PB-1"
+  },
+  "criteria": [
+    {
+      "id": "IDENTITY",
+      "text": "precondition: the declared arm reproduces V2-DECLARED-CELLS C1 +2.67pp [+1.46, +3.89] to the printed digits, else refuse",
+      "result": "HELD",
+      "value": "C1 +2.67pp [+1.46, +3.89] reproduced",
+      "denominator": "5,907 items / 5,404 components (two-stage)"
+    },
+    {
+      "id": "U1",
+      "text": "INTERVAL decides: G_AF = acc(per-cell policy on AF-U cells) - acc(best single model); HELD iff lower > 0; FAILED iff upper <= 0; else UNDETERMINED. SCOREABLE",
+      "result": "HELD",
+      "value": "G_AF +1.52pp, two-stage 95% [+0.14, +2.91] (thin; percentile [-0.03, +2.73]); SE 0.00707, MDE80 1.98pp",
+      "denominator": "5,907 items / 5,404 components (two-stage)"
+    },
+    {
+      "id": "U2",
+      "text": "= F-TAX L-1 verbatim; INTERVAL AND POINT: D_K = G_AF - G_K (per-source spherical k-means at AF-U's per-source leaf counts, seeds 0-4); FIRES iff 95% interval wholly above 0 AND D_K > spread_K; reverse reported beside. DESCRIPTIVE-ONLY at its prediction; an observed FIRE counts (F-TAX bracket 2026-10-01)",
+      "result": "n/a",
+      "value": "L-1 NOT FIRED (by support): D_K -0.45pp [-1.31, +0.41], spread_K 0.58pp; D-4 asymmetry against AF",
+      "denominator": "5,907 items / 5,404 components (two-stage)"
+    },
+    {
+      "id": "U3a",
+      "text": "TOST delta 1.0pp (Holm over U3a/U3b; 95% then 90% intervals; INTERVAL decides): D_K inside ±1.0pp -> EQUIVALENT. SCOREABLE. delta the research-lead's; the author may revise it pre-data",
+      "result": "FAILED",
+      "value": "NOT EQUIVALENT (95% [-1.31, +0.41] leaves +/-1; TOST p 0.104; Holm stops)",
+      "denominator": "5,907 items / 5,404 components (two-stage)"
+    },
+    {
+      "id": "U3b",
+      "text": "TOST delta 1.0pp: M_AF = G_AF - G_declared inside ±1.0pp -> EQUIVALENT. SCOREABLE, thin",
+      "result": "FAILED",
+      "value": "NOT EQUIVALENT: M_AF -1.15pp [-2.19, -0.12], a measured shortfall vs declared labels (descriptive), never parity (TOST p 0.613)",
+      "denominator": "5,907 items / 5,404 components (two-stage)"
+    },
+    {
+      "id": "AK1",
+      "text": "ADDED PRE-DATA 2026-10-02. INTERVAL AND POINT (C-b1's form): D_AU = P_fl(AF-U) - P(U_0), U_s = spherical k-means on all TRAIN items in AF-U's 256-d slice at k = AF-U's total leaf count, TRAIN-majority naming, EVAL to the nearest of all centroids, seeds 0-4; HELD iff 95% interval wholly above 0 AND D_AU > spread_AU; REVERSED iff wholly below 0 AND D_AU < -spread_AU; else UNDETERMINED. DESCRIPTIVE-ONLY at its prediction",
+      "result": "UNDETERMINED",
+      "value": "mirrored: D_AU +0.0018 [-0.0084, +0.0122], spread_AU 0.0269 (registered rule, descriptive: +0.0197 [+0.0082, +0.0314], spread 0.0275)",
+      "denominator": "6,139 EVAL / 5,628 components; TRAIN 12,334"
+    },
+    {
+      "id": "AK2",
+      "text": "ADDED PRE-DATA 2026-10-02. As AK1 against U-source (C-b2's variant): within each source, k = AF-U's leaf count in that source, EVAL to the nearest of ALL centroids (no source oracle); D_AUs = P_fl(AF-U) - P(US_0) against spread_AUs. DESCRIPTIVE-ONLY at its prediction, thin",
+      "result": "UNDETERMINED",
+      "value": "mirrored: D_AUs -0.0021 [-0.0115, +0.0077], spread_AUs 0.0165",
+      "denominator": "6,139 EVAL / 5,628 components; TRAIN 12,334"
+    },
+    {
+      "id": "AK-IDENTITY",
+      "text": "precondition: the AK reader pointed at B0 (512-d, 133 leaves) reproduces G13-BREAKDOWN's D_U +0.0738, D_Us +0.0656, spread_U 0.0414, spread_US 0.0233 to the printed digits, else refuse",
+      "result": "HELD",
+      "value": "reproduced (dry-run on B0)",
+      "denominator": "6,139 EVAL / 5,628 components; TRAIN 12,334"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "U1-P",
+      "text": "G_AF +2.4pp [+1.2, +3.6]; HELD 0.85",
+      "result": "HELD",
+      "value": "+1.52 in [+1.2, +3.6]",
+      "denominator": ""
+    },
+    {
+      "id": "U2-P",
+      "text": "D_K +0.1pp [-0.8, +1.0]; spread_K 0.5pp [0.2, 1.0]; L-1 fires 0.10",
+      "result": "HELD",
+      "value": "D_K -0.45 in [-0.8, +1.0]; spread_K 0.58 in [0.2, 1.0]; L-1 did not fire (p 0.10)",
+      "denominator": ""
+    },
+    {
+      "id": "U3-P",
+      "text": "U3a EQUIVALENT 0.45; U3b EQUIVALENT 0.40, M_AF -0.2pp [-1.0, +0.6]",
+      "result": "FAILED",
+      "value": "M_AF -1.15 outside [-1.0, +0.6]; U3a, U3b NOT EQ (EQ 0.45 / 0.40)",
+      "denominator": ""
+    },
+    {
+      "id": "LEAVES",
+      "text": "AF-U 70-110 leaves in total",
+      "result": "FAILED",
+      "value": "123 outside [70, 110] (122 split leaves fail too)",
+      "denominator": ""
+    },
+    {
+      "id": "AK1-P",
+      "text": "D_AU -0.015 [-0.050, +0.020]; spread_AU 0.035 [0.015, 0.060]; P_fl(AF-U) 0.71 [0.64, 0.78]; P(U_0) 0.73 [0.69, 0.77]; HELD 0.10, REVERSED 0.25, UNDETERMINED 0.65 (registrar's prior, uncertain)",
+      "result": "HELD",
+      "value": "P_fl 0.7346, P(U_0) 0.7329, D_AU +0.0018, spread_AU 0.0269 in their intervals; AK1 UNDETERMINED",
+      "denominator": "union EVAL 6,139 items / 5,628 CK-CLOSE components (G13's P_fl denominator, MC-EXCLUDE); never joined with U1-U3's 5,907"
+    },
+    {
+      "id": "AK2-P",
+      "text": "D_AUs -0.020 [-0.055, +0.015]; spread_AUs 0.025 [0.010, 0.045]; P(US_0) 0.74 [0.70, 0.78]; HELD 0.10, REVERSED 0.35, UNDETERMINED 0.55; F-AK fires 0.70 (registrar's prior, uncertain)",
+      "result": "HELD",
+      "value": "P(US_0) 0.7368, D_AUs -0.0021, spread_AUs 0.0165 in their intervals; AK2 UNDETERMINED; F-AK FIRES (p 0.70)",
+      "denominator": "union EVAL 6,139 items / 5,628 CK-CLOSE components (G13's P_fl denominator, MC-EXCLUDE); never joined with U1-U3's 5,907"
+    }
+  ],
+  "falsifier": {
+    "text": "F-U1 fires iff U1 FAILED: the union router gain on declared cells (+2.67pp) and anchored tree cells (+2.62pp) does not transfer to label-free cells. An L-1 fire is F-TAX's F1 (lever): 'a lever AND N-1: recorded joined, no sentence' | F-AK (ADDED PRE-DATA 2026-10-02): fires iff the upper bound of AK2's 95% interval is <= the measured spread_AUs: the anchor-free tree is NOT better than unsupervised, source-aware k-means at matched k beyond its seed spread; 'F-AK FIRES (REVERSED)' if AK2 is also REVERSED, else 'F-AK FIRES (not better)'; cannot fire with AK2 HELD. Overturns any reading that the tree's discovered structure files better than unsupervised clustering; feeds no F-TAX leg",
+    "fired": true,
+    "fired_F-AK": false,
+    "outcome": "F-U1 NOT FIRED; F-AK FIRES (AK2 upper 0.0077 <= spread 0.0165) under the mirrored filing fixed pre-data (Q1: the registered rule would miss by 0.0002); F-TAX L-1 NOT FIRED by support"
+  },
+  "numbers_of_record": {
+    "arms": "best 0.6049, declared 0.6316, AF 0.6201, K0-K4 0.6271 / 0.6227 / 0.6213 / 0.6259 / 0.6262 (5,907 / 5,404)",
+    "U1": "G_AF +1.52pp, two-stage 95% [+0.14, +2.91]; percentile [-0.03, +2.73] (thin)",
+    "U2": "D_K -0.45pp [-1.31, +0.41]; spread_K 0.58pp; G_K +1.97pp",
+    "U3b": "M_AF -1.15pp [-2.19, -0.12] (measured shortfall vs declared labels; descriptive)",
+    "AK": "D_AU +0.0018 [-0.0084, +0.0122] (spread 0.0269); D_AUs -0.0021 [-0.0115, +0.0077] (spread 0.0165); registered-rule D_AUs +0.0057 [-0.0041, +0.0157] (spread 0.0155; misses by 0.0002)",
+    "build": "123 cells: ifeval one cell (best root sep 0.02111 < 0.025), gpqa 4, musr 3, math 10, bbh 36, mmlu_pro_lb 69 (graft 122)",
+    "DEFF": "U two-stage 1.595 / 2.867 / 2.761 (transported 1.392); AK 1.102 / 1.080 (transported 1.341 / 1.449)"
+  },
+  "sentence_of_record": "UNION-AF-ROUTE (RP13), content-closed v2 union split, 0 calls: a fresh anchor-free federated tree (AF-U; 123 cells, IFEVAL one cell under the author's one-cell amendment) routes the 18-model roster above the best single model, U1 HELD: G_AF +1.52pp, two-stage 95% [+0.14, +2.91] (thin; percentile [-0.03, +2.73]; 5,907 items / 5,404 components). It does not route equivalently to declared labels: U3b NOT EQUIVALENT, M_AF -1.15pp [-2.19, -0.12], a measured shortfall against declared labels (descriptive). Against per-source k-means at matched counts, U2 / F-TAX L-1 not fired by support (D_K -0.45pp [-1.31, +0.41], spread_K 0.58pp; filing asymmetry D-4 against AF), and U3a NOT EQUIVALENT. On filing, the anchor-free tree is not better than unsupervised k-means: AK1 / AK2 UNDETERMINED (D_AU +0.0018 [-0.0084, +0.0122]; D_AUs -0.0021 [-0.0115, +0.0077]; 6,139 / 5,628), and F-AK FIRES (not better): AK2's upper bound 0.0077 <= the seed spread 0.0165, under the mirrored one-cell filing bracketed pre-data (C-S1; the registered nearest-of-all value, descriptive, would miss by 0.0002). F-TAX reads 'a filing device only (N-1 fired) (lever leg not fired, by support)'. Predictions: U3b and LEAVES FAILED; the others HELD. [Not licensed: parity with declared labels; 'the tree beats k-means'; 'no lever'; anything for MMLU-Pro alone; any ranking against the anchored recipe.] [CORRECTED 2026-10-04 (registrar): AF-U is [SC] (federated per source), not label-free; whether source alone carries the +1.52pp is open until ROUTE-SOURCE-NULL]",
+  "chips": [
+    "REGISTERED 2026-10-01, BEFORE ANY CODE [plan]",
+    "U1, U3 SCOREABLE; U2 (F-TAX L-1) DESCRIPTIVE-ONLY AT ITS PREDICTION; AN OBSERVED FIRE COUNTS [plan]",
+    "AK1, AK2 (AF-U vs UNSUPERVISED k-MEANS) DESCRIPTIVE-ONLY AT PREDICTION; F-AK SCOREABLE; ADDED PRE-DATA 2026-10-02 [plan]",
+    "VALID (POST-RUN 589c04ae): U1 HELD (THIN); F-AK FIRES (MIRRORED FILING); F-U1 NOT FIRED",
+    "U3b SHORTFALL &minus;1.15pp [&minus;2.19, &minus;0.12] VS DECLARED, NEVER PARITY; U2 / L-1 NOT FIRED BY SUPPORT; AK1 / AK2 UNDETERMINED; F-AK MISSES BY 0.0002 UNDER THE REGISTERED RULE (Q1); IFEVAL ONE CELL"
+  ],
+  "brackets": [
+    {
+      "date": "2026-10-02",
+      "by": "registrar (THE AUTHOR's go \"yes do both\")",
+      "text": "PRE-DATA ADDITION, before any RP13 code, build or datum: criteria AK1 (AF-U vs U-global k-means at matched k) and AK2 (vs per-source k-means), identity precondition on B0, Support, predictions and falsifier F-AK; U1-U3, F-U1 and F-TAX's table unchanged. Pointer bracket in RP13's READOUTS line (L22634). docs/judge_v2_program.md L23093-L23116 (section \"## Registered 2026-10-02 (before any code or call) — UNION-AF-ROUTE, pre-data addition AF-VS-KMEANS: ...\"; _as_of the commit that writes it, parent aaf12c77, re-grepped)"
+    },
+    {
+      "date": "2026-10-02",
+      "by": "registrar",
+      "text": "PRE-DATA (READY_union_af_route 502191e7): D-3 D_fd NOT COMPUTED; D-4 K_s filed by true source while flatLeaf searches all leaves (disclosure); AK1 decides nothing (not like with like), AK2 decides F-AK; D-5 union_af_route_train_policy.json never committed. Build READY under P1-P6; P2 the author's WAL checkpoint blocks the launch. section \"## Registrar's record 2026-10-02 (insertion only; zero calls; nothing run; pre-data) — E1 readout READY (READY_e1_readout.md, bcb7f2f8) R-1 brackets D ...\" (L23555-L23559, _as_of the commit that writes it, parent bcb7f2f8)"
+    },
+    {
+      "date": "2026-10-03",
+      "by": "registrar (THE AUTHOR's decision, pre-data)",
+      "text": "\"one cell per unsplit member\": a member whose anchor-free root does not clear the bar (0.025, mcs 55 unchanged) enters AF-U as ONE cell; the build continues; AK2 / K_s at k = 1 for such members (like with like); ifeval root separation 0.02111 SEEN, recorded as a build result; build STOPPED at member 1 (9a41adfe); delta READY owed before resuming. section \"## Author's decision 2026-10-03 (insertion only; zero calls; nothing run; pre-data for every AF-U routing and AK number) — UNION-AF-ROUTE (RP13): \"one cell per unsplit member\": ...\" (L23660-L23667, _as_of the commit that writes it, parent 9a41adfe)"
+    },
+    {
+      "date": "2026-10-03",
+      "by": "registrar (pre-data; READY_union_af_single_cell C-S1 / C-S2)",
+      "text": "MIRRORED filing of a one-cell source decides AK1 / AK2 (filed by source to its single centroid, k = 1, excluded from other items' search); the registered nearest-of-all value descriptive (B0 proxy +0.0077 for AF); disclosure: like with like in k, filing mirrored in AK1 / AK2 only. section \"## Registrar's record 2026-10-03 (insertion only; zero calls; nothing run; pre-data) — UNION-AF-ROUTE C-S1 / C-S2 ...\" (L23669-L23674, _as_of the commit that writes it, parent 1075b506)"
+    },
+    {
+      "date": "2026-10-03",
+      "by": "registrar (POSTBUILD, POSTRUN 589c04ae)",
+      "text": "outcome recorded; D-PB-1 (worktree DB copies never promoted); D-PR-1 (transport a tree-arm DEFF); AF-U/ and inputs/ committed by path. docs/judge_v2_program.md L23676-L23686 (section \"## UNION-AF-ROUTE (RP13) (2026-10-03, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent 589c04ae)"
+    },
+    {
+      "date": "2026-10-03",
+      "by": "registrar (THE AUTHOR's rule, bulky-outputs-not-in-git)",
+      "text": "correction: AF-U/ and inputs/ were wrongly committed in 66fedf63; untracked in d4639c27; backup E:/TaxoArena_backup_2026-10-03_rp13_afu (SHA256SUMS, cmp-verified); history still holds the blobs until rewritten before any push (the author's call). Programme bracket at L23685."
+    },
+    {
+      "date": "2026-10-04",
+      "by": "registrar (consistency check 2026-10-04; zero calls)",
+      "text": "the 'chips' list had drifted from the ledger row's chips (wording or replaced chips); the chips of record are the ledger's, copied verbatim into 'chips_ledger_verbatim' (ledger v379); 'chips' is kept as history."
+    },
+    {
+      "date": "2026-10-04",
+      "by": "registrar (status correction; zero calls)",
+      "text": "status correction (testing-logic review, docs/literature/2026-10-04_testing_logic_review.md (bd5ca001)): AF-U is federated per source (prog L22633), so it is SOURCE-CONDITIONED [SC], not label-free; 'label-free' / [LF] on AF-U reads [SC]; K_0 is [SC] too (like with like); no number or verdict moves; docs/judge_v2_program.md L24259-L24263 (registrar's record; _as_of the commit that writes it, parent bd5ca001)"
+    }
+  ],
+  "does_not_show": [
+    "that the tree beats clustering in general (one draw, one recipe, one roster, qwen3 256)",
+    "a gain over declared labels",
+    "parity outside ±1pp, or at all if U3 is not EQUIVALENT",
+    "anything for MMLU-Pro alone",
+    "any certificate",
+    "that a non-fire of L-1 is evidence of no lever",
+    "(AK, added pre-data 2026-10-02) parity with k-means (no TOST); that trees lose or win against clustering in general; a ranking of the anchor-free against the anchored recipe"
+  ],
+  "ledger": {
+    "row_id": "UNION-AF-ROUTE",
+    "version": "v382 (2026-10-04: [SC] status bracket) | v354 (2026-10-03: OUTCOME bracket, OK + WARN chips) | v340 (2026-10-02: pre-data addition bracket, PLAN chip AK1/AK2/F-AK) | v329 (2026-10-01: new row, PLAN chips)"
+  },
+  "depends_on": [
+    "ARCH-V2-E-T-R2",
+    "F-TAX",
+    "G13-BREAKDOWN",
+    "V2-DECLARED-CELLS"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "value": false,
+    "text": "closes nothing; CONTEXT §5 lines not touched"
+  },
+  "cost": {
+    "calls": 0,
+    "cce": 0,
+    "machine": "one federated build, ~1.5-2.5 h at 12 threads (estimate; re-priced by the cost-estimator); no site null",
+    "cpu": "minutes"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L22627-L22653 (section \"## Registered 2026-10-01 (before any code or call) — UNION-AF-ROUTE: on the content-closed v2 union split (draw 5a3e756), ...\"; _as_of the commit that writes it, parent ce0d0f17, re-grepped)",
+    "docs/agents/plans/2026-10-02_next_registrations.md (ce0d0f17)",
+    "docs/judge_v2_program.md L22621-L22625 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data, before any UNION-AF-ROUTE code, build or datum) — F-TAX Support (f): ...\"; _as_of the commit that writes it, parent ce0d0f17, re-grepped)",
+    "docs/judge_v2_program.md L23093-L23116 (section \"## Registered 2026-10-02 (before any code or call) — UNION-AF-ROUTE, pre-data addition AF-VS-KMEANS: ...\"; _as_of the commit that writes it, parent aaf12c77, re-grepped)",
+    "docs/judge_v2_program.md L23087-L23091 (section \"## Registrar's record 2026-10-02 (insertion only; zero calls; nothing run; pre-data for UNION-AF-ROUTE) — the author's \"yes do both\": G13-BREAKDOWN C-b1 / C-b2 corrected ...\"; _as_of the commit that writes it, parent aaf12c77, re-grepped)",
+    "docs/judge_v2_program.md L23676-L23686 (section \"## UNION-AF-ROUTE (RP13) (2026-10-03, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent 589c04ae)",
+    "docs/reviews/POSTRUN_union_af_route.md (589c04ae)",
+    "docs/reviews/POSTBUILD_union_af_route.md"
+  ],
+  "last_update": "2026-10-04",
+  "chips_ledger_verbatim": [
+    "plan: REGISTERED 2026-10-01, BEFORE ANY CODE",
+    "plan: U1, U3 SCOREABLE; U2 (F-TAX L-1) DESCRIPTIVE-ONLY AT ITS PREDICTION; AN OBSERVED FIRE COUNTS",
+    "plan: AK1, AK2 (AF-U vs UNSUPERVISED k-MEANS) DESCRIPTIVE-ONLY AT PREDICTION; F-AK SCOREABLE; ADDED PRE-DATA 2026-10-02",
+    "ok: VALID (POST-RUN 589c04ae): U1 HELD (THIN); F-AK FIRES (MIRRORED FILING); F-U1 NOT FIRED",
+    "warn: U3b SHORTFALL −1.15pp VS DECLARED, NEVER PARITY; U2 / L-1 NOT FIRED BY SUPPORT; AK1 / AK2 UNDETERMINED; F-AK MISSES BY 0.0002 UNDER THE REGISTERED RULE (Q1)"
+  ],
+  "label_status": "AF-U [SC] (source-conditioned; federated per source), not [LF]; K_0 [SC]",
+  "plain_description": {
+    "sq": "SQ1 Use",
+    "what": "Builds a fresh federated tree without the declared category labels, but separately within each source benchmark (so it is source-conditioned, not fully label-free). It uses only training questions on the clean multi-corpus split. It tests whether routing each cell to its best model beats the best single model, beats per-source k-means at matched cell counts, and matches routing by declared labels within 1pp. No judge calls.",
+    "why": "It checks whether the routing gain survives when the cells are discovered rather than declared, and whether the tree beats plain clustering.",
+    "information": "Shows whether label-free discovered cells are useful for routing and whether the tree structure adds anything over k-means. Result: done. Beats the best single model by +1.52pp (thin, interval +0.14 to +2.91). It falls 1.15pp short of declared labels, so it is not equivalent to them. Against per-source k-means the difference (-0.45pp) is within noise, so the tree is not shown to be better than clustering. One draw, one roster.",
+    "written": "2026-10-07"
+  }
+}

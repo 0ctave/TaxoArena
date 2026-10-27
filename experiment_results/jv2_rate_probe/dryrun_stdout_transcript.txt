@@ -1,0 +1,27 @@
+TRANSPORT PREFLIGHT: OK (.env loaded through rejudge_reasoning.load_env: True; endpoint present: True; https: True; endpoint loopback: False; key present: True; provider azure; deployment grok-4-1-fast-non-reasoning; temperature omitted: True; values never printed)
+pool: none (SYNTHETIC-DEV payloads; no pool item is posted; the corpora are read once by the content gate)
+[LIVE GUARD] endpoint loopback: False; selftest settings / switches set: none -> LIVE, ADMITTED
+script: tools/analysis/jv2_rate_probe.py blob:5f075d18f1e04638d5b33b3e35c4077066a21d6d / sha256-lf16:553fd699a7bbe279 / sha256-crlf16:f1191d61bba8e6c5 (the working tree is the CRLF rendering; the LF rendering is of record)
+[OPT] python optimisation level 0 -> a launch is admitted
+[K46] run2 store (R8: outcome written): 5328 posted bodies; body bytes q10 / q50 / q90 = 4581 / 5369 / 6805; median completion tokens 254.0; system_template_sha ['sha256:0d064ee28dd10f6c65ac3a59e62d1d4896e74c54abcac81c812eccd79f6b62f5']; rubric_sha ['sha256:67f843eb7a632ae5bd411a9debcbaf9dedccd362e0c8355c366c6d85cb89b1dc']; system turn sha256 d0c524bbd66b5a5e9781f049c93584401f27ed503742c687733afa03a2a7171e
+[PLAN] system turn sha256 d0c524bbd66b5a5e9781f049c93584401f27ed503742c687733afa03a2a7171e = K46's launch manifest: True; template / rubric shas = K46's: True
+[PLAN] size targets (posted BODY bytes; user bytes = body - 2735): q10 4581 (1846), q50 5369 (2634), q90 6805 (4070)
+[GATE] MMLU-Pro (mmlu_pro, p2dca21ab5f4ef3ae): 12000 rows, 11609 distinct stem keys
+[GATE] union (corpus_questions, paeec37aa28063c75): 21606 rows, 20535 distinct stem keys
+[GATE] CONTENT GATE (split_side.stem_key, CK-CLOSE-v1): 398 generated stems (398 distinct keys) against MMLU-Pro (mmlu_pro, p2dca21ab5f4ef3ae) 11609 keys, union (corpus_questions, paeec37aa28063c75) 20535 keys -> 0 hit(s) OK
+[X1] K46 run2 journal unresolved invocations: 0 -> OK
+[X1] the dry-run: 1 python/java process(es) besides this one; foreign posting scripts none; admitted (selftest / dry-run) none; others [48000] -> OK
+[X2] the dry-run (day 2026-09-26): day 2026-09-26 ledger: JUDGEBENCH-REASONING-SIDE rows none (0 calls); ARCH-V2-PILOT-K46 rows 0 calls (printed, not refused) -> OK
+[PLAN] STEPS (the ramp stops at the first inadmissible step; S6 only if N* >= 2):
+  S1 N=1: 24 invocation(s), slots 1-24, the first 12 = the PILOT 12
+  S2 N=2: 36 invocation(s), slots 25-60, 60 s idle gap before
+  S3 N=4: 48 invocation(s), slots 61-108, 60 s idle gap before
+  S4 N=8: 64 invocation(s), slots 109-172, 60 s idle gap before
+  S5 N=12: 76 invocation(s), slots 173-248, 60 s idle gap before
+  S6 N=N*: 150 invocation(s), slots 249-398, 60 s idle gap before
+[PLAN] TOTAL REAL-CALL BUDGET: at most 398 invocations (ramp 248 + S6 150), ceiling 400 (journal cap), 1 cce each = <= 398 cce; HTTP attempts per invocation <= 6 (rr's retries; not the ledger unit)
+[ACCOUNT] JV2-RATE-PROBE (dry-run (the whole remaining plan)): (i) own 0 (cache 0, ledgers 0) + 398 = 398 of 400 | (ii) matches 199 of 4000 | (iii) 4060 + ARCH-V2-INDUCE-RUBRIC-1 1 + ARCH-V2-INDUCE-RUBRIC-2 1 + ARCH-V2-INDUCE-RUBRIC-3 2 + CANARY-EPOCH2-RUNG 1252 + JUDGEBENCH-REASONING-SIDE 0 + JV2-RATE-PROBE 0 + TRACE-TRUNCATION 2178 + 398 = 7892 of 14000 | ledger of record for today's posts: Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\day_calls_2026-09-26.json -> OK
+[ACCOUNT] JV2-RATE-PROBE (dry-run (the whole remaining plan)): own 0 (ledgers 0, journal 0) + planned 398 = 398 of 400 | (iii) as registered: day 2026-09-26 total 0 + 400 = 400 of 14000 (with the planned only: 398) | ledger of record Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\day_calls_2026-09-26.json -> OK
+[PLAN] probe DB Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\jv2_rate_probe\jv2_rate_probe.db (exists: False); journal Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\jv2_rate_probe\jv2_rate_probe.db.invocations.db (invocations 0, unresolved 0)
+[PLAN] plan sha256 b2177cd172eacab59df2e72b6276fe25768c8fc610d623e5051e90b96f09f86f (the launch's --expect-plan-sha)
+[DRY-RUN] 0 calls: urlopen invoked 0 time(s); nothing written; content gate hits 0

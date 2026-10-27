@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="taxonomy.service.PairStatsInvariantTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-10-01T07:10:14" hostname="HORTENSIA" time="0.004">
+  <properties/>
+  <testcase name="fit is invariant to the order models are listed in()" classname="taxonomy.service.PairStatsInvariantTest" time="0.001"/>
+  <testcase name="recording the same match from the reversed perspective yields identical stats()" classname="taxonomy.service.PairStatsInvariantTest" time="0.001"/>
+  <testcase name="consistent ties keep models level()" classname="taxonomy.service.PairStatsInvariantTest" time="0.0"/>
+  <testcase name="order ledgers never influence the fit()" classname="taxonomy.service.PairStatsInvariantTest" time="0.001"/>
+  <testcase name="pure position bias produces a flat fit — regression for the removed correction()" classname="taxonomy.service.PairStatsInvariantTest" time="0.0"/>
+  <testcase name="auditOrderBias returns stats unchanged even when it flags()" classname="taxonomy.service.PairStatsInvariantTest" time="0.0"/>
+  <testcase name="accumulation conserves counts for any outcome stream()" classname="taxonomy.service.PairStatsInvariantTest" time="0.001"/>
+  <system-out><![CDATA[09:10:14.940 [INFO ] BtMmFitter - [ARENA-IDENT] [invariant-test] identified: models=4 pairs_with_data=6 of 6 comparisons=57.0
+09:10:14.941 [INFO ] BtMmFitter - [ARENA-IDENT] [invariant-test] identified: models=4 pairs_with_data=6 of 6 comparisons=57.0
+09:10:14.942 [INFO ] BtMmFitter - [ARENA-IDENT] [invariant-test] identified: models=2 pairs_with_data=1 of 1 comparisons=10.0
+09:10:14.942 [INFO ] BtMmFitter - [ARENA-IDENT] [invariant-test] identified: models=2 pairs_with_data=1 of 1 comparisons=12.0
+09:10:14.943 [WARN ] PairStatsLedger - [ORDER-BIAS] node 'leaf-test' alpha vs beta: order delta 1.00 over n=12 (ledgers 12.0/0.0). Diagnostic only — counts are not modified; flips were already forced to ties per verdict.
+09:10:14.943 [INFO ] BtMmFitter - [ARENA-IDENT] [invariant-test] identified: models=2 pairs_with_data=1 of 1 comparisons=12.0
+09:10:14.943 [WARN ] PairStatsLedger - [ORDER-BIAS] node 'leaf-test' alpha vs beta: order delta 1.00 over n=12 (ledgers 12.0/0.0). Diagnostic only — counts are not modified; flips were already forced to ties per verdict.
+09:10:14.943 [INFO ] BtMmFitter - [ARENA-IDENT] [invariant-test] identified: models=2 pairs_with_data=1 of 1 comparisons=12.0
+09:10:14.943 [WARN ] PairStatsLedger - [ORDER-BIAS] node 'leaf-test' alpha vs beta: order delta 0.83 over n=12 (ledgers 11.0/1.0). Diagnostic only — counts are not modified; flips were already forced to ties per verdict.
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

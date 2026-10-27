@@ -1,0 +1,396 @@
+=== ANCHOR-FREE-REDRAW readout (registered 2026-09-17, programme L4627-4781; zero LLM calls) ===
+  pool of record: p2dca21ab5f4ef3ae | corpus: 12000 mmlu_pro rows, 11769 distinct texts, held-out 3445 | record: experiment_results/anchorfree/af/seed_42, experiment_results/anchorfree/site_null_af_s42.csv (16 certified of 69)
+  instrument: (a) existence margin (refused-k min-pair from proposals.csv; accepted joint sepScore = dasguptaDeltaNorm; min-pair exact at k = 2 only)
+              (b) trunk axis on the 12 scored categories (flatLeaf, pool of record); (c) trunk cert margins observed / p95; (d) Jaccard >= 0.50 on shared train texts, one-to-one greedy;
+              (e) mu-match cos >= 0.95 | snapshots.db: table snapshots, column graph (SerializedGraph JSON: nodes[].childIds, nodes[].queryIds), opened mode=ro&immutable=1
+  operator: a build that crashed without diagnostics/run_manifest.json must be declared with --failed <arm> (C1 FAIL, never retried); a site null that did not
+            complete at 300 reps with --undetermined <arm> (never a partial null); otherwise --run / --arm REFUSE. A completed build with leaves outside [60, 100]
+            is a C1 FAIL and 'not built' for C2-C5 automatically.
+  arms scored: R1=af_clean_s42, R1c=o0_clean_s42, R2=af_s137, R3=af_s2048, R4=af_s42_o1 | declared UNDETERMINED: none | declared failed: none
+
+--- REC record af/seed_42 (record (the tree every arm is compared to)) | af/seed_42 | snapshot 20260916_235050_Headless_Run_Auto_ge | manifest: seed 42, split pool p8a29d8f3ff75aa55, train 8219 / test 3781, gate 832, anchor_free True, order seed None, commit e3557647
+    site null: experiment_results/anchorfree/site_null_af_s42.csv (69 sites, 300 reps) | readout: experiment_results/anchorfree/anchor_free_readout.txt
+    leaves 81 / nodes 150 / max depth 7 / iterations 13 | certified 16 of 69 sites (23.2%) | members 8133; pool of record among members 2406 of 3445 (69.8%) (in-sample share of the readout pool)
+    held-out purity (leaf, flatLeaf, pool of record) 0.715 [0.700, 0.730] | readout: purity 0.715, F6 leaf +13.194/1000 (control column o0/seed_42: 0.779, +14.016)
+  (a) existence margin (bar 0.025):
+      n00000001 d0 [MMLU_PRO] n=8133: accepted k=2: min-pair == joint sepScore 0.042168 = 1.687x bar (EXACT)
+      n00000004 d1 [Emergent Concept #3] n=3757: accepted k=3: joint sepScore 0.056435 = 2.257x bar; min-pair NOT recorded, in [1.00, 2.257]x bar (INTERVAL)
+          refused k=2 emK=2: min-pair sep 0.02410 = 0.964x bar (iter 2,3, n_site 3776)
+          NEAR-BAR: a recorded separation lies within 0.002 of the bar
+      n00000005 d1 [Emergent Concept #4] n=4508: accepted k=4: joint sepScore 0.059454 = 2.378x bar; min-pair NOT recorded, in [1.00, 2.378]x bar (INTERVAL)
+          refused k=2 emK=2: min-pair sep 0.01331 = 0.532x bar (iter 2, n_site 4516)
+          refused k=2 emK=3: min-pair sep 0.01360 = 0.544x bar (iter 2, n_site 4516)
+  (b) trunk axis: root k = 2 | quantitative cell n00000004 | discursive cell n00000005 | axis present | scored 12 of 12 on the record's side
+      category              n00000004    n00000005      n   majority cell   side
+      math                        340           53    393   n00000004      quantitative on record side
+      physics                     359           20    379   n00000004      quantitative on record side
+      chemistry                   336            3    339   n00000004      quantitative on record side
+      engineering                 265            2    267   n00000004      quantitative on record side
+      law                           0          287    287   n00000005      discursive   on record side
+      other                        20          257    277   n00000005      discursive   on record side
+      economics                    17          233    250   n00000005      discursive   on record side
+      psychology                    5          233    238   n00000005      discursive   on record side
+      health                        4          202    206   n00000005      discursive   on record side
+      biology                      22          174    196   n00000005      discursive   on record side
+      philosophy                    1          143    144   n00000005      discursive   on record side
+      history                       0          114    114   n00000005      discursive   on record side
+      business                    120          112    232   n00000004      reported     -
+      computer science             55           68    123   n00000005      reported     -
+  (c) trunk certification (cert_site_p95; margin observed / p95):
+      n00000001 d0 [MMLU_PRO]: CERTIFIED observed 0.042168 p95 0.037566 margin 1.123
+      n00000004 d1 [Emergent Concept #3]: CERTIFIED observed 0.056435 p95 0.032649 margin 1.729
+      n00000005 d1 [Emergent Concept #4]: CERTIFIED observed 0.059454 p95 0.028317 margin 2.100
+      root certified: True | all 2 depth-1 sites certified: True
+
+--- R1 af_clean_s42 (anchor-free) | af_clean_s42/seed_42 | snapshot 20260917_201353_Headless_Run_Auto_ge | manifest: seed 42, split pool p2dca21ab5f4ef3ae, train 8230 / test 3770, gate 843, anchor_free True, order seed None, commit 190cb485
+    site null: experiment_results/anchorfree/redraw/site_null_af_clean_s42.csv (69 sites, 300 reps) | readout: experiment_results/anchorfree/redraw/anchor_free_af_clean_s42_readout.txt
+    leaves 82 / nodes 151 / max depth 8 / iterations 14 | certified 14 of 69 sites (20.3%) | members 8125; pool of record among members 0 of 3445 (0.0%) (clean split: purity is out-of-sample)
+    held-out purity (leaf, flatLeaf, pool of record) 0.727 [0.712, 0.741] | readout: purity 0.727, F6 leaf +12.785/1000 (control column af/seed_42: 0.715, +13.194)
+  (a) existence margin (bar 0.025):
+      n00000001 d0 [MMLU_PRO] n=8125: accepted k=2: min-pair == joint sepScore 0.042461 = 1.698x bar (EXACT)
+      n00000004 d1 [Emergent Concept #3] n=3837: accepted k=2: min-pair == joint sepScore 0.025148 = 1.006x bar (EXACT)
+          NEAR-BAR: a recorded separation lies within 0.002 of the bar
+      n00000005 d1 [Emergent Concept #4] n=4404: accepted k=4: joint sepScore 0.059496 = 2.380x bar; min-pair NOT recorded, in [1.00, 2.380]x bar (INTERVAL)
+          refused k=2 emK=2: min-pair sep 0.01319 = 0.528x bar (iter 2, n_site 4416)
+          refused k=2 emK=3: min-pair sep 0.01298 = 0.519x bar (iter 2, n_site 4416)
+  (b) trunk axis: root k = 2 | quantitative cell n00000004 | discursive cell n00000005 | axis present | scored 12 of 12 on the record's side
+      category              n00000004    n00000005      n   majority cell   side
+      math                        351           42    393   n00000004      quantitative on record side
+      physics                     353           26    379   n00000004      quantitative on record side
+      chemistry                   337            2    339   n00000004      quantitative on record side
+      engineering                 264            3    267   n00000004      quantitative on record side
+      law                           1          286    287   n00000005      discursive   on record side
+      other                        18          259    277   n00000005      discursive   on record side
+      economics                    15          235    250   n00000005      discursive   on record side
+      psychology                    5          233    238   n00000005      discursive   on record side
+      health                        5          201    206   n00000005      discursive   on record side
+      biology                      17          179    196   n00000005      discursive   on record side
+      philosophy                    1          143    144   n00000005      discursive   on record side
+      history                       0          114    114   n00000005      discursive   on record side
+      business                    128          104    232   n00000004      reported     -
+      computer science             59           64    123   n00000005      reported     -
+  (c) trunk certification (cert_site_p95; margin observed / p95):
+      n00000001 d0 [MMLU_PRO]: CERTIFIED observed 0.042461 p95 0.037214 margin 1.141
+      n00000004 d1 [Emergent Concept #3]: not certified observed 0.025148 p95 0.033733 margin 0.746
+      n00000005 d1 [Emergent Concept #4]: CERTIFIED observed 0.059496 p95 0.028375 margin 2.097
+      root certified: True | all 2 depth-1 sites certified: False
+  (d) certified-site identity vs the record: shared train texts 5625 (record members 8133, arm members 8125); Jaccard >= 0.50 one-to-one greedy: 7 of 16 record sites reproduce
+      record site d      n  margin   arm site     Jaccard   verdict
+      n00000005   1   4508    2.100  n00000005       0.979  reproduces
+      n00000017   2   1683    1.771  n00000017       0.953  reproduces
+      n00000004   1   3757    1.729  n00000001       0.467  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000043   3    863    1.698  n00000018       0.652  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000016   2   1287    1.412  n00000018       0.937  reproduces
+      n00000141   4    161    1.352  n00000020       0.214  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000062   4    297    1.258  n00000018       0.231  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000056   4    389    1.235  n00000050       0.798  reproduces
+      n00000032   3    629    1.191  n00000042       0.856  reproduces
+      n00000001   0   8133    1.123  n00000001       1.000  reproduces
+      n00000175   5    177    1.103  n00000124       0.516  reproduces
+      n00000127   4    281    1.065  n00000086       0.158  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000074   3    614    1.044  n00000086       0.330  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000144   3    564    1.027  n00000001       0.069  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000045   2   1095    1.025  n00000001       0.135  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000167   5    247    1.014  n00000111       0.071  NOT reproduced (best Jaccard over the arm's certified sites)
+  (e) mu-match of the record's 81 leaves to this tree at cos >= 0.95: 55 of 81 (median best cos 0.963)
+
+--- R1c o0_clean_s42 (anchored) | o0_clean_s42/seed_42 | snapshot 20260918_040207_Headless_Run_Auto_ge | manifest: seed 42, split pool p2dca21ab5f4ef3ae, train 8230 / test 3770, gate 843, anchor_free False, order seed None, commit af176a25
+    site null: experiment_results/anchorfree/redraw/site_null_o0_clean_s42.csv (60 sites, 300 reps) | readout: experiment_results/anchorfree/redraw/anchor_free_o0_clean_s42_readout.txt
+    leaves 84 / nodes 145 / max depth 5 / iterations 15 | certified 11 of 60 sites (18.3%) | members 8125; pool of record among members 0 of 3445 (0.0%) (clean split: purity is out-of-sample)
+    held-out purity (leaf, flatLeaf, pool of record) 0.770 [0.756, 0.784] | readout: purity 0.770, F6 leaf +13.949/1000 (control column af/seed_42: 0.715, +13.194)
+  (a) existence margin (bar 0.025):
+      n00000001 d0 [MMLU_PRO] n=8125: accepted k=14: joint sepScore 0.000000 = 0.000x bar; min-pair NOT recorded, in [1.00, 0.000]x bar (INTERVAL)
+      n00000011 d1 [Math] n=912: accepted k=2: min-pair == joint sepScore 0.042515 = 1.701x bar (EXACT)
+      n00000012 d1 [Physics] n=818: accepted k=2: min-pair == joint sepScore 0.032551 = 1.302x bar (EXACT)
+      n00000010 d1 [Economics] n=536: accepted k=2: min-pair == joint sepScore 0.030958 = 1.238x bar (EXACT)
+      n00000008 d1 [Other] n=510: accepted k=2: min-pair == joint sepScore 0.032251 = 1.290x bar (EXACT)
+      n00000009 d1 [Health] n=496: accepted k=2: min-pair == joint sepScore 0.026173 = 1.047x bar (EXACT)
+          NEAR-BAR: a recorded separation lies within 0.002 of the bar
+      n00000006 d1 [Chemistry] n=913: accepted k=3: joint sepScore 0.099628 = 3.985x bar; min-pair NOT recorded, in [1.00, 3.985]x bar (INTERVAL)
+      n00000007 d1 [History] n=317: accepted k=2: min-pair == joint sepScore 0.059789 = 2.392x bar (EXACT)
+      n00000004 d1 [Psychology] n=615: accepted k=4: joint sepScore 0.028203 = 1.128x bar; min-pair NOT recorded, in [1.00, 1.128]x bar (INTERVAL)
+      n00000015 d1 [Engineering] n=614: accepted k=2: min-pair == joint sepScore 0.078407 = 3.136x bar (EXACT)
+      n00000005 d1 [Biology] n=533: accepted k=3: joint sepScore 0.059026 = 2.361x bar; min-pair NOT recorded, in [1.00, 2.361]x bar (INTERVAL)
+          refused k=2 emK=2: min-pair sep 0.02213 = 0.885x bar (iter 1, n_site 534)
+      n00000002 d1 [Business] n=627: accepted k=2: min-pair == joint sepScore 0.036991 = 1.480x bar (EXACT)
+      n00000013 d1 [Computer science] n=557: accepted k=2: min-pair == joint sepScore 0.036207 = 1.448x bar (EXACT)
+      n00000003 d1 [Law] n=665: accepted k=2: min-pair == joint sepScore 0.059583 = 2.383x bar (EXACT)
+      n00000014 d1 [Philosophy] n=392: accepted k=2: min-pair == joint sepScore 0.032149 = 1.286x bar (EXACT)
+  (b) trunk axis: root k = 14 | quantitative cell n00000006 | discursive cell n00000003 | axis present | scored 2 of 12 on the record's side
+      (14 depth-1 cells: category x cell table omitted; majority cells: math->n00000011; physics->n00000012; chemistry->n00000006; engineering->n00000015; law->n00000003; other->n00000008; economics->n00000010; psychology->n00000004; health->n00000009; biology->n00000005; philosophy->n00000014; history->n00000007; business->n00000002; computer science->n00000013)
+  (c) trunk certification (cert_site_p95; margin observed / p95):
+      n00000001 d0 [MMLU_PRO]: NOT IN the site null CSV (leaf?)
+      n00000011 d1 [Math]: CERTIFIED observed 0.042515 p95 0.040528 margin 1.049
+      n00000012 d1 [Physics]: not certified observed 0.032551 p95 0.035677 margin 0.912
+      n00000010 d1 [Economics]: not certified observed 0.030958 p95 0.039019 margin 0.793
+      n00000008 d1 [Other]: not certified observed 0.032251 p95 0.032946 margin 0.979
+      n00000009 d1 [Health]: not certified observed 0.026173 p95 0.034205 margin 0.765
+      n00000006 d1 [Chemistry]: CERTIFIED observed 0.099628 p95 0.067070 margin 1.485
+      n00000007 d1 [History]: not certified observed 0.059789 p95 0.074551 margin 0.802
+      n00000004 d1 [Psychology]: not certified observed 0.028203 p95 0.028741 margin 0.981
+      n00000015 d1 [Engineering]: CERTIFIED observed 0.078407 p95 0.065998 margin 1.188
+      n00000005 d1 [Biology]: CERTIFIED observed 0.059026 p95 0.039267 margin 1.503
+      n00000002 d1 [Business]: not certified observed 0.036991 p95 0.037133 margin 0.996
+      n00000013 d1 [Computer science]: CERTIFIED observed 0.036207 p95 0.035565 margin 1.018
+      n00000003 d1 [Law]: not certified observed 0.059583 p95 0.073719 margin 0.808
+      n00000014 d1 [Philosophy]: not certified observed 0.032149 p95 0.047562 margin 0.676
+      root certified: False | all 14 depth-1 sites certified: False
+  (d) certified-site identity vs the record: shared train texts 5625 (record members 8133, arm members 8125); Jaccard >= 0.50 one-to-one greedy: 3 of 16 record sites reproduce
+      record site d      n  margin   arm site     Jaccard   verdict
+      n00000005   1   4508    2.100  n00000005       0.099  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000017   2   1683    1.771  n00000005       0.257  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000004   1   3757    1.729  n00000006       0.240  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000043   3    863    1.698  n00000013       0.025  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000016   2   1287    1.412  n00000013       0.020  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000141   4    161    1.352  n00000013       0.012  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000062   4    297    1.258  n00000013       0.035  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000056   4    389    1.235  n00000005       0.567  reproduces
+      n00000032   3    629    1.191  n00000005       0.474  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000001   0   8133    1.123  n00000011       0.113  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000175   5    177    1.103  n00000005       0.004  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000127   4    281    1.065  n00000062       0.368  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000074   3    614    1.044  n00000020       0.552  reproduces
+      n00000144   3    564    1.027  n00000006       0.548  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000045   2   1095    1.025  n00000006       0.573  reproduces
+      n00000167   5    247    1.014  n00000006       0.159  NOT reproduced (best Jaccard over the arm's certified sites)
+  (e) mu-match of the record's 81 leaves to this tree at cos >= 0.95: 52 of 81 (median best cos 0.966)
+
+--- R2 af_s137 (anchor-free) | af_s137/seed_137 | snapshot 20260918_041114_Headless_Run_Auto_ge | manifest: seed 137, split pool pd610c9ad05255f16, train 8237 / test 3763, gate 821, anchor_free True, order seed None, commit af176a25
+    site null: experiment_results/anchorfree/redraw/site_null_af_s137.csv (64 sites, 300 reps) | readout: experiment_results/anchorfree/redraw/anchor_free_af_s137_readout.txt
+    leaves 79 / nodes 143 / max depth 8 / iterations 14 | certified 12 of 64 sites (18.8%) | members 8126; pool of record among members 2357 of 3445 (68.4%) (in-sample share of the readout pool)
+    held-out purity (leaf, flatLeaf, pool of record) 0.738 [0.723, 0.753] | readout: purity 0.738, F6 leaf +12.970/1000 (control column af/seed_42: 0.715, +13.194)
+  (a) existence margin (bar 0.025):
+      n00000001 d0 [MMLU_PRO] n=8126: accepted k=2: min-pair == joint sepScore 0.042804 = 1.712x bar (EXACT)
+      n00000004 d1 [Emergent Concept #3] n=3835: accepted k=3: joint sepScore 0.056303 = 2.252x bar; min-pair NOT recorded, in [1.00, 2.252]x bar (INTERVAL)
+          refused k=2 emK=2: min-pair sep 0.02034 = 0.814x bar (iter 2,3, n_site 3852)
+      n00000005 d1 [Emergent Concept #4] n=4412: accepted k=4: joint sepScore 0.060174 = 2.407x bar; min-pair NOT recorded, in [1.00, 2.407]x bar (INTERVAL)
+          refused k=2 emK=2: min-pair sep 0.01481 = 0.592x bar (iter 2, n_site 4423)
+          refused k=2 emK=3: min-pair sep 0.01270 = 0.508x bar (iter 2, n_site 4423)
+  (b) trunk axis: root k = 2 | quantitative cell n00000004 | discursive cell n00000005 | axis present | scored 12 of 12 on the record's side
+      category              n00000004    n00000005      n   majority cell   side
+      math                        349           44    393   n00000004      quantitative on record side
+      physics                     363           16    379   n00000004      quantitative on record side
+      chemistry                   336            3    339   n00000004      quantitative on record side
+      engineering                 265            2    267   n00000004      quantitative on record side
+      law                           1          286    287   n00000005      discursive   on record side
+      other                        15          262    277   n00000005      discursive   on record side
+      economics                     9          241    250   n00000005      discursive   on record side
+      psychology                    7          231    238   n00000005      discursive   on record side
+      health                        5          201    206   n00000005      discursive   on record side
+      biology                      24          172    196   n00000005      discursive   on record side
+      philosophy                    0          144    144   n00000005      discursive   on record side
+      history                       0          114    114   n00000005      discursive   on record side
+      business                    108          124    232   n00000005      reported     -
+      computer science             47           76    123   n00000005      reported     -
+  (c) trunk certification (cert_site_p95; margin observed / p95):
+      n00000001 d0 [MMLU_PRO]: CERTIFIED observed 0.042804 p95 0.037628 margin 1.138
+      n00000004 d1 [Emergent Concept #3]: CERTIFIED observed 0.056303 p95 0.033064 margin 1.703
+      n00000005 d1 [Emergent Concept #4]: CERTIFIED observed 0.060174 p95 0.028450 margin 2.115
+      root certified: True | all 2 depth-1 sites certified: True
+  (d) certified-site identity vs the record: shared train texts 5666 (record members 8133, arm members 8126); Jaccard >= 0.50 one-to-one greedy: 8 of 16 record sites reproduce
+      record site d      n  margin   arm site     Jaccard   verdict
+      n00000005   1   4508    2.100  n00000005       0.979  reproduces
+      n00000017   2   1683    1.771  n00000016       0.951  reproduces
+      n00000004   1   3757    1.729  n00000004       0.977  reproduces
+      n00000043   3    863    1.698  n00000017       0.646  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000016   2   1287    1.412  n00000017       0.920  reproduces
+      n00000141   4    161    1.352  n00000005       0.034  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000062   4    297    1.258  n00000017       0.188  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000056   4    389    1.235  n00000065       0.727  reproduces
+      n00000032   3    629    1.191  n00000043       0.842  reproduces
+      n00000001   0   8133    1.123  n00000001       1.000  reproduces
+      n00000175   5    177    1.103  n00000005       0.042  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000127   4    281    1.065  n00000004       0.078  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000074   3    614    1.044  n00000004       0.159  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000144   3    564    1.027  n00000141       0.900  reproduces
+      n00000045   2   1095    1.025  n00000141       0.536  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000167   5    247    1.014  n00000079       0.304  NOT reproduced (best Jaccard over the arm's certified sites)
+  (e) mu-match of the record's 81 leaves to this tree at cos >= 0.95: 61 of 81 (median best cos 0.974)
+
+--- R3 af_s2048 (anchor-free) | af_s2048/seed_2048 | snapshot 20260918_043908_Headless_Run_Auto_ge | manifest: seed 2048, split pool p19d9f473b5a610a0, train 8206 / test 3794, gate 829, anchor_free True, order seed None, commit af176a25
+    site null: experiment_results/anchorfree/redraw/site_null_af_s2048.csv (66 sites, 300 reps) | readout: experiment_results/anchorfree/redraw/anchor_free_af_s2048_readout.txt
+    leaves 81 / nodes 147 / max depth 7 / iterations 13 | certified 10 of 66 sites (15.2%) | members 8130; pool of record among members 2399 of 3445 (69.6%) (in-sample share of the readout pool)
+    held-out purity (leaf, flatLeaf, pool of record) 0.749 [0.735, 0.764] | readout: purity 0.749, F6 leaf +13.847/1000 (control column af/seed_42: 0.715, +13.194)
+  (a) existence margin (bar 0.025):
+      n00000001 d0 [MMLU_PRO] n=8130: accepted k=2: min-pair == joint sepScore 0.042431 = 1.697x bar (EXACT)
+      n00000004 d1 [Emergent Concept #3] n=3782: accepted k=3: joint sepScore 0.056143 = 2.246x bar; min-pair NOT recorded, in [1.00, 2.246]x bar (INTERVAL)
+          refused k=2 emK=2: min-pair sep 0.01975 = 0.790x bar (iter 2,3, n_site 3799)
+      n00000005 d1 [Emergent Concept #4] n=4465: accepted k=4: joint sepScore 0.060650 = 2.426x bar; min-pair NOT recorded, in [1.00, 2.426]x bar (INTERVAL)
+          refused k=2 emK=2: min-pair sep 0.01280 = 0.512x bar (iter 2, n_site 4478)
+          refused k=2 emK=3: min-pair sep 0.01283 = 0.513x bar (iter 2, n_site 4478)
+  (b) trunk axis: root k = 2 | quantitative cell n00000004 | discursive cell n00000005 | axis present | scored 12 of 12 on the record's side
+      category              n00000004    n00000005      n   majority cell   side
+      math                        343           50    393   n00000004      quantitative on record side
+      physics                     345           34    379   n00000004      quantitative on record side
+      chemistry                   337            2    339   n00000004      quantitative on record side
+      engineering                 265            2    267   n00000004      quantitative on record side
+      law                           1          286    287   n00000005      discursive   on record side
+      other                        17          260    277   n00000005      discursive   on record side
+      economics                    13          237    250   n00000005      discursive   on record side
+      psychology                    4          234    238   n00000005      discursive   on record side
+      health                        6          200    206   n00000005      discursive   on record side
+      biology                      30          166    196   n00000005      discursive   on record side
+      philosophy                    0          144    144   n00000005      discursive   on record side
+      history                       0          114    114   n00000005      discursive   on record side
+      business                    116          116    232   n00000004      reported     -
+      computer science             52           71    123   n00000005      reported     -
+  (c) trunk certification (cert_site_p95; margin observed / p95):
+      n00000001 d0 [MMLU_PRO]: CERTIFIED observed 0.042431 p95 0.037657 margin 1.127
+      n00000004 d1 [Emergent Concept #3]: CERTIFIED observed 0.056143 p95 0.033258 margin 1.688
+      n00000005 d1 [Emergent Concept #4]: CERTIFIED observed 0.060650 p95 0.028514 margin 2.127
+      root certified: True | all 2 depth-1 sites certified: True
+  (d) certified-site identity vs the record: shared train texts 5656 (record members 8133, arm members 8130); Jaccard >= 0.50 one-to-one greedy: 8 of 16 record sites reproduce
+      record site d      n  margin   arm site     Jaccard   verdict
+      n00000005   1   4508    2.100  n00000005       0.988  reproduces
+      n00000017   2   1683    1.771  n00000031       0.544  reproduces
+      n00000004   1   3757    1.729  n00000004       0.988  reproduces
+      n00000043   3    863    1.698  n00000042       0.907  reproduces
+      n00000016   2   1287    1.412  n00000016       0.951  reproduces
+      n00000141   4    161    1.352  n00000119       0.494  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000062   4    297    1.258  n00000042       0.293  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000056   4    389    1.235  n00000032       0.447  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000032   3    629    1.191  n00000032       0.671  reproduces
+      n00000001   0   8133    1.123  n00000001       1.000  reproduces
+      n00000175   5    177    1.103  n00000109       0.534  reproduces
+      n00000127   4    281    1.065  n00000004       0.075  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000074   3    614    1.044  n00000004       0.158  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000144   3    564    1.027  n00000004       0.147  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000045   2   1095    1.025  n00000004       0.283  NOT reproduced (best Jaccard over the arm's certified sites)
+      n00000167   5    247    1.014  n00000004       0.071  NOT reproduced (best Jaccard over the arm's certified sites)
+  (e) mu-match of the record's 81 leaves to this tree at cos >= 0.95: 58 of 81 (median best cos 0.969)
+
+--- R4 af_s42_o1 (anchor-free) | af_s42_o1/seed_42 | snapshot 20260918_050715_Headless_Run_Auto_ge | manifest: seed 42, split pool p8a29d8f3ff75aa55, train 8219 / test 3781, gate 832, anchor_free True, order seed 1, commit af176a25
+    site null: experiment_results/anchorfree/redraw/site_null_af_s42_o1.csv (69 sites, 300 reps) | readout: experiment_results/anchorfree/redraw/anchor_free_af_s42_o1_readout.txt
+    leaves 81 / nodes 150 / max depth 7 / iterations 13 | certified 16 of 69 sites (23.2%) | members 8133; pool of record among members 2406 of 3445 (69.8%) (in-sample share of the readout pool)
+    held-out purity (leaf, flatLeaf, pool of record) 0.715 [0.700, 0.730] | readout: purity 0.715, F6 leaf +13.194/1000 (control column af/seed_42: 0.715, +13.194)
+  (a) existence margin (bar 0.025):
+      n00000001 d0 [MMLU_PRO] n=8133: accepted k=2: min-pair == joint sepScore 0.042168 = 1.687x bar (EXACT)
+      n00000004 d1 [Emergent Concept #3] n=3757: accepted k=3: joint sepScore 0.056435 = 2.257x bar; min-pair NOT recorded, in [1.00, 2.257]x bar (INTERVAL)
+          refused k=2 emK=2: min-pair sep 0.02410 = 0.964x bar (iter 2,3, n_site 3776)
+          NEAR-BAR: a recorded separation lies within 0.002 of the bar
+      n00000005 d1 [Emergent Concept #4] n=4508: accepted k=4: joint sepScore 0.059454 = 2.378x bar; min-pair NOT recorded, in [1.00, 2.378]x bar (INTERVAL)
+          refused k=2 emK=2: min-pair sep 0.01331 = 0.532x bar (iter 2, n_site 4516)
+          refused k=2 emK=3: min-pair sep 0.01360 = 0.544x bar (iter 2, n_site 4516)
+  (b) trunk axis: root k = 2 | quantitative cell n00000004 | discursive cell n00000005 | axis present | scored 12 of 12 on the record's side
+      category              n00000004    n00000005      n   majority cell   side
+      math                        340           53    393   n00000004      quantitative on record side
+      physics                     359           20    379   n00000004      quantitative on record side
+      chemistry                   336            3    339   n00000004      quantitative on record side
+      engineering                 265            2    267   n00000004      quantitative on record side
+      law                           0          287    287   n00000005      discursive   on record side
+      other                        20          257    277   n00000005      discursive   on record side
+      economics                    17          233    250   n00000005      discursive   on record side
+      psychology                    5          233    238   n00000005      discursive   on record side
+      health                        4          202    206   n00000005      discursive   on record side
+      biology                      22          174    196   n00000005      discursive   on record side
+      philosophy                    1          143    144   n00000005      discursive   on record side
+      history                       0          114    114   n00000005      discursive   on record side
+      business                    120          112    232   n00000004      reported     -
+      computer science             55           68    123   n00000005      reported     -
+  (c) trunk certification (cert_site_p95; margin observed / p95):
+      n00000001 d0 [MMLU_PRO]: CERTIFIED observed 0.042168 p95 0.037603 margin 1.121
+      n00000004 d1 [Emergent Concept #3]: CERTIFIED observed 0.056435 p95 0.032551 margin 1.734
+      n00000005 d1 [Emergent Concept #4]: CERTIFIED observed 0.059454 p95 0.028277 margin 2.103
+      root certified: True | all 2 depth-1 sites certified: True
+  (d) certified-site identity vs the record: shared train texts 8133 (record members 8133, arm members 8133); Jaccard >= 0.50 one-to-one greedy: 16 of 16 record sites reproduce
+      record site d      n  margin   arm site     Jaccard   verdict
+      n00000005   1   4508    2.100  n00000005       1.000  reproduces
+      n00000017   2   1683    1.771  n00000017       1.000  reproduces
+      n00000004   1   3757    1.729  n00000004       1.000  reproduces
+      n00000043   3    863    1.698  n00000022       1.000  reproduces
+      n00000016   2   1287    1.412  n00000016       1.000  reproduces
+      n00000141   4    161    1.352  n00000219       1.000  reproduces
+      n00000062   4    297    1.258  n00000062       1.000  reproduces
+      n00000056   4    389    1.235  n00000058       1.000  reproduces
+      n00000032   3    629    1.191  n00000043       1.000  reproduces
+      n00000001   0   8133    1.123  n00000001       1.000  reproduces
+      n00000175   5    177    1.103  n00000163       1.000  reproduces
+      n00000127   4    281    1.065  n00000139       1.000  reproduces
+      n00000074   3    614    1.044  n00000083       1.000  reproduces
+      n00000144   3    564    1.027  n00000143       1.000  reproduces
+      n00000045   2   1095    1.025  n00000045       1.000  reproduces
+      n00000167   5    247    1.014  n00000195       1.000  reproduces
+  (e) mu-match of the record's 81 leaves to this tree at cos >= 0.95: 81 of 81 (median best cos 1.000)
+
+=== Criteria (registered; anchor-free arms = af_clean_s42, af_s137, af_s2048, af_s42_o1; control = o0_clean_s42; UNDETERMINED: none; did not build: none) ===
+  C1 EXISTENCE R1   af_clean_s42  leaves 82 in [60, 100] -> PASS
+  C1 EXISTENCE R1c  o0_clean_s42  leaves 84 in [60, 100] -> PASS
+  C1 EXISTENCE R2   af_s137       leaves 79 in [60, 100] -> PASS
+  C1 EXISTENCE R3   af_s2048      leaves 81 in [60, 100] -> PASS
+  C1 EXISTENCE R4   af_s42_o1     leaves 81 in [60, 100] -> PASS
+  C1 sweep: 5 of 5 arms in band (>= 4 of 5 required; 0 UNDETERMINED) -> PASS
+  C2 TRUNK AXIS R1   af_clean_s42  root k = 2, 12 of 12 scored categories on the record's side (>= 11) -> PASS
+  C3 TRUNK CERT R1   af_clean_s42  depth-1 sites certified 1 of 2 (all k=2 depth-1 sites; registration says both, identical at root k=2) -> FAIL | root certified: True (margin 1.141)
+  C4 CERT COUNT R1   af_clean_s42  14 of 69 certified (20.3%): count in [11, 21] and share in [16%, 30%] -> PASS
+  C2 TRUNK AXIS R2   af_s137       root k = 2, 12 of 12 scored categories on the record's side (>= 11) -> PASS
+  C3 TRUNK CERT R2   af_s137       depth-1 sites certified 2 of 2 (all k=2 depth-1 sites; registration says both, identical at root k=2) -> PASS | root certified: True (margin 1.138)
+  C4 CERT COUNT R2   af_s137       12 of 64 certified (18.8%): count in [11, 21] and share in [16%, 30%] -> PASS
+  C2 TRUNK AXIS R3   af_s2048      root k = 2, 12 of 12 scored categories on the record's side (>= 11) -> PASS
+  C3 TRUNK CERT R3   af_s2048      depth-1 sites certified 2 of 2 (all k=2 depth-1 sites; registration says both, identical at root k=2) -> PASS | root certified: True (margin 1.127)
+  C4 CERT COUNT R3   af_s2048      10 of 66 certified (15.2%): count in [11, 21] and share in [16%, 30%] -> FAIL
+  C2 TRUNK AXIS R4   af_s42_o1     root k = 2, 12 of 12 scored categories on the record's side (>= 11) -> PASS
+  C3 TRUNK CERT R4   af_s42_o1     depth-1 sites certified 2 of 2 (all k=2 depth-1 sites; registration says both, identical at root k=2) -> PASS | root certified: True (margin 1.121)
+  C4 CERT COUNT R4   af_s42_o1     16 of 69 certified (23.2%): count in [11, 21] and share in [16%, 30%] -> PASS
+  C2 sweep: holds in 4 of 4 anchor-free arms that built -> PASS
+  C3 sweep: depth-1 certified in every built anchor-free arm -> FAIL | root certified in 4 of 4 anchor-free arms (>= 3 of 4 required) -> PASS
+  C4 sweep: -> FAIL
+  C5 IDENTITY R1   af_clean_s42  7 of 16 record sites reproduce (>= 6) -> PASS
+  C5 IDENTITY R2   af_s137       8 of 16 record sites reproduce (>= 6) -> PASS
+  C5 IDENTITY R3   af_s2048      8 of 16 record sites reproduce (>= 6) -> PASS
+  C5 IDENTITY R4   af_s42_o1     16 of 16 record sites reproduce (>= 14) -> PASS
+  RE-DRAW-STABLE CERTIFIED SET (reproduces in R1, R2 and R3): 5 of 16: n00000001(n=8133, margin 1.12), n00000005(n=4508, margin 2.10), n00000016(n=1287, margin 1.41), n00000017(n=1683, margin 1.77), n00000032(n=629, margin 1.19)
+  C6 CONTROL: R1 certifies 14, R1c 11: R1 >= R1c + 8 -> FAIL  [F4 FIRES]
+
+=== Predictions (registered before any build; scored HELD / FAILED with the number beside) ===
+  R1   builds, leaves 74-90                                       HELD           leaves 82
+  R1   depth-1 margins 1.0-1.2x the bar (accepted min-pair)       NOT DECIDABLE  n00000004 1.006x exact; n00000005 [1.00, 2.380]x interval
+  R1   root k = 2                                                 HELD           root k = 2
+  R1   12 of 12 categories on the record's side                   HELD           12 of 12
+  R1   both depth-1 sites certified at >= 1.6x p95                FAILED         n00000004 not cert 0.746; n00000005 cert 2.097
+  R1   root certified (p 0.6)                                     HELD           root certified, margin 1.141
+  R1   13-19 certified of 60-80 sites (20-26%)                    HELD           14 of 69 (20.3%)
+  R1   7-10 of 16 sites reproduce                                 HELD           7 of 16
+  R1   mu-match 50-65 of 81                                       HELD           55 of 81
+  R1   held-out purity 0.68-0.71 (clean split; below the record's 0.715) FAILED         0.727 [0.712, 0.741]
+  R1   key-only leaf information +12.5 to +13.5 / 1000            HELD           +12.785 / 1000 (readout)
+  R1c  80-92 leaves                                               HELD           leaves 84
+  R1c  3-7 certified of 60-70                                     FAILED         11 of 60
+  R1c  purity 0.74-0.77                                           FAILED         0.770 [0.756, 0.784]
+  R1c  R1 - R1c purity -5 to -9pp (like-for-like: both clean)     FAILED         -4.3pp (0.727 - 0.770)
+  R2   builds (C1 band; no registered leaves prediction for R2/R3) HELD           leaves 79
+  R2   root k = 2                                                 HELD           root k = 2
+  R2   11-12 of 12 categories on the record's side                HELD           12 of 12
+  R2   depth-1 certified (all)                                    HELD           n00000004 cert 1.703; n00000005 cert 2.115
+  R2   12-20 certified                                            HELD           12 of 64 (18.8%)
+  R2   6-10 of 16 sites reproduce                                 HELD           8 of 16
+  R2   mu-match 50-65 of 81                                       HELD           61 of 81
+  R2   held-out purity (in-sample share printed; no band registered) NOT SCORABLE   0.738, pool overlap 2357 of 3445 (68.4%)
+  R3   builds (C1 band; no registered leaves prediction for R2/R3) HELD           leaves 81
+  R3   root k = 2                                                 HELD           root k = 2
+  R3   11-12 of 12 categories on the record's side                HELD           12 of 12
+  R3   depth-1 certified (all)                                    HELD           n00000004 cert 1.688; n00000005 cert 2.127
+  R3   12-20 certified                                            FAILED         10 of 66 (15.2%)
+  R3   6-10 of 16 sites reproduce                                 HELD           8 of 16
+  R3   mu-match 50-65 of 81                                       HELD           58 of 81
+  R3   held-out purity (in-sample share printed; no band registered) NOT SCORABLE   0.749, pool overlap 2399 of 3445 (69.6%)
+  R1-3 root certified in 2 of the 3 sample arms                   FAILED         3 of 3 (3 built; a non-building arm certifies nothing): af_clean_s42 cert, af_s137 cert, af_s2048 cert
+  R1-3 ONE sample arm has a depth-1 separation within 0.002 of the bar HELD           1 arm(s): af_clean_s42 (recorded seps = refused-k min-pairs + the joint score at an accepted k = 2)
+  R4   leaves 79-83                                               HELD           leaves 81
+  R4   certified 15-17                                            HELD           16 of 69
+  R4   >= 14 of 16 sites reproduce                                HELD           16 of 16
+  R4   mu-match >= 78 of 81                                       HELD           81 of 81
+  SW   C1 HELD (4-5 of 5)                                         HELD           5 of 5
+  SW   C2 HELD in every arm                                       HELD           4 of 4 anchor-free arms
+  SW   C3 depth-1 HELD                                            FAILED         3 of 4 arms
+  SW   C3 root FAILS at exactly 2 of 4                            FAILED         root certified in 4 of 4
+  SW   C4 HELD                                                    FAILED         3 of 4 arms
+  SW   C5 HELD in R1 at 6-10                                      HELD           7 of 16
+  SW   C5 HELD in R2 at 6-10                                      HELD           8 of 16
+  SW   C5 HELD in R3 at 6-10                                      HELD           8 of 16
+  SW   C5 HELD in R4 at 14-16                                     HELD           16 of 16
+  SW   C6 HELD                                                    FAILED         R1 14 vs R1c 11
+  SW   re-draw-stable certified set 5-8 sites, all record n >= 560 HELD           5 sites; min record n 629
+
+  Readout-pool rule: purity is scored on the pool of record for every tree; that pool is in-sample for the record (2,406 of 3,445 members = 69.8% found; 70.4% of the split's train side, programme L3821) and for R2 / R3 / R4 by the
+  overlaps printed per arm, and out-of-sample for R1 / R1c.  Like-for-like pairs: R1 vs R1c; R2 / R3 / R4 vs the record.  R1 vs the record
+  confounds re-draw with contamination removal and is read only as the registered prediction (0.68-0.71).

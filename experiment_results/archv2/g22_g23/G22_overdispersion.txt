@@ -1,0 +1,129 @@
+[POOL] p2dca21ab5f4ef3ae: pool_guard.assert_pool_of_record PASSED (the id file and the reserved_pool rows both hash to it; the guard's own read-only open of the eval DB is not in the DB-open log below)
+=== ARCH-V2 G22 SIMULATOR, leg overdispersion: RUN UNDER THE REGISTRATION ARCH-V2-G22 at d6129cf (programme L15208-L15265), master ARCHV2-G22-REC-1, R 1000 ===
+  argv: tools/analysis/archv2_g22_sim.py --leg overdispersion --boards grok,x12,merged --builder exact --out experiment_results/archv2/g22_g23/G22_overdispersion.txt
+  master 'ARCHV2-G22-REC-1' | data root Z:\FAC\TUBerlin\THESIS\TaxoArena | started 2026-09-24 11:08:07
+  instrument identity (git blob / sha256-lf16 of the LF rendering; working tree state):
+    archv2_g22_sim.py                  blob:522cefe751fcbf53d8e898f043218b697c254db2 sha256-lf16:eff3435a973c1cfd (CRLF sha256-crlf16:9023845e49799760)
+    archv2_arena/__init__.py           blob:210bd76eaff44916ea9d85b0d6dcccd711d85154 sha256-lf16:ae6a0736954a8674 (CRLF sha256-crlf16:2f57cabe6c394809)
+    archv2_arena/streams.py            blob:30c23f9700a1309cda059c76bfe6fcbc6c41d64b sha256-lf16:315a30993d340650 (CRLF sha256-crlf16:bd52a16174d485b7)
+    archv2_arena/ro.py                 blob:98cfb84a58e7844e24b73ba301c2792cddc61b7c sha256-lf16:23d4f38710e3007f (CRLF sha256-crlf16:297117b2176e7cd7)
+    archv2_arena/bt.py                 blob:8ee2e28b4fe9097f68b462562adaedea92f54813 sha256-lf16:138bd034706eb2e1 (CRLF sha256-crlf16:b9c25ce1f79d1875)
+    archv2_arena/cert.py               blob:d150ec9c3084352354bd83c4b106f7936f11d036 sha256-lf16:11e2ec7e76e0b495 (CRLF sha256-crlf16:1a5f2a861058b6d1)
+    archv2_arena/verdict_model.py      blob:2d6d0e2c9f494f33bfc40fab18a30d31b2d433ad sha256-lf16:10b9a030c3f09e47 (CRLF sha256-crlf16:5ba1fa98b405f8a1)
+    archv2_arena/data.py               blob:7de0b135028ba96eab24b2ba998a62dd74e03247 sha256-lf16:78d3947f51dc8596 (CRLF sha256-crlf16:769163d4f95b4437)
+    archv2_arena/design.py             blob:4959cb525c8d07a26d19358c3f98342d5b28b3d2 sha256-lf16:becd63768eedb8fc (CRLF sha256-crlf16:c0e5c5ffd6dcd994)
+    archv2_arena/g22.py                blob:257d14ca64328f1d48d52fc57b0386dc71690b3b sha256-lf16:a8e7026c0d7e8c7a (CRLF sha256-crlf16:407a72846563346f)
+    archv2_arena/report.py             blob:51639563bdd47d48e0ec8b1673eee0e7b865653a sha256-lf16:da954a3c4d1b833f (CRLF sha256-crlf16:50e5e1884a1eb849)
+    archv2_arena/synth.py              blob:02db84ba5d3ee2c819bddc1be4455ec0e186b5ca sha256-lf16:b64657775ffa4422 (CRLF sha256-crlf16:3633804b08d6b3f1)
+    archv2_arena/selftest_g22.py       blob:88adb8247e51f9231282fc421fe9b6d82ac18aff sha256-lf16:e12bf469e0071db9 (CRLF sha256-crlf16:50145f9087cd36d5)
+    archv2_arena/selftest_g22_v2.py    blob:bd1e73f96db66ae31cb360a28be466c925e6c86c sha256-lf16:b3f4d8bffa636c41 (CRLF sha256-crlf16:d478cfe70a36b9d1)
+  inputs (size, mtime; -wal / -journal sizes):
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\x12_crossdomain\grok_calib.db | 37879808 B | mtime 2026-09-16 05:00:28 | no sidecar
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\mmlu_pro_dataset_cache_v2.db | 974917632 B | mtime 2026-09-19 16:30:10 | -wal 0 B
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\snapshots.db | 1065541632 B | mtime 2026-09-23 04:34:26 | -wal 0 B
+  builder: EXACT (build()'s loop, random.Random(42), rj.mm_fit) - the edge objects of record
+
+=== (f) OVERDISPERSION of wrong(established) on grok ===
+  denominator: 809 established edges (exact McNemar on each anchor's judged questions); wrong(established) 20
+  by MODEL (each edge counts for both endpoints): chi-square vs a homogeneous rate 15.87 over 12 models, permutation p 0.0775 (2000 permutations of the wrong labels among the established edges)
+  by ANCHOR: chi-square 11.99 over 14 anchors, permutation p 0.5097
+  ALL-WRONG population (printed under its own name; NOT the deciding residue definition): most-incident SET: {Meta-Llama-3_1-70B-Instruct, gemini-3.1-pro_5-shots, gpt-4o-2024-08-06} at 6 each | roster membership: Meta-Llama-3_1-70B-Instruct IN, gemini-3.1-pro_5-shots IN, gpt-4o-2024-08-06 IN (share 0.30; permutation p for the top share 0.8041)
+  incidence by model: Meta-Llama-3_1-70B-Instruct 6, gemini-3.1-pro_5-shots 6, gpt-4o-2024-08-06 6, deepseek-chat-v2_5 5, iask_pro 5, arx_0314 4, Meta-Llama-3_1-8B 3, Qwen1.5-72B-Chat 2, Llama-2-13b-hf 1, Yi-6b-Chat 1, c4ai-command-r-v01 1
+  DEFF of the wrong indicator, anchor-clustered: ANOVA ICC -0.0010, Kish m 57.92, DEFF 0.945, n_eff 856.5; rate 20 / 809 = 0.0247, one-sided 95% CP UB at n 809: 0.0357, at n_eff (w scaled) 0.0351
+  THE CERTIFICATE OF RECORD (ruling B, 4b25059): the SHIPPED pair COLD for grok: b0 -3.5451 b1 +3.3854 (grok: the GROK-CALIB stored pair on the same 891 denominator (programme L3928)) + the key-tie decline at 0.975, per anchor, on the 891 key-gap >= 0.02 edges: widener alone 669 called; after the decline 649 called, wrong 1(1)
+    precondition (merged only; exact builder, KTD-CHECK 1,714 / 4(4)): no precondition registered for board grok -> MET
+    in-sample widener (a DIFFERENT OBJECT, printed beside, deciding nothing): b0 -3.5451 b1 +3.3854; + decline at 0.975: 649 called, wrong(established) 1
+  RESIDUE MODEL, THE DECIDING DEFINITION (ruling 4 as corrected by ruling B): CALLED wrong(established) under the certificate of record: 1 edges
+    the residue model SET: {Meta-Llama-3_1-70B-Instruct, Qwen1.5-72B-Chat} at 1 each | roster membership: Meta-Llama-3_1-70B-Instruct IN, Qwen1.5-72B-Chat IN
+    the called wrong(established) edges: Law Meta-Llama-3_1-70B-Instruct vs Qwen1.5-72B-Chat
+  RESIDUE MODEL, RESOLVED FROM THE DATA: the 70B Llama models in the eval DB roster: Llama-2-70b-hf, Meta-Llama-3-70B, Meta-Llama-3-70B-Instruct, Meta-Llama-3_1-70B, Meta-Llama-3_1-70B-Instruct
+    quarantined (CONTEXT.md section 4 rule 6): Meta-Llama-3-70B-Instruct -> in the DB, EXCLUDED from the roster
+    the residue model on this board (CALLED definition, ruling 4): {Meta-Llama-3_1-70B-Instruct, Qwen1.5-72B-Chat} | roster: 46 models
+    Llama-2-70b-hf: in the roster YES; quarantined no
+    Meta-Llama-3-70B: in the roster YES; quarantined no
+    Meta-Llama-3-70B-Instruct: in the roster NO; quarantined YES
+    Meta-Llama-3_1-70B: in the roster YES; quarantined no
+    Meta-Llama-3_1-70B-Instruct: in the roster YES; quarantined no
+  inputs (size, mtime; -wal / -journal sizes):
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\x12_crossdomain\stack_v2_promptv2_x12all.db | 39124992 B | mtime 2026-09-10 19:58:37 | no sidecar
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\mmlu_pro_dataset_cache_v2.db | 974917632 B | mtime 2026-09-19 16:30:10 | -wal 0 B
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\snapshots.db | 1065541632 B | mtime 2026-09-23 04:34:26 | -wal 0 B
+  builder: EXACT (build()'s loop, random.Random(42), rj.mm_fit) - the edge objects of record
+
+=== (f) OVERDISPERSION of wrong(established) on x12 ===
+  denominator: 809 established edges (exact McNemar on each anchor's judged questions); wrong(established) 26
+  by MODEL (each edge counts for both endpoints): chi-square vs a homogeneous rate 15.40 over 12 models, permutation p 0.0935 (2000 permutations of the wrong labels among the established edges)
+  by ANCHOR: chi-square 12.52 over 14 anchors, permutation p 0.4673
+  ALL-WRONG population (printed under its own name; NOT the deciding residue definition): most-incident SET: {gemini-3.1-pro_5-shots} at 9 each | roster membership: gemini-3.1-pro_5-shots IN (share 0.35; permutation p for the top share 0.2289)
+  incidence by model: gemini-3.1-pro_5-shots 9, Meta-Llama-3_1-70B-Instruct 7, gpt-4o-2024-08-06 6, iask_pro 6, arx_0314 5, Meta-Llama-3_1-8B 4, Qwen1.5-72B-Chat 4, c4ai-command-r-v01 4, deepseek-chat-v2_5 4, Yi-6b-Chat 3
+  DEFF of the wrong indicator, anchor-clustered: ANOVA ICC -0.0001, Kish m 57.92, DEFF 0.994, n_eff 814.3; rate 26 / 809 = 0.0321, one-sided 95% CP UB at n 809: 0.0443, at n_eff (w scaled) 0.0440
+  THE CERTIFICATE OF RECORD (ruling B, 4b25059): the SHIPPED pair COLD for x12: b0 -3.2326 b1 +3.3133 (Mistral: the SHIPPED pair, the fit on the 891 filtered x12 edges (FRAMEWORK L95, L165, L319)) + the key-tie decline at 0.975, per anchor, on the 891 key-gap >= 0.02 edges: widener alone 665 called; after the decline 651 called, wrong 1(1)
+    precondition (merged only; exact builder, KTD-CHECK 1,714 / 4(4)): no precondition registered for board x12 -> MET
+    in-sample widener (a DIFFERENT OBJECT, printed beside, deciding nothing): b0 -3.2326 b1 +3.3133; + decline at 0.975: 651 called, wrong(established) 1
+  RESIDUE MODEL, THE DECIDING DEFINITION (ruling 4 as corrected by ruling B): CALLED wrong(established) under the certificate of record: 1 edges
+    the residue model SET: {Meta-Llama-3_1-70B-Instruct, Qwen1.5-72B-Chat} at 1 each | roster membership: Meta-Llama-3_1-70B-Instruct IN, Qwen1.5-72B-Chat IN
+    the called wrong(established) edges: Law Meta-Llama-3_1-70B-Instruct vs Qwen1.5-72B-Chat
+  RESIDUE MODEL, RESOLVED FROM THE DATA: the 70B Llama models in the eval DB roster: Llama-2-70b-hf, Meta-Llama-3-70B, Meta-Llama-3-70B-Instruct, Meta-Llama-3_1-70B, Meta-Llama-3_1-70B-Instruct
+    quarantined (CONTEXT.md section 4 rule 6): Meta-Llama-3-70B-Instruct -> in the DB, EXCLUDED from the roster
+    the residue model on this board (CALLED definition, ruling 4): {Meta-Llama-3_1-70B-Instruct, Qwen1.5-72B-Chat} | roster: 46 models
+    Llama-2-70b-hf: in the roster YES; quarantined no
+    Meta-Llama-3-70B: in the roster YES; quarantined no
+    Meta-Llama-3-70B-Instruct: in the roster NO; quarantined YES
+    Meta-Llama-3_1-70B: in the roster YES; quarantined no
+    Meta-Llama-3_1-70B-Instruct: in the roster YES; quarantined no
+  inputs (size, mtime; -wal / -journal sizes):
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\x12_crossdomain\stack_v2_promptv2_x12all.db | 39124992 B | mtime 2026-09-10 19:58:37 | no sidecar
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\x12_crossdomain\stack_v2_promptv2_x20.db | 54575104 B | mtime 2026-09-10 23:44:17 | no sidecar
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\mmlu_pro_dataset_cache_v2.db | 974917632 B | mtime 2026-09-19 16:30:10 | -wal 0 B
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\snapshots.db | 1065541632 B | mtime 2026-09-23 04:34:26 | -wal 0 B
+  builder: EXACT (build()'s loop, random.Random(42), rj.mm_fit) - the edge objects of record
+
+=== (f) OVERDISPERSION of wrong(established) on merged ===
+  denominator: 2210 established edges (exact McNemar on each anchor's judged questions); wrong(established) 75
+  by MODEL (each edge counts for both endpoints): chi-square vs a homogeneous rate 53.40 over 20 models, permutation p 0.0005 (2000 permutations of the wrong labels among the established edges)
+  by ANCHOR: chi-square 22.34 over 14 anchors, permutation p 0.0465
+  ALL-WRONG population (printed under its own name; NOT the deciding residue definition): most-incident SET: {Qwen1.5-14B-Chat} at 19 each | roster membership: Qwen1.5-14B-Chat IN (share 0.25; permutation p for the top share 0.0030)
+  incidence by model: Qwen1.5-14B-Chat 19, gemini-3.1-pro_5-shots 16, Meta-Llama-3_1-70B-Instruct 13, arx_0314 13, Qwen1.5-110B 11, claude-3-5-haiku-20241022 8, Mixtral-8x7B-Instruct-v0.1 7, claude-3-5-sonnet-20241022 7, gpt-4o-2024-08-06 7, Qwen1.5-72B-Chat 6, arx_3 6, c4ai-command-r-v01 6, deepseek-chat-v2_5 6, gpt-4o-mini 6, iask_pro 6, Meta-Llama-3_1-8B 5, Llama-2-13b-hf 2, Llama-2-7b-hf 2, Yi-6b-Chat 2, gemma-7b 2
+  DEFF of the wrong indicator, anchor-clustered: ANOVA ICC 0.0050, Kish m 158.34, DEFF 1.780, n_eff 1241.9; rate 75 / 2210 = 0.0339, one-sided 95% CP UB at n 2210: 0.0410, at n_eff (w scaled) 0.0435
+  THE CERTIFICATE OF RECORD (ruling B, 4b25059): the SHIPPED pair COLD for merged: b0 -3.2326 b1 +3.3133 (Mistral: the SHIPPED pair, the fit on the 891 filtered x12 edges (FRAMEWORK L95, L165, L319)) + the key-tie decline at 0.975, per anchor, on the 2538 key-gap >= 0.02 edges: widener alone 1783 called; after the decline 1714 called, wrong 4(4)
+    precondition (merged only; exact builder, KTD-CHECK 1,714 / 4(4)): REPRODUCED KTD-CHECK: called 1714 / 4(4) -> MET
+    in-sample widener (a DIFFERENT OBJECT, printed beside, deciding nothing): b0 -2.4305 b1 +2.4507; + decline at 0.975: 1627 called, wrong(established) 3
+  RESIDUE MODEL, THE DECIDING DEFINITION (ruling 4 as corrected by ruling B): CALLED wrong(established) under the certificate of record: 4 edges
+    the residue model SET: {Meta-Llama-3_1-70B-Instruct} at 4 each | roster membership: Meta-Llama-3_1-70B-Instruct IN
+    the called wrong(established) edges: Law Meta-Llama-3_1-70B-Instruct vs Qwen1.5-72B-Chat; Law Meta-Llama-3_1-70B-Instruct vs deepseek-chat-v2_5; Law Meta-Llama-3_1-70B-Instruct vs gpt-4o-mini; Philosophy Meta-Llama-3_1-70B-Instruct vs gpt-4o-mini
+  RESIDUE MODEL, RESOLVED FROM THE DATA: the 70B Llama models in the eval DB roster: Llama-2-70b-hf, Meta-Llama-3-70B, Meta-Llama-3-70B-Instruct, Meta-Llama-3_1-70B, Meta-Llama-3_1-70B-Instruct
+    quarantined (CONTEXT.md section 4 rule 6): Meta-Llama-3-70B-Instruct -> in the DB, EXCLUDED from the roster
+    the residue model on this board (CALLED definition, ruling 4): {Meta-Llama-3_1-70B-Instruct} | roster: 46 models
+    Llama-2-70b-hf: in the roster YES; quarantined no
+    Meta-Llama-3-70B: in the roster YES; quarantined no
+    Meta-Llama-3-70B-Instruct: in the roster NO; quarantined YES
+    Meta-Llama-3_1-70B: in the roster YES; quarantined no
+    Meta-Llama-3_1-70B-Instruct: in the roster YES; quarantined no
+
+=== P7 (the P7 scoring ruling): the residue model and its roster membership ===
+  IDENTITY CLAUSE (scored on MERGED ONLY): HELD (Meta-Llama-3_1-70B-Instruct is the UNIQUE most-incident model on merged)
+  x12 (DESCRIPTIVE, never scored): {Meta-Llama-3_1-70B-Instruct, Qwen1.5-72B-Chat}: UNRESOLVED (one-edge tie)
+  grok (DESCRIPTIVE, never scored): {Meta-Llama-3_1-70B-Instruct, Qwen1.5-72B-Chat}: UNRESOLVED (one-edge tie)
+  ROSTER CLAUSE (checked on ALL boards read: grok, merged, x12): every residue-set member is inside the 46-model roster
+  POST-DATA readings, deciding nothing: (a) 'Meta-Llama-3_1-70B-Instruct in the top set on every board read' yes; (b) 'the unique top on every board read' no (boards read: grok, merged, x12)
+
+  EXECUTION WITNESS (new code paths): {'edges_exact.boards': 12600, 'edges_exact.edges': 4478}
+  DB OPENS (all through pool_guard.open_ro: -wal/-journal refused, then mode=ro&immutable=1): 11
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\mmlu_pro_dataset_cache_v2.db
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\snapshots.db
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\x12_crossdomain\grok_calib.db
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\mmlu_pro_dataset_cache_v2.db
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\snapshots.db
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\x12_crossdomain\stack_v2_promptv2_x12all.db
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\mmlu_pro_dataset_cache_v2.db
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\snapshots.db
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\x12_crossdomain\stack_v2_promptv2_x12all.db
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\x12_crossdomain\stack_v2_promptv2_x20.db
+    Z:\FAC\TUBerlin\THESIS\TaxoArena\mmlu_pro_dataset_cache_v2.db
+  RANDOM STREAMS (master 'ARCHV2-G22-REC-1'): 6 named streams, log sha256 751692a45fb0bc193eef51c00cc1952178b4fa692787db14084fc50456aea100 (full list in the .streams.tsv beside this file); seed = sha256(master|name)[:8] big-endian unless 'of record'
+    grok/edges_exact/build()-Random(42)                                            42  random.Random (seed of record)
+    merged/edges_exact/build()-Random(42)                                          42  random.Random (seed of record)
+    overdispersion/grok/permutations                              7594148266388811207  numpy.PCG64
+    overdispersion/merged/permutations                            8054849674692887990  numpy.PCG64
+    overdispersion/x12/permutations                              15647948991709329778  numpy.PCG64
+    x12/edges_exact/build()-Random(42)                                             42  random.Random (seed of record)

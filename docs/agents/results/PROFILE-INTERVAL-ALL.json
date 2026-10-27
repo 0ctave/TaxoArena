@@ -1,0 +1,139 @@
+{
+  "id": "PROFILE-INTERVAL-ALL",
+  "title": "PROFILE-INTERVAL-ALL: FRAMEWORK item 9: the reliability crossing published as a range and a per-anchor certifiability list with intervals on every board-level reliability number (zero calls)",
+  "question": "Fixed six-cell and all-14 sweeps, 10 halving seeds, three estimators, on the x12 board, the merged 20-model board and the key rows; per-anchor class on the lower of a recentred question bootstrap (B=125) and a delete-one-question jackknife; the merged profile at 119-132 questions per anchor.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "eaf1dbf",
+    "program_lines": "docs/judge_v2_program.md L3603-L3611 (by reference; docs/design/FRAMEWORK.md L362 item 9); the Block 1 record bullet at L3755",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-15 (before any run) — BY REFERENCE: the 26 tests in docs/design/FRAMEWORK.md \"Tests to register before shipping\" (commit 8d77f7b), with the criteria, predictions and call counts stated there, scheduled in docs/plan_2026-09-15.md",
+    "outcome_heading": [
+      "L3662: ## Block 1 record (2026-09-15/16, zero calls) — FRAMEWORK items 1-12, 14-16: fourteen zero-call tests built, each adversarially checked; verdicts of record below (checker's number wins where it refutes the builder)",
+      "L3755: - **PROFILE-INTERVAL-ALL (2026-09-16, zero calls): both deliverables delivered (C1, C2 PASS as deliverables); prediction \"History, Health, Philosophy below 0.70 individually\" PARTLY, not confirmed as a three-anchor statement; three merged-board classes are halving-seed-decided.**"
+    ],
+    "date": "2026-09-15"
+  },
+  "script": {
+    "path": "tools/analysis/profile_interval_all.py",
+    "sha16": "53611f3401116cef",
+    "commit": "7076615"
+  },
+  "ready": null,
+  "go": "n/a (0 calls; Block 1)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/profile_interval_all.txt",
+    "outcome_commit": "7076615",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae (pool_guard.assert_pool_of_record() first; union pool paeec37aa28063c75 by explicit id where used)",
+    "date": "2026-09-15/16"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); each Block 1 test was 'adversarially checked' at build time and the checker's number wins where it refutes the builder (Block 1 record header L3662-L3663); the checker-confirmed defects are listed in the bullet",
+    "commit": "7076615",
+    "verdict": ""
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "crossing published as a range",
+      "result": "DELIVERED",
+      "value": "six-cell x12: point 178-320 q/cell (estimator (a) from S=210 178-226; (c) 205-320), interval union [82, 418]; first measured seed-mean >= 0.70 at S=210 (0.7071; 3 of 10 seeds below); six-cell merged 131-187 [88, 234]; all-14 x12 349-732 [135, 9405], merged 226-325 [141, 495], none measured >= 0.70 within the 115-q ceiling; key 19-58 / 34-49; every per-seed R reproduced to 4 dp (CONFIRMED, framing corrected: the defensible statement is 'six largest anchors 178-352 q/cell, measured >= 0.70 only by seed-mean at S=210')",
+      "denominator": "10 halving seeds; three estimators; x12 / merged / key"
+    },
+    {
+      "id": "C2",
+      "text": "per-anchor certifiability list (merged board, profile reading; class on the lower of the recentred bootstrap and the delete-one jackknife)",
+      "result": "DELIVERED",
+      "value": "PASS Physics 0.9148, Math 0.8833; PASS-WITH-INTERVAL Law 0.7923, Psychology 0.7882, Business 0.7701, Chemistry 0.7604, Philosophy 0.7334, Other 0.7090, History 0.7063; FAIL Engineering 0.6866, Biology 0.3987, Computer science 0.3054, Economics 0.1431, Health -0.0710 (2/7/5); x12 2/4/8; raw-order reading all 14 PASS (0.92-0.99, near-vacuous); History, Other, Engineering have 0.70 inside their 40-halving bands ([0.681, 0.731], [0.678, 0.738], [0.652, 0.720]): seed-dependent at the point",
+      "denominator": "14 anchors, 119-304 judged q; B=125 x 16 halvings; jackknife on 10 halvings"
+    },
+    {
+      "id": "(1)",
+      "text": "jackknife intervals on every board-level reliability number",
+      "result": "DELIVERED",
+      "value": "PARTLY: x12 anchor 0.6728 [0.5108, 0.8348] fixed / [0.4932, 0.8524] re-halved / [0.4097, 0.8054] cell-boot FAIL; merged 0.7183 [0.6102, 0.8264] / [0.6076, 0.8291] / [0.5641, 0.8126] PASS-WITH-INTERVAL; leaf(50)/leaf(25) FAIL on both judge boards; key rows PASS / PASS-WITH-INTERVAL; the recorded 11-cell S=150 row (0.4356 / 0.9164) is in neither sweep and carries no interval",
+      "denominator": "board-level R on x12, merged, key"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "History, Health, Philosophy below 0.70 individually",
+      "result": "FAILED",
+      "value": "PARTLY (checker; builder FAIL): merged profile Health -0.071 below; History 0.706 (0.689-0.721 across halving seeds, undetermined at the point); Philosophy 0.733 (above on every board, seed and reading); x12 2 of 3 (History 0.614, Health -0.152); raw-order 0 of 3; key-20 rows 0.668 / 0.648 / 0.674 all below: NOT CONFIRMED as a three-anchor statement; the failing merged set is Health, Economics, Computer science, Biology and (seed-dependently) Engineering, not the three smallest anchors",
+      "denominator": "14 anchors on the merged board"
+    }
+  ],
+  "falsifier": {
+    "text": "none beyond the deliverables (registered by reference)",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "crossing": "six-cell x12 178-320 q/cell [82, 418]; six-cell merged 131-187 [88, 234]; all-14 x12 349-732 [135, 9405]; merged 226-325 [141, 495]; key 19-58 / 34-49; seed-mean >= 0.70 first at S=210 (0.7071, 3 of 10 seeds below)",
+    "board_level": "x12 0.6728 [0.5108, 0.8348] / [0.4932, 0.8524] / [0.4097, 0.8054]; merged 0.7183 [0.6102, 0.8264] / [0.6076, 0.8291] / [0.5641, 0.8126]; SB extrapolation of the published boards: x12 0.6728 at mean 200.8 q/cell -> 228, merged 0.7183 -> 184 (outside the all-14 range, inside the six-cell range)",
+    "classes_merged": "PASS Physics 0.9148, Math 0.8833; PWI Law 0.7923, Psychology 0.7882, Business 0.7701, Chemistry 0.7604, Philosophy 0.7334, Other 0.7090, History 0.7063; FAIL Engineering 0.6866, Biology 0.3987, Computer science 0.3054, Economics 0.1431, Health -0.0710; x12 2/4/8; under the raw interval x12 Math and key Economics / Other drop PASS -> PASS-WITH-INTERVAL",
+    "halving_bands": "History [0.681, 0.731], Other [0.678, 0.738], Engineering [0.652, 0.720] contain 0.70"
+  },
+  "sentence_of_record": "PROFILE-INTERVAL-ALL (2026-09-16, zero calls): both deliverables delivered (C1 the crossing as a range; C2 the per-anchor certifiability list: merged board PASS Physics 0.9148, Math 0.8833; PASS-WITH-INTERVAL Law, Psychology, Business, Chemistry, Philosophy, Other, History; FAIL Engineering, Biology, Computer science, Economics, Health = 2/7/5); (1) PARTLY: the recorded 11-cell S=150 row carries no interval; prediction 'History, Health, Philosophy below 0.70 individually' PARTLY, not confirmed as a three-anchor statement (Health below; History seed-undetermined at 0.706; Philosophy above on every reading); three merged-board classes (History, Other, Engineering) are halving-seed-decided; the failing set is Health, Economics, Computer science, Biology and (seed-dependently) Engineering, not the three smallest anchors; at 119-132 questions a per-anchor deviation row is not certifiable by the key either.",
+  "chips": [
+    "C1, C2 DELIVERED",
+    "(1) PARTLY: THE S=150 ROW CARRIES NO INTERVAL",
+    "PREDICTION PARTLY (checker; builder FAIL)"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-18",
+      "by": "PROFILE-RELIABILITY-INTERACTION (the like-for-like re-reading of the board-level numbers; PROFILE-R-FILTERED re-used the per-anchor instrument and reproduced all 14 C2 points to 4 dp)",
+      "text": "the judge's 0.6728 (x12) and 0.7183 (merged) are interaction-only by construction (per-anchor BT centres theta); the like-for-like key comparator is the K12 interaction-only 0.8665 / K20 0.8391."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the coordinator's verified record-integrity blocker A1 (insertion only, zero calls; no number of this record moves)",
+      "text": "DISCLOSED 2026-09-23 by the registrar (blocker A1, insertion only, zero calls; NO number of this record moves and nothing above is rewritten): THE UNION TREE THIS RESULT IS ROUTED ON FAILS THE TRAIN-ONLY INVARIANT. Snapshot 20260911_144214 carries 427 distinct EVAL texts among its member slots by exact text and 432 under the split function's own key norm-v1 (FRAMEWORK L229 / L373, `gradlew trainOnlyAudit`, read-only), i.e. 432 of the 6,482 paeec EVAL ids = 6.66% of the routed population were visible to construction. THE WORST-CASE BOUND, which needs no run and is a BOUND AND NOT AN ESTIMATE OF THE EFFECT (it assumes every contaminated item is correct BECAUSE of the contamination, which is the largest the effect can possibly be). UNION TREE 20260911_144214: 432 of 6,482 paeec EVAL ids = 6.66% (exact text 427). At MC-ROOT's Top-1 of 81.58% that is 5,288.0 correct, so a clean reading is at worst (5,288 - 432) / (6,482 - 432) = 4,856 / 6,050 = 80.26%: THE UNION ROUTING HEADLINE CANNOT FALL BY MORE THAN 1.32pp. MC-E2E's +3.38pp router gain and PROFILE-INTERVAL-ALL-UNION's 0.8537 are bounded by the same 6.66% share. MMLU-PRO TREE 20260910_043557: 70 of 3,445 = 2.03% (exact text 37), so AT MOST 2.03pp on any routed proportion - about 5 questions per anchor spread over the 14 bareq512_s42 anchors at 119-304 questions per anchor. THE BOUND IS A WORST CASE AND NOT AN ESTIMATE; no clean re-read was run, and whether to rebuild under content closure (0 judge calls, new snapshot ids, every routed readout moves) or to disclose at this bound is an OPEN AUTHOR DECISION registered in docs/agents/results/SPLIT-FUNCTION-IMPL.json."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a per-anchor deviation row certifiable by the key at 119-132 questions",
+    "a measured (not extrapolated) all-14 crossing within the 115-q ceiling",
+    "the per-anchor halving SD in the published table (omitted; the checker asks for it)",
+    "[DISCLOSED 2026-09-23 by the registrar (blocker A1, insertion only, zero calls; NO number of this record moves and nothing above is rewritten): THE UNION TREE THIS RESULT IS ROUTED ON FAILS THE TRAIN-ONLY INVARIANT. Snapshot 20260911_144214 carries 427 distinct EVAL texts among its member slots by exact text and 432 under the split function's own key norm-v1 (FRAMEWORK L229 / L373, `gradlew trainOnlyAudit`, read-only), i.e. 432 of the 6,482 paeec EVAL ids = 6.66% of the routed population were visible to construction. THE WORST-CASE BOUND, which needs no run and is a BOUND AND NOT AN ESTIMATE OF THE EFFECT (it assumes every contaminated item is correct BECAUSE of the contamination, which is the largest the effect can possibly be). UNION TREE 20260911_144214: 432 of 6,482 paeec EVAL ids = 6.66% (exact text 427). At MC-ROOT's Top-1 of 81.58% that is 5,288.0 correct, so a clean reading is at worst (5,288 - 432) / (6,482 - 432) = 4,856 / 6,050 = 80.26%: THE UNION ROUTING HEADLINE CANNOT FALL BY MORE THAN 1.32pp. MC-E2E's +3.38pp router gain and PROFILE-INTERVAL-ALL-UNION's 0.8537 are bounded by the same 6.66% share. MMLU-PRO TREE 20260910_043557: 70 of 3,445 = 2.03% (exact text 37), so AT MOST 2.03pp on any routed proportion - about 5 questions per anchor spread over the 14 bareq512_s42 anchors at 119-304 questions per anchor. THE BOUND IS A WORST CASE AND NOT AN ESTIMATE; no clean re-read was run, and whether to rebuild under content closure (0 judge calls, new snapshot ids, every routed readout moves) or to disclose at this bound is an OPEN AUTHOR DECISION registered in docs/agents/results/SPLIT-FUNCTION-IMPL.json.]"
+  ],
+  "ledger": {
+    "row_id": "PROFILE-INTERVAL-ALL",
+    "version": "v103 (684be03) [UPDATED 2026-09-23 at ledger v130 (audit OK, 227 rows): the blocker-A1 TRAIN-ONLY disclosure, with its counts and its worst-case bound, inserted into this row's observed cell. No number in the row moves.]; [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "PROFILE-RELIABILITY",
+    "PROFILE-RELIABILITY-X20",
+    "ANCHOR-PROFILE-INTERVAL",
+    "PROFILE-TREE-ROBUST"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L3603-L3611 (by-reference registration eaf1dbf) and docs/design/FRAMEWORK.md L362 item 9: criterion, prediction, call count",
+    "docs/judge_v2_program.md L3755 ff. (Block 1 record bullet, 7076615): the criterion table, predictions scored, checker-confirmed defects, script and output",
+    "experiment_results/x12_crossdomain/profile_interval_all.txt (7076615)",
+    "docs/test_ledger.html row PROFILE-INTERVAL-ALL (v103 684be03): chips verbatim, design / criteria / observed cells, evidence",
+    "script sha16 = sha256 of tools/analysis/profile_interval_all.py at 7076615 (its first commit), first 16 hex (identity, computed by the registrar 2026-09-22; later edited at 13f2142 for the pool_guard change)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' heading and the '- **ID (...)**' bullet line inside the Block 1 record, to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Putting uncertainty intervals on every reliability number of the per-subject model profiles. It reports how many questions per subject are needed for a reliable profile, and which of 14 MMLU-Pro subjects reach the reliability bar.",
+    "why": "Per-subject profiles are only trustworthy if their reliability is shown with intervals, not as point values.",
+    "information": "Result (no new calls): delivered. Physics and Math pass. Seven subjects pass only within their intervals. Engineering, Biology, Computer science, Economics and Health fail. The failing set is not simply the smallest subjects. At about 120-130 questions per subject, a per-subject deviation row cannot be certified. Later disclosure: the tree used for routing had about 6.7% of the routed questions visible during construction. It is on older judged data now ruled history.",
+    "written": "2026-10-07"
+  }
+}

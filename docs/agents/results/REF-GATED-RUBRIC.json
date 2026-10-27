@@ -1,0 +1,160 @@
+{
+  "id": "REF-GATED-RUBRIC",
+  "title": "REF-GATED-RUBRIC: is rubric value CONDITIONAL on the reference being right? (the specific-judges line, redirected; 3,594 calls)",
+  "question": "A 2x2 run fresh in one session: 900 matches where the grok reference is WRONG and 899 where it is CORRECT (drawn from answer-disagreeing key-decidable pairs), each judged with the anchor rubric alone and with the RK-1b data-only leaf card, paired, single order, grok-4-1-fast-non-reasoning: (1) the INTERACTION (card effect in stratum B minus A) with a bootstrap CI excluding zero; (2) stratum A null at adequate power; (3) stratum B replicates RK-1b; (4) the decisiveness split.",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "3770ca5",
+    "program_lines": "docs/rubric_v2_design.md L331-L363 (registration) and L364-L400 (outcome); no programme section (the rubric line is recorded in rubric_v2_design.md)",
+    "program_lines_as_of": "docs/rubric_v2_design.md at 53f5fd4",
+    "heading": "## Registered 2026-09-14 (before any call) — REF-GATED-RUBRIC: is rubric value conditional on the reference being right?",
+    "outcome_heading": [
+      "docs/rubric_v2_design.md L364: - **REF-GATED-RUBRIC OUTCOME (2026-09-14): the registered interaction FAILS, both cells individually reproduce RUBRIC-STRATA, and the failure is my sampling error rather than a property of the world.**"
+    ],
+    "date": "2026-09-14"
+  },
+  "script": {
+    "path": "tools/analysis/ref_gated_rubric.py",
+    "sha16": "e209b20e5a442806 (at 69605b0)",
+    "commit": "69605b0 (later 13f2142)"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (1,800 matches, 3,600 calls registered; 3,594 posted)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/refgated_outcome.txt",
+    "outcome_commit": "c7edd45",
+    "calls": 3594,
+    "cce": "not stated",
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-14",
+    "other_files": [
+      "refgated.db (cache)"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the ledger audit's C-6 (population mismatch) is the class the registration itself fell into, named in the outcome",
+    "commit": "c7edd45",
+    "verdict": "(1) NOT CONFIRMED; (2) (3) (4) INFORMATIVE: stratum A definitively null at good power, stratum B replicates RK-1b, the card buys discrimination there"
+  },
+  "criteria": [
+    {
+      "id": "(1)",
+      "text": "PRIMARY: the interaction (card's paired effect in stratum B minus stratum A) positive with a bootstrap CI excluding zero",
+      "result": "FAILED",
+      "value": "+0.013, bootstrap 95% [-0.008, +0.036]: NOT CONFIRMED; a sampling error of the registration: both strata drawn from answer-DISAGREEING pairs (the shipped filter) while RUBRIC-STRATA was unfiltered, so the reference-correct baseline is 0.969 here vs 0.930 there and the card had only 3.1pp of ceiling (the audit's C-6 class)",
+      "denominator": "900 + 899 matches"
+    },
+    {
+      "id": "(2)",
+      "text": "stratum A (reference WRONG) alone against zero, null at adequate power",
+      "result": "HELD",
+      "value": "0.389 vs 0.389, +0.000, 40:40 discordant on 899 matches, McNemar p 1.000; MDE ~2.0pp at a 0.089 discordance rate: the card moves 80 verdicts and they cancel exactly; the n = 127 null in RUBRIC-STRATA was not a fluke",
+      "denominator": "899 matches"
+    },
+    {
+      "id": "(3)",
+      "text": "stratum B (reference CORRECT) replicates RK-1b's +1.3 to +1.7pp on a fresh sample and session",
+      "result": "HELD",
+      "value": "0.969 -> 0.982, +1.3pp, 3:15, p 0.0075 (the original RK-1b PASS depended on which of three byte-identical control sessions was drawn; this is a clean independent replication)",
+      "denominator": "900 matches"
+    },
+    {
+      "id": "(4)",
+      "text": "DECISIVENESS SPLIT: decisive-and-correct and correct-given-committed for all four cells",
+      "result": "DELIVERED",
+      "value": "stratum B: ties 1.0% -> 0.6%, correct-given-committed 0.979 -> 0.988 (about 0.9pp of the 1.3pp is better judging: DISCRIMINATION, the opposite of the RK-1b anatomy); stratum A: ties 0.101 -> 0.103, committed 0.433 -> 0.434 (nothing moves)",
+      "denominator": "four cells"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "interaction +1.5 to +3pp with a CI excluding zero",
+      "result": "FAILED",
+      "value": "+0.013 [-0.008, +0.036]",
+      "denominator": "1,799 matches"
+    },
+    {
+      "id": "P2",
+      "text": "stratum A within +-1pp of zero",
+      "result": "HELD",
+      "value": "+0.000",
+      "denominator": "899"
+    },
+    {
+      "id": "P3",
+      "text": "stratum B reproduces +1.0 to +2.0pp",
+      "result": "HELD",
+      "value": "+1.3pp",
+      "denominator": "900"
+    },
+    {
+      "id": "P4",
+      "text": "the card's effect in stratum B is mostly decisiveness",
+      "result": "FAILED",
+      "value": "discrimination, not decisiveness (ties already at 1.0%)",
+      "denominator": "900"
+    }
+  ],
+  "falsifier": {
+    "text": "IF the interaction is null, RUBRIC-STRATA was noise and the rubric line stays closed where it was; IF confirmed, the line is REDIRECTED (a cell-specific judge means a cell-specific REFERENCE)",
+    "fired": false,
+    "note": "the interaction is unconfirmed as a registered test; the directional claim stands on its components: a rubric cannot substitute for a reference, it can only improve the use of one that already works (+1.3pp where right, p 0.0075; exactly nothing where wrong, 40:40 at ~2pp resolution); the clean rerun (reference-correct stratum drawn WITHOUT the disagreement filter, 3,600 calls) is not worth spending"
+  },
+  "numbers_of_record": {
+    "table": "ref_correct n 900: no card 0.969 / + card 0.982 / +0.013 / 3:15 / p 0.0075 / ties .010 -> .006 / committed .979 -> .988; ref_wrong n 899: 0.389 / 0.389 / +0.000 / 40:40 / p 1.000 / ties .101 -> .103 / committed .433 -> .434",
+    "interaction": "+0.013 [-0.008, +0.036]",
+    "run": "3,594 calls, 0 errors; 900 + 899 matches; strata from the 7,691 answer-disagreeing key-decidable pairs on the 481 reference-wrong pool questions and the reference-correct questions",
+    "headroom": "reference-correct baseline 0.969 here vs 0.930 in RUBRIC-STRATA (3.1pp of ceiling)"
+  },
+  "sentence_of_record": "REF-GATED-RUBRIC (2026-09-14, 3,594 calls): the registered interaction FAILS (+0.013 [-0.008, +0.036]) and the failure is the registration's sampling error (both strata drawn from answer-disagreeing pairs, leaving the card 3.1pp of ceiling: the audit's C-6 class); both cells individually reproduce RUBRIC-STRATA: where the reference is WRONG the card gives +0.000 with 40:40 discordant on 899 matches (definitively null at ~2pp resolution), where it is RIGHT it replicates RK-1b on a fresh sample and session (+1.3pp, 3:15, p = 0.0075) and buys DISCRIMINATION, not decisiveness (correct-given-committed 0.979 -> 0.988). The directional claim stands on its components: a rubric cannot substitute for a reference, only improve the use of one that works; the formal interaction is unconfirmed and must be quoted as such.",
+  "chips": [
+    "(1) NOT CONFIRMED",
+    "(2)(3)(4) INFORMATIVE"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "a confirmed interaction (the registered test)",
+    "a rubric acting where the reference is wrong (exactly nothing at ~2pp resolution)",
+    "a reopened rubric line (the redirection: cell-specific REFERENCE, rubric as a second-order sharpener)"
+  ],
+  "ledger": {
+    "row_id": "REF-GATED-RUBRIC",
+    "version": "v82 (c7edd45); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "RUBRIC-STRATA",
+    "RK-1b",
+    "LEAF-POWERED",
+    "ORDER-1"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "rubric text at every granularity (CONTEXT.md section 5); this row is the confirmation that rubric value is conditional on a working reference (rubric_v2_design.md L328)"
+  },
+  "sources": [
+    "docs/rubric_v2_design.md L331-L363 (registration 3770ca5) and L364-L400 (outcome c7edd45)",
+    "experiment_results/x12_crossdomain/refgated_outcome.txt (c7edd45)",
+    "docs/test_ledger.html row REF-GATED-RUBRIC (v82): chips verbatim, observed cell, evidence (ref_gated_rubric.py, refgated_outcome.txt, 3770ca5)",
+    "script sha16 = sha256 of tools/analysis/ref_gated_rubric.py at 69605b0, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (rubric_v2_design.md / multi_corpus_design.md lines as of their last commits named in sources)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "A 2x2 judged run (3,594 calls). It compares matches where the reference answer is wrong with matches where it is right, each judged with and without a cell-specific rubric card.",
+    "why": "Tests whether a rubric only helps when the judge's reference is correct, which decides whether a cell-specific judge needs a cell-specific rubric or a cell-specific reference.",
+    "information": "Tells where to invest to make judges better per cell. Result: the registered interaction test FAILED (not confirmed), largely because of how the samples were drawn. Taken separately, the rubric does exactly nothing when the reference is wrong, and gives a small gain (+1.3pp) when it is right. Direction: a rubric cannot replace a good reference, it can only sharpen one that works. Older judged set, now classed as history.",
+    "written": "2026-10-07"
+  }
+}

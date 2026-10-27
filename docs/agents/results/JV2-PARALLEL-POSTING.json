@@ -1,0 +1,321 @@
+{
+  "id": "JV2-PARALLEL-POSTING",
+  "title": "JV2-PARALLEL-POSTING: a bounded worker pool for the judge_v2 posting path (two-phase transport, journal v2, live rate control), every guarantee of record unchanged, BYTE-INERT at --workers 1 (engineering; zero calls; build gated on JV2-RATE-PROBE's G >= 1.5 or the author; merge gated on F5)",
+  "question": "Can the judge_v2 posting path (writer + driver accounting) post with up to N calls in flight while every guarantee of record holds unchanged (write-ahead journal per invocation, per-slot idempotence, ledger == journal, ceilings, the day-rollover stop, the transport preflight, body fidelity, the six-way classification, a store independent of completion order), and is the path BYTE-IDENTICAL to today's at --workers 1? No verdict, recipe, prompt, reference, cap, temperature, order or combiner changes (2.1).",
+  "kind": "engineering",
+  "state": "done",
+  "registration": {
+    "commit": "the commit that writes this record (parent 0c10ea2)",
+    "program_lines": "docs/judge_v2_program.md L19096-L19239",
+    "program_lines_as_of": "_as_of the commit that writes them, parent 0c10ea2, re-grepped",
+    "date": "2026-09-25",
+    "heading": "## Registered 2026-09-25 (before any code; zero calls) — JV2-PARALLEL-POSTING: ...",
+    "provenance": "parallel_posting_registration_draft.md (the judge-design-specialist's own write, session scratchpad, not committed), sha256 8c50c0e8d28f40cdad2ee369e3a8ba4e44e0383e7c8ce195e5e1948ea57d2861 (UTF-8, LF, 0 CR, 240 lines, 42,113 bytes; registrar-verified); recorded verbatim in three contiguous blocks, sha256 block 1/3 edc3bf000e2241e6ebbf98ec83bd9683c400e1910ec2e5133dea54a108271388, 2/3 5362eb2fe7f9d0f36c027afc3d0b63b2d54d193e209942dd7f90c0ae928e0fea, 3/3 d68ddb4f67f538e8c32aaa805f27b173420815dff62db98e63dd90b9bacb07f0; concatenation re-hashed from the programme = the file",
+    "authority": "THE AUTHOR 2026-09-25: \"do both, start the LCB build now and register parallel posting\" (plan Amendment 23, recorded at a3df39a); the two-item split, the gates and the placement are the specialist's (relayed by the orchestrator), not author decisions"
+  },
+  "script": {
+    "path": "tools/analysis/judge_v2/{pool.py, pool_selftest.py, pool_inertness.py, writer.py}, tools/analysis/archv2_pilot/{accounting.py, pilot.py, selftest.py}, tools/analysis/archv2_pilot_k46.py (merged on main at 3187b6f)",
+    "sha16": "PINS OF RECORD (re-hashed by the registrar from HEAD ca4afcd; = the delta review's table): pool.py blob:e9bc770fb16aafa0256e10adbd18c91da237e61e / sha256-lf16:978ad89c8632a1b2 / sha256-crlf16:e426aa010d5f1796; pilot.py blob:c0565b57ab1f276048d380a70c6f030f980e2b22 / sha256-lf16:8029c6f5e3bf5998 / sha256-crlf16:4652c4a5df63a357; writer.py blob:0c9c57c335151ff198ea45c8bc98ffbd9c23adf2 / sha256-lf16:f3e2d1cf7447d8ca / sha256-crlf16:de1495810a956e73 (unchanged); accounting.py blob:dd777f32f07b90a90911e71e18ce5560daf7c932 / sha256-lf16:3012d9bbd2b2e36a / sha256-crlf16:f727d3ad26612f1f; selftest.py blob:82ee9cde74c196970b16d12a57d685bc21ef3e1d / sha256-lf16:8e23ad5f15833b23 / sha256-crlf16:9e8649b7ff55845e; archv2_pilot_k46.py blob:91dc8f577a755192d8d44b53050be60c37ef62ec / sha256-lf16:a9ffee1fb0353a3b / sha256-crlf16:1a994badea4531af; pool_selftest.py blob:318c9acaa01afd3b475698312d5d82dc4b8f0ba0 / sha256-lf16:90b2fd48d954d356 / sha256-crlf16:c84a1772f015bcee; pool_inertness.py blob:993c5c6800892900ed63f5c0526c1f57f381dece / sha256-lf16:c7a6b683145589a5 / sha256-crlf16:04b54940adc2cf0a; archv2_pilot package lf16 00bce6429d6dea64; unchanged _base.py 6f25e4ce, data_v2/verdicts.py 10138042, rejudge_reasoning.py 1339592a",
+    "commit": "branch tip 5ece92f (chain 86e88d2 -> 7594243 -> aae49ff -> 8a3da23 -> 94a93ac -> 5ece92f); merged by path at 3187b6f (parent 10c5213)"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_jv2_parallel_posting_delta1.md at 10c5213 (blob:00f8eef2f5bf6c6d2ee91b0589590838797f7866; LF of record, sha256 5965588d3ac9022614fb107c4b75abdf7e76277f4859499e9cbce64eb5d9cfbf): READY on 5ece92f; after docs/reviews/READY_jv2_parallel_posting.md at d32fa75 (blob:96685f1fe2cedf7b72e7cafd3b5069aa3986faf8; LF of record, sha256 d7058cf94b866a382617b43ad598df8ceeb7bacfe75db8e605f4077870190797): NOT READY on aae49ff",
+    "commit": "10c5213 (delta READY 1, READY); d32fa75 (first review, NOT READY, fixes F1-F6)",
+    "verdict": "READY on 5ece92f: F1-F6 closed (D-1..D-11 CONFIRMED); EC1-EC5 pass; P-c HELD; R4 NOT FIRED; deviation rulings 1-7 ACCEPTED (3: LOW residual, the plain sequential path has no live guard over the MUTANT switches); merge procedure section 5",
+    "recorded_at": "docs/judge_v2_program.md L19976-L20052 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — JV2-PARALLEL-POSTING MERGED at 3187b6f (8 paths by path from 5ece92f, blob-equal), after ... NOT READY d32fa75 ... and DELTA READY 1 10c5213 ...\"; _as_of the commit that writes it, parent ca4afcd, re-grepped)",
+    "record_lag": "the rebase (aae49ff), the NOT READY (d32fa75) and the delta READY (10c5213) were not recorded when they happened; the F6 pin bracket was not written before the delta READY; recorded together at the merge (registrar gap, disclosed)"
+  },
+  "go": "n/a (0 calls, 0 cce). BUILD GATE: JV2-RATE-PROBE C2 reads G >= 1.5, OR the author decides otherwise. MERGE GATE: F5 (the ARCH-V2-PILOT-K46 outcome written), and VIEWS-AUDIT-STAGE's re-pin first if it lands first | [BUILD AUTHORISED 2026-09-25 by THE AUTHOR regardless of JV2-RATE-PROBE's G (\"Go for 350 and build it anyway I'll find a way to increase the quota\"; plan Amendment 24): build gate (1) DISCHARGED by its 'or the author decides' branch; the build proceeds now in a worktree at zero calls, rebased onto main after the K46 outcome (2.10); MERGE GATE unchanged (F5; VIEWS-AUDIT-STAGE)] | [BUILT 2026-09-25 at 5373858 (NOT MERGED); MERGE GATE unchanged: after F5 (the K46 outcome written) and VIEWS-AUDIT-STAGE if it re-pins first; archv2-k46-preanalyze merges first, this branch rebased onto it; docs/judge_v2_program.md L19378-L19432 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; BEFORE the READY) — JV2-PARALLEL-POSTING BUILT: ...\"; _as_of the commit that writes it, parent 79fad3a, re-grepped)]",
+  "run": {
+    "outcome_file": "docs/judge_v2_program.md L19976-L20052 (the merge record; engineering, no outcome file under experiment_results)",
+    "outcome_commit": "3187b6f (the merge); the record: the commit that writes it (parent ca4afcd)",
+    "calls": 0,
+    "cce": 0,
+    "pool": "n/a (engineering; no store of record opened)",
+    "date": "2026-09-25",
+    "post_merge_checks": "RELAYED by the orchestrator: judge_v2 selftest ALL PASS (174); archv2_pilot selftest --part all without --main-ref 282 / 0; package_lf16 00bce6429d6dea64 (re-read by the registrar, equal)",
+    "preconditions": "RELAYED: F5 lifted (38ec2f3); VIEWS-AUDIT-STAGE drafted (verified); 0 changes since 86e88d2 on the judge_v2 / data_v2 / archv2_pilot / archv2_pilot_k46.py / rejudge_reasoning.py paths (verified: 0 at 10c5213); no python / java process, no .judgebench_side_ledger.lock; scan_v2.py: 6 judge_v2 stores, all K46; run2 main and worktree copies 5328 / 5328; the retired pilot_k46_verdicts.db and the incident copy 0"
+  },
+  "review": {
+    "file": "docs/reviews/READY_jv2_parallel_posting_delta1.md at 10c5213 (blob:00f8eef2f5bf6c6d2ee91b0589590838797f7866; LF of record, sha256 5965588d3ac9022614fb107c4b75abdf7e76277f4859499e9cbce64eb5d9cfbf): READY on 5ece92f (READY); docs/reviews/READY_jv2_parallel_posting.md at d32fa75 (blob:96685f1fe2cedf7b72e7cafd3b5069aa3986faf8; LF of record, sha256 d7058cf94b866a382617b43ad598df8ceeb7bacfe75db8e605f4077870190797): NOT READY on aae49ff",
+    "commit": "10c5213 (READY); d32fa75 (NOT READY)",
+    "verdict": "READY at the delta (10c5213) after NOT READY (d32fa75: HIGH C5 / C6, queued workers took tokens inside a 429 pause, 10/10 runs; MEDIUM C4, C18, C19; LOW C1a, C13, A-E5.4 wording)"
+  },
+  "design": {
+    "E-1": "writer.run(call_full, out=print, workers=1): workers == 1 executes today's path verbatim plus one line '[POOL] workers 1 (sequential path)'; workers is NOT a recipe-identity key (recorded per launch)",
+    "E-2": "two-phase transport reserve (main thread: rollover, slot, journal PENDING + commit, triggers, posts n += 1, body assert) / send (worker: no sqlite, no rr global, date re-check, NOT_SENT on change) / resolve (main); journal v2 trigger 'unresolved >= meta.max_inflight'; at workers 1 today's DDL text and no new meta row",
+    "E-3": "pipeline over drain (store.drain and data_v2/verdicts.py UNCHANGED, pin kept): <= N tickets reserved-and-unresolved; records in key order at any N",
+    "E-4": "on any stop, no further reservation; in-flight tickets recorded before the stop; KeyboardInterrupt -> <= N ORPHANs on relaunch, counted",
+    "E-5": "rate control at workers > 1: wire counter; 429 -> reservations pause max(Retry-After, 3 s); exhausted-429 -> bound halves (min 1), never rises within a launch; at bound 1 a third exhausted-429 -> RATE STOP; [RATE] lines; journal v2 http_attempts / http_429",
+    "E-6": "ceilings as SQLite triggers at reserve on the single main connection; day ledger append under JudgeBench's LedgerLock",
+    "E-7": "transport_preflight first, as at 5e9de0f; rr globals asserted unchanged after the run",
+    "E-8": "order invariance with a deterministic fake: N in {1, 2, 4, 8, 16} x 20 seeded latency permutations, store projection identical to N = 1 except created_at, latency_ms, session_id"
+  },
+  "identity_effect": "writer_blob is ALREADY in IDENTITY_KEYS (writer.py L108-L111, main blob:6db4ab3207a24aa61a1d4ea43ca6f2da2c68e547; refusal at L245-L248); the change alters its VALUE (and script_blob on the driver side), so every store created before the change REFUSES A RELAUNCH under the new writer; K46 run2 is complete before the merge and never relaunched; at merge the reviewer lists every unsealed judge_v2 verdict DB (expected none besides K46's). Verdict content of new stores stays comparable row for row (PARSE_VERSION, template shas, combiner_blob, prompt_template_blob, payload_version, E-D pins unchanged)",
+  "criteria": [
+    {
+      "id": "EC1",
+      "text": "the byte-inertness proof at --workers 1 (2.4) PASSES with all four execution discriminators (a) new identifiers 0 in leg A, > 0 in leg B; (b) leg B's judge_v2.writer resolves inside its worktree with the build's blob; (c) run_meta.writer_blob = the new blob; (d) the [POOL] line printed) and the positive control B' (--workers 4, projection = leg A). FAILS on one byte beyond the enumerated lines (store .dump: only run_meta.writer_blob and pins_json; journal byte-identical; ledger JSON byte-identical; stdout only the [POOL] line; posted bodies byte-identical)",
+      "result": "HELD",
+      "value": "15/15 at d32fa75 (harness replica; F5 scope disclosed); 16/16 at 10c5213 with discriminator (e) (leg B imported pool.py e9bc770f; journal 9d453855, ledger 913933479d32c767, bodies 20a0ca29 equal)",
+      "denominator": "5 compared artefacts + 4 discriminators + 1 positive control"
+    },
+    {
+      "id": "EC2",
+      "text": "every invariant I1-I13 holds and every listed mutant is KILLED, under python and -O; a timing-sensitive mutant (I4, I7, I12) counts as killed only if killed in EVERY registered trial (R2)",
+      "result": "HELD",
+      "value": "FAILED at d32fa75 (RC1 / RC3 intermittent: combined 14 runs RC1 5, RC3 2; one acquire defect); HELD at 10c5213 (103 checks, 0 failed, 37/37 mutants under python and -O on the builder's logs; changed sections re-executed 10/10, 9/9 mutants each)",
+      "denominator": "13 invariants and their listed mutants"
+    },
+    {
+      "id": "EC3",
+      "text": "E-8 order invariance on 100 of 100 (N, seed) cells; FAILS on one differing cell",
+      "result": "HELD",
+      "value": "per the reviews (d32fa75: from the relayed log, not re-executed; 10c5213: 'EC1-EC5 pass')",
+      "denominator": "100 (N, seed) cells"
+    },
+    {
+      "id": "EC4",
+      "text": "the three standing suites pass: judge_v2 selftest ALL PASS; archv2_pilot --part all; lint_opens 0 findings",
+      "result": "HELD",
+      "value": "judge_v2 selftest 174 (python and -O), lint 0; archv2 --part all --main-ref HEAD 282/0 (both reviews); on main after the merge without --main-ref 282/0 (relayed)",
+      "denominator": "3 suites"
+    },
+    {
+      "id": "EC5",
+      "text": "the dry-run of the next judge_v2 driver prints the preflight, the [POOL] line and max_inflight, and posts nothing",
+      "result": "HELD",
+      "value": "in the fixture (d32fa75)",
+      "denominator": "1 dry-run"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P-a",
+      "text": "EC1, EC3, EC4 and EC5 PASS at the FIRST READY review (registrar's split R3 of the specialist's prediction)",
+      "result": "HELD",
+      "value": "HELD at d32fa75, qualified: EC3 from the relayed log",
+      "denominator": "the first READY review"
+    },
+    {
+      "id": "P-b",
+      "text": ">= 1 mutant of I4 or I12 SURVIVES at the first READY review (EC2 fails there)",
+      "result": "FAILED",
+      "value": "I4 and I12: 3 of 3 mutants killed, re-executed at d32fa75",
+      "denominator": "the I4 / I12 mutant lists"
+    },
+    {
+      "id": "P-c",
+      "text": "0 surviving mutants after the delta (EC2 PASS at the final READY)",
+      "result": "HELD",
+      "value": "0 surviving mutants after the delta (37/37 builder; 9/9 in each of the reviewer's 10 subset runs)",
+      "denominator": "all listed mutants"
+    }
+  ],
+  "falsifier": {
+    "text": "any surviving mutant after the delta, or any byte difference in 2.4 beyond the enumerated lines -> NOT READY. It OVERTURNS the design claim (E-1 / E-3) that the two-phase pipeline preserves every guarantee of record and is byte-inert at --workers 1; it revises no result of record; the change does not merge (R4)",
+    "fired": false,
+    "result": "R4 NOT FIRED at d32fa75 and at 10c5213"
+  },
+  "support": "(a) 5 compared artefacts (+4 discriminators, 1 positive control); 13 invariants with their mutants; 100 (N, seed) cells; not a sample, Kish 1 by construction. (b) DEFF NOT APPLICABLE, DECLARED (deterministic comparisons against a deterministic fake; the live 5.7% test-retest floor not measured). (c) n_eff n/a. (d) SE none (exact counts). (e) MDE one byte / one surviving mutant / one differing cell. (f) SCOREABLE (pass / fail). (g) STRUCTURAL: EC1 reachable iff the workers-1 dispatch executes today's path verbatim and the journal keeps today's DDL; EC3 reachable only with the deterministic fake (says nothing about live verdicts); zero double posts after a crash NOT reachable at any budget against a non-idempotent API (0.3 (i)); the registered invariant is <= 1 verdict per slot and re-posts <= N, counted",
+  "registrar_readings": [
+    "R1 (identity) the relay's 'writer_blob becomes an identity key' read against the code: it already is one (writer.py L108-L111); the change alters its value, so earlier stores refuse relaunch",
+    "R2 (rule 7) EC1-EC5 deterministic pass/fail; timing-sensitive mutants killed only if killed in every registered trial",
+    "R3 (rule 5) the specialist's prediction split into P-a / P-b / P-c",
+    "R4 the falsifier overturns the E-1 / E-3 design claim; nothing of record revised",
+    "R5 (rule 8) failing observables per criterion named (see criteria)"
+  ],
+  "numbers_of_record": {
+    "draft_sha256": "8c50c0e8d28f40cdad2ee369e3a8ba4e44e0383e7c8ce195e5e1948ea57d2861 (parallel_posting_registration_draft.md; UTF-8, LF, 240 lines, 42,113 bytes; registrar-verified)",
+    "block_3_of_3_sha256": "d68ddb4f67f538e8c32aaa805f27b173420815dff62db98e63dd90b9bacb07f0 (file lines 128-240, 18,073 bytes; re-hashed from the programme: equal)",
+    "writer_blob_today": "tools/analysis/judge_v2/writer.py blob:6db4ab3207a24aa61a1d4ea43ca6f2da2c68e547 (main, = 5e9de0f's; git hash-object, LF, at HEAD 0c10ea2)",
+    "sequential_bound": "60 / 3.5 s = 17.1 calls/min (K46 observes 14-18)",
+    "saving_09-16_regime": "N = 4 about 68 calls/min, N = 8 about 137; a K46-size run (5,328 calls, 5.2-6.3 h sequential) about 1.3 h / 0.65 h (the specialist's 2.8)",
+    "saving_09-24_regime": "none (N = 8 was 10-15 calls/min, below sequential; E-5 exists for this case)",
+    "pins_of_record": "pool.py blob:e9bc770fb16aafa0256e10adbd18c91da237e61e / sha256-lf16:978ad89c8632a1b2 / sha256-crlf16:e426aa010d5f1796; pilot.py blob:c0565b57ab1f276048d380a70c6f030f980e2b22 / sha256-lf16:8029c6f5e3bf5998 / sha256-crlf16:4652c4a5df63a357; writer.py blob:0c9c57c335151ff198ea45c8bc98ffbd9c23adf2 / sha256-lf16:f3e2d1cf7447d8ca / sha256-crlf16:de1495810a956e73 (unchanged); accounting.py blob:dd777f32f07b90a90911e71e18ce5560daf7c932 / sha256-lf16:3012d9bbd2b2e36a / sha256-crlf16:f727d3ad26612f1f; selftest.py blob:82ee9cde74c196970b16d12a57d685bc21ef3e1d / sha256-lf16:8e23ad5f15833b23 / sha256-crlf16:9e8649b7ff55845e; archv2_pilot_k46.py blob:91dc8f577a755192d8d44b53050be60c37ef62ec / sha256-lf16:a9ffee1fb0353a3b / sha256-crlf16:1a994badea4531af; pool_selftest.py blob:318c9acaa01afd3b475698312d5d82dc4b8f0ba0 / sha256-lf16:90b2fd48d954d356 / sha256-crlf16:c84a1772f015bcee; pool_inertness.py blob:993c5c6800892900ed63f5c0526c1f57f381dece / sha256-lf16:c7a6b683145589a5 / sha256-crlf16:04b54940adc2cf0a; archv2_pilot package lf16 00bce6429d6dea64; unchanged _base.py 6f25e4ce, data_v2/verdicts.py 10138042, rejudge_reasoning.py 1339592a",
+    "in_code_pin": "pilot.py L187 POOL_BLOB_JV2PP = blob:e9bc770f... # sha256-lf16:978ad89c8632a1b2 (under [RE-PINNED]; L184 a7fdd8a2 kept as the build's record); L193 JUDGE_PIN_MODES = (JV2-PARALLEL-POSTING,); L194 RETIRED_PIN_MODES adds MAIN-B653B0A",
+    "merge": "3187b6f (parent 10c5213): 8 paths by path from 5ece92f, 8 of 8 blobs equal (registrar re-verified)",
+    "throughput_cap_default": "at --max-rpm 20: 20 attempts/min vs sequential 60 / 3.5 s = 17.1 calls/min: at most ~1.17x; real gains need a probe-measured --max-rpm (depends on the author's Azure quota check)",
+    "rate_control_delta": "grants inside a 429 pause 0 in 10/10 (build [3,4,4,3,4,3,4,4,3,4]); worst window > max_rpm 0/20 (min gap 0.06019 s vs 0.060); RC1 geometry 0/20 (build 8/20); 0 grants after abort in 10/10"
+  },
+  "sentence_of_record": "JV2-PARALLEL-POSTING (2026-09-25, zero calls; READY by delta review 10c5213 after NOT READY d32fa75): a bounded posting pool with a live rate control for the judge_v2 path, merged by path at 3187b6f (pool.py blob:e9bc770f / sha256-lf16:978ad89c8632a1b2 / sha256-crlf16:e426aa010d5f1796; pilot.py blob:c0565b57 / 8029c6f5e3bf5998 / 4652c4a5df63a357; writer.py 0c9c57c3; package lf16 00bce6429d6dea64), byte-inert at --post-workers 1 with no rate flag on the harness replica (EC1 16/16) and 0 surviving mutants [the mechanism only: no live call made; at the default --max-rpm 20 at most ~1.17x the sequential 17.1 calls/min; the first live pooled or rate-flagged run must register its N and --max-rpm from JV2-RATE-PROBE, run its pilot 12 at N, and check 'LIVE, ADMITTED' at time_scale 1.0 and name the data-steward's hot -journal recovery (gate 3, D8)]",
+  "chips": [
+    "REGISTERED 2026-09-25, BEFORE ANY CODE",
+    "NOT READY d32fa75 (RATE CONTROL: QUEUED WORKERS POSTED INSIDE A 429 PAUSE, 10/10) &rarr; DELTA READY 10c5213 (F1&ndash;F6 CLOSED; EC1&ndash;EC5 PASS; P-c HELD; R4 NOT FIRED)",
+    "MERGED 2026-09-25 AT 3187b6f BY PATH (8 PATHS = 5ece92f); pool.py e9bc770f / 978ad89c8632a1b2; MODE JV2-PARALLEL-POSTING, MAIN-B653B0A RETIRED",
+    "GATE (3) OPEN: FIRST LIVE POOLED RUN REGISTERS N + --max-rpm FROM JV2-RATE-PROBE; PILOT 12 AT N; &ldquo;LIVE, ADMITTED&rdquo; AT time_scale 1.0; D8 HOT -journal RECOVERY NAMED",
+    "IDENTITY: STORES CREATED BEFORE THE CHANGE REFUSE RELAUNCH (writer_blob); K46 --analyze REPRODUCED FROM 86e88d2",
+    "DEFAULT --max-rpm 20: AT MOST ~1.17&times; THE SEQUENTIAL 17.1 CALLS/MIN",
+    "ZERO CALLS; ENGINEERING; SCOREABLE AS PASS / FAIL"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-25",
+      "by": "registrar (registration; zero calls; insertion only)",
+      "text": "REGISTERED before any code at docs/judge_v2_program.md L19096-L19239 (section \"## Registered 2026-09-25 (before any code; zero calls) — JV2-PARALLEL-POSTING: ...\"; block 3/3 verbatim between the marker lines L19100 and L19214), _as_of the commit that writes them, parent 0c10ea2, re-grepped; evidence at docs/judge_v2_program.md L18908-L18977 (section \"## Finding of record 2026-09-25 (registrar; zero calls; read-only evidence of the judge-design-specialist, recorded VERBATIM) — GROK-NR-THROUGHPUT: ...\"; block 1/3 verbatim between the marker lines L18913 and L18966); from parallel_posting_registration_draft.md (the judge-design-specialist's own write, session scratchpad, not committed), sha256 8c50c0e8d28f40cdad2ee369e3a8ba4e44e0383e7c8ce195e5e1948ea57d2861 (UTF-8, LF, 0 CR, 240 lines, 42,113 bytes; registrar-verified); recorded verbatim in three contiguous blocks, sha256 block 1/3 edc3bf000e2241e6ebbf98ec83bd9683c400e1910ec2e5133dea54a108271388, 2/3 5362eb2fe7f9d0f36c027afc3d0b63b2d54d193e209942dd7f90c0ae928e0fea, 3/3 d68ddb4f67f538e8c32aaa805f27b173420815dff62db98e63dd90b9bacb07f0; concatenation re-hashed from the programme = the file. THE AUTHOR 2026-09-25: \"do both, start the LCB build now and register parallel posting\" (plan Amendment 23, recorded at a3df39a); the two-item split, the gates and the placement are the specialist's (relayed by the orchestrator), not author decisions. Ledger v272, new row JV2-PARALLEL-POSTING."
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (author's decisions, relayed verbatim by the orchestrator; zero calls; insertion only)",
+      "text": "BUILD AUTHORISED BY THE AUTHOR regardless of the probe's G (\"Go for 350 and build it anyway I'll find a way to increase the quota\"; plan Amendment 24); the author intends to raise the Azure quota (an intent; no number, no change recorded). Gate (1) of THE ITEM (L19219) DISCHARGED by its second branch. The build proceeds NOW in a worktree at zero calls; per 2.10 it is rebased onto main after the K46 outcome; registrar's reading (objectable before the READY): the READY of record is taken on the rebased tip, or a delta READY covers the rebase. MERGE UNCHANGED: by pathspec only after the ARCH-V2-PILOT-K46 outcome is written (F5), and after VIEWS-AUDIT-STAGE's re-pin if it lands first. Gate (3) unchanged (the first live N > 1 registered by its run, citing the probe, pilot 12 at N). State registered, NOT BUILT. docs/judge_v2_program.md L19341-L19376 (section \"## Author's decisions 2026-09-25 (recorded by the registrar; zero calls; insertion only) — (1) JUDGEBENCH-REASONING-SIDE SIZE = 350 ...\"; _as_of the commit that writes it, parent 95d9821, re-grepped)"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (build recorded; zero calls; insertion only)",
+      "text": "BUILT at 5373858 (base 9a29715 = 8 K46 driver files byte-identical from 788ea85; build 8fcf7cd; branch worktree-agent-a22e907c054aec66f; NOT MERGED); pins re-derived from git (pool.py a7fdd8a2, writer.py 0c9c57c3 was 6db4ab32, package lf16 098302869a14bd65 -> 92fa31eb02aedd94; _base.py, verdicts.py, rejudge_reasoning.py unchanged). E-5 AMENDED PRE-READY BY THE ORCHESTRATOR under the author's authorisation of 2026-09-25 (A-E5.1-A-E5.6; not an author decision). Deviations D1-D3, D5-D9 OPEN for the READY. READY PENDING, after ARCH-V2-PILOT-K46's --analyze (CPU). Builder counts relayed, not executed. Ledger v277. docs/judge_v2_program.md L19378-L19432 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; BEFORE the READY) — JV2-PARALLEL-POSTING BUILT: ...\"; _as_of the commit that writes it, parent 79fad3a, re-grepped)"
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (merge record; zero calls; insertion only)",
+      "text": "MERGE recorded at docs/judge_v2_program.md L19976-L20052 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — JV2-PARALLEL-POSTING MERGED at 3187b6f (8 paths by path from 5ece92f, blob-equal), after ... NOT READY d32fa75 ... and DELTA READY 1 10c5213 ...\"; _as_of the commit that writes it, parent ca4afcd, re-grepped): rebased onto 86e88d2 (aae49ff; range-diff '='); NOT READY d32fa75 (C5 / C6 HIGH: acquire let queued workers post inside a 429 pause; fixes F1-F6); DELTA READY 1 10c5213 (F1-F6 closed; EC1 16/16; EC2 103 / 0, 37/37; P-c HELD; R4 not fired; deviation rulings 1-7 ACCEPTED, 3's LOW residual: the sequential path has no live guard); merged by path at 3187b6f (8 paths, blobs equal to 5ece92f, re-verified); pins of record re-hashed in three kinds; POOL_BLOB_JV2PP re-pinned; mode JV2-PARALLEL-POSTING admitted, MAIN-B653B0A RETIRED; K46's run2 store refuses relaunch (intended); gate (3) OPEN with D8's condition; the ~1.17x cap at --max-rpm 20; record lag (rebase / NOT READY / delta READY not recorded when they happened; F6 pin bracket not written) disclosed. Line-end brackets at L19239 and L19432. State built -> done (merged). Ledger v286."
+    },
+    {
+      "date": "2026-09-25",
+      "by": "registrar (merge / archive record; zero calls; insertion only)",
+      "text": "evidence archived at TaxoArena_data\\evidence_2026-09-25\\jv2pp_review (both READY reviews' scratch) and rcx (the builder's logs) (Z:\\FAC\\TUBerlin\\THESIS\\TaxoArena_data\\evidence_2026-09-25; copied by the orchestrator; file counts equal to the scratchpad's; the scratchpad is temporary); docs/judge_v2_program.md L20054-L20090 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — LCB-STAGE0-INTERACTION's Kotlin, tests and configs MERGED at ca4afcd ... and the session evidence ARCHIVED at TaxoArena_data\\evidence_2026-09-25 ...\"; _as_of the commit that writes it, parent c16ab01, re-grepped)"
+    },
+    {
+      "date": "2026-09-26",
+      "by": "registrar (JV2-RATE-PROBE outcome; zero calls; insertion only)",
+      "text": "GATE (3) bracketed with the JV2-RATE-PROBE OUTCOME (docs/judge_v2_program.md L20478-L20556 (section \"## JV2-RATE-PROBE (2026-09-26, 398 calls) — VALID (post-run review 6ea4f02): C0 HELD, V5 HELD; N* = 12 ...\"; _as_of the commit that writes it, parent ef045a1, re-grepped), items 5 and 8; line-end bracket at L20033): the probe reads N* = 12, a ramp-capped LOWER BOUND, on ONE night (22:23-22:33Z), non-reasoning only, S6 42.8 s; N* is measured under rr's retry schedule (6 attempts, Retry-After ignored); every HTTP 429 counts for admissibility; it does not transfer as-is to a pool that honours Retry-After (A4). THE REVIEWER'S RECOMMENDATION (docs/reviews/POSTRUN_jv2_rate_probe.md, 6ea4f02, section 4), RECORDED, NOT REGISTERED: daytime (06-20Z) --post-workers 8 --max-rpm 60 with the pilot 12 at N = 8; night (about 20-06Z) --post-workers 12 --max-rpm 120 only after a clean first run at 60 (0 exhausted, 429 share <= 2%); never above 12 workers or 210 rpm; --request-timeout-s 120 and --breaker-k 8 (defaults); the run's own pilot at that N is the day's check, N* = 12 is not. The gate-(3) registration quotes the review's scope section (D2) and may not cite 'G ~ 10' as a daytime or pooled expectation. Gate (3) stays OPEN. Ledger v296."
+    }
+  ],
+  "does_not_show": [
+    "that verdicts from a LIVE judge are unaffected by concurrency (order invariance proven only with a deterministic fake; any effect would sit inside the 5.7% test-retest floor, unmeasured)",
+    "that any N > 1 is safe on the deployment on a given day (the probe's job, a snapshot)",
+    "zero double posts after a crash (only at most N, each counted)",
+    "anything about the Kotlin production judge path (TaxonomyArenaService / JUDGE-WIRING), which has its own pacer",
+    "that any --max-rpm or N > 1 keeps a live run under the deployment's limit (no live call made; the probe's job)",
+    "any throughput gain (at the default --max-rpm 20 at most ~1.17x the sequential rate)",
+    "the full 103-check selftest re-executed by a reviewer (builder's logs); the post-merge suite counts (relayed)",
+    "a live guard on the plain sequential path (deviation 3's residual)"
+  ],
+  "ledger": {
+    "row_id": "JV2-PARALLEL-POSTING",
+    "version": "v296 (2026-09-26: a bracket in the observed cell: gate (3) and the JV2-RATE-PROBE outcome; chips unchanged) | v286 (2026-09-25: MERGED; bracket in the observed cell; chips BUILT ... and MERGE GATED ON F5 replaced) | v277 (2026-09-25: built at 5373858; E-5 amended pre-READY by the orchestrator; bracket in the observed cell; chip NOT BUILT: BUILD AUTHORISED ... -> BUILT 5373858 (NOT MERGED); ..., class plan unchanged); v276 (2026-09-25: build authorised by the author; bracket in the observed cell; chip NOT BUILT: BUILD GATED ... -> NOT BUILT: BUILD AUTHORISED ..., class plan unchanged); v272 (2026-09-25: registered; new row)"
+  },
+  "depends_on": [
+    "JV2-RATE-PROBE (C2: the build gate) or the author's decision",
+    "ARCH-V2-PILOT-K46 (F5: merge only after its outcome is written; its store never relaunched)",
+    "VIEWS-AUDIT-STAGE (merge order: its re-pin first if it lands first)",
+    "JUDGEBENCH-REASONING-SIDE (LedgerLock and wire-counter patterns reused; its runner not touched)"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing; reopens no closed line (no prompt, reference, rubric, temperature, cap, order policy, combiner or judge tier changes); gate (3) open"
+  },
+  "cost": {
+    "calls_expected": 0,
+    "cce_expected": 0,
+    "calls_max": 0,
+    "cce_max": 0,
+    "machine": "minutes; no pool read, no rule-7 window",
+    "agent_time": "engine-coder about 5-7 h; adversarial-reviewer about 2.5-3.5 h; registrar about 0.5 h",
+    "source": "the specialist's 2.9; PROVISIONAL, the experiment-manager's to confirm"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L19096-L19239 (section \"## Registered 2026-09-25 (before any code; zero calls) — JV2-PARALLEL-POSTING: ...\"; block 3/3 verbatim between the marker lines L19100 and L19214), _as_of the commit that writes them, parent 0c10ea2, re-grepped",
+    "docs/judge_v2_program.md L18908-L18977 (section \"## Finding of record 2026-09-25 (registrar; zero calls; read-only evidence of the judge-design-specialist, recorded VERBATIM) — GROK-NR-THROUGHPUT: ...\"; block 1/3 verbatim between the marker lines L18913 and L18966), _as_of the commit that writes them, parent 0c10ea2, re-grepped",
+    "parallel_posting_registration_draft.md (the judge-design-specialist's own write, session scratchpad, not committed), sha256 8c50c0e8d28f40cdad2ee369e3a8ba4e44e0383e7c8ce195e5e1948ea57d2861 (UTF-8, LF, 0 CR, 240 lines, 42,113 bytes; registrar-verified); recorded verbatim in three contiguous blocks, sha256 block 1/3 edc3bf000e2241e6ebbf98ec83bd9683c400e1910ec2e5133dea54a108271388, 2/3 5362eb2fe7f9d0f36c027afc3d0b63b2d54d193e209942dd7f90c0ae928e0fea, 3/3 d68ddb4f67f538e8c32aaa805f27b173420815dff62db98e63dd90b9bacb07f0; concatenation re-hashed from the programme = the file",
+    "plan Amendment 23, bracketed at this record",
+    "the orchestrator's relay of 2026-09-25 (zero calls; build only on >= 1.5x or the author; merge after the K46 outcome, F5; writer_blob identity)",
+    "read-only checks at HEAD 0c10ea2: git hash-object tools/analysis/judge_v2/writer.py; IDENTITY_KEYS L108-L111 and the refusal L245-L248; F5 text at docs/judge_v2_program.md (L5 of the ARCH-V2-PILOT-K46 READY record, 'F5, THE JUDGE_V2 FREEZE')",
+    "docs/judge_v2_program.md L19341-L19376 (section \"## Author's decisions 2026-09-25 (recorded by the registrar; zero calls; insertion only) — (1) JUDGEBENCH-REASONING-SIDE SIZE = 350 ...\"; _as_of the commit that writes it, parent 95d9821, re-grepped)",
+    "docs/plan_2026-09-15.md Amendment 24 (\"## Amendment 24 (2026-09-25) — \\\"Go for 350 and build it anyway ...\\\" ...\")",
+    "docs/judge_v2_program.md L19378-L19432 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; BEFORE the READY) — JV2-PARALLEL-POSTING BUILT: ...\"; _as_of the commit that writes it, parent 79fad3a, re-grepped)",
+    "git, read-only by the registrar: git rev-parse 5373858:<path>, sha256 of the LF blobs, the package_lf16 rule, git diff --stat 788ea85 9a29715 (empty), git diff --name-only 9a29715 5373858 (8 paths), git merge-base --is-ancestor bf9d80b 9a29715 (0) and 5373858 main (1)",
+    "the orchestrator's relay of 2026-09-25 (the builder's table, claims and deviations 1-9; the E-5 amendment; the merge plan)",
+    "docs/reviews/READY_jv2_parallel_posting.md at d32fa75 (blob:96685f1fe2cedf7b72e7cafd3b5069aa3986faf8; LF of record, sha256 d7058cf94b866a382617b43ad598df8ceeb7bacfe75db8e605f4077870190797): NOT READY on aae49ff",
+    "docs/reviews/READY_jv2_parallel_posting_delta1.md at 10c5213 (blob:00f8eef2f5bf6c6d2ee91b0589590838797f7866; LF of record, sha256 5965588d3ac9022614fb107c4b75abdf7e76277f4859499e9cbce64eb5d9cfbf): READY on 5ece92f",
+    "merge commit 3187b6f (parent 10c5213); the orchestrator's relay of 2026-09-25 (preconditions, post-merge checks)",
+    "docs/judge_v2_program.md L19976-L20052 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — JV2-PARALLEL-POSTING MERGED at 3187b6f (8 paths by path from 5ece92f, blob-equal), after ... NOT READY d32fa75 ... and DELTA READY 1 10c5213 ...\"; _as_of the commit that writes it, parent ca4afcd, re-grepped)",
+    "docs/judge_v2_program.md L20054-L20090 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — LCB-STAGE0-INTERACTION's Kotlin, tests and configs MERGED at ca4afcd ... and the session evidence ARCHIVED at TaxoArena_data\\evidence_2026-09-25 ...\"; _as_of the commit that writes it, parent c16ab01, re-grepped)",
+    "docs/judge_v2_program.md L20478-L20556 (section \"## JV2-RATE-PROBE (2026-09-26, 398 calls) — VALID (post-run review 6ea4f02): C0 HELD, V5 HELD; N* = 12 ...\"; _as_of the commit that writes it, parent ef045a1, re-grepped)",
+    "docs/reviews/POSTRUN_jv2_rate_probe.md (6ea4f02), section 4 (gate (3) recommendation)"
+  ],
+  "last_update": "2026-09-26 (registrar: gate (3) bracketed with the JV2-RATE-PROBE outcome and the reviewer's recommendation (not registered); ledger v296)",
+  "author_decisions": [
+    {
+      "date": "2026-09-25",
+      "words_verbatim": "Go for 350 and build it anyway I'll find a way to increase the quota",
+      "relayed_by": "orchestrator",
+      "question": "build JV2-PARALLEL-POSTING even if JV2-RATE-PROBE shows a gain under 1.5x?",
+      "decision": "YES: build regardless of the probe's gain; the author intends to raise the Azure quota",
+      "amendment": "plan Amendment 24",
+      "programme": "docs/judge_v2_program.md L19341-L19376 (section \"## Author's decisions 2026-09-25 (recorded by the registrar; zero calls; insertion only) — (1) JUDGEBENCH-REASONING-SIDE SIZE = 350 ...\"; _as_of the commit that writes it, parent 95d9821, re-grepped)"
+    }
+  ],
+  "builder_claims_unverified": "AS RELAYED, NOT EXECUTED BY THE REGISTRAR, TO BE VERIFIED BY THE READY: EC1 inertness 15 / 15 (identical bodies, journal and ledger at N = 1; store differs only in writer_blob and pins_json; four executed-code discriminators; positive control at N = 4); pool_selftest 94 checks, 34 mutants all killed (21 for I1-I13, 13 for rate control); archv2_pilot --part all --main-ref HEAD 282 / 0 (without --main-ref refuses by design at K2); judge_v2 selftest 174 / 174; lint 0",
+  "amendments": [
+    {
+      "id": "A-E5.1",
+      "date": "2026-09-25",
+      "by": "the orchestrator, pre-READY, under the author's authorisation of 2026-09-25 (plan Amendment 24); NOT an author decision; the author's observation (relayed, not verbatim): spamming Azure causes slowdowns and timeouts",
+      "text": "amends E-5 (b): Retry-After honoured in seconds AND HTTP-date form, 3 s floor; with no header full-jitter backoff (ceilings 2/4/8/16/32/60 s, floor 3 s) replaces the flat 3 s; one 429 pauses the WHOLE pool"
+    },
+    {
+      "id": "A-E5.2",
+      "date": "2026-09-25",
+      "by": "the orchestrator, pre-READY, under the author's authorisation of 2026-09-25 (plan Amendment 24); NOT an author decision; the author's observation (relayed, not verbatim): spamming Azure causes slowdowns and timeouts",
+      "text": "new: global token bucket --max-rpm, default 20"
+    },
+    {
+      "id": "A-E5.3",
+      "date": "2026-09-25",
+      "by": "the orchestrator, pre-READY, under the author's authorisation of 2026-09-25 (plan Amendment 24); NOT an author decision; the author's observation (relayed, not verbatim): spamming Azure causes slowdowns and timeouts",
+      "text": "amends E-5 (c), SUPERSEDES \"never rises\": the bound halves on an exhausted invocation, a timeout, or 3 429s within 30 s (the latter two at most once per 10 s); rises by 1 per clean 60 s up to --post-workers"
+    },
+    {
+      "id": "A-E5.4",
+      "date": "2026-09-25",
+      "by": "the orchestrator, pre-READY, under the author's authorisation of 2026-09-25 (plan Amendment 24); NOT an author decision; the author's observation (relayed, not verbatim): spamming Azure causes slowdowns and timeouts",
+      "text": "new: per-request timeout, default 120 s; circuit breaker K = 8"
+    },
+    {
+      "id": "A-E5.5",
+      "date": "2026-09-25",
+      "by": "the orchestrator, pre-READY, under the author's authorisation of 2026-09-25 (plan Amendment 24); NOT an author decision; the author's observation (relayed, not verbatim): spamming Azure causes slowdowns and timeouts",
+      "text": "amends E-5 (a): the pool owns retries; rr neutralised via PoolRetry (exactly one attempt per call); every HTTP attempt journaled (http_attempts, http_429) and capped by an HTTP-attempt cap; LIMIT: the day ledger and day cap remain in invocation units"
+    },
+    {
+      "id": "A-E5.6",
+      "date": "2026-09-25",
+      "by": "the orchestrator, pre-READY, under the author's authorisation of 2026-09-25 (plan Amendment 24); NOT an author decision; the author's observation (relayed, not verbatim): spamming Azure causes slowdowns and timeouts",
+      "text": "amends the E-5 header and E-1: any rate flag makes the launch pooled at --post-workers 1 (bound 1, journal v2); only workers 1 with no rate flag is today's path"
+    }
+  ],
+  "amendment_readings": "registrar's readings (objectable before the READY): (i) EC1 scored at --workers 1 with NO rate flag; (ii) the 13 rate-control mutants join EC2 under R2; (iii) P-a / P-b / P-c, the falsifier, EC3, EC5 unchanged; (iv) gate (3) extends to the first live rate-flagged launch at N = 1",
+  "deviations_open": [
+    "D1 base import 9a29715 (8 K46 driver files byte-identical from 788ea85; verified)",
+    "D2 launch_bound table + invocation_launch_bound trigger in journal v2 (builder addition)",
+    "D3 pool.py enters the pins via writer._pins(); _base.pin_table() not edited (_base.py 6f25e4ce)",
+    "D4 = the E-5 amendment A-E5.1-A-E5.6 (recorded as amendments, not open)",
+    "D5 NotSent error attempt rows written to the store at a send-time day rollover",
+    "D6 RATE STOP read as the third exhausted invocation while the bound is already 1",
+    "D7 flag name --post-workers (default 1)",
+    "D8 CRASH HAZARD: hot -journal after a worker-phase crash in 25 / 50 I12 crash points (as relayed); needs the data-steward's read-write open / close",
+    "D9 stress-harness speed-ups (PRAGMA synchronous=OFF on scratch connections, never in I12 or the inertness proof; SELFTEST-ONLY pool.TIME_SCALE)"
+  ],
+  "merge_plan": "after F5 (the K46 outcome written) and after VIEWS-AUDIT-STAGE if it re-pins first; the K2 pin table moves to mode JV2-PARALLEL-POSTING (writer.py blob:0c9c57c3 + pool.py blob:a7fdd8a2; MAIN-B653B0A retired, so K46 --analyze must precede the merge); K46's run2 store refuses any relaunch (intended); archv2-k46-preanalyze (788ea85) merges FIRST, this branch is rebased onto it, READY of record on the rebased tip or a delta READY covering the rebase; pins re-derived after the rebase [EXECUTED 2026-09-25: archv2-k46-preanalyze merged first (86e88d2); rebased (aae49ff); delta READY 10c5213; merged by path at 3187b6f; docs/judge_v2_program.md L19976-L20052 (section \"## Registrar's record 2026-09-25 (insertion only; zero calls; nothing run) — JV2-PARALLEL-POSTING MERGED at 3187b6f (8 paths by path from 5ece92f, blob-equal), after ... NOT READY d32fa75 ... and DELTA READY 1 10c5213 ...\"; _as_of the commit that writes it, parent ca4afcd, re-grepped)]",
+  "deviations_rulings": {
+    "first_review_d32fa75": "D1 ACCEPTED (moot after the rebase); D2 ACCEPTED as disclosed; D3 ACCEPTED (MAIN-B653B0A retired; K46 --analyze reproduced from 86e88d2); D5 ACCEPTED; D6 ACCEPTED (by reasoning); D7 ACCEPTED; D8 ACCEPTED WITH A CONDITION ON LIVE USE (the first live run's launch READY names the data-steward's hot -journal recovery); D9 ACCEPTED with F4; A-E5.1 / A-E5.2 PARTLY (fixed by F1, CONFIRMED at the delta); A-E5.3-A-E5.6 CONFIRMED (A-E5.4 LOW wording: network failures also count toward the breaker)",
+    "delta_10c5213": [
+      "1 clock time.perf_counter (monotonic 15.6 ms on Windows): ACCEPTED",
+      "2 RC1's 429 in the 4th slot (stronger; client-side): ACCEPTED",
+      "3 live = rr.call_judge_full AND non-loopback, plus the wire-level refusal: ACCEPTED; RESIDUAL LOW: the plain sequential path (workers 1, no rate flag) is not pooled and has no live guard over the MUTANT switches (pre-existing pattern)",
+      "4 install() refuses a second wrapper; new printed lines (live guard, [POOL] INTERRUPTED): ACCEPTED",
+      "5 EC1 15 -> 16 (discriminator (e)): ACCEPTED",
+      "6 two inherent races (grant before a 429 / abort; in-flight attempt completes after Ctrl-C, bounded by 120 s, never re-sent): ACCEPTED, disclosed in pool.py",
+      "7 rule-7 overlap with d9bm_run.py: DISCLOSED, not a defect; future gates also sample at step end"
+    ]
+  },
+  "plain_description": {
+    "sq": "Engineering/infrastructure",
+    "what": "An engineering change: a bounded worker pool with live rate control that lets the version-2 judge send several calls at once. It was checked against all safety guarantees (journal, no double counting, ceilings, preflight) and checked to give byte-identical behaviour when run with one worker.",
+    "why": "Judging is slow when calls go one at a time. Speed must not cost any guarantee about the recorded verdicts.",
+    "information": "Result: done and merged (no live calls). With one worker it is byte-identical to the old path, and no deliberately injected bug went undetected. At the default rate limit the speed-up is at most about 1.17x. It does not show that concurrency leaves live judge verdicts unchanged, or that more workers are safe on a given day. The first live parallel run must declare its settings in advance.",
+    "written": "2026-10-07"
+  }
+}

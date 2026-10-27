@@ -1,0 +1,53 @@
+M3 synthetic arena: 46 models, 11436 keyed questions | oracle = key; noisy = 12% flips + 80% coin flips on non-decidable
+
+-- ORACLE judge | 100 matches per newcomer (4 anchors x 25) --
+   roster<= | newcomer rank error median (p75) | within +-1 rank | matches/newcomer | board rho (median over seeds)
+          8 | base | - | - | 1.000
+         16 |   1.0 ( 1.0) |    80% |     89 | 0.968
+         24 |   1.0 ( 2.0) |    72% |    100 | 0.974
+         32 |   1.0 ( 3.0) |    55% |    100 | 0.972
+         46 |   1.5 ( 3.0) |    50% |    100 | 0.976
+
+-- ORACLE judge | 200 matches per newcomer (4 anchors x 50) --
+   roster<= | newcomer rank error median (p75) | within +-1 rank | matches/newcomer | board rho (median over seeds)
+          8 | base | - | - | 1.000
+         16 |   0.0 ( 1.0) |    88% |    180 | 0.971
+         24 |   0.5 ( 1.0) |    90% |    200 | 0.986
+         32 |   1.0 ( 2.0) |    60% |    200 | 0.981
+         46 |   1.0 ( 3.0) |    51% |    200 | 0.986
+
+-- ORACLE judge | 400 matches per newcomer (4 anchors x 100) --
+   roster<= | newcomer rank error median (p75) | within +-1 rank | matches/newcomer | board rho (median over seeds)
+          8 | base | - | - | 1.000
+         16 |   0.0 ( 0.0) |    98% |    358 | 0.991
+         24 |   0.0 ( 1.0) |    88% |    400 | 0.993
+         32 |   1.0 ( 2.0) |    72% |    400 | 0.990
+         46 |   1.0 ( 2.0) |    61% |    400 | 0.989
+
+-- NOISY judge | 100 matches per newcomer (4 anchors x 25) --
+   roster<= | newcomer rank error median (p75) | within +-1 rank | matches/newcomer | board rho (median over seeds)
+          8 | base | - | - | 0.958
+         16 |   1.0 ( 2.2) |    58% |     84 | 0.897
+         24 |   2.0 ( 3.2) |    42% |    100 | 0.884
+         32 |   3.5 ( 5.0) |    30% |    100 | 0.907
+         46 |   3.0 ( 8.0) |    27% |    100 | 0.889
+
+-- NOISY judge | 200 matches per newcomer (4 anchors x 50) --
+   roster<= | newcomer rank error median (p75) | within +-1 rank | matches/newcomer | board rho (median over seeds)
+          8 | base | - | - | 0.958
+         16 |   1.0 ( 2.0) |    62% |    168 | 0.935
+         24 |   2.0 ( 3.0) |    42% |    200 | 0.943
+         32 |   2.0 ( 4.2) |    40% |    200 | 0.957
+         46 |   2.5 ( 5.0) |    34% |    200 | 0.955
+
+-- NOISY judge | 400 matches per newcomer (4 anchors x 100) --
+   roster<= | newcomer rank error median (p75) | within +-1 rank | matches/newcomer | board rho (median over seeds)
+          8 | base | - | - | 0.958
+         16 |   0.5 ( 1.0) |    78% |    365 | 0.947
+         24 |   1.0 ( 1.0) |    78% |    400 | 0.955
+         32 |   2.0 ( 2.0) |    48% |    400 | 0.969
+         46 |   2.0 ( 3.0) |    36% |    400 | 0.975
+
+-- JOINT round-robin baseline, 46 models, same total budget as 400/newcomer (46*400 = 18,400 matches) --
+   ORACLE: rho median 0.994 (per pair 17 matches)
+   NOISY: rho median 0.971 (per pair 17 matches)

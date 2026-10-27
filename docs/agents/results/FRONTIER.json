@@ -1,0 +1,120 @@
+{
+  "id": "FRONTIER",
+  "title": "FRONTIER: is the top-cluster inversion caused by dilution, by judge capability, or by the reserved split taking the questions that separate the frontier models? (zero calls)",
+  "question": "(A) per top-4 pair, the questions where the two models differ by the key, the win split and its binomial SE; (B) top-4 boards refitted on DECIDABLE matches only, both formats; (C) what each format does on the NON-decidable pairs. Decidable-only pairwise reaching 0 violations => dilution; staying inverted => capability; an unresolvable key gap => dataset.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "4af8512",
+    "program_lines": "docs/judge_v2_program.md L833-L850 (registration) and L851-L893 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-13 (before running, ZERO calls) — FRONTIER: is the top-cluster inversion dilution, judge capability, or the dataset?",
+    "outcome_heading": [
+      "L851: - **FRONTIER (2026-09-13, zero calls): the dataset is exonerated; the inversion is manufactured on the pairs the ...**"
+    ],
+    "date": "2026-09-13"
+  },
+  "script": {
+    "path": "tools/analysis/frontier_probe.py",
+    "sha16": "df6d5ddaa6dfdf2b (at 5143ef0)",
+    "commit": "5143ef0"
+  },
+  "ready": null,
+  "go": "n/a (0 calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/frontier_outcome.txt",
+    "outcome_commit": "5143ef0",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-13"
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the mechanism was later measured further by DECOMP / CONSENSUS-FIT / ORACLE and ARXIASK (602 calls on the 301 discriminating questions)",
+    "commit": "5143ef0",
+    "verdict": "DATASET EXONERATED; the bias is manufactured on key-tie pairs"
+  },
+  "criteria": [
+    {
+      "id": "(A)",
+      "text": "per top-4 pair, the questions where the two models differ by the key; the win split and its binomial SE",
+      "result": "DELIVERED",
+      "value": "all six pairs separable; the closest, arx vs iask, differ on 301 questions with arx winning 0.595 +- 0.028, 3.4 SE from chance: the split did not remove the evidence (dataset exonerated)",
+      "denominator": "six top-4 pairs; 301 discriminating questions for arx / iask"
+    },
+    {
+      "id": "(B)",
+      "text": "top-4 boards refitted on DECIDABLE matches only, both formats",
+      "result": "DELIVERED",
+      "value": "decidable-only leaves pairwise inverted (0.721 accuracy there) and breaks pointwise; both underpowered at ~44 matches per pair",
+      "denominator": "~44 matches per pair"
+    },
+    {
+      "id": "(C)",
+      "text": "what each format does on the NON-decidable pairs",
+      "result": "DELIVERED",
+      "value": "THE MECHANISM: on the 333 pairs the key calls ties, pairwise invents a winner 52% of the time with iask +34 and arx -44 net (a 78-point swing between exactly the inverted pair), 73% of those to the longer answer; pointwise abstains on 69%, asymmetry a quarter the size, length preference 55% (chance)",
+      "denominator": "333 key-tie pairs"
+    }
+  ],
+  "predictions": [],
+  "falsifier": {
+    "text": "decidable-only pairwise reaching 0 violations => dilution; staying inverted => capability; an unresolvable key gap => dataset",
+    "fired": false,
+    "note": "the dataset is exonerated; the inversion is manufactured on the key-tie pairs by the pairwise format's invented winners and length preference; settling it costs 602 calls on the 301 discriminating questions (ARXIASK)"
+  },
+  "numbers_of_record": {
+    "arx_iask": "301 discriminating questions, arx wins 0.595 +- 0.028 (3.4 SE)",
+    "decidable_only": "pairwise 0.721, still inverted; pointwise breaks; ~44 matches per pair",
+    "key_tie_pairs": "333; pairwise invents a winner 52% (iask +34 / arx -44; 73% longer answer); pointwise abstains 69%, length 55%"
+  },
+  "sentence_of_record": "FRONTIER (2026-09-13, zero calls): the dataset is exonerated (all six top-4 pairs separable; arx vs iask differ on 301 questions with arx winning 0.595 +- 0.028, 3.4 SE from chance); decidable-only pairwise stays inverted (0.721) and pointwise breaks, both underpowered at ~44 matches per pair; the mechanism: on the 333 pairs the key calls ties, pairwise invents a winner 52% of the time with iask +34 and arx -44 net, a 78-point swing between exactly the inverted pair, 73% to the longer answer, while pointwise abstains on 69%; the bias is manufactured on key-tie pairs. Settling it costs 602 calls on the 301 discriminating questions.",
+  "chips": [
+    "DATASET EXONERATED",
+    "bias manufactured on key-tie pairs"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "the frontier order (closed by rule)",
+    "a capability verdict at ~44 matches per pair"
+  ],
+  "ledger": {
+    "row_id": "FRONTIER",
+    "version": "v59 (5143ef0); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "ARENA-V2",
+    "POINTWISE",
+    "ARXIASK",
+    "SCHEDULING",
+    "DECOMP"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "the frontier order (CONTEXT.md section 5: FRONTIER, AGGREGATE, ORACLE)"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L833-L893 (registration 4af8512, outcome 5143ef0)",
+    "experiment_results/x12_crossdomain/frontier_outcome.txt (5143ef0)",
+    "docs/test_ledger.html row FRONTIER (v59): chips verbatim, evidence (frontier_probe.py, frontier_outcome.txt, 4af8512)",
+    "script sha16 = sha256 of tools/analysis/frontier_probe.py at 5143ef0, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Looks at the top-4 models, whose arena order is inverted against the answer key. It checks whether the questions that separate them exist, what happens on matches the key can decide, and how the judge behaves when the key calls a tie. No judge calls.",
+    "why": "Finds out whether the top-cluster inversion comes from too little data, a weak judge, or the judging format itself.",
+    "information": "Each possible cause points to a different fix: more data, a better judge, or a different format. Result: the dataset is cleared, since all pairs are separable, for example 301 questions separate arx and iask. The likely mechanism is that on pairs the key calls a tie, the pairwise judge invents a winner 52% of the time and favours the longer answer. The capability question stays underpowered (about 44 matches per pair). This test belongs to the older question pool, so it now counts as history, not evidence.",
+    "written": "2026-10-07"
+  }
+}

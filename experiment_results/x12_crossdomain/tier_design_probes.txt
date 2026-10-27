@@ -1,0 +1,42 @@
+=== TIER-HONEST: when the board tiers itself by its OWN uncertainty, is it honest? ===
+  the key's 10 tiers at a 0.017 gap; 66 model pairs, 2 within a tier, 64 across tiers
+
+  ACROSS-TIER pairs (the key separates them):
+    the arena separates 62 of 64 at 95% confidence (97%)
+    of those, 0 point the WRONG WAY  <- these are the only real errors a tiered product can make
+  WITHIN-TIER pairs (the key ties them):
+    the arena separates 2 of 2 at 95% confidence (100%) - overconfidence, the other failure mode
+      Meta-Llama-3_1-8B            vs c4ai-command-r-v01           P(first above) 0.000 | key 0.371 vs 0.363
+      arx_0314                     vs iask_pro                     P(first above) 0.000 | key 0.834 vs 0.817
+
+  SELF-TIERING: group models the arena cannot separate at 95%%, reading down its own board.
+    the arena's own tiers (10):
+      tier 1: iask_pro (key 0.817), gemini-3.1-pro_5-shots (key 0.913)
+      tier 2: arx_0314 (key 0.834), gpt-4o-2024-08-06 (key 0.750)
+      tier 3: deepseek-chat-v2_5 (key 0.657)
+      tier 4: Meta-Llama-3_1-70B-Instruc (key 0.630)
+      tier 5: Qwen1.5-72B-Chat (key 0.474)
+      tier 6: c4ai-command-r-v01 (key 0.363)
+      tier 7: Meta-Llama-3_1-8B (key 0.371)
+      tier 8: Yi-6b-Chat (key 0.271)
+      tier 9: Llama-2-13b-hf (key 0.235)
+      tier 10: Llama-2-7b-hf (key 0.178)
+    cross-tier key inversions in the arena's own tiering: 2
+      iask_pro                     is tiered ABOVE arx_0314                     but scores 0.817 against 0.834
+      c4ai-command-r-v01           is tiered ABOVE Meta-Llama-3_1-8B            but scores 0.363 against 0.371
+    (an earlier version of this line required the inversion to exceed the 0.017 tier gap and
+     reported 0, because the one real inversion sits EXACTLY on that threshold - corrected)
+    READ: a tiered product is honest if it makes no confident wrong separations and its own tiers
+    contain no key inversions. That is a far weaker demand than reproducing the key's partition,
+    and it is the demand a cost-aware router actually places on the ranking.
+
+=== TIER-ROUTER-U: tier-then-cheapest on the six-corpus union ===
+  pool paeec37aa28063c75 | 6482 questions with all 18 models
+  policy                             accuracy  mean params B
+  best single                          0.5543           72.0
+  per-cell best                        0.6169           46.1
+  per-cell best TIER, smallest         0.6143           38.3
+  tier-then-smallest against per-cell best: -0.0026 accuracy at 83% of the parameters
+  CAVEAT: parameter count parsed from the model name is a crude cost proxy and the union DB
+  carries no token counts or latencies. It orders models by size, which is what a tier-then-
+  cheapest rule needs, but it is not a price.

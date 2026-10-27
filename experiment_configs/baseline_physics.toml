@@ -1,0 +1,83 @@
+# Physics -- BASELINE BATCH, paired MAIN vs C5, RESOLVED option mode. 2026-07-31.
+#
+# One of eight domains re-run to establish a new 12-model baseline under the corrected
+# arena. Every earlier batch is superseded and lives under testing/.
+#
+# BASELINE MODE IS RESOLVED: the judge sees the question stem and both traces, with NO
+# candidate option set, and each trace carries its own selected option resolved from `pred`
+# to the option text so no answer letter appears without a referent. Answer-key blindness is
+# unchanged -- the injected option is the model's OWN selection, wrong on a large share of
+# comparisons, and `gt_answer` never reaches the judging path. The injection is additive and
+# bracketed, never a rewrite of the model's prose, and must be declared in the methodology
+# as a transformation applied before judging.
+#
+# WHY NOT OPTIONS. Showing the candidate set lets the judge decide which option is correct
+# from the set alone and then read off each trace's letter -- a verdict reachable without
+# assessing any reasoning. WHY NOT BLIND: 72% of traces end in "the answer is (X)" and only
+# 23% carry the option text nearby, so withholding the set without resolving the letter
+# leaves roughly half the conclusions unreadable, which is a different manipulation.
+#
+# CORRECTIONS THIS BATCH CARRIES that no earlier run did:
+#   - confidence gate evaluated PER CELL, not on the pooled board
+#   - convergence requires local evidence; gate suppression no longer counts as terminal
+#   - cell judge-consistency pooled over the cell, not `.any` over 66 pairs
+#   - judge/key agreement counted only on decidable matches
+#   - cached verdicts no longer re-propagated into the fit
+#   - arm budgets matched on VERDICTS, not leaf-credited comparisons
+#   - one query, one cell (secondary memberships withdrawn)
+#
+# KNOWN LIMITATION, do not report around it: Delta rho here varies the RUBRIC on a fixed
+# partition. C5 replays MAIN's triples under MAIN's cells, and pooling per-cell statistics
+# is arithmetically identical to a direct domain fit, so this does NOT isolate the partition.
+# See docs/findings-2026-07-31.md section 1.
+#
+# NOT REGISTERED.
+
+datasetType   = "MMLU_PRO"
+models        = [
+    "gemini-3.1-pro_5-shots",
+    "iask_pro",
+    "arx_3",
+    "claude-3.5-sonnet",
+    "gpt-4o-2024-08-06",
+    "deepseek-chat-v2_5",
+    "gpt-4o-mini",
+    "claude-3-5-sonnet-20241022",
+    "Qwen1.5-72B-Chat",
+    "Meta-Llama-3-8B-Instruct",
+    "Qwen1.5-14B-Chat",
+    "Meta-Llama-3-8B"
+]
+snapshotId    = "20260727_042523_Headless_Run_Auto_ge"
+category      = "Physics"
+queryLimit    = 0            # all in-domain reserved questions
+outputDir     = "experiment_results/baseline_physics"
+testRatio     = 0.3
+seed          = 42
+
+runPipeline        = false
+regenerateSplit    = false   # load-bearing: use the canonical reserved pool as-is
+runBenchmark       = true
+runTrickle         = false
+runBaselines       = false
+enableFinalMetrics = false
+enableLabeling     = false   # rubrics already in the snapshot
+judgeInduction     = false
+
+conditions         = ["MAIN", "C5"]
+questionsPerRound  = 1
+confidenceGate     = 0.0     # DISABLED for both arms: C5 emits a flat 0.85 and
+                             # MAIN emits real values, so a live gate would filter one
+                             # arm and not the other - the paired design would break at
+                             # the verdict level while looking intact at the question level.
+parallelism        = 4
+reservedOnly       = true
+
+dagMode = "DAG_MAX"
+maxDepth              = 8
+minClusterSize        = 55
+proposalSeparationBar = 0.025
+
+# Judge sees no candidate set; each trace carries its OWN selected option, resolved
+# from `pred` to the option text. Applies to BOTH arms.
+judgeOptionMode = "RESOLVED"

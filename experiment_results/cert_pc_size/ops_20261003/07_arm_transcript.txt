@@ -1,0 +1,58 @@
+﻿To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.10/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+Configuration on demand is an incubating feature.
+Calculating task graph as no cached configuration is available for tasks: certPcSize
+> Task :checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :processTestResources UP-TO-DATE
+> Task :processResources UP-TO-DATE
+> Task :compileKotlin UP-TO-DATE
+> Task :compileJava NO-SOURCE
+> Task :classes UP-TO-DATE
+> Task :jar UP-TO-DATE
+> Task :compileTestKotlin FROM-CACHE
+> Task :compileTestJava NO-SOURCE
+> Task :testClasses UP-TO-DATE
+
+> Task :processTestAot
+20:39:05.917 [main] INFO org.springframework.test.context.aot.TestClassScanner -- Scanning for Spring test classes in all packages in classpath roots [Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\build\classes\kotlin\test, Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\build\resources\test]
+
+> Task :compileAotTestKotlin NO-SOURCE
+> Task :processAotTestResources UP-TO-DATE
+> Task :compileAotTestJava FROM-CACHE
+> Task :aotTestClasses UP-TO-DATE
+
+> Task :certPcSize
+
+SeparationNullBySizeTest > certPcSize - subsampled declared sites scored against their own site nulls() STANDARD_OUT
+    [THREAD-CAP] requested=12 availableProcessors=12 heapEstimate=n/a budget=5.80GB
+    [PCS] reads embeddings_cache.db (the qwen3 cache of record; -DembeddingCacheFile / -DembeddingModel refused)
+    [PCS] snapshot 20261001_094311_Headless_Run_Auto_ge root n00000001 'MMLU_PRO_LB' n=6993; site file experiment_results\cert_pc_size\site_labels.tsv sha256 231db2e0e11974b28f19244753a1c0a1a5b5c4f96ff695fead2599fe78cfe737; sites 16 (IDENTITY:6993, PS_n486_d1:486, PS_n486_d2:486, PS_n486_d3:486, PS_n486_d4:486, PS_n486_d5:486, PS_n441_d1:441, PS_n441_d2:441, PS_n441_d3:441, PS_n441_d4:441, PS_n441_d5:441, PS_n264_d1:264, PS_n264_d2:264, PS_n264_d3:264, PS_n264_d4:264, PS_n264_d5:264)
+    [SEPBAR] proposalSeparationBar=0.0145 (-DsepBar '0.0145'); sliceDim=512 dropTop=0 whiten=false reps=300 minClusterSize=55
+    [THREAD-CAP] requested=12 availableProcessors=12 heapEstimate=2.15GB budget=5.80GB
+    [SITENULL-HEAP] sliceDim=512 largest site n=6993 live=12 -> peak live 2.15 GB; budget 5.80 GB
+    [EMB-GUARD] model=qwen3-embedding:latest (default (no -DembeddingCacheFile, no -DembeddingModel, no manifest reachable: the DB of record's canonical model)); cache=embeddings_cache.db; native dim expected 4096; vectors read 6993 of 6993 ids, raw dims {4096=6993}; slice width 512
+    [EMB-GUARD] vmfMu cosine over 60 sites: min 0.9976 (site n00000014 'MMLU_PRO_LB/philosophy' n=322), median 0.9996; budget 0.99 -> ADMIT
+    [EMB-GUARD]   site n00000014  n=322   found=322   cos=0.9976  MMLU_PRO_LB/philosophy
+    [EMB-GUARD]   site n00000047  n=286   found=286   cos=0.9980  Emergent Concept #32
+    [EMB-GUARD]   site n00000018  n=426   found=426   cos=0.9982  Emergent Concept #3
+    [PCS] IDENTITY n=6993 declared=0.107803 k=0 (registered 0.107803, k 0) plain p95=0.041626 max=0.042414
+    [PCS] site PS_n486_d1   n=486 declared=0.108987 k=  0 plain p95=0.056704 reached=300 deflated dims=13 k=  0 C0 p95=0.002562 (seed 558690466240731126)
+    [PCS] site PS_n486_d2   n=486 declared=0.112115 k=  0 plain p95=0.055705 reached=300 deflated dims=13 k=  0 C0 p95=0.002632 (seed 558690468895166887)
+    [PCS] site PS_n486_d3   n=486 declared=0.106584 k=  0 plain p95=0.054464 reached=300 deflated dims=13 k=  0 C0 p95=0.002412 (seed 558690471549602648)
+    [PCS] site PS_n486_d4   n=486 declared=0.108733 k=  0 plain p95=0.054442 reached=300 deflated dims=13 k=  0 C0 p95=0.002462 (seed 558690474204038409)
+    [PCS] site PS_n486_d5   n=486 declared=0.116460 k=  0 plain p95=0.055332 reached=300 deflated dims=13 k=  0 C0 p95=0.002205 (seed 558690476858474170)
+    [PCS] site PS_n441_d1   n=441 declared=0.109913 k=  0 plain p95=0.056530 reached=300 deflated dims=13 k=  0 C0 p95=0.003103 (seed 548489366088213447)
+    [PCS] site PS_n441_d2   n=441 declared=0.109947 k=  0 plain p95=0.051837 reached=300 deflated dims=13 k=  0 C0 p95=0.002865 (seed 548489368742649208)
+    [PCS] site PS_n441_d3   n=441 declared=0.103843 k=  0 plain p95=0.053499 reached=300 deflated dims=13 k=  0 C0 p95=0.002474 (seed 548489371397084969)
+    [PCS] site PS_n441_d4   n=441 declared=0.112311 k=  0 plain p95=0.055279 reached=300 deflated dims=13 k=  0 C0 p95=0.002728 (seed 548489374051520730)
+    [PCS] site PS_n441_d5   n=441 declared=0.113371 k=  0 plain p95=0.054814 reached=300 deflated dims=13 k=  0 C0 p95=0.003074 (seed 548489376705956491)
+    [PCS] site PS_n264_d1   n=264 declared=0.118311 k=  0 plain p95=0.054820 reached=300 deflated dims=13 k=  0 C0 p95=0.004715 (seed 401640970869412440)
+    [PCS] site PS_n264_d2   n=264 declared=0.112570 k=  0 plain p95=0.051666 reached=300 deflated dims=13 k=  0 C0 p95=0.003962 (seed 401640973523848201)
+    [PCS] site PS_n264_d3   n=264 declared=0.108559 k=  0 plain p95=0.048377 reached=300 deflated dims=13 k=  0 C0 p95=0.004021 (seed 401640976178283962)
+    [PCS] site PS_n264_d4   n=264 declared=0.112532 k=  0 plain p95=0.049785 reached=300 deflated dims=13 k=  0 C0 p95=0.004300 (seed 401640978832719723)
+    [PCS] site PS_n264_d5   n=264 declared=0.108864 k=  0 plain p95=0.048757 reached=300 deflated dims=13 k=  0 C0 p95=0.004012 (seed 401640981487155484)
+    [PCS] wrote experiment_results\cert_pc_size\arm: sites.csv, replicates.csv, status.txt (COMPLETE); verdicts are the readout's
+
+BUILD SUCCESSFUL in 15m 25s
+9 actionable tasks: 2 executed, 2 from cache, 5 up-to-date
+Configuration cache entry stored.

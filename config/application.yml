@@ -1,0 +1,70 @@
+# External override config (loaded from ./config/ by Spring Boot). Every key below is read by code:
+#   arc.ollama.base-url / num-ctx  -> ArcTaxonomyLLMClient.kt:64,66, ArcLLMProvider.kt:51
+#   huggingface.token              -> MMLUDatasetFetcher.kt:22
+#   taxoadapt.*                    -> TaxonomyConfig (@ConfigurationProperties)
+# Removed in PR #59: jvm.args (Spring doesn't consume it; pass -D flags on the CLI), arc.ai.clients
+# (unused — ArcLLMProvider reads only arc.ollama.*), and the duplicate spring.application.name.
+
+logging:
+  level:
+    root: WARN
+    taxonomy: INFO
+
+arc:
+  ollama:
+    base-url: http://localhost:11434
+    num-ctx: 8192
+
+huggingface:
+  token: ${HUGGINGFACE_TOKEN:}
+
+taxoadapt:
+  execution:
+    run-batch: false
+    calibrate: false
+    start-service: true
+    num-iterations: 15
+    enable-visualization: false
+    enable-tui: true
+    enable-live-labeling: false
+    # Pre-flight TTY probe (PR #60) fails fast with a clear message when there is no terminal.
+    # Set true to skip it if the probe itself ever misbehaves.
+    # skip-tty-precheck: false
+
+  dataset:
+    sample: 12000
+    split-dataset: true
+    test-split-ratio: 0.2
+    selected-domains: []
+
+  llm:
+    provider: AZURE
+    embedding-provider: OLLAMA
+    embedding-model: "qwen3-embedding:latest"
+    judge-model: "Mistral-Large-3"
+    labeling-model: "Mistral-Large-3"
+    max-judge-generality: 1  # 0=leaves only, 1=leaves+parents, 2=leaves+parents+grandparents
+    gemini:
+      api-key: ${GEMINI_API_KEY:}
+      model-name: "gemini-1.5-flash"
+    azure:
+      endpoint: ${AZURE_AI_ENDPOINT:}
+      api-key: ${AZURE_AI_API_KEY:}
+      deployment-name: "Mistral-Large-3"
+      embedding-deployment-name: ""
+      api-version: "2024-02-15-preview"
+
+  # --- Advanced Mathematical Formalism Controls ---
+
+  formalism:
+    # Graph Limits
+    max-depth: 8
+    min-cluster-size: 25
+    separation-epsilon: 0.02
+    cosine-tau: 5.0
+    assignment-margin: 1.0
+    ema-alpha: 0.7
+    ged-threshold: 0.005
+    volume-threshold: 0.0001
+    enable-early-stopping: true
+

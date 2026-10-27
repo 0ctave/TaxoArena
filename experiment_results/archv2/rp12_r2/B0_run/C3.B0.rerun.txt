@@ -1,0 +1,40 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.10/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+Configuration on demand is an incubating feature.
+Reusing configuration cache.
+> Task :checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :processResources
+> Task :processTestResources
+
+> Task :compileKotlin
+w: file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/rp12-r2-run/src/main/kotlin/taxonomy/dataset/MMLUDatasetFetcher.kt:892:36 Redundant creation of Json format. Creating instances for each usage can be slow.
+w: file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/rp12-r2-run/src/main/kotlin/taxonomy/runner/HeadlessBenchmarkRunner.kt:2589:48 'fun exec(p0: String!): Process!' is deprecated. Deprecated in Java.
+w: file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/rp12-r2-run/src/main/kotlin/taxonomy/service/TaxonomySnapshotManager.kt:810:40 Redundant creation of Json format. Creating instances for each usage can be slow.
+
+> Task :compileJava NO-SOURCE
+> Task :classes
+> Task :jar
+
+> Task :compileTestKotlin
+w: file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/rp12-r2-run/src/test/kotlin/taxonomy/dataset/V2SplitInertnessTest.kt:114:31 This declaration needs opt-in. Its usage should be marked with '@kotlinx.serialization.ExperimentalSerializationApi' or '@OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)'
+w: file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/rp12-r2-run/src/test/kotlin/taxonomy/dataset/V2SplitInertnessTest.kt:114:54 This declaration needs opt-in. Its usage should be marked with '@kotlinx.serialization.ExperimentalSerializationApi' or '@OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)'
+w: file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/rp12-r2-run/src/test/kotlin/taxonomy/runner/JudgeRecipeConfigTest.kt:114:20 Redundant creation of Json format. Creating instances for each usage can be slow.
+w: file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/rp12-r2-run/src/test/kotlin/taxonomy/service/AzureInferenceJudgeClientTest.kt:91:9 Name contains character(s) that can cause problems on Windows: *
+
+> Task :compileTestJava NO-SOURCE
+> Task :testClasses
+
+> Task :processTestAot
+09:48:50.898 [main] INFO org.springframework.test.context.aot.TestClassScanner -- Scanning for Spring test classes in all packages in classpath roots [Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\build\classes\kotlin\test, Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\build\resources\test]
+
+> Task :compileAotTestKotlin NO-SOURCE
+> Task :processAotTestResources
+> Task :compileAotTestJava
+> Task :aotTestClasses
+Java HotSpot(TM) 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+09:48:59.465 [INFO ] RankingService - SQLite database connection closed cleanly via shutdown hook.
+> Task :test
+
+BUILD SUCCESSFUL in 48s
+9 actionable tasks: 9 executed
+Configuration cache entry reused.

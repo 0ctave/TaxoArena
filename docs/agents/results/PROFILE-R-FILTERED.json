@@ -1,0 +1,182 @@
+{
+  "id": "PROFILE-R-FILTERED",
+  "title": "PROFILE-R-FILTERED: does the anchor profile's reliability survive the answer-disagreement filter that halves the newcomer bill? (zero calls; plan A11; FRAMEWORK L405 names it untested)",
+  "question": "On the merged board restricted to matches whose extracted answers disagree (the shipped scheduler economy), is the split-half R of the within-anchor model order, with its jackknife interval, within the unfiltered value's (0.7183) reach, and which anchors change class? The value of the answer is a BILL (whether ~1,550 unfiltered matches per newcomer can become ~800 without losing the profile), not a claim about any model.",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "5bd56bb",
+    "program_lines": "docs/judge_v2_program.md L6240-L6311; pre-run bracket L6390 (af176a2): A / B are FILTER conventions, the registrar's addition scored as R_f >= 0.70 at the point, History 119 counts for P3, the per-anchor instrument at 125 x 16 / 10, the reconciliation sentence conditional [re-lined 2026-09-22: batch-1 lines were read at 9c1f37b-era HEAD and shifted by +6 by later insertions]",
+    "program_lines_as_of": "6aa2a0d",
+    "heading": "## Registered 2026-09-18 (before any code or call) — PROFILE-R-FILTERED: does the anchor profile's reliability survive the answer-disagreement filter that halves the newcomer bill? (zero calls; plan docs/agents/plans/2026-09-17_continual_capability_profile_leads.md A11; lens arena_profile.md L4; FRAMEWORK L405 names it untested)",
+    "outcome_heading": [
+      "L6759: ## PROFILE-R-FILTERED (2026-09-18, zero judge calls) — on the merged board (21,536 verdicts, 2,811 judged q) the answer-disagreement filter keeps 12,614 matches"
+    ],
+    "date": "2026-09-18"
+  },
+  "script": {
+    "path": "tools/analysis/profile_r_filtered.py",
+    "sha16": "299f8d20f5a4609f",
+    "commit": "2ccd646"
+  },
+  "ready": null,
+  "go": "n/a (0 calls; window W2 pool reader)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/profile_r_filtered_outcome.txt",
+    "outcome_commit": "17a4434",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-18",
+    "other_files": [
+      "experiment_results/x12_crossdomain/profile_r_filtered_anchors.csv (14 rows, 17a4434)",
+      "experiment_results/x12_crossdomain/profile_r_filtered_run.log"
+    ]
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-18_night_batch.md section 'PROFILE-R-FILTERED and PROFILE-RELIABILITY-INTERACTION: independent post-run review'",
+    "commit": "f505a2a (file last at 074eb3d)",
+    "verdict": "every number CONFIRMED to 4 dp (filter counts by SQL; all 14 LOAO folds); P1 FAILED, P2 HELD (near-vacuous), P3 HELD, registrar's addition FAILED at the point (the file's printed 'HELD (FAIL)' is the lenient line and must not reach the ledger), FALSIFIER FIRES under both conventions; the drop decomposes into support 58% / selection 42%; 'destroys the profile' not supported"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "board-level R filtered vs unfiltered, each with its jackknife interval and halving SD, the unfiltered value reproduced to 4 dp",
+      "result": "HELD",
+      "value": "unfiltered 0.7183 [0.6076, 0.8291], SD 0.0300, REPRODUCED to 4 dp (key-20 0.9139); filtered conv A 0.5613 [0.3385, 0.7842] (fixed [0.3377, 0.7850]), SD 0.0440, delta -0.1570; conv B 0.4477 [0.2183, 0.6772], SD 0.0404, delta -0.2706; key-20 on the same filtered questions 0.8618 (A) / 0.8534 (B)",
+      "denominator": "merged board 21,536 verdicts / 2,811 judged q; filtered conv A 12,614 matches on 2,511 q (per anchor Philosophy 114, Psychology 201, Economics 145, Other 182, Business 143, Math 295, Computer science 156, Law 259, Health 116, Biology 138, History 100, Chemistry 260, Engineering 153, Physics 249); conv B 10,442 on 2,399"
+    },
+    {
+      "id": "C2",
+      "text": "the per-anchor class under the filter (PASS / PASS-WITH-INTERVAL / FAIL / UNDETERMINED-by-support) beside PROFILE-INTERVAL-ALL C2's merged classes, with filtered q_distinct per anchor",
+      "result": "HELD",
+      "value": "conv A: PASS Math 0.8810 [0.8331, 0.9271] (recorded 0.8833), Physics 0.8690 [0.8116, 0.9211] (0.9148); PWI Chemistry 0.7766 (0.7604), Law 0.7351 (0.7923); FAIL Economics -0.2469, Computer science -0.1523, Biology -0.1835, Engineering -0.1911, Other 0.4769 (from PWI 0.7090), Business 0.3440 (0.7701), Psychology 0.4515 (0.7882); UNDETERMINED Philosophy 0.6047 (114), Health -0.0851 (116), History 0.5980 (100; 119 unfiltered): 2 / 2 / 7 / 3 vs recorded 2 / 7 / 5; conv B 2 / 1 / 8 / 3 (Chemistry PWI -> FAIL)",
+      "denominator": "14 anchors; the lower of the recentred bootstrap (125 x 16) and the delete-one jackknife (10); support rule q_distinct < 120"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "(plan A11) board R filtered within 0.05 of the unfiltered 0.7183 at the point",
+      "result": "FAILED",
+      "value": "A -0.157; B -0.271",
+      "denominator": "merged board, filtered"
+    },
+    {
+      "id": "P2",
+      "text": "(plan A11) no anchor moves more than one class step",
+      "result": "HELD",
+      "value": "movers Psychology, Other, Business PWI -> FAIL, one step each (B adds Chemistry); near-vacuous since only PASS anchors can move two steps",
+      "denominator": "11 supported anchors"
+    },
+    {
+      "id": "P3",
+      "text": "(plan A11) >= 3 anchors fall under the support rule (filtered q_distinct < 120) and read UNDETERMINED",
+      "result": "HELD",
+      "value": "Philosophy 114, Health 116, History 100 under A (110 / 112 / 96 under B), counting History's pre-filter 119",
+      "denominator": "14 anchors"
+    },
+    {
+      "id": "P4",
+      "text": "(registrar's blind addition) the filtered board is PASS-WITH-INTERVAL or better, i.e. R_f >= 0.70 at the point (per the af176a2 bracket)",
+      "result": "FAILED",
+      "value": "0.5613 (A) / 0.4477 (B); the outcome file's printed 'HELD (FAIL)' is the lenient literal-containment line set aside by the bracket and is NOT the label of record; under B even the literal containment fails",
+      "denominator": "merged board, filtered"
+    }
+  ],
+  "falsifier": {
+    "text": "board R filtered < 0.60 at the point: the newcomer's profile-coverage bill cannot be halved by the filter; FRAMEWORK L189 step 5 keeps the unfiltered ~1,550 matches per model and L405's 'untested' is replaced by 'tested, FAIL' by insertion. It overturns the bill, not the filter's other results (FILTER-BOARD, MATCH-FILTER, ORACLE's filtered rho, NEWCOMER-PLACEMENT-LIVE's use of the filter)",
+    "fired": true,
+    "note": "FIRES under conv A (0.5613) and conv B (0.4477); the registered wording 'the filter destroys the profile' is NOT supported by the mechanism and is not written into the rule"
+  },
+  "numbers_of_record": {
+    "filter_counts": "x12 AGREE 3,076 / DISAGREE 5,276 / UNDETERMINED 790, conv A kept 6,066 of 9,142 = 66.4%, conv B 5,276 of 8,352 = 63.2%; x20 5,846 / 5,166 / 1,382, conv A 6,548 of 12,394 = 52.8%, conv B 5,166 of 11,012 = 46.9%; merged conv A 12,614 of 21,536 = 58.6%, conv B 10,442 of 19,364 = 53.9%; non-letter pred values: None 16,084 rows",
+    "reconciliation": "AGGREGATE arm B's 5,276 = x12 DISAGREE exactly; the 57.7% vs 65.7% gap is the missing-prediction convention (790 matches); TOPIC-DIFFICULTY's 34.3% / 48.2% same-letter counted 64 / 134 both-missing matches as equal, same-letter proper 33.6% / 47.2% (TOPIC-DIFFICULTY L4883 / L5201 bracketed)",
+    "board_R": "unfiltered 0.7183 [0.6076, 0.8291] (r 0.5604, SD 0.0300); filtered A 0.5613 [0.3385, 0.7842] (SD 0.0440); B 0.4477 [0.2183, 0.6772] (SD 0.0404)",
+    "LOAO_conv_A": "drop Math 0.4917, Physics 0.5110, Chemistry 0.5423 ... Computer science 0.6012",
+    "kept_matches_per_anchor_A/B": "Philosophy 441 / 411 of 784; Psychology 877 / 852 of 1,934; Economics 684 / 618 of 1,394; Other 909 / 881 of 1,798; Business 416 / 339 of 695; Math 1,929 / 1,306 of 2,881; Computer science 895 / 748 of 1,490; Law 993 / 945 of 1,425; Health 578 / 547 of 1,210; Biology 753 / 645 of 1,605; History 464 / 435 of 900; Chemistry 1,222 / 778 of 1,754; Engineering 618 / 493 of 936; Physics 1,835 / 1,444 of 2,730 (matches ratio 0.45-0.70 = the bill's cut)",
+    "key_rows_beside_filtered_questions": "key-20 0.8618 (A) / 0.8534 (B) vs 0.9139 unfiltered; per anchor Math 0.9465, Chemistry 0.9269, Law 0.8849, Business 0.8492 ... Computer science 0.4206; the key-20 drop is question selection (random-q 0.904), not like-for-like",
+    "mechanism_reviewer_unregistered": "random same-size subsample of the unfiltered board reads 0.627 (5 seeds 0.613-0.657; conv-B sizes 0.536): SUPPORT 58% of the drop (67% under B); SELECTION 0.627 -> 0.561: the dropped same-answer matches carry a reproducible order of their own (AGREE-only board R 0.648 vs 0.46-0.50 random; ~0 under within-anchor permutation), two-way r -0.18 with the key profile [qualified by AGREE-ORDER: the AGREE-only ORDER tracks the key at 0.926 / the unfiltered theta at 0.976; only its deviation profile is non-key, +0.40 two-way with length]; the filtered profile tracks the key profile better (two-way r 0.54 vs 0.28)",
+    "consequence_as_rule": "at half density the profile fails 0.70 with or without the filter (random same-size 0.61-0.66, filtered 0.56); the bill is not halved; FRAMEWORK L405 'untested' -> 'tested, FAIL (0.5613; support 58% / selection 42%)'; L189 step 5 keeps ~1,550 unfiltered"
+  },
+  "sentence_of_record": "PROFILE-R-FILTERED: on the merged board (21,536 verdicts, 2,811 judged q) the answer-disagreement filter keeps 12,614 matches (conv A, missing kept; 10,442 conv B) on 2,511 / 2,399 questions; the judge-built anchor profile's split-half R falls from 0.7183 [0.6076, 0.8291] to 0.5613 [0.3385, 0.7842] (conv A; 0.4477 [0.2183, 0.6772] conv B): P1 FAILED, falsifier (< 0.60) FIRES, registrar's addition FAILED at the point, P2 HELD (Psychology, Other, Business PWI -> FAIL), P3 HELD (Philosophy 114, Health 116, History 100 UNDETERMINED-by-support). The drop decomposes into support (a random subsample of the same match count per anchor reads 0.627, 58% of the drop) and selection (0.627 -> 0.561): the dropped same-answer matches carry a reproducible order of their own (AGREE-only R 0.648 vs 0.46-0.50 random; ~0 under permutation) anti-correlated with the key profile (two-way r -0.18), and the filtered profile tracks the key profile better (r 0.54 vs 0.28). [CORRECTED 2026-09-19 by AGREE-ORDER (D3; docs/reviews/2026-09-19_zero_call_batch2.md, 83cb8e5): \"anti-correlated with the key profile (two-way r -0.18)\" is a two-way (model x anchor) interaction correlation between the AGREE per-anchor theta table and the key table; the AGREE-only order itself tracks the key at 0.926 and the unfiltered theta at 0.976 (Spearman over the 20 models), and its deviation profile correlates +0.40 two-way with the length profile; \"the dropped pairs carry a non-key order\" reads: they carry the board's order with a non-key, length-tracking deviation profile. Whether that order's reproducibility (R 0.648) is length is UNDETERMINED (AGREE-ORDER).] The key-20 row's 0.9139 -> 0.8618 on the filtered questions is question selection (random-q 0.904), not the same mechanism. Consequence as registered: the newcomer profile-coverage bill is not halved by the filter; at half density the profile fails 0.70 with or without it. FRAMEWORK L405 'untested' -> 'tested, FAIL (0.5613)'; L189 step 5 keeps ~1,550 unfiltered matches per model, with the decomposition beside it.",
+  "chips": [
+    "FILTERED R 0.56 [0.34, 0.78] (A) / 0.45 (B)",
+    "FALSIFIER FIRES",
+    "P1 FAILED",
+    "P2 HELD",
+    "P3 HELD",
+    "REGISTRAR'S ADDITION FAILED (POINT)",
+    "SUPPORT 58% / SELECTION 42% (RANDOM SAME-SIZE 0.63)",
+    "DROPPED PAIRS CARRY A REPRODUCIBLE ORDER (AGREE-ONLY 0.65; ORDER TRACKS THE KEY 0.93; DEVIATION PROFILE NON-KEY, TWO-WAY r -0.18) [QUALIFIED 2026-09-19 BY AGREE-ORDER]",
+    "BILL NOT HALVED"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-18",
+      "by": "the pre-run review, before --run (programme L6384, af176a2)",
+      "text": "(1) The conventions A/B of this test are FILTER conventions (A: missing or blank extraction kept, the shipped MatchFilter.kt rule; B: both present and different), not the record's verdict conventions; ties enter the BT fit at 1/2 under both. (2) The registrar's addition is scored as: the filtered board's class is PASS-WITH-INTERVAL or better, i.e. R_f >= 0.70 at the point; the script's printed HELD (interval reaching 0.70) is beside, not the label of record. (3) History is 119 unfiltered, below the 120 support rule before any filter; P3 counts it; the matches ratio is printed per anchor. (4) The per-anchor instrument runs at 125 x 16 / 10. (5) The reconciliation sentence is asserted only if x12 DISAGREE equals 5,276."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "AGREE-ORDER D3 (docs/reviews/2026-09-19_zero_call_batch2.md, 83cb8e5); programme L6753 / L6812 / L6837 and the ledger observed cell (v116)",
+      "text": "'anti-correlated with the key profile (two-way r -0.18)' is a two-way (model x anchor) INTERACTION correlation between the AGREE per-anchor theta table and the key table (own -0.1816); the AGREE-only ORDER itself tracks the key at 0.926 and the unfiltered theta at 0.976 (Spearman over the 20 models), and its deviation profile correlates +0.40 two-way with the length profile: the dropped same-answer matches carry the BOARD's order with a non-key, length-tracking deviation profile, not a non-key order; whether that order's reproducibility (R 0.648) is length is UNDETERMINED (AGREE-ORDER: matching cannot be separated from support at this size). The chip 'DROPPED PAIRS CARRY A NON-KEY ORDER' was qualified accordingly."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "CORRECTIONS_2026-09-23 (registrar)",
+      "text": "[CORRECTED 2026-09-23 by the registrar (line pointer only, zero calls; no number, no criterion and no sentence moves): registration.program_lines names docs/judge_v2_program.md L6240, and that was exact when it was written. After commit cd83eac inserted four one-line correction brackets mid-file (hunks @@ -3911,0 / -6535,0 / -6692,0 / -6949,0 @@), the heading of record \"## Registered 2026-09-18 (before any code or call) — PROFILE-R-FILTERED: does the anchor profile's reliability survive the answer-disagreeme ...\" stands at L6241, +1; the whole span shifts by the same +1. Verified at HEAD by sed -n '6241p' docs/judge_v2_program.md. The map for every such pointer is the programme's \"## Line-shift map, appended 2026-09-23\" section: +0 up to old L3911, +1 to L6535, +2 to L6692, +3 to L6949, +4 below. The recorded span is left standing beside this bracket, not rewritten.]"
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "any model's theta or position under the filter (PLACEBO-ENTRY's +13% theta scale is why only R is compared)",
+    "a per-anchor claim for the three UNDETERMINED anchors",
+    "that the scheduler's filter is unsafe for boards (FILTER-BOARD stands)",
+    "a judged reading of the AGREE-only order (the AGREE-only R is a descriptive reading of the same verdicts)",
+    "x20 alone (never read alone)",
+    "that 'the filter destroys the profile' (58% of the drop is support; the filtered profile tracks the key better)"
+  ],
+  "ledger": {
+    "row_id": "PROFILE-R-FILTERED",
+    "version": "v116 (row added v114; observed cell bracketed and one chip qualified at v116 by AGREE-ORDER); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "ANCHOR-PROFILE-INTERVAL",
+    "PROFILE-INTERVAL-ALL",
+    "PROFILE-RELIABILITY",
+    "PROFILE-RELIABILITY-X20",
+    "FILTER-BOARD",
+    "MATCH-FILTER",
+    "AGGREGATE",
+    "TOPIC-DIFFICULTY",
+    "PLACEBO-ENTRY",
+    "NEWCOMER-PLACEMENT-LIVE"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L6234-L6305 (registration 5bd56bb) and the pre-run bracket L6384 (af176a2): question, hygiene, instrument, criteria, predictions, falsifier",
+    "docs/judge_v2_program.md L6753-L6845 (outcome section, 3dd0900; AGREE-ORDER brackets L6753 / L6812 / L6837 at 83cb8e5 or the following registrar commit): every number, C1-C2, P1-P3 and the registrar's addition scored, the falsifier, the reviewer's mechanism, defects (1)-(6), does-not-show, the sentence of record with its bracket",
+    "docs/reviews/2026-09-18_night_batch.md independent post-run review section (f505a2a; file last at 074eb3d): CONFIRMED status, the decomposition, chips (pre-qualification)",
+    "docs/reviews/2026-09-19_zero_call_batch2.md section 3 D3 (83cb8e5): the AGREE-ORDER qualification",
+    "experiment_results/x12_crossdomain/profile_r_filtered_outcome.txt and profile_r_filtered_anchors.csv (17a4434)",
+    "docs/test_ledger.html row PROFILE-R-FILTERED (v114, bracketed v116): chips verbatim (the qualified chip as it now reads), observed cell bracket, evidence (5bd56bb, af176a2, 2ccd646, 17a4434, f505a2a, 3dd0900)",
+    "script sha16 = sha256 of tools/analysis/profile_r_filtered.py at 2ccd646, first 16 hex (identity, computed by the registrar 2026-09-20)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' lines to grep -n regardless of line drift; line numbers re-lined 2026-09-22 as of programme HEAD 6aa2a0d (shift +6 from the batch-1 reading)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ4 Price",
+    "what": "On about 21,500 existing verdicts, the test kept only matches where the two models gave different final answers. This filter roughly halves the judging bill for a new model. It then measured how reproducible the per-subject model order stays, by comparing two random halves of the data.",
+    "why": "It checks whether the cheaper evaluation still gives a reliable per-subject profile of the models.",
+    "information": "If reliability held, new models could be profiled at about half the cost. If it dropped, the saving costs precision. Result: done. Reliability fell from 0.72 to 0.56, below the 0.60 bar, so the prediction failed. About 58% of the drop is just from having fewer matches. The rest is because the dropped same-answer matches carry an order of their own. The filtered profile actually tracks the answer key better. This does not show that the filter 'destroys' the profile. Older judged question family, later ruled 'history, not evidence'.",
+    "written": "2026-10-07"
+  }
+}

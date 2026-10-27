@@ -1,0 +1,156 @@
+{
+ "id": "JUDGE-SOLVED-SPLIT",
+ "title": "JUDGE-SOLVED-SPLIT: on K46-KEY-READ's key-decidable ONE matches, does key accuracy depend on whether the judge model solved the item itself (right reference, JS1 deciding; wrong reference, JS2 descriptive, the Krumdick reconciliation)? (zero calls; REGISTERED 2026-10-02)",
+ "question": "With a cached reference under the v2 recipe, is the judge more key-accurate on items it can solve itself (a content-closed re-reading of JUDGE-2x2's question)?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "the commit that writes it (parent 1a922a80)",
+  "program_lines": "docs/judge_v2_program.md L23437-L23462",
+  "program_lines_as_of": "the commit that writes them, parent 1a922a80, re-grepped",
+  "date": "2026-10-02",
+  "heading": "## Registered 2026-10-02 (before any code or call) — JUDGE-SOLVED-SPLIT: on K46-KEY-READ's key-decidable ONE matches ...",
+  "provenance": "the orchestrator's brief of 2026-10-02 and the data-steward's read-only join (446 of 544 covered; grok.db sha256-bytes 0f2d96d416c70dc3); bars, Support, predictions, falsifier the registrar's; the author's go (plan Amendment 38)"
+ },
+ "script": {
+  "path": "tools/analysis/judge_solved_split.py",
+  "sha16": "blob:c1f36f794d9d83ece13f5ecf2d553bdb6dbf0869 (LF, git hash-object in main)",
+  "commit": "e051e017 (merge of judge-solved-split 129fbc56)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_judge_solved_split.md (C1-C4)",
+  "commit": "e051e017"
+ },
+ "go": "plan Amendment 38: the author's \"register 2, 6 and 3\" (0 calls for the readouts; the 4k-match rule not engaged)",
+ "run": {
+  "outcome_file": "experiment_results/archv2/judge_solved_split/outcome.txt (sha256 9d41dbac64790cc4...; blob:510f41e1; write-once; UNTRACKED)",
+  "outcome_commit": "run from main at e051e017; outcome untracked",
+  "calls": 0,
+  "cce": 0,
+  "pool": "pv2_41dbd3dbcd399df0 (K46 store 44724d25, eval view e35b7518, grok.db 0f2d96d4: AFTER EQUAL)",
+  "date": "2026-10-02"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_judge_solved_split.md",
+  "commit": "b60dd49d",
+  "verdict": "VALID; JS1 UNDETERMINED; F-JS NOT FIRED"
+ },
+ "criteria": [
+  {
+   "id": "IDENTITY",
+   "text": "precondition (refuse): K46-KEY-READ C1 on 544 reproduced (0.8787; right 0.9249 / 506, wrong 0.2632 / 38) and the steward's cell counts (446; 226 / 188; 5 / 27)",
+   "result": "HELD",
+   "value": "both identity blocks PASS",
+   "denominator": "414 covered reference-right ONE matches (226 judge-solved / 188 unsolved) of K46-KEY-READ's 544 key-decidable (160 CK-CLOSE components, Kish m 4.934); DEFF 2.727 transported (K46-KEY-READ C1, measured); component bootstrap B 2,000"
+  },
+  {
+   "id": "JS1",
+   "text": "Delta_S = acc(judge solved) - acc(judge unsolved) on covered reference-right matches, convention A; the INTERVAL decides: HELD iff the 95% interval lies wholly above 0; FAILED (REVERSED) iff wholly below 0; UNDETERMINED otherwise, never parity. Verdict line: DESCRIPTIVE-ONLY at prediction (SE 0.0433, MDE80 0.121)",
+   "result": "UNDETERMINED",
+   "value": "Delta_S +0.0196, 95% percentile [-0.0472, +0.0802] (B 2,000, seed 42); acc 0.9292 / 226 vs 0.9096 / 188; measured DEFF 1.334, SE 0.0322, MDE80 0.0901 (transported plan DEFF 2.727, MDE80 0.121); DESCRIPTIVE-ONLY",
+   "denominator": "414 covered reference-right matches (226 / 188), 122 CK-CLOSE components (Kish 4.850)"
+  },
+  {
+   "id": "JS2",
+   "text": "DESCRIPTIVE-ONLY: reference-wrong covered matches, acc(solved, 5 in 2 variants) vs acc(unsolved, 27 in 7 variants)",
+   "result": "n/a",
+   "value": "DESCRIPTIVE: solved 0.2000 on 5 (2 variants) vs unsolved 0.2593 on 27 (7 variants); does not show the Krumdick pattern",
+   "denominator": "32 covered reference-wrong matches in 9 variants"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "Delta_S -0.01 [-0.09, +0.07]; JS1 HELD 0.15, FAILED 0.05, UNDETERMINED 0.80 (prior JUDGE-2x2 history, [P-FAM])",
+   "result": "HELD",
+   "value": "Delta_S +0.0196 in [-0.09, +0.07]; UNDETERMINED (0.80) realised; Brier 0.0650",
+   "denominator": "414 covered reference-right ONE matches (226 judge-solved / 188 unsolved) of K46-KEY-READ's 544 key-decidable (160 CK-CLOSE components, Kish m 4.934); DEFF 2.727 transported (K46-KEY-READ C1, measured); component bootstrap B 2,000"
+  },
+  {
+   "id": "P2",
+   "text": "acc(solved) 0.93 [0.88, 0.97]; acc(unsolved) 0.92 [0.86, 0.96]",
+   "result": "HELD",
+   "value": "0.9292 in [0.88, 0.97]; 0.9096 in [0.86, 0.96]",
+   "denominator": "414 covered reference-right ONE matches (226 judge-solved / 188 unsolved) of K46-KEY-READ's 544 key-decidable (160 CK-CLOSE components, Kish m 4.934); DEFF 2.727 transported (K46-KEY-READ C1, measured); component bootstrap B 2,000"
+  },
+  {
+   "id": "P3",
+   "text": "JS2 at the point: acc(unsolved, wrong ref) 0.20 [0.05, 0.40]; acc(solved, wrong ref) 0.60 [0.20, 1.00]",
+   "result": "HELD",
+   "value": "0.2593 in [0.05, 0.40]; 0.2000 in [0.20, 1.00] (on its endpoint, inclusive)",
+   "denominator": "32 covered reference-wrong matches in 9 variants"
+  }
+ ],
+ "falsifier": {
+  "text": "F-JS fires iff JS1 HELD: overturns on the content-closed v2 split the reading taken from JUDGE-2x2 (history) that judge ability makes no difference once the reference is right; the cheap-judge sentence then carries 'judge competence still matters with a right reference'. No recorded number revised.",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "JS1": "Delta_S +0.0196, 95% percentile [-0.0472, +0.0802] (normal [-0.0435, +0.0827] descriptive); 414 matches (226 / 188), 122 components; convention A",
+  "support": "MEASURED analytic DEFF 1.334 (n_eff 169.4 / 140.9), SE 0.0322, MDE80 0.0901; TRANSPORTED plan DEFF 2.727 (K46-KEY-READ C1, 544), MDE80 0.121",
+  "JS2": "solved 0.2000 on 5 (2 variants); unsolved 0.2593 on 27 (7 variants); descriptive",
+  "convention_B": "-0.0251 (0.9633 / 218 vs 0.9884 / 173); TIE shares 0.0354 solved vs 0.0798 unsolved (reference right)",
+  "uncovered": "0.9082 on 98 matches on 29 qids (never counted as unsolved)",
+  "predictions": "5 / 5 HELD; Brier 0.0650"
+ },
+ "sentence_of_record": "JS1 UNDETERMINED: on 414 covered reference-right key-decidable ONE matches (226 judge-solved / 188 unsolved; 122 CK-CLOSE components; convention A), Delta_S = +0.0196, 95% percentile interval [-0.0472, +0.0802] (B 2,000, seed 42). Not shown either way at n = 414; never 'judge ability makes no difference' and never parity. Measured support: analytic DEFF 1.334, SE 0.0322, MDE80 0.090, DESCRIPTIVE-ONLY. F-JS NOT FIRED. JS2 (descriptive, 9 variants): 0.20 on 5 solved vs 0.26 on 27 unsolved. 98 uncovered matches on 29 qids, outside JS1 / JS2. Convention B beside: -0.0251 (W1). [content-closed under CK-CLOSE-v2 (residual disclosed), pv2_41dbd3dbcd399df0, v2 recipe, judge grok-4-1-fast-non-reasoning; solve status a separate cached solve, 5.7% retest noise; JUDGE-2x2 comparators [P-FAM] history, not evidence]",
+ "chips": [
+  "REGISTERED 2026-10-02, BEFORE ANY CODE; not built",
+  "VALID (POST-RUN b60dd49d): JS1 UNDETERMINED; F-JS NOT FIRED; PREDICTIONS 5/5 HELD",
+  "DESCRIPTIVE-ONLY (MEASURED DEFF 1.334, MDE80 0.090); CONVENTION B REVERSES THE SIGN (TIES); JS2 NOT THE KRUMDICK PATTERN (9 VARIANTS); NEVER PARITY"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-02",
+   "by": "registrar (POSTRUN b60dd49d W1, W2, C3, C4)",
+   "text": "outcome recorded, programme L23531-L23541"
+  }
+ ],
+ "does_not_show": [
+  "a causal effect of judge competence (separate cached solve, 5.7% retest noise, difficulty confounds)",
+  "that judge ability makes no difference (no parity)",
+  "the Krumdick reconciliation (JS2, 9 variants)",
+  "the 98 uncovered matches' solve status (29 qids)",
+  "another judge, recipe, split or the NONE matches; a reference policy (D2)"
+ ],
+ "ledger": {
+  "row_id": "JUDGE-SOLVED-SPLIT",
+  "version": "v347 (2026-10-02: OUTCOME bracket, OK + WARN chips) | v345 (2026-10-02: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "K46-KEY-READ"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; a read of existing verdicts by a cached attribute, not a gate, confidence rule, abstention or escalation (REF-CONF, ABSTAIN, ESCALATE-LLAMA-LAW not reopened)"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "seconds to minutes",
+  "agent_hours": "engine-coder about 1.5 h",
+  "reads_pool": false,
+  "option": "J-COMPLETE: 29 solve calls (judge_solve_map.py), PAID, separate flow, unpriced, not registered"
+ },
+ "sources": [
+  "docs/judge_v2_program.md L23437-L23462 (section \"## Registered 2026-10-02 (before any code or call) — JUDGE-SOLVED-SPLIT: on K46-KEY-READ's key-decidable ONE matches ...\"; _as_of the commit that writes it, parent 1a922a80, re-grepped)",
+  "docs/agents/results/K46-KEY-READ.json (C1_ONE_A, C1_support_measured)",
+  "the data-steward's join as relayed by the orchestrator 2026-10-02",
+  "ledger row JUDGE-2x2 ([P-FAM] history)",
+  "docs/literature/2026-10-02_related_work_pass2.md (487ac3bd) §2.2, §5 row 2",
+  "docs/plan_2026-09-15.md Amendment 38",
+  "docs/judge_v2_program.md L23531-L23541 (outcome section, _as_of the commit that writes it, parent b60dd49d)",
+  "docs/reviews/POSTRUN_judge_solved_split.md (b60dd49d)"
+ ],
+ "last_update": "2026-10-02",
+ "plain_description": {
+  "sq": "SQ2 Trust",
+  "what": "On 414 matches where the answer key decides the winner and the judge's reference answer is right, it compares the judge's accuracy on questions the judge model can solve itself with its accuracy on those it cannot. No judge calls.",
+  "why": "It checks whether a cheap judge is enough once it gets a correct reference, or whether the judge's own competence still matters.",
+  "information": "A clear gap would mean judge competence matters even with a right reference. No gap at adequate power would support cheap judges. Result: done, undetermined. The difference is +2.0pp with an interval from -4.7 to +8.0pp. This is not shown either way at this sample size and must never be read as 'judge ability makes no difference'. Descriptive only.",
+  "written": "2026-10-07"
+ }
+}

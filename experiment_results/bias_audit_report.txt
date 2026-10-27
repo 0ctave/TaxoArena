@@ -1,0 +1,49 @@
+
+== H1: rubric-induced per-model shift (theta_cell - theta_generic) ==
+  arx_0314                        +0.138 [-0.013, +0.307]
+  gemini-3.1-pro_5-shots          +0.074 [-0.081, +0.245]
+  Qwen1.5-72B-Chat                +0.045 [-0.077, +0.163]
+  Meta-Llama-3_1-70B-Instruct     +0.023 [-0.114, +0.162]
+  iask_pro                        +0.017 [-0.118, +0.162]
+  Meta-Llama-3_1-8B               -0.003 [-0.168, +0.152]
+  Llama-2-13b-hf                  -0.005 [-0.207, +0.195]
+  gpt-4o-2024-08-06               -0.017 [-0.139, +0.103]
+  Llama-2-7b-hf                   -0.026 [-0.224, +0.163]
+  c4ai-command-r-v01              -0.054 [-0.204, +0.082]
+  deepseek-chat-v2_5              -0.091 [-0.210, +0.044]
+  Yi-6b-Chat                      -0.100 [-0.261, +0.053]
+  models whose CI excludes 0: 0 of 12
+
+== H2: rubric content scan (answer leakage) ==
+  option letter answer     0 hit(s) 
+  explicit option ref      0 hit(s) 
+  numeric = answer         0 hit(s) 
+  TODO/FIXME               0 hit(s) 
+  rubrics scanned: 87 | total hits: 0
+
+== H3: length bias (verdict ~ lengthDiff/1k + gtDiff, decisive only) ==
+  mistral/cell     n= 7373 | beta_len +0.3938 (z=+14.6) | beta_gt +1.930 (z=+36.0)
+  mistral/generic  n= 7456 | beta_len +0.3954 (z=+14.8) | beta_gt +1.805 (z=+34.6)
+  grok/cell        n= 1513 | beta_len +0.3393 (z=+5.6) | beta_gt +2.063 (z=+16.2)
+  -- length-matched top-cluster refit (|dlen| <= 300 chars) --
+  x12 all(n=1873):     iask_pro > gemini-3.1-pro_5-shots > arx_0314 > gpt-4o-2024-08-06
+  x12 matched(n=674): gemini-3.1-pro_5-shots > iask_pro > arx_0314 > gpt-4o-2024-08-06
+  R2  all(n=7464):     iask_pro > gemini-3.1-pro_5-shots > gpt-4o-2024-08-06 > arx_0314
+  R2  matched(n=2894): gemini-3.1-pro_5-shots > iask_pro > arx_0314 > gpt-4o-2024-08-06
+
+== H4: order-bias sweep (|winAFirst-winASecond|/n > 0.3, n >= 6) ==
+  x12 eligible   35 | flagged 11.4% | chance-expected 6.4%
+  R2  eligible 2037 | flagged 5.0% | chance-expected 3.0%
+
+== H5: routing anchor purity vs MMLU-Pro category (primary assignment) ==
+  overall purity 73.6% (2534/3445)
+  flow Physics          -> Chemistry        67
+  flow Math             -> Computer science 54
+  flow Physics          -> Engineering      43
+  flow Engineering      -> Chemistry        33
+  flow Other            -> Psychology       30
+
+== H6: board invariance to cell weighting (x12) ==
+  uniform per leaf     rho 1.0000 | order IDENTICAL
+  pool-proportional    rho 1.0000 | order IDENTICAL
+  uniform per anchor   rho 1.0000 | order IDENTICAL

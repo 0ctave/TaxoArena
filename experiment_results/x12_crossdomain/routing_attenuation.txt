@@ -1,0 +1,161 @@
+=== ROUTING-ATTENUATION (FRAMEWORK item 11): synthetic misrouting on the key, attenuation of (model x anchor) contrasts ===
+  pool of record p2dca21ab5f4ef3ae (active: p2dca21ab5f4ef3ae) | 3445 questions | 12 models (Meta-Llama-3-70B-Instruct excluded; not in ARENA12) | 14 anchors = declared MMLU-Pro categories
+  key: eval_results.is_correct; 3408 questions carry all 12 models, 37 carry fewer (nan-aware means)
+  denominators: EVAL-side keyed pool = 3445 questions (decides the verdict: smaller SE, the harder reading); x12 JUDGED = 2811 questions (second class, printed)
+  rates 0.00, 0.10, 0.19, 0.20, 0.30 | 200 misrouting draws per rate | clustered SE from 2000 within-anchor question-bootstrap draws | seed 42
+  anchor sizes (declared, pool / judged): History 114/107, Computer science 123/105, Philosophy 144/121, Biology 196/157, Health 206/159, Business 232/188, Psychology 238/222, Economics 250/188, Engineering 267/182, Other 277/243, Law 287/282, Chemistry 339/256, Physics 379/275, Math 393/326
+
+=== (0) The tree's realised routing of this pool (bareq512_s42, primary leaf -> anchor) ===
+  filed in the declared anchor 2595 of 3445 = 75.3%; misfiled 24.7% (the record's 'MMLU-Pro alone 74-76%'; the union figure is 81.6%, i.e. ~19%)
+  NOTE: every x12 per-anchor board in the record was built on the ROUTED anchor (verdict.anchor == routed anchor on 9,142 of 9,142 matches), so the anchor rows already carry this realised misfiling relative to the declared category.
+  per anchor: misfiled OUT of it / foreign arrivals INTO it / net cell size under routing
+    History           n=114  out  16 (14.0%)  in  26  routed n=124  main destinations: Biology 10, Other 2, Law 2
+    Computer science  n=123  out  31 (25.2%)  in 118  routed n=210  main destinations: Math 20, Other 5, Engineering 3
+    Philosophy        n=144  out  25 (17.4%)  in  38  routed n=157  main destinations: Other 8, History 7, Psychology 5
+    Biology           n=196  out  33 (16.8%)  in  63  routed n=226  main destinations: Health 17, Math 5, Chemistry 4
+    Health            n=206  out  70 (34.0%)  in  45  routed n=181  main destinations: Biology 31, Psychology 19, Other 12
+    Business          n=232  out  60 (25.9%)  in  53  routed n=225  main destinations: Other 21, Psychology 16, Economics 11
+    Psychology        n=238  out  51 (21.4%)  in  79  routed n=266  main destinations: Health 14, Other 10, Biology 10
+    Economics         n=250  out  52 (20.8%)  in  27  routed n=225  main destinations: Computer science 17, Other 12, Business 12
+    Engineering       n=267  out  94 (35.2%)  in  54  routed n=227  main destinations: Chemistry 35, Physics 23, Math 21
+    Other             n=277  out 127 (45.8%)  in  91  routed n=241  main destinations: Psychology 26, Business 23, Economics 15
+    Law               n=287  out  23 ( 8.0%)  in   9  routed n=273  main destinations: Philosophy 14, Other 8, Business 1
+    Chemistry         n=339  out  52 (15.3%)  in  97  routed n=384  main destinations: Physics 41, Math 5, Computer science 3
+    Physics           n=379  out 110 (29.0%)  in  85  routed n=354  main destinations: Chemistry 49, Engineering 40, Other 7
+    Math              n=393  out 106 (27.0%)  in  65  routed n=352  main destinations: Computer science 60, Business 15, Physics 14
+
+=== (1) Clean (declared) cells, EVAL denominator: contrast spread and clustered SE ===
+  C1 model-centred: SD across cells 0.1014, |C1| median 0.0657 max 0.2791 | clustered SE median 0.0276 (min 0.0104, max 0.0438)
+  C2 interaction:   SD across cells 0.0639, |C2| median 0.0490 max 0.1726 | clustered SE median 0.0215 (min 0.0114, max 0.0374)
+  cell-accuracy SE (the Stage 5 row SE): question-bootstrap median 0.0285, binomial median 0.0284; ratio clustered-C1 / bootstrap-acc median 0.969 (the contrast SE is the smaller: the harder bar, and the one the verdict uses)
+  cells with |C1| > 2 SE (a publishable 'above its own average' claim): 99 of 168; |C2| > 2 SE: 91 of 168
+  per-anchor clustered SE (C1 median over models): History 0.039, Computer science 0.036, Philosophy 0.036, Biology 0.028, Health 0.030, Business 0.027, Psychology 0.029, Economics 0.027, Engineering 0.027, Other 0.029, Law 0.026, Chemistry 0.020, Physics 0.020, Math 0.020
+
+=== (1) Clean (declared) cells, JUDGED denominator: contrast spread and clustered SE ===
+  C1 model-centred: SD across cells 0.1012, |C1| median 0.0692 max 0.2739 | clustered SE median 0.0297 (min 0.0113, max 0.0464)
+  C2 interaction:   SD across cells 0.0631, |C2| median 0.0472 max 0.1664 | clustered SE median 0.0235 (min 0.0120, max 0.0383)
+  cell-accuracy SE (the Stage 5 row SE): question-bootstrap median 0.0305, binomial median 0.0307; ratio clustered-C1 / bootstrap-acc median 0.970 (the contrast SE is the smaller: the harder bar, and the one the verdict uses)
+  cells with |C1| > 2 SE (a publishable 'above its own average' claim): 93 of 168; |C2| > 2 SE: 82 of 168
+  per-anchor clustered SE (C1 median over models): History 0.041, Computer science 0.041, Philosophy 0.039, Biology 0.031, Health 0.034, Business 0.030, Psychology 0.030, Economics 0.032, Engineering 0.033, Other 0.029, Law 0.027, Chemistry 0.023, Physics 0.025, Math 0.021
+
+=== (2) Attenuation by misrouting rate, EVAL denominator (pooled over the 168 cells) ===
+  bias = mean over draws of C_p - C_0; rms = sqrt(mean (C_p - C_0)^2); slope = regression of C_p on C_0 through the origin
+  mechanism   rate   C1: median|bias| max|bias| median rms  slope  cells |bias|<=SE  rms<=SE  | C2: median|bias| max|bias| median rms  slope  cells |bias|<=SE  rms<=SE
+  SYN-UNIFORM 0.00       0.0000    0.0000     0.0000  1.000     168/168    168/168   |     0.0000    0.0000     0.0000  1.000     168/168    168/168
+  SYN-UNIFORM 0.10       0.0075    0.0294     0.0161  0.890     165/168    160/168   |     0.0055    0.0212     0.0117  0.890     168/168    166/168
+  SYN-UNIFORM 0.19       0.0135    0.0539     0.0234  0.797     126/168    106/168   |     0.0096    0.0376     0.0173  0.797     141/168    126/168
+  SYN-UNIFORM 0.20       0.0144    0.0538     0.0240  0.787     123/168    103/168   |     0.0103    0.0369     0.0178  0.788     138/168    122/168
+  SYN-UNIFORM 0.30       0.0210    0.0815     0.0300  0.677      97/168     68/168   |     0.0159    0.0520     0.0231  0.682     113/168     80/168
+  SYN-TREE    0.00       0.0000    0.0000     0.0000  1.000     168/168    168/168   |     0.0000    0.0000     0.0000  1.000     168/168    168/168
+  SYN-TREE    0.10       0.0050    0.0286     0.0142  0.943     166/168    166/168   |     0.0033    0.0154     0.0109  0.944     168/168    168/168
+  SYN-TREE    0.19       0.0095    0.0534     0.0193  0.893     152/168    138/168   |     0.0065    0.0277     0.0150  0.894     160/168    147/168
+  SYN-TREE    0.20       0.0096    0.0564     0.0208  0.888     148/168    132/168   |     0.0065    0.0305     0.0153  0.892     159/168    147/168
+  SYN-TREE    0.30       0.0136    0.0842     0.0256  0.831     125/168    102/168   |     0.0091    0.0433     0.0193  0.835     134/168    118/168
+  REALISED    0.247      0.0160    0.0835          -  0.972     122/168        -   |     0.0136    0.0780          -  0.992     119/168        -   (single realisation: shift, not bias)
+
+=== (2) Attenuation by misrouting rate, JUDGED denominator (pooled over the 168 cells) ===
+  bias = mean over draws of C_p - C_0; rms = sqrt(mean (C_p - C_0)^2); slope = regression of C_p on C_0 through the origin
+  mechanism   rate   C1: median|bias| max|bias| median rms  slope  cells |bias|<=SE  rms<=SE  | C2: median|bias| max|bias| median rms  slope  cells |bias|<=SE  rms<=SE
+  SYN-UNIFORM 0.00       0.0000    0.0000     0.0000  1.000     168/168    168/168   |     0.0000    0.0000     0.0000  1.000     168/168    168/168
+  SYN-UNIFORM 0.10       0.0071    0.0251     0.0169  0.894     168/168    165/168   |     0.0053    0.0231     0.0125  0.896     168/168    168/168
+  SYN-UNIFORM 0.19       0.0148    0.0496     0.0252  0.796     137/168    116/168   |     0.0101    0.0380     0.0187  0.800     153/168    138/168
+  SYN-UNIFORM 0.20       0.0146    0.0492     0.0256  0.788     137/168    110/168   |     0.0102    0.0397     0.0186  0.794     152/168    131/168
+  SYN-UNIFORM 0.30       0.0216    0.0730     0.0315  0.686     102/168     78/168   |     0.0150    0.0548     0.0243  0.691     126/168     92/168
+  SYN-TREE    0.00       0.0000    0.0000     0.0000  1.000     168/168    168/168   |     0.0000    0.0000     0.0000  1.000     168/168    168/168
+  SYN-TREE    0.10       0.0048    0.0264     0.0150  0.948     167/168    166/168   |     0.0035    0.0185     0.0117  0.947     168/168    168/168
+  SYN-TREE    0.19       0.0097    0.0500     0.0211  0.900     155/168    144/168   |     0.0060    0.0282     0.0170  0.898     161/168    150/168
+  SYN-TREE    0.20       0.0100    0.0525     0.0222  0.895     153/168    142/168   |     0.0066    0.0302     0.0175  0.895     160/168    149/168
+  SYN-TREE    0.30       0.0150    0.0745     0.0274  0.841     137/168    108/168   |     0.0101    0.0407     0.0210  0.839     142/168    122/168
+  REALISED    0.234      0.0152    0.0860          -  0.968     129/168        -   |     0.0126    0.0766          -  0.990     129/168        -   (single realisation: shift, not bias)
+
+=== (3) CRITERION: attenuation at 19% <= the cell's clustered SE, per anchor (cells failing of 12 per anchor) ===
+  columns: SYN-UNIFORM bias / rms, SYN-TREE bias / rms, each for C1 and C2; anchors smallest first
+  -- EVAL denominator --
+  anchor              n   UNI-C1 bias rms   UNI-C2 bias rms   TREE-C1 bias rms   TREE-C2 bias rms   REALISED C1 C2   worst   UNI-C1 med|bias| / med SE
+  History            114      0    2             4    6             0    0              0    0              1    2       6   0.0206 / 0.0386 = 0.53
+  Computer science   123      0    1             0    1             0    0              0    0              1    1       1   0.0099 / 0.0356 = 0.28
+  Philosophy         144      0    1             1    1             0    0              0    1              0    1       1   0.0075 / 0.0364 = 0.21
+  Biology            196     10   10             2    4             6    8              1    1              5    5      10   0.0372 / 0.0276 = 1.35
+  Health             206      0    0             0    0             1    2              0    0              5    3       2   0.0087 / 0.0302 = 0.29
+  Business           232      0    1             0    1             0    0              0    0              7    9       1   0.0088 / 0.0274 = 0.32
+  Psychology         238      5    7             4    4             2    5              0    4              8    2       7   0.0246 / 0.0291 = 0.85
+  Economics          250      2    7             0    1             0    0              0    0              2    3       7   0.0211 / 0.0267 = 0.79
+  Engineering        267      7    9             1    1             3    4              0    3              2    3       9   0.0313 / 0.0273 = 1.15
+  Other              277      0    0             0    0             0    1              0    1              7    8       1   0.0044 / 0.0286 = 0.15
+  Law                287      5    6             1    2             0    0              0    0              0    0       6   0.0210 / 0.0257 = 0.81
+  Chemistry          339      6    6             6    7             3    4              3    6              4    6       7   0.0154 / 0.0202 = 0.76
+  Physics            379      1    4             2    5             0    0              0    0              1    2       5   0.0113 / 0.0202 = 0.56
+  Math               393      6    8             6    9             1    6              4    5              3    4       9   0.0155 / 0.0198 = 0.78
+  TOTAL failing              42   62            27   42            16   30              8   21             46   49      72
+  -- JUDGED denominator --
+  anchor              n   UNI-C1 bias rms   UNI-C2 bias rms   TREE-C1 bias rms   TREE-C2 bias rms   REALISED C1 C2   worst   UNI-C1 med|bias| / med SE
+  History            107      0    1             2    4             0    0              0    0              1    1       4   0.0173 / 0.0415 = 0.42
+  Computer science   105      0    0             0    0             0    0              0    1              1    1       1   0.0071 / 0.0409 = 0.17
+  Philosophy         121      1    1             1    1             0    0              0    1              0    1       1   0.0064 / 0.0389 = 0.17
+  Biology            157      7   10             0    1             5    6              1    1              6    3      10   0.0342 / 0.0314 = 1.09
+  Health             159      0    0             0    0             0    1              0    0              5    6       1   0.0103 / 0.0344 = 0.30
+  Business           188      0    2             0    1             0    0              0    0              4    8       2   0.0110 / 0.0301 = 0.37
+  Psychology         222      5    6             1    4             1    2              0    3              8    2       6   0.0254 / 0.0301 = 0.84
+  Economics          188      3    5             0    2             0    0              0    0              1    2       5   0.0233 / 0.0316 = 0.74
+  Engineering        182      5    8             1    1             2    4              0    1              2    3       8   0.0328 / 0.0327 = 1.00
+  Other              243      0    0             0    0             1    2              0    2              5    6       2   0.0070 / 0.0288 = 0.24
+  Law                282      2    5             1    1             0    0              0    0              0    0       5   0.0187 / 0.0266 = 0.70
+  Chemistry          256      5    6             5    6             2    5              2    4              2    2       6   0.0174 / 0.0232 = 0.75
+  Physics            275      0    2             0    2             0    0              0    0              1    2       2   0.0126 / 0.0251 = 0.50
+  Math               326      3    6             4    7             2    4              4    5              3    2       7   0.0152 / 0.0213 = 0.71
+  TOTAL failing              31   52            15   30            13   24              7   18             39   39      60
+
+=== (4) VERDICTS ===
+  Criterion (attenuation at 19% <= cell clustered SE), EVAL denominator, 168 cells:
+    UNI-C1 bias   failing cells  42 of 168 (25.0%)
+    UNI-C1 rms    failing cells  62 of 168 (36.9%)
+    UNI-C2 bias   failing cells  27 of 168 (16.1%)
+    UNI-C2 rms    failing cells  42 of 168 (25.0%)
+    TREE-C1 bias  failing cells  16 of 168 (9.5%)
+    TREE-C1 rms   failing cells  30 of 168 (17.9%)
+    TREE-C2 bias  failing cells   8 of 168 (4.8%)
+    TREE-C2 rms   failing cells  21 of 168 (12.5%)
+    registered reading (SYN-UNIFORM, bias): 42 of 168 cells fail -> FAIL
+    hardest reading (worst of mechanism x contrast x bias/rms): 62 of 168 cells fail -> FAIL
+    softest reading: 8 of 168 cells fail -> FAIL
+    CRITERION VERDICT: FAIL (the item is per cell; a single failing cell fails it; scored on the hardest reading, as declared)
+    JUDGED denominator, same readings: UNI-C1 bias 31, UNI-C1 rms 52, UNI-C2 bias 15, UNI-C2 rms 30, TREE-C1 bias 13, TREE-C1 rms 24, TREE-C2 bias 7, TREE-C2 rms 18
+    supplementary, EVAL, SE = the cell-accuracy row SE (softer than the contrast SE): contrast bias > row SE: UNI-C1 39, UNI-C2 14, TREE-C1 16, TREE-C2 7; raw cell-accuracy bias > row SE: UNI 35, TREE 17; raw cell-accuracy rms > row SE: UNI 53, TREE 28 (of 168)
+    analytic cross-check SYN-UNIFORM 0.10: max|MC bias - closed form| C1 0.0026 C2 0.0022 (median MC SE of the bias 0.0011); failing cells by the closed form, C1 bias > SE: 3 (MC 3)
+    analytic cross-check SYN-UNIFORM 0.19: max|MC bias - closed form| C1 0.0034 C2 0.0040 (median MC SE of the bias 0.0017); failing cells by the closed form, C1 bias > SE: 42 (MC 42)
+    analytic cross-check SYN-UNIFORM 0.30: max|MC bias - closed form| C1 0.0038 C2 0.0031 (median MC SE of the bias 0.0021); failing cells by the closed form, C1 bias > SE: 74 (MC 71)
+    second MC seed (1042), EVAL, failing cells at 19%: UNI-C1 bias 39, UNI-C1 rms 62, UNI-C2 bias 25, UNI-C2 rms 41, TREE-C1 bias 17, TREE-C1 rms 30, TREE-C2 bias 9, TREE-C2 rms 19
+    registered reading: |C1_0| / SE among failing cells min 4.19 (median 6.40); among passing cells max 5.97 -> a contrast of about 4.9 SE or more is attenuated by more than one SE at 19% uniform misrouting (bias/contrast slope 0.797)
+    failing cells, registered reading (anchor: models with |bias| / SE):
+      Biology           Meta-Llama-3_1-70B-Instruct 1.88, Meta-Llama-3_1-8B 1.17, Qwen1.5-72B-Chat 1.48, Yi-6b-Chat 1.42, arx_0314 1.06, c4ai-command-r-v01 1.06, deepseek-chat-v2_5 2.22, gemini-3.1-pro_5-shots 1.22, gpt-4o-2024-08-06 1.70, iask_pro 1.21
+      Psychology        Llama-2-13b-hf 1.21, Llama-2-7b-hf 1.01, Meta-Llama-3_1-8B 1.10, Yi-6b-Chat 1.45, c4ai-command-r-v01 1.03
+      Economics         Meta-Llama-3_1-70B-Instruct 1.10, deepseek-chat-v2_5 1.14
+      Engineering       Meta-Llama-3_1-70B-Instruct 1.16, Qwen1.5-72B-Chat 1.49, Yi-6b-Chat 1.47, c4ai-command-r-v01 1.52, deepseek-chat-v2_5 1.10, gpt-4o-2024-08-06 1.47, iask_pro 1.17
+      Law               Llama-2-13b-hf 1.03, Meta-Llama-3_1-70B-Instruct 1.07, Meta-Llama-3_1-8B 1.33, Qwen1.5-72B-Chat 1.01, deepseek-chat-v2_5 1.78
+      Chemistry         Llama-2-13b-hf 1.48, Llama-2-7b-hf 1.15, Meta-Llama-3_1-8B 1.03, Qwen1.5-72B-Chat 1.90, Yi-6b-Chat 1.75, c4ai-command-r-v01 1.86
+      Physics           c4ai-command-r-v01 1.10
+      Math              Llama-2-13b-hf 1.55, Llama-2-7b-hf 1.48, Yi-6b-Chat 1.17, arx_0314 1.13, c4ai-command-r-v01 1.25, iask_pro 1.09
+  Prediction 'fails for the smallest anchors' (three smallest: History, Computer science, Philosophy):
+    registered reading: failing cells in the three smallest anchors 0 of 36 (42/132 elsewhere, 11 anchors); Spearman(anchor size, fails) = +0.482 p = 0.081
+    hardest reading:    failing cells in the three smallest anchors 8 of 36 (64/132 elsewhere); Spearman(anchor size, worst fails) = +0.320 p = 0.265
+    anchors with any failing cell - registered: Biology, Psychology, Economics, Engineering, Law, Chemistry, Physics, Math | hardest: History, Computer science, Philosophy, Biology, Health, Business, Psychology, Economics, Engineering, Other, Law, Chemistry, Physics, Math
+    PREDICTION: NOT SUPPORTED: failing-cell share in the three smallest anchors 0% vs 32% elsewhere (registered), 22% vs 48% (hardest); the size-fail correlation is positive - failures sit where the SE is smallest and the contrast largest, not where the anchor is small
+    mechanism: the expected shift of a cell under SYN-UNIFORM is ~p x (mixture mean - acc(m,a)), i.e. proportional to the contrast itself (slope 0.797 at 19%), while the SE falls with sqrt(n); the small anchors take more foreign arrivals per own question but their SE absorbs it
+    Monte Carlo: bias estimated from 200 draws; its MC standard error ~ rms/sqrt(200) ~ 0.0017, an order below the cell SE
+  Realised routing (bareq512_s42, 24.7% misfiled, single realisation): cells shifted by more than their SE: C1 46, C2 49 of 168 (EVAL)
+
+=== (5) Publishable contrasts (|C| > 2 SE on the clean cells) and their fate at 19% SYN-UNIFORM misrouting, EVAL denominator ===
+  C1 model-centred   publishable clean  99 of 168; still |C_19| > 2 SE with the same sign after the expected shift  84; erased  15; mean shrinkage of |C| among them 20.4%
+  C2 interaction     publishable clean  91 of 168; still |C_19| > 2 SE with the same sign after the expected shift  65; erased  26; mean shrinkage of |C| among them 20.5%
+
+=== (6) Pair directions: established key edges (exact McNemar p < 0.05, denominator = the anchor's JUDGED questions) ===
+  key denominator: systematic_budget.mcnemar_edge over the anchor's x12 JUDGED questions under each labelling (declared, misrouted, realised); wrong-direction counts carry their established count as n(n_est)
+  declared cells: established 809 of 924 per-anchor edges (14 anchors x 66 pairs)
+  SYN-UNIFORM 19%  per labelling (mean over 20): established 816.4 | of the 809 clean-established: kept 789.6 (97.6%), lost 19.4, REVERSED = wrong-direction 0.0(0.0) [n(n_established); established by construction] | newly established 26.7
+      most establishment lost: Psychology 3.5 of 61, Philosophy 2.5 of 57, Computer science 2.0 of 55, Health 1.9 of 58
+  SYN-TREE 19%     per labelling (mean over 20): established 812.0 | of the 809 clean-established: kept 790.9 (97.8%), lost 18.1, REVERSED = wrong-direction 0.0(0.0) [n(n_established); established by construction] | newly established 21.1
+      most establishment lost: Psychology 2.8 of 61, Economics 1.9 of 56, Philosophy 1.8 of 57, Health 1.6 of 58
+  REALISED 24.7%   per labelling (mean over 1): established 809.0 | of the 809 clean-established: kept 785.0 (97.0%), lost 24.0, REVERSED = wrong-direction 0.0(0.0) [n(n_established); established by construction] | newly established 24.0
+      most establishment lost: Health 5.0 of 58, Philosophy 3.0 of 57, Engineering 3.0 of 56, Physics 2.0 of 61
+
+  elapsed 19 s; SE cache C:\Users\octav\AppData\Local\Temp\claude\Z--FAC-TUBerlin-THESIS-TaxoArena\7c10e5cb-d16b-4a0e-864a-f3a6151d835b\scratchpad\block1

@@ -1,0 +1,22 @@
+$ python tools/ingest/intent_ingest.py
+[INTENT-INGEST] raw amazon-massive-dataset-1.1.tar.gz: 40251390 bytes sha256 4cba5faa11c71437928e17cb1b9b3d8b8e727e7ea363a3a9a8045e19c0491577 [UNPINNED (the registrar pins it after the first fetch)]
+[INTENT-INGEST] raw clinc_data_oos_plus.json: 2509789 bytes sha256 bfcca9ae515623541dc1983c94c4ed7cae9d26b42ae47d74b972e51bb6f7a21f [UNPINNED (the registrar pins it after the first fetch)]
+[INTENT-INGEST] raw clinc_domains.json: 3818 bytes sha256 b947b579d3b8e74b06f93b01083d8efaff2888b43a3e362533bd88a6e1211b3a [UNPINNED (the registrar pins it after the first fetch)]
+[INTENT-INGEST] raw banking77_train.csv: 839073 bytes sha256 b06e26ac675513959a63135f11b94ea7786ed02da65db93a5650d8838cbc664b [UNPINNED (the registrar pins it after the first fetch)]
+[INTENT-INGEST] raw banking77_test.csv: 239961 bytes sha256 d12d6e3bc4c3103966ae786dc435913c0c563dfa328f5a3646d0e62cfeeb474d [UNPINNED (the registrar pins it after the first fetch)]
+[INTENT-INGEST] massive: raw 16521, kept 16507 (components 16425), dropped {"cross_label": 14}; in-scope sides {"EVAL": 4946, "GATE": 1691, "TRAIN": 9870}; OOS sides {} (their hash sides {}); labels below the minima (< 10 EVAL or < 20 TRAIN): 5 ['audio_volume_other', 'cooking_query', 'general_greet', 'iot_hue_lighton', 'music_dislikeness']
+[INTENT-INGEST] clinc: raw 23850, kept 23842 (components 23841), dropped {"cross_label": 8}; in-scope sides {"EVAL": 6672, "GATE": 2333, "TRAIN": 13487}; OOS sides {"EVAL": 1350} (their hash sides {"EVAL": 408, "GATE": 136, "TRAIN": 806}); labels below the minima (< 10 EVAL or < 20 TRAIN): 0 []
+[INTENT-INGEST] banking77: raw 13083, kept 13083 (components 13071), dropped {}; in-scope sides {"EVAL": 3908, "GATE": 1290, "TRAIN": 7885}; OOS sides {} (their hash sides {}); labels below the minima (< 10 EVAL or < 20 TRAIN): 0 []
+[INTENT-INGEST] cross-corpus stem_key collisions (disclosed; each corpus is read on its own): 210
+[INTENT-INGEST] wrote Z:\FAC\TUBerlin\THESIS\TaxoArena\intent_transfer_corpora_v1.db: 53454 items, 5 provenance rows; sha256 487e0093719c184c98bca53bc9bc61c193559690abb206d77010fd77f81c09a2
+exit 0
+$ python tools/ingest/intent_ingest.py --manifest
+[INTENT-INGEST] massive: raw 16521, kept 16507 (components 16425), dropped {"cross_label": 14}; in-scope sides {"EVAL": 4946, "GATE": 1691, "TRAIN": 9870}; OOS sides {} (their hash sides {}); labels below the minima (< 10 EVAL or < 20 TRAIN): 5 ['audio_volume_other', 'cooking_query', 'general_greet', 'iot_hue_lighton', 'music_dislikeness']
+[INTENT-INGEST] clinc: raw 23850, kept 23842 (components 23841), dropped {"cross_label": 8}; in-scope sides {"EVAL": 6672, "GATE": 2333, "TRAIN": 13487}; OOS sides {"EVAL": 1350} (their hash sides {"EVAL": 408, "GATE": 136, "TRAIN": 806}); labels below the minima (< 10 EVAL or < 20 TRAIN): 0 []
+[INTENT-INGEST] banking77: raw 13083, kept 13083 (components 13071), dropped {}; in-scope sides {"EVAL": 3908, "GATE": 1290, "TRAIN": 7885}; OOS sides {} (their hash sides {}); labels below the minima (< 10 EVAL or < 20 TRAIN): 0 []
+[INTENT-INGEST] cross-corpus stem_key collisions (disclosed; each corpus is read on its own): 210
+[INTENT-INGEST] manifest: items_sha256 540291cc8e2ebfcf2d2768dba2b2026e053e2d643d66bdaf0bcf4b2942da6ab1; db sha256 487e0093719c184c98bca53bc9bc61c193559690abb206d77010fd77f81c09a2; rows recomputed and equal (53454)
+[INTENT-INGEST] wrote Z:\FAC\TUBerlin\THESIS\TaxoArena\intent_transfer_corpora_v1.db.manifest.json
+exit 0
+$ sha256sum study DB
+487e0093719c184c98bca53bc9bc61c193559690abb206d77010fd77f81c09a2 *intent_transfer_corpora_v1.db

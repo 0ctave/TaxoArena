@@ -1,0 +1,43 @@
+STAGE 1b UNION ASSEMBLY — union_s42 (experiment_configs/multicorpus/union_s42.toml), 2026-09-11, zero LLM calls
+Snapshot 20260911_141311_Union_graft_of_6_cor = graft of the six per-corpus snapshots (BBH 20260911_135229, MATH
+20260911_140810, MUSR 20260911_141022, IFEVAL 20260911_141054, GPQA 20260911_140945, MMLU_PRO_LB 20260911_135112),
+each built alone (mc6 body, testRatio 0.30, seed 42, label-free). Node ids prefixed "<SOURCE>:", depths shifted by 1;
+nothing beneath a per-corpus root refitted. Union root: 6 corpus roots, 239 nodes, 143 leaves (BBH 39, MATH 11,
+MUSR 3, IFEVAL 4, GPQA 5, MMLU_PRO_LB 81); root vMF fitted on 15,226 region embeddings (kappa 339.2, child-centroid
+shrinkage 0.837). Union reserved pool paeec37aa28063c75 = union of the six per-corpus pools (6,482 ids in 52
+domains; same count as the one-loop mc6 pool pa95843d826d40ffd, different membership: per-corpus splits), recorded
+and activated on multicorpus_cache_v1.db, pinned by the snapshot ([POOL-PIN]). Wall: 101 s including three routing
+passes over the 6,482 held-out queries.
+
+Certified sites = SUM of the per-corpus site nulls (the union adds no split sites): 13 of 89
+  MMLU_PRO_LB 8/66, BBH 4/15, IFEVAL 1/2, MATH 0/4, GPQA 0/2, MUSR 0/0   (one-loop mc6: 5/94)
+
+Held-out routing on the union (MAIN trickle, 6,482 queries, 0 unrouted):
+  standard Top-1 (routed leaf's dominant training domain == designed (source, domain) key): 72.08% [70.97, 73.16]
+  nearest-centroid flat sweep (readout baseline): Top-1 81.58%, Top-10 97.19%
+  per source (validation/MAIN_union_routing.csv; source = routed depth-1 corpus root == true source,
+  domain = routed depth-2 anchor == designed domain):
+    source        n   top1    source  domain
+    BBH        1728  91.20%  91.20%  91.20%
+    GPQA        358  87.99%  88.27%  87.99%
+    IFEVAL      162  90.74%  90.74%  90.74%
+    MATH        398  65.58%  94.97%  65.58%
+    MMLU_PRO_LB 3609 59.46%  78.00%  58.49%
+    MUSR        227 100.00% 100.00% 100.00%
+    ALL        6482  72.08%  84.22%  71.54%
+  source flow (validation/MAIN_union_source_flow.csv), true source -> routed corpus root:
+    MMLU_PRO_LB -> GPQA 324, MATH 251, BBH 120, IFEVAL 95, MUSR 4 (2,815 of 3,609 stay);
+    BBH -> IFEVAL 86, MMLU_PRO_LB 48, MATH 18; GPQA -> MMLU_PRO_LB 32, MATH 8; MATH -> BBH 10, MMLU_PRO_LB 10.
+
+Reading. The grafted union preserves per-corpus certification by construction (13/89 vs 5/94 for one loop over
+the union) and routes 84% of held-out queries to their true corpus and 72% to their designed domain, but its
+Top-1 is BELOW the one-loop mc6 tree (78.5%) and below its own members built alone (MMLU_PRO_LB 75.8% alone vs
+59.5% inside the union; MATH 68.3% vs 65.6%): the new root level is a six-way vMF softmax with the production
+beam/descent gate, and it hands 22% of MMLU-Pro questions to the semantically adjacent GPQA/MATH/BBH roots (the
+same flows the stage-2b nearest-centroid readout saw: MMLU-Pro -> MATH, MMLU-Pro -> GPQA). The flat
+nearest-centroid sweep on the same leaves scores 81.6%, so the loss is in the root-level descent, not in the
+leaves. Where a query lands in a sibling corpus it lands in a semantically matching cell (MMLU-Pro physics/
+chemistry -> GPQA, MMLU-Pro math -> MATH), which is the arena's cell assignment, not a routing error in the
+model-capability sense (stage 2: strengths live at the family/domain layer). Options if union Top-1 matters:
+route by corpus root with a wider beam or a per-root prior, or report the union as cells (what it is for) and
+keep per-corpus Top-1 as the routing metric of record.

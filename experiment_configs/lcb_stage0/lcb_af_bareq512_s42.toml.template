@@ -1,0 +1,67 @@
+# LCB-STAGE0-INTERACTION, the ONE tree arm (docs/judge_v2_program.md L17702-L17982; P4 L17740, A8 L17959). ZERO judge
+# calls; label-free (enableLabeling false, judgeInduction false, runBenchmark false); embeddings local (Ollama
+# qwen3-embedding, application.yml L117-L118). STRUCTURAL: the regions of the stage-0 interaction test come from this tree.
+#
+# A TEMPLATE, NOT A CONFIG: the two @...@ placeholders are filled AFTER the committed draw from
+# experiment_results/lcb_stage0/manifests/construction_manifest.json (written by ingest.py --construction):
+#   @LCB_CONSTRUCTION_DB@  the ABSOLUTE path of $TAXOARENA_LCB_ROOT/lcb_v6_construction_<sha16>.db (TRAIN + GATE texts,
+#                          Design N; outside the repository, D7)
+#   @POOL_ID@              construction_manifest.json "pool_id" (ReservedPool.computePoolId of the GATE export)
+# ingest.py --construction writes the filled file as lcb_af_bareq512_s42.toml beside this template (write-once) and
+# REFUSES while any "@" placeholder remains; the template itself is never passed to the runner.
+# Body = experiment_configs/topic_partition/ng_af_bareq512_s42.toml (T1b: anchor-free, slice 512, bar 0.0145,
+# minClusterSize 55, seed 42) with datasetType LIVECODEBENCH, the LCB corpus DB, reservedPoolFile = the GATE id
+# export (the engine refuses an empty reserved pool; GATE is routed statelessly, H5), pool = its id, its own outputDir.
+# testRatio is IGNORED under reservedPoolFile (the split is the file's). No `seeds = [...]`. Own ratings DB:
+# -Dranking.db.path=ratings_lcb_af_bareq512_s42.db. Built ONLY from the separate build worktree (P2, A6), inside the
+# rule-7 window; the main checkout's embeddings_cache.db is never opened.
+#
+datasetType   = "LIVECODEBENCH"
+corpusDbPath  = "@LCB_CONSTRUCTION_DB@"
+
+models        = []
+
+category      = ""
+queryLimit    = 0
+outputDir     = "experiment_results/lcb_stage0/lcb_af_bareq512_s42"
+testRatio     = 0.3
+seed          = 42
+
+reservedPoolFile = "experiment_configs/lcb_stage0/lcb_gate_ids.json"
+pool             = "@POOL_ID@"
+
+anchorFree = true
+
+embeddingSliceDim = 512
+
+runPipeline        = true
+runBenchmark       = false
+runTrickle         = true
+runBaselines       = false
+enableFinalMetrics = false
+enableLabeling     = false
+judgeInduction     = false
+
+dagMode = "DAG_MAX"
+
+maxDepth              = 8
+minClusterSize        = 55
+proposalSeparationBar = 0.0145
+tau                   = 1e-6
+acceptanceZ           = 2.0
+enableRefitGate       = false
+
+membershipFloor       = 0.25
+routingBeamGamma      = 0.2
+descentMargin         = 0.12
+
+effectiveSupportFloor = 2.0
+defaultKappaPrior     = 10.0
+
+numIterations         = 50
+maxLeafAssignments    = 5
+
+fusionSimilarityThreshold = 0.90
+enableGtWarmStart         = false
+
+enableProfiling           = true

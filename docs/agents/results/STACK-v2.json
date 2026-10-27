@@ -1,0 +1,137 @@
+{
+  "id": "STACK-v2",
+  "title": "STACK-v2: the assembled judge with the v2 verify-first mechanics (~4k Mistral calls; registered 2026-09-10 02:15)",
+  "question": "STACK's configuration with the SYSTEM template = v2 (prompt_v2.v2_system_template on the anchor rubric); same 1,980 matches, Mistral, one session. REGISTERED: the six STACK checks, with (3) evaluated on the ungated board; PRIMARY = check (3) <= 1 violation AND (1)-(2) hold. Prediction: (1), (2), (4), (5), (6) pass; (3) 50/50.",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "e4eed23",
+    "program_lines": "docs/judge_v2_program.md L166-L172 (registration) and L199-L220 (outcome)",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "### STACK-v2 — the assembled judge with the v2 mechanics (~4k Mistral calls; registered 2026-09-10 02:15)",
+    "outcome_heading": [
+      "L199: - **STACK-v2 (2026-09-10 02:50): REGISTERED PRIMARY PASS — the board is now key-ordered at the top;"
+    ],
+    "date": "2026-09-10"
+  },
+  "script": {
+    "path": "tools/analysis/stack_judge.py --prompt v2",
+    "sha16": "bc16651d483a4a03 (at c0bc274)",
+    "commit": "c0bc274"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (~4k Mistral calls)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/stack_v2_outcome.txt",
+    "outcome_commit": "c0bc274",
+    "calls": "~4k (1,974 judged, 0 invalid; dual order)",
+    "cce": "not stated",
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-10",
+    "other_files": [
+      "experiment_results/x12_crossdomain/stack_v2_promptv2.db (cache; the recipe of record's R3 draw)"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the recipe was carried across judge families by RECIPE-GROK, onto the arena by ARENA-V2 and X20, and its flip rate decomposed by FLIP-PROV / POSITION-DECOMP (6pp position on 6pp stochasticity)",
+    "commit": "c0bc274",
+    "verdict": "PRIMARY PASS; 5/6 (the flip guard misses by 1.1pp); recommended and adopted as the production judge"
+  },
+  "criteria": [
+    {
+      "id": "PRIMARY",
+      "text": "(3) <= 1 violation on the ungated board AND (1)-(2) hold",
+      "result": "HELD",
+      "value": "gemini > iask > arx > gpt-4o, 1 violation (key-ordered top for the first time); (1) 0.865 >= 0.839; (2) 0.699 >= 0.645",
+      "denominator": "944 key-decidable; 599 top-cluster matches"
+    },
+    {
+      "id": "(4)",
+      "text": "decidable ties <= 15%",
+      "result": "HELD",
+      "value": "5.6%",
+      "denominator": "944"
+    },
+    {
+      "id": "(5)",
+      "text": "flip rate <= 12.8%",
+      "result": "FAILED",
+      "value": "13.9% (misses by 1.1pp; flips resolve to TIE, so the cost is verdict yield, not accuracy)",
+      "denominator": "1,974"
+    },
+    {
+      "id": "(6)",
+      "text": "long-wrong preference < v1's",
+      "result": "HELD",
+      "value": "0.230 (lowest measured)",
+      "denominator": "short-correct top-cluster pairs"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "(1), (2), (4), (5), (6) pass; (3) 50/50",
+      "result": "FAILED",
+      "value": "(5) failed by 1.1pp; (3) passed",
+      "denominator": "six checks"
+    }
+  ],
+  "falsifier": {
+    "text": "the six checks; PRIMARY = (3) AND (1)-(2)",
+    "fired": false,
+    "note": "vs J2-R +1.6pp (29:13, p = 0.02); vs production v1 +9.3pp (105:17, p < 1e-4); the recipe of record for every later judged test"
+  },
+  "numbers_of_record": {
+    "accuracy": "0.865 (944 decidable; best Mistral configuration)",
+    "top_cluster": "0.699 (above the reasoning judge's 0.647)",
+    "board": "gemini > iask > arx > gpt-4o, 1 violation",
+    "ties": "5.6%",
+    "flips": "13.9% (guard 12.8%)",
+    "long_wrong": "0.230",
+    "paired": "vs J2-R +1.6pp (29:13, p = 0.02); vs production +9.3pp (105:17, p < 1e-4)"
+  },
+  "sentence_of_record": "STACK-v2 (2026-09-10, ~4k calls): REGISTERED PRIMARY PASS: 944 decidable, accuracy 0.865 (best Mistral config), top cluster 0.699 (above the reasoning judge's 0.647), board gemini > iask > arx > gpt-4o with 1 violation (key-ordered top for the first time), decidable ties 5.6%, long-wrong preference 0.230 (lowest); the flip rate 13.9% misses the 12.8% guard by 1.1pp; vs J2-R +1.6pp (29:13, p = 0.02); vs production +9.3pp (105:17, p < 1e-4). Recommended as the production judge with the flip rate disclosed.",
+  "chips": [
+    "PRIMARY PASS · 5/6"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "the frontier order (iask / arx: the one violation)",
+    "a flip rate under the guard (13.9%; FLIP-PROV / POSITION-DECOMP decompose it)"
+  ],
+  "ledger": {
+    "row_id": "STACK-v2",
+    "version": "v29 (c0bc274); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "STACK",
+    "L1-V2",
+    "J3-R",
+    "J2-R"
+  ],
+  "supersedes": "STACK",
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md L166-L172 and L199-L220 (e4eed23 / c0bc274)",
+    "experiment_results/x12_crossdomain/stack_v2_outcome.txt (c0bc274)",
+    "docs/test_ledger.html row STACK-v2 (v29): chips verbatim, observed cell, evidence",
+    "script sha16 = sha256 of tools/analysis/stack_judge.py at c0bc274, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' / '### ...' / '- **ID ...**' lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06 (multi_corpus_design.md lines as of 4ec8f18)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "The assembled Mistral judge was run with a 'verify first' system prompt on 1,980 matches (about 4,000 calls). It was scored on six registered checks against the answer key.",
+    "why": "It tests whether this judge configuration is good enough to become the production judge.",
+    "information": "Passing would make it the recipe for later judged tests. Result: done, registered primary check passed. Accuracy is 0.865, the best Mistral configuration. The top-4 order has 1 violation. It beats the earlier judges (+1.6 and +9.3 points). The order-flip rate, 13.9%, misses its guard by 1.1 points and is disclosed. It does not settle the order at the very top. Older p2dca data family: history, not evidence.",
+    "written": "2026-10-07"
+  }
+}

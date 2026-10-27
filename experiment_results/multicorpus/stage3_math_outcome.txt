@@ -1,0 +1,35 @@
+=== STAGE3-MATH: 2996 judged of 2996 scheduled | judge grok-4-1-fast-non-reasoning | max_tokens 8192 | temperature omitted (provider default) | pool paeec37aa28063c75 | cache stage3_math_grok_v2_capfree.db ===
+  protocol STACK-v2/grok: prompt_v2 verify-first system template + GEN-ARENA MATH system prompt and rubric + SCHEMA_INSTRUCTION; CHECKER_OUTPUT reference block '[Verified reference answer]'; dual order, TIE on flip, INVALID on parse failure or finish_reason=length; confidence recorded, never gated
+  checker  checker_answers_v2.db::math_checker_answers_v2 written 2026-09-16 05:14:47 (reading=full compare=norm filter=keep terminated-only)
+  reference: the pool's raw target verbatim under GEN-ARENA's header '[Verified reference answer]' (the checker's normalised form is an internal comparison form, never shown; the v2 template's 'may be wrong' wording is inherited from GEN-ARENA's 0.935 record)
+  temperature: omitted (provider default) (Amendment 1 D2: omitted from the payload, as every compared cache was)
+  board convention: TIE = 1/2, question-clustered bootstrap B=1000, Bradley-Terry (rejudge_grok.mm_fit) on the 8-model roster
+  GUARD: deciding subset = 1540 key-decidable of 2996 judged (51%) | unparsed or non-terminated 3 (0.2%) [bar 5%] | overall, all judged matches: 11 (0.4%) | finish_reason pairs among the deciding unparsed {'stop/stop': 2, 'length/stop': 1} | finish_reason=length in any order over all judged 1
+  GUARD PASSED (0.2% <= 5% on the deciding subset; 0.4% overall)
+  (1) key-decidable accuracy, convention A (ties wrong):    0.958 (n=1537) -> bar 0.75 OK | prediction >= 0.90 held
+      key-decidable accuracy, convention B (ties excluded): 0.993 (n=1484) -> bar 0.75 OK | prediction >= 0.90 held
+      convention A with INVALID counted wrong (truncations-wrong figure): 0.956 (n=1540, 3 invalid scored wrong) -> bar 0.75 OK
+      decidable tie rate 0.034 | flip rate over all valid 0.182 | wrong-direction matches 11 | invalid excluded from A/B 3
+      by filter verdict DISAGREE     n=1534 | A 0.958 | B 0.993 (descriptive)
+      by filter verdict UNDETERMINED n=   3 | A 1.000 | B 1.000 (descriptive)
+  (2) 8-model board over 2985 valid matches / 383 questions: rho vs checker accuracy over all 398 pool questions = 1.000, question-bootstrap 95% CI [0.905, 1.000] (B=1000)
+      beside: rho vs checker accuracy over the 383 judged questions = 1.000 (descriptive; biased under a filtered schedule)
+      Qwen2.5-72B-Instruct           theta +0.954 (SE 0.095) | checker accuracy all 398 q 0.608 | judged 383 q 0.611
+      Qwen2.5-32B-Instruct           theta +0.948 (SE 0.087) | checker accuracy all 398 q 0.603 | judged 383 q 0.603
+      Qwen2.5-Math-7B-Instruct       theta +0.762 (SE 0.085) | checker accuracy all 398 q 0.595 | judged 383 q 0.595
+      Llama-3.3-70B-Instruct         theta +0.288 (SE 0.079) | checker accuracy all 398 q 0.482 | judged 383 q 0.478
+      Llama-3.1-70B-Instruct         theta -0.102 (SE 0.068) | checker accuracy all 398 q 0.379 | judged 383 q 0.371
+      Phi-3.5-mini-instruct          theta -0.803 (SE 0.063) | checker accuracy all 398 q 0.188 | judged 383 q 0.175
+      Mistral-Small-Instruct-2409    theta -0.827 (SE 0.062) | checker accuracy all 398 q 0.176 | judged 383 q 0.162
+      Mixtral-8x7B-Instruct-v0.1     theta -1.220 (SE 0.070) | checker accuracy all 398 q 0.088 | judged 383 q 0.070
+      judged argmax Qwen2.5-72B-Instruct | key argmax Qwen2.5-72B-Instruct -> same (descriptive, not registered)
+  (3) raw wrong-direction rate: 24 of 28 pairs have an ESTABLISHED key direction (exact McNemar p < 0.05; denominator = the 383 judged questions, not the 398-question pool); all(established) = 24
+      point-estimate sign vs key: wrong 0 of 24 = 0.000 | 95% UB normal 0.000 | exact one-sided 95% UB 0.117
+       threshold   called   declined  wrong-direction    UB normal     UB exact    nominal
+           0.900       24          0         0 (0.000)        0.000        0.117       0.00
+           0.950       24          0         0 (0.000)        0.000        0.117       0.00
+           0.975       24          0         0 (0.000)        0.000        0.117       0.00
+           0.990       24          0         0 (0.000)        0.000        0.117       0.00
+      calibration status: UNDETERMINED by design (28 pairs; nominal expected wrong calls < 3 at every threshold; the power rule)
+  STAGE3-MATH REGISTERED: accuracy bar 0.75 under both conventions PASS | prediction >= 0.90 held | calibration UNDETERMINED by design
+  producing script sha256 ce8c24152d9ced186381c824cec0fcea957cff9e9858b35c19bc3150e4edb10b | outcome written 2026-09-16 06:12:57

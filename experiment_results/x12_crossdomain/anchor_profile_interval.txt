@@ -1,0 +1,80 @@
+=== ANCHOR-PROFILE-INTERVAL: is the 0.7183 pass a pass? ===
+
+--- DATA CHECK (the object, before strata are read into it) ---
+  [ok] x12 cache verdicts (valid) = 9,142  (9142)
+  [ok] merged = x12 9,142 + x20 12,394 = 21,536  ((9142, 12394, 21536))
+  [ok] x12 cache model set == ARENA12 (12 models)  (12)
+  [ok] merged model set has 20 models and contains ARENA12  (20)
+  [ok] Meta-Llama-3-70B-Instruct absent from both caches  (False)
+  [ok] every judged question is in the reserved pool p2dca21ab5f4ef3ae  (0)
+  [ok] merged judged question set == x12 judged question set  ((2811, 2811))
+  [ok] routed & judged questions = 2,811  ((2811, 2811))
+  [ok] 14 anchors, all >= 50 questions  ((14, 14))
+  [info] key rows missing on the 2811 judged questions, by model: {'arx_0314': 5, 'gemini-3.1-pro_5-shots': 2, 'iask_pro': 27}  (34 questions touched)
+         Those three are ARENA12 members. The key is a COMPARATOR here, not the statistic under test - the judge
+         R never reads it - and the per-half key profile averages over the rows present, exactly as
+         profile_reliability.key_build and x20_merged.key_build did for the recorded 0.9135 / 0.9139. Not fatal.
+  anchors (q): Philosophy 132, Psychology 260, Economics 178, Other 211, Business 174, Math 304, Computer science 162, Law 271, Health 129, Biology 181, History 119, Chemistry 269, Engineering 162, Physics 259
+  q/cell 200.8 | halvings 40 | seed random.Random(7) | min_cell 25 (profile_reliability defaults)
+  KEY DENOMINATOR of the instrument: each anchor's JUDGED questions (the 2,811 routed+judged reserved
+  questions, ~201 per anchor), split into two disjoint halves of ~100; the profile on each half is the
+  Bradley-Terry fit (rj.mm_fit via judge_free_tests.board_from) on that half's verdicts.
+  McNEMAR-ESTABLISHED RULE: this test compares no separation to the key's direction, so there is no
+  wrong-direction count for the rule to attach to. Not applicable, stated so.
+
+=== (1) LEAVE-ONE-ANCHOR-OUT JACKKNIFE (14 folds) on the 40-halving mean r, Spearman-Brown to R ===
+  board                                                       r    R(SB)    SE_jk  95% [z=1.96]       95% [t13=2.160]        R_bc
+  A x12 board, 12 rows                                   0.5069   0.6728   0.0916  [0.4932, 0.8524]   [0.4749, 0.8707]     0.6847
+  B MERGED board, 12 rows (same verdicts, 20-model fit)   0.6200   0.7654   0.0598  [0.6483, 0.8825]   [0.6363, 0.8945]     0.7802
+  C MERGED board, 20 rows                                0.5604   0.7183   0.0565  [0.6076, 0.8291]   [0.5962, 0.8404]     0.7305
+  key, 12 models                                         0.8408   0.9135   0.0219  [0.8706, 0.9565]   [0.8662, 0.9609]     0.9568
+  key, 20 models                                         0.8415   0.9139   0.0221  [0.8705, 0.9573]   [0.8661, 0.9617]     0.9268
+  R_bc = bias-corrected jackknife estimate n*R - (n-1)*mean(R_-i); intervals are centred on R (the recorded value).
+
+  Sensitivity readings (all on the merged 20-row board, the one the pass rests on):
+    primary,   SE on R after SB, z=1.96 ............ [0.6076, 0.8291]
+    t(13)=2.160 instead of z ......................... [0.5962, 0.8404]
+    SE on r, endpoints SB-transformed, z=1.96 ....... [0.5983, 0.8194]
+    halvings FIXED (drop the anchor's points), z=1.96  [0.6102, 0.8264]  (full R on fixed halvings 0.7183, SE 0.0552)
+    (self-check: fixed-halving full-sample r 0.560450 vs reliability() r 0.560450 - identical rng stream)
+
+  Per-anchor leave-one-out R on the merged 20-row board (which anchors carry the pass):
+    drop Physics                      R_-i 0.6822  (fixed halvings 0.6771)  delta vs full -0.0361
+    drop Math                         R_-i 0.6911  (fixed halvings 0.6974)  delta vs full -0.0272
+    drop Law                          R_-i 0.7099  (fixed halvings 0.7120)  delta vs full -0.0084
+    drop Other                        R_-i 0.7128  (fixed halvings 0.7204)  delta vs full -0.0056
+    drop Psychology                   R_-i 0.7150  (fixed halvings 0.7131)  delta vs full -0.0033
+    drop Philosophy                   R_-i 0.7154  (fixed halvings 0.7180)  delta vs full -0.0029
+    drop History                      R_-i 0.7159  (fixed halvings 0.7208)  delta vs full -0.0025
+    drop Business                     R_-i 0.7168  (fixed halvings 0.7144)  delta vs full -0.0016
+    drop Chemistry                    R_-i 0.7176  (fixed halvings 0.7165)  delta vs full -0.0007
+    drop Engineering                  R_-i 0.7246  (fixed halvings 0.7225)  delta vs full +0.0062
+    drop Biology                      R_-i 0.7313  (fixed halvings 0.7327)  delta vs full +0.0130
+    drop Economics                    R_-i 0.7339  (fixed halvings 0.7332)  delta vs full +0.0155
+    drop Computer science             R_-i 0.7365  (fixed halvings 0.7319)  delta vs full +0.0182
+    drop Health                       R_-i 0.7405  (fixed halvings 0.7389)  delta vs full +0.0222
+
+  CRITERION (1): merged-board R = 0.7183, jackknife 95% interval [0.6076, 0.8291]; LOWER BOUND does NOT clear 0.70
+  -> FAIL (the pass is qualified): the lower bound is below 0.70 on every reading. REGISTERED CONSEQUENCE,
+     as amended in advance: RESOLVE may publish per-anchor claims on a board of this size WITH the interval,
+     not as a bare pass. Prediction (lower bound below 0.70) CONFIRMED.
+  Registered interval guess was roughly [0.55, 0.85]; measured width is 0.222.
+  For the record, the x12 board: R = 0.6728, jackknife 95% [0.4932, 0.8524] (recorded 0.6728).
+
+=== (2) DECOMPOSITION: 'more verdicts on the same pairs' vs 'more models in the profile' ===
+  A  x12 board,    12 models fit, 12 rows ............ R = 0.6728  [0.4932, 0.8524]
+  B  MERGED board, 20 models fit, 12 rows ............ R = 0.7654  [0.6483, 0.8825]
+  C  MERGED board, 20 models fit, 20 rows ............ R = 0.7183  [0.6076, 0.8291]
+  'more verdicts'  B - A = +0.0926  (paired jackknife 95% [+0.0199, +0.1653], SE 0.0371)
+  'more models'    C - B = -0.0471  (paired jackknife 95% [-0.0836, -0.0105], SE 0.0186)
+  total            C - A = +0.0455  (paired jackknife 95% [-0.0442, +0.1352], SE 0.0458)
+  share of the gain that is 'more verdicts' = 2.03  (jackknife 95% [-1.33, 5.40])
+  CRITERION (2): point estimate says mostly 'more verdicts' but the jackknife interval on the share includes 0.5 -> UNDETERMINED
+  (criterion (2) carries no registered bar; its verdict scores the registered prediction and is UNDETERMINED
+   whenever the paired jackknife interval on the share includes one half.)
+  comparator: key R = 0.9135 (12 models) / 0.9139 (20 models); the key's own interval is [0.8706, 0.9565] / [0.8705, 0.9573]
+
+=== VERDICTS ===
+  (1) merged-board jackknife interval [0.6076, 0.8291], lower bound vs 0.70: FAIL
+  (2) decomposition A 0.6728 / B 0.7654 / C 0.7183, more-verdicts +0.0926 vs more-models -0.0471: UNDETERMINED
+  fold table cached at C:\Users\octav\AppData\Local\Temp\claude\Z--FAC-TUBerlin-THESIS-TaxoArena\7c10e5cb-d16b-4a0e-864a-f3a6151d835b\scratchpad\bigpic\anchor_profile_interval_folds.json

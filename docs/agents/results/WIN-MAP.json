@@ -1,0 +1,249 @@
+{
+ "id": "WIN-MAP",
+ "title": "WIN-MAP: legs ORACLE-WATERFALL (per-question oracle -> luck-adjusted oracle -> per-cell oracle -> TRAIN-chosen router -> best single, content-closed v2 union EVAL) and REGION-STABILITY (UMAP x k-means seed stability of the map regions; caption rule) (zero calls; REGISTERED 2026-10-08; HF post 2)",
+ "question": "How much of the per-question oracle is luck, how much of the luck-adjusted headroom does the router realise, and are the map's regions seed-stable?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "the commit that writes it (parent e83b59d5)",
+  "program_lines": "docs/judge_v2_program.md L25066-L25079",
+  "program_lines_as_of": "the commit that writes them, parent e83b59d5, re-grepped",
+  "date": "2026-10-08",
+  "heading": "## Registered 2026-10-08 (before any code or call) — WIN-MAP: on the content-closed v2 union split, how much of the per-question oracle of the 18-model roster is luck ...",
+  "provenance": "the orchestrator's brief of 2026-10-08 and docs/drafts/hf/SERIES_PLAN.md (design); criteria, Support, predictions, falsifier the registrar's; docs/judge_v2_program.md L25043-L25049 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — five HF blog-series analyses registered ...\"; _as_of the commit that writes it, parent e83b59d5, re-grepped)"
+ },
+ "script": {
+  "path": "tools/analysis/win_map.py",
+  "sha16": "blob:80f5cb1f343de1f0df74e39499c953f00fed232d (LF; sha256-lf16 8f754f5df9a2ea46 of record; CRLF rendering 32b963ad68e17890; per READY_WIN-MAP_pincheck.md and the outcome)",
+  "commit": "6353b5f6 (merge by path from win-map-official a8717f45) [earlier blob 74f2e234 (43ff4f09), pre-deviation]"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_WIN-MAP_pincheck.md",
+  "commit": "1b7a603a",
+  "verdict": "READY (pin-check) at blob 80f5cb1f: the L25412 Support point values equal the script's SUPPORT to the digit; L-1..L-4 LOW [code CONFIRMED in READY_WIN-MAP_official_delta.md 69032fdb; earlier READY_WIN-MAP_delta.md 7e2673d4 at 74f2e234 did not cover the official-scorer run]"
+ },
+ "go": "the author's 2026-10-08 authorisation (relayed in the orchestrator's brief, words not supplied): register and build zero-call analyses for the HF blog series (docs/drafts/hf/SERIES_PLAN.md); no judged calls [2026-10-09: one refit of the routing policy under the official MATH scorer authorised as a declared pre-run deviation, D-2026-10-09-2, docs/agents/author_decisions/2026-10-09.md (defab40c)]",
+ "run": {
+  "outcome_file": "experiment_results/archv2/win_map/win_map_outcome.txt (sha256 79392b32..., 123 lines; write-once, never committed); official policy experiment_results/archv2/win_map/win_map_official_policy.json sha256 3d114b24cc525c77fa9dc88cfddf1b09f0c40aa666470d8e57b1ca39e826f2db (canonical JSON, LF); backup E:/TaxoArena_backup_20261009_win_map (8/8 OK)",
+  "outcome_commit": "outcome not committed (run from main after merge 6353b5f6; declared pre-run deviation D-2026-10-09-2 printed)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "pv2_1575de61bb20e977 (content-closed v2 union); gen view c2930c60 / eval view e35b7518 equal before and after; MATH official, overlay rows 0; selftest 12/12, dry-run rc 0 (35 lines)",
+  "date": "2026-10-09"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_WIN-MAP.md",
+  "commit": "8012b48a",
+  "verdict": "VALID; every deciding point to the digit; own two-stage intervals rho [0.0456, 0.1319], lambda [0.1225, 0.1515] on the same side of every bar; own TRAIN refit = the policy on 123 of 123 picks; own UMAP x k-means median ARI 0.6161 (SD 0.0534, 250 pairs); C-1 MEDIUM (luck-adjusted under the independence assumption; rho_raw 0.0825, MMLU-Pro R_AF 0.5424 < B 0.5592, H rho -0.0082 beside); C-2 MEDIUM (regions not seed-stable; no captions); L-1 LOW (outcome SUPPORT block labelled pre-deviation; L25412 binds); L-2 LOW (P2, P4 bands FAILED)"
+ },
+ "criteria": [
+  {
+   "id": "WF1",
+   "text": "DECIDING, ORACLE-WATERFALL (the 95% INTERVAL decides): rho = (R_AF - B) / (O_adj - B); REALISATION-GAP iff UB95(rho) < 0.25; NOT-SHOWN otherwise; NOT EVALUABLE if O_adj <= B. SCOREABLE (SE 0.0363 from UNION-AF-ROUTE's realised two-stage interval, MDE80 0.102, predicted 0.08)",
+   "result": "HELD",
+   "value": "REALISATION-GAP: rho 0.0956, 95% [0.0459, 0.1356]; UB 0.1356 < 0.25 (review's own [0.0456, 0.1319]); O_q 0.9059, O_adj 0.8598, R_AF 0.595395, B 0.567462; luck-adjusted under the independence assumption",
+   "denominator": "5,907 EVAL items / 5,404 components; two-stage bootstrap B 2,000"
+  },
+  {
+   "id": "WF2",
+   "text": "SCORED (the 95% INTERVAL decides): lambda = (O_q - O_adj) / (O_q - B); LUCK-MATERIAL iff LB95 > 0.10; NOT-SHOWN otherwise. SCOREABLE (SE 0.0143, MDE80 0.040; O_adj model-based, independence disclosed)",
+   "result": "HELD",
+   "value": "LUCK-MATERIAL: lambda 0.1362, 95% [0.1216, 0.1536]; LB 0.1216 > 0.10 (review's own [0.1225, 0.1515])",
+   "denominator": "5,907 / 5,404"
+  },
+  {
+   "id": "RS1",
+   "text": "DECIDING, REGION-STABILITY (the POINT decides): STABLE-MAP iff the median ARI over UMAP-seed-differing partition pairs (5 UMAP x 5 k-means seeds, k 20) >= 0.80; UNSTABLE-MAP otherwise. SCOREABLE (declared seed SD 0.05, DEFF 2.0, SE 0.028, MDE80 0.078, predicted 0.70)",
+   "result": "FAILED",
+   "value": "UNSTABLE-MAP: median ARI 0.6161 < 0.80 over 250 UMAP-differing pairs (seed SD 0.0534); RS1 FAILS (rule 8); the map ships with no region captions",
+   "denominator": "250 partition pairs (10 UMAP pairs, about 5 independent)"
+  },
+  {
+   "id": "RS2",
+   "text": "CAPTION RULE (count, POINT): a region is STABLE iff median best-match Jaccard >= 0.75; a winner caption needs STABLE + the same EVAL argmax in >= 20 of 25 partitions + BH-surviving winner-minus-best at q 0.05 (CELL-FLIPS form); no caption under UNSTABLE-MAP",
+   "result": "n/a",
+   "value": "caption rule (no HELD/FAILED word registered); applied: 4 of 20 regions STABLE; would license 1 caption, but under UNSTABLE-MAP licensed captions 0 (review spot check)",
+   "denominator": "20 regions of the published map"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "O_q 0.90 [0.86, 0.93]; O_adj 0.80 [0.72, 0.86]; O_chance 0.75 [0.60, 0.85]",
+   "result": "HELD",
+   "value": "O_q 0.9059 in [0.86, 0.93]; O_adj 0.8598 in [0.72, 0.86]; O_chance 0.8124 in [0.60, 0.85]",
+   "denominator": "5,907"
+  },
+  {
+   "id": "P2",
+   "text": "O_cell (AF-U, in-sample) 0.67 [0.64, 0.71]",
+   "result": "FAILED",
+   "value": "O_cell 0.6360 outside [0.64, 0.71]",
+   "denominator": "5,907"
+  },
+  {
+   "id": "P3",
+   "text": "WF1 REALISATION-GAP 0.90; rho 0.08 [0.00, 0.16]",
+   "result": "HELD",
+   "value": "word REALISATION-GAP, Brier 0.0100; rho 0.0956 in [0.00, 0.16]",
+   "denominator": "5,907"
+  },
+  {
+   "id": "P4",
+   "text": "WF2 LUCK-MATERIAL 0.85; lambda 0.35 [0.20, 0.50]",
+   "result": "FAILED",
+   "value": "word LUCK-MATERIAL occurred, Brier 0.0225; lambda 0.1362 outside [0.20, 0.50]",
+   "denominator": "5,907"
+  },
+  {
+   "id": "P5",
+   "text": "RS1 STABLE-MAP 0.35 / UNSTABLE-MAP 0.65; median ARI 0.70 [0.55, 0.88]",
+   "result": "HELD",
+   "value": "word UNSTABLE-MAP, Brier 0.1225; median ARI 0.6161 in [0.55, 0.88]",
+   "denominator": "250 pairs"
+  },
+  {
+   "id": "P6",
+   "text": "RS2 stable regions 8 [4, 14] of 20; licensed winner captions 2 [0, 5]",
+   "result": "HELD",
+   "value": "stable regions 4 in [4, 14]; licensed captions 0 in [0, 5]",
+   "denominator": "20 regions"
+  }
+ ],
+ "falsifier": {
+  "text": "F-WM fires iff rho's point >= 0.25: the router realises at least a quarter of the luck-adjusted headroom; overturns the post's 'most oracle headroom is unreachable' thesis for this roster and split. UNSTABLE-MAP is not a falsifier: it withdraws every region caption",
+  "fired": false,
+  "value": "NOT FIRED: rho's point 0.0956 < 0.25"
+ },
+ "numbers_of_record": {
+  "WF1_rho": "0.0956, 95% [0.0459, 0.1356] (two-stage bootstrap B 2,000; 5,907 EVAL items / 5,404 components); REALISATION-GAP",
+  "WF2_lambda": "0.1362, 95% [0.1216, 0.1536]; LUCK-MATERIAL",
+  "RS1_median_ARI": "0.6161 over 250 UMAP-differing partition pairs (seed SD 0.0534); UNSTABLE-MAP",
+  "O_q": "0.9059 [0.8989, 0.9122]",
+  "O_adj": "0.8598 [0.8513, 0.8675] (independence across models assumed)",
+  "O_chance": "0.8124 (552 items with c_i = 0; descriptive)",
+  "O_cell_AF": "0.6360 (in-sample ceiling)",
+  "R_AF": "0.595395 [0.5801, 0.6069] (the ONE official TRAIN refit, policy 3d114b24)",
+  "B": "0.567462 [0.5554, 0.5785] (Qwen2.5-72B-Instruct)",
+  "G_AF": "+2.79pp [+1.46pp, +4.13pp] two-stage",
+  "rho_raw": "0.0825 (descriptive)",
+  "MMLU_PRO_line": "R_AF 0.5424 < B 0.5592 on 3,376 MMLU-Pro EVAL items (the router loses to the best single model)",
+  "RS2": "4 of 20 regions STABLE; licensed captions 0",
+  "ARI_kmeans_only": "0.7667 (fixed UMAP seed, 50 pairs; descriptive)",
+  "H_sensitivity": "rho -0.0082, lambda 0.1464 (no interval; decides nothing)",
+  "support_measured": "WF1 SE 0.0225, MDE80 0.0629, DEFF 1.470, n_eff 4,018; WF2 SE 0.0081, MDE80 0.0227; RS1 SE(median) 0.0299, MDE80 0.0838"
+ },
+ "sentence_of_record": "WIN-MAP (2026-10-09, 0 calls) — VALID; on the content-closed v2 union EVAL (5,907 items / 5,404 components, 18 models), the TRAIN-chosen AF-U router realises rho 0.0956, 95% [0.0459, 0.1356], of the luck-adjusted oracle headroom: REALISATION-GAP; lambda 0.1362, 95% [0.1216, 0.1536], of the per-question oracle headroom is luck: LUCK-MATERIAL; F-WM NOT FIRED; the map regions are not seed-stable (median ARI 0.6161 over 250 pairs): UNSTABLE-MAP, RS1 FAILS, no region captioned. [POSTRUN docs/reviews/POSTRUN_WIN-MAP.md, 8012b48a: luck-adjusted under the independence assumption (O_adj model-based); rho_raw 0.0825; on MMLU-Pro the router loses to the best single model (0.5424 vs 0.5592); under the H sensitivity line, which decides nothing, rho -0.0082; one official TRAIN refit of the policy, declared pre-run deviation D-2026-10-09-2; relative to these 18 models and draw 5a3e756.]",
+ "chips": [
+  "REGISTERED 2026-10-08, BEFORE ANY CODE",
+  "VALID (POST-RUN 8012b48a): WF1 REALISATION-GAP, WF2 LUCK-MATERIAL (LUCK-ADJUSTED UNDER THE INDEPENDENCE ASSUMPTION); F-WM NOT FIRED",
+  "RS1 UNSTABLE-MAP: RS1 FAILS; MAP SHIPS WITH NO REGION CAPTIONS"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-08",
+   "by": "registrar (pre-data rulings; docs/judge_v2_program.md L25212-L25219 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — rulings GAP-FIX-CC P-1 (seed replacement), the R1 twin rule ...\"; _as_of the commit that writes it, parent 8daf8220, re-grepped))",
+   "text": "RULING R1 (binds ADAPTIVE-PROFILE, WIN-MAP, SATURATION-IRT): twin items are dropped wherever they fall and the registered denominators stand; the scored EVAL set (5,907 items / 5,404 components) carries 0 twin items (twin v2 items have n_q >= 2 and are unscored; WIN-MAP reviews 12f42190 row 8, 7e2673d4 row 7); an instrument refuses iff a twin is among its SCORED EVAL items; the 115 EVAL-side twin items (TRAIN 265 / GATE 47 / EVAL 115 of 427) are unscored, dropped and counted. EVAL 5,792 is NOT of record; R1 stays applicable on the v2 EVAL side. Support unchanged. WIN-MAP's W-R1b (refuse iff a scored EVAL twin) is the ruled form; no change to WIN-MAP. Its delta READY (docs/reviews/READY_WIN-MAP_delta.md, 7e2673d4, READY with C1-C3) sits on branch worktree-wf_42805bc7-f2d-4; merge not recorded here."
+  },
+  {
+   "date": "2026-10-08",
+   "by": "registrar (HARNESS-EXTRACTOR)",
+   "text": "MATH scorer of record: MATH-FIX STAYS (ruling L15137, R2) pending the author's decision on the audit's hybrid H (recommended, not adopted; eligible only after HARNESS-EXTRACTOR READY). Not re-pinned now. CONDITIONAL: if the author adopts H, re-pin the MATH label source to H before --run (registrar's record + builder delta + delta READY; denominators unchanged). A MATH-reading outcome discloses the pilot: MATH-FIX false credits about 368 of 7,516 (4.9%, MC 95% 338-686); ranks below 12th move under H. Source: docs/judge_v2_program.md L25221-L25227 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — HARNESS-EXTRACTOR amended to the MATH + IFEval scorer-gap study ...\"; _as_of the commit that writes it, parent cc49fc6a, re-grepped)"
+  },
+  {
+   "date": "2026-10-08",
+   "by": "registrar (D-2026-10-08)",
+   "text": "D-2026-10-08-5 (the author, verbatim: \"Official scorer, H as sensitivity (Recommended)\"): the MATH scorer of record for this run is the official scorer eval_results.is_correct (the imported leaderboard/harness verdict), with NO MATH-FIX overlay; this supersedes MATH-FIX and voids the conditional re-pin to H. H (pinned definition, with corrected refs 2060002 / 2060129 / 2000164 for H only) is a sensitivity line read from a per-row table that must be sha256-pinned (LF) before --run; it decides nothing. Declared pre-run deviation: every outcome header carries the scorer line; criteria, Support, denominators and predictions stand as registered. Not retroactive. CONDITION: the READY blob 74f2e234 (43ff4f09) hardcodes the overlay (union_cells_io.py L187, win_map.py L832 read_key(..., True, ...)); builder delta + delta READY owed before --run. Source: docs/judge_v2_program.md L25317-L25327 (section \"## Author's decision 2026-10-08 (recorded by the registrar; zero calls; insertion only) — D-2026-10-08-1..6 ...\"; _as_of the commit that writes it, parent 5211616a, re-grepped); authority docs/agents/author_decisions/2026-10-08.md (5211616a); plan Amendment 40"
+  },
+  {
+   "date": "2026-10-09",
+   "by": "registrar (docs/judge_v2_program.md L25352-L25361 (section \"## Registrar's record 2026-10-09 (insertion only; zero calls; nothing run) — H table pinned ...\"; _as_of the commit that writes it, parent 38eac1c8, re-grepped))",
+   "text": "Not run (0 backups, 0 outputs, 0 run commits). Scorer-delta READY 9af2c14a NOT READY / BLOCKED: a registrar's ruling (a/b/c) owed on the W-ID identities bound to the MATH-FIX overlay (R_AF 0.6201, B 0.6049, G_AF, refit == frozen 8d68018c; win_map.py L832 overlay True); not ruled. H table PINNED (D-2026-10-08-5 deviation (2)): experiment_results/math_scorer_h/math_h_table.csv sha256-lf 6b010fa60dde727816b91196d2cb3045094082c3800fe738adebe21d19eeb1d1, 23,832 rows, H 7,126 / official 2,335 (READY f4f7e0a0, run 62d269af); decides nothing (meets D2). State registered (blocked)."
+  },
+  {
+   "date": "2026-10-09",
+   "by": "registrar (docs/judge_v2_program.md L25394-L25401 (section \"## Author's decision 2026-10-09 (recorded by the registrar; zero calls; insertion only) — D-2026-10-09-1 ...\"; _as_of the commit that writes it, parent defab40c, re-grepped))",
+   "text": "D-2026-10-09-2 (the AUTHOR, verbatim: \"(a) Refit under official (Recommended)\"; docs/agents/author_decisions/2026-10-09.md (defab40c)): the registrar's a/b/c ruling owed by scorer-delta READY 9af2c14a is replaced by the author's. DECLARED PRE-RUN DEVIATION: the registered 'never refit' clause (AF-U frozen TRAIN policy 8d68018c, L25070) is broken by exactly ONE refit on TRAIN under the official MATH scorer (eval_results.is_correct, no overlay); policy, W-ID identity checks (R_AF, B, G_AF, refit == policy) and oracle terms (O_q, O_adj, O_chance) all under the official scorer; the MATH-FIX identity values (R_AF 0.6201, B 0.6049, frozen 8d68018c) are no longer targets (registrar); H stays a sensitivity line that decides nothing; Support (b)-(g) (L25073) to be RE-DERIVED by a registrar's insertion before the delta READY. Owed: builder delta, Support re-derivation, delta READY. State registered (blocked)."
+  },
+  {
+   "date": "2026-10-09",
+   "by": "registrar (docs/judge_v2_program.md L25403-L25410 (section \"## Registrar's record 2026-10-09 (insertion only; zero calls; nothing run) — delta READY reviews 69032fdb recorded ...\"; _as_of the commit that writes it, parent 69032fdb, re-grepped))",
+   "text": "Delta READY review docs/reviews/READY_WIN-MAP_official_delta.md (69032fdb), blob 80f5cb1f (git blob; LF sha256-lf16 8f754f5df9a2ea46): NOT READY: the registration gate only. Code CONFIRMED. G-1: registrar Support (b)-(g) insertion owed, then pin-check READY. Operator skipped; nothing ran; no outcome. State registered (blocked)."
+  },
+  {
+   "date": "2026-10-09",
+   "by": "registrar (docs/judge_v2_program.md L25412-L25418 (section \"## Registrar's record 2026-10-09 (insertion only; zero calls; nothing run; pre-data) — WIN-MAP Support (b)-(g) re-derived ...\"; _as_of the commit that writes it, parent 24deb1ab, re-grepped))",
+   "text": "G-1 MET: Support (b)-(g) re-derived under the ONE official refit (D-2026-10-09-2), copied from docs/reviews/READY_WIN-MAP_official_delta.md (69032fdb): (b) WF1 DEFF 1.595 TRANSPORTED, WF2 1.10 planning, RS1 2.0 DECLARED; (c) n_eff 3,388 / 4,913 / 5; (d) SE POINT WF1 0.0363 (0.00707 / 0.195), WF2 0.0143, RS1 0.0280; WF1 worst reachable 0.0494 (0.00823 / 0.1666, H-table bound D_any <= 0.430), corner 0.0638; WF2 worst 0.0158; (e) MDE80 POINT WF1 0.102, WF2 0.040, RS1 0.078; WF1 worst reachable 0.138, corner 0.179 (disclosed unreachable); WF2 worst 0.044; builder's realistic 0.122 corrected to 0.142 (review row 7 LOW); (f) WF1, WF2, RS1 SCOREABLE; (g) bounded by the TRAIN-only official refit, O_adj <= B -> NOT EVALUABLE. Point values equal SUPPORT in win_map.py blob:80f5cb1f: no builder delta; pin-check delta READY owed. State registered (blocked: pin-check READY)."
+  },
+  {
+   "date": "2026-10-09",
+   "by": "registrar (docs/judge_v2_program.md L25420-L25427 (section \"## Registrar's record 2026-10-09 (insertion only; zero calls; nothing run) — delta READYs 1b7a603a recorded ...\"; _as_of the commit that writes it, parent 8012b48a, re-grepped); docs/judge_v2_program.md L25441-L25451 (section \"## WIN-MAP (2026-10-09, 0 calls) — VALID (POSTRUN 8012b48a): WF1 REALISATION-GAP ...\"; _as_of the commit that writes it, parent 8012b48a, re-grepped))",
+   "text": "READY pin-check (1b7a603a) at blob 80f5cb1f; merged by path 6353b5f6; run 2026-10-09 under D-2026-10-09-2 (one official refit, policy 3d114b24); POSTRUN 8012b48a VALID: WF1 REALISATION-GAP (HELD), WF2 LUCK-MATERIAL (HELD), F-WM NOT FIRED, RS1 UNSTABLE-MAP (FAILS; no captions), RS2 4 of 20 STABLE / 0 captions; P1 / P3 / P5 / P6 HELD, P2 / P4 FAILED; reading conditions C-1 (independence assumption; MMLU-Pro loss) and C-2 (regions not seed-stable). Outcome and support-as-realised brackets at prog L25072 / L25073. State done."
+  }
+ ],
+ "does_not_show": [
+  "that O_adj is the true knowable ceiling (model-based, independence assumed)",
+  "that the router beats the best single model on every source (MMLU-Pro: 0.5424 vs 0.5592)",
+  "any router beyond the ONE official TRAIN refit (D-2026-10-09-2)",
+  "that any map region is seed-stable or a semantic category",
+  "judged orders; new cell flips",
+  "anything beyond these 18 models and draw 5a3e756"
+ ],
+ "ledger": {
+  "row_id": "WIN-MAP",
+  "version": "v425 (2026-10-09: OUTCOME bracket; VALID ok chip and RS1 warn chip beside REGISTERED) | v424 (2026-10-09: Support (b)-(g) bracket; no chip changed) | v423 (2026-10-09: D-2026-10-09-2 bracket; no chip changed) | v415 (2026-10-08: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "UNION-AF-ROUTE (R_AF, B, two-stage bootstrap; union_af_route.py blob bf3f17db)",
+  "CELL-FLIPS (flip set; cell_flips.py READY 998d39a7)",
+  "MC-ROUTER (oracle history)",
+  "CONTENT-DISJOINT-SPLIT-AUDIT (R1)",
+  "EMBEDDER-PLUMBING (second-embedder map, descriptive only)"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; the routing oracle (best of 18 contestants per item) is not the closed frontier-order ORACLE line (a perfect judge reference); no policy refit"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "about 1-2 h",
+  "agent_hours": "about 5 h (the Space is a separate presentation task)",
+  "reads_pool": true
+ },
+ "outputs": "never committed: pinned by sha256, stored on E: with SHA256SUMS.txt; temp under E:/TaxoArena_tmp via scratch_dir",
+ "sources": [
+  "docs/judge_v2_program.md L25066-L25079 (_as_of the commit that writes it, parent e83b59d5, re-grepped)",
+  "docs/judge_v2_program.md L25043-L25049 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — five HF blog-series analyses registered ...\"; _as_of the commit that writes it, parent e83b59d5, re-grepped)",
+  "docs/judge_v2_program.md L25212-L25219 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — rulings GAP-FIX-CC P-1 (seed replacement), the R1 twin rule ...\"; _as_of the commit that writes it, parent 8daf8220, re-grepped)",
+  "docs/judge_v2_program.md L25221-L25227 (section \"## Registrar's record 2026-10-08 (insertion only; zero calls; nothing run; pre-data) — HARNESS-EXTRACTOR amended to the MATH + IFEval scorer-gap study ...\"; _as_of the commit that writes it, parent cc49fc6a, re-grepped)",
+  "docs/judge_v2_program.md L25317-L25327 (section \"## Author's decision 2026-10-08 (recorded by the registrar; zero calls; insertion only) — D-2026-10-08-1..6 ...\"; _as_of the commit that writes it, parent 5211616a, re-grepped); authority docs/agents/author_decisions/2026-10-08.md (5211616a); plan Amendment 40",
+  "docs/judge_v2_program.md L25352-L25361 (section \"## Registrar's record 2026-10-09 (insertion only; zero calls; nothing run) — H table pinned ...\"; _as_of the commit that writes it, parent 38eac1c8, re-grepped)",
+  "docs/reviews/READY_WIN-MAP_scorer_delta.md (9af2c14a)",
+  "docs/judge_v2_program.md L25394-L25401 (section \"## Author's decision 2026-10-09 (recorded by the registrar; zero calls; insertion only) — D-2026-10-09-1 ...\"; _as_of the commit that writes it, parent defab40c, re-grepped)",
+  "docs/agents/author_decisions/2026-10-09.md (defab40c)",
+  "docs/reviews/READY_WIN-MAP_official_delta.md (69032fdb)",
+  "docs/judge_v2_program.md L25412-L25418 (section \"## Registrar's record 2026-10-09 (insertion only; zero calls; nothing run; pre-data) — WIN-MAP Support (b)-(g) re-derived ...\"; _as_of the commit that writes it, parent 24deb1ab, re-grepped)",
+  "docs/judge_v2_program.md L25420-L25427 (section \"## Registrar's record 2026-10-09 (insertion only; zero calls; nothing run) — delta READYs 1b7a603a recorded ...\"; _as_of the commit that writes it, parent 8012b48a, re-grepped)",
+  "docs/judge_v2_program.md L25441-L25451 (section \"## WIN-MAP (2026-10-09, 0 calls) — VALID (POSTRUN 8012b48a): WF1 REALISATION-GAP ...\"; _as_of the commit that writes it, parent 8012b48a, re-grepped)",
+  "docs/reviews/READY_WIN-MAP_pincheck.md (1b7a603a)",
+  "docs/reviews/POSTRUN_WIN-MAP.md (8012b48a)",
+  "experiment_results/archv2/win_map/win_map_outcome.txt (sha256 79392b32...; not committed)"
+ ],
+ "last_update": "2026-10-09",
+ "label_status": "map geometry [LF] (qwen3 512 RAW, no labels or correctness); AF-U cells [SC]; declared cells descriptive",
+ "data_disclosure": "DATA ALREADY LOOKED AT (disclosed): GPQA-HEADROOM 7.2% vs 36.7%, MC-ROUTER oracle 0.907 / best 0.553, UNION-AF-ROUTE best 0.6049 / AF 0.6201 / declared 0.6316, CELL-FLIPS 7/101, MODEL-VINTAGE-CANARY 5/12, K46-KEY-READ 0.9249 / 0.2632; [P-FAM] 2.7:1, +16.4pp, 5.7%, 42:1, +0.39/1k as motivation only",
+ "shared_rules": "shared rules R1-R6: drop the 471 union twins (CONTENT-DISJOINT-SPLIT-AUDIT; recomputed, refusal unless 471 / 427) and collapse exact duplicates; one documented extractor per harness; GPQA text never shown; release ids + 0/1 (and verdicts) only; claims relative to these 18 models",
+ "null_means_for_post": "WF1 NOT-SHOWN: 'routers realise a material share' replaces 'your router can't get there'; WF2 NOT-SHOWN: the luck step leaves the waterfall caption; UNSTABLE-MAP: the map ships without region captions",
+ "series": "HF blog series (docs/drafts/hf/SERIES_PLAN.md)",
+ "plain_description": {
+  "sq": "SQ1 Use",
+  "what": "Builds a waterfall from the per-question best-of-18 oracle, corrected for lucky guesses, down through a per-cell oracle and the trained router to the best single model, and tests whether regions of a 2-D map of the questions stay the same when the random seeds change. No judge calls.",
+  "why": "Shows how much of the apparent routing headroom is reachable and whether the map's regions can be described at all.",
+  "information": "Would size the gap between oracle and realised routing gain. Result: registered, not run yet.",
+  "written": "2026-10-08"
+ }
+}

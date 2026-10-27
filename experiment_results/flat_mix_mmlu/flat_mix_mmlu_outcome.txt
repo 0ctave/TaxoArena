@@ -1,0 +1,50 @@
+=== FLAT-MIX-MMLU outcome (docs/judge_v2_program.md L20672-L20735; zero calls) ===
+pool p2dca21ab5f4ef3ae: held-out 3445 judgeable questions in 3445 stem_key twin groups (Kish mean group size 1.0000); keyed questions 10925
+script blob:c5cc7934 / sha256-lf16:70666bb7c751fd54 / sha256-crlf16:93b52490cec474af; state Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\flat_mix_mmlu\state (12 partitions)
+
+PER ARM (M1 held-out purity [Wilson 95%], M2 F6 x1000, M3 split-half R(SB) at leaves, M4 held-out mean ll in nats):
+  T   M1 0.727 [0.712, 0.741] (2504/3445) | M2 +12.785 | M3 0.786 | M4 415.6267
+  O   M1 0.770 [0.756, 0.784] (2653/3445) | M2 +13.949 | M3 0.847 | M4 416.7910
+  V0  M1 0.770 [0.755, 0.784] (2652/3445) | M2 +14.318 | M3 0.845 | M4 416.9797 | nearest-mean assignment M1 0.770 (descriptive)
+  V1  M1 0.768 [0.754, 0.782] (2647/3445) | M2 +13.725 | M3 0.808 | M4 417.8238 | nearest-mean assignment M1 0.773 (descriptive)
+  V2  M1 0.743 [0.728, 0.757] (2559/3445) | M2 +14.429 | M3 0.870 | M4 417.2443 | nearest-mean assignment M1 0.746 (descriptive)
+  V3  M1 0.773 [0.759, 0.787] (2664/3445) | M2 +13.607 | M3 0.846 | M4 417.5707 | nearest-mean assignment M1 0.776 (descriptive)
+  V4  M1 0.758 [0.743, 0.772] (2610/3445) | M2 +13.730 | M3 0.889 | M4 417.1571 | nearest-mean assignment M1 0.759 (descriptive)
+  K0  M1 0.771 [0.756, 0.784] (2655/3445) | M2 +13.723 | M3 0.842 | M4 416.4321
+  K1  M1 0.746 [0.731, 0.761] (2571/3445) | M2 +12.523 | M3 0.791 | M4 417.0063
+  K2  M1 0.751 [0.737, 0.765] (2588/3445) | M2 +13.361 | M3 0.850 | M4 416.6959
+  K3  M1 0.763 [0.749, 0.777] (2629/3445) | M2 +13.156 | M3 0.859 | M4 417.1339
+  K4  M1 0.766 [0.752, 0.780] (2639/3445) | M2 +14.105 | M3 0.845 | M4 416.3118
+  spread_V: M1 0.0305, M2 0.822 x1e-3, M4 0.8441 | spread_K: M1 0.0244, M2 1.582 x1e-3, M4 0.8221
+
+CRITERIA (against V0; the point decides the seed-spread leg, the interval the CI leg; one conjunctive clause each):
+  C1 PURITY: M1(T) - M1(V0) = -0.0430, twin-group 95% CI [-0.0557, -0.0293], spread_V 0.0305 (MDE 0.0213; effective threshold 0.0305, bound by the seed spread) -> FAILED
+  C2 KEY INFORMATION: M2(T) - M2(V0) = -1.534 x1e-3, F6 95% CI [-2.230, -0.826], spread_V 0.822 x1e-3 (MDE 0.84; effective threshold 0.840, bound by the MDE) -> FAILED
+  L1 LOSS FLAG: FIRES (M1 loss yes, M2 loss yes)
+  BESIDE (reported only) against K0 with spread_K: M1 -0.0438 [-0.0569, -0.0287] -> no win; M2 -0.938 [-1.576, -0.288] x1e-3 -> no win; loss yes
+  M4 (DESCRIPTIVE BY DESIGN; V maximises this likelihood): T - V0 = -1.3530 nats, twin-group 95% CI [-1.7164, -0.9475]
+
+THE READING OF THE OUTCOME: (T-4) the size floor and the greedy cuts cost partition quality or key information: a LIMITATION for the construction chapter's record.
+
+PREDICTIONS:
+  P1a M1(T) - M1(V0) = -0.005, 80% [-0.025, +0.015]: observed -0.0430 -> FAILED
+  P1b C1 FAILED (p 0.80): C1 FAILED -> HELD
+  P2a M2(T) - M2(V0) = +0.3 x1e-3, 80% [-1.0, +1.5]: observed -1.534 -> FAILED
+  P2b C2 FAILED (p 0.75): C2 FAILED -> HELD
+  P3 spread_V(M1) = 0.008, 80% [0.003, 0.020]: observed 0.0305 -> FAILED
+  P4 M4: V0 above T (p 0.85): V0 416.9797, T 415.6267 -> HELD
+  P5 |M1(K0) - M1(V0)| <= 0.010 (p 0.70): 0.0009 -> HELD
+  P6 L1 fires (p 0.15): L1 fired -> HELD
+  P7 the reading is (T-1) (the largest registered probability, 0.65): observed T-4 -> FAILED
+  P8 the identity check reproduces M1 0.727 [0.712, 0.741] and M2 +12.785: observed M1 0.727 [0.712, 0.741], M2 +12.785 -> HELD
+
+FALSIFIER F1 FIRES (L1 FIRED): the registered expectation that the TOPIC-PARTITION-20NG sentence holds on MMLU-Pro is overturned (a LOSS: a stated limitation); TOPIC-PARTITION-20NG stands on 20NG.
+
+SUPPORT:
+  (a) C1: 3445 held-out questions in 3445 twin groups (Kish mean size 1.0000; DEFF upper bound 1.0000 at rho = 1); C2: 10925 keyed questions (F6's unit).
+  (b) DEFF C1 1.0 declared (measured m-bar above); C2 transported from anchor_free_af_clean_s42_readout.txt (-0.409 [-0.976, +0.201]).
+  (c) n_eff C1 3445 / 1.0; C2 inside the transported SE.
+  (d) SE C1 sqrt(0.20 / 3,445) = 0.00762 (declared discordance 0.20; observed discordance T vs V0 0.1533); C2 0.300 x1e-3.
+  (e) MDE C1 0.0213 (2.1 pp), C2 0.84 x1e-3; effective thresholds max(MDE, spread_V): C1 0.0305, C2 0.840 x1e-3.
+  (f) a FAILED C1 / C2 licenses "not shown better at MDE 2.1 pp / 0.84 x1e-3", never equivalence.
+  (g) the seed-spread leg does not shrink with n; spread_V printed beside every difference.

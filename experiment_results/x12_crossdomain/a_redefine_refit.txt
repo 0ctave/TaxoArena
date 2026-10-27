@@ -1,0 +1,133 @@
+=== A-REDEFINE-REFIT: A over the cell's EVAL-side questions with extracted answers, not its judged questions ===
+  registered by reference: FRAMEWORK.md item 2 (commit 8d77f7b); 0 calls; pool of record p2dca21ab5f4ef3ae
+  form unchanged: tau(A) = exp(b0 + b1*A); c~ = min(c_raw, Phi(|m|/sqrt(s^2+tau^2))); call iff c~ >= 0.975
+
+  DATA CHECK x12 edge table (systematic_budget.build via key_tie_decline's cache): 920 edges any gap / 60 wrong | 891 at gap >= 0.02 / 44 wrong | raw 0.975 on filtered 739 called / 8 wrong
+  judged-A fits reproduce: 891 b0 -3.2326 b1 +3.3133 (shipped -3.2326/+3.3133) | 920 b0 -3.0438 b1 +3.1980 (printed -3.0438/+3.1980)
+
+  EVAL-SIDE CELLS: pool of record p2dca21ab5f4ef3ae = 3445 questions, routed by bareq512_s42 primary assignment to 14 anchors;
+  judged questions 2811 = 81.6% of the pool (the record's '82%'); judged subset of eval-side asserted per anchor.
+  anchor               judged     eval    determ.   determination = share of (q, model) with a non-blank extracted answer
+  Biology                 181      226      95.4%
+  Business                174      225      92.7%
+  Chemistry               269      384      82.2%
+  Computer science        162      210      93.4%
+  Economics               178      225      97.7%
+  Engineering             162      227      88.4%
+  Health                  129      181      98.1%
+  History                 119      124      97.9%
+  Law                     271      273      97.6%
+  Math                    304      352      84.3%
+  Other                   211      241      98.8%
+  Philosophy              132      157      97.6%
+  Physics                 259      354      89.9%
+  Psychology              260      266      99.2%
+
+  A_eval vs A_judged over the 920 edges: corr 0.9972 | mean diff +0.0006 | median |diff| 0.0084 | p90 |diff| 0.0264 | max |diff| 0.0874
+  on the 77 edges with A_judged >= 0.80 (the pairs the widener budgets hardest): mean diff -0.0026, range [-0.0361, +0.0164]
+  per-edge question support: judged median 162 (min 69) -> eval-side median 212 (min 100)
+  under x12's uniform schedule the judged questions are a near-random subset, so A should move little; the
+  redefinition matters for the FILTERED schedule of Stage 3, which this test cannot see. The test is whether
+  the parameters and the operating point are indifferent to the definition on the data that exist.
+
+=== (1) THE REFIT, both definitions, both edge sets ===
+  set                  A over            b0         b1  deviance | tau at A = 0.30 / 0.60 / 0.88
+  891 (gap >= 0.02)    judged       -3.2326    +3.3133    206.13 | 0.107 / 0.288 / 0.728
+  891 (gap >= 0.02)    eval         -3.2172    +3.2921    206.22 | 0.108 / 0.289 / 0.726
+  920 (any gap)        judged       -3.0438    +3.1980    254.77 | 0.124 / 0.325 / 0.795
+  920 (any gap)        eval         -3.0538    +3.2101    254.69 | 0.124 / 0.324 / 0.795
+
+=== (2) LEAVE-ONE-ANCHOR-OUT (14 folds) at 0.975: the criterion's two numbers ===
+  wrong = all(McNemar-established on the anchor's JUDGED questions)[established on the anchor's EVAL-side questions]
+  KEY DENOMINATOR for the bracketed count: sb.mcnemar_edge over anchor_qs[anchor] = judged questions (119-304 per anchor);
+  the square-bracketed eval-side count (124-384 routed pool questions per anchor) is a sensitivity only.
+  set / A over / fold                       called          wrong   nominal    ratio   utility
+  891 / judged / in sample                     665        2(1)[1]      1.30     1.5x     74.6%
+  891 / judged / LOAO                          663        3(2)[2]      1.27     2.4x     74.4%
+  891 / eval / in sample                       664        2(1)[1]      1.28     1.6x     74.5%
+  891 / eval / LOAO                            661        3(2)[2]      1.22     2.5x     74.2%
+  891 / raw certificate                        739        8(4)[4]         -        -     82.9%   (empirical called set; no nominal)
+  920 / judged / in sample                     651        2(1)[1]      1.38     1.5x     70.8%
+  920 / judged / LOAO                          646        3(2)[2]      1.28     2.4x     70.2%
+  920 / eval / in sample                       648        1(1)[1]      1.29     0.8x     70.4%
+  920 / eval / LOAO                            646        3(2)[2]      1.26     2.4x     70.2%
+  920 / raw certificate                        748       11(4)[4]         -        -     81.3%   (empirical called set; no nominal)
+  committed baseline check (systematic_budget.txt / budget_lomo.txt): 891 judged LOAO 663 / 3(2) / 1.27, 74.4% -> here 663 / 3(2) / 1.27, 74.4% OK
+  review-scratch baseline (adv_budget.out, uncommitted): 920 judged LOAO 646 / 3 / 1.28, 70.2% -> here 646 / 3(2) / 1.28, 70.2% OK
+
+  wrong calls out of fold, eval-side A (each with McNemar b:c and p on the judged denominator):
+    891 (gap >= 0.02)  Law              Meta-Llama-3_1-70B-Instruc vs deepseek-chat-v2_5         c~=0.9912 A_j=0.476 A_e=0.476 gap=0.1070 | judged 54:25 p=0.0015 ESTABLISHED | eval 55:25 p=0.0011
+    891 (gap >= 0.02)  Law              Meta-Llama-3_1-70B-Instruc vs Qwen1.5-72B-Chat           c~=0.9989 A_j=0.475 A_e=0.479 gap=0.1107 | judged 59:29 p=0.0018 ESTABLISHED | eval 59:29 p=0.0018
+    891 (gap >= 0.02)  History          Qwen1.5-72B-Chat           vs deepseek-chat-v2_5         c~=0.9874 A_j=0.605 A_e=0.610 gap=0.0336 | judged 21:17 p=0.6271 unestablished | eval 21:17 p=0.6271
+    920 (any gap)      Law              Meta-Llama-3_1-70B-Instruc vs deepseek-chat-v2_5         c~=0.9888 A_j=0.476 A_e=0.476 gap=0.1070 | judged 54:25 p=0.0015 ESTABLISHED | eval 55:25 p=0.0011
+    920 (any gap)      Law              Meta-Llama-3_1-70B-Instruc vs Qwen1.5-72B-Chat           c~=0.9984 A_j=0.475 A_e=0.479 gap=0.1107 | judged 59:29 p=0.0018 ESTABLISHED | eval 59:29 p=0.0018
+    920 (any gap)      History          Qwen1.5-72B-Chat           vs deepseek-chat-v2_5         c~=0.9794 A_j=0.605 A_e=0.610 gap=0.0336 | judged 21:17 p=0.6271 unestablished | eval 21:17 p=0.6271
+  call-set differences between the two definitions (LOAO), edges keyed by (anchor, a, b):
+    891 (gap >= 0.02)    common 659 | judged-only 4 (0 wrong) | eval-only 2 (0 wrong) | same wrong set: yes
+      judged    Chemistry        Meta-Llama-3_1-70B-Instruc vs Qwen1.5-72B-Chat           A_j=0.482 A_e=0.510 c~ judged 0.9766 / eval 0.9710 key right
+      judged    Chemistry        Meta-Llama-3_1-70B-Instruc vs deepseek-chat-v2_5         A_j=0.564 A_e=0.585 c~ judged 0.9785 / eval 0.9738 key right
+      judged    Computer science arx_0314                   vs deepseek-chat-v2_5         A_j=0.691 A_e=0.713 c~ judged 0.9774 / eval 0.9707 key right
+      eval      Economics        Qwen1.5-72B-Chat           vs Yi-6b-Chat                 A_j=0.628 A_e=0.596 c~ judged 0.9731 / eval 0.9801 key right
+      eval      Philosophy       Llama-2-13b-hf             vs deepseek-chat-v2_5         A_j=0.455 A_e=0.446 c~ judged 0.9741 / eval 0.9752 key right
+      judged    Philosophy       Meta-Llama-3_1-70B-Instruc vs Yi-6b-Chat                 A_j=0.397 A_e=0.421 c~ judged 0.9762 / eval 0.9741 key right
+    920 (any gap)        common 644 | judged-only 2 (0 wrong) | eval-only 2 (0 wrong) | same wrong set: yes
+      judged    Biology          Meta-Llama-3_1-70B-Instruc vs gpt-4o-2024-08-06          A_j=0.829 A_e=0.836 c~ judged 0.9760 / eval 0.9732 key right
+      eval      Economics        Meta-Llama-3_1-70B-Instruc vs Yi-6b-Chat                 A_j=0.593 A_e=0.529 c~ judged 0.9715 / eval 0.9843 key right
+      judged    Health           Meta-Llama-3_1-70B-Instruc vs c4ai-command-r-v01         A_j=0.525 A_e=0.547 c~ judged 0.9788 / eval 0.9742 key right
+      eval      Psychology       arx_0314                   vs deepseek-chat-v2_5         A_j=0.723 A_e=0.714 c~ judged 0.9723 / eval 0.9752 key right
+
+=== CRITERION 1: LOAO wrong count within ONE EVENT and utility within 5pp of the judged-question fit ===
+  891 (gap >= 0.02)    wrong all 3 -> 3 (delta +0) | established 2 -> 2 (delta +0) | utility 74.4% -> 74.2% (delta -0.2pp) | nominal 1.27 -> 1.22 -> PASS
+  920 (any gap)        wrong all 3 -> 3 (delta +0) | established 2 -> 2 (delta +0) | utility 70.2% -> 70.2% (delta +0.0pp) | nominal 1.28 -> 1.26 -> PASS
+  hardest reading (both sets, all-label AND established counts, both within one event; utility within 5pp): PASS
+
+=== CRITERION 2: b1 = 0 rejected on ESTABLISHED labels, A over eval-side questions ===
+  established = sb.established(edges, K, anchor_qs): exact McNemar p < 0.05 on the anchor's judged questions.
+  primary: profile likelihood ratio, dev(b1 = 0, b0 free) - dev(MLE) ~ chi2(1); secondary: 14-anchor cluster
+  bootstrap P(b1 <= 0) (600 reps, seed 11). PASS needs both at 5% / 2.5%.
+  established edges: 891-set 809, 920-set 809, identical sets: yes (every McNemar-established edge has key gap >= 0.02,
+  so the criterion is one test read twice; the two rows below are the same edges).
+  set                  A over   edges  wrong         b0         b1     ddev    p(LR)  P(b1<=0) | b1 95% cluster CI
+  891 (gap >= 0.02)    judged     809     26    -2.6463    +2.1430     5.22   0.0223    0.0350 | [-0.09, +11.90] (600 reps) -> (reference)
+                               confirmation bootstrap 2000 reps seed 2026: P(b1 <= 0) 0.0270 | b1 95% CI [-0.03, +14.37]
+  891 (gap >= 0.02)    eval       809     26    -2.6407    +2.1332     5.16   0.0231    0.0367 | [-0.11, +12.52] (600 reps) -> UNDETERMINED (tests disagree)
+                               confirmation bootstrap 2000 reps seed 2026: P(b1 <= 0) 0.0315 | b1 95% CI [-0.09, +13.07]
+  920 (any gap)        judged     809     26    -2.6463    +2.1430     5.22   0.0223    0.0350 | [-0.09, +11.90] (600 reps) -> (reference)
+                               confirmation bootstrap 2000 reps seed 2026: P(b1 <= 0) 0.0270 | b1 95% CI [-0.03, +14.37]
+  920 (any gap)        eval       809     26    -2.6407    +2.1332     5.16   0.0231    0.0367 | [-0.11, +12.52] (600 reps) -> UNDETERMINED (tests disagree)
+                               confirmation bootstrap 2000 reps seed 2026: P(b1 <= 0) 0.0315 | b1 95% CI [-0.09, +13.07]
+  committed reference: 891 established refit with judged A gave b1 = +2.1430 (systematic_budget.txt section 4).
+  READINGS. (a) The framework's own identification rule (Stage 6: 'rejects b1 = 0 at delta-deviance 3.84', the
+      Mistral board's 5.22 established): profile delta-deviance on eval-side A -> PASS (both sets).
+      (b) Hardest reading, the derivation's own interval procedure (14-anchor cluster bootstrap, two-sided 5%):
+      P(b1 <= 0) must be < 0.025 -> NOT REJECTED. The judged-A reference rows carry the SAME disagreement, so this is a
+      property of the established-label fit (26 wrong events, 14 clusters), not of the redefinition.
+  hardest reading (both tests reject on both sets): UNDETERMINED
+
+=== PREDICTION: parameters move by less than their CI width ===
+  CI = the derivation's interval procedure (14-anchor cluster bootstrap, 600 reps, numpy default_rng(11), Nelder-Mead
+  from (-3, 3)) on the JUDGED-A fit of each set; the 891 interval must reproduce b1 [1.72, 7.87] first.
+  891 (gap >= 0.02)    judged-A b0 -3.2326 CI [-7.047, -2.122] width 4.925 | b1 +3.3133 CI [+1.719, +7.871] width 6.152 | P(b1<=0) 0.0017
+                       reproduction of the recorded b1 CI [1.72, 7.87]: OK
+                       eval-A   b0 -3.2172 (delta +0.0154 = 0% of width) | b1 +3.2921 (delta -0.0212 = 0% of width) -> literal HELD; inside the judged CI yes
+                       tau(A=0.30): judged 0.107 CI [0.009, 0.215] | eval 0.108 -> inside
+                       tau(A=0.60): judged 0.288 CI [0.089, 0.445] | eval 0.289 -> inside
+                       tau(A=0.88): judged 0.728 CI [0.416, 1.273] | eval 0.726 -> inside
+  920 (any gap)        judged-A b0 -3.0438 CI [-6.959, -2.119] width 4.840 | b1 +3.1980 CI [+1.831, +8.021] width 6.190 | P(b1<=0) 0.0000
+                       eval-A   b0 -3.0538 (delta -0.0100 = 0% of width) | b1 +3.2101 (delta +0.0121 = 0% of width) -> literal HELD; inside the judged CI yes
+                       tau(A=0.30): judged 0.124 CI [0.010, 0.223] | eval 0.124 -> inside
+                       tau(A=0.60): judged 0.325 CI [0.105, 0.470] | eval 0.324 -> inside
+                       tau(A=0.88): judged 0.795 CI [0.470, 1.453] | eval 0.795 -> inside
+  literal reading (|delta| < CI width, both parameters, both sets): HELD
+  strict reading (eval-A point inside the judged-A CI, both parameters, both sets): HELD
+
+=== VERDICT ===
+  criterion 1 (LOAO wrong within one event, utility within 5pp; both sets): PASS
+  criterion 2 (b1 = 0 rejected on established labels, eval-side A; both sets): UNDETERMINED
+      under the framework's registered identification rule (profile delta-deviance > 3.84): PASS;
+      under the anchor-clustered bootstrap (hardest reading): not rejected at two-sided 5%; identical on the judged-A reference
+  prediction (parameters move by less than their CI width): HELD (literal) / HELD (strict)
+  what this test cannot say: whether A_eval differs from A_judged under a FILTERED schedule - x12's schedule is
+  uniform, so the two definitions are near-identical here by construction; the refit is a consistency check on
+  the parameters, not evidence about Stage 3. Calibration at the operating point stays UNDETERMINED (nominal < 3).
+  runtime 212 s; no LLM calls; no DB written; caches under C:\Users\octav\AppData\Local\Temp\claude\Z--FAC-TUBerlin-THESIS-TaxoArena\7c10e5cb-d16b-4a0e-864a-f3a6151d835b\scratchpad\block1

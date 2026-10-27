@@ -1,0 +1,127 @@
+{
+  "id": "ESCALATE-LLAMA-LAW",
+  "title": "ESCALATE-LLAMA-LAW: FRAMEWORK item 24: does escalating to the reasoning judge buy back the model-anchored residue on Llama-3.1-70B's Law and Philosophy cells? (666 calls)",
+  "question": "J1-R (grok-4-1-fast-reasoning + v1 cell rubric + grok-reasoning reference, cap 8192, temperature omitted, dual order, flip -> TIE) on every Law and Philosophy match of Meta-Llama-3.1-70B-Instruct (treatment) and of the matched control Qwen1.5-72B-Chat, paired against the cheap judge on identical matches: does committed accuracy rise by more than the paired MDE at the known n, with no fall on the control?",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "eaf1dbf",
+    "program_lines": "docs/judge_v2_program.md L3603-L3611 (by reference; FRAMEWORK L380 item 24; the control model fixed at L3606); deciding thresholds fixed before launch by plan Amendment 1 D4 (0.136 treatment / 0.140 control, a priori d = 0.20); the registered protocol restated at L3634-L3638",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-15 (before any run) — BY REFERENCE: the 26 tests in docs/design/FRAMEWORK.md \"Tests to register before shipping\" (commit 8d77f7b), with the criteria, predictions and call counts stated there, scheduled in docs/plan_2026-09-15.md",
+    "outcome_heading": [
+      "L3633: ## ESCALATE-LLAMA-LAW (2026-09-16, 666 calls) — FRAMEWORK item 24: FAIL, as predicted (JUDGE-2x2); escalation does not buy back the model-anchored residue"
+    ],
+    "date": "2026-09-15"
+  },
+  "script": {
+    "path": "tools/analysis/escalate_llama_law.py",
+    "sha16": "41b54b9c95563172 (at the Block 2 dry-run commit 1e3b1ea)",
+    "commit": "1e3b1ea (later edited 0ba096f / 13f2142 / 7d11c4e)"
+  },
+  "ready": null,
+  "go": "under the 4,000-match rule (~600 calls registered, 666 posted); Amendment 1 D2 (temperature omitted) and D4 (the deciding thresholds)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/escalate_llama_law.txt",
+    "outcome_commit": "7076615",
+    "calls": 666,
+    "cce": "not stated in the programme (J1-R at ~10 cce per match)",
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-16",
+    "other_files": [
+      "experiment_results/x12_crossdomain/escalate_llama_law_*.db (gitignored)"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the Block 2 dry-run review (1e3b1ea) and Amendment 1 D4 (thresholds fixed a priori) are the checks of record; no post-run recomputation file",
+    "commit": "1e3b1ea",
+    "verdict": "FAIL, as predicted (JUDGE-2x2); control: no fall; the gain is a tie-removal gain, larger on the control than on the treatment"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "committed accuracy on the treatment matches rises by more than the paired MDE at the known n (deciding threshold 0.136), with no fall on the control (0.140)",
+      "result": "FAILED",
+      "value": "TREATMENT: A (ties wrong) J1-R 0.881 vs STACK-v2 0.857, +0.024, 5:3 McNemar p 0.73; B (ties excluded) 0.934 vs 0.934, +0.000: both far below 0.136 -> FAILS under both conventions; CONTROL: A 0.911 vs 0.810, +0.101, 8:0 p 0.008; B +0.042, 3:0 p 0.25 -> no fall (OK); POOLED A +0.061 (13:3, p 0.021), B +0.020 (5:2, n.s.)",
+      "denominator": "key-decidable 84 treatment / 79 control (the registered 85 / 80 counted the two reference-less ones); 333 judgeable matches of 337 (4 without cached reference)"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "(JUDGE-2x2) FAIL",
+      "result": "HELD",
+      "value": "FAIL under both conventions",
+      "denominator": "84 / 79 key-decidable"
+    }
+  ],
+  "falsifier": {
+    "text": "the criterion itself (registered by reference); consequence: a model-anchored escalation rule at 10 cce per match is NOT adopted; the residue stays 'unseparated, not certified'",
+    "fired": true,
+    "note": "the reasoning judge's gain is a TIE-REMOVAL gain (J1-R ties 0.018 vs STACK-v2 0.092), not accuracy on committed verdicts, and it is LARGER on the control than on Llama-3.1-70B; the four established wrong-direction edges of KEY-TIE-DECLINE's composed rule are not what a stronger judge fixes"
+  },
+  "numbers_of_record": {
+    "run": "337 matches by anchor cell, 333 judgeable (4 without cached reference: 3360, 4277, 4702, 6951), 333 cached; finish_reason stop on all 666 calls; 0 unparsed; guard OK on all three subsets",
+    "treatment": "A 0.881 vs 0.857 (+0.024, 5:3 p 0.73); B 0.934 vs 0.934 (+0.000)",
+    "control": "A 0.911 vs 0.810 (+0.101, 8:0 p 0.008); B +0.042 (3:0 p 0.25)",
+    "pooled": "A +0.061 (13:3, p 0.021); B +0.020 (5:2, n.s.); tie rates J1-R 0.018 vs STACK-v2 0.092",
+    "comparator": "Mistral STACK-v2 (stack_v2_promptv2_x12all.db), a PROXY for the shipped grok recipe judge (JUDGE-SWAP 0.864 vs 0.865, p 1.0); the 25-match grok overlap reads the same, underpowered (MDE 0.25)",
+    "confound": "the J1-R cell rubric comes from the frozen tree (reserved split p8a29), 168 of the 250 questions on its train side; clean stratum (46 pooled key-decidable) A +0.022, B +0.000; train-side (117) A +0.077 (11:2, p 0.023), B +0.029 n.s.; the contamination favours J1-R, so the FAIL stands a fortiori on the clean stratum [ID-ONLY 2026-09-23 (CLAIMS-SWEEP-BRACKETS, registrar): pool frozen tree 20260727_042523 (withheld p8a29); verified by id only, not by content; reviewed twins on this pool (reviews 1df2cf1, 8ebfa7a): 2,437 exact / 2,448 norm-v1 p2dca texts among the frozen tree's members, 12 / 23 of them in the 1,020 CLEAN; see docs/judge_v2_program.md L14280-L14340 (CONTENT-DISJOINT-SPLIT-AUDIT) and L14455-L14487 (SPLIT-FOLLOWUPS).]",
+    "test_retest": "53 matches shared with the ledger's J1-R cache, verdict agreement 0.981"
+  },
+  "sentence_of_record": "ESCALATE-LLAMA-LAW (2026-09-16, 666 calls): FRAMEWORK item 24: FAIL, as predicted (JUDGE-2x2); escalation does not buy back the model-anchored residue. The reasoning judge's gain on these cells is a TIE-REMOVAL gain, not an accuracy-on-committed gain (treatment B +0.000), and it is LARGER on the control model than on Llama-3.1-70B, the model the residue is anchored to: the four established wrong-direction edges of KEY-TIE-DECLINE's composed rule are not what a stronger judge fixes. A model-anchored escalation rule at 10 cce per match is NOT adopted; the framework's fallback for that residue stays 'unseparated, not certified'. The J1-R rubric's p8a29 contamination favours J1-R, so the FAIL stands a fortiori on the clean stratum. [ID-ONLY 2026-09-23 (CLAIMS-SWEEP-BRACKETS, registrar): pool frozen tree 20260727_042523 (withheld p8a29); verified by id only, not by content; reviewed twins on this pool (reviews 1df2cf1, 8ebfa7a): 2,437 exact / 2,448 norm-v1 p2dca texts among the frozen tree's members, 12 / 23 of them in the 1,020 CLEAN; see docs/judge_v2_program.md L14280-L14340 (CONTENT-DISJOINT-SPLIT-AUDIT) and L14455-L14487 (SPLIT-FOLLOWUPS).]",
+  "chips": [
+    "FAIL, AS PREDICTED",
+    "CONTROL: NO FALL"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-23",
+      "by": "INCONSISTENCIES-PASS (registrar, zero calls; insertion only)",
+      "text": "PIN (OPEN) 2026-09-23 by INCONSISTENCIES-PASS (registrar, zero calls; insertion only): 'Block 2 scripts edited mid-window'. tools/analysis/escalate_llama_law.py was dry-run at 1e3b1ea (2026-09-16 01:43:55) and EDITED at 0ba096f (01:52:46) before this run's outcome commit 7076615 (02:31:47) (0ba096f changed the readout scope filter and the docstring). LF sha16 of the script: 1e3b1ea 41b54b9c95563172, 0ba096f bf5258297c3ae7aa; unchanged at 7076615 (git show <commit>:<path> | sha256sum). Which version posted the verdicts is NOT determinable from the record; the script pins its own sha in the cache's meta at first launch, so a read-only read of that meta value (not done: no DB was opened in this pass) settles it the way C5-1 settled GROK-CALIB. The pin may be of the CRLF working-tree rendering (INCONSISTENCIES class 5)."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "an accuracy-on-committed gain from the reasoning judge (B +0.000 on the treatment)",
+    "a result on the shipped grok recipe judge itself (the comparator is the Mistral STACK-v2 proxy; the 25-match grok overlap is underpowered)"
+  ],
+  "ledger": {
+    "row_id": "ESCALATE-LLAMA-LAW",
+    "version": "v103 (684be03) [v132 2026-09-23: INCONSISTENCIES-PASS insertion in this row]; [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "JUDGE-2x2",
+    "JUDGE-SWAP",
+    "KEY-TIE-DECLINE",
+    "KTD-CHECK",
+    "J1-R"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": true,
+    "what": "escalation to a reasoning judge on the residue (CONTEXT.md section 5: ESCALATE-LLAMA-LAW)"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L3603-L3611 (by-reference registration eaf1dbf; control model fixed L3606) and docs/design/FRAMEWORK.md L380 item 24; docs/plan_2026-09-15.md Amendment 1 D2 / D4",
+    "docs/judge_v2_program.md L3633-L3660 (outcome section 7076615): registered, run, result, reading, confound, test-retest",
+    "experiment_results/x12_crossdomain/escalate_llama_law.txt (7076615)",
+    "docs/test_ledger.html row ESCALATE-LLAMA-LAW (v103): chips verbatim, design and observed cells, evidence (outcome, caches gitignored)",
+    "script sha16 = sha256 of tools/analysis/escalate_llama_law.py at 1e3b1ea, first 16 hex (identity, computed by the registrar 2026-09-22)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' (or '- **ID ...**' bullet) lines to grep -n regardless of line drift; line numbers are as of programme HEAD 5dc8a06",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Re-judges every Law and Philosophy match of Llama-3.1-70B, plus a matched control model (Qwen1.5-72B), with a stronger reasoning judge. It then compares the verdicts with the cheap judge on the same matches (666 calls).",
+    "why": "A few remaining wrong-direction verdicts were tied to Llama-3.1-70B in those cells. The test asks whether escalating to a stronger judge just there fixes them.",
+    "information": "A gain on the treated model and none on the control would justify a targeted escalation rule. Result: done, failed as predicted. The stronger judge mostly removes ties. It does not make committed verdicts more accurate (gain +0.000 on the treated model), and its gain is larger on the control. The escalation rule is not adopted, and these cells stay 'unseparated, not certified'. The comparison was against a proxy of the shipped judge, and the script was edited during the run window. Older judged question family, later ruled 'history, not evidence'.",
+    "written": "2026-10-07"
+  }
+}

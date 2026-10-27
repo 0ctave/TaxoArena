@@ -1,0 +1,82 @@
+# K-SELECTION arm I2 af_clean_s42_inert: the INERTNESS build. BASE experiment_configs/anchorfree/redraw/
+# af_clean_s42.toml (REDRAW R1) unchanged but for this header and its own outputDir; the key
+# proposalAcceptMultiplier is ABSENT (= 1.0, byte-inert). Built on the merged engine BEFORE any primed arm:
+# its leaf membership (dag_snapshots.jsonl) must reproduce experiment_results/anchorfree/redraw/af_clean_s42/
+# seed_42/dag_snapshots.jsonl (snapshot 20260917_201353) byte-identically, else C0 fails and nothing is read.
+# No site null on this arm (the certified 14 of 69 are read from the EXISTING site_null_af_clean_s42.csv).
+# The `pool` line is the [POOL-PIN] guard the base carries. Own -Dranking.db.path
+# (experiment_results/anchorfree/redraw/kselect/ratings_i2.db, set by the chain).
+#  outputDir: experiment_results/anchorfree/redraw/kselect/i2
+# REGISTRATION. docs/judge_v2_program.md, "Registered 2026-09-19 (before any code or call) - K-SELECTION"
+# (L8224-L8390, commit 8fde7fa; plan docs/agents/plans/2026-09-18_reframing_and_next.md S2 R2 / S5). Zero judge
+# calls; label-free, z 2.0, mcs 55, 256-dim slice, bar 0.025; the split is the base's. The tree this builds is
+# STRUCTURAL EVIDENCE ONLY; the registration does NOT authorise judging on it. File names and outputDirs follow
+# the engine-coder delegation (redraw/kselect/, _k105); the registration's L8339-8340 names them
+# anchorfree/kselect/{..._m105, af_clean_s42_inert}: the MERGEABLE review records the naming (registration (b)).
+# Instrument: 300-rep site null at the build's slice, anchor_free_readout.py vs af/seed_42, then
+# anchor_free_redraw.py --arms <kselect> --unprimed <redraw>. Order in the sweep: I2, R1', R2', R3'; all run.
+#
+datasetType   = "MMLU_PRO"
+
+models        = [
+    "gpt-4o-2024-08-06",
+    "claude-3-5-sonnet-20241022",
+    "gemini-1.5-pro-002",
+    "deepseek-chat-v2_5",
+    "Meta-Llama-3_1-70B-Instruct",
+    "Qwen1.5-72B-Chat",
+    "gpt-4o-mini",
+    "claude-3-5-haiku-20241022",
+    "Mixtral-8x7B-Instruct-v0.1",
+    "c4ai-command-r-v01",
+    "Qwen1.5-14B-Chat",
+    "Meta-Llama-3_1-8B-Instruct",
+    "gemini-1.5-flash-002",
+    "Llama-2-70b-hf",
+    "Llama-2-13b-hf"
+]
+
+category      = ""
+queryLimit    = 0
+outputDir     = "experiment_results/anchorfree/redraw/kselect/i2"
+testRatio     = 0.3
+seed          = 42
+reservedPoolFile = "experiment_configs/reserved_pool_frozen_p2dca.json"
+pool             = "p2dca21ab5f4ef3ae"   # [POOL-PIN] guard, not a treatment (registration: allowed beside reservedPoolFile)
+
+# Body = o0_s42.toml (seed 42 = the frozen build's split and construction seed). anchorFree = true is
+# the BASE's instrument key (ANCHOR-FREE / REDRAW), inherited unchanged; the K-SELECTION key
+# proposalAcceptMultiplier is deliberately ABSENT from this file (I2, the inertness build).
+anchorFree = true
+
+runPipeline        = true
+runBenchmark       = false
+runTrickle         = true
+runBaselines       = false
+enableFinalMetrics = false
+enableLabeling     = false
+judgeInduction     = false
+
+dagMode = "DAG_MAX"
+
+maxDepth              = 8
+minClusterSize        = 55
+proposalSeparationBar = 0.025
+tau                   = 1e-6
+acceptanceZ           = 2.0
+enableRefitGate       = false
+
+membershipFloor       = 0.25
+routingBeamGamma      = 0.2
+descentMargin         = 0.12
+
+effectiveSupportFloor = 2.0
+defaultKappaPrior     = 10.0
+
+numIterations         = 50
+maxLeafAssignments    = 5
+
+fusionSimilarityThreshold = 0.90
+enableGtWarmStart         = false
+
+enableProfiling           = true

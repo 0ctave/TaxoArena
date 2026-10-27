@@ -1,0 +1,337 @@
+SPLIT sg893684444c6df3e9 (SUPERGPQA-STAGE0b; SuperGPQA has no pool of record; reading R2) | split file sha256-lf=1db5c7c4366b1a0d7d4109eb7d93368c61d5f520257d16f0df99595d4e695df2
+SCRIPT supergpqa_stage0.py blob:35b11858eab0cc20fe0982fe4af14a471a0fb6b1 / sha256-lf16:271528ead60f5279 / sha256-crlf16:b452cdc1bde89218 (working tree CRLF)
+       split_side.py blob:05224b5a4b76e74353bc3931ec69f0b14f0e340b / sha256-lf16:19501df01e3d6285 / sha256-crlf16:0cc90adcd2122d5e (working tree CRLF)
+       content_closure.py blob:1533cb5a56c8e001ddc65d3e2ec0cc4b56aa87e3 / sha256-lf16:d362aad31f650cc0 / sha256-crlf16:351f89732f9f8b22 (working tree CRLF)
+       profile_reliability_interaction.py blob:c9f99c1b25e5d1d6dfee354e783945d7546e7e94 / sha256-lf16:f4f38364373bc648 / sha256-crlf16:8b03013bed379383 (working tree CRLF)
+  extractor port block sha256-lf 24d32e051c0c73356e7a6fe15c3c554adb0ef3d8f3d8342ae88f1d1772a50317 == upstream eval.py L32-L105 @ e31e8bf: OK
+SPLIT sg893684444c6df3e9 (SuperGPQA has no pool of record; reading R2) | split file experiment_configs\supergpqa_stage0_split.json sha256-lf=1db5c7c4366b1a0d7d4109eb7d93368c61d5f520257d16f0df99595d4e695df2
+  [OPEN] question file SuperGPQA-all.jsonl sha256=28b998e70205ee95e540317b5adc06a06552a3961fb50b153df126b833f7a910
+  questions 26529 (planning figure 26529, unsourced: equal)
+  [CK-CLOSE] content-disjoint SUPERGPQA-STAGE0 split: PASS, 18568 train / 7961 reserved / 0 sentinel ids; 0 twins under split_side.stem_key (norm-v1, ck-v1, options-free); 0 shared families (no families given)
+  whitelist experiment_configs\supergpqa_stage0_whitelist.json sha256-lf=14c8acd1c4cae81fd93306f2b133a20fa20ad0e6fff1ae626842a0c9d5b1c9be: 49 files (revision {'m-a-p/SuperGPQA': '4430d4458112c7d4497fdcf94d7cc223313d6acf', 'm-a-p/SuperGPQA-Records': 'd52d0a8bdb2ae86733fb6085aa1ec54085fffbec'})
+  pinned exclusion list experiment_configs\supergpqa_stage0b_mmlu_pro_exclusion.json sha256-lf=89d17b0df027728e674ef83ff822a99b7a85e7e820749e4226138aa862de7ae2: 1251 uuids (EVAL 370 / TRAIN 881)
+A3 closure: straddling families 0, guard PASS -> PASS
+  store S01 MMLU-Pro                     mmlu_pro_dataset_cache_v2.db: 38093 distinct values, 14516 keys; colliding families 1251, items 1251
+  store S02 union (6 tasks incl. GPQA)   multicorpus_cache_v1.db: 41094 distinct values, 20537 keys; colliding families 1251, items 1251
+  store S03a LCB v6 texts                lcb_v6_texts_7d2f4cad635b254d.db: 2110 distinct values, 1055 keys; colliding families 0, items 0
+  store S03b LCB v6 eval texts           lcb_v6_eval_texts_92764cb2900dd0dc.db: 628 distinct values, 314 keys; colliding families 0, items 0
+  store S04 20NG                         twenty_newsgroups_cache_v1.db: 33842 distinct values, 16921 keys; colliding families 0, items 0
+  store S05 BFCL                         experiment_results/agent/bfcl_result_2025-12-16.db: 292 distinct values, 291 keys; colliding families 0, items 0
+  store S06 Multi-SWE                    experiment_results/agent/multiswe_result_2026-09-22.db: 2132 distinct values, 2132 keys; colliding families 0, items 0
+  store S07a v2 split-1 mmlu-pro-v2      data_v2/REG_ARCHV2-SPLIT-1_c03031568a0a9d827d834b075512b8e4dd095642/corpus_v2_mmlu_pro_v2.db: 12490 distinct values, 12490 keys; colliding families 1251, items 1251
+  store S07b v2 split-1 union mc6        data_v2/REG_ARCHV2-SPLIT-1_c03031568a0a9d827d834b075512b8e4dd095642/corpus_v2_union_mc6.db: 20537 distinct values, 20537 keys; colliding families 1251, items 1251
+  store S07c v2 split-2 mmlu-pro-v2      data_v2/REG_ARCHV2-SPLIT-2_2929bd46aa271d883050bfe735f96e621ed55fd2/corpus_v2_mmlu_pro_v2.db: 12490 distinct values, 12490 keys; colliding families 1251, items 1251
+  store S07d v2 split-2 union mc6        data_v2/REG_ARCHV2-SPLIT-2_2929bd46aa271d883050bfe735f96e621ed55fd2/corpus_v2_union_mc6.db: 20537 distinct values, 20537 keys; colliding families 1251, items 1251
+  store S08 ag_news smoke                ag_news_smoke_cache_v1.db: 4000 distinct values, 2000 keys; colliding families 0, items 0
+  store S09 JudgeBench                   judgebench_corpus_v1.db: 528 distinct values, 528 keys; colliding families 0, items 0
+A4b IDENTITY GATE: MMLU-Pro-bearing stores' colliding uuids 1251 (EVAL 370 / TRAIN 881) vs the pinned 1251 (370 / 881); equal True -> PASS
+A4b excluded 1251 of 26529 items = 4.7156% in total, EVAL 370 / TRAIN 881 (disclosed; no bar)
+POPULATION of every STAGE0b number: SuperGPQA minus its MMLU-Pro stem_key collisions (1,251 of 26,529 items = 4.7156% excluded, 370 EVAL / 881 TRAIN; the programme's own corpus; STAGE0b says nothing about the excluded items or SuperGPQA as a whole)
+  [OPEN] zero-shot/DeepSeek-R1-Zero_SuperGPQA-all_zero-shot.jsonl sha256=df279fa2527575a05120b1170ff582414c30f125fb3a09f75ba1e8f739646c02 bytes=853814205
+    DeepSeek-R1-Zero                         records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 DeepSeek-R1-Zero agreement 1.000 on the TRAIN sample (re-extraction miss 0 / 200; stored miss 0)
+  [OPEN] zero-shot/DeepSeek-R1_SuperGPQA-all_zero-shot.jsonl sha256=38a0f130a0ae8c0f857d52b0658ec1fca84d2ea6253df214b6f235172f7363df bytes=170269274
+    DeepSeek-R1                              records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 DeepSeek-R1 agreement 1.000 on the TRAIN sample (re-extraction miss 0 / 200; stored miss 0)
+  [OPEN] zero-shot/DeepSeek-V3_SuperGPQA-all_zero-shot.jsonl sha256=907e97dd20d91d51dbe8fb181f43b216d575af4a202d4132a6a850586c093658 bytes=65935778
+    DeepSeek-V3                              records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 DeepSeek-V3 agreement 1.000 on the TRAIN sample (re-extraction miss 0 / 200; stored miss 0)
+  [OPEN] zero-shot/Doubao-1.5-pro-32k-241225_SuperGPQA-all_zero-shot.jsonl sha256=6855c20c07dbca7ddc00b977c8e60d762394703fc22805d12d241f6158e23cb0 bytes=80508781
+    Doubao-1.5-pro-32k-241225                records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 Doubao-1.5-pro-32k-241225 agreement 1.000 on the TRAIN sample (re-extraction miss 1 / 200; stored miss 0)
+  [OPEN] zero-shot/Doubao-1.5-pro-32k-250115_SuperGPQA-all_zero-shot.jsonl sha256=871c9cb1acef3f60a642cb43ec6d0078cdd48e01d17763ed5ba7ad91059f385f bytes=106224521
+    Doubao-1.5-pro-32k-250115                records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 Doubao-1.5-pro-32k-250115 agreement 1.000 on the TRAIN sample (re-extraction miss 4 / 200; stored miss 0)
+  [OPEN] zero-shot/K2-Chat_SuperGPQA-all_zero-shot.jsonl sha256=76db908cb11c3739b21dacff9bbc89095f2f50c7a6aae692a974b303235d3668 bytes=27626210
+    K2-Chat                                  records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 K2-Chat agreement 1.000 on the TRAIN sample (re-extraction miss 2 / 200; stored miss 0)
+  [OPEN] zero-shot/Llama-3.1-405B-Instruct_SuperGPQA-all_zero-shot.jsonl sha256=5ec63efc3bd1b78a08321dd63ea919248c9afce118a8faf81636a9fa3609da5e bytes=83780804
+    Llama-3.1-405B-Instruct                  records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 Llama-3.1-405B-Instruct agreement 1.000 on the TRAIN sample (re-extraction miss 16 / 200; stored miss 0)
+  [OPEN] zero-shot/Llama-3.1-70B-Instruct_SuperGPQA-all_zero-shot.jsonl sha256=6b81322ccf323a521507d68ce7afc28e73ed895f1cb431254e3ec8fd7fc5aa1b bytes=94046386
+    Llama-3.1-70B-Instruct                   records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 Llama-3.1-70B-Instruct agreement 1.000 on the TRAIN sample (re-extraction miss 30 / 200; stored miss 0)
+  [OPEN] zero-shot/Llama-3.1-8B-Instruct_SuperGPQA-all_zero-shot.jsonl sha256=92cf66dbc61f593a1a86e040647fcabeb6bf686524704d2fc92b8b5076fefa1a bytes=121840094
+    Llama-3.1-8B-Instruct                    records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 Llama-3.1-8B-Instruct agreement 1.000 on the TRAIN sample (re-extraction miss 51 / 200; stored miss 0)
+  [OPEN] zero-shot/Llama-3.3-70B-Instruct_SuperGPQA-all_zero-shot.jsonl sha256=d638808c78a05c7d2782542550976c7ac631655a2d45f41550839c572c4ecb63 bytes=90909075
+    Llama-3.3-70B-Instruct                   records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 Llama-3.3-70B-Instruct agreement 1.000 on the TRAIN sample (re-extraction miss 2 / 200; stored miss 0)
+  [OPEN] zero-shot/MAP-Neo-7B-Instruct-v0.1_SuperGPQA-all_zero-shot.jsonl sha256=dabfc54b76f512794f137ae04772c12b6c12cd2a722a392ff8f3de96fd787069 bytes=70906436
+    MAP-Neo-7B-Instruct-v0.1                 records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 MAP-Neo-7B-Instruct-v0.1 agreement 1.000 on the TRAIN sample (re-extraction miss 7 / 200; stored miss 0)
+  [OPEN] zero-shot/MiniMax-Text-01_SuperGPQA-all_zero-shot.jsonl sha256=262c354729102ff35bc7310d916cffa8491c5fb56864c0c99d44e61f7e9e3745 bytes=63219125
+    MiniMax-Text-01                          records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 MiniMax-Text-01 agreement 1.000 on the TRAIN sample (re-extraction miss 0 / 200; stored miss 0)
+  [OPEN] zero-shot/Mistral-7B-Instruct-v0.3_SuperGPQA-all_zero-shot.jsonl sha256=8963a1c33b4f18087a9e4f5437fbd46f31dedd69a94d6d2ddf158972c13aaf7b bytes=46544389
+    Mistral-7B-Instruct-v0.3                 records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 Mistral-7B-Instruct-v0.3 agreement 1.000 on the TRAIN sample (re-extraction miss 21 / 200; stored miss 0)
+  [OPEN] zero-shot/Mistral-Large-Instruct-2411_SuperGPQA-all_zero-shot.jsonl sha256=9903ba3e44f37c6f810ace731a0a13b5923a190eb26468e84e3ee5497608b80a bytes=51887697
+    Mistral-Large-Instruct-2411              records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 Mistral-Large-Instruct-2411 agreement 1.000 on the TRAIN sample (re-extraction miss 3 / 200; stored miss 0)
+  [OPEN] zero-shot/Mistral-Small-Instruct-2409_SuperGPQA-all_zero-shot.jsonl sha256=1385f4afdfdca8c2cec30c2a0029c5e45eb845efd78dd7cea14f5bc09f3998fb bytes=50815354
+    Mistral-Small-Instruct-2409              records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 Mistral-Small-Instruct-2409 agreement 1.000 on the TRAIN sample (re-extraction miss 17 / 200; stored miss 0)
+  [OPEN] zero-shot/Mixtral-8x22B-Instruct-v0.1_SuperGPQA-all_zero-shot.jsonl sha256=79d840fa780e6032af04245cdea679e9baa5759a9d1551cfb02f3644fae3dacf bytes=64808381
+    Mixtral-8x22B-Instruct-v0.1              records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 Mixtral-8x22B-Instruct-v0.1 agreement 1.000 on the TRAIN sample (re-extraction miss 19 / 200; stored miss 0)
+  [OPEN] zero-shot/Mixtral-8x7B-Instruct-v0.1_SuperGPQA-all_zero-shot.jsonl sha256=7d35c96a6670feaaf5c52a9bc951c69e63570ca2a141c268cd5ab1ca92410f63 bytes=51933471
+    Mixtral-8x7B-Instruct-v0.1               records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 Mixtral-8x7B-Instruct-v0.1 agreement 1.000 on the TRAIN sample (re-extraction miss 21 / 200; stored miss 0)
+  [OPEN] zero-shot/OLMo-2-1124-13B-Instruct_SuperGPQA-all_zero-shot.jsonl sha256=9a9a8324d5230f3ce0839a5740cf510d2310fca7cff646875543683483720338 bytes=55286440
+    OLMo-2-1124-13B-Instruct                 records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 OLMo-2-1124-13B-Instruct agreement 1.000 on the TRAIN sample (re-extraction miss 5 / 200; stored miss 0)
+  [OPEN] zero-shot/OLMo-2-1124-7B-Instruct_SuperGPQA-all_zero-shot.jsonl sha256=577c782846bab460aa0518ac2a07a98aba94e14c2d2859086e263f1e3884cd4c bytes=47928708
+    OLMo-2-1124-7B-Instruct                  records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 OLMo-2-1124-7B-Instruct agreement 1.000 on the TRAIN sample (re-extraction miss 14 / 200; stored miss 0)
+  [OPEN] zero-shot/QwQ_SuperGPQA-all_zero-shot.jsonl sha256=9e56ddded0cb67d11fa6c54f0995f0c45fb4a0f455f0fc1efdc817448ff09450 bytes=401329509
+    QwQ                                      records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 QwQ agreement 1.000 on the TRAIN sample (re-extraction miss 8 / 200; stored miss 0)
+  [OPEN] zero-shot/Qwen2.5-0.5B-Instruct_SuperGPQA-all_zero-shot.jsonl sha256=760129ba1342a09feea209addc92f428ee598105e41e66c1fbfdbc449f67d194 bytes=98550465
+    Qwen2.5-0.5B-Instruct                    records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 Qwen2.5-0.5B-Instruct agreement 1.000 on the TRAIN sample (re-extraction miss 35 / 200; stored miss 0)
+  [OPEN] zero-shot/Qwen2.5-1.5B-Instruct_SuperGPQA-all_zero-shot.jsonl sha256=3786b29e7bcb586162649a693770fadb4c64838dcf39f3ed5611d8dd9987eb69 bytes=56088461
+    Qwen2.5-1.5B-Instruct                    records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 Qwen2.5-1.5B-Instruct agreement 1.000 on the TRAIN sample (re-extraction miss 10 / 200; stored miss 0)
+  [OPEN] zero-shot/Qwen2.5-14B-Instruct_SuperGPQA-all_zero-shot.jsonl sha256=0546e79f064a3a87aa1e05d0f424243add4b2c278c3fdcd26205bc056c780ce7 bytes=59858989
+    Qwen2.5-14B-Instruct                     records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 Qwen2.5-14B-Instruct agreement 1.000 on the TRAIN sample (re-extraction miss 2 / 200; stored miss 0)
+  [OPEN] zero-shot/Qwen2.5-32B-Instruct_SuperGPQA-all_zero-shot.jsonl sha256=1a0df3d2de4c3b683b1159a12e568f57f7d37e137c9c2593aa8a2a311b30a0a3 bytes=58062838
+    Qwen2.5-32B-Instruct                     records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 Qwen2.5-32B-Instruct agreement 1.000 on the TRAIN sample (re-extraction miss 3 / 200; stored miss 0)
+  [OPEN] zero-shot/Qwen2.5-3B-Instruct_SuperGPQA-all_zero-shot.jsonl sha256=42e7d5f2623e93b7831044b4e13f655ae5a443125e0e83d04cd1ad94c8fd5b16 bytes=69272982
+    Qwen2.5-3B-Instruct                      records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 Qwen2.5-3B-Instruct agreement 1.000 on the TRAIN sample (re-extraction miss 4 / 200; stored miss 0)
+  [OPEN] zero-shot/Qwen2.5-72B-Instruct_SuperGPQA-all_zero-shot.jsonl sha256=ff864778a4670633ccbf332ef401fd67336d725061e340def3774d592dc39c94 bytes=76143968
+    Qwen2.5-72B-Instruct                     records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 Qwen2.5-72B-Instruct agreement 1.000 on the TRAIN sample (re-extraction miss 7 / 200; stored miss 0)
+  [OPEN] zero-shot/Qwen2.5-7B-Instruct_SuperGPQA-all_zero-shot.jsonl sha256=525883a5acf77711dc08c72bd607b752353914331831ec0b702fdad41fda0d9a bytes=63176818
+    Qwen2.5-7B-Instruct                      records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 Qwen2.5-7B-Instruct agreement 1.000 on the TRAIN sample (re-extraction miss 3 / 200; stored miss 0)
+  [OPEN] zero-shot/Yi-1.5-34B-Chat_SuperGPQA-all_zero-shot.jsonl sha256=8663cddf408bf7e67fee2073fe38250204fbce2906205bc0e69d8728c6061ed2 bytes=71036592
+    Yi-1.5-34B-Chat                          records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 Yi-1.5-34B-Chat agreement 1.000 on the TRAIN sample (re-extraction miss 12 / 200; stored miss 0)
+  [OPEN] zero-shot/Yi-1.5-6B-Chat_SuperGPQA-all_zero-shot.jsonl sha256=ce5a4028536cc98b2b9e14be0d13fc38ed5191c75d74f9a510c943a3ba811205 bytes=47147969
+    Yi-1.5-6B-Chat                           records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 Yi-1.5-6B-Chat agreement 1.000 on the TRAIN sample (re-extraction miss 18 / 200; stored miss 0)
+  [OPEN] zero-shot/Yi-1.5-9B-Chat_SuperGPQA-all_zero-shot.jsonl sha256=8daf19c86706d482c7633ff407b567ba595143acf1b504f0356bc9e7a6145ce6 bytes=66698257
+    Yi-1.5-9B-Chat                           records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 Yi-1.5-9B-Chat agreement 1.000 on the TRAIN sample (re-extraction miss 13 / 200; stored miss 0)
+  [OPEN] zero-shot/Yi-Lighting_SuperGPQA-all_zero-shot.jsonl sha256=374bbaf4d92f5d4372afd0abf39bd8a0874bf3b9ab8e53ef9dda4c1177e8fdb6 bytes=67747766
+    Yi-Lighting                              records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 Yi-Lighting agreement 1.000 on the TRAIN sample (re-extraction miss 4 / 200; stored miss 0)
+  [OPEN] zero-shot/claude-3-5-sonnet-20241022_SuperGPQA-all_zero-shot.jsonl sha256=e237147865a3c8849cd73ba80d31b34b1a3c7654a6c9cc088449c55af8dd100a bytes=50460403
+    claude-3-5-sonnet-20241022               records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 claude-3-5-sonnet-20241022 agreement 1.000 on the TRAIN sample (re-extraction miss 0 / 200; stored miss 0)
+  [OPEN] zero-shot/gemini-2.0-flash_SuperGPQA-all_zero-shot.jsonl sha256=ea74ae23f0b52ef78e1462411b6791ab402ab861de6da64687bc0f7b900a3d16 bytes=64344283
+    gemini-2.0-flash                         records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 gemini-2.0-flash agreement 1.000 on the TRAIN sample (re-extraction miss 2 / 200; stored miss 0)
+  [OPEN] zero-shot/gemma-2-27b-it_SuperGPQA-all_zero-shot.jsonl sha256=99844ae9417bb59b6dc2d3ec1b3723aebff247f8f5d373f3731d022662744361 bytes=41935013
+    gemma-2-27b-it                           records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 gemma-2-27b-it agreement 1.000 on the TRAIN sample (re-extraction miss 11 / 200; stored miss 0)
+  [OPEN] zero-shot/gemma-2-2b-it_SuperGPQA-all_zero-shot.jsonl sha256=1ad136af2e2e86890b32664f45e2b9c3323a773f5474998552383aaab39010f8 bytes=50564206
+    gemma-2-2b-it                            records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 gemma-2-2b-it agreement 1.000 on the TRAIN sample (re-extraction miss 8 / 200; stored miss 0)
+  [OPEN] zero-shot/gemma-2-9b-it_SuperGPQA-all_zero-shot.jsonl sha256=55b1e2f36b9fa4fcf9776aa05838e5f6e7b94ba17f05fd7efa925ab25f60bfe6 bytes=40300534
+    gemma-2-9b-it                            records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 gemma-2-9b-it agreement 1.000 on the TRAIN sample (re-extraction miss 30 / 200; stored miss 0)
+  [OPEN] zero-shot/gpt-4o-2024-05-13_SuperGPQA-all_zero-shot.jsonl sha256=76579e2cf50d570553c35341609d2ad07581415152921cc1542d1b588d7d08e7 bytes=49776091
+    gpt-4o-2024-05-13                        records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 gpt-4o-2024-05-13 agreement 1.000 on the TRAIN sample (re-extraction miss 3 / 200; stored miss 0)
+  [OPEN] zero-shot/gpt-4o-2024-08-06_SuperGPQA-all_zero-shot.jsonl sha256=da546e69dde6b40d4f9d22bff9a7d3e45d17908b18f8cb5bda94ef9514da7a17 bytes=52507223
+    gpt-4o-2024-08-06                        records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 gpt-4o-2024-08-06 agreement 1.000 on the TRAIN sample (re-extraction miss 3 / 200; stored miss 0)
+  [OPEN] zero-shot/gpt-4o-2024-11-20_SuperGPQA-all_zero-shot.jsonl sha256=b98524969f60d2ee1b402c86d4d8857c10f74aa654e4760ba49f342880d44e30 bytes=57319991
+    gpt-4o-2024-11-20                        records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 gpt-4o-2024-11-20 agreement 1.000 on the TRAIN sample (re-extraction miss 11 / 200; stored miss 0)
+  [OPEN] zero-shot/granite-3.1-2b-instruct_SuperGPQA-all_zero-shot.jsonl sha256=070758cfc7ee620ed8e8a06fce1fa0d6b9b9a90a4b958345b5e6d79d0e26b697 bytes=40752472
+    granite-3.1-2b-instruct                  records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 granite-3.1-2b-instruct agreement 1.000 on the TRAIN sample (re-extraction miss 7 / 200; stored miss 0)
+  [OPEN] zero-shot/granite-3.1-8b-instruct_SuperGPQA-all_zero-shot.jsonl sha256=30b4732a2ece999fdf404d2c16ec9a54667227eed188324b7ba9c000b3b9a497 bytes=73921557
+    granite-3.1-8b-instruct                  records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 granite-3.1-8b-instruct agreement 1.000 on the TRAIN sample (re-extraction miss 2 / 200; stored miss 0)
+  [OPEN] zero-shot/o1-2024-12-17_SuperGPQA-all_zero-shot.jsonl sha256=9a15a3603efd3cd2f76bf5a6fec83252ee543dde328f801da725ed18b91e00f1 bytes=47283630
+    o1-2024-12-17                            records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 o1-2024-12-17 agreement 1.000 on the TRAIN sample (re-extraction miss 1 / 200; stored miss 0)
+  [OPEN] zero-shot/o1-mini-2024-09-12_SuperGPQA-all_zero-shot.jsonl sha256=b644b37c2e79d9ab954e45a996230ea835f66cb8ed0033a321faf9da08ebd422 bytes=44868213
+    o1-mini-2024-09-12                       records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 o1-mini-2024-09-12 agreement 1.000 on the TRAIN sample (re-extraction miss 0 / 200; stored miss 0)
+  [OPEN] zero-shot/o3-mini-2025-01-31-high_SuperGPQA-all_zero-shot.jsonl sha256=3be9112d520f0220e6c8c64f654b5531749b422e7b2b6bc7efff82d3ddfd2da3 bytes=54340848
+    o3-mini-2025-01-31-high                  records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 o3-mini-2025-01-31-high agreement 1.000 on the TRAIN sample (re-extraction miss 1 / 200; stored miss 0)
+  [OPEN] zero-shot/o3-mini-2025-01-31-low_SuperGPQA-all_zero-shot.jsonl sha256=8314a2a0d50f0c570d636a913bed40b6ea3a8139861cfbaf75963700ec60fb59 bytes=49243855
+    o3-mini-2025-01-31-low                   records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 o3-mini-2025-01-31-low agreement 1.000 on the TRAIN sample (re-extraction miss 1 / 200; stored miss 0)
+  [OPEN] zero-shot/o3-mini-2025-01-31-medium_SuperGPQA-all_zero-shot.jsonl sha256=11ca8e22bf9f1d0860fc2ecf479de3e028e2f0ff390863e5a7c106686f87617d bytes=52365998
+    o3-mini-2025-01-31-medium                records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 o3-mini-2025-01-31-medium agreement 1.000 on the TRAIN sample (re-extraction miss 1 / 200; stored miss 0)
+  [OPEN] zero-shot/phi-4_SuperGPQA-all_zero-shot.jsonl sha256=236a886da11956c704cadaba1f32a7a5a439a05cc2a7e307496875d03ba464fe bytes=72849321
+    phi-4                                    records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 phi-4 agreement 1.000 on the TRAIN sample (re-extraction miss 5 / 200; stored miss 0)
+  [OPEN] zero-shot/qwen-max-2024-09-19_SuperGPQA-all_zero-shot.jsonl sha256=f15eed78852f69a895d0105a60520f4e326f7ca51157a325993dd8fbd76b5aa8 bytes=64813180
+    qwen-max-2024-09-19                      records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 qwen-max-2024-09-19 agreement 1.000 on the TRAIN sample (re-extraction miss 0 / 200; stored miss 0)
+  [OPEN] zero-shot/qwen-max-2025-01-25_SuperGPQA-all_zero-shot.jsonl sha256=6427937ceacd0a027b0518682ea04f29c28538a30646a7d312bad83252f2ae91 bytes=70613565
+    qwen-max-2025-01-25                      records  26529 missing     0 dup    0 conflicts    0 foreign    0 -> complete
+      A2 qwen-max-2025-01-25 agreement 1.000 on the TRAIN sample (re-extraction miss 1 / 200; stored miss 0)
+A1 file-list zero-shot models 49 (asserted 49); complete 49 (>= 20 required) -> PASS
+A2 sample 200 TRAIN uuids after exclusion (allocation {'Agronomy': 4, 'Economics': 6, 'Education': 4, 'Engineering': 60, 'History': 5, 'Law': 4, 'Literature and Arts': 13, 'Management': 4, 'Medicine': 21, 'Military Science': 2, 'Philosophy': 2, 'Science': 74, 'Sociology': 1}); admitted 49, EXCLUDED BY NAME 0: none -> PASS
+A5 licences {'m-a-p/SuperGPQA': 'odc-by', 'm-a-p/SuperGPQA-Records': 'odc-by'} -> PASS
+A6 disciplines (EVAL after closure and exclusions):
+    Science                items  9325  EVAL  2792  SCORED
+    Engineering            items  7617  EVAL  2284  SCORED
+    Medicine               items  2678  EVAL   800  SCORED
+    Literature and Arts    items  1669  EVAL   503  SCORED
+    Economics              items   739  EVAL   228  SCORED
+    History                items   652  EVAL   198  SCORED
+    Law                    items   523  EVAL   161  SCORED
+    Agronomy               items   483  EVAL   145  SCORED
+    Management             items   470  EVAL   143  SCORED
+    Education              items   474  EVAL   142  SCORED
+    Philosophy             items   312  EVAL    94  unscored (< 120 EVAL)
+    Military Science       items   204  EVAL    62  unscored (< 120 EVAL)
+    Sociology              items   132  EVAL    39  unscored (< 120 EVAL)
+KEY (read only now, after A6 passed): the admitted models' stored correctness on the 25278 non-excluded items [population: SuperGPQA minus its MMLU-Pro stem_key collisions (1,251 of 26,529 items = 4.7156% excluded, 370 EVAL / 881 TRAIN; the programme's own corpus; STAGE0b says nothing about the excluded items or SuperGPQA as a whole)]
+    DeepSeek-R1-Zero                         miss + error share 0.0077 (194 of 25278 non-excluded items; scored wrong)
+    DeepSeek-R1                              miss + error share 0.0013 (33 of 25278 non-excluded items; scored wrong)
+    DeepSeek-V3                              miss + error share 0.0038 (95 of 25278 non-excluded items; scored wrong)
+    Doubao-1.5-pro-32k-241225                miss + error share 0.0061 (153 of 25278 non-excluded items; scored wrong)
+    Doubao-1.5-pro-32k-250115                miss + error share 0.0238 (602 of 25278 non-excluded items; scored wrong)
+    K2-Chat                                  miss + error share 0.0072 (183 of 25278 non-excluded items; scored wrong)
+    Llama-3.1-405B-Instruct                  miss + error share 0.0574 (1451 of 25278 non-excluded items; scored wrong)
+    Llama-3.1-70B-Instruct                   miss + error share 0.1457 (3683 of 25278 non-excluded items; scored wrong)
+    Llama-3.1-8B-Instruct                    miss + error share 0.2485 (6281 of 25278 non-excluded items; scored wrong)
+    Llama-3.3-70B-Instruct                   miss + error share 0.0077 (194 of 25278 non-excluded items; scored wrong)
+    MAP-Neo-7B-Instruct-v0.1                 miss + error share 0.0231 (585 of 25278 non-excluded items; scored wrong)
+    MiniMax-Text-01                          miss + error share 0.0005 (12 of 25278 non-excluded items; scored wrong)
+    Mistral-7B-Instruct-v0.3                 miss + error share 0.1323 (3345 of 25278 non-excluded items; scored wrong)
+    Mistral-Large-Instruct-2411              miss + error share 0.0135 (340 of 25278 non-excluded items; scored wrong)
+    Mistral-Small-Instruct-2409              miss + error share 0.0792 (2003 of 25278 non-excluded items; scored wrong)
+    Mixtral-8x22B-Instruct-v0.1              miss + error share 0.1032 (2608 of 25278 non-excluded items; scored wrong)
+    Mixtral-8x7B-Instruct-v0.1               miss + error share 0.0944 (2387 of 25278 non-excluded items; scored wrong)
+    OLMo-2-1124-13B-Instruct                 miss + error share 0.0278 (703 of 25278 non-excluded items; scored wrong)
+    OLMo-2-1124-7B-Instruct                  miss + error share 0.0415 (1048 of 25278 non-excluded items; scored wrong)
+    QwQ                                      miss + error share 0.0436 (1102 of 25278 non-excluded items; scored wrong)
+    Qwen2.5-0.5B-Instruct                    miss + error share 0.2118 (5353 of 25278 non-excluded items; scored wrong)
+    Qwen2.5-1.5B-Instruct                    miss + error share 0.0582 (1471 of 25278 non-excluded items; scored wrong)
+    Qwen2.5-14B-Instruct                     miss + error share 0.0126 (318 of 25278 non-excluded items; scored wrong)
+    Qwen2.5-32B-Instruct                     miss + error share 0.0109 (276 of 25278 non-excluded items; scored wrong)
+    Qwen2.5-3B-Instruct                      miss + error share 0.0285 (721 of 25278 non-excluded items; scored wrong)
+    Qwen2.5-72B-Instruct                     miss + error share 0.0103 (260 of 25278 non-excluded items; scored wrong)
+    Qwen2.5-7B-Instruct                      miss + error share 0.0129 (326 of 25278 non-excluded items; scored wrong)
+    Yi-1.5-34B-Chat                          miss + error share 0.0712 (1801 of 25278 non-excluded items; scored wrong)
+    Yi-1.5-6B-Chat                           miss + error share 0.0909 (2297 of 25278 non-excluded items; scored wrong)
+    Yi-1.5-9B-Chat                           miss + error share 0.0683 (1727 of 25278 non-excluded items; scored wrong)
+    Yi-Lighting                              miss + error share 0.0199 (504 of 25278 non-excluded items; scored wrong)
+    claude-3-5-sonnet-20241022               miss + error share 0.0001 (2 of 25278 non-excluded items; scored wrong)
+    gemini-2.0-flash                         miss + error share 0.0042 (105 of 25278 non-excluded items; scored wrong)
+    gemma-2-27b-it                           miss + error share 0.0670 (1693 of 25278 non-excluded items; scored wrong)
+    gemma-2-2b-it                            miss + error share 0.0423 (1070 of 25278 non-excluded items; scored wrong)
+    gemma-2-9b-it                            miss + error share 0.1278 (3230 of 25278 non-excluded items; scored wrong)
+    gpt-4o-2024-05-13                        miss + error share 0.0093 (234 of 25278 non-excluded items; scored wrong)
+    gpt-4o-2024-08-06                        miss + error share 0.0068 (172 of 25278 non-excluded items; scored wrong)
+    gpt-4o-2024-11-20                        miss + error share 0.0435 (1099 of 25278 non-excluded items; scored wrong)
+    granite-3.1-2b-instruct                  miss + error share 0.0314 (794 of 25278 non-excluded items; scored wrong)
+    granite-3.1-8b-instruct                  miss + error share 0.0247 (624 of 25278 non-excluded items; scored wrong)
+    o1-2024-12-17                            miss + error share 0.0021 (52 of 25278 non-excluded items; scored wrong)
+    o1-mini-2024-09-12                       miss + error share 0.0032 (80 of 25278 non-excluded items; scored wrong)
+    o3-mini-2025-01-31-high                  miss + error share 0.0034 (87 of 25278 non-excluded items; scored wrong)
+    o3-mini-2025-01-31-low                   miss + error share 0.0046 (117 of 25278 non-excluded items; scored wrong)
+    o3-mini-2025-01-31-medium                miss + error share 0.0047 (120 of 25278 non-excluded items; scored wrong)
+    phi-4                                    miss + error share 0.0153 (387 of 25278 non-excluded items; scored wrong)
+    qwen-max-2024-09-19                      miss + error share 0.0036 (90 of 25278 non-excluded items; scored wrong)
+    qwen-max-2025-01-25                      miss + error share 0.0065 (165 of 25278 non-excluded items; scored wrong)
+  key DB written Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\supergpqa\supergpqa_stage0b_key.db (1238622 rows) sha256=9898d91af093503f3d3e4b728ffe06ec420b2b47707d76c64c870bec56882677
+  two-stage replicate 500 / 2000
+  two-stage replicate 1000 / 2000
+  two-stage replicate 1500 / 2000
+  two-stage replicate 2000 / 2000
+C1 DENOMINATOR: EVAL items of the 10 scored disciplines n = 7396 in 7395 CK-CLOSE components (component Kish 1.0003); roster 49 admitted models
+C1 G = acc(policy) 0.6195 - acc(best single DeepSeek-R1) 0.6130 = +0.65pp; two-stage SE 0.00309 -> 95% [+0.04pp, +1.25pp]; percentile [-0.05pp, +1.16pp]
+  SUPPORT (measured): SE_iid 0.00280 | SE_2stage 0.00309 -> DEFF 1.218, n_eff 6074, MDE80 = 2.80 x SE = +0.86pp
+  SUPPORT (registered plan): STAGE0b (post-exclusion scored-EVAL object): n_EVAL 7,396 in 7,395 CK-CLOSE components (Kish 1.00027, measured key-free); DEFF 1.312 (two-stage, TRANSPORTED from ROUTER-CLEAN-POLICY x component Kish 1.00027); n_eff 5,637; SE 0.005265 (d 0.15627); MDE80 1.47pp (1.86pp at d 0.25); VERDICT LINE: DESCRIPTIVE-ONLY (P3 +1.0pp is 1.0pp from the bar 0 < MDE 1.47pp)
+PLACEBO P = +0.28pp, two-stage 95% [-0.66pp, +1.23pp] -> does not fire
+DOMINANCE column (per scored discipline: TRAIN argmax; is it the best single?):
+    Agronomy               DeepSeek-R1                              = best single
+    Economics              DeepSeek-R1-Zero                         
+    Education              DeepSeek-R1-Zero                         
+    Engineering            DeepSeek-R1                              = best single
+    History                o1-2024-12-17                            
+    Law                    DeepSeek-R1-Zero                         
+    Literature and Arts    DeepSeek-R1-Zero                         
+    Management             DeepSeek-R1-Zero                         
+    Medicine               o1-2024-12-17                            
+    Science                DeepSeek-R1                              = best single
+C2 DENOMINATOR: 10 scored disciplines x 49 models; EVAL items 7396
+C2 R (interaction-only) 0.6413; jackknife re-halved [0.4382, 0.8444] (SE 0.1036); fixed [0.4266, 0.8560]; halving SD 0.0306; model-only R 0.7063
+  null (logit-additive, 20 tables): interaction-only sorted ['-0.150', '-0.150', '-0.144', '-0.027', '-0.021', '-0.010', '-0.008', '-0.003', '0.004', '0.014', '0.016', '0.028', '0.033', '0.033', '0.038', '0.048', '0.074', '0.094', '0.099', '0.156']; p95 (19th) 0.0995; model-only median 0.5816; clipped 0
+  SUPPORT (measured): jackknife SE 0.1036 -> MDE80 0.2901 | (registered plan): SE 0.0339 transported from PROFILE-RELIABILITY-INTERACTION's K12 half-width 0.0665; MDE80 0.095; VERDICT LINE: SCOREABLE (prediction 0.85 against a null p95 <= 0.60; break-even null p95 0.755)
+DESCRIPTIVE (decide nothing):
+  pooled EVAL accuracy per model (all 7591 EVAL items after exclusions; the 'mostly solved' readout P7):
+    DeepSeek-R1                              0.6119
+    o1-2024-12-17                            0.5956
+    DeepSeek-R1-Zero                         0.5945
+    o3-mini-2025-01-31-high                  0.5451
+    Doubao-1.5-pro-32k-250115                0.5430
+    o3-mini-2025-01-31-medium                0.5189
+    Doubao-1.5-pro-32k-241225                0.5030
+    qwen-max-2025-01-25                      0.4908
+    claude-3-5-sonnet-20241022               0.4785
+    DeepSeek-V3                              0.4782
+    gemini-2.0-flash                         0.4725
+    o3-mini-2025-01-31-low                   0.4717
+    MiniMax-Text-01                          0.4461
+    o1-mini-2024-09-12                       0.4458
+    gpt-4o-2024-11-20                        0.4341
+    QwQ                                      0.4271
+    Llama-3.1-405B-Instruct                  0.4238
+    Mistral-Large-Instruct-2411              0.4038
+    gpt-4o-2024-08-06                        0.4034
+    Qwen2.5-72B-Instruct                     0.4017
+    qwen-max-2024-09-19                      0.3994
+    gpt-4o-2024-05-13                        0.3940
+    Qwen2.5-32B-Instruct                     0.3835
+    Llama-3.3-70B-Instruct                   0.3687
+    phi-4                                    0.3628
+    Qwen2.5-14B-Instruct                     0.3500
+    Llama-3.1-70B-Instruct                   0.3448
+    Yi-Lighting                              0.3268
+    Mixtral-8x22B-Instruct-v0.1              0.2939
+    Qwen2.5-7B-Instruct                      0.2877
+    gemma-2-27b-it                           0.2780
+    Mistral-Small-Instruct-2409              0.2627
+    Yi-1.5-34B-Chat                          0.2615
+    gemma-2-9b-it                            0.2395
+    Qwen2.5-3B-Instruct                      0.2334
+    Yi-1.5-9B-Chat                           0.2311
+    Mixtral-8x7B-Instruct-v0.1               0.2233
+    K2-Chat                                  0.2221
+    granite-3.1-8b-instruct                  0.2147
+    Llama-3.1-8B-Instruct                    0.2112
+    Yi-1.5-6B-Chat                           0.1934
+    Qwen2.5-1.5B-Instruct                    0.1904
+    gemma-2-2b-it                            0.1885
+    OLMo-2-1124-13B-Instruct                 0.1855
+    Mistral-7B-Instruct-v0.3                 0.1831
+    granite-3.1-2b-instruct                  0.1785
+    OLMo-2-1124-7B-Instruct                  0.1738
+    MAP-Neo-7B-Instruct-v0.1                 0.1711
+    Qwen2.5-0.5B-Instruct                    0.1125
+  field grain: 18 fields >= 120 EVAL, n 4927; G_field +0.91pp [-0.30pp, +2.13pp]; discipline policy on the same items +0.71pp
+  family-collapsed (R6 map, 16 families): G_family +0.54pp [-0.04pp, +1.12pp]
+  miss + error share per model: printed in the KEY block above (read after A6 only; stored 'miss' / 'error' scored wrong).
+POPULATION: SuperGPQA minus its MMLU-Pro stem_key collisions (1,251 of 26,529 items = 4.7156% excluded, 370 EVAL / 881 TRAIN; the programme's own corpus; STAGE0b says nothing about the excluded items or SuperGPQA as a whole)
+C1: HELD -- G +0.65pp, two-stage 95% [+0.04pp, +1.25pp] lies wholly above 0 (recorded as notable: the verdict line is DESCRIPTIVE-ONLY at the planned support).
+C2: HELD -- R 0.6413, jackknife 95% lower bound 0.4382 > null p95 (19th of 20) 0.0995.
+PREDICTIONS:
+  P1 legs A1, A2, A3, A5, A6 all pass (0.70): HELD
+  P1a A1 finds 49 zero-shot models (read: complete == 49) (0.85): HELD
+  P1c >= 40 models pass A2 (0.75): HELD
+  P2 SEEN (post-count, 10 scored disciplines): recorded as an identity, not scored (observed 10; equal)
+  P3 G = +1.0pp, 80% [-0.2, +2.5] (observed +0.65pp): HELD; realised C1 class HELD (priors HELD 0.35 / UNDETERMINED 0.60 / FAILED 0.05)
+  P4 R = 0.85, 80% [0.70, 0.93] (observed 0.6413): FAILED; C2 HELD prior 0.85
+  P5 best single is the TRAIN argmax in >= 5 scored disciplines (0.60) (observed 3): FAILED
+  P6 the placebo's interval covers 0 (0.90) ([-0.66pp, +1.23pp]): HELD
+  P7 best zero-shot pooled EVAL accuracy <= 0.65 (0.85) (observed 0.6119, DeepSeek-R1): HELD
+DESCRIPTIVE, STRUCK (bracket: the registrar's record of 2026-09-29, ruling 20, pre-key): the two-roster contrast (49 zero-shot vs the 26 five-shot base models) and the best-of-N resample floor; either returns only in a later registration with a definition and a whitelist amendment.
+F1: DOES NOT FIRE (C2 HELD).

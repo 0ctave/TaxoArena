@@ -1,0 +1,291 @@
+K-RECONCILE (FRAMEWORK.md item 10) - zero calls; pool of record p2dca21ab5f4ef3ae asserted
+ratings_x12.db: 9144 matches, 2812 distinct questions, 12 models (Meta-Llama-3-70B-Instruct absent, asserted)
+STACK-v2 re-judge cache: 9142 valid verdicts on the same match ids
+Key denominator: (anchor, model) cells = 14 x 12 = 168; q = distinct judged questions of ratings_x12.db in the cell.
+No wrong-direction counts are produced here; the McNemar-established clause is not applicable to this item.
+
+=== 0. The two records' anchor mappings on ratings_x12.db ===
+  category (mmlu_pro.category via eval_question_link; the stress pass): 9144 matches mapped, 0 dropped
+  tree anchor (bareq512_s42 primary routing; RESOLVE-CALIB):           9144 matches mapped, 0 dropped
+  matches whose two anchors agree: 6711 of 9144 (73.4%)
+  tree anchor == the STACK-v2 cache's own anchor column: 9142 of 9142
+  anchor             category     tree
+  Biology                 558      686
+  Business                421      295
+  Chemistry               767      753
+  Computer science        320      626
+  Economics               649      583
+  Engineering             546      399
+  Health                  585      510
+  History                 349      382
+  Law                     670      601
+  Math                   1279     1229
+  Other                   887      782
+  Philosophy              287      342
+  Physics                1124     1149
+  Psychology              702      807
+
+fit check: numpy MM with PRIOR 0.5 vs rj.mm_fit on tree/Business, max |dtheta| = 2.99e-09 (must be < 1e-6)
+
+=== 1. k = q * SE^2 per (anchor, model) cell: both estimators, and each factor swapped ===
+  configuration                                                    cells  k_med  k_p10  k_p25  k_p75  k_p90 | SE_med SD_med   kstd |   DEFF  offcor
+  1 STRESS  | x12 verdicts | category | np120 B400 s137              168   4.87   3.20   4.01   6.97   9.79 |  0.260  1.943   1.44 |   1.12  -0.083
+  2 RESOLVE | x12 verdicts | category | mm_fit B300 s42              168   2.04   1.35   1.68   2.60   3.16 |  0.166  1.337   1.21 |   1.11  -0.088
+  3 STRESS  | x12 verdicts | tree     | np120 B400 s137              168   5.03   3.18   3.88   6.45   8.79 |  0.255  1.932   1.43 |   1.09  -0.084
+  4 RESOLVE | x12 verdicts | tree     | mm_fit B300 s42              168   2.04   1.42   1.68   2.47   3.06 |  0.167  1.279   1.21 |   1.12  -0.089
+  5 STRESS  | STACK-v2     | tree     | np120 B400 s137              168   4.24   2.81   3.53   5.28   6.62 |  0.239  1.741   1.45 |   1.14  -0.088
+  6 RESOLVE | STACK-v2     | tree     | mm_fit B300 s42              168   2.06   1.33   1.67   2.43   3.02 |  0.163  1.203   1.32 |   1.16  -0.090
+  7 RESOLVE | STACK-v2     | category | mm_fit B300 s42              168   2.05   1.33   1.68   2.38   3.27 |  0.165  1.227   1.35 |   1.17  -0.090
+  8 STRESS-fit converged   | x12 | category | npconv B400 s137       168   4.87   3.20   4.01   6.97  10.08 |  0.261  1.943   1.44 |   1.13  -0.083
+  9 STRESS-fit + PRIOR 0.5 | x12 | category | npprior B400 s137      168   2.06   1.35   1.72   2.60   3.28 |  0.167  1.337   1.24 |   1.14  -0.089
+  SE_med = median question-clustered bootstrap SE; SD_med = median across cells of the anchor's theta SD (12 models, point fit);
+  kstd = q * (SE / SD_anchor)^2, scale-free; DEFF = SE_q^2 / SE_match^2 (question-clustered vs match resample) per cell,
+  median; offcor = mean off-diagonal correlation of the (B x 12) mean-centred draw matrix, median over anchors
+  (the centring alone induces -1/11 = -0.091).
+
+=== 2. C1 reproduction ===
+  Median convention: the stress pass used statistics.median (mean of the two middle cells of 168); resolve_calibration
+  used ks[len // 2] (the upper middle cell). Tables above use the upper middle; each record is compared in its own convention.
+  STRESS procedure on x12/category: median k 4.87 (statistics.median 4.835; record 4.84; the stress pass's own cells.pkl re-read: 4.835)
+  RESOLVE-CALIB procedure on STACK-v2/tree: median k 2.06 (record 2.06)
+  C1: PASS
+
+=== 3. Per anchor, both estimators ON ratings_x12.db (configs 1 and 4; 2 and 3 are the mapping swaps) ===
+  anchor             |   STR n  q_med  k_med   kstd |   RES n  q_med  k_med   kstd |  RESc n  k_med   kstd
+  Biology            |     558     69   4.95   1.09 |     686     85   2.00   0.99 |     558   2.07   1.04
+  Business           |     421     51   4.80   1.64 |     295     43   1.86   1.73 |     421   1.76   1.49
+  Chemistry          |     767    106   6.11   1.33 |     753    106   2.52   1.25 |     767   2.53   1.11
+  Computer science   |     320     37  12.83   3.09 |     626     82   1.93   1.23 |     320   1.47   1.17
+  Economics          |     649     84   5.06   1.18 |     583     80   1.91   1.11 |     649   2.02   0.98
+  Engineering        |     546     64   4.99   1.42 |     399     52   1.64   1.08 |     546   2.15   1.43
+  Health             |     585     64   4.53   1.25 |     510     54   1.99   1.35 |     585   2.21   1.24
+  History            |     349     49   6.11   1.62 |     382     54   1.85   1.32 |     349   1.68   1.28
+  Law                |     670    100   5.46   1.41 |     601     90   2.26   1.03 |     670   2.60   1.27
+  Math               |    1279    153   5.82   1.54 |    1229    146   2.78   1.10 |    1279   2.72   1.10
+  Other              |     887    114   3.54   1.69 |     782    105   2.13   1.44 |     887   2.04   1.46
+  Philosophy         |     287     43   4.72   2.08 |     342     49   1.72   2.02 |     287   1.44   1.68
+  Physics            |    1124    137   4.34   0.97 |    1149    139   2.38   0.79 |    1124   2.61   0.95
+  Psychology         |     702     87   4.32   1.59 |     807    112   2.42   1.48 |     702   2.50   1.58
+  STR = STRESS estimator, category anchors; RES = RESOLVE-CALIB estimator, tree anchors; RESc = RESOLVE-CALIB estimator, category anchors.
+
+=== 4. Per-cell k under the framework's estimator on ratings_x12.db (config 4), sorted by k ===
+  anchor             model                            q   theta      SE      k   kstd   DEFF
+  Business           Llama-2-7b-hf                   27  -1.467   0.163   0.72   0.67   1.08
+  Health             deepseek-chat-v2_5              77   0.376   0.120   1.11   0.76   1.22
+  Biology            c4ai-command-r-v01              81  -0.821   0.118   1.14   0.56   0.78
+  Philosophy         deepseek-chat-v2_5              53  -0.119   0.150   1.19   1.39   0.90
+  Computer science   gpt-4o-2024-08-06              107   1.120   0.107   1.23   0.78   0.85
+  Engineering        Yi-6b-Chat                      38  -1.065   0.180   1.23   0.81   0.88
+  Other              Meta-Llama-3_1-8B               77  -0.814   0.127   1.24   0.84   0.83
+  Engineering        Meta-Llama-3_1-8B               40  -0.304   0.178   1.27   0.83   0.91
+  Other              deepseek-chat-v2_5             117   0.199   0.105   1.28   0.86   0.76
+  Philosophy         Meta-Llama-3_1-8B               41  -0.816   0.180   1.33   1.57   0.85
+  Engineering        gpt-4o-2024-08-06               60   1.004   0.151   1.38   0.90   0.88
+  Philosophy         Llama-2-13b-hf                  32  -1.159   0.207   1.38   1.61   0.95
+  Health             Llama-2-13b-hf                  46  -1.501   0.173   1.38   0.94   0.94
+  Health             Yi-6b-Chat                      46  -0.889   0.175   1.41   0.96   1.20
+  Philosophy         Yi-6b-Chat                      34  -0.586   0.204   1.41   1.66   1.01
+  Biology            deepseek-chat-v2_5              89   0.397   0.126   1.41   0.70   1.12
+  Economics          Qwen1.5-72B-Chat                78  -0.087   0.135   1.42   0.83   0.98
+  Health             Meta-Llama-3_1-8B               54  -0.997   0.162   1.42   0.96   1.09
+  Health             c4ai-command-r-v01              51  -0.655   0.167   1.42   0.97   1.06
+  Economics          c4ai-command-r-v01              70  -0.889   0.143   1.43   0.83   0.78
+  History            Llama-2-7b-hf                   39  -1.527   0.193   1.45   1.03   1.20
+  History            Qwen1.5-72B-Chat                54   0.020   0.165   1.47   1.05   1.34
+  Business           c4ai-command-r-v01              34  -0.417   0.208   1.47   1.37   0.97
+  Computer science   c4ai-command-r-v01              62  -0.610   0.156   1.50   0.96   0.86
+  Engineering        Qwen1.5-72B-Chat                46  -0.165   0.181   1.50   0.99   1.36
+  Business           Meta-Llama-3_1-8B               32  -0.640   0.217   1.51   1.41   1.28
+  Computer science   Qwen1.5-72B-Chat                87   0.302   0.132   1.52   0.97   0.94
+  Business           gpt-4o-2024-08-06               55   1.107   0.167   1.54   1.44   1.01
+  Business           Llama-2-13b-hf                  33  -1.430   0.216   1.55   1.44   1.06
+  Physics            gpt-4o-2024-08-06              159   1.368   0.099   1.56   0.52   0.86
+  Computer science   deepseek-chat-v2_5              96   0.576   0.128   1.57   1.00   0.98
+  Engineering        Meta-Llama-3_1-70B-Instruct     52  -0.228   0.174   1.57   1.03   1.00
+  Business           Meta-Llama-3_1-70B-Instruct     43  -0.150   0.191   1.57   1.47   1.12
+  Philosophy         Meta-Llama-3_1-70B-Instruct     59   0.005   0.163   1.57   1.85   1.32
+  History            Llama-2-13b-hf                  40  -1.440   0.199   1.59   1.14   0.93
+  Philosophy         Qwen1.5-72B-Chat                49  -0.115   0.181   1.61   1.89   0.91
+  Psychology         Llama-2-13b-hf                  84  -1.131   0.138   1.61   0.98   0.97
+  Engineering        deepseek-chat-v2_5              65   0.522   0.158   1.62   1.06   1.30
+  History            Meta-Llama-3_1-8B               28  -0.920   0.241   1.63   1.17   1.20
+  Economics          Llama-2-7b-hf                   57  -1.698   0.170   1.64   0.96   1.20
+  Engineering        Llama-2-13b-hf                  38  -1.635   0.208   1.64   1.08   1.47
+  Psychology         gpt-4o-2024-08-06              131   1.620   0.113   1.67   1.02   0.85
+  Computer science   Yi-6b-Chat                      60  -1.309   0.167   1.68   1.07   0.73
+  Math               c4ai-command-r-v01             124  -0.958   0.117   1.69   0.67   0.78
+  Law                Llama-2-13b-hf                  61  -1.727   0.167   1.70   0.78   0.94
+  Biology            gpt-4o-2024-08-06              100   1.378   0.131   1.70   0.84   1.17
+  Health             Qwen1.5-72B-Chat                51  -0.595   0.183   1.70   1.16   1.23
+  Other              Meta-Llama-3_1-70B-Instruct     90  -0.560   0.138   1.71   1.15   1.04
+  Philosophy         c4ai-command-r-v01              45  -0.581   0.196   1.72   2.02   0.98
+  Law                Meta-Llama-3_1-70B-Instruct     89  -0.589   0.139   1.73   0.79   0.87
+  Psychology         Meta-Llama-3_1-70B-Instruct     91  -0.295   0.138   1.73   1.06   0.91
+  Economics          deepseek-chat-v2_5              91   0.613   0.138   1.74   1.01   1.15
+  Engineering        c4ai-command-r-v01              34  -0.600   0.227   1.74   1.14   1.50
+  History            Meta-Llama-3_1-70B-Instruct     55  -0.283   0.179   1.75   1.26   0.95
+  Other              Llama-2-13b-hf                  75  -1.124   0.153   1.76   1.19   1.02
+  Economics          Llama-2-13b-hf                  60  -1.475   0.172   1.78   1.04   1.27
+  Chemistry          Meta-Llama-3_1-70B-Instruct    108   0.131   0.129   1.81   0.89   0.90
+  History            deepseek-chat-v2_5              61   0.163   0.173   1.82   1.30   1.12
+  Law                c4ai-command-r-v01              79  -0.701   0.152   1.82   0.83   0.81
+  Economics          Meta-Llama-3_1-8B               63  -1.264   0.170   1.83   1.07   0.97
+  Other              Yi-6b-Chat                      82  -1.136   0.150   1.84   1.24   0.93
+  History            c4ai-command-r-v01              51  -0.379   0.190   1.85   1.32   1.39
+  History            Yi-6b-Chat                      38  -1.190   0.221   1.85   1.32   1.25
+  Business           deepseek-chat-v2_5              61   0.738   0.175   1.86   1.73   1.45
+  Business           Qwen1.5-72B-Chat                33  -0.281   0.238   1.86   1.74   0.90
+  Biology            Meta-Llama-3_1-70B-Instruct     82  -0.311   0.151   1.88   0.93   1.21
+  Philosophy         Llama-2-7b-hf                   33  -1.133   0.239   1.89   2.22   0.91
+  Economics          gemini-3.1-pro_5-shots          82   1.613   0.153   1.91   1.11   1.17
+  Philosophy         iask_pro                        56   1.190   0.185   1.91   2.24   1.43
+  Computer science   Llama-2-7b-hf                   60  -1.791   0.179   1.92   1.22   0.94
+  Biology            Yi-6b-Chat                      63  -1.263   0.174   1.92   0.95   1.09
+  Computer science   Meta-Llama-3_1-70B-Instruct     71   0.053   0.165   1.93   1.23   1.00
+  Business           Yi-6b-Chat                      34  -0.963   0.238   1.93   1.80   1.00
+  Computer science   iask_pro                        82   1.614   0.154   1.94   1.24   1.17
+  History            iask_pro                        48   1.765   0.201   1.95   1.39   1.10
+  History            gemini-3.1-pro_5-shots          62   1.519   0.177   1.95   1.39   0.93
+  History            gpt-4o-2024-08-06               55   1.610   0.189   1.96   1.41   1.11
+  Physics            Meta-Llama-3_1-70B-Instruct    139   0.058   0.119   1.98   0.66   1.05
+  Biology            gemini-3.1-pro_5-shots          85   2.019   0.153   1.99   0.98   0.84
+  Health             gemini-3.1-pro_5-shots          61   1.986   0.181   1.99   1.35   1.09
+  Biology            Meta-Llama-3_1-8B               70  -1.131   0.169   2.00   0.99   1.08
+  Psychology         Qwen1.5-72B-Chat               112  -0.190   0.134   2.02   1.23   1.08
+  Health             arx_0314                        77   0.872   0.162   2.03   1.38   1.24
+  Other              Llama-2-7b-hf                   72  -1.790   0.168   2.03   1.37   1.13
+  Chemistry          Yi-6b-Chat                      73  -1.429   0.167   2.04   1.01   0.98
+  Biology            Llama-2-13b-hf                  59  -1.718   0.186   2.05   1.01   1.10
+  Computer science   Llama-2-13b-hf                  61  -1.578   0.184   2.06   1.31   1.09
+  Law                gemini-3.1-pro_5-shots          90   2.375   0.152   2.07   0.94   0.88
+  Chemistry          gpt-4o-2024-08-06              134   1.229   0.125   2.08   1.03   1.06
+  Philosophy         arx_0314                        58   0.666   0.189   2.08   2.44   1.26
+  Business           arx_0314                        60   0.890   0.186   2.08   1.94   1.09
+  Health             Meta-Llama-3_1-70B-Instruct     53  -0.296   0.199   2.09   1.42   1.23
+  Economics          Meta-Llama-3_1-70B-Instruct     83  -0.463   0.159   2.09   1.22   1.27
+  Physics            Llama-2-7b-hf                   93  -2.735   0.150   2.09   0.70   0.80
+  Business           gemini-3.1-pro_5-shots          60   1.238   0.187   2.10   1.96   1.41
+  Health             Llama-2-7b-hf                   48  -1.316   0.210   2.12   1.44   1.26
+  Engineering        Llama-2-7b-hf                   37  -2.014   0.240   2.13   1.39   1.19
+  Other              Qwen1.5-72B-Chat               110  -0.002   0.139   2.13   1.44   1.38
+  Biology            iask_pro                        87   2.202   0.157   2.15   1.06   0.88
+  Math               Qwen1.5-72B-Chat               146  -0.123   0.121   2.15   0.85   1.05
+  Law                Qwen1.5-72B-Chat               112   0.064   0.139   2.17   0.99   0.95
+  Biology            Qwen1.5-72B-Chat                86  -0.144   0.160   2.19   1.08   1.39
+  Psychology         Meta-Llama-3_1-8B               84  -1.228   0.162   2.20   1.34   1.19
+  Health             gpt-4o-2024-08-06               71   1.230   0.176   2.20   1.50   1.33
+  Law                gpt-4o-2024-08-06               93   1.794   0.154   2.20   1.01   1.06
+  Economics          gpt-4o-2024-08-06               90   1.468   0.157   2.21   1.29   1.47
+  Physics            c4ai-command-r-v01             117  -0.727   0.137   2.21   0.74   0.90
+  Engineering        gemini-3.1-pro_5-shots          55   1.386   0.201   2.23   1.46   1.43
+  Psychology         deepseek-chat-v2_5             120   0.324   0.137   2.25   1.37   1.49
+  Law                deepseek-chat-v2_5             126   0.257   0.134   2.26   1.03   1.16
+  Engineering        iask_pro                        54   1.999   0.206   2.29   1.50   1.14
+  Chemistry          c4ai-command-r-v01              81  -0.900   0.168   2.30   1.13   1.15
+  Math               deepseek-chat-v2_5             173   1.105   0.115   2.30   0.91   1.18
+  Math               gpt-4o-2024-08-06              180   1.271   0.113   2.31   0.92   1.15
+  Other              c4ai-command-r-v01              92  -0.577   0.159   2.32   1.56   1.26
+  Physics            Llama-2-13b-hf                  98  -2.135   0.155   2.34   0.78   0.87
+  Philosophy         gpt-4o-2024-08-06               54   1.368   0.208   2.35   2.75   1.10
+  Other              gemini-3.1-pro_5-shots         105   1.669   0.150   2.37   1.60   1.24
+  Physics            iask_pro                       152   2.453   0.125   2.37   0.79   0.91
+  Physics            deepseek-chat-v2_5             153   0.942   0.125   2.38   0.79   1.34
+  Computer science   Meta-Llama-3_1-8B               66  -1.117   0.190   2.39   1.52   1.12
+  Law                iask_pro                        94   2.217   0.160   2.40   1.09   1.08
+  Biology            Llama-2-7b-hf                   54  -1.804   0.211   2.41   1.19   1.22
+  Psychology         Yi-6b-Chat                      81  -1.073   0.173   2.42   1.48   1.23
+  Chemistry          Llama-2-13b-hf                  69  -1.536   0.187   2.42   1.20   1.13
+  Chemistry          deepseek-chat-v2_5             117   0.987   0.145   2.45   1.21   1.37
+  Math               Llama-2-13b-hf                 103  -2.014   0.155   2.47   0.98   0.97
+  Law                Yi-6b-Chat                      66  -1.219   0.194   2.48   1.13   1.08
+  Other              gpt-4o-2024-08-06              126   1.464   0.140   2.48   1.68   1.35
+  Chemistry          iask_pro                       106   2.055   0.154   2.52   1.25   1.10
+  Business           iask_pro                        47   1.375   0.232   2.53   2.36   1.17
+  Chemistry          Qwen1.5-72B-Chat                93  -0.350   0.165   2.54   1.25   1.23
+  Engineering        arx_0314                        64   1.100   0.200   2.55   1.67   1.47
+  Chemistry          Meta-Llama-3_1-8B               74  -1.078   0.187   2.57   1.27   1.14
+  Psychology         gemini-3.1-pro_5-shots         143   1.724   0.135   2.61   1.60   1.02
+  Law                Llama-2-7b-hf                   63  -1.790   0.206   2.67   1.22   1.07
+  History            arx_0314                        66   0.663   0.201   2.68   1.91   1.15
+  Math               Yi-6b-Chat                     109  -1.241   0.157   2.69   1.07   1.02
+  Computer science   arx_0314                        91   1.050   0.172   2.70   1.72   1.41
+  Other              iask_pro                       106   1.929   0.162   2.77   1.87   1.02
+  Math               iask_pro                       176   2.078   0.126   2.78   1.10   0.89
+  Psychology         c4ai-command-r-v01              92  -0.733   0.175   2.82   1.72   1.43
+  Physics            gemini-3.1-pro_5-shots         160   2.076   0.133   2.82   0.94   1.22
+  Economics          Yi-6b-Chat                      67  -0.996   0.207   2.87   1.67   1.14
+  Law                Meta-Llama-3_1-8B               64  -1.217   0.213   2.90   1.32   1.06
+  Philosophy         gemini-3.1-pro_5-shots          47   1.281   0.251   2.95   3.47   1.61
+  Health             iask_pro                        69   1.784   0.208   2.99   2.03   1.31
+  Physics            Yi-6b-Chat                     100  -1.867   0.173   3.01   1.00   1.24
+  Math               Meta-Llama-3_1-8B              119  -1.252   0.159   3.01   1.20   1.03
+  Physics            Meta-Llama-3_1-8B              113  -0.975   0.163   3.01   1.00   1.45
+  Math               Meta-Llama-3_1-70B-Instruct    140  -0.031   0.147   3.04   1.21   1.48
+  Psychology         Llama-2-7b-hf                   84  -1.861   0.191   3.06   1.87   1.16
+  Economics          arx_0314                        94   1.462   0.181   3.07   1.79   1.36
+  Physics            Qwen1.5-72B-Chat               115  -0.169   0.164   3.08   1.03   1.37
+  Computer science   gemini-3.1-pro_5-shots          84   1.689   0.193   3.12   1.98   1.25
+  Physics            arx_0314                       163   1.711   0.139   3.13   1.04   1.43
+  Chemistry          Llama-2-7b-hf                   63  -2.116   0.223   3.14   1.55   1.15
+  Economics          iask_pro                        80   1.716   0.200   3.21   1.87   1.65
+  Other              arx_0314                       128   0.742   0.159   3.22   2.17   1.09
+  Chemistry          arx_0314                       108   1.362   0.174   3.25   1.61   1.13
+  Chemistry          gemini-3.1-pro_5-shots         119   1.644   0.167   3.31   1.64   1.72
+  Law                arx_0314                       122   0.537   0.167   3.40   1.55   1.18
+  Psychology         arx_0314                       145   1.116   0.155   3.50   2.14   1.21
+  Math               arx_0314                       185   1.660   0.140   3.64   1.45   1.38
+  Biology            arx_0314                        89   1.197   0.204   3.72   1.84   2.07
+  Math               Llama-2-7b-hf                  112  -2.435   0.191   4.07   1.62   0.80
+  Psychology         iask_pro                       128   1.727   0.185   4.40   2.69   1.68
+  Math               gemini-3.1-pro_5-shots         178   1.938   0.158   4.43   1.76   1.68
+
+=== 5. Decomposition of log(4.84 / 2.06) into factors (medians of k; each step changes ONE thing) ===
+  step                                                                                   from     to  log-gap  share
+  fit: np120 -> converged (same resamples, x12/category)                                 4.87   4.87   -0.000    -0%
+  fit: converged -> + PRIOR 0.5 pseudo-match (= mm_fit)                                  4.87   2.06   +0.862   100%
+  procedure: npprior/B400/s137/all cells -> mm_fit/B300/s42/q>10 (x12/category)          2.06   2.04   +0.010     1%
+  anchor mapping: category -> tree (RESOLVE procedure, x12 verdicts)                     2.04   2.04   -0.001    -0%
+  verdict source: x12 judge -> STACK-v2 (RESOLVE procedure, tree)                        2.04   2.06   -0.011    -1%
+  TOTAL                                                                                  4.87   2.06   +0.860   100%
+  order check (mapping and verdict source swapped):
+  verdict source first: x12 -> STACK-v2 (RESOLVE, category)                              2.04   2.05   -0.008    -1%
+  then mapping: category -> tree (RESOLVE, STACK-v2)                                     2.05   2.06   -0.003    -0%
+
+=== 6. C2 - 'per-cell 2.06-class values' under the framework's estimator on ratings_x12.db ===
+  config 4 (RESOLVE-CALIB procedure, x12 verdicts, tree anchors): k median 2.04, p10 1.42, p90 3.06 over 168 cells
+  config 2 (same procedure, category anchors):                       k median 2.04, p10 1.35, p90 3.16
+  inside RESOLVE-CALIB's p10-p90 band [1.33, 3.02]: True; below the design constant 3: True
+  hardest reading: the same holds for the category mapping too: True
+  C2: PASS
+
+=== 7. C3 - does the 4.84 'reflect cross-model correlation'? ===
+  The clustering term: DEFF = (question-clustered SE / match-resampled SE)^2, per cell, median:
+    STRESS estimator, x12/category (config 1): DEFF 1.12; mean off-diagonal draw correlation -0.083 (centring baseline -0.091)
+    RESOLVE estimator, x12/tree (config 4):    DEFF 1.12
+    RESOLVE estimator, STACK-v2/tree (config 6): DEFF 1.16; off-diagonal -0.090
+  Under the STRESS estimator, removing the clustering entirely (match resample) would give k 4.33, not 2.06.
+  Same-data gap, STRESS -> RESOLVE procedure on x12/category: log(4.87 / 2.04) = 0.871
+    share carried by the clustering term log(DEFF):         13%
+    share carried by the fit (np120 -> mm_fit prior):       99%
+    theta SD, STRESS fit vs prior fit (median over anchors): 1.943 vs 1.337 (ratio 1.45); scale-free kstd: 1.44 vs 1.24
+  C3 (clustering term carries > 50% of the gap): FAIL
+
+=== 8. C4 - the framework's k ===
+  Every committed helper the certificate rests on (systematic_budget, key_tie_decline, budget_transfer,
+  profile_reliability, x20_merged) fits boards with jf.board_from -> rj.mm_fit, i.e. the RESOLVE-CALIB fit:
+  a 0.5-win pseudo-match on each side of every observed pair, iterated to convergence, mean-centred; the
+  question-clustered bootstrap is the SE. That is the framework's estimator, and FRAMEWORK.md L85 does not
+  declare the pseudo-match. Its k on the item's DB (ratings_x12.db, tree anchors): median 2.04 [p10 1.42, p90 3.06];
+  on the STACK-v2 verdicts the certificate actually uses: 2.06 [1.33, 3.02].
+  The unpenalised fit's 4.87 is the same data on a wider theta scale (SD ratio 1.45): k = q * SE^2 is not scale-free,
+  and the two records' k values are not the same quantity. The range [2.06, 4.84] carried at FRAMEWORK.md L207 mixes scales.
+  DECLARED: k_framework = q * SE^2 under jf.board_from + question-clustered bootstrap, per cell, on the judge of
+  record's verdicts, with the pseudo-match prior stated; forecast range on ratings_x12.db = [p10, p90] of config 4 =
+  [1.42, 3.06]; the scale-free companion kstd = q * (SE / SD_anchor)^2, median 1.44 (STRESS fit) vs 1.21 (framework fit).
+
+=== VERDICTS ===
+  C1 reproduction of both records:                 PASS  (4.835 vs 4.84; 2.06 vs 2.06)
+  C2 2.06-class under the framework's k on x12:    PASS  (median 2.04; band [1.33, 3.02]; < 3)
+  C3 4.84 reflects cross-model correlation:        FAIL  (clustering share 13%; fit share 99%; DEFF 1.12)
+  C4 framework's k declared:                       DECLARED (jf.board_from fit + question bootstrap; prior stated; range [1.42, 3.06] on x12)
+  Prediction as registered: PARTIAL - the value class holds, the mechanism does not

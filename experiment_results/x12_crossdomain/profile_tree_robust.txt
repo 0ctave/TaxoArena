@@ -1,0 +1,151 @@
+=== PROFILE-TREE-ROBUST: does the sub-anchor profile survive a change of tree? ===
+  trees bareq512_s42 (87 leaves) and abt2d512_s42 (47 leaves) on the same reserved pool
+  questions carrying verdicts under both: 2811 | matches 9142 | models 12
+
+  ANCHOR LEVEL, reported as a NULL BY CONSTRUCTION and not as a result: the two trees place
+  2800 of 2811 questions (0.996) in the same anchor, because the anchors ARE the pinned MMLU-Pro
+  categories. Nothing can be learned from an anchor-level counterfactual on these trees.
+
+  leaves carrying at least 25 questions: bareq512_s42 53 of 87 | abt2d512_s42 41 of 47
+
+=== (1) PRIMARY: correlation of the two trees' centred per-(model, question) strengths ===
+  pairs 24864 over 2072 questions
+  observed Pearson r = +0.9147
+  question-clustered bootstrap 95% CI [+0.9115, +0.9179] over 1000 draws
+  size-matched random-partition null over 200 reps: median +0.8643 | 95th pct +0.8764 | max +0.8819
+
+  REGISTERED BAR: adopt sub-anchor reporting only if r exceeds the null's 95th pct AND exceeds 0.50
+    exceeds null 95th pct: YES (+0.9147 vs +0.8764)
+    exceeds 0.50:           YES (+0.9147)
+  -> AS REGISTERED: PASSES both conditions
+
+  BUT THE REGISTERED BAR IS UNINFORMATIVE AND I AM SAYING SO RATHER THAN BANKING THE PASS.
+  The null sits at +0.8643. A RANDOM partition of the same shape reproduces almost the whole
+  correlation, so the 0.50 bar was miscalibrated when I registered it: anything at all would clear
+  it. The cause is a shrinkage artefact - a small cell pulls the whole BT vector toward zero, so
+  the centred profile is roughly (s_c - 1) x theta_global with a cell-specific scalar, and both
+  trees' profiles end up proportional to the SAME global ordering whatever the partition is. The
+  margin over the null, +0.0504, is the only part of the primary that carries information.
+
+=== (1b) AMENDMENT, recorded before the result was read: the same test with model means removed ===
+  Removing each model's own mean removes everything that is a pure function of the model and
+  leaves only the claim the profile actually makes - is m unusually strong HERE. The null must
+  collapse toward zero for this statistic to be the right instrument; if it does not, neither
+  statistic works and the honest answer is that this design cannot measure tree robustness.
+  observed model-demeaned r = +0.4754 | question-clustered 95% CI [+0.4613, +0.4901]
+  size-matched random-partition null over 200 reps: median +0.0123 | 95th pct +0.0258 | max +0.0354
+  -> the demeaned null collapses toward zero, so this statistic is the right instrument
+  -> observed +0.4754 against a +0.0258 null 95th pct: the leaf profile carries real, tree-reproducible structure
+
+=== (1c) CORRECTED NULL AND DEMEANING (review of 2026-09-15) ===
+  The nulls above permute cells ACROSS anchors and so destroy the anchor membership the two trees
+  share on 2,800 of 2,811 questions; and model-demeaning leaves the anchor profile in. A sub-anchor
+  question needs a WITHIN-anchor null and (model, anchor) demeaning. Both, for judge and key:
+  JUDGE  model-demeaned          observed +0.4754 | within-anchor null median +0.3818, 95th +0.4175
+  JUDGE  (model, anchor)-demeaned observed +0.2982 | within-anchor null median +0.0097, 95th +0.0249
+  READ: the model-demeaned observed value sitting near its within-anchor null median means it was
+  measuring the anchor profile the trees share by fiat. Only the (model, anchor)-demeaned line speaks
+  to the registered question, and only if it clears its own within-anchor null.
+
+=== (2) SECONDARY: router agreement and realised key-decidable accuracy ===
+  the two trees name the same best model for 1240 of 2072 questions = 0.598
+  global best single model (gemini-3.1-pro_5-shots): 0.9068 (n=2070)
+  bareq512_s42 leaf router: 0.8494 (n=2052) | -0.0573 against the global best
+  abt2d512_s42 leaf router: 0.8515 (n=2060) | -0.0553 against the global best
+  LEAF-POWER predicted neither router beats the global best: HELD - neither does
+
+=== (3) THE READER'S NUMBER: how often does a per-cell claim flip sign between trees? ===
+  sign-reversal rate over 24864 non-zero pairs: 0.072
+  restricted to |centred strength| >= 0.05 in bareq512_s42 (n=24174): 0.059
+  restricted to |centred strength| >= 0.10 in bareq512_s42 (n=23569): 0.051
+  restricted to |centred strength| >= 0.20 in bareq512_s42 (n=22018): 0.039
+  READ: a reader asking what a published per-cell capability claim is worth should be told this
+  number, whatever the primary does. It is the share of such claims that reverse if the tree is
+  rebuilt with a different embedding configuration on the same data and the same split.
+
+=== (4) ADDED before its result was computed: is the reproducible structure CAPABILITY or JUDGE? ===
+  The leading alternative explanation for (1b) is that both trees capture the same JUDGE artefact
+  rather than the same capability. The x12 verdicts carry a measured verbosity preference and a
+  measured position effect; if either clusters by topic, both trees would pick it up and the two
+  profiles would agree without any capability structure underneath. That would also explain why
+  neither leaf router beats the global best in (2).
+  THE DISCRIMINATOR, and it is free: run the identical model-demeaned tree-robustness statistic on
+  per-cell ANSWER-KEY ACCURACY instead of judge-derived BT strength. The key cannot have a judge
+  artefact. If the key-derived profile reproduces at a similar level, the structure is capability.
+  If it sits near the null while the judge-derived one does not, the profile is a judge artefact.
+
+  key-derived model-demeaned r = +0.8143 over 24864 pairs
+  its size-matched null over 200 reps: median +0.0183 | 95th pct +0.0352
+  judge-derived was +0.4754 against a +0.0258 null.
+  KEY  model-demeaned          observed +0.8143 | WITHIN-anchor null median +0.8130, 95th +0.8321
+  KEY  (model, anchor)-demeaned observed +0.4135 | within-anchor null median +0.0146, 95th +0.0360
+  -> CORRECTION: the key's +0.8143 is AT its within-anchor null. 'The structure is real and
+     tree-robust' measured the ANCHOR profile, which the two trees share on 2,800 of 2,811
+     questions. It said nothing about sub-anchor structure. The (model, anchor)-demeaned
+     line is the only test of the registered question.
+  -> THE KEY REPRODUCES TOO. The per-cell structure is a property of the QUESTIONS, not of the
+     judge: the answer key, which cannot carry a judge artefact, agrees across trees at
+     +0.8143 against a +0.0352 null. The judge-artefact explanation is rejected.
+  RATIO judge/key = 0.58. A ratio far above 1 means the judge sees more 'structure' than the key
+  supports, which is the signature of an artefact riding on top of real structure.
+
+=== (5) ADDED before its result was computed: is the judge's shortfall FIDELITY or NOISE? ===
+  (4) shows the judge recovers a fraction of a structure the key reproduces at +0.8143. Two very
+  different readings: the judge TRANSMITS LESS of the real structure (a fidelity loss, which is
+  a property of the judge and is improvable), or the judge's per-cell estimate is simply NOISIER
+  because it rests on about three matches per question where the key rests on a fact. Those
+  demand different responses, so separate them by measuring each instrument's own reliability.
+  METHOD: under ONE tree, split each cell's questions into two halves, build the profile on each
+  half, correlate them model-demeaned, and Spearman-Brown to full length. Then disattenuate the
+  cross-tree correlation by that reliability. Identical treatment for both instruments.
+  judge  split-half r=+0.0860 -> Spearman-Brown reliability R=+0.1583 | cross-tree +0.4754 -> disattenuated +3.0022
+  key    split-half r=+0.7201 -> Spearman-Brown reliability R=+0.8373 | cross-tree +0.8143 -> disattenuated +0.9726
+
+  THE DISATTENUATION IS INVALID AND ITS VERDICT IS DISCARDED. It returns +3.0022 for the judge,
+  and a correlation cannot exceed 1. The assumption it breaks is independence: the two
+  cross-tree profiles are built from the SAME questions and the SAME verdicts under two
+  partitions that agree on 99.6% of anchor assignments, so they share almost all their data,
+  while the split-half compares disjoint question sets. The two quantities are not on the
+  same footing and their ratio means nothing. I am reporting this rather than the verdict it
+  produced, which would have read 'NOISE, not fidelity'.
+
+  WHAT (5) DOES ESTABLISH, and it is more important than what it was built to test:
+    judge per-cell profile split-half reliability  r=+0.0860  (Spearman-Brown R=+0.1583)
+    key   per-cell profile split-half reliability  r=+0.7201  (Spearman-Brown R=+0.8373)
+  Measured on two INDEPENDENT halves of the same cell in the same tree, the judge's per-cell
+  capability profile reproduces at +0.0860. At the x12 budget it is close to pure noise. The key's
+  reproduces at +0.7201 on exactly the same split, so this is a property of the judge-derived
+  estimate and not of the cells.
+  AND THIS CUTS AGAINST (1b). The cross-tree judge correlation was +0.4754 - 5.5x its own
+  independent-sample reliability of +0.0860. Two measurements that share almost all their data
+  agree far better than two measurements that share none, which is what shared data does and
+  not what reproducible structure does. (1b)'s reading that the judge profile 'carries real,
+  tree-reproducible structure' is therefore NOT supported by (1b) alone.
+
+=== (6) ADDED before its result was computed: restrict to questions the two trees DISAGREE about ===
+  (5) shows the cross-tree comparison is contaminated by shared data. The clean version is to keep
+  only the questions whose CELL ACTUALLY CHANGES between trees, where the two profiles are genuinely
+  being asked to agree about something. If the agreement in (1b) came from shared cells it collapses
+  here; if the profile is really tree-robust it survives.
+  cell ids are not comparable across trees, so 'changed' is measured by the question's COMPANY:
+  the Jaccard overlap between the set of questions sharing its cell in A and in B.
+  most changed third (lowest overlap)    n=  690 | overlap 0.146 | model-demeaned judge +0.1895 key +0.6836 | (model,anchor)-demeaned judge -0.0841 key -0.0711
+  middle third                           n=  691 | overlap 0.280 | model-demeaned judge +0.4815 key +0.8112 | (model,anchor)-demeaned judge +0.1554 key +0.5148
+  least changed third (highest overlap)  n=  691 | overlap 0.585 | model-demeaned judge +0.7497 key +0.9406 | (model,anchor)-demeaned judge +0.7409 key +0.8513
+  READ: if r falls as overlap falls, the cross-tree agreement is shared data. If r holds, the
+  profile is genuinely tree-robust and (1b) stands. The KEY column is the decisive one: it says
+  whether the structure itself is partition-dependent, or only the judge's estimate of it.
+
+=== (7) BUDGET IMPLICATION: what would it take to resolve the leaf profile? ===
+  (base: 8 leaves carried the split-half measurement, mean 71 questions each)
+  to reach reliability 0.70: 12.4x the current per-cell evidence, i.e. ~883 questions per leaf
+  to reach reliability 0.80: 21.3x the current per-cell evidence, i.e. ~1514 questions per leaf
+  to reach reliability 0.90: 47.8x the current per-cell evidence, i.e. ~3408 questions per leaf
+  (Spearman-Brown from the measured R=+0.1583, over 53 profiled leaves averaging 53 questions each)
+  AND THE CAVEAT THAT MATTERS: this is a QUESTIONS-PER-CELL requirement, not only a call budget.
+  Re-judging the same match does not add independent evidence - TEMP-0 showed the 5.7% test-retest
+  floor is intrinsic and survives temperature 0 - so the multiplier has to come from new
+  questions in each cell. The reserved pool holds 2811 questions across 53 profiled leaves; the
+  0.80 target needs roughly 59764, which MMLU-Pro does not contain. A reliable per-leaf capability
+  profile is therefore out of reach on this corpus at any call budget, which is a DATA limit and
+  is the honest reason every leaf-level test in this programme has been underpowered.

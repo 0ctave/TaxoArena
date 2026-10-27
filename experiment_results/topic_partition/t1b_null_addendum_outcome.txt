@@ -1,0 +1,27 @@
+TOPIC-PARTITION-20NG-T1B-NULL addendum readout (registration docs/judge_v2_program.md a5dfcf0, L11542-L11570 as of 7da2ec5; registrar's rulings 0a1b44b, L13445-L13525); script sha256[:16] LF 79b3338d31df6593 / CRLF 4b917e1590728d61 (git blob 956c6d023046, LF); date 2026-09-23
+pool pf844849e133cda4e (the corpus's own split; NOT read: no pool, no arena DB, no judge, no construction); arm ng_af_bareq512_s42, snapshot 20260923_043423_Headless_Run_Auto_ge, bar 0.0145, slice 512, 300 reps
+GUARD (2) DISJOINTNESS: PASS -- target (1) L226 equal True, occurrences 1, UNDETERMINED True; target (2) L238 equal True, occurrences 1, UNDETERMINED True; target (3) L120 equal True, occurrences 1, UNDETERMINED True; target (4) L220 equal True, occurrences 1, UNDETERMINED True; L128 (not a target) unchanged True; 243 lines; blob 90632b36bed0 (pinned 90632b36bed0: True; informational, the match rule is the line rule)
+GUARD (1) PROVENANCE PIN: PASS -- last [SEPBAR] (line 76; after [SITENULL-HEAP] line 72): bar 0.0145, sliceDim 512; CSV 97 rows, reps ['300'], snapshot 20260923_043423_Headless_Run_Auto_ge; jsonl iteration 15: 97 sites, 100 leaves (sliceDim [512]), orphans CSV->site 0 / site->CSV 0; snapshots.db leaf set 100 = jsonl's; root n00000001, depth-1 sites n00000004 / n00000005
+GUARD (3) SUPERSESSION BY INSERTION ONLY: PASS (pre-write) -- experiment_results/topic_partition/t1b_null_addendum_outcome.txt absent and not a protected path; outcome of record sha256[:16] 263ed95f9e9d1527, never opened for write
+A1 GATE (SCOREABLE, deterministic): HELD -- CSV present; rows 97; reps ['300']; snapshot ids ['20260923_043423_Headless_Run_Auto_ge']; clauses (1) PASS / (2) PASS / (3) PASS
+  A2 row root n00000001: depth 0 n 11845 observed 0.048664 site p95 0.056788 margin 0.857 cert_site_p95 False (the CSV's flag decides; observed >= p95 at printed precision False)
+  A2 row depth-1 n00000004: depth 1 n 5703 observed 0.036789 site p95 0.046432 margin 0.792 cert_site_p95 False (the CSV's flag decides; observed >= p95 at printed precision False)
+  A2 row depth-1 n00000005: depth 1 n 6254 observed 0.029781 site p95 0.053796 margin 0.554 cert_site_p95 False (the CSV's flag decides; observed >= p95 at printed precision False)
+A2 (C3-beside for T1b; SCOREABLE, a structural read of three rows; Monte-Carlo fragility of a 300-rep p95 disclosed, not modelled): PARTIAL -- leaves 100 (> 20: True); root certified FAILED; at least one depth-1 site certified FAILED
+A3 (DESCRIPTIVE-ONLY; recorded): T1b certified share (cert_site_p95, 300 reps, bar 0.0145) 1 of 97 = 0.010 [0.002, 0.056] (Wilson 95%, NOMINAL: sites are nested, n_eff 97 is an upper bound); by site-size band: n<200 0/22; 200-400 1/33; 400-800 0/19; >=800 0/23
+A4 (P11's certified-share clause; DESCRIPTIVE-ONLY): HELD -- T1b certified share 1 of 97 = 0.010 [0.002, 0.056; Wilson, nominal] against T1's RECORDED share 0.158 (topic_partition_outcome.txt L14, blob 90632b36bed0; quoted, not recomputed): below at the point; DESCRIPTIVE-ONLY under (b)(5); no cross-bar certified-count claim
+AF1 (fires iff A2 = PARTIAL, ruling (2)): FIRED -- the per-corpus pair BUILDS BUT DOES NOT CERTIFY on this corpus - overturns the reading that the FRAMEWORK 512 / 0.0145 pair transfers whole, and narrows the transfer finding to the bar-0.025 / 256-dim recipe alone; TOPIC-PARTITION-20NG's C3 is untouched either way
+AF2 (fires iff A1 FAILED, ruling (2)): NOT FIRED (A1 HELD)
+  AP1  HELD         null completes at 14 g without OOM, wall 90-140 min: run segment: BUILD SUCCESSFUL in 2h 14m 29s = 134.5 min (task wall clock from gradle's line; registered 90-140); OutOfMemoryError False;     [SITENULL-HEAP] sliceDim=512 largest site n=11845 live=24 -> peak live 7.28 GB; budget 0.90 * maxMemory(15.03 GB) = 13.53 GB
+  AP2  FAILED       certified share 8-22% of 97: 0.010 (1/97)
+  AP3  FAILED       root certifies (P 0.7): FAILED; at least one depth-1 certifies (P 0.6): FAILED; A2 HELD (P ~0.6): FAILED
+  AP4  HELD         share below T1's recorded 0.158 (P 0.6): below -- recorded, DESCRIPTIVE-ONLY, never a cross-bar claim
+  AP5  HELD         the four target strings still contain UNDETERMINED at launch (P 0.98): disjointness PASS
+SUPERSESSION BY INSERTION (topic_partition_outcome.txt is NOT edited; the last bracket wins; the programme's TOPIC-PARTITION-20NG outcome section receives the registrar's dated bracket):
+  target (1) L226 superseded by A2 above: PARTIAL
+  target (2) L238: ONLY the clause "certified share comparison: UNDETERMINED" is superseded, by A4 above (HELD, DESCRIPTIVE-ONLY); P11's other three clauses are not restated
+  target (3) L120 superseded: site null experiment_results/topic_partition/site_null_ng_af_bareq512_s42.csv PRESENT, 97 sites at 300 reps, snapshot 20260923_043423_Headless_Run_Auto_ge (A1 HELD)
+  target (4) L220 NOT superseded, stays UNDETERMINED: T1b certification vs alignment: site null now present; NOT COMPUTED by the addendum (C2 exclusion; a new test would need its own registration)
+  L128 '  site null: ABSENT (certified share UNDETERMINED)': not a registered target; not superseded
+WHAT THIS DOES NOT SHOW: nothing about C2 (not computed; T1b's sites never pooled); nothing about the partition (C1); nothing like-for-like against T1 or MMLU-Pro (different bars, p95 falls with n); one corpus, one embedding model, one seed, one split, no re-draw.
+GUARD (3) SUPERSESSION BY INSERTION ONLY: PASS (at write) -- outcome of record unchanged, sha256[:16] 263ed95f9e9d1527

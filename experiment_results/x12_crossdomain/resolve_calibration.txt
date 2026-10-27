@@ -1,0 +1,65 @@
+=== (A) THE SUPPORT CONSTANT: is SE ~= sqrt(k/q) with k=3, or larger? ===
+  Per anchor: fit a BT board on that anchor's matches, bootstrap over QUESTIONS (the clustering
+  unit, not matches), and solve k = q * SE^2 for each (anchor, model) cell.
+
+  anchor           matches  q(med)  SE(med)   k(med)   k(p90)
+  Math               1229     119    0.140     2.32     3.29
+  Physics            1149     117    0.149     2.59     3.11
+  Psychology          806     120    0.144     2.47     4.56
+  Other               781      89    0.158     2.21     2.98
+  Chemistry           753     108    0.143     2.20     2.77
+  Biology             686      59    0.191     2.16     3.24
+  Computer science    626      66    0.177     2.06     2.65
+  Law                 601      66    0.185     2.27     3.41
+  Economics           583      91    0.152     2.11     2.75
+  Health              510      53    0.184     1.80     3.00
+  Engineering         399      46    0.180     1.49     2.03
+  History             382      61    0.173     1.84     2.60
+  Philosophy          342      34    0.230     1.81     2.15
+  Business            295      55    0.173     1.64     2.13
+
+  POOLED over 168 cells: k median 2.06 | p10 1.33 | p90 3.02
+  The design assumes k=3; the measured median is 2.06 (p90 3.02).
+  So k=3 OVERSTATES the per-cell SE by 1.21x and the design's resolution claim is CONSERVATIVE by that factor - the stress pass's k~=4.8 does not reproduce.
+  At the measured k, SE=0.20 needs q = 51 distinct questions per cell; at k=3 it needs 75.
+
+=== (B) THE SEPARATION CERTIFICATE: calibrate the inflation factor on every edge, not 66 ===
+  An EDGE is an (anchor, model-pair) cell carrying key-decidable evidence. For each, the arena's
+  P(A above B) comes from the per-anchor bootstrap; the truth comes from the key on that anchor.
+  edges with a key gap above 2pp: 891 (the design calibrated on 66 global pairs)
+
+  An earlier version of this sweep inflated the interval as |p-0.5|/f, which is unsatisfiable for
+  f > 1.11 and reported 0 edges called at every f above 1. The quantity the design actually sets is
+  the CONFIDENCE THRESHOLD, so sweep that.
+
+   threshold     called   declined  wrong-direction  95% upper bound
+       0.900        800         91            2.00%            2.97%
+       0.950        772        119            1.68%            2.59%
+       0.975        732        159            0.82%            1.47%
+       0.990        714        177            0.84%            1.51%
+       0.995        694        197            0.86%            1.55%
+       1.000        667        224            0.60%            1.19%
+  READ: pick the smallest threshold whose 95%% UPPER BOUND clears the target. A zero-count criterion on 66
+  edges cannot distinguish a 0%% rate from a 4%% one; that is what the stress pass objected to.
+
+=== (C) CROSS-CELL SCALE: do anchors share a theta scale at all? ===
+  anchor            matches   theta SD      range
+  Math                 1229      1.440      4.030
+  Physics              1149      1.630      4.583
+  Psychology            806      1.128      3.194
+  Other                 781      1.035      3.278
+  Chemistry             753      1.516      3.960
+  Biology               686      1.353      3.977
+  Computer science      626      1.203      3.241
+  Law                   601      1.412      4.221
+  Economics             583      1.165      3.106
+  Health                510      1.253      3.348
+  Engineering           399      1.037      2.967
+  History               382      1.109      3.015
+  Philosophy            342      0.994      2.663
+  Business              295      0.937      2.631
+
+  theta SD across anchors: min 0.937, median 1.203, max 1.630 - a 1.7x spread
+  A tier map that compares raw theta across anchors is comparing numbers on different scales by
+  exactly that factor. Either standardise (publish theta/SD with the SD beside it) or publish
+  independent within-anchor boards and no cross-anchor statement at all.

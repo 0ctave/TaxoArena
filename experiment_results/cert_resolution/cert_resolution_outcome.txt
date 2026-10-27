@@ -1,0 +1,95 @@
+pool: none (no DB opened)
+script tools/analysis/cert_resolution.py blob:dbe9425d / sha256-lf16:3e3fb1b91aa3d361 / sha256-crlf16:b0982ba75521b7d4
+CERT-RESOLUTION outcome (registration docs/judge_v2_program.md L20752-L20815, 6402b0a). Zero calls.
+k = the null exceedance count round(q_site x reps); the input CSV's k (the site's children) is used only by the identity check
+INPUTS
+  bareq512_s42  csv    Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results/promoted/site_null_bareq512_s42.csv  blob:16aaf5a4 / sha256-lf16:ea0cb19865f63036 / sha256-crlf16:8b3d32ffd88f4a3c (working file CRLF)
+  bareq512_s42  dag    Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results/promoted/bareq512_s42/seed_42/dag_snapshots.jsonl  blob:ffbbb321 / sha256-lf16:0bf29bbc8c9b10b2 / sha256-crlf16:1aad19328b8a8513 (working file LF)
+  af_clean_s42  csv    Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results/anchorfree/redraw/site_null_af_clean_s42.csv  blob:8ed1b699 / sha256-lf16:e15302b76a1aba3a / sha256-crlf16:a21f1836900cb8bc (working file CRLF)
+  af_clean_s42  dag    Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results/anchorfree/redraw/af_clean_s42/seed_42/dag_snapshots.jsonl  blob:e8a76790 / sha256-lf16:1b9bd34d648ef29e / sha256-crlf16:4a4479bed8a24f56 (working file LF)
+  o0_clean_s42  csv    Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results/anchorfree/redraw/site_null_o0_clean_s42.csv  blob:f69179a0 / sha256-lf16:f44c4dbff0d8e360 / sha256-crlf16:58d79630d11bc689 (working file CRLF)
+  o0_clean_s42  dag    Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results/anchorfree/redraw/o0_clean_s42/seed_42/dag_snapshots.jsonl  blob:8a60a143 / sha256-lf16:c73b1cc206b72807 / sha256-crlf16:96008f6a26683d40 (working file LF)
+  frozen        csv    Z:\FAC\TUBerlin\THESIS\TaxoArena\docs/data/site_null_frozen.csv  blob:1577e9e4 / sha256-lf16:09c41b45ef5d0596 / sha256-crlf16:71965a361d7954fa (working file CRLF)
+  frozen        dag    Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results/freeze_mcs55/seed_42/dag_snapshots.jsonl  blob:1c020ca5 / sha256-lf16:6e7c577210f75529 / sha256-crlf16:fedbe53b5b3e9d60 (working file CRLF)
+REACHABILITY (registered arithmetic, no data): min p = 1/301 = 0.003322
+  Holm / Bonferroni first threshold 0.05/m < 1/301 for every m >= 16 (0.05/15 = 0.003333 >= 0.003322 > 0.05/16 = 0.003125): Holm can reject NOTHING on any of the four trees at 300 reps (m = 70 / 69 / 60 / 66), whatever the data
+  flat BH can reject only if at least ceil(m / 15.05) sites sit at k = 0: 5 of 70 (bareq512_s42), 5 of 69 (af_clean_s42), 4 of 60 (o0_clean_s42), 5 of 66 (frozen)
+  a hierarchical family of at most 15 sites can reject a single k = 0 site
+  the largest k whose CP upper bound is below 0.05 is 7 (k = 7: 0.0475; k = 8: 0.0519)
+SUPPORT (registered): deciding denominators m = 70 / 69 / 60 / 66 sites (C1: bareq512_s42's 70); within a site DEFF = 1 by construction (independent parametric null draws; declared, not measured); n_eff = 300 draws per site; MC SE of an exceedance at the per-site bar 0.05: sqrt(0.05 x 0.95 / 300) = 0.01258; exact 95% upper bound at k = 0: 1 - 0.025^(1/300) = 0.01222; MDE at 80% power (2.80 SE) = 0.0352; sites are nested, not independent units (BH's positive dependence NOT shown; BY printed as the sensitivity).
+RECIPES ARE NEVER COMPARED: bareq512_s42 is R512 (512 d, bar 0.0145); af_clean_s42, o0_clean_s42 and frozen are R256 (256 d, bar 0.025); no count or share below is ranked or differenced across R256 and R512.
+
+== bareq512_s42 (R512): m = 70 sites
+  identity check: PASS (70 sites; multi-parent sites: 0)
+  flat BH at q = 0.05: 0 of 70 rejected
+  BY (descriptive): 0 of 70
+  hierarchical BH (per-family q = 0.05; tree-wide FDR NOT claimed): 2 rejected; top family 14 sites
+  families reached: 3; sizes m_f = [14, 2, 1]
+  D1: cert_site_p95 sites 10, of which CP interval contains 0.05: 4
+  D1 cross-tab (cert_site_p95 x k <= 14): cert&k<=14 10, cert&k>14 0, uncert&k<=14 0, uncert&k>14 60
+  E1 list (2): n00000006 Chemistry [certified at per-family FDR q = 0.05 (hierarchical BH over nested sites, 300 reps, bareq512_s42, R512)], n00000015 Engineering [certified at per-family FDR q = 0.05 (hierarchical BH over nested sites, 300 reps, bareq512_s42, R512)]
+  E2 list (0): (empty)
+  E3 list (8): n00000003 Law [passes its own site-null p95 (per-site, uncorrected, 300 reps); resolution-limited at 300 reps], n00000002 Business [passes its own site-null p95 (per-site, uncorrected, 300 reps)], n00000007 History [passes its own site-null p95 (per-site, uncorrected, 300 reps); resolution-limited at 300 reps], n00000020 Applied Classical and Quantum Physics Problems [passes its own site-null p95 (per-site, uncorrected, 300 reps)], n00000054 Normative Ethical and Legal Theory Analysis [passes its own site-null p95 (per-site, uncorrected, 300 reps)], n00000127 Contract and Property Dispute Scenarios [passes its own site-null p95 (per-site, uncorrected, 300 reps); resolution-limited at 300 reps], n00000078 Discrete Fact Verification and Trivia Discrimination [passes its own site-null p95 (per-site, uncorrected, 300 reps); resolution-limited at 300 reps], n00000060 Applied Probability and Statistical Inference [passes its own site-null p95 (per-site, uncorrected, 300 reps)]
+
+== af_clean_s42 (R256): m = 69 sites
+  identity check: PASS (69 sites; multi-parent sites: 0)
+  flat BH at q = 0.05: 12 of 69 rejected (cutoff 0.008696)
+  BY (descriptive): 0 of 69
+  hierarchical BH (per-family q = 0.05; tree-wide FDR NOT claimed): 8 rejected; top family 1 sites
+  families reached: 9; sizes m_f = [1, 2, 4, 3, 2, 2, 2, 2, 1]
+  D1: cert_site_p95 sites 14, of which CP interval contains 0.05: 1
+  D1 cross-tab (cert_site_p95 x k <= 14): cert&k<=14 14, cert&k>14 0, uncert&k<=14 0, uncert&k>14 55
+  E1 list (8): n00000001 MMLU_PRO [certified at per-family FDR q = 0.05 (hierarchical BH over nested sites, 300 reps, af_clean_s42, R256)], n00000005 Emergent Concept #4 [certified at per-family FDR q = 0.05 (hierarchical BH over nested sites, 300 reps, af_clean_s42, R256)], n00000017 Emergent Concept #16 [certified at per-family FDR q = 0.05 (hierarchical BH over nested sites, 300 reps, af_clean_s42, R256)], n00000018 Emergent Concept #17 [certified at per-family FDR q = 0.05 (hierarchical BH over nested sites, 300 reps, af_clean_s42, R256)], n00000042 Emergent Concept #41 [certified at per-family FDR q = 0.05 (hierarchical BH over nested sites, 300 reps, af_clean_s42, R256)], n00000045 Emergent Concept #44 [certified at per-family FDR q = 0.05 (hierarchical BH over nested sites, 300 reps, af_clean_s42, R256)], n00000043 Emergent Concept #42 [certified at per-family FDR q = 0.05 (hierarchical BH over nested sites, 300 reps, af_clean_s42, R256)], n00000074 Emergent Concept #73 [certified at per-family FDR q = 0.05 (hierarchical BH over nested sites, 300 reps, af_clean_s42, R256)]
+  E2 list (4): n00000086 Emergent Concept #85 [BH-certified at q = 0.05 over the tree's m sites (nesting not respected)], n00000111 Emergent Concept #110 [BH-certified at q = 0.05 over the tree's m sites (nesting not respected)], n00000113 Emergent Concept #112 [BH-certified at q = 0.05 over the tree's m sites (nesting not respected)], n00000124 Emergent Concept #123 [BH-certified at q = 0.05 over the tree's m sites (nesting not respected); MC-MARGINAL]
+  E3 list (2): n00000020 Emergent Concept #19 [passes its own site-null p95 (per-site, uncorrected, 300 reps); resolution-limited at 300 reps], n00000050 Emergent Concept #49 [passes its own site-null p95 (per-site, uncorrected, 300 reps)]
+
+== o0_clean_s42 (R256): m = 60 sites
+  identity check: PASS (60 sites; multi-parent sites: 0)
+  flat BH at q = 0.05: 4 of 60 rejected (cutoff 0.003333)
+  BY (descriptive): 0 of 60
+  hierarchical BH (per-family q = 0.05; tree-wide FDR NOT claimed): 4 rejected; top family 14 sites
+  families reached: 5; sizes m_f = [14, 3, 2, 2, 1]
+  D1: cert_site_p95 sites 11, of which CP interval contains 0.05: 4
+  D1 cross-tab (cert_site_p95 x k <= 14): cert&k<=14 10, cert&k>14 1, uncert&k<=14 0, uncert&k>14 49
+  E1 list (4): n00000006 Chemistry [certified at per-family FDR q = 0.05 (hierarchical BH over nested sites, 300 reps, o0_clean_s42, R256)], n00000011 Math [certified at per-family FDR q = 0.05 (hierarchical BH over nested sites, 300 reps, o0_clean_s42, R256)], n00000015 Engineering [certified at per-family FDR q = 0.05 (hierarchical BH over nested sites, 300 reps, o0_clean_s42, R256)], n00000005 Biology [certified at per-family FDR q = 0.05 (hierarchical BH over nested sites, 300 reps, o0_clean_s42, R256)]
+  E2 list (1): n00000143 Emergent Concept #128 [BH-certified at q = 0.05 over the tree's m sites (nesting not respected); MC-MARGINAL]
+  E3 list (6): n00000013 Computer science [passes its own site-null p95 (per-site, uncorrected, 300 reps)], n00000020 Emergent Concept #5 [passes its own site-null p95 (per-site, uncorrected, 300 reps); resolution-limited at 300 reps], n00000144 Emergent Concept #129 [passes its own site-null p95 (per-site, uncorrected, 300 reps)], n00000026 Emergent Concept #11 [passes its own site-null p95 (per-site, uncorrected, 300 reps); resolution-limited at 300 reps], n00000062 Emergent Concept #47 [passes its own site-null p95 (per-site, uncorrected, 300 reps); resolution-limited at 300 reps], n00000117 Emergent Concept #102 [passes its own site-null p95 (per-site, uncorrected, 300 reps); resolution-limited at 300 reps]
+
+== frozen (R256): m = 66 sites
+  identity check: PASS (66 sites; multi-parent sites: 0)
+  flat BH at q = 0.05: 0 of 66 rejected
+  BY (descriptive): 0 of 66
+  hierarchical BH (per-family q = 0.05; tree-wide FDR NOT claimed): 2 rejected; top family 14 sites
+  families reached: 3; sizes m_f = [14, 2, 2]
+  D1: cert_site_p95 sites 6, of which CP interval contains 0.05: 2
+  D1 cross-tab (cert_site_p95 x k <= 14): cert&k<=14 6, cert&k>14 0, uncert&k<=14 0, uncert&k>14 60
+  E1 list (2): n00000006 Chemistry [certified at per-family FDR q = 0.05 (hierarchical BH over nested sites, 300 reps, frozen, R256)], n00000005 Biology [certified at per-family FDR q = 0.05 (hierarchical BH over nested sites, 300 reps, frozen, R256)]
+  E2 list (0): (empty)
+  E3 list (4): n00000011 Math [passes its own site-null p95 (per-site, uncorrected, 300 reps)], n00000002 Business [passes its own site-null p95 (per-site, uncorrected, 300 reps); resolution-limited at 300 reps], n00000015 Engineering [passes its own site-null p95 (per-site, uncorrected, 300 reps)], n00000160 Elementary Quantitative Reasoning and Symbolic Logic [passes its own site-null p95 (per-site, uncorrected, 300 reps); resolution-limited at 300 reps]
+
+CRITERIA (the POINT decides; the CP never decides)
+C1 HELD: the hierarchical BH set of bareq512_s42 at per-family q = 0.05 is NON-EMPTY (2 sites).
+C2-bareq512_s42 FAILED POST-HOC-SEEN: flat BH empty (0 of 70).
+C2-af_clean_s42 HELD POST-HOC-SEEN: flat BH non-empty (12 of 69).
+C2-o0_clean_s42 HELD (unseen): flat BH non-empty (4 of 60).
+C2-frozen FAILED POST-HOC-SEEN: flat BH empty (0 of 66).
+C3-af_clean_s42 HELD: hierarchical BH non-empty (8).
+C3-o0_clean_s42 HELD: hierarchical BH non-empty (4).
+C3-frozen HELD: hierarchical BH non-empty (2).
+
+EXHIBITS (the only words of record for a named split)
+The talk's certified R512 exhibits are bareq512_s42's E1 list (2).
+
+PREDICTIONS
+P1 HELD (reproduction, not a test): flat BH bareq512_s42 0/70, af_clean_s42 12/69, frozen 0/66; registered bareq512_s42 0, af_clean_s42 12, frozen 0.
+P2 HELD: flat BH on o0_clean_s42 = 4 (point 0, 80% interval [0, 5]).
+P3-bareq512_s42 HELD: hierarchical BH size 2 (point 3, 80% interval [1, 6]).
+P3-af_clean_s42 HELD: hierarchical BH size 8 (point 11, 80% interval [6, 14]).
+P3-o0_clean_s42 HELD: hierarchical BH size 4 (point 3, 80% interval [1, 6]).
+P3-frozen HELD: hierarchical BH size 2 (point 2, 80% interval [1, 4]).
+P4 HELD: C1 HELD (registered probability 0.80 of HELD).
+P5 HELD: 4 of bareq512_s42's 10 cert_site_p95 sites resolution-limited (point 5, 80% interval [3, 7]).
+
+FALSIFIERS
+F1 does not fire (C1 HELD).
+F2 does not fire (P1 HELD: the brief's Q2 counts reproduce).

@@ -1,0 +1,247 @@
+[B0/graft_descent] start 2026-10-01T09:45:29+02:00 cmd: ./gradlew.bat bootRun --console=plain --offline --no-daemon -PjvmThreads=12 --args="--config experiment_configs/rp12_r2/B0/graft_descent.toml"
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.10/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+Configuration on demand is an incubating feature.
+Calculating task graph as no cached configuration is available for tasks: bootRun --args=--config experiment_configs/rp12_r2/B0/graft_descent.toml
+> Task :checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :processResources UP-TO-DATE
+> Task :compileKotlin UP-TO-DATE
+> Task :compileJava NO-SOURCE
+> Task :classes UP-TO-DATE
+> Task :resolveMainClassName UP-TO-DATE
+> Task :processAot UP-TO-DATE
+> Task :processAotResources UP-TO-DATE
+> Task :compileAotKotlin NO-SOURCE
+> Task :compileAotJava UP-TO-DATE
+> Task :aotClasses UP-TO-DATE
+
+> Task :bootRun
+[BOOT] TaxoAdapt starting � pid=22876, java=21.0.6, jar=file:/Z:/FAC/TUBerlin/THESIS/TaxoArena/.claude/worktrees/rp12-r2-run/build/classes/kotlin/main/
+[THREAD-CAP] requested=12 availableProcessors=12 heapEstimate=n/a budget=16.94GB
+[BOOT] corpusDbPath from TOML: taxoadapt.eval.db-path=multicorpus_cache_v1.db
+Page de codes active�: 65001
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+09:45:37.405 [INFO ] EmbeddingCache - SQLite Embedding, GMM & Query Cache initialized successfully.
+09:45:37.418 [INFO ] ModelEvalStore - ModelEvalStore schema ready.
+09:45:37.421 [INFO ] DatasetFetcher - SQLite cache tables initialized successfully.
+09:45:37.439 [WARN ] ArcConfig - LLM provider is AZURE but AZURE_AI_ENDPOINT/AZURE_AI_API_KEY are blank. Create a root-level .env (see .env.example) or export these variables. Falling back to the Ollama chat model at http://localhost:11434 so the application can still start.
+09:45:37.471 [INFO ] LLMClient - [ARENA-PACING] request pacing at 4.0 req/s, semaphore capacity 4
+09:45:37.480 [INFO ] RankingService - SQLite Agent Ratings V2, Match History, and Bradley-Terry schema initialized.
+09:45:37.503 [INFO ] HeadlessRunner - Starting Headless Benchmark Mode with config: experiment_configs/rp12_r2/B0/graft_descent.toml
+09:45:37.529 [INFO ] RatingsDbGuard - [DB-GUARD] ratings database 'ratings.db' is not tracked; safe to write
+09:45:37.553 [INFO ] HeadlessRunner - Loaded CLI Configuration: HeadlessCliConfig(snapshotId=unsaved, models=[DeepSeek-R1-Distill-Llama-8B, DeepSeek-R1-Distill-Qwen-32B, Falcon3-10B-Instruct, Llama-3.1-70B-Instruct, Llama-3.2-3B-Instruct, Llama-3.3-70B-Instruct, Mistral-Small-Instruct-2409, Mixtral-8x7B-Instruct-v0.1, OLMo-2-1124-7B-Instruct, Phi-3.5-mini-instruct, Qwen2.5-32B-Instruct, Qwen2.5-72B-Instruct, Qwen2.5-7B-Instruct, Qwen2.5-Coder-7B-Instruct, Qwen2.5-Math-7B-Instruct, Yi-1.5-34B-Chat-16K, c4ai-command-r-plus-08-2024, internlm2_5-20b-chat], queryLimit=0, category=null, confidenceGate=0.65, parallelism=6, questionsPerRound=12, reservedOnly=true, resumeBenchmark=false, profileMode=false, profileSeTarget=0.15, profileStrataFile=null, maxQueryReuse=2147483647, matchFilter=none, tau=1.0E-6, enableFinalMetrics=false, adaptiveBarFile=null, embeddingSliceDim=512, splitDropTopPcs=0, splitWhiten=false, proposalMemo=null, conditions=[MAIN, ORACLE, GENERIC_JUDGE, RANDOM_SCHEDULER], outputDir=experiment_results/archv2/rp12_r2/B0/graft_descent, testRatio=0.3, seed=42, seeds=[], splitSeed=null, constructionOrderShuffleSeed=null, anchorFree=false, proposalAcceptMultiplier=null, reservedPoolFile=null, v2PoolFile=experiment_configs/engine_pool_pv2_1575de61bb20e977.json, unionRoutingItemKey=true, v2ForeignMembers=[], pool=pv2_1575de61bb20e977, acknowledgedEvalMembers=[], regenerateSplit=false, runPipeline=false, maxDepth=8, minClusterSize=55, proposalSeparationBar=0.0145, membershipFloor=0.25, routingBeamGamma=0.2, descentMargin=0.12, acceptanceZ=2.0, marginalEps=null, maxK=null, excludeFromAnchoring=[], expectedWithheldQueries=null, enableRefitGate=false, defaultKappaPrior=10.0, enableLabeling=false, judgeInduction=false, datasetType=null, corpora=[BBH, MATH, MUSR, IFEVAL, GPQA, MMLU_PRO_LB], corpusDbPath=multicorpus_cache_v1.db, unionSnapshots=[20261001_093951_Headless_Run_Auto_ge, 20261001_094019_Headless_Run_Auto_ge, 20261001_094040_Headless_Run_Auto_ge, 20261001_094100_Headless_Run_Auto_ge, 20261001_094121_Headless_Run_Auto_ge, 20261001_094311_Headless_Run_Auto_ge], unionRootRouting=descent, runBenchmark=false, runTrickle=true, domains=[], enableStableQuestionIds=null, enableResidualRouting=null, enableResidualSplitGate=null, fusionSimilarityThreshold=0.9, effectiveSupportFloor=2.0, numIterations=50, runBaselines=false, enableGtWarmStart=false, maxLeafAssignments=5, dagMode=DAG_MAX, enableProfiling=true, judgeSeesOptions=null, judgeOptionMode=null, judgeRecipe=null, judgeRecipeKit=null, judgeRecipeModel=null, judgeRecipeMaxTokens=null, judgeRecipeTemperature=null)
+09:45:37.554 [INFO ] HeadlessRunner - [SLICE] embedding slice width = 512, split PCA dropTop=0 whiten=false
+09:45:37.555 [INFO ] HeadlessRunner - [CORPUS] corpora=[BBH, MATH, MUSR, IFEVAL, GPQA, MMLU_PRO_LB] corpusDbPath=multicorpus_cache_v1.db
+09:45:37.555 [INFO ] HeadlessRunner - [JUDGE-RECIPE] disabled: judge = Mistral-Large-3 on the langchain4j path (byte-identical to the board of record)
+09:45:37.643 [INFO ] Diagnostics - [DIAG] diagnostics bundle open at Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\experiment_results\archv2\rp12_r2\B0\graft_descent\seed_42\diagnostics
+09:45:37.643 [INFO ] HeadlessRunner - ==================================================
+09:45:37.643 [INFO ] HeadlessRunner - STARTING PIPELINE AND EVALUATION WITH SEED: 42
+09:45:37.643 [INFO ] HeadlessRunner - ==================================================
+09:45:37.644 [INFO ] HeadlessRunner - [UNION] assembling 6 per-corpus snapshot(s) under a union root: [20261001_093951_Headless_Run_Auto_ge, 20261001_094019_Headless_Run_Auto_ge, 20261001_094040_Headless_Run_Auto_ge, 20261001_094100_Headless_Run_Auto_ge, 20261001_094121_Headless_Run_Auto_ge, 20261001_094311_Headless_Run_Auto_ge]
+09:45:37.761 [INFO ] Persistence - Loading serialized graph from memory version: 2 (legacy: false)
+09:45:38.002 [INFO ] Persistence - [DB] Successfully loaded and hydrated DAG with 49 nodes.
+09:45:38.009 [INFO ] HeadlessRunner - [UNION] BBH: snapshot 20261001_093951_Headless_Run_Auto_ge, 49 nodes (36 leaves, 3490 query slots), reserved 2286 ids in 24 domain(s), pool pc6bf56283b637368
+09:45:38.009 [INFO ] Persistence - Loading serialized graph from memory version: 2 (legacy: false)
+09:45:38.062 [INFO ] Persistence - [DB] Successfully loaded and hydrated DAG with 12 nodes.
+09:45:38.063 [INFO ] HeadlessRunner - [UNION] MATH: snapshot 20261001_094019_Headless_Run_Auto_ge, 12 nodes (9 leaves, 824 query slots), reserved 538 ids in 7 domain(s), pool pf1ed1f367dc1132e
+09:45:38.063 [INFO ] Persistence - Loading serialized graph from memory version: 2 (legacy: false)
+09:45:38.126 [INFO ] Persistence - [DB] Successfully loaded and hydrated DAG with 10 nodes.
+09:45:38.127 [INFO ] HeadlessRunner - [UNION] MUSR: snapshot 20261001_094040_Headless_Run_Auto_ge, 10 nodes (6 leaves, 456 query slots), reserved 302 ids in 3 domain(s), pool p01afdc4cf1d2fa86
+09:45:38.127 [INFO ] Persistence - Loading serialized graph from memory version: 2 (legacy: false)
+09:45:38.149 [INFO ] Persistence - [DB] Successfully loaded and hydrated DAG with 9 nodes.
+09:45:38.149 [INFO ] HeadlessRunner - [UNION] IFEVAL: snapshot 20261001_094100_Headless_Run_Auto_ge, 9 nodes (5 leaves, 344 query slots), reserved 216 ids in 1 domain(s), pool p01c5441205338483
+09:45:38.150 [INFO ] Persistence - Loading serialized graph from memory version: 2 (legacy: false)
+09:45:38.174 [INFO ] Persistence - [DB] Successfully loaded and hydrated DAG with 4 nodes.
+09:45:38.175 [INFO ] HeadlessRunner - [UNION] GPQA: snapshot 20261001_094121_Headless_Run_Auto_ge, 4 nodes (3 leaves, 333 query slots), reserved 476 ids in 3 domain(s), pool p9dc399bae36e9100
+09:45:38.175 [INFO ] Persistence - Loading serialized graph from memory version: 2 (legacy: false)
+09:45:38.626 [INFO ] Persistence - [DB] Successfully loaded and hydrated DAG with 135 nodes.
+09:45:38.630 [INFO ] HeadlessRunner - [UNION] MMLU_PRO_LB: snapshot 20261001_094311_Headless_Run_Auto_ge, 135 nodes (74 leaves, 7437 query slots), reserved 4804 ids in 14 domain(s), pool pf40fe86a9ec7b60e
+09:45:38.786 [INFO ] HeadlessRunner - [UNION] root 'BBH+MATH+MUSR+IFEVAL+GPQA+MMLU_PRO_LB': 6 corpus roots, 220 nodes, 133 leaves; root vMF fitted on 12884 region embeddings (kappa=336.31, child-centroid shrinkage=0.8364)
+09:45:38.821 [INFO ] ModelEvalStore - Reserved pool 'p91e9dc963a7d9b85' recorded: 8622 question(s) across 52 domain(s); nothing activated.
+09:45:38.908 [INFO ] HeadlessRunner - [POOL-PIN] union reserved pool p91e9dc963a7d9b85 (8622 ids across 52 domains) = union of BBH:pc6bf56283b637368, MATH:pf1ed1f367dc1132e, MUSR:p01afdc4cf1d2fa86, IFEVAL:p01c5441205338483, GPQA:p9dc399bae36e9100, MMLU_PRO_LB:pf40fe86a9ec7b60e; recorded, nothing activated
+09:45:38.931 [WARN ] HeadlessRunner - [SPLIT-V2] UNION member 20261001_093951_Headless_Run_Auto_ge (BBH) on pv2_1575de61bb20e977, namespaces [BBH]: reserved 2286 ids == the file's
+09:45:38.932 [WARN ] HeadlessRunner - [SPLIT-V2] UNION member 20261001_094019_Headless_Run_Auto_ge (MATH) on pv2_1575de61bb20e977, namespaces [MATH]: reserved 538 ids == the file's
+09:45:38.932 [WARN ] HeadlessRunner - [SPLIT-V2] UNION member 20261001_094040_Headless_Run_Auto_ge (MUSR) on pv2_1575de61bb20e977, namespaces [MUSR]: reserved 302 ids == the file's
+09:45:38.932 [WARN ] HeadlessRunner - [SPLIT-V2] UNION member 20261001_094100_Headless_Run_Auto_ge (IFEVAL) on pv2_1575de61bb20e977, namespaces [IFEVAL]: reserved 216 ids == the file's
+09:45:38.932 [WARN ] HeadlessRunner - [SPLIT-V2] UNION member 20261001_094121_Headless_Run_Auto_ge (GPQA) on pv2_1575de61bb20e977, namespaces [GPQA]: reserved 476 ids == the file's
+09:45:38.932 [WARN ] HeadlessRunner - [SPLIT-V2] UNION member 20261001_094311_Headless_Run_Auto_ge (MMLU_PRO_LB) on pv2_1575de61bb20e977, namespaces [MMLU_PRO]: reserved 4804 ids == the file's
+09:45:38.932 [WARN ] HeadlessRunner - [TRAIN-ONLY] union graft: global reserved keys installed: 8186 (pv2_1575de61bb20e977)
+09:45:39.575 [INFO ] HeadlessRunner - [TRAIN-ONLY] after union graft: 0 EVAL texts among the grafted tree's members
+09:45:39.575 [INFO ] Persistence - Saving taxonomy DAG with Vector-Offloading to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\temp_graph_save.tmp...
+09:45:41.632 [INFO ] Persistence - Saved 220 nodes successfully (offloaded structure to SQL).
+09:45:42.083 [WARN ] AdditionalMetrics - computeRoutingECE: empty ground truth — returning 0.0 (GT plumbing absent)
+09:45:42.094 [INFO ] SnapshotManager - [POOL-PIN] snapshot stores this run's own reserved pool p91e9dc963a7d9b85
+09:45:42.470 [INFO ] SnapshotManager - [TRAIN-ONLY] saveSnapshot: 0 EVAL texts among the tree's members (8193 pool texts checked)
+09:45:42.754 [INFO ] SnapshotManager - Successfully created and saved snapshot to DB: 20261001_094539_Union_graft_of_6_cor
+09:45:42.756 [INFO ] HeadlessRunner - Successfully assembled and saved union snapshot. Snapshot ID: 20261001_094539_Union_graft_of_6_cor
+09:45:42.757 [INFO ] HeadlessRunner - Active graph node set: union
+09:45:42.758 [INFO ] HeadlessRunner - Bridge Nodes CSV written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\experiment_results\archv2\rp12_r2\B0\graft_descent\seed_42\validation\bridge_nodes.csv
+09:45:42.760 [INFO ] HeadlessRunner - Bridge Residuals CSV written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\experiment_results\archv2\rp12_r2\B0\graft_descent\seed_42\validation\bridge_residuals.csv
+09:45:42.801 [INFO ] LeaderboardCorpus - Loaded 5761 BBH queries across 24 domain(s) from multicorpus_cache_v1.db
+09:45:42.807 [INFO ] LeaderboardCorpus - Loaded 1324 MATH queries across 7 domain(s) from multicorpus_cache_v1.db
+09:45:42.826 [INFO ] LeaderboardCorpus - Loaded 756 MUSR queries across 3 domain(s) from multicorpus_cache_v1.db
+09:45:42.829 [INFO ] LeaderboardCorpus - Loaded 541 IFEVAL queries across 1 domain(s) from multicorpus_cache_v1.db
+09:45:42.833 [INFO ] LeaderboardCorpus - Loaded 1192 GPQA queries across 3 domain(s) from multicorpus_cache_v1.db
+09:45:42.870 [INFO ] LeaderboardCorpus - Loaded 12032 MMLU_PRO_LB queries across 14 domain(s) from multicorpus_cache_v1.db
+09:45:42.874 [INFO ] DatasetFetcher - [CORPUS] merged 6 source(s): BBH=24 domain(s)/5761 queries, MATH=7 domain(s)/1324 queries, MUSR=3 domain(s)/756 queries, IFEVAL=1 domain(s)/541 queries, GPQA=3 domain(s)/1192 queries, MMLU_PRO_LB=14 domain(s)/12032 queries -> 52 domain key(s), 21606 queries
+09:45:42.886 [INFO ] HeadlessRunner - ========================================
+09:45:42.886 [INFO ] HeadlessRunner - RUNNING TRICKLE VALIDATION: MAIN
+09:45:42.887 [INFO ] HeadlessRunner - ========================================
+09:45:42.888 [INFO ] HeadlessRunner - Starting Headless Batch Trickle Validation for MAIN...
+09:45:42.890 [INFO ] HeadlessRunner - Graph validity CSV for MAIN written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\experiment_results\archv2\rp12_r2\B0\graft_descent\seed_42\validation\MAIN_graph_validity.csv
+09:45:43.571 [INFO ] AdditionalMetrics - [CALIB]  ECE=0.9996, reliability_bins={[0.9,1.0]:1.00/0.00, [0.5,0.6]:0.50/0.00}
+09:45:43.572 [INFO ] HeadlessRunner - Taxonomy quality CSV for MAIN written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\experiment_results\archv2\rp12_r2\B0\graft_descent\seed_42\validation\MAIN_taxonomy_quality.csv
+09:45:43.573 [INFO ] HeadlessRunner - Bridge quality CSV for MAIN written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\experiment_results\archv2\rp12_r2\B0\graft_descent\seed_42\validation\MAIN_bridge_quality.csv
+09:45:43.586 [INFO ] HeadlessRunner - Loaded 12884 ground-truth categories directly from DAG queries.
+09:45:43.600 [INFO ] HeadlessRunner - Backfilled 0 categories from local cache. Total mapping keys: 12730
+09:45:43.649 [INFO ] HeadlessRunner - Indexed leaves: 133 / 133 leaves tagged with a domain.
+09:45:43.655 [INFO ] HeadlessRunner - Routing 8622 test queries...
+09:45:58.723 [INFO ] AdditionalMetrics - [CALIB]  ECE=0.2407, reliability_bins={[0.9,1.0]:1.00/0.74, [0.7,0.8]:0.72/0.59, [0.6,0.7]:0.65/0.49, [0.5,0.6]:0.55/0.56, [0.4,0.5]:0.44/0.50, [0.3,0.4]:0.37/0.32}
+09:45:58.727 [INFO ] BatchTrickleEvaluator - [ROUTE]  posterior_sum≈1.0000, membership_depth_corr=-0.1983, multi_leaf_rate=0.1217, dist={1:0.88, 2:0.12, 3:0.00}
+09:45:58.727 [INFO ] BatchTrickleEvaluator - Held-out residual rate: 0.00%
+09:45:58.728 [INFO ] HeadlessRunner - Batch Trickle Results (MAIN):
+09:45:58.728 [INFO ] HeadlessRunner -   - Total Queries: 8622
+09:45:58.728 [INFO ] HeadlessRunner -   - Top-1 Accuracy: 71,76% (95% Wilson CI: [70,80%, 72,70%])
+09:45:58.728 [INFO ] HeadlessRunner -   - Any-Match Accuracy: 73,44%
+09:45:58.728 [INFO ] HeadlessRunner -   - Mean Leaf Purity: 85,98%
+09:45:58.728 [INFO ] HeadlessRunner -   - Expected Calibration Error (ECE): 0,2407
+09:45:58.728 [INFO ] HeadlessRunner -   - Macro F1: 76,36%
+09:45:58.728 [INFO ] HeadlessRunner -   - Avg Match Count (Eval): 1,13 leaves/query
+09:45:58.728 [INFO ] HeadlessRunner -   - Median Nodes/Query (Eval): 1,00
+09:45:58.728 [INFO ] HeadlessRunner - Held-out residual rate: 0.00%
+09:45:58.731 [INFO ] HeadlessRunner - 
+Per-Domain Trickle Results (MAIN):
+----------------------------------------------------------------------
+Domain                    | Support | Precision |   Recall |       F1
+----------------------------------------------------------------------
+MMLU_PRO_LB/math          |     541 |     61,5% |    33,6% |    43,5%
+MMLU_PRO_LB/physics       |     519 |     75,2% |    49,7% |    59,9%
+MMLU_PRO_LB/chemistry     |     456 |     62,5% |    41,7% |    50,0%
+MMLU_PRO_LB/law           |     439 |     93,8% |    85,9% |    89,7%
+MMLU_PRO_LB/engineering   |     389 |     81,1% |    57,3% |    67,2%
+MMLU_PRO_LB/other         |     369 |     58,5% |    38,2% |    46,2%
+MMLU_PRO_LB/economics     |     335 |     85,7% |    84,2% |    84,9%
+MMLU_PRO_LB/health        |     329 |     72,9% |    72,9% |    72,9%
+MMLU_PRO_LB/psychology    |     320 |     68,4% |    73,1% |    70,7%
+MMLU_PRO_LB/business      |     317 |     70,0% |    71,3% |    70,6%
+MMLU_PRO_LB/biology       |     280 |     66,8% |    70,4% |    68,5%
+IFEVAL/ifeval             |     216 |     45,9% |    92,6% |    61,3%
+GPQA/Physics              |     202 |     43,5% |    80,7% |    56,5%
+MMLU_PRO_LB/philosophy    |     201 |     65,0% |    59,2% |    62,0%
+GPQA/Chemistry            |     191 |     49,3% |    97,9% |    65,6%
+MMLU_PRO_LB/computer scie |     166 |     70,5% |    51,8% |    59,7%
+MMLU_PRO_LB/history       |     143 |     76,7% |    62,2% |    68,7%
+MATH/Algebra              |     124 |     33,6% |    59,7% |    43,0%
+MATH/Intermediate Algebra |     114 |     65,4% |    74,6% |    69,7%
+BBH/date_understanding    |     108 |     98,2% |    99,1% |    98,6%
+BBH/logical_deduction_thr |     105 |     91,3% |   100,0% |    95,5%
+BBH/disambiguation_qa     |     102 |     99,0% |   100,0% |    99,5%
+MUSR/murder_mysteries     |     102 |     98,1% |   100,0% |    99,0%
+BBH/object_counting       |     100 |     88,6% |    78,0% |    83,0%
+BBH/hyperbaton            |     100 |     90,9% |   100,0% |    95,2%
+MUSR/team_allocation      |     100 |    100,0% |   100,0% |   100,0%
+BBH/sports_understanding  |     100 |     87,0% |    94,0% |    90,4%
+BBH/salient_translation_e |     100 |    100,0% |    99,0% |    99,5%
+MUSR/object_placements    |     100 |     99,0% |   100,0% |    99,5%
+BBH/temporal_sequences    |     100 |     97,1% |   100,0% |    98,5%
+BBH/reasoning_about_color |     100 |     84,0% |   100,0% |    91,3%
+BBH/boolean_expressions   |     100 |     88,5% |   100,0% |    93,9%
+BBH/navigate              |     100 |     97,1% |   100,0% |    98,5%
+BBH/ruin_names            |     100 |     93,8% |    60,0% |    73,2%
+BBH/geometric_shapes      |     100 |    100,0% |    93,0% |    96,4%
+BBH/formal_fallacies      |     100 |     73,5% |   100,0% |    84,7%
+BBH/movie_recommendation  |     100 |     98,7% |    75,0% |    85,2%
+BBH/web_of_lies           |     100 |     84,7% |   100,0% |    91,7%
+BBH/tracking_shuffled_obj |      99 |    100,0% |   100,0% |   100,0%
+BBH/logical_deduction_sev |      95 |     95,0% |   100,0% |    97,4%
+BBH/tracking_shuffled_obj |      94 |     96,9% |   100,0% |    98,4%
+BBH/tracking_shuffled_obj |      90 |    100,0% |    98,9% |    99,4%
+BBH/causal_judgement      |      84 |     80,8% |    25,0% |    38,2%
+GPQA/Biology              |      83 |     55,7% |    65,1% |    60,0%
+BBH/logical_deduction_fiv |      80 |     95,2% |   100,0% |    97,6%
+MATH/Prealgebra           |      78 |     14,0% |    16,7% |    15,2%
+BBH/snarks                |      71 |     80,0% |    39,4% |    52,8%
+MATH/Number Theory        |      62 |     45,0% |    93,5% |    60,7%
+BBH/penguins_in_a_table   |      58 |    100,0% |   100,0% |   100,0%
+MATH/Precalculus          |      55 |     51,9% |    76,4% |    61,8%
+MATH/Counting & Probabili |      53 |     38,6% |    83,0% |    52,7%
+MATH/Geometry             |      52 |     37,3% |    84,6% |    51,8%
+======================================================================
+
+09:45:58.734 [INFO ] HeadlessRunner - Trickle validation results written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\experiment_results\archv2\rp12_r2\B0\graft_descent\seed_42\validation\MAIN_trickle_validation_results.csv
+09:45:59.263 [INFO ] HeadlessRunner - Nearest-Centroid Routing Results (MAIN):
+09:45:59.263 [INFO ] HeadlessRunner -   - Total Evaluated: 8622
+09:45:59.263 [INFO ] HeadlessRunner -   - Top-1 Accuracy: 80,48%
+09:45:59.264 [INFO ] HeadlessRunner -   - Top-3 Accuracy: 91,31%
+09:45:59.264 [INFO ] HeadlessRunner -   - Top-5 Accuracy: 94,44%
+09:45:59.264 [INFO ] HeadlessRunner -   - Top-10 Accuracy: 97,17%
+09:45:59.264 [INFO ] HeadlessRunner - Centroid routing results written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\experiment_results\archv2\rp12_r2\B0\graft_descent\seed_42\validation\MAIN_centroid_routing_results.csv
+09:46:12.986 [INFO ] HeadlessRunner - Migration flow matrix written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\experiment_results\archv2\rp12_r2\B0\graft_descent\seed_42\validation\MAIN_migration_flow_matrix.csv
+09:46:26.711 [INFO ] HeadlessRunner - Held-out leaf support CSV written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\experiment_results\archv2\rp12_r2\B0\graft_descent\seed_42\validation\MAIN_heldout_leaf_support.csv
+09:46:26.713 [INFO ] HeadlessRunner - Held-out leaf support (MAIN): leaves=133, top1 min=5 median=53.0 max=379, leaves with <12 held-out top-1 queries: 7
+09:46:26.726 [INFO ] HeadlessRunner - Routing calibration CSV written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\experiment_results\archv2\rp12_r2\B0\graft_descent\seed_42\validation\MAIN_routing_calibration.csv
+09:46:27.525 [INFO ] AdditionalMetrics - [CALIB]  ECE=0.9996, reliability_bins={[0.9,1.0]:1.00/0.00, [0.5,0.6]:0.50/0.00}
+09:46:56.150 [INFO ] HeadlessRunner - Appended condition MAIN results to ledger at Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\experiment_results\archv2\rp12_r2\B0\graft_descent\tuning_ledger.csv
+09:46:56.151 [WARN ] HeadlessRunner - [UNION-ROUTING] RP12 B3: item-keyed readout (item_id column; TRAIN routing and leaf table written beside)
+09:46:56.161 [WARN ] HeadlessRunner - [UNION-ROUTING] 38 leaf query categories disagreed with the corpus DB's designed key and were overridden (shared text-keyed query cache)
+09:47:31.126 [WARN ] HeadlessRunner - [UNION-ROUTING] item-keyed: 12984 TRAIN text(s) routed (0 cache miss(es), unrouted); 133 leaves written
+09:47:31.126 [INFO ] HeadlessRunner - [UNION-ROUTING] held-out routing on the union (rule=descent; n=8622; top1 = profile-based Top-1, source = routed depth-1 corpus root == true source, domain = routed depth-2 anchor == designed domain)
+source              n unrouted     top1   source   domain
+BBH              2286        0   90.86%   90.90%   90.86%
+GPQA              476        0   84.87%   85.29%   84.87%
+IFEVAL            216        0   92.59%   92.59%   92.59%
+MATH              538        0   66.91%   97.03%   66.91%
+MMLU_PRO_LB      4804        0   59.20%   78.00%   57.87%
+MUSR              302        0  100.00%  100.00%  100.00%
+ALL              8622        0   71.76%   84.15%   71.02%
+union Top-1 71.76% [70.80, 72.70] (95% Wilson, n=8622)
+
+09:47:31.131 [INFO ] HeadlessRunner - [UNION-ROUTING] per-source readout written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\experiment_results\archv2\rp12_r2\B0\graft_descent\seed_42\validation\MAIN_union_routing.csv
+09:47:31.133 [INFO ] HeadlessRunner - Performance report JSON written to Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\experiment_results\archv2\rp12_r2\B0\graft_descent\seed_42\performance_report.json
+09:47:31.134 [INFO ] HeadlessRunner - 
+========================================================================================================
+                               DAG PERFORMANCE REPORT & INSTRUMENTATION                                 
+========================================================================================================
+Top-Level Roll-Up:
+  Construction     :      1 446 ms (  1,9%)
+  Arena/Bench      :     73 262 ms ( 94,1%)
+  Persistence      :      3 180 ms (  4,1%)
+  Other            :          0 ms (  0,0%)
+  TOTAL TIME       :     77 888 ms (100.0%)
+========================================================================================================
+
+Section: CONSTRUCTION DETAILS
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| Phase / Operation                           | Calls | Total(ms) | Avg(ms) | p50(ms) | p95(ms) |     Count |    Unit/s |  Shr |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| finalization.generate_report                |     2 |      1446 |   723,0 |     796 |     796 |         2 |       1,4 | 1,9% |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+
+Section: ARENA/BENCHMARK DETAILS
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| Phase / Operation                           | Calls | Total(ms) | Avg(ms) | p50(ms) | p95(ms) |     Count |    Unit/s |  Shr |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| validation.MAIN                             |     1 |     73262 | 73262,0 |   73262 |   73262 |     8 622 |     117,7 | 94,1% |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+
+Section: PERSISTENCE DETAILS
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| Phase / Operation                           | Calls | Total(ms) | Avg(ms) | p50(ms) | p95(ms) |     Count |    Unit/s |  Shr |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+| snapshot_save                               |     1 |      3180 |  3180,0 |    3180 |    3180 |         1 |       0,3 | 4,1% |
++---------------------------------------------+-------+-----------+---------+---------+---------+-----------+-----------+------+
+========================================================================================================
+
+09:47:31.135 [ERROR] Diagnostics - [DIAG] iteration_metrics.csv contains ONLY a header — nothing was ever recorded to it. The file parses and looks valid, so this will not surface later: its producer is not wired up.
+09:47:31.135 [ERROR] Diagnostics - [DIAG] proposals.csv contains ONLY a header — nothing was ever recorded to it. The file parses and looks valid, so this will not surface later: its producer is not wired up.
+09:47:31.139 [INFO ] Diagnostics - [DIAG] diagnostics bundle closed (completed) at Z:\FAC\TUBerlin\THESIS\TaxoArena\.claude\worktrees\rp12-r2-run\experiment_results\archv2\rp12_r2\B0\graft_descent\seed_42\diagnostics
+09:47:31.139 [INFO ] HeadlessRunner - Headless Benchmark finished successfully.
+09:47:31.141 [INFO ] ModelEvalStore - SQLite evaluation store database connection closed cleanly via shutdown hook.
+09:47:31.141 [INFO ] DatasetFetcher - SQLite dataset fetcher database connection closed cleanly via shutdown hook.
+09:47:31.141 [INFO ] RankingService - SQLite database connection closed cleanly via shutdown hook.
+09:47:31.142 [INFO ] SnapshotManager - SQLite snapshot database connection closed cleanly via shutdown hook.
+
+BUILD SUCCESSFUL in 2m 2s
+7 actionable tasks: 1 executed, 6 up-to-date
+Configuration cache entry stored.
+[B0/graft_descent] end 2026-10-01T09:47:32+02:00 rc=0 wall_s=123

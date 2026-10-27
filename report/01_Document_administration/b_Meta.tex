@@ -1,0 +1,92 @@
+%-----------------------------
+% MUST BE CHANGED BY THE USER
+%-----------------------------
+%-----------------------------
+% BOOLEAN FOR DECISION B/M THESIS OR DISSERTATION
+%-----------------------------
+\newboolean{isDiss}
+% Options:
+% true: Dissertation
+% false: Bachelor/Master thesis
+\setboolean{isDiss}{false}
+%-----------------------------
+% BOOLEAN FOR DECISION MASTER OR BACHELOR THESIS
+%-----------------------------
+\newboolean{isMT}
+% Options:
+% true: Master thesis
+% false: Bachelor thesis
+\setboolean{isMT}{true}
+%-----------------------------
+% BOOLEAN FOR DECISION EMBARGO NOTICE
+%-----------------------------
+\newboolean{containsEN}
+% Options:
+% true: Thesis contains embargo notice due to a confidentiality agreement between company and TU Berlin
+% false: Thesis does not contain such a notice
+\setboolean{containsEN}{false}
+\newcommand{\firmenname}{Firmenname (definiert in \path{b_Meta.tex})} % Firma, bei der die Abschlussarbeit verfasst wurde
+%-----------------------------
+% TITLE, AUTHOR, AND DOCUMENT TYPE
+%-----------------------------
+\newcommand{\mytitle}{Query-Adaptive Multidimensional Ranking for Agents in Dynamic Domains}
+\newcommand{\autor}{Octave Lucien Boëlle}
+%\newcommand{\orcid}{XXXX-XXXX-XXXX-XXXX}
+\newcommand{\mydocumenttype}{Dissertation}
+\ifthenelse{\boolean{isDiss}}{%
+}{\ifthenelse{\boolean{isMT}}{\renewcommand{\mydocumenttype}{Master's Thesis}%
+}{\renewcommand{\mydocumenttype}{Bachelor's Thesis}}%
+}%
+%-----------------------------
+% FOR BACHELOR/MASTER THESIS
+%-----------------------------
+\newcommand{\courseofstudy}{M.Sc. Computer Science (Informatik)}
+\newcommand{\mymatriculationnumber}{0510121}
+\newcommand{\myadvisor}{Jonathan Rau}
+%-----------------------------
+% KEYWORDS FOR THE ABSTRACT
+%-----------------------------
+\newcommand{\germankeywords}{LLM-Evaluation, LLM-as-a-Judge, Taxonomie-Induktion, Bradley-Terry-Modell, Modell-Routing}
+\newcommand{\englishkeywords}{LLM evaluation, LLM-as-a-judge, taxonomy induction, Bradley-Terry ranking, model routing}
+
+%-----------------------------
+% FOR DISSERTATION
+%-----------------------------
+\newcommand{\chairman}{Prof.~Dr.-Ing.~habil.~Martina Superwichtig}
+\newcommand{\firstreviewer}{\mysupervisor}
+\newcommand{\secondreviewer}{\section*{Prof. Dr. rer. nat. Volker Markl}}
+\newcommand{\dayofdefense}{\DTMdisplaydate{2026}{07}{31}{-1}}
+%-----------------------------
+% MUST BE CHANGED BY THE USER
+%-----------------------------
+
+
+%-----------------------------
+% NOT TO BE CHANGED BY THE USER
+%-----------------------------
+
+\usepackage[
+    a-2b,                   % PDF/A-2b conformity
+    mathxmp,                % for writing metadata from xmpdata file
+]{pdfx}                     % package for PDF/A standard
+\newcommand{\myuniversity}{Technische Universität Berlin}
+\newcommand{\myfaculty}{Fakultät IV -- Elektrotechnik und Informatik}
+\newcommand{\myinstitute}{Institut für Telekommunikationssysteme}
+\newcommand{\mydepartment}{Fachgebiet Verteilte Systeme und Betriebssysteme (DOS)}
+\newcommand{\myplace}{Berlin}
+\newcommand{\mysupervisor}{Prof.~Dr.~habil.~Odej Kao}
+\newboolean{isSG}
+% Options:
+% true: document in styleguide mode
+% false: dissertation or thesis mode
+\setboolean{isSG}{false}
+\newcommand{\version}{3.7.0}
+\ifthenelse{\boolean{isSG}}{\setboolean{isDiss}{true}}{}
+% Subtitle English
+\newcommand{\myengsubtitle}{Thesis in partial fulfillment of the requirements for the degree \\ \ifthenelse{\boolean{isMT}}{Master}{Bachelor} of Science (\ifthenelse{\boolean{isMT}}{M.Sc.}{B.Sc.})}
+% Subtitle German
+\newcommand{\mygersubtitle}{Wissenschaftliche Arbeit zur Erlangung des Grades \\ \ifthenelse{\boolean{isMT}}{Master}{Bachelor} of Science (\ifthenelse{\boolean{isMT}}{M.Sc.}{B.Sc.})}
+%-----------------------------
+% NOT TO BE CHANGED BY THE USER
+%-----------------------------
+

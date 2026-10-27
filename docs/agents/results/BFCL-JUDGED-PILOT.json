@@ -1,0 +1,293 @@
+{
+  "id": "BFCL-JUDGED-PILOT",
+  "title": "BFCL-JUDGED-PILOT: on the BFCL base stratum, where does the deployed judge's agreement with the corpus's own CHECKER_OUTPUT sit on the reference ladder, and is it above the 0.75 bar? (judged; the night of 2026-09-23 under plan Amendment 9; the first judged use of an agent corpus; no profile cell, ever)",
+  "question": "On the BFCL-Result 2025-12-16 multi_turn BASE stratum (EVAL side, 57 tasks, pool p2035adddedd1becb), where on the reference ladder (NONE 0.738 PAIR-NOREF / CACHED_SOLVE 0.865 STACK-v2 / MATH CHECKER_OUTPUT 0.958 A STAGE3-MATH-CAPFREE) does A, the deployed recipe's agreement with the BFCL CHECKER_OUTPUT on checker-disagreeing matches, sit, and is it above the 0.75 falsifier bar? Verification fidelity against a checker on a real agentic artefact; never a preference, a ranking or a capability claim.",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "22c5d5f",
+    "program_lines": "docs/judge_v2_program.md L10965-L11237 as of the 2026-09-23 amendment commit 6ccf2f7 (registered at L10965-L11146 in 22c5d5f; the two amendment brackets of 2026-09-23 added 91 lines)",
+    "program_lines_as_of": "22c5d5f (the registration commit)",
+    "heading": "## Registered 2026-09-23 (before any code or call) — BFCL-JUDGED-PILOT: on the BFCL base stratum, where does the deployed judge's agreement with the CORPUS'S OWN CHECKER sit on the reference ladder, and is it above the 0.75 bar? (judged; the night's B1 under plan Amendment 9; the first judged use of an agent corpus in this record; no profile cell, ever)",
+    "date": "2026-09-23"
+  },
+  "script": {
+    "path": "tools/analysis/bfcl_judged_pilot.py",
+    "sha16": "5e9db53b894eeccb (LF sha of the version that COMPLETED the cache; the cache was OPENED under fa38c1dbe2776314 at 66aaaf7, 124 rows, and the difference is INERT by execution: all 1,216 payloads + the system prompt hash to 951ec3a0a063b5a8 under both shas, schedule hash bcf9d1654e68e4ca under both)",
+    "commit": "95c6d92 (the one-line launch() label fix plus additive selftest hardening, merged from d1ead84; the instrument itself 1c43c20, the BFCL-REF-ORACLE reference change 66aaaf7)"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_bfcl_judged_pilot.md",
+    "commit": "5d1dde1 (code-only READY), re-pinned at e158975 (§12, resume at --run after the step-(7) halt)"
+  },
+  "go": "docs/plan_2026-09-15.md Amendment 9 (2026-09-23, L316-L363; ebd462d) for the SPEND (hard ceiling 14,000 grok calls for the night; the 4,000-match rule superseded for tonight only). The per-episode artefact cap and the roster are NOT the author's: they are taken by the experiment-manager on 2026-09-23 BY PRECEDENT and REVERSIBLY, with the author's veto window BEFORE THE RUN and a reversal cost of 1,316 calls (Amendment 6 L214-L217 had reserved both to the author; Amendment 9 does not release them).",
+  "run": {
+    "outcome_file": "experiment_results/agent/bfcl_judged_pilot_outcome.txt",
+    "outcome_commit": "e18e37e (write-once, never edited; the cache committed at 5a38eca; the four blocking corrections are brackets in the programme outcome section, not edits here)",
+    "calls": 1316,
+    "cce": "1,316 posted of 1,316 expected, ceiling 3,096 (100 probe + 24 pilot + 1,192 run; 1,216 judged calls in `verdicts` + 100 probe rows)",
+    "pool": "p2035adddedd1becb (BFCL base stratum, 57 EVAL tasks; corpus experiment_results/agent/bfcl_result_2025-12-16.db, mode=ro&immutable=1)",
+    "date": "2026-09-23"
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-23_bfcl_judged_pilot_post.md",
+    "commit": "1cda83f",
+    "verdict": "THE ARITHMETIC IS CLEAN (every headline figure reproduces to the digit; no computed number is wrong except one label, D4) and THE CONCLUSION AS WRITTEN IS NOT SUPPORTED; record state NOT READY for the ledger until D1-D4 are bracketed by insertion (done in this commit)"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "A, the headline agreement with CHECKER_OUTPUT, and its position on the ladder: HELD iff A under convention A is above 0.75 by the lower end of its DEFF-inflated interval; FAILED iff the point is <= 0.75 (the falsifier); UNDETERMINED if the interval straddles 0.75 or the deciding subset is below 300 matches. Both conventions always; Wilson and question-clustered (57 tasks, DEFF 2.0, SE ~0.024 = the SE of record) intervals; the three rungs printed beside A with the test and the corpus that measured each.",
+      "result": "FAILED",
+      "value": "FAILED AT THE POINT / UNDETERMINED BY INTERVAL (both registered clauses fire): A = 339/458 = 0.7402 under convention A, Wilson [0.6981, 0.7782], question-clustered bootstrap over the 49 tasks (B=2000, seed 42) SE 0.0389, interval of record [0.6640, 0.8164], percentile [0.6590, 0.8136]; the point is at or below 0.75 (FAILED clause, L11093-L11095) AND both intervals contain 0.75 (UNDETERMINED straddle clause, L11093-L11095 restated at L11140-L11142). Convention B 339/358 = 0.9469 [0.9109, 0.9829]. All 461: 0.7419 (A) / 0.9474 (B)",
+      "denominator": "458 checker-disagreeing base-stratum EVAL matches on the 7-agent TERMINATED roster over 49 TASKS (the deciding subset; 461 before C2 removed 3), and 358 committed matches on 48 tasks for convention B",
+      "result_note": "[CORRECTED 2026-09-23 by BFCL-JUDGED-PILOT-REVIEW (1cda83f, D1, BLOCKER, criterion substitution C-7): the outcome file records FAILED alone, having narrowed the UNDETERMINED trigger to amendment item (5)(d)'s two-interval-DISAGREEMENT test. The result of record is FAILED AT THE POINT / UNDETERMINED BY INTERVAL; (5)(d) governs WHICH INTERVAL IS OF RECORD, not whether the straddle clause applies. The falsifier's CONSEQUENCE follows from the point and stands.]"
+    },
+    {
+      "id": "C2",
+      "text": "the empty-turn / degenerate-trace class DECLARED NON-JUDGEABLE BEFORE THE COUNT (admission defect D10: 55 of 300 drawn episodes = 18.3% empty_turn_model_response), excluded from the deciding subset, never silently dropped, its share printed with its denominator before A is read; A reported both ways, the deciding-subset reading being the reading of record for C1.",
+      "result": "HELD",
+      "value": "declared before any call, counted and printed before A: EMPTY 1 + DEGENERATE 0 = 1 of 385 = 0.0026; 3 of the 461 headline matches removed (0.0065) -> deciding subset 458 on 49 tasks; partition 458 + 3 = 461 and 146 + 1 = 147; the error_type share printed beside as a DIFFERENT object at 56/385 = 0.1455. Reproduced independently by the reviewer with its own decoder and rule on all 608 schedule rows, 0 disagreements",
+      "denominator": "empty / degenerate episodes over the base-stratum EVAL TERMINATED episodes of the 7-agent roster; and the matches they remove over the 461"
+    },
+    {
+      "id": "C3",
+      "text": "the self-preference stratum (grok-4-1-fast-reasoning-FC judged by grok-4-1-fast-non-reasoning) read BESIDE the headline and never in it: A_grok with its interval, the delta A_grok - A_headline paired by task, the grok-FC win-share beside its checker pass-share. HELD iff computed, printed and kept out of every headline figure; FAILED if any headline number contains a grok-FC match.",
+      "result": "HELD",
+      "value": "HELD on its registered condition (computed, printed, and 0 grok-FC matches in any headline figure), with a MISLABELLED win-share denominator (D4): A_grok = 100/146 = 0.6849, clustered SE 0.0439, [0.5988, 0.7711]; A_grok - A_headline = -0.0552, paired-by-task bootstrap [-0.1269, +0.0173] (reviewer [-0.1269, +0.0166], SE 0.0373); win-share 0.7358 of 106 COMMITTED / 0.5342 of 146 DECIDING beside the checker pass-share 0.7534 of 146 (the outcome file printed only '0.5342 of 146 committed matches')",
+      "denominator": "147 checker-disagreeing matches with grok-4-1-fast-reasoning-FC on one side (of 385 before the filter); DEFF-inflated SE ~0.04, a DIRECTION not a number",
+      "result_note": "[CORRECTED 2026-09-23 by BFCL-JUDGED-PILOT-REVIEW (1cda83f, D4, HIGH): '0.5342 of 146 committed' is 78/146 DECIDING; committed is 106 (40 ties), so the committed win-share is 78/106 = 0.7358 against pass-share 0.7534 — a 1.8pp gap, not 21.9pp (script L1561 counts not-pending/not-invalid INCLUDING TIE, L1096 defines committed as EXCLUDING TIE). Both are printed from now on. 'No detectable self-preference' is the wrong word: the interval covers the whole band, so the stratum is UNDETERMINED at this support (nothing beyond about 7pp either way was detectable).]"
+    },
+    {
+      "id": "C4",
+      "text": "instrument counts, printed, no bar: truncated sides / matches under the cap; NON_TERMINATED and CAP_HIT episodes excluded by rule (c) per agent; unusable rows; order-flip TIE share; the cumulative night call count at each launch against 14,000.",
+      "result": "HELD",
+      "value": "truncated sides 0 of 922, truncated matches 0 of 461, state-over-cap 0; reference block median 609 / max 1,118 chars, CHECKER_TEXT_CUT 0 of 57 tasks (0 of the 49 scheduled, D11); NON_TERMINATED by rule (c) 0 for seven agents and 14 CAP_HIT of 57 for meta-llama_Llama-3.3-70B-Instruct-FC; unusable 0 of 1,216 posted calls; order-flip TIE share 100/458 = 0.2183; night 2,944 of 14,000. Two denominator LABELS wrong (D7 '604 of 608'; D11), no count wrong",
+      "denominator": "922 sides / 461 matches; the agent's base-stratum EVAL episodes; the posted calls"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "A on the deciding subset, convention A, in [0.78, 0.90] (point 0.85)",
+      "result": "FAILED",
+      "value": "0.7402 against the registered [0.78, 0.90] (point 0.85); 0.85 is rejected at p = 0.0069 (t, 48 df)",
+      "denominator": "458 deciding matches on 49 tasks"
+    },
+    {
+      "id": "P2",
+      "text": "A under convention B in [0.85, 0.95], i.e. 4-8pp above convention A",
+      "result": "HELD",
+      "value": "0.9469 in [0.85, 0.95] — HELD ON THE BAND; the registered gloss 'i.e. 4-8pp above convention A' is MISSED at +20.68pp, 2.6x the top of the stated range (D6), and that miss IS the mechanism of D2",
+      "denominator": "358 committed matches on 48 tasks (convention A denominator 458)"
+    },
+    {
+      "id": "P3",
+      "text": "order-flip TIE share in [0.08, 0.25]",
+      "result": "HELD",
+      "value": "0.2183 (100 of 458) in [0.08, 0.25]",
+      "denominator": "458 judged deciding matches"
+    },
+    {
+      "id": "P4",
+      "text": "truncated-side share under the 2,500-estimated-token cap in [0.04, 0.12]",
+      "result": "FAILED",
+      "value": "0.0000 against [0.04, 0.12] — a mis-calibrated band: per-side estimated tokens median 428, p95 699, max 1,169 against the 2,500 cap (inert by 2.1x)",
+      "denominator": "922 headline sides"
+    },
+    {
+      "id": "P5",
+      "text": "the C2 empty / degenerate class in [0.10, 0.25] (the admission draw read 0.183 pooled over four strata)",
+      "result": "FAILED",
+      "value": "0.0026 (1 of 385) against [0.10, 0.25] — a mis-calibrated band, as amendment item (3) foresaw in terms: the admission's 0.183 is the ERROR-TYPE share, a different object, 56/385 = 0.1455 here",
+      "denominator": "385 base-stratum EVAL TERMINATED episodes of the 7-agent roster"
+    },
+    {
+      "id": "P6",
+      "text": "A_grok - A_headline in [-0.05, +0.10]; scored as a band, with 'undecidable at this support' an allowed outcome",
+      "result": "UNDETERMINED",
+      "value": "-0.0552 [-0.1269, +0.0166] against the band [-0.05, +0.10]: 0.0052 = 0.14 SE outside the lower edge, with the interval covering the band entirely. UNDECIDABLE AT THIS SUPPORT, the registration's explicit allowed outcome (L11122-L11124)",
+      "denominator": "49 tasks shared by the two strata; 146 stratum matches, paired SE 0.0373",
+      "result_note": "[CORRECTED 2026-09-23 by BFCL-JUDGED-PILOT-REVIEW (1cda83f, D3, HIGH): the outcome file scores P6 FAILED on a 0.14-SE excursion; scoring the point makes the registered 'undecidable at this support' clause unreachable and vacuous. P6 = UNDETERMINED.]"
+    },
+    {
+      "id": "P7",
+      "text": "registrar's addition: unusable rows (content_filter + length) <= 1% of the posted calls",
+      "result": "HELD",
+      "value": "0 of 1,216 = 0.0000 <= 0.01",
+      "denominator": "1,216 posted judged calls"
+    },
+    {
+      "id": "P8",
+      "text": "registrar's addition: A's DEFF-inflated interval EXCLUDES 0.958 (this corpus does not reproduce the MATH checker rung)",
+      "result": "HELD",
+      "value": "[0.6640, 0.8164] excludes 0.958 (t = -5.60, p < 1e-5 on 48 df)",
+      "denominator": "458 deciding matches on 49 tasks"
+    }
+  ],
+  "falsifier": {
+    "text": "A <= 0.75 at the POINT on the deciding subset under convention A overturns the 'for Agents' bridge sentence AS MEASURED: on a real agentic artefact with a real outcome checker the deployed recipe would verify no better than a no-reference judge does on MMLU-Pro (PAIR-NOREF 0.738), and the bridge may then be written only as motivation. It overturns no BFCL number, no board, no profile, no tier and no MMLU-Pro result. A pilot refused by the truncation guard (> 5% unusable on the deciding subset) fires AGENT-CORPUS-ADMISSION's own falsifier ('the pilot was not predictive') and the admission test is amended by insertion before any further agent spend.",
+    "fired": true,
+    "fired_note": "FIRED AT THE POINT (0.7402 <= 0.75). Its CONSEQUENCE stands: the 'for Agents' bridge may be written only as motivation on this corpus, never as a measured claim; it overturns no BFCL number, no board, no profile, no tier and no MMLU-Pro result. Its MECHANISM CLAUSE IS STRUCK (D2, BLOCKER): 'the deployed recipe verifies no better than a NO-REFERENCE judge does on MMLU-Pro' is refuted by the decomposition — 458 deciding = 339 right + 19 wrong-committed (0.0415) + 100 order-flip ties (0.2183); against REF-CHECKLIST's table (programme L4427-L4432, n = 826, same conventions) PAIR-NOREF reads 0.734 / 0.887 / 0.173 / 0.0930 and RECIPE-GROK 0.857 / 0.925 / 0.074 / 0.0690, so BFCL has the HIGHEST convention-B rate and the LOWEST wrong-committed rate of any arm in the record at the HIGHEST tie rate. A DECISIVENESS result, not a FIDELITY result, on a FIDELITY ladder: the 0.740 ~ 0.738 coincidence joins two different mechanisms at one rung. The truncation-guard leg never fired (0 unusable), so AGENT-CORPUS-ADMISSION's 'the pilot was not predictive' clause is NOT triggered."
+  },
+  "numbers_of_record": {
+    "counts_at_registration": "THE EXPERIMENT-MANAGER'S, from experiment_results/agent/bfcl_result_2025-12-16.db mode=ro on 2026-09-23, TO BE RE-VERIFIED BY THE BUILDER'S DRY-RUN: base stratum / EVAL side / TERMINATED-only, 57 tasks; 7-agent headline roster 1,113 matches -> 461 after the checker-disagreement filter = 922 calls; grok-FC self-preference stratum 385 -> 147 = 294 calls; probe 50 matches = 100 calls; pilot 12 matches = 24 calls inside the 922",
+    "bill": "ceiling 3,096 calls (all-8 unfiltered 2,996 + the 100-call probe); expected 1,316 calls (922 + 294 + 100), against the 14,000-call hard ceiling of plan Amendment 9",
+    "artefact_cap": "2,500 ESTIMATED tokens (chars / 4, no tokenizer); the corpus's measured distribution median 453, p95 2,422, max 7,199; final state_info always retained; symmetric between the two sides; truncations marked and counted",
+    "split": "BFCL pool p2035adddedd1becb, 228 EVAL ids over 57 EVAL families; side by split_side.tier_b norm-v1, 0 mismatches of 800, 0 straddling families",
+    "ladder_rungs_for_positioning": "NONE 0.738 (PAIR-NOREF, MMLU-Pro) / CACHED_SOLVE 0.865 (STACK-v2; 0.849 GROK-CALIB, MMLU-Pro) / MATH CHECKER_OUTPUT 0.958 A, 0.993 B (STAGE3-MATH-CAPFREE, terminated MATH traces); measured on OTHER corpora, so the comparison is a positioning ACROSS CORPORA, never a paired test",
+    "SE_of_record": "DEFF-inflated: 461 matches over 57 tasks, DEFF 2.0 median (QUERY-SUPPORT) -> SE ~0.024 for C1; ~0.04 on the 147-match self-preference stratum",
+    "reference_of_record": "AMENDED 2026-09-23 BEFORE ANY CALL: the PER-TASK EXPECTED OUTCOME (the corpus's ground-truth call sequence, experiment_results/agent/bfcl_raw/2025-12-16/dataset/possible_answer/BFCL_v4_multi_turn_base.json; the expected side of episodes.checker_details where used), rendered ONCE PER TASK, identical for both sides, order-invariant, carrying no per-side verdict and no per-side error text. The per-episode checker verdict of the original registration is FORBIDDEN in this test (it is the ORACLE condition, FRAMEWORK L37). The reference block is outside the 2,500-estimated-token artefact cap; a 1,200-character cut applies to it (class CHECKER_TEXT_CUT, denominator TASKS).",
+    "night_ledger": "experiment_results/night_calls_2026-09-23.json, the night's count of record: {test, launch, calls, ts} appended after every posting launch with the calls actually posted, read by every instrument before it posts (plan Amendment 9 clause (e), bracketed 2026-09-23 to name it)",
+    "C1_interval_form": "point +- 1.96 x the clustered-bootstrap SE (clusters = the 57 tasks) is the interval of record; the percentile interval, B and the cluster unit are printed beside it; C1 is UNDETERMINED if the two disagree about the 0.75 bar",
+    "A_headline_conventionA": "0.7402 = 339/458 deciding matches on 49 TASKS [interval of record, point +- 1.96 x the question-clustered bootstrap SE 0.0389 over the 49 tasks, B = 2000, seed 42: [0.6640, 0.8164]; percentile [0.6590, 0.8136]; Wilson [0.6981, 0.7782]] (source: outcome file; reviewer's independent bootstrap [0.6590, 0.8132] / [0.6639, 0.8164], the difference Monte-Carlo noise)",
+    "A_headline_conventionB": "0.9469 = 339/358 committed matches on 48 TASKS [clustered SE 0.0184 -> [0.9109, 0.9829]; percentile [0.9069, 0.9793]]",
+    "A_all_461_matches": "0.7419 = 342/461 convention A [0.6659, 0.8178]; 0.9474 = 342/361 convention B [0.9116, 0.9831]",
+    "decomposition_mandatory": "458 deciding = 339 right + 19 WRONG-COMMITTED (0.0415, the LOWEST of any arm in the record) + 100 ORDER-FLIP TIES (0.2183, the HIGHEST); comparison table REF-CHECKLIST programme L4427-L4432, n = 826: PAIR-NOREF 0.734 / 0.887 / 0.173 / 0.0930, CHECKLIST 0.749 / 0.893 / 0.161 / 0.0900, REF 0.845 / 0.921 / 0.080 / 0.0750, RECIPE-GROK 0.857 / 0.925 / 0.074 / 0.0690",
+    "position_one_sidedness": "of the 100 flips, 57 are (Model A, Model A) and 0 are (Model B, Model B) (also 24 TIE/A, 14 A/TIE, 3 TIE/TIE, 2 B/TIE); first-position rate 0.5862 = 510 of 870 non-tie votes on the deciding subset, z = 5.09 against 0.5; ties cluster in 11 of 49 tasks at or above 50%, 5 tasks carrying 32 of the 100",
+    "power": "naive binomial SE 0.0205 against the question-clustered SE of record 0.0389 -> DEFF 3.60 (the registration expected ~1.4), n_eff 127 independent matches of 458, MDE +-0.109 at 80% power (+-0.076 at 50%): separable from 0.75 only if A >= 0.859 or A <= 0.641",
+    "what_the_run_establishes": "A < 0.85 (P(observed <= 0.7402 | true 0.85, SE 0.0389) = 0.0024; two-sided t on 48 df p = 0.0069), A < 0.865 (p = 0.0024) and A < 0.958 (p < 1e-5); it establishes NEITHER A <= 0.75 (p = 0.80) NOR A < 0.80 (p = 0.13)",
+    "C3_selfpreference": "A_grok 0.6849 = 100/146 [0.5988, 0.7711], clustered SE 0.0439; delta -0.0552 paired-by-task on 49 shared tasks [-0.1269, +0.0166] (outcome file prints [-0.1269, +0.0173]); win-share 0.7358 = 78/106 COMMITTED / 0.5342 = 78/146 DECIDING beside the checker pass-share 0.7534 of 146",
+    "instrument": "1,316 posted rows = 100 probe + 24 pilot + 1,192 run; 1,216 judged calls, one fingerprint azure:grok-4-1-fast-non-reasoning on all of them, finish_reason stop on all 1,216, 0 unusable, 0 truncated sides, 0 state-over-cap, max completion tokens 452 of the 8,192 cap, max per-side artefact 1,169 of the 2,500-token cap, reference blocks cut 0 of 57 tasks (0 of the 49 scheduled); night ledger 5 rows summing to 2,944 of 14,000",
+    "leakage_full_population": "no per-side verdict, error_type, PASS/FAIL or all_pass in ANY of the 1,216 re-assembled payloads (full population, not a sample); the only regex hits are the reference preamble's own 'the task's checker is state-based' (x 1,216, naming no verdict) and 12 occurrences of 'failed' inside the corpus's own user-turn text; assert_no_per_side_verdict executed on all 608 statements and passed [SCOPE 2026-09-23: assert_no_per_side_verdict (bfcl_judged_pilot.py L720-L741) inspects the TASK STATEMENT only (task text + reference block), not the artefacts or the full user turn (BFCL-FINAL-STATE-SWAP review 80caf70, D1). This pilot's leakage conclusion stands on its own post-run review's FULL-population audit of all 1,216 re-assembled payloads (1cda83f, row 7f), not on the guard.]",
+    "two_sha_inertness": "all 1,216 payloads + the system prompt hash to 951ec3a0a063b5a8 under BOTH fa38c1dbe2776314 and 5e9db53b894eeccb; schedule hash bcf9d1654e68e4ca under both, with all 608 cached schedule rows reproducing with 0 differences (reviewer, BY EXECUTION)",
+    "registration_span_of_record": "docs/judge_v2_program.md L10965-L11237 (the outcome file and run_meta.registration print L10965-L11146, which excludes the five-item amendment at L11190-L11237 including the (5)(d) the outcome cites by name; D8, corrected by bracket and by the registration-defect section at L11990-L12024)"
+  },
+  "sentence_of_record": "On the BFCL base stratum (pool p2035adddedd1becb, 57 EVAL tasks; corpus bfcl_result_2025-12-16.db), with the deployed recipe (grok-4-1-fast-non-reasoning, prompt_v2 verify-first + corpus-level SYSTEM_BFCL/RUBRIC_BFCL, cap 8192, temperature omitted, dual order, TIE on flip) and the task's own ground-truth call sequence as a blind per-task reference, the judge's agreement with the corpus checker on the 458 checker-disagreeing deciding matches (49 tasks) is A = 0.7402 under convention A [interval of record, point +- 1.96 x the question-clustered bootstrap SE 0.0389 over the 49 TASKS, B = 2000, seed 42: [0.6640, 0.8164]; percentile [0.6590, 0.8136]] [and A = 0.9469 [0.9109, 0.9829] under convention B on the 358 committed matches — both conventions are always reported and the B number is the one that carries the mechanism] [DECOMPOSITION, mandatory with this number: 339 right + 19 wrong-committed (0.0415) + 100 order-flip ties (0.2183); the wrong-committed rate is the LOWEST and the tie rate the HIGHEST of any arm in the record (PAIR-NOREF 0.0930 / 0.173, RECIPE-GROK 0.0690 / 0.074, REF-CHECKLIST table L4427-L4432); 57 of the 100 flips are the judge naming the FIRST-SHOWN side in both orders and 0 the second-shown, first-position rate 0.5862 of 870 non-tie votes, z = 5.09] [C1 = FAILED AT THE POINT (0.7402 <= 0.75, the registered falsifier) AND UNDETERMINED BY INTERVAL (the registered UNDETERMINED trigger 'the interval straddles 0.75', L11093-L11095 and L11140-L11142, also fires); the outcome file states only the first, which is a criterion substitution bracketed by the registrar] [SUPPORT: DEFF 3.60, n_eff 127, MDE +-0.109 at 80% power; the run establishes A < 0.85 (p = 0.007), A < 0.865 (p = 0.002) and A < 0.958 (p < 1e-5), and establishes NEITHER A <= 0.75 (p = 0.80) NOR A < 0.80 (p = 0.13)] [CROSS-CORPORA: the rungs 0.738 / 0.865 / 0.958 were measured on MMLU-Pro and MATH under the same recipe; this is a positioning across corpora, never a paired test. 'Not distinguished from 0.738' is true of every value in [0.664, 0.816], including 0.80] [NOT LICENSED: 'the recipe verifies no better than a no-reference judge' — refuted by convention B and the wrong-committed rate; any statement about WHY A is 0.74 (position bias, corpus difficulty and a template mis-fitted to a trace-shaped artefact are all live and none was separated); any profile cell, agent ranking, per-trajectory or process claim] [PROVENANCE, condition 10: the cache was opened under script LF sha fa38c1dbe2776314 (124 rows) and completed under 5e9db53b894eeccb; the difference is the one-line launch() label fix plus additive selftest hardening and it is INERT, verified BY EXECUTION — all 1,216 assembled payloads plus the system prompt hash to 951ec3a0a063b5a8 under BOTH shas, and the schedule hash is bcf9d1654e68e4ca under both] [INSTRUMENT: 1,316 posted rows (100 probe + 24 pilot + 1,192 run), one fingerprint on all 1,216 judged calls, finish_reason stop on all 1,216, 0 unusable, 0 truncated sides, 0 state-over-cap, reference blocks cut 0 of 57 tasks (0 of the 49 scheduled), max completion tokens 452 of the 8,192 cap, max per-side artefact 1,169 of the 2,500-token cap; no per-side verdict, error_type, PASS/FAIL or all_pass in any of the 1,216 payloads, verified on the full population by re-assembly; night ledger 5 rows summing to 2,944 of 14,000] [it overturns no BFCL number, no board, no profile, no tier and no MMLU-Pro result]",
+  "chips": [
+    "C1 FAILED AT THE POINT / UNDETERMINED BY INTERVAL",
+    "C2 HELD",
+    "C3 HELD (win-share denominator mislabelled, D4)",
+    "C4 HELD",
+    "P1 FAILED",
+    "P2 HELD on the band; gloss MISSED (+20.68pp vs 4-8pp)",
+    "P3 HELD",
+    "P4 FAILED (mis-calibrated band)",
+    "P5 FAILED (mis-calibrated band)",
+    "P6 UNDETERMINED",
+    "P7 HELD",
+    "P8 HELD",
+    "FALSIFIER FIRED AT THE POINT",
+    "arithmetic CLEAN",
+    "instrument CLEAN",
+    "conclusion NOT SUPPORTED AS WRITTEN"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-23",
+      "by": "the pre-build ruling BFCL-REF-ORACLE (registrar, phase A, before the READY and before any call; the defect found by the engine-coder at commit 1c43c20, branch bfcl-judged-pilot, nothing executed), programme bracket after the registration's REFERENCE sentence",
+      "text": "THE REFERENCE OF RECORD IS THE PER-TASK EXPECTED OUTCOME, NOT THE PER-EPISODE CHECKER VERDICT. The engine-coder, implementing the registration literally (commit 1c43c20, branch bfcl-judged-pilot, nothing executed), found that 'the BFCL CHECKER_OUTPUT for the (task, agent) EPISODE ... its verdict and the normalised error text' is PER SIDE: the block would tell the judge which side the checker passed, and C1's A would be agreement with a verdict the recipe had been SHOWN - THE ORACLE CONDITION by FRAMEWORK L37, which this registration itself cites, and not the deployed condition. MATH's rung (0.958) carries the VERIFIED ANSWER, one per QUESTION, independent of either response. RULING (the coder's option (a)): the reference becomes the task's GROUND-TRUTH CALL SEQUENCE as the corpus carries it (experiment_results/agent/bfcl_raw/2025-12-16/dataset/possible_answer/BFCL_v4_multi_turn_base.json, 200 base tasks, `id` + `ground_truth` = a list of turns of calls; and, if used at all, only the EXPECTED side of episodes.checker_details), RENDERED ONCE PER TASK, IDENTICAL FOR BOTH SIDES, attached to the task statement and not to a trace (hence order-invariant: no transposition hazard), carrying NO per-side verdict, NO error_type, NO error text, NO PASS/FAIL, NO all_pass and NOT the `actual` side; its header names it one correct solution, not necessarily the only one (the checker is state-based), and does not tell the judge to defer to it. Under this form C1's A is a BLIND VERIFICATION RATE and the ladder positioning and the 0.75 bar are legitimate. OPTION (b) REJECTED (keeping the per-side verdict and re-scoping to an obedience / decisiveness reading): it would throw away this test's registered value - the ladder position and the bar - and would need a design that is not registered (interleaved arms, a same-session control, a paired-McNemar power paragraph). THE PER-SIDE VARIANT IS FORBIDDEN IN THIS TEST; if ever wanted it is a separate registration with the ORACLE framing in its criteria and its number never beside 0.958. The coder's [ORACLE-HAZARD] print stays in the script as a standing warning about the rejected form, and the READY certifies it fires on no live path. UNCHANGED: every count and denominator (the checker-disagreement filter reads the checker's outcomes but does not show them), C1-C4, P1-P8, the falsifier and the hygiene clauses; P1's [0.78, 0.90] was always a blind-verification band. The per-task reference block is OUTSIDE the 2,500-estimated-token artefact cap and its own length is printed."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, phase A, same commit as the ruling; programme bracket at the end of the registration section",
+      "text": "THE ENGINE-CODER'S FIVE REMAINING OPEN ITEMS, RULED. (2) PROMPT STRINGS APPROVED: exactly two corpus-level constants SYSTEM_BFCL and RUBRIC_BFCL in the v2 verify-first template's $systemPrompt / $rubric slots, following STAGE3-MATH; the closed rubric line is NOT reopened (nothing induced, no anchor / leaf / per-cell rubric); they are printed in full by --dry-run, are the reviewer's to approve and are quoted in the READY, pinned in run_meta and the cache meta, a differing relaunch refused, a change after the first posted call a different instrument; neither string may name the checker's verdict or tell the judge to defer to the reference. (3) P5 IS SCORED ON THE REGISTERED C2 TRACE-SHAPE CLASS with the empty_turn_model_response ERROR-TYPE share printed beside it under its own denominator; P5's band [0.10, 0.25] was calibrated on the error-type object (18.3% at admission), a DIFFERENT object from C2's, and the trace-shape class will be far smaller, so a FAILED P5 reads as a mis-calibrated band, not as a surprise; neither reading may change the deciding subset after the count. (4) THE NIGHT LEDGER ADOPTED as the night's count of record: experiment_results/night_calls_2026-09-23.json, a JSON list of {test, launch, calls, ts} appended after every posting launch with the calls ACTUALLY posted and read by every instrument before it posts; append-only, reconciled from the cache if a launch dies, quoted by every outcome of the night; the refusal at 14,000 stays the operator's act (plan Amendment 9 clause (e) is bracketed to name the file; IFEVAL-RESPONSE-ORACLE reads and appends to the same file). (5) DECLARED AND COUNTED: a 1,200-character cut on the rendered reference text, class CHECKER_TEXT_CUT, now falling on the PER-TASK block (identical in both orders; denominator TASKS, not sides); a ~180-character truncation marker added on top of capped text, so the cap governs the artefact text BEFORE the marker and both lengths are printed; the task statement read read-only from experiment_results/agent/bfcl_raw/2025-12-16/dataset/BFCL_v4_multi_turn_base.json (the DB stores only the stem) with its path and sha256 printed and pinned; C1's INTERVAL OF RECORD = point +- 1.96 x the clustered-bootstrap SE with the percentile interval, B and cluster unit printed beside, and C1 UNDETERMINED if the two intervals disagree about the 0.75 bar; gate names BFCL_GO=9 (9 = the plan amendment authorising the spend) and docs/reviews/READY_bfcl_judged_pilot.md, asserted by every posting mode. (6) THE PROBE'S 50 MATCHES ARE POSTED AGAIN BY THE RUN: probe rows live in their own `probe` table, never enter A and are not verdict rows, so this is not a rule-10 re-post (rule 10 governs a cached row of the same instrument), and the bill stands at 922 + 294 + 100 = 1,316 expected, ceiling 3,096."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "BFCL-JUDGED-PILOT-REVIEW (adversarial-reviewer, docs/reviews/2026-09-23_bfcl_judged_pilot_post.md, 1cda83f, zero calls), D1, BLOCKER, criterion substitution C-7; recorded in the programme outcome section at C1 and in the registration-defect section L11990-L12024",
+      "text": "C1 IS OVER-DETERMINED AND THE OUTCOME FILE RESOLVED IT SILENTLY. The registration carries two clauses that BOTH fire at this data: 'FAILED iff the POINT is <= 0.75' and 'UNDETERMINED if the interval straddles 0.75' (L11093-L11095, restated in the falsifier at L11140-L11142). The point is 0.7402 and both intervals contain 0.75 (percentile [0.6590, 0.8132], normal [0.6639, 0.8164]). The outcome narrowed the UNDETERMINED trigger to amendment item (5)(d)'s two-interval-DISAGREEMENT test — a different, narrower criterion — and reported C1 FAILED alone. THE RESULT OF RECORD IS 'C1 = FAILED AT THE POINT / UNDETERMINED BY INTERVAL'. The conflict between the two registered clauses is recorded as a REGISTRATION DEFECT, and the ruling is that (5)(d) governs WHICH INTERVAL IS OF RECORD, NOT whether the straddle clause applies; a registration carrying a point clause and an interval clause over the same bar is scored on both. The falsifier's CONSEQUENCE follows from the point and stands."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "BFCL-JUDGED-PILOT-REVIEW (1cda83f), D2, BLOCKER, the finding itself; recorded in the programme outcome section at the FALSIFIER paragraph",
+      "text": "THE FALSIFIER READING'S MECHANISM CLAUSE IS STRUCK. 'On a real agentic artefact the deployed recipe verifies no better than a NO-REFERENCE judge does on MMLU-Pro' is REFUTED by the decomposition: 458 deciding = 339 right + 19 wrong-committed (0.0415) + 100 order-flip ties (0.2183); against REF-CHECKLIST's table (programme L4427-L4432, n = 826, same conventions) PAIR-NOREF reads convA 0.734 / convB 0.887 / ties 0.173 / wrong-committed 0.0930 and RECIPE-GROK 0.857 / 0.925 / 0.074 / 0.0690. BFCL has the HIGHEST convention-B rate (0.9469) and the LOWEST wrong-committed rate (0.0415) of any arm in the record, at the highest tie rate. It verifies BETTER when it commits and commits far less: a DECISIVENESS result, not a FIDELITY result, and the ladder is a fidelity ladder, so the 0.740 ~ 0.738 coincidence joins two different mechanisms at one rung. The struck clause is replaced by that decomposition, and the wrong-committed rate is printed beside every convention-A number on this corpus. The one-sidedness is of record: of the 100 flips 57 are (Model A, Model A) and 0 are (Model B, Model B); first-position rate 0.5862 of 870 non-tie votes, z = 5.09; ties cluster in 11 of 49 tasks."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "BFCL-JUDGED-PILOT-REVIEW (1cda83f), D3, HIGH; recorded in the programme outcome section at P6",
+      "text": "P6 READS UNDETERMINED, NOT FAILED. The paired delta -0.0552 is 0.0052 = 0.14 SE outside the registered band [-0.05, +0.10] and its interval [-0.1269, +0.0166] covers the band entirely; the registration wrote 'undecidable at this support' as an explicit allowed outcome for exactly this arithmetic (L11122-L11124), and scoring the point makes that clause unreachable and vacuous."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "BFCL-JUDGED-PILOT-REVIEW (1cda83f), D4, HIGH; recorded in the programme outcome section at C3",
+      "text": "C3'S WIN-SHARE DENOMINATOR IS MISLABELLED. '0.5342 of 146 committed matches' is 78/146 DECIDING; committed is 106 (40 ties), so grok-FC's win-share on committed is 78/106 = 0.7358 against its checker pass-share 0.7534 — a 1.8pp gap, not the 21.9pp the printed pair implies (script L1561 counts not-pending/not-invalid INCLUDING TIE, while L1096 defines committed as EXCLUDING TIE). BOTH ARE PRINTED. And 'no detectable self-preference' is the wrong word: the interval covers the whole registered band, so the stratum is UNDETERMINED AT THIS SUPPORT — nothing beyond about 7pp in either direction was detectable."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "BFCL-JUDGED-PILOT-REVIEW (1cda83f), D5-D14, recorded in the programme outcome section",
+      "text": "D5 the ladder positioning is a SELECTED COMPARISON ('not distinguished from 0.738' is true of every value in [0.664, 0.816]); D6 P2 HELD on the band but its registered gloss 'i.e. 4-8pp above convention A' is MISSED at +20.68pp, and that miss IS D2's mechanism; D7 'matches with both orders 604 of 608' takes its numerator from the deciding subset and its denominator from the full schedule — all 608 have both orders (script L1015-L1021 / L1040); D8 the outcome file and run_meta.registration point at L10965-L11146, which EXCLUDES the five-item amendment at L11190-L11237 including the (5)(d) the outcome cites by name — the true span is L10965-L11237; D9 READY condition 10 is only PARTLY met (the outcome states both shas and '(DIFFERS)' but not the inertness sentence, which lives only in commit 5a38eca) — bracketed with the reviewer's EXECUTED proof that all 1,216 payloads plus the system prompt hash to 951ec3a0a063b5a8 under BOTH shas and the schedule hash is identical; D10 DEFF 3.60 against the registered ~1.4, n_eff 127, MDE +-0.109, printed beside every C1 interval on this corpus; D11 CHECKER_TEXT_CUT's denominator 57 tasks against the 49 scheduled (both 0); D12 '385' names two different objects in the same outcome; D13 the DBGUARD monkeypatch of sqlite3.connect is NOT IDEMPOTENT (RecursionError on double import; harmless in production, fix = a sentinel attribute), carried as a standing defect of the instrument; D14 READY defects 1, 2 and 5 were never exercised (0 errors, no guard fire, no halt) and are carried forward latent."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar, on the review's §2.4 and §2.3; recorded in the programme outcome section",
+      "text": "THE AMENDMENT'S LOAD-BEARING PROPERTY IS CONFIRMED ON THE FULL POPULATION: no per-side verdict, error_type, PASS/FAIL or all_pass appears in any of the 1,216 re-assembled payloads; the only regex hits are the reference preamble's own 'the task's checker is state-based' (naming no verdict) and 12 occurrences of 'failed' inside the corpus's own user-turn text. A is therefore a BLIND verification rate. AND THE THIRD HYPOTHESIS THE OUTCOME NEVER NAMES IS RECORDED: the frozen v2 verify-first block instructs the judge to extract each model's 'FINAL ANSWER' and check it against the reference — MMLU-Pro furniture on a trace that has no final answer, only a final state. Template mis-fit, corpus difficulty and position bias are ALL LIVE and NONE was separated. The two separators, each needing its own registration and neither scheduled: (1) re-post the 100 flipped matches at a new seed (~200 calls); (2) a one-arm swap of 'final answer' -> 'final state' in the INHERITED verify-first block, everything else byte-identical (~916 calls; not the closed rubric line, because it changes the template and not the rubric slot)."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "CORRECTIONS_2026-09-23 (registrar)",
+      "text": "[CORRECTED 2026-09-23 by the registrar (line pointer only, zero calls; no number, no criterion and no sentence moves): registration.program_lines names docs/judge_v2_program.md L10965, and that was exact when it was written. After commit cd83eac inserted four one-line correction brackets mid-file (hunks @@ -3911,0 / -6535,0 / -6692,0 / -6949,0 @@), the heading of record \"## Registered 2026-09-23 (before any code or call) — BFCL-JUDGED-PILOT: on the BFCL base stratum, where does the deployed judge's agreement  ...\" stands at L10969, +4; the whole span shifts by the same +4. Verified at HEAD by sed -n '10969p' docs/judge_v2_program.md. The map for every such pointer is the programme's \"## Line-shift map, appended 2026-09-23\" section: +0 up to old L3911, +1 to L6535, +2 to L6692, +3 to L6949, +4 below. The recorded span is left standing beside this bracket, not rewritten.]"
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (restatement pack hygiene item; insertion only, no number moves)",
+      "text": "RECONCILED: 'PAIR-NOREF n = 826' in does_not_show is NOT PAIR-NOREF's own denominator (every PAIR-NOREF denominator is the 944 key-decidable R3 matches, convention A 0.738). It is the REF-CHECKLIST paired subset: programme section '## REF-CHECKLIST (2026-09-17, 782 reasoning + 4,956 cheap calls) — PRIMARY FAIL; the value of a reference is the ANSWER, not the verification structure; the leakage is not avoidable by this route', table 'arm (n = 826)', where the cached PAIR-NOREF arm reads conv A 0.734 / conv B 0.887 / ties 0.173 on 944 - 118 checklist-named exclusions = 826 matches ('the paired deltas are fair within the 826'). The citation is sourced and stands; read it as 'the no-reference arm on REF-CHECKLIST's 826-match subset'."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (recording the coordinator's relay; zero calls, no DB opened)",
+      "text": "BACKUP OF THE BFCL INPUTS OF RECORD: experiment_results/_backup/bfcl_2026-09-23/ holds bfcl_result_2025-12-16.db (sha256 c5eddd267623f0ff652dad1f912e3473829a8adf7c2bcae8960f229c8303399e, identical to experiment_results/agent/bfcl_result_2025-12-16.db, 18,767,872 bytes) and the full raw tree bfcl_raw_2025-12-16/ (72 of 72 files match the committed experiment_results/agent/bfcl_raw/2025-12-16/MANIFEST.txt on sha256 AND byte size, 371.2 MB; the backup's MANIFEST.txt is the CRLF working-tree rendering of the committed LF blob, identical modulo line endings). Verified by the registrar at zero calls with sha256sum and a manifest re-hash (no DB opened). Neither had a backup before; BFCL-DEGRADED-CONTROL's DC3 depends on the raw tree. No number of this record moves."
+    },
+    {
+      "date": "2026-09-23",
+      "by": "the registrar (insertion only, zero calls)",
+      "text": "SCOPE CORRECTED: assert_no_per_side_verdict (bfcl_judged_pilot.py L720-L741) inspects the TASK STATEMENT only (task text + reference block), not the artefacts or the full user turn (BFCL-FINAL-STATE-SWAP review 80caf70, D1). This pilot's leakage conclusion stands on its own post-run review's FULL-population audit of all 1,216 re-assembled payloads (1cda83f, row 7f), not on the guard."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: imported quantity (c) (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM (c) 2026-09-27: the NONE 0.738 and CACHED_SOLVE 0.865 rungs (the 0.75 bar and the BFCL numbers are not family) is a p2dca-family quantity — planning only (RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "that A <= 0.75: the interval of record reaches 0.8164 and p against 0.75 is 0.80; the run establishes A < 0.85 (p = 0.007), A < 0.865 and A < 0.958, and establishes NEITHER A <= 0.75 NOR A < 0.80 (p = 0.13)",
+    "that the recipe verifies WORSE on agentic traces than on MMLU-Pro: on committed verdicts it verifies BETTER than any arm in the record (convention B 0.9469, wrong-committed 0.0415 against PAIR-NOREF's 0.887 / 0.0930 and RECIPE-GROK's 0.925 / 0.0690)",
+    "WHY the judge flips: position bias is measured (57 of 100 flips first-position in both orders, 0 second-position, first-position rate 0.5862 of 870 non-tie votes, z = 5.09) but its cause is not separated — THREE HYPOTHESES ARE LIVE AND NONE WAS SEPARATED: template mis-fit (the inherited v2 verify-first block asks the judge to extract a 'FINAL ANSWER' from a trace that has only a final state), corpus difficulty, and position bias itself",
+    "anything at a support it does not have: DEFF 3.60 (the registration expected ~1.4), n_eff 127 of 458 matches, MDE +-0.109 at 80% power — this design separates A from 0.75 only if A >= 0.859 or A <= 0.641",
+    "any self-preference result: the paired delta's interval [-0.1269, +0.0166] covers the registered band entirely, so nothing above about 7pp in either direction could have been detected (P6 UNDETERMINED)",
+    "whether the flips are reproducible: no retest was run, and DECOMP's 5.7% test-retest floor was measured on a different corpus",
+    "anything about the three refused strata (miss_func, miss_param, long_context), about non-terminated episodes (14 CAP_HIT for meta-llama_Llama-3.3-70B-Instruct-FC) or about the 8 EVAL tasks that never entered a match",
+    "any agent capability, ranking, profile cell, tier, per-trajectory or process claim: 57 EVAL tasks against the 120-question support rule, so the corpus carries no cell and this pilot is a calibration / canary object only",
+    "a paired comparison with any ladder rung: the rungs were measured on other corpora, so the ladder reading is a positioning across corpora and never a paired test; the rungs' own sampling error (PAIR-NOREF n = 826) is not carried",
+    "anything under the per-EPISODE checker verdict (the ORACLE condition), forbidden in this test by the 2026-09-23 BFCL-REF-ORACLE ruling: no number here is an obedience or decisiveness reading of that kind, and none may be compared with one",
+    "a tokenizer count (chars / 4 only, as at admission)"
+  ],
+  "ledger": {
+    "row_id": "BFCL-JUDGED-PILOT",
+    "version": "v127 (2026-09-23; section 7, newest first, at docs/test_ledger.html L194, before IFEVAL-RESPONSE-ORACLE; audit OK, 224 rows); [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "depends_on": [
+    "AGENT-CORPUS-ADMISSION",
+    "MULTI-SWE-ADMISSION"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing; it is the first JUDGED application of AGENT-CORPUS-ADMISSION's rule set. Closed lines checked and not touched (CONTEXT section 5): rubric at every granularity, rubric-shaped and specification references, ensembles / gating / confidence / two-reference variants, sub-anchor rows, the frontier order, escalation, single and selective order, temperature 0. No judged cell on the three refused BFCL strata."
+  },
+  "sources": [
+    "docs/judge_v2_program.md L10965-L11146 (the registration itself, 2026-09-23): question, hygiene, instrument, the manager's two design choices, counts of record, criteria, predictions, falsifier, cost and consequence, closed-lines check, prior results",
+    "docs/judge_v2_program.md, outcome section 'AGENT-CORPUS-ADMISSION pilot (2026-09-18, zero LLM calls)' (2ccd646; ledger v114): the base stratum's PASS-AT-POINT, the 57 EVAL tasks per stratum, the artefact length distribution (median 453 / p95 2,422 / max 7,199 estimated tokens), the 8 ingested agents, Llama-3.3-70B's 267 of 303 CAP_HITs, defect D10's 55 of 300 empty-turn episodes, the pool id p2035adddedd1becb",
+    "docs/agents/plans/2026-09-19_queue_bills.md item 4 (cost-estimator): the earlier bill and its cheapest variant; superseded tonight by the manager's filtered counts",
+    "docs/agents/queue.json item BFCL-JUDGED-PILOT (experiment-manager, 2026-09-23T04:10+02:00): the counts of record, the cap and roster decisions, the 1,316 / 3,096 bill, the no-shared-DB requirement",
+    "docs/plan_2026-09-15.md Amendment 9 (ebd462d): the night's 14,000-call hard ceiling and clause (d) (register before code, a committed READY before any pilot)",
+    "engine-coder report at commit 1c43c20 (branch bfcl-judged-pilot, CODE ONLY, nothing executed): the ORACLE defect in the registration's reference clause and the five remaining open items ruled on 2026-09-23",
+    "experiment_results/agent/bfcl_raw/2025-12-16/dataset/possible_answer/BFCL_v4_multi_turn_base.json and .../dataset/BFCL_v4_multi_turn_base.json (existence and shape verified by ls and head on 2026-09-23; no DB opened, no script run)",
+    "experiment_results/agent/bfcl_judged_pilot_outcome.txt (e18e37e, write-once): every count, rate, interval and prediction score of the run",
+    "docs/reviews/2026-09-23_bfcl_judged_pilot_post.md (1cda83f, adversarial-reviewer, zero calls): the per-claim table, the decomposition, the power paragraph, the flip table, the two-sha inertness proof by execution, defects D1-D14, the chips and the sentence of record",
+    "docs/judge_v2_program.md L11772-L11988 (the outcome section of record, with the D1-D4 brackets) and L11990-L12024 (the registration-defect section, C1's over-determination and the L10965-L11237 span)",
+    "experiment_results/night_calls_2026-09-23.json (5 launch rows: 48 + 1,580 + 100 + 24 + 1,192 = 2,944 of 14,000)",
+    "experiment_results/_backup/bfcl_2026-09-23/ (backup of bfcl_result_2025-12-16.db and bfcl_raw_2025-12-16/, verified 2026-09-23)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "programme_outcome_lines": "docs/judge_v2_program.md L11772-L11988 (the outcome section) and L11990-L12024 (the registration-defect section)",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "The first judged run on an agent benchmark (BFCL function-calling, 57 tasks). It measures how often the deployed LLM judge agrees with the benchmark's own automatic checker, with the task's correct call sequence given as a reference.",
+    "why": "It tests whether the judge can be trusted outside MMLU-Pro-style questions, on agent traces, against a 0.75 agreement bar.",
+    "information": "Agreement well above or below 0.75 would say whether the judge transfers to agent tasks. Result: done. When ties count, agreement is 0.74 [0.66, 0.82], and the run cannot say whether that is above or below 0.75. On the verdicts where the judge commits, agreement is 0.95, its best in the record. The weak spot is many order-flip ties, with a clear preference for the first-shown answer; the cause is not separated. Self-preference is not shown. Pilot only, with no profile cell.",
+    "written": "2026-10-07"
+  }
+}

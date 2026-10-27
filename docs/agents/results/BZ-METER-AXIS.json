@@ -1,0 +1,171 @@
+{
+ "id": "BZ-METER-AXIS",
+ "title": "BZ-METER-AXIS: the axis_v1 leaves (kappa = 3) read by the benchzoom granularity meter, L3a|L2 deciding on MATH (69 models) and MMLU-Pro (23), within-category permutation null, same harness, rosters, split and scale as BZ-METER v2 (zero LLM calls)",
+ "question": "Do the axis_v1 leaves add held-out predictive information over subject x declared finer label (L2) on MATH and MMLU-Pro?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "benchzoom 0297313d07f079de8bbac84c93bcaeb022acb54f (registration before code); [A1] 096d43db641485eacb13afadf60623287122bc35",
+  "program_lines": "external: benchzoom docs/meter_axis_registration.md, read under blob:5de17ff1 (git blob, LF; no CRLF rendering, per READY 6ecdd0ff); parent docs/meter_registration.md blob:5c457088. TaxoArena record: docs/judge_v2_program.md L25473-L25480 (_as_of the commit that writes it, parent 4759e014, re-grepped)",
+  "date": "2026-10-20",
+  "note": "no '## Registered' section in docs/judge_v2_program.md (registration lives in benchzoom); Support verdict line (f) and structural leg (g) absent in the external registration"
+ },
+ "script": {
+  "path": "benchzoom examples/meter_test.py --axis vault (runner examples/meter_axis.py)",
+  "sha16": "blob:6ad6b268 (meter_test.py at 096d43d; meter.py blob:f31973af; per POSTRUN claim 1)",
+  "commit": "benchzoom 096d43d (code 567841c; D1 fix after the read f04f549c7e3fef003843170bb0dbd1f832023877)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_BZ-METER-AXIS.md",
+  "commit": "6ecdd0ff",
+  "verdict": "READY with C1 (launch --axis vault without --out); D1 MEDIUM out-dir not pinned",
+  "delta": {
+   "file": "docs/reviews/DELTA_BZ-METER-AXIS-D1.md",
+   "commit": "4759e014",
+   "verdict": "CORRECT, MERGEABLE (fix f04f549); E1, E2 LOW"
+  }
+ },
+ "go": "D-2026-10-20-1 (the author, verbatim: \"I want the last tree performances mesured\"; docs/agents/author_decisions/2026-10-20.md, 6c6c394d)",
+ "run": {
+  "outcome_file": "E:/benchzoom_demo/meter_axis_v1/outcome.json (sha256 2b957d5d3525bc48e530a31151b1a937cf7702317cb8cf154d9a505c5fb56118) + outcome.txt; never committed; backup E:/TaxoArena_backup_20261020_meter_axis_v1 (6/6 OK)",
+  "outcome_commit": "outcome not committed (run at benchzoom 096d43d)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "BZ-METER reserved 40% vault (MATH 1,965 items, 1,960 kept; MMLU-Pro 4,797, 4,654 kept); THIRD opening by a meter statistic; not content-closed",
+  "date": "2026-10-20"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_BZ-METER-AXIS.md",
+  "commit": "1260cf3a",
+  "verdict": "VALID; MATH L3a|L2 SUPPORTED stands with Q1 (3-SE lower bound +0.070 < delta_min 0.10; WORK cross-fit +0.120 SE 0.047) and Q2 (leaves built on all items' text); MMLU-Pro NOT SUPPORTED powered; vault-side per-leaf split UNDETERMINED"
+ },
+ "criteria": [
+  {
+   "id": "MATH L3a|L2",
+   "text": "DECIDING; [R2] words on the point: SUPPORTED iff g >= 3 SE AND g > q95 AND g >= delta_min 0.10",
+   "result": "HELD",
+   "value": "SUPPORTED (with Q1, Q2): g +0.2588 SE 0.0628, q95 +0.0035, tau2 0.04, MDE80 0.2411; 3-SE lower bound +0.070 < 0.10",
+   "denominator": "1,960 scored vault items (1,960 clusters, DEFF 1.09, n_eff 1,800) x 69 models; fits on 2,949 WORK"
+  },
+  {
+   "id": "MMLU-Pro L3a|L2",
+   "text": "DECIDING; [R2] words on the point",
+   "result": "HELD",
+   "value": "NOT SUPPORTED by null and interest: g -0.0059 SE 0.0183, q95 +0.0005, tau2 0.005, MDE80 0.0703 (powered)",
+   "denominator": "4,654 scored (4,625 clusters, DEFF 1.13, n_eff 4,134) x 23 models; fits on 7,197 WORK"
+  },
+  {
+   "id": "secondary",
+   "text": "secondary words (never deciding)",
+   "result": "n/a",
+   "value": "MATH L3a|L1 +0.2685 SE 0.0638 SUPPORTED (secondary); MATH 22-model L3a|L2 +0.7932 SE 0.1947, L3a|L1 +0.8230 SE 0.1979 SUPPORTED (secondary); MMLU-Pro L3a|L1 +0.2040 SE 0.0754 INCONCLUSIVE (secondary); paired G(L3a|L3t) MATH +0.2011 SE 0.0605, MMLU-Pro -0.0059 SE 0.0183 (descriptive)",
+   "denominator": "as the deciding lines"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "PA1",
+   "text": "MATH L3a|L2 in [-0.010, 0.100], NOT SUPPORTED",
+   "result": "FAILED",
+   "value": "+0.2588, SUPPORTED",
+   "denominator": "1,960 x 69"
+  },
+  {
+   "id": "PA2",
+   "text": "MMLU-Pro L3a|L2 in [-0.010, 0.050], NOT SUPPORTED or DEGENERATE",
+   "result": "HELD",
+   "value": "-0.0059, NOT SUPPORTED",
+   "denominator": "4,654 x 23"
+  },
+  {
+   "id": "PA3",
+   "text": "MATH L3a|L1 in [-0.010, 0.150], NOT SUPPORTED (secondary)",
+   "result": "FAILED",
+   "value": "+0.2685, SUPPORTED (secondary)",
+   "denominator": "1,960 x 69"
+  },
+  {
+   "id": "PA4",
+   "text": "MMLU-Pro L3a|L1 in [-0.010, 0.080], NOT SUPPORTED or DEGENERATE (secondary)",
+   "result": "FAILED",
+   "value": "+0.2040, INCONCLUSIVE (secondary)",
+   "denominator": "4,654 x 23"
+  },
+  {
+   "id": "PA5",
+   "text": "MATH 22-model L3a|L2 in [0.000, 0.300], SUPPORTED (secondary)",
+   "result": "FAILED",
+   "value": "+0.7932 out of range; word SUPPORTED (secondary) held",
+   "denominator": "1,960 x 22"
+  },
+  {
+   "id": "PA6-MATH",
+   "text": "G(L3a|L3t) in [-0.050, 0.050] (range only)",
+   "result": "FAILED",
+   "value": "+0.2011",
+   "denominator": "1,960 x 69"
+  },
+  {
+   "id": "PA6-MMLU",
+   "text": "G(L3a|L3t) in [-0.050, 0.050] (range only)",
+   "result": "HELD",
+   "value": "-0.0059",
+   "denominator": "4,654 x 23"
+  }
+ ],
+ "falsifier": {
+  "text": "L3a|L2 SUPPORTED on either dataset contradicts the prior that the axis_v1 leaves add nothing of interest over the declared finer label",
+  "fired": true
+ },
+ "numbers_of_record": {
+  "MATH G(L3a|L2)": "+0.2588 SE 0.0628 (x 1e-3 nats per cell; 3-SE lower bound +0.070; 1,960 scored items x 69 models; DEFF 1.09; MDE80 0.2411)",
+  "MATH WORK cross-fit G(L3a|L2)": "+0.120 SE 0.047 (POSTRUN own diagnostic; WORK 5-fold, tau2 0.04, pooled n 2,949)",
+  "MMLU-Pro G(L3a|L2)": "-0.0059 SE 0.0183 (4,654 scored x 23 models; MDE80 0.0703)",
+  "vault openings": "3 by a meter statistic (v1 harness, v2 read, this); 12 deciding tests on this vault (FWER <= .0162)"
+ },
+ "sentence_of_record": "On the BZ-METER reserved 40% (its third opening by a meter statistic), the axis_v1 leaves add a gain over subject x level on MATH: SUPPORTED (g +0.26, SE 0.063; 3-SE lower bound +0.070 below delta_min 0.10; WORK cross-fit +0.12, SE 0.047), held out from the meter; leaves built on all items' text; on MMLU-Pro NOT SUPPORTED (g -0.006, SE 0.018; MDE80 0.070) [benchzoom registration 0297313 + [A1] 096d43d (blob 5de17ff1); POSTRUN 1260cf3a Q1, Q2; x 1e-3 nats per cell; 69 / 23 models, 1,960 / 4,654 scored items]",
+ "chips": [
+  "MATH SUPPORTED, QUALIFIED (Q1 3-SE LB +0.070 < 0.10; Q2 leaves on all items' text)",
+  "MMLU-Pro NOT SUPPORTED (powered)",
+  "FALSIFIER FIRED (MATH)"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-20",
+   "by": "registrar",
+   "text": "recorded from POSTRUN 1260cf3a; registration external (benchzoom); A1 Support projection REFUTED as a projection (claim 9, D2); D1 fixed after the read (f04f549, DELTA 4759e014)"
+  }
+ ],
+ "does_not_show": [
+  "a precise size (Q1)",
+  "a held-out or content-closed tree (Q2: leaves built on all items' text)",
+  "topic rather than difficulty (only explored on WORK, BZ-GRANULARITY-WORK)",
+  "the vault-side per-leaf / per-model split (UNDETERMINED)",
+  "any MMLU-Pro gain beyond the declared src label",
+  "other seeds, rosters or benchmarks"
+ ],
+ "ledger": {
+  "row_id": "BZ-METER-AXIS",
+  "version": "v427"
+ },
+ "depends_on": [
+  "BZ-METER v2 (no TaxoArena record; open registrar item)"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "nothing closed; no further reserved read (D-2026-10-20-4)"
+ },
+ "sources": [
+  "docs/reviews/POSTRUN_BZ-METER-AXIS.md (1260cf3a)",
+  "docs/reviews/READY_BZ-METER-AXIS.md (6ecdd0ff)",
+  "docs/reviews/DELTA_BZ-METER-AXIS-D1.md (4759e014)",
+  "E:/benchzoom_demo/meter_axis_v1/outcome.txt",
+  "benchzoom docs/meter_axis_registration.md (blob 5de17ff1) Sections 3, 5, 6, 7, 8",
+  "docs/agents/author_decisions/2026-10-20.md",
+  "docs/judge_v2_program.md L25473-L25480 (_as_of the commit that writes it, parent 4759e014, re-grepped)",
+  "docs/judge_v2_program.md L25482-L25492 (_as_of the commit that writes it, parent 4759e014, re-grepped)"
+ ],
+ "last_update": "2026-10-20"
+}

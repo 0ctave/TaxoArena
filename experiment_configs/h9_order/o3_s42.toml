@@ -1,0 +1,107 @@
+# H9-REM, ARM: CONSTRUCTION-ORDER SHUFFLE — REGISTERED 2026-09-16, NOT YET RUN.
+# (Block 3 of docs/plan_2026-09-15.md; executed after the judged queue drains, never
+# concurrent with any other run.)
+#
+# WHAT. The greedy construction loop visits its proposal sites in an arbitrary-but-
+# deterministic order (BFS/id-hash order inside a depth in the split pass, enumeration
+# order in the four merge passes; construction-loop audit 2026-09-07). This arm permutes
+# exactly those orders under a declared seed (`constructionOrderShuffleSeed`, see
+# taxonomy.operations.ConstructionOrder) and NOTHING else: same corpus, same 70/30 split
+# as the frozen artifact (seed = 42 drives both the split and the construction, as in
+# freeze_mcs55.toml), same thresholds, labeling/judging/final-metrics OFF (zero LLM
+# calls, ~3.5 min; h9_seed137 ran 199 s). The depth schedule (deepest-first) and the
+# ascending-k first-accept rule are documented modelling decisions and stay fixed.
+#
+# ARMS: constructionOrderShuffleSeed = {1, 2, 3} (o1, o2, o3). The pure path-dependence
+# probe: everything the 20-seed floor varies (the sample) is held fixed here, so any
+# spread across o1..o3 and the frozen build is order-dependence alone.
+#
+# READOUT (registered): tools/analysis/h9_stability.py on the three runs vs the frozen
+# artifact (experiment_results/freeze_mcs55/seed_42) and vs the 20-seed floor of
+# experiment_configs/h9_sweep/REGISTRATION.md (Top-1 0.750-0.776, leaves 72-92,
+# mu-match 62-79/87, anchor drift <= 0.59pp).
+# [INSERTED 2026-09-16, review fix] COMPARATOR: the Top-1 (and leaf-count) readout compares
+# this arm against the SAME-CODE seed-42 UNSHUFFLED rebuild, o0_s42.toml (the control arm:
+# key absent, otherwise identical to this file), NOT against the July frozen artifact, whose
+# code predates the flag and would confound order-dependence with code drift. The frozen
+# artifact is kept ONLY for the mu-match / leaf-identity readout (the 87 frozen leaves the
+# 20-seed floor's 62-79/87 figure is measured against). Run o0 first.
+# PREDICTION (the audit's, frozen here): held-out routing Top-1 stays INSIDE the seed
+# band; leaf identity moves (mu-match below 87/87). If leaf count and mu-match fall
+# INSIDE the seed floor, the seed spread is NOT sample-only: the greedy order alone
+# accounts for a comparable part of it. Any other pattern is reported as-is.
+#
+# PROVENANCE. The seed in force is written to diagnostics/run_manifest.json
+# (construction_order_shuffle_seed), printed in the config report, and stamped on
+# fixed_point_certificate.txt. A run without the key is byte-identical to a pre-flag run
+# (ConstructionOrderInertnessTest golden hash).
+#
+# OPS: one arm per process; own outputDir and own -Dranking.db.path
+# (-Dranking.db.path=experiment_results/h9_order/ratings_o3.db); the frozen artifact
+# and snapshots_frozen.db are never modified (new snapshot ids only). This construction
+# activates its own reserved split (seed 42 => the split the frozen build used, NOT the
+# pool of record p2dca21ab5f4ef3ae): after every run, `python tools/analysis/pool_guard.py
+# --activate`, restore frozen_triples_20260727_042523_Headless_Run_Auto_ge_MAIN.json from
+# HEAD, run the audit invariant. runBenchmark = false, so no judging touches the pool.
+#
+datasetType   = "MMLU_PRO"
+
+models        = [
+    "gpt-4o-2024-08-06",
+    "claude-3-5-sonnet-20241022",
+    "gemini-1.5-pro-002",
+    "deepseek-chat-v2_5",
+    "Meta-Llama-3_1-70B-Instruct",
+    "Qwen1.5-72B-Chat",
+    "gpt-4o-mini",
+    "claude-3-5-haiku-20241022",
+    "Mixtral-8x7B-Instruct-v0.1",
+    "c4ai-command-r-v01",
+    "Qwen1.5-14B-Chat",
+    "Meta-Llama-3_1-8B-Instruct",
+    "gemini-1.5-flash-002",
+    "Llama-2-70b-hf",
+    "Llama-2-13b-hf"
+]
+
+category      = ""
+queryLimit    = 0
+outputDir     = "experiment_results/h9_order/o3"
+testRatio     = 0.3
+seed          = 42
+
+# Body = h9_seed137.toml with seed = 42 (the frozen build's split and construction seed)
+# and its outputDir; the key below is the only other difference.
+constructionOrderShuffleSeed = 3
+
+runPipeline        = true
+runBenchmark       = false
+runTrickle         = true
+runBaselines       = false
+enableFinalMetrics = false
+enableLabeling     = false
+judgeInduction     = false
+
+dagMode = "DAG_MAX"
+
+maxDepth              = 8
+minClusterSize        = 55
+proposalSeparationBar = 0.025
+tau                   = 1e-6
+acceptanceZ           = 2.0
+enableRefitGate       = false
+
+membershipFloor       = 0.25
+routingBeamGamma      = 0.2
+descentMargin         = 0.12
+
+effectiveSupportFloor = 2.0
+defaultKappaPrior     = 10.0
+
+numIterations         = 50
+maxLeafAssignments    = 5
+
+fusionSimilarityThreshold = 0.90
+enableGtWarmStart         = false
+
+enableProfiling           = true

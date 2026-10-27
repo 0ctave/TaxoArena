@@ -1,0 +1,141 @@
+{
+  "id": "STAGE3-MATH-CAPFREE",
+  "title": "STAGE3-MATH-CAPFREE: FRAMEWORK item 23 re-registered on the population the framework's own rules admit: the cheap judge with a CHECKER reference on MATH, cap-hit responses excluded (5,992 calls)",
+  "question": "CHECKER-ANSWER-INGEST found the MATH harness capped generations at 1,024 tokens (12-19% of eval-side rows of several models end at the cap), making the 8-model cell's consistent D_c 0.8322 NOT MET under rule 9. On the question-pairs where BOTH responses are terminated under the consistent cap proxy (9,307 of 11,144 = 83.5%): key-decidable accuracy under both conventions (bar 0.75), rho with CI against the admitted-rows key (all-398 beside), raw wrong-direction rate with UB; calibration UNDETERMINED by design.",
+  "kind": "judged",
+  "state": "done",
+  "registration": {
+    "commit": "2976bc4",
+    "program_lines": "docs/judge_v2_program.md (lines as of 5dc8a06) L3960-L3990 (re-registration of item 23; the original STAGE3-MATH by reference L3603 / FRAMEWORK L379)",
+    "date": "2026-09-16",
+    "program_lines_as_of": "5dc8a06",
+    "heading": "## Registered 2026-09-16 (before any call) — STAGE3-MATH-CAPFREE: item 23 re-registered on the population the framework's own rules admit",
+    "outcome_heading": [
+      "L3992: ## STAGE3-MATH-CAPFREE (2026-09-16, 5,992 calls) — FRAMEWORK item 23 on the admitted population: PASS, prediction held; the cheap judge with a checker reference reaches 0.96 on terminated MATH traces"
+    ]
+  },
+  "script": {
+    "path": "tools/analysis/stage3_math.py --checker-table v2 --terminated-only (with tools/analysis/checker_answer_ingest.py --v2; cache stage3_math_grok_v2_capfree.db)",
+    "sha16": "ce8c24152d9ced18",
+    "commit": "2976bc4 (later edited at 7d11c4e)"
+  },
+  "ready": null,
+  "go": "STAGE3-MATH approved as a plan (<= 3,000 matches; programme L3604-L3605 'plan approved'); 2,996 matches / 5,992 calls under the 4,000-match rule",
+  "run": {
+    "outcome_file": "experiment_results/multicorpus/stage3_math_outcome.txt",
+    "outcome_commit": "5c8b813",
+    "calls": 5992,
+    "cce": "not stated in the programme",
+    "pool": "paeec37aa28063c75 (union pool), MATH slice 398 q; 383 distinct questions judged",
+    "date": "2026-09-16",
+    "other_files": [
+      "experiment_results/multicorpus/checker_answers_v2.db (math_checker_answers_v2; checker_answers_v1.db unchanged at sha cc4a4a29...)",
+      "stage3_math_grok_v2_capfree.db (gitignored)"
+    ]
+  },
+  "review": {
+    "file": "no separate review file (pre-dates docs/reviews/); the instrument (checker_answers_v2, the consistent cap proxy) was built by builder + independent checker at registration with every number reproduced exactly (programme L3966-L3974); the post-run rho against the admitted key was recomputed at zero calls",
+    "commit": "2976bc4",
+    "verdict": "instrument reproduces the Block 1 checker exactly (18-model D_c 0.6701 [0.6501, 0.6890]; 8-model 0.8189 [0.7935, 0.8433]; 321 of 3,152 rows at the cap); the checker's LOW recorded before the run: the exclusion is selective on correctness (removed rows' key accuracy 0.034 vs 0.427) and the Qwen2.5-32B / Qwen2.5-Math swap is a property of the two keys"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "key-decidable accuracy under both conventions, bar 0.75",
+      "result": "HELD",
+      "value": "A (ties wrong) 0.958 (n = 1,537; 0.956 with INVALID scored wrong, n = 1,540); B (ties excluded) 0.993 (n = 1,484): PASS under both; decidable tie 0.034, flip 0.182, 11 wrong-direction matches",
+      "denominator": "1,540 key-decidable of 2,996 matches (51%)"
+    },
+    {
+      "id": "C2",
+      "text": "rho with CI against the checker accuracy over the ADMITTED terminated rows, the all-398 figure beside",
+      "result": "HELD",
+      "value": "vs the all-398 key 1.000 [0.905, 1.000] (B = 1,000); vs the judged 383 q 1.000; vs the ADMITTED-rows key, as registered, 0.976: one adjacent swap Qwen2.5-32B (theta +0.948, admitted 0.649) above Qwen2.5-Math-7B (+0.762, admitted 0.672), the swap recorded in advance as a property of the two keys; judged argmax = key argmax = Qwen2.5-72B",
+      "denominator": "8-model board on 2,985 valid matches"
+    },
+    {
+      "id": "C3",
+      "text": "raw wrong-direction rate with upper bound, established counts beside it",
+      "result": "HELD",
+      "value": "24 of 28 pairs established (exact McNemar p < 0.05 on the 383 judged q); wrong 0 of 24 at every threshold 0.90-0.99, exact one-sided 95% UB 0.117; calibration UNDETERMINED by design (nominal < 3 at every threshold)",
+      "denominator": "24 established pairs of 28"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "accuracy >= 0.90",
+      "result": "HELD",
+      "value": "0.958 (A) / 0.993 (B)",
+      "denominator": "1,537 / 1,484 key-decidable"
+    }
+  ],
+  "falsifier": {
+    "text": "none beyond the bar (registered by reference: FRAMEWORK item 23); rule 9 read on the admitted population; the unfiltered cell (0.832 / min 0.597, NOT MET) cited as what the cap costs",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "population": "question-pairs where BOTH responses are terminated under the consistent proxy (cap_hit = cl100k >= 960 AND abrupt end; non_terminated = unclosed <think> OR cap_hit): 9,307 of 11,144 (83.5%); D_c 0.9965 (row), min domain 0.9928 (Precalculus): item-7 rule MET (certifies the EXCLUSION, not the cell); 297 of 3,184 roster rows non_terminated on the union-pool cell",
+    "schedule": "28 pairs x 107, 2,996 matches over 383 distinct questions, seed 42; eligible 6,756 question-pairs (60.6%); filter DISAGREE 2,983 / UNDETERMINED 13; expected key-decidable 1,540 (51.4%)",
+    "guard": "deciding subset 1,540; 3 unparsed or non-terminated (0.2%), 11 overall (0.4%), one finish=length: PASSED",
+    "accuracy": "A 0.958 (n 1,537), 0.956 with INVALID wrong (n 1,540); B 0.993 (n 1,484); ties 0.034; flips 0.182; 11 wrong-direction matches",
+    "board": "rho vs all-398 key 1.000 [0.905, 1.000]; vs admitted-rows key 0.976 (one adjacent swap); theta Qwen2.5-72B +0.954, Qwen2.5-32B +0.948, Qwen2.5-Math +0.762, Llama-3.3-70B +0.288, Llama-3.1-70B -0.102, Phi-3.5 -0.803, Mistral-Small -0.827, Mixtral -1.220",
+    "wrong_direction": "0 of 24 established at every threshold 0.90-0.99; UB 0.117",
+    "cost_of_the_cap": "16.5% of question-pairs excluded; per-model checker accuracy up to +0.10 higher on admitted rows; the unfiltered cell 0.832 / min 0.597"
+  },
+  "sentence_of_record": "STAGE3-MATH-CAPFREE (2026-09-16, 5,992 calls): FRAMEWORK item 23 on the admitted population: PASS, prediction held; the cheap judge with a checker reference reaches 0.96 on terminated MATH traces. With a checker (exact) reference and terminated traces the cheap judge's key-decidable accuracy is 0.958 against 0.849-0.852 on MMLU-Pro under a possibly-wrong reasoning reference and 0.935 on GEN-ARENA's unfiltered MATH cell: the reference ceiling, not the judge, is what MMLU-Pro measures (ORACLE's line). [RESTATED 2026-09-23 by the adversarial audit (insertion only; 0.958 and the PASS stand): the comparison in this clause is a POSITIONING, not a measurement. 0.958 is MATH / 8 models / checker output / terminated traces only (16.5% of question-pairs excluded, the exclusion selective on correctness: removed rows' key accuracy 0.034 vs 0.427) / n = 1,537 convention A; 0.849-0.852 is MMLU-Pro / 12 models / cached reasoning reference / n = 4,499-4,507 on the full x12 schedule. Different corpus, roster, reference form and population; the two were never judged on a shared match and BFCL-JUDGED-PILOT's does_not_show forbids reading such a step as a paired test. The only paired reference contrast inside one corpus in the whole record is PAIR-NOREF's 0.864 vs 0.738 on identical MMLU-Pro matches. AND the reading \"the reference ceiling, not the judge, is what MMLU-Pro measures\" is stronger than the row it cites: ORACLE's criterion (4) decomposes the residual as reference-induced error 0.165 against the judge's IRREDUCIBLE error 0.223 on 302 paired matches, and ORACLE's does_not_show records \"a reference-only explanation of the residual (the judge's own error is the larger half)\". The two sentences are in the record together and are not reconciled; see the OPEN CONTRADICTION note.] The cost of the cap is on the record beside it: 16.5% of question-pairs excluded, and per-model checker accuracy up to +0.10 higher on admitted rows.",
+  "chips": [
+    "PASS: 0.958 / 0.993",
+    "PREDICTION HELD",
+    "0(0) OF 24 ESTABLISHED WRONG",
+    "CALIBRATION UNDETERMINED BY DESIGN"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-23",
+      "by": "registrar, applying the restatement pack R3(b) (adversarial audit; insertion only)",
+      "text": "[RESTATED 2026-09-23 by the adversarial audit (insertion only; 0.958 and the PASS stand): the comparison in this clause is a POSITIONING, not a measurement. 0.958 is MATH / 8 models / checker output / terminated traces only (16.5% of question-pairs excluded, the exclusion selective on correctness: removed rows' key accuracy 0.034 vs 0.427) / n = 1,537 convention A; 0.849-0.852 is MMLU-Pro / 12 models / cached reasoning reference / n = 4,499-4,507 on the full x12 schedule. Different corpus, roster, reference form and population; the two were never judged on a shared match and BFCL-JUDGED-PILOT's does_not_show forbids reading such a step as a paired test. The only paired reference contrast inside one corpus in the whole record is PAIR-NOREF's 0.864 vs 0.738 on identical MMLU-Pro matches. AND the reading \"the reference ceiling, not the judge, is what MMLU-Pro measures\" is stronger than the row it cites: ORACLE's criterion (4) decomposes the residual as reference-induced error 0.165 against the judge's IRREDUCIBLE error 0.223 on 302 paired matches, and ORACLE's does_not_show records \"a reference-only explanation of the residual (the judge's own error is the larger half)\". The two sentences are in the record together and are not reconciled; see the OPEN CONTRADICTION note.]"
+    },
+    {
+      "date": "2026-09-23",
+      "by": "registrar (restatement pack R3(b), ledger half, on the coordinator's ruling; zero calls)",
+      "text": "The R3(b) bracket of this record's sentence_of_record is now also in the ledger row STAGE3-MATH-CAPFREE, after the row's own clause 'reaches 0.958 against 0.849-0.852 on MMLU-Pro under a possibly-wrong reasoning reference - ORACLE's line;' (the row does not carry the record's wording verbatim). [ledger] observed cell, v133."
+    }
+  ],
+  "does_not_show": [
+    "anything about the 297 non-terminated responses (rule 10 keeps them out of every verdict)",
+    "calibration (by design)",
+    "the unfiltered MATH cell (STAGE3-MATH: 0.832 / min 0.597, NOT MET under rule 9)"
+  ],
+  "ledger": {
+    "row_id": "STAGE3-MATH-CAPFREE",
+    "version": "v105 (eece8b0) [v133 2026-09-23: bracket in this row]"
+  },
+  "depends_on": [
+    "STAGE3-MATH",
+    "CHECKER-ANSWER-INGEST",
+    "GEN-ARENA",
+    "ORACLE",
+    "MATH-FIX",
+    "CERT-CORPUS"
+  ],
+  "supersedes": "STAGE3-MATH's held registration on the unfiltered cell (NOT MET under rule 9)",
+  "superseded_by": null,
+  "closed_line": false,
+  "sources": [
+    "docs/judge_v2_program.md (lines as of 5dc8a06) L3960-L3990 (re-registration 2976bc4): why, instrument, population, schedule, criteria, prediction, the checker's LOW; FRAMEWORK L379 item 23",
+    "docs/judge_v2_program.md (lines as of 5dc8a06) L3992-L4019 (outcome section 5c8b813): the run, guard, (1)-(3), the reading",
+    "experiment_results/multicorpus/stage3_math_outcome.txt (5c8b813)",
+    "docs/test_ledger.html row STAGE3-MATH-CAPFREE (v105): chips verbatim, evidence (stage3_math.py flags, checker_answer_ingest.py --v2, outcome, checker_answers_v2.db, cache, 2976bc4, 5c8b813)",
+    "script sha16 = sha256 of tools/analysis/stage3_math.py at 2976bc4, first 16 hex (identity, computed by the registrar 2026-09-22; later edited at 7d11c4e)",
+    "stable anchor: registration.heading / registration.outcome_heading are the exact '## ...' lines (grep -n them regardless of line drift); line numbers are as of programme HEAD 5dc8a06"
+  ],
+  "last_update": "2026-09-23",
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Measures the cheap judge's accuracy against the key on MATH, 8 models (5,992 calls). The judge gets an exact checker reference answer. Responses cut off by the 1,024-token generation cap are excluded (83.5% of question pairs kept).",
+    "why": "The unfiltered MATH cell failed the accuracy bar because truncated answers polluted it. The test asks whether the judge is reliable on the population the framework's rules admit.",
+    "information": "Passing shows the cheap judge is accurate when it has an exact reference. Result: done, passed (0.958 accuracy, bar 0.75). Comparing this with MMLU-Pro's 0.85 is only a positioning, not a measurement: corpus, models and reference type differ, and the excluded rows were mostly wrong answers. It says nothing about the truncated responses or about calibration.",
+    "written": "2026-10-07"
+  }
+}

@@ -1,0 +1,219 @@
+{
+  "ready": null,
+  "go": "n/a (0 calls; Amendment 6)",
+  "run": {
+    "outcome_file": "experiment_results/x12_crossdomain/agree_order_outcome.txt",
+    "outcome_commit": "dce5566",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-19",
+    "other_files": [
+      "experiment_results/x12_crossdomain/agree_order_cells.csv",
+      "experiment_results/x12_crossdomain/agree_order_models.csv"
+    ]
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-19_zero_call_batch2.md §3",
+    "commit": "83cb8e5",
+    "verdict": "numbers READY (all CONFIRMED to 4 dp); the builder's VERDICT 'C1 HELD' is NOT READY: UNDETERMINED on the mechanism per the registered half-held rule"
+  },
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "depends_on": [
+    "PROFILE-R-FILTERED",
+    "H3",
+    "TOPIC-DIFFICULTY",
+    "PROFILE-DEVIATION-CERT"
+  ],
+  "last_update": "2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307)",
+  "id": "AGREE-ORDER",
+  "title": "AGREE-ORDER: is the reproducible order carried by the same-answer (AGREE) matches the filter removes a LENGTH order, a POSITION order, or a contestant-identity order?",
+  "question": "On the 8,922 AGREE matches (x12 3,076 + x20 5,846) of the 2,811 judged questions: H3's length logistic on AGREE decisive matches, the length-matched AGREE-only split-half R against a random same-size subsample, the position-consistent shares against DISAGREE, theta_AGREE's Spearman with length / the unfiltered theta / the key; deviation-residue leg on the 8 wrong-sign cells registered expecting UNDETERMINED.",
+  "kind": "zero-call",
+  "state": "UNDETERMINED",
+  "registration": {
+    "commit": "5205c1d",
+    "program_lines": "docs/judge_v2_program.md L8065-L8222",
+    "date": "2026-09-19"
+  },
+  "script": {
+    "path": "tools/analysis/agree_order.py",
+    "sha16": "39d996f9effd47b1",
+    "commit": "dce5566"
+  },
+  "criteria": [
+    {
+      "id": "C0",
+      "text": "GATE: the AGREE-only R reproduces 0.648 to 2 dp and the counts 3,076 / 5,846 / 5,276 / 5,166 / 790 / 1,382 exactly",
+      "result": "HELD",
+      "value": "0.6477 (r 0.4790; SD 0.0380); counts exact",
+      "denominator": "8,922 AGREE matches; 40 halvings Random(7), model-demeaned, prior one pseudo-match per pair"
+    },
+    {
+      "id": "C1",
+      "text": "LENGTH IS THE MECHANISM: (L1) beta_len on AGREE decisive >= +2.5 / 1k with the clustered CI excluding 0, AND (L3) the length-matched AGREE-only R < 0.50 at the point",
+      "result": "UNDETERMINED",
+      "value": "L1 HELD: +2.8119 [+2.504, +3.119] on 5,814 AGREE decisive (both-wrong +2.3921; DISAGREE +0.3201); L3 UNDETERMINED-by-support: matched R 0.3275 vs random same-size 0.36-0.38 (builder seeds mean 0.359, reviewer 0.377), selection 0.03-0.05, 9 of 14 anchors < 120 q; verdict UNDETERMINED on the mechanism per the registered half-held rule (the builder printed HELD)",
+      "denominator": "5,814 AGREE decisive on 1,979 q (L1); 4,054 matched of 8,922 (L3)"
+    },
+    {
+      "id": "C2",
+      "text": "POSITION IS NOT: the AGREE-minus-DISAGREE difference in the position-consistent share has a CI including 0 or a point difference below 2pp",
+      "result": "HELD",
+      "value": "HELD on the 2pp clause only: both-FIRST +1.13pp [+0.79, +1.46] excludes 0; both-SECOND -0.64pp [-1.29, +0.04]; union +0.49pp [-0.22, +1.24] includes 0",
+      "denominator": "8,922 AGREE vs 10,442 DISAGREE; clustered bootstrap over 2,778 q"
+    },
+    {
+      "id": "C3",
+      "text": "IDENTITY: reported; the sentence names the largest of the three correlations",
+      "result": "DELIVERED",
+      "value": "unfiltered theta +0.9759 > key +0.9263 > length +0.8436: the AGREE-only order's nearest description is the unfiltered theta",
+      "denominator": "20 models"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "(plan) beta_len on AGREE decisive >= +2.5 / 1k",
+      "result": "HELD",
+      "value": "+2.8119",
+      "denominator": "5,814"
+    },
+    {
+      "id": "P2",
+      "text": "(plan) Spearman(theta_AGREE, mean length) >= 0.6",
+      "result": "HELD",
+      "value": "+0.8436 (uninformative: length correlates 0.83 with the unfiltered theta and 0.78 with the key)",
+      "denominator": "20 models"
+    },
+    {
+      "id": "P3",
+      "text": "(plan) length-matched AGREE-only R < 0.50",
+      "result": "HELD",
+      "value": "0.3275 at the point (UNDETERMINED-by-support on 9 anchors)",
+      "denominator": "4,054 matched"
+    },
+    {
+      "id": "P4",
+      "text": "(registrar) both-wrong beta within +-1.0 / 1k of both-right",
+      "result": "HELD",
+      "value": "+2.392 vs +2.885, diff -0.493",
+      "denominator": "784 / 5,030"
+    },
+    {
+      "id": "P5",
+      "text": "(registrar) AGREE tie rate exceeds DISAGREE by >= 10pp",
+      "result": "HELD",
+      "value": "+0.2256 [+0.2105, +0.2401]",
+      "denominator": "merged"
+    },
+    {
+      "id": "P6",
+      "text": "(registrar) first-position-consistent share differs by < 2pp",
+      "result": "HELD",
+      "value": "+0.0113",
+      "denominator": "merged"
+    },
+    {
+      "id": "P7",
+      "text": "(registrar) Spearman(theta_AGREE, key) in [-0.35, 0.05]",
+      "result": "FAILED",
+      "value": "+0.9263 (the -0.18 was a two-way interaction correlation, not an order correlation)",
+      "denominator": "20 models"
+    },
+    {
+      "id": "P8",
+      "text": "(registrar) (D) 0 of 8 decidable AND >= 2 of the 3 established cells positive",
+      "result": "FAILED",
+      "value": "decidable 0 of 8; established positive 1 of 3",
+      "denominator": "8 cells"
+    }
+  ],
+  "falsifier": {
+    "text": "F1: length-matched AGREE-only R >= 0.60 at the point; overturns the plan's R4 claim that the removed order is verbosity. VACUOUS at the matched size (a random same-size subsample reads 0.36): its silence is not evidence for length (registration defect, bracketed)",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "counts": "x12 AGREE 3076 / DISAGREE 5276 / UNDETERMINED 790; x20 5846 / 5166 / 1382; merged AGREE 8,922, DISAGREE 10,442",
+    "AGREE_only_R": "0.6477 (r 0.4790; SD 0.0380; interaction-only 0.6477; seed 99 0.6343; prior-per-match variant 0.6020)",
+    "beta_len_AGREE_decisive": "merged +2.8119 [+2.504, +3.119] (n 5,814; z 17.93); x12 +2.3085; x20 +2.7701; both-right +2.8847 [+2.551, +3.218]; both-wrong +2.3921 [+1.625, +3.159]; DISAGREE +0.3201 [+0.230, +0.410]; ALL decisive +0.8107",
+    "terciles_both_right": "+3.444 / +2.685 / +1.320 (TOPIC-DIFFICULTY +3.44 / +2.69 / +1.32 reproduced)",
+    "matched_R": "0.3275 (r 0.1958; SD 0.0536) on 4,054 matched of 8,922; random same-size: builder 0.3529 / 0.3100 / 0.3619 / 0.4099 / 0.3604 (mean 0.359), reviewer mean 0.3771; support 84-90%, selection 0.03-0.05",
+    "spearman_20_models": "theta_AGREE vs length +0.8436; vs unfiltered theta +0.9759; vs key +0.9263; theta_matched vs length +0.8226; (key, length) +0.7759; (unfiltered, length) +0.8256",
+    "two_way_interaction_r": "(AGREE theta, key) -0.1816; (AGREE theta, length) +0.4024; (unfiltered theta, key) +0.2754; (unfiltered theta, length) +0.3566 (reviewer)",
+    "position": "AGREE both-FIRST 0.0184 / both-SECOND 0.0474 / tie 0.3484; DISAGREE 0.0071 / 0.0538 / 0.1228; diff FIRST +0.0113 [+0.0082, +0.0146], SECOND -0.0064 [-0.0129, +0.0004], union +0.0049 [-0.0022, +0.0124], tie +0.2256 [+0.2105, +0.2401]",
+    "deviation_leg": "0 of 8 decidable (all q_w < 120); established: arx_3/Math +0.102 [+0.027, +0.175], sonnet/Law -0.087, gemini/Law -0.204 [-0.297, -0.112]",
+    "reconciliation_residual": "resolved by the 2026-09-18 bracket at L4883 / L5201: TOPIC-DIFFICULTY's 34.3% / 48.2% counted 64 / 134 both-missing matches as equal"
+  },
+  "sentence_of_record": "UNDETERMINED on the mechanism: beta_len +2.81/1k [+2.50, +3.12] on 5,814 AGREE decisive matches (L1 HELD; both-wrong +2.39); length-matched AGREE-only R 0.3275 against 0.648 unmatched and 0.36-0.38 for a random same-size subsample (L3 UNDETERMINED-by-support: 9 of 14 anchors < 120 q; selection 0.03-0.05)",
+  "chips": [
+    "C0 HELD",
+    "C1 L1 HELD / L3 UNDETERMINED-by-support -> mechanism UNDETERMINED",
+    "C2 HELD (2pp clause only; +1.1pp CI excl. 0)",
+    "C3 unfiltered theta 0.976",
+    "P7 FAILED (+0.93)",
+    "P8 FAILED",
+    "F1 silent (vacuous at this size)",
+    "(D) UNDETERMINED"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-19",
+      "by": "AGREE-ORDER post-run review D1 (docs/reviews/2026-09-19_zero_call_batch2.md, 83cb8e5)",
+      "text": "C1: L1 HELD; L3 UNDETERMINED-by-support (matched R 0.3275 vs random same-size 0.36-0.38, selection 0.03-0.05; 9 anchors < 120 q); verdict UNDETERMINED on the mechanism per the registered half-held rule."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "AGREE-ORDER post-run review D2 (registration defect)",
+      "text": "F1 (matched R >= 0.60) was vacuous at the matched size (a random same-size subsample reads 0.36); P2 is uninformative (length correlates 0.83 with the unfiltered theta and 0.78 with the key). Bracket also at the registration's FALSIFIER paragraph, L8172."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "AGREE-ORDER post-run review D3",
+      "text": "P7 FAILED +0.926: the AGREE-only ORDER is the board's order (rho 0.976 with the unfiltered theta, 0.926 with the key); only its per-anchor deviation profile is non-key (two-way r -0.18 with the key, +0.40 with the length profile). PROFILE-R-FILTERED's 'anti-correlated with the key profile r -0.18' bracketed by insertion (programme L6753 / L6812 / L6837; ledger row)."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "AGREE-ORDER post-run review D4",
+      "text": "C2 HELD on the 2pp clause only; first-position excess +1.13pp CI [+0.79, +1.46] excludes 0; both-second -0.64pp [-1.29, +0.04]; union +0.49pp includes 0."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "AGREE-ORDER post-run review D5",
+      "text": "the '-0.7pp left for the checker' residual was already resolved by the 2026-09-18 bracket at L4883: both-missing matches counted as equal."
+    },
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (Wave-0 record; insertion only; zero calls)",
+      "text": "[P-FAM] class: full member (docs/reviews/RULING_w0_p2dca_family.md, 5effe96, Appendix A at ledger blob fedff88e). The ledger row now carries: [P-FAM 2026-09-27: p2dca judged family — history, not evidence (docs/reviews/RULING_w0_p2dca_family.md)]. Long form of record: docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)."
+    }
+  ],
+  "does_not_show": [
+    "that the AGREE-only order's reproducibility (R 0.648) is length (UNDETERMINED: matching cannot be separated from support at this size)",
+    "that it is NOT length (F1 was vacuous)",
+    "any model's theta or position under the AGREE selection (only R and Spearman are read)",
+    "a frontier order (the top-4 is a set)",
+    "anything about the 8 deviation cells' standing (0 of 8 decidable)",
+    "that the filter removes a NON-KEY order (it removes matches carrying the board's order with a length-tracking deviation profile)",
+    "x20 alone; any change to the recipe or the filter"
+  ],
+  "ledger": {
+    "row_id": "AGREE-ORDER",
+    "version": "v116; [P-FAM] bracket v307 (2026-09-27)"
+  },
+  "sources": [
+    "experiment_results/x12_crossdomain/agree_order_outcome.txt (dce5566): counts, L1-L3, (P), (D), criteria and predictions as printed (VERDICT line 'C1 HELD' superseded)",
+    "docs/reviews/2026-09-19_zero_call_batch2.md §3 (83cb8e5): CONFIRMED status, reviewer's same-size comparator, two-way correlations, D1-D5, sentence of record, chips",
+    "docs/judge_v2_program.md §AGREE-ORDER registration L8065-L8222 and outcome section (this commit); PROFILE-R-FILTERED brackets L6753 / L6812 / L6837 (this commit)",
+    "docs/reviews/RULING_w0_p2dca_family.md (5effe96) Appendix A; docs/judge_v2_program.md L21459-L21504 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run) — the two Wave-0 RULINGS: (1) the a ...\"; _as_of the commit that writes it, parent 5effe96, re-grepped)"
+  ],
+  "plain_description": {
+    "sq": "SQ2 Trust",
+    "what": "Takes the 8,922 judged matches where both models gave the same final answer, which the filter normally throws away. It asks whether the stable model order these matches still produce comes from answer length, from which side is shown first, or from the models themselves. No new judge calls.",
+    "why": "It checks whether the judge's order on 'same-answer' matches is a real ability signal or a length bias that the filter quietly removes.",
+    "information": "If length explained it, the filter would be removing a bias. If it did not, the filter would be throwing away real signal. Result: undetermined. Within these matches the judge clearly prefers longer answers. But once the matches are length-matched, too few questions remain to tell 'length' apart from 'too little data'. The order these matches give is basically the usual leaderboard order. A later ruling classes this run's judged data as history, not evidence.",
+    "written": "2026-10-07"
+  }
+}

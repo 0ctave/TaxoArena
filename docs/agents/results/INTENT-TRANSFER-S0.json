@@ -1,0 +1,270 @@
+{
+  "id": "INTENT-TRANSFER-S0",
+  "title": "INTENT-TRANSFER-S0: known-answer stage 0 on MASSIVE en-US, CLINC150 (+OOS) and Banking77: embedder dependence against gold (C1a/C1b), label-free no-match as OOS detection (C2), a label-free cell margin vs gold purity (C3), slot-swap stability of flat cells (C4); no build (DONE 2026-10-01: VALID; C1a/C2/C3 HELD, C4 FAILED, F4 FIRED; zero calls)",
+  "question": "On three intent corpora with a known answer (MASSIVE en-US 18/60, CLINC150 10/150 + OOS, Banking77 77), split content-closed by CK-CLOSE-v1 hash sides, does the embedder dependence seen on MMLU-Pro (coarse holds, fine depends) reappear against GOLD labels, does label-free no-match detect out-of-scope, does a label-free cell margin predict gold cell purity, and is a flat cell a stable address under slot swaps?",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "the commit that writes this record (parent 7a95a1a)",
+    "program_lines": "docs/judge_v2_program.md L22092-L22134",
+    "program_lines_as_of": "the commit that writes them, parent 7a95a1a, re-grepped",
+    "date": "2026-09-29",
+    "heading": "## Registered 2026-09-29 (before any code or call) \u2014 INTENT-TRANSFER-S0: on three intent corpora with a known answer (MASSIVE en-US 18/60, CLINC150 10/150 + OOS, Banking77 77), split content-closed by CK-CLOSE-v1 hash sides, does the embedder dependence seen on MMLU-Pro (coarse holds, fine depends) reappear against GOLD labels, ...",
+    "index_section": "docs/judge_v2_program.md L22080-L22090 (section \"## Registrar's record 2026-09-29 (insertion only; zero calls; nothing run; pre-data) \u2014 the author's decisions D1, D3, D4, D5 on INTENT-TRANSFER (D2 open); ...\"; _as_of the commit that writes it, parent 7a95a1a, re-grepped)",
+    "provenance": "the research lead's draft, section \"## 7. Registration draft: INTENT-TRANSFER-S0 (for the registrar; not committed as a registration until D1)\" of docs/agents/plans/2026-09-29_intent_transfer_design.md (7a95a1a, blob:d5fb15fe5534b915222a8635795810ceeb1072d2, LF), registered as drafted except the registrar's pre-data items R-1..R-5; the author's D1 'Yes, all three' (plan Amendment 29)"
+  },
+  "script": {
+    "path": "tools/ingest/intent_ingest.py; tools/analysis/intent_transfer_s0.py",
+    "sha16": "blob:33f33f2159c9876c4b8cca1a8973a4656aa500cd / sha256-lf16:4f20b299b13902ec (ingest); blob:8386a99f84c96b493e3aa20954716cca9e6a55f7 / sha256-lf16:192a49cff75789f0 (analysis); LF of record, from READY 0f3591a \"## Pins\" [2026-10-01: at 1d822bd intent_transfer_s0.py blob:f662ceb19738f515972871f5963f5dcfc764a271 / sha256-lf16:0c71d9dd1bb37f17; embedder_arms.py blob:2073d1315981a30464037913b85ce2bf8838aa00; LF of record, from READY_emb_pace 59073f4 '## PINS']",
+    "commit": "9b32cc4 (merged by path 61d7bfe); delta 9192a38 (merged 6885f92); emb-pace f0dda20 (merged 1d822bd)"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_intent_s0c.md",
+    "commit": "4fb2459",
+    "at": "9192a38 (merged by path 6885f92)",
+    "verdict": "MERGEABLE; READY for --embed --go on qwen3/nomic/gemma (per-embedder parity bar qwen3 0.9980, nomic/gemma 0.9999); --run gated on the registrar pinning the embedding DBs (pinned 2026-10-01)",
+    "also": "docs/reviews/READY_emb_pace.md 59073f4 on f0dda20 (merged 1d822bd): READY for the three --embed --go under C-EP-1..4; prior: READY_intent_s0.md 0f3591a",
+    "source": "READY_intent_s0c.md verdict line; READY_emb_pace.md '## VERDICT'",
+    "prior": {
+      "file": "docs/reviews/READY_intent_s0.md",
+      "commit": "0f3591a",
+      "at": "9b32cc4",
+      "verdict": "MERGEABLE; fetch -> census READY with C-5 (run 960decf); embedding READY after C-2, C-3, C-6; --run NOT READY until C-1 and C-4 (bracketed 2026-09-30)",
+      "conditions": [
+        "C-1 HIGH: BRACKETED 2026-09-30 (basic interval, D - b printed)",
+        "C-2 MEDIUM code (implement C-1) OPEN",
+        "C-3 MEDIUM code (kill RV-2/4/5/6) OPEN",
+        "C-4 MEDIUM: BRACKETED 2026-09-30 (B2 fail-observable wording; B3 seed 0; B7 design doc, printed)",
+        "C-5 LOW: DONE (fetch --dry-run first, 960decf)",
+        "C-6 LOW code (print OLLAMA_URL) OPEN",
+        "C-7 LOW: registrar half DISCHARGED (Support (d) bracketed); code argument order open",
+        "C-8: annot_text_mismatch = 0, run-operator before embedding OPEN"
+      ],
+      "source": "docs/reviews/READY_intent_s0.md (0f3591a) \"## Verdict\" and \"## Defects and conditions\""
+    }
+  },
+  "go": "n/a (0 calls, 0 cce); corpora admitted by the author's D1 'Yes, all three' (plan Amendment 29); lane before RP12 (plan Amendment 28); fetch -> census run 960decf",
+  "run": {
+    "outcome_file": "experiment_results/intent_transfer/s0_outcome.txt (blob:812b277f423dd40f6fea4d975cb9fb36e56b4f14, LF of record, 0 CR; write-once)",
+    "outcome_commit": "6d04e84",
+    "calls": 0,
+    "cce": 0,
+    "pool": "none (the study's own DBs; no pool of record)",
+    "date": "2026-10-01",
+    "script": "tools/analysis/intent_transfer_s0.py blob:f662ceb19738f515972871f5963f5dcfc764a271 (LF)"
+  },
+  "review": {
+    "file": "docs/reviews/POSTRUN_intent_s0.md",
+    "commit": "c9c2fed",
+    "verdict": "VALID; every deciding number reproduced to the printed digit; wording conditions W-1..W-5; defects D-1 (F-line wording, MEDIUM), D-2 (DOES NOT SHOW digest, LOW), D-3 (CLINC near-copy denominator, LOW), all applied by the registrar"
+  },
+  "criteria": [
+    {
+      "id": "S0-C1a",
+      "text": "fine dependence (POINT AND INTERVAL, conjunctive): WORSE(e,g) iff D < -max(MDE80, spread) AND the paired CI below 0; HELD iff >= 1 of {nomic, gemma} WORSE at the fine level on >= 2 of 3 corpora; FAILED otherwise [CORRECTED 2026-09-30 by C-1 / C-4 B2 (the orchestrator, pre-data): the paired interval of record is the BASIC bootstrap interval (D - b printed, not deciding); C1a HELD iff at least 2 of 3 corpora carry a WORSE fine family (either family), FAILED iff fewer than 2]",
+      "result": "HELD",
+      "value": "3 of 3 corpora with a WORSE fine family (nomic on all three; gemma none). Fine D(nomic) MASSIVE -0.06521 basic [-0.07370, -0.06137] bar 0.02463 (R-1 DESCRIPTIVE-ONLY); CLINC -0.02539 [-0.02972, -0.02400] bar 0.00968; Banking77 -0.05443 [-0.06237, -0.05140] bar 0.01648. Two-sided (W-1): gemma BETTER fine on MASSIVE +0.03340 and Banking77 +0.05628, NEITHER on CLINC -0.00691. Holds on CLINC and Banking77 alone.",
+      "denominator": "EVAL in-scope MASSIVE 4,946 / CLINC 6,672 / Banking77 3,908; 3 corpora"
+    },
+    {
+      "id": "S0-C1b",
+      "text": "coarse (non-fire readout): NOT FIRED iff 0 of 2 families WORSE at the coarse level on both MASSIVE and CLINC; FIRES otherwise; a non-fire is never parity",
+      "result": "n/a",
+      "value": "NOT FIRED: 0 of 2 families WORSE at coarse on MASSIVE and CLINC (nomic -0.01164 / -0.09114; gemma +0.13529 / -0.04216; bars 0.03858 / 0.13023 / 0.04419 / 0.13622). W-2: not fired (coarse differences lie inside the coarse k-means seed spread); with a bar of MDE80 only C1b would FIRE on CLINC; never 'coarse holds', never parity.",
+      "denominator": "EVAL MASSIVE 4,946 / CLINC 6,672"
+    },
+    {
+      "id": "S0-C2",
+      "text": "OOS (INTERVAL): A = AUROC of max-cos to label-free k-means (K 150) centroids, CLINC in-scope EVAL vs OOS; HELD iff lower(A) >= 0.85; FAILED iff upper(A) < 0.85; UNDETERMINED otherwise [CORRECTED 2026-09-30 by C-4 B3: k-means seed 0 CONFIRMED]",
+      "result": "HELD",
+      "value": "A 0.97437, 95% CI [0.97043, 0.97813] (stratified component bootstrap B 2,000); FPR95 0.1578 at the GATE threshold 0.74326 (GATE TPR 0.9503, n 2,333); supervised-centroid A 0.97640 (W-3: CLINC OOS is one curated set; K 150 qwen3 seed 0)",
+      "denominator": "6,672 CLINC in-scope EVAL vs 1,350 OOS (every OOS row)"
+    },
+    {
+      "id": "S0-C3",
+      "text": "label-free cell quality (INTERVAL): rho = Spearman(m_c, EVAL gold purity_c) at K_f (qwen3 256, seed 0), cell bootstrap; HELD iff lower(rho) > 0 on >= 2 of 3; FAILED iff upper(rho) <= 0 on >= 2 of 3; UNDETERMINED otherwise",
+      "result": "HELD",
+      "value": "lower(rho) > 0 on 2 of 3: CLINC 0.4107 [0.2652, 0.5405] (145 cells), Banking77 0.3945 [0.1741, 0.5834] (76 cells); MASSIVE 0.2705 [-0.0154, 0.5102] (57 cells) not shown positive (W-4: a positive sign, not a per-cell diagnostic)",
+      "denominator": "cells scored 57 / 145 / 76 (cells < 10 EVAL excluded: 3 / 5 / 1)"
+    },
+    {
+      "id": "S0-C4",
+      "text": "slot-swap stability, MASSIVE (INTERVAL): S = P(same k-means cell at K_f 60 | original, variant); HELD iff lower(S) >= 0.80; FAILED iff upper(S) < 0.80; UNDETERMINED otherwise [CORRECTED 2026-09-30 by C-4 B3: k-means seed 0 CONFIRMED; B7: the slot variant follows the design doc, slots swapped per variant printed]",
+      "result": "FAILED",
+      "value": "S 0.75978, 95% CI [0.74566, 0.77419], upper < 0.80; seeds 1-4 0.739-0.772; beside: supervised-centroid label stability 0.834, kNN-1 0.829, random same-intent co-filing 0.692 (W-5); by slots 1: 0.774 (2,094), 2: 0.732 (850), 3+: 0.737 (278)",
+      "denominator": "3,222 MASSIVE EVAL variants in 3,207 components (4,946 EVAL, 3,310 with a slot, -56 no alternative, -32 TRAIN collision); DEFF 1.0093, n_eff 3,192"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "levels (qwen3 256, seed mean) NMI: MASSIVE coarse 0.68 [0.58, 0.78] K 18, fine 0.78 [0.72, 0.84] K 60; CLINC coarse 0.50 [0.38, 0.62] K 10, fine 0.90 [0.86, 0.93] K 150; Banking77 fine 0.80 [0.74, 0.85] K 77",
+      "result": "HELD",
+      "value": "5 of 5 in interval: MASSIVE coarse 0.6553, fine 0.7642; CLINC coarse 0.5761, fine 0.9280; Banking77 fine 0.8399",
+      "denominator": "per corpus and level"
+    },
+    {
+      "id": "P2",
+      "text": "fine nomic D MASSIVE -0.025 [-0.05, 0.00], CLINC -0.020 [-0.04, 0.00], Banking77 -0.030 [-0.06, -0.005]; fine gemma D -0.010 [-0.035, +0.015] each; C1a HELD 0.55; C1b NOT FIRED 0.65; qwen3 BETTER than both at fine on >= 2 of 3: 0.40",
+      "result": "FAILED",
+      "value": "3 of 6 D intervals: nomic MASSIVE -0.0652 FAILED, CLINC -0.0254 HELD, Banking77 -0.0544 HELD; gemma MASSIVE +0.0334 FAILED, CLINC -0.0069 HELD, Banking77 +0.0563 FAILED; C1a HELD p 0.55 YES (Brier 0.2025); C1b NOT FIRED p 0.65 YES (0.1225); qwen3 BETTER than both p 0.40 NO (0.1600)",
+      "denominator": "C1"
+    },
+    {
+      "id": "P3",
+      "text": "C2: A 0.88 [0.80, 0.94]; FPR95 0.45 [0.30, 0.65]; HELD 0.65; supervised-centroid A printed, predicted 0.91",
+      "result": "FAILED",
+      "value": "A 0.9744 outside [0.80, 0.94]; FPR95 0.1578 outside [0.30, 0.65] (favourable direction); supervised-centroid A 0.9764 (predicted 0.91); C2 HELD p 0.65 YES (0.1225)",
+      "denominator": "C2"
+    },
+    {
+      "id": "P4",
+      "text": "C3: rho 0.45 [0.20, 0.65] MASSIVE, 0.50 [0.35, 0.62] CLINC, 0.45 [0.25, 0.62] Banking77; HELD 0.75",
+      "result": "HELD",
+      "value": "3 of 3 in interval: 0.2705 / 0.4107 / 0.3945; C3 HELD p 0.75 YES (0.0625)",
+      "denominator": "C3"
+    },
+    {
+      "id": "P5",
+      "text": "C4: S 0.90 [0.85, 0.95]; HELD 0.85; kNN-1 label stability below supervised-centroid stability 0.60",
+      "result": "FAILED",
+      "value": "S 0.7598 outside [0.85, 0.95]; C4 HELD p 0.85 NO (Brier 0.7225, honest); kNN-1 below supervised-centroid p 0.60 YES (0.1600); mean Brier of the 7 probabilities 0.2218",
+      "denominator": "C4"
+    },
+    {
+      "id": "P6",
+      "text": "descriptive, scored at the point: H(MASSIVE) 0.45 [0.25, 0.65], H(CLINC) 0.55 [0.30, 0.75], both above random p95; within-scenario share of MASSIVE confusion >= 0.55; selective filing at 80% coverage raises MASSIVE fine precision >= 5pp",
+      "result": "FAILED",
+      "value": "2 of 4: H(MASSIVE) 0.4040 HELD (p95 0.0370); H(CLINC) 0.1429 FAILED (above p95 0.0161); D3 within-scenario share 0.3119 < 0.55 FAILED; D4 +0.0773 >= +0.05 HELD",
+      "denominator": "D2, D3, D4"
+    }
+  ],
+  "falsifier": {
+    "text": "F1 C1a FAILED -> E0b's fine embedder dependence (k 82, nomic WORSE) narrows to MMLU-Pro and one draw. F1' C1b FIRES -> E0b's coarse 'not shown worse' does not generalise. F2 C2 FAILED -> no-match is not an OOS detector; stage 3 declined; no-match may not be described as scope detection. F3 C3 FAILED -> no self-diagnostic for label-free cells; S1 strengthened. F4 C4 FAILED -> every filing rate of record (81.6%) carries 'surface-sensitive, untested on capability text'. None revises a recorded number. [OUTCOME 2026-10-01 (D-1 form): F1 (fires iff C1a FAILED): NOT FIRED; F1' (fires iff C1b FIRES): NOT FIRED; F2 (fires iff C2 FAILED): NOT FIRED; F3 (fires iff C3 FAILED): NOT FIRED; F4 (fires iff C4 FAILED): FIRED, consequence verbatim from the registration: \"flat cells are not stable addresses under slot swaps on the easiest known answer; every filing rate of record (81.6%) carries 'surface-sensitive, untested on capability text'\"; beside it supervised-centroid stability 0.834 and same-intent co-filing 0.692]",
+    "fired": true
+  },
+  "numbers_of_record": {
+    "census": "EVAL MASSIVE 4,946; CLINC in-scope 6,672 + OOS 1,350; Banking77 3,908 (each within 5% of the planning 4,890 / 6,750 / 1,350 / 3,925); 22 cross-label twins removed (MASSIVE 14, CLINC 8); 210 cross-corpus stem_key collisions disclosed; 53,454 items (experiment_results/intent_transfer_s0/ingest/ingest.log)",
+    "study_db": "intent_transfer_corpora_v1.db sha256-bytes 487e0093719c184c98bca53bc9bc61c193559690abb206d77010fd77f81c09a2; items_sha256 540291cc8e2ebfcf2d2768dba2b2026e053e2d643d66bdaf0bcf4b2942da6ab1; five raw-file sha256 pinned in experiment_configs/intent_transfer_s0_pins.json",
+    "support_correction": "C2 Hanley-McNeil SE 0.0036 (counts in HM's own order, DEFF 1.05) is CORRECT; the registered 0.0059 is CONSERVATIVE; SCOREABLE unchanged (READY 0f3591a claim 10)",
+    "emb_pins (sha256-bytes; pre-data, not a readout)": "qwen3 9e100e04fc91b137a075b8abedbc87d2b29a6dc2244c5f242b1c587004a4ee74; nomic 4aafd6c7fa5f779ee21f152eb7e935774323903b32117f48f6acd24d1ccf11ad; gemma b187b82f90ce98376ba3ffac100157493fd8c5ee52dfa88f707738dde2acf512; 57,350 texts each (f4ad285 logs)",
+    "transport_parity_final (pre-data)": "qwen3 min cos 0.998761 (bar 0.9980), nomic 1.000000, gemma 0.999995 (bar 0.9999), 20 texts each, PASS (final --go logs; Ollama 0.35.0, flash attention on)",
+    "C1a_fine_D_nomic": "MASSIVE -0.06521 basic [-0.07370, -0.06137] (R-1 DESCRIPTIVE-ONLY); CLINC -0.02539 [-0.02972, -0.02400]; Banking77 -0.05443 [-0.06237, -0.05140]; EVAL 4,946 / 6,672 / 3,908",
+    "C1a_fine_D_gemma": "MASSIVE +0.03340 [+0.02974, +0.04115] BETTER; CLINC -0.00691 [-0.01015, -0.00475] NEITHER; Banking77 +0.05628 [+0.05341, +0.06298] BETTER",
+    "C1b_coarse_D": "nomic MASSIVE -0.01164 / CLINC -0.09114; gemma +0.13529 / -0.04216; bars 0.03858 / 0.13023 / 0.04419 / 0.13622 (k-means seed spread decides; NOT FIRED)",
+    "C2_AUROC": "0.97437 [0.97043, 0.97813]; FPR95 0.1578 (GATE thr 0.74326); n_in 6,672, n_OOS 1,350; supervised-centroid 0.97640",
+    "C3_rho": "MASSIVE 0.2705 [-0.0154, 0.5102] (57 cells); CLINC 0.4107 [0.2652, 0.5405] (145); Banking77 0.3945 [0.1741, 0.5834] (76)",
+    "C4_S": "0.75978 [0.74566, 0.77419], n 3,222 variants / 3,207 components, DEFF 1.0093, SE 0.00748",
+    "C4_beside": "supervised TRAIN-centroid label stability 0.834; kNN-1 0.829; random same-intent co-filing 0.692 (3,222 pairs)",
+    "support_measured": "Kish DEFF 1.0093 / 1.0000 / 1.0015 (declared 1.05); C1 SE 0.00137-0.00478 (declared 0.004)",
+    "near_copies (D-3)": "cos >= 0.98 qwen3 512, EVAL vs TRAIN, disclosed not removed: MASSIVE 274 of 4,946; CLINC 1,110 of 8,022 EVAL incl. 1,350 OOS; Banking77 569 of 3,908",
+    "mean_brier": "0.2218 over 7 probability predictions"
+  },
+  "sentence_of_record": "INTENT-TRANSFER-S0 (2026-10-01, 0 calls; run 6d04e84, post-run review c9c2fed VALID): on MASSIVE en-US, CLINC150 and Banking77 (one CK-CLOSE-v1 draw, RAW protocol, k-means seeds 0-4), fine structure is embedder-dependent against gold labels on 3 of 3 corpora, two-sided (nomic WORSE at fine on all three, D -0.065 / -0.025 / -0.054; gemma BETTER on MASSIVE and Banking77, NEITHER on CLINC); C1b not fired (coarse differences lie inside the coarse k-means seed spread); label-free no-match detects CLINC's curated OOS at AUROC 0.974 [0.970, 0.978], FPR95 0.158 (6,672 in-scope vs 1,350 OOS), equal to the supervised centroid's 0.976 to 0.002; a label-free TRAIN margin ranks flat cells by gold purity on CLINC and Banking77 (rho 0.41 [0.27, 0.54], 0.39 [0.17, 0.58]; MASSIVE not shown positive); and a label-free k-means cell is not a stable address under slot swaps (S 0.760 [0.746, 0.774], 3,222 variants; supervised-centroid label stability 0.834, random same-intent co-filing 0.692), so F4 FIRED: every filing rate of record (81.6%) carries 'surface-sensitive, untested on capability text' [known-answer intent corpora, not capability text; no tree or construction; never parity (no TOST); MASSIVE's nomic line R-1 DESCRIPTIVE-ONLY; the instability belongs to the embedding geometry under slot swaps at least as much as to label-free cells; F4's thesis wording is the author's (D2, OPEN)]",
+  "chips": [
+    "REGISTERED 2026-09-29, BEFORE ANY CODE [plan]",
+    "C1a (NOMIC) / C2 / C4 SCOREABLE; C3 THIN ON MASSIVE; GEMMA C1 DESCRIPTIVE-ONLY AT ITS PREDICTION [plan]",
+    "NOT BUILT; MACHINE LANE BEFORE RP12; UNPRICED (ESTIMATES ONLY) [warn]",
+    "BUILT (READY 0f3591a; MERGED 61d7bfe); CENSUS 960decf (EVAL 4,946 / 6,672 + 1,350 OOS / 3,908); C-1, C-4 BRACKETED; EMBED WAITS C-2, C-3, C-6, C-8 [plan]",
+    "VALID (POST-RUN c9c2fed); RUN 6d04e84: C1a HELD (3 OF 3, NOMIC WORSE; TWO-SIDED, GEMMA BETTER ON 2), C2 HELD (AUROC 0.974), C3 HELD (CLINC, BANKING77) [ok]",
+    "C4 FAILED (S 0.760 [0.746, 0.774]); F4 FIRED: FILING RATES OF RECORD CARRY &ldquo;SURFACE-SENSITIVE, UNTESTED ON CAPABILITY TEXT&rdquo;; SUPERVISED 0.834, CO-FILING 0.692 [warn]",
+    "C1b NOT FIRED (INSIDE THE COARSE SEED SPREAD; NOT PARITY) [warn]"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-29",
+      "by": "the registrar (the author's D1, D3, D4, D5, relayed by the orchestrator; insertion only; zero calls; pre-data)",
+      "text": "REGISTERED from the design's section 7 (7a95a1a). The author: D1 'Yes, all three'; D3 'Synthetic only'; D4 'WildChat-1M' (stage 3, personal data kept local); D5 'After RP12'; D2 OPEN. Registrar's items R-1 (C1 SE declared; SCOREABLE on nomic while measured SE <= 0.0071 and spread <= 0.020), R-2 (C2 denominator = every OOS row), R-3 (D7 HWU64 conditional on an author admission), R-4 (gemma DESCRIPTIVE-ONLY at its prediction), R-5 (kind zero-call). docs/judge_v2_program.md L22080-L22090 (section \"## Registrar's record 2026-09-29 (insertion only; zero calls; nothing run; pre-data) \u2014 the author's decisions D1, D3, D4, D5 on INTENT-TRANSFER (D2 open); ...\"; _as_of the commit that writes it, parent 7a95a1a, re-grepped)"
+    },
+    {
+      "date": "2026-09-30",
+      "by": "the registrar (the orchestrator's rulings of 2026-09-30; insertion only; zero calls; pre-data)",
+      "text": "READY 0f3591a (MERGEABLE; fetch -> census READY with C-5; embed after C-2/C-3/C-6; --run after C-1/C-4); merged by path 61d7bfe. C-1: S0-C1's interval of record is the BASIC bootstrap interval, D - b printed (percentile bias ~K^2/n; reviewer's simulation -3.8 to +6.0 SE at CLINC fine). C-4: B2 follows the fail-observable wording; B3 seed 0 confirmed; B7 slots follow the design doc and are printed. HM: 0.0036 correct, registered 0.0059 conservative, SCOREABLE unchanged. Fetch -> census 960decf pinned (DB sha256 487e0093..., items 540291cc..., five raw files). Ruling: the 5 MASSIVE labels below the minima stay in every partition-level measure; any per-label reading for them is DESCRIPTIVE-ONLY. C-8 (annot_text_mismatch = 0) owed by the run-operator before embedding. State registered -> built."
+    },
+    {
+      "date": "2026-10-01",
+      "by": "registrar",
+      "text": "EMBEDS COMPLETE (f4ad285) and PINNED. READY_intent_s0c 4fb2459 (merge 6885f92) and READY_emb_pace 59073f4 (merge 1d822bd) recorded. Incidents: WSAENOBUFS refusal on the first qwen3 --go; three PC hard resets (Kernel-Power 41, no dump) 09-30 11:19, 09-30 23:36, 10-01 02:24; partials backed up in _incident/; resumed under the same pins (qwen3 at 31,296, nomic at 45,728) after a hot-journal rollback. Ollama 0.35.0 with flash attention; parity PASS after the change (qwen3 margin 0.00076). Model digests not printed, not pinned. State built -> READY for --run. docs/judge_v2_program.md L22230-L22240 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data) \u2014 INTENT-TRANSFER-S0 embedding DBs pinned (f4ad285); ...\"; _as_of the commit that writes it, parent f4ad285, re-grepped)"
+    },
+    {
+      "date": "2026-10-01",
+      "by": "the registrar (the orchestrator's correction; insertion only)",
+      "text": "CORRECTED: FOUR PC hard resets, not three: 2026-09-30 03:49, 2026-09-30 11:19, 2026-09-30 23:36 and 2026-10-01 02:24 (bracketed into the 2026-10-01 record's INCIDENTS line and the ledger row). docs/judge_v2_program.md L22292-L22299 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-readout) \u2014 checkpoint A (167062c): B-A1, B-A2, B-A3 bracketed into ARCH-V2-E-T; ...\"; _as_of the commit that writes it, parent e7348f3, re-grepped)"
+    },
+    {
+      "date": "2026-10-01",
+      "by": "the registrar (post-run review c9c2fed VALID; insertion only; zero calls)",
+      "text": "OUTCOME recorded: C1a HELD, C1b NOT FIRED, C2 HELD, C3 HELD, C4 FAILED; F4 FIRED; F1, F1', F2, F3 NOT FIRED (D-1 form). W-1..W-5 applied; D-2 (registration's DOES NOT SHOW quoted), D-3 (CLINC near-copy denominator 8,022 incl. 1,350 OOS). P1, P4 HELD; P2, P3, P5, P6 FAILED. State READY -> done. Author items open: D2 (F4 qualifier wording), embedder of record, D3 (BlendX; the record carries D3 'Synthetic only', listed open by the orchestrator). docs/judge_v2_program.md L22252-L22279 (section \"## INTENT-TRANSFER-S0 (2026-10-01, 0 calls) \u2014 VALID (post-run review docs/reviews/POSTRUN_intent_s0.md, c9c2fed): ...\"; _as_of the commit that writes it, parent e7348f3, re-grepped)"
+    }
+  ],
+  "does_not_show": [
+    "the tree or the construction (no build)",
+    "capability, judges, boards, routing GAIN or any policy (no models on these corpora)",
+    "that a gold coarse level is the right taxonomy (a low H is the designer's hierarchy as much as the geometry)",
+    "transfer from short templated English utterances to benchmark questions (no sentence about MMLU-Pro cells)",
+    "embedder parity anywhere (no TOST); coarse parity (W-2)",
+    "a second split draw",
+    "natural multi-intent behaviour (D5 synthetic)",
+    "OOS on real traffic (CLINC OOS is one curated set with documented mislabels)",
+    "the card-conformant protocol of any embedder (RAW only; qwen3 without an instruction)",
+    "that a tree leaf is more or less stable than a k-means cell (C4 measured k-means cells only)",
+    "surface sensitivity on capability text (F4: 'untested')",
+    "that gemma beats qwen3 in general",
+    "that margin-gated filing fixes surface sensitivity (D4 is accuracy at 80% coverage, not stability)"
+  ],
+  "ledger": {
+    "row_id": "INTENT-TRANSFER-S0",
+    "version": "v321 (2026-10-01: OUTCOME bracket, three chips, reset-count correction) | v320 (2026-10-01: bracket and chip, registrar's record) | v317 (2026-09-30: READY / merge / census / C-1, C-4 brackets and chip) | v316 (2026-09-29: new section-7 row, registered)"
+  },
+  "depends_on": [
+    "EMBEDDER-CROSS-FLAT (E0b; prior of C1)",
+    "TOPIC-PARTITION-20NG (spread prior)",
+    "FLAT-MIX-MMLU (near-copy method)",
+    "the data-steward's census (960decf)"
+  ],
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing; touches no closed line (CONTEXT section 5 checked at 7a95a1a)"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L22092-L22134 (section \"## Registered 2026-09-29 (before any code or call) \u2014 INTENT-TRANSFER-S0: on three intent corpora with a known answer (MASSIVE en-US 18/60, CLINC150 10/150 + OOS, Banking77 77), split content-closed by CK-CLOSE-v1 hash sides, does the embedder dependence seen on MMLU-Pro (coarse holds, fine depends) reappear against GOLD labels, ...\"; _as_of the commit that writes it, parent 7a95a1a, re-grepped)",
+    "docs/judge_v2_program.md L22080-L22090 (section \"## Registrar's record 2026-09-29 (insertion only; zero calls; nothing run; pre-data) \u2014 the author's decisions D1, D3, D4, D5 on INTENT-TRANSFER (D2 open); ...\"; _as_of the commit that writes it, parent 7a95a1a, re-grepped)",
+    "docs/agents/plans/2026-09-29_intent_transfer_design.md sections 5, 6, 7, 10 (7a95a1a, blob:d5fb15fe5534b915222a8635795810ceeb1072d2)",
+    "docs/plan_2026-09-15.md Amendment 28, Amendment 29",
+    "docs/judge_v2_program.md L22146-L22158 (section \"## Registrar's record 2026-09-30 (insertion only; zero calls; nothing run; pre-data) \u2014 READY_intent_s0 0f3591a and merge 61d7bfe; ...\"; _as_of the commit that writes it, parent 960decf, re-grepped)",
+    "docs/reviews/READY_intent_s0.md (0f3591a); experiment_results/intent_transfer_s0/ingest/ (960decf)",
+    "docs/judge_v2_program.md L22230-L22240 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-data) \u2014 INTENT-TRANSFER-S0 embedding DBs pinned (f4ad285); ...\"; _as_of the commit that writes it, parent f4ad285, re-grepped)",
+    "docs/judge_v2_program.md L22252-L22279 (section \"## INTENT-TRANSFER-S0 (2026-10-01, 0 calls) \u2014 VALID (post-run review docs/reviews/POSTRUN_intent_s0.md, c9c2fed): ...\"; _as_of the commit that writes it, parent e7348f3, re-grepped)",
+    "docs/judge_v2_program.md L22292-L22299 (section \"## Registrar's record 2026-10-01 (insertion only; zero calls; nothing run; pre-readout) \u2014 checkpoint A (167062c): B-A1, B-A2, B-A3 bracketed into ARCH-V2-E-T; ...\"; _as_of the commit that writes it, parent e7348f3, re-grepped)",
+    "docs/reviews/POSTRUN_intent_s0.md (c9c2fed)",
+    "experiment_results/intent_transfer/s0_outcome.txt (6d04e84)"
+  ],
+  "last_update": "2026-09-29 (registrar: registered; ledger v316); 2026-09-30 (registrar: READY 0f3591a, merge 61d7bfe, C-1/C-4/HM brackets, census 960decf pinned, label ruling; state built; ledger v317); 2026-10-01 (registrar: READY_intent_s0c 4fb2459 / merge 6885f92 and READY_emb_pace 59073f4 / merge 1d822bd recorded; embeds complete f4ad285; emb pins committed; state READY for --run; ledger v320); 2026-10-01 (registrar: OUTCOME VALID c9c2fed recorded, state done, sentence of record and chips; reset count corrected to four; ledger v321)",
+  "support": {
+    "a": "C1 EVAL MASSIVE ~4,890 / CLINC ~6,750 / Banking77 ~3,925; C2 6,750 + ~1,350 OOS (every OOS row); C3 cells 60 / 150 / 77; C4 ~3,400; clusters = exact-duplicate CK-CLOSE components",
+    "b": "DEFF 1.05, a DECLARED pilot assumption (Kish bound from exact-duplicate components); measured at the run; C3 not applicable",
+    "c": "n_eff 4,657 / 6,429 / 3,738 (C1); n_OOS,eff 1,286 (C2); 3,238 (C4)",
+    "d": "C1 0.004 declared (not derived from b); C2 Hanley-McNeil A 0.90, n1 1,350, n2 6,750: var 298.9 / 9,112,500 = 3.28e-5, SE 0.00573 x sqrt(1.05) = 0.0059; C3 SE_z 1/sqrt(K-3) = 0.132 / 0.083 / 0.117; C4 sqrt(0.09 / 3,238) = 0.0053",
+    "e": "MDE80 = 2.8 x SE: C1 0.0112 (bar max(0.0112, spread)); C2 0.017; C3 rho 0.35 / 0.23 / 0.31; C4 0.015",
+    "f": "C1a SCOREABLE on nomic, gemma DESCRIPTIVE-ONLY at its prediction; C1b non-fire readout; C2 SCOREABLE; C3 SCOREABLE on CLINC and Banking77, THIN on MASSIVE; C4 SCOREABLE",
+    "g": "C1 reachable only where |D| exceeds the seed spread (else C1a FAILED at any budget); C2, C4 reachable; C3 bounded by cells (K 60: rho < ~0.35 unreachable)"
+  },
+  "cost": {
+    "calls_expected": 0,
+    "cce_expected": 0,
+    "calls_max": 0,
+    "cce_max": 0,
+    "machine": "Ollama ~62k texts x 3 embedders serial (nomic, gemma ~15 min each by analogy to E0b; qwen3 UNSOURCED, priced by the 500-text pilot); CPU ~2-3 h single-threaded (the design's estimates)",
+    "agent_hours": "about 12-18 (estimate)",
+    "priced": "UNPRICED (the cost-estimator has not priced stage 0)"
+  },
+  "plain_description": {
+    "sq": "SQ5 Invariance",
+    "what": "On three intent datasets with known answers (MASSIVE, CLINC150 with out-of-scope queries, Banking77), split so no text is shared, it checks four things with k-means and no tree build: whether results depend on the embedder; whether \"no match\" flags out-of-scope queries; whether a label-free cell margin predicts how pure a cell is; and whether a cell stays the same when slot words in the query are swapped.",
+    "why": "Checks against true labels whether the behaviours seen on MMLU-Pro (coarse level stable, fine level embedder-dependent) generalise, and whether label-free cells are trustworthy addresses.",
+    "information": "Confirms or narrows earlier MMLU-Pro claims. Result: fine structure depends on the embedder on all 3 datasets (nomic worse each time), while coarse differences stay within noise. \"No match\" detects CLINC's out-of-scope queries very well (AUROC 0.974, as good as a supervised method). The margin ranks cell purity on 2 of 3 datasets. But cells are not stable when slot words are swapped, so every filing rate of record now carries the note \"surface-sensitive, untested on capability text\". Short intent utterances only, one split.",
+    "written": "2026-10-07"
+  }
+}

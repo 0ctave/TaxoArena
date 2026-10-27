@@ -1,0 +1,250 @@
+{
+  "id": "FLAT-GENERALITY",
+  "title": "FLAT-GENERALITY: does the FLAT-MIX-MMLU loss appear in the three anchor-free re-draws (af_s137, af_s2048, af_s42_o1), and does the anchored o0_clean_s42 lose to V at k = 84 or to a label-anchored flat arm V_A? (zero-call, zero builds; arm (a) = FLAT-MIX-ANCHORED; REGISTERED)",
+  "question": "Is the FLAT-MIX-MMLU loss a property of one draw, or does it appear in the three existing anchor-free re-draws, and does the anchored tree o0_clean_s42 lose to a flat mixture at its own k = 84 or to a label-anchored flat arm V_A?",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "the commit that writes this record (parent b9491bf)",
+    "program_lines": "docs/judge_v2_program.md L21646-L21678",
+    "program_lines_as_of": "the commit that writes them, parent b9491bf, re-grepped",
+    "date": "2026-09-27",
+    "heading": "## Registered 2026-09-27 (before any code or call) \u2014 FLAT-GENERALITY: is the FLAT-MIX-MMLU loss (af_clean_s42 a measurably worse partition than a flat vMF mixture at the same k) a property of one draw ...",
+    "index_section": "docs/judge_v2_program.md L21535-L21555 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run; BEFORE any code) \u2014 Wave-0 REGISTRATIONS (record 2 of 2) ...\"; _as_of the commit that writes them, parent b9491bf, re-grepped)",
+    "provenance": "plan docs/agents/plans/2026-09-27_research_plan_rev2.md PART C2 (the research-lead's drafts), verified and corrected by the registrar before registration (stale items S1-S14 and reconciliations (i)-(ii) in the index section); the orchestrator's brief of 2026-09-27 (computed task, not the author's words); authority: the author's adoption and 'You can start' (docs/judge_v2_program.md L21435-L21457, _as_of b9491bf)"
+  },
+  "script": {
+    "path": "tools/analysis/flat_generality.py (+ flat_mix_mmlu.py)",
+    "sha16": "flat_generality.py blob:df785c125cacacaeddf73664fd3c3351e6158cd1 / sha256-lf16:c65d464f1f8eba51; flat_mix_mmlu.py blob:cdb354f162605fdce0156c1363b393147203b5a9 / sha256-lf16:4e5fec853e3ec463 (review pins) [2026-09-29 registrar: at b2ad5ef / merged 481b613: flat_generality.py blob:2920358b847f01f024889a8dafbea17cdc942b80 / sha256-lf16:c458d4d856880377 / sha256-crlf16:3f9aa53456bc4ce7; flat_mix_mmlu.py cdb354f1 unchanged (delta-2 review pins, LF blob of record; equal at HEAD 481b613 by git rev-parse)] [2026-09-29 registrar: delta-3 df936fa, merged by path 219dec0: flat_generality.py blob:44ca378e00b6d0661cedaf958f0b7489ba8b6bcd / sha256-lf16:b2adc3f1e58c8d3c / sha256-crlf16:ac268966627772c5 (delta-3 review pins, LF of record; equal at 61c99ad per POSTRUN W1); flat_mix_mmlu.py cdb354f1 unchanged]",
+    "commit": "481b613 (by-path merge of 5ab4d89; not an ancestor) [2026-09-29 registrar: 219dec0 (by-path merge of df936fa; not an ancestor)]"
+  },
+  "ready": {
+    "file": "docs/reviews/READY_w0_delta3.md",
+    "commit": "3da93fc",
+    "at": "df936fa (flat_generality.py blob:44ca378e / sha256-lf16:b2adc3f1e58c8d3c / sha256-crlf16:ac268966627772c5)",
+    "verdict": "READY (C5-1 and C5-2 discharged); MERGEABLE",
+    "conditions": [
+      "rule-7 window and operator preconditions as usual"
+    ],
+    "source": "docs/reviews/READY_w0_delta3.md (3da93fc) Part 1",
+    "previous": {
+      "file": "docs/reviews/READY_w0_delta2.md",
+      "commit": "b2ad5ef",
+      "at": "5ab4d89 (2650b34)",
+      "verdict": "READY-WITH-CONDITIONS (B5-1 CLOSED as built); MERGEABLE; --run NOT READY (C5-1 HIGH, C5-2)",
+      "conditions": [
+        "C5-1 HIGH OPEN (oracle guard does not cover the deciding path tree_measures; Y5-B, Y5-C survive)",
+        "C5-2 OPEN (VA_FIT_SIZES: registrar pin bracketed 2026-09-29; builder delta + re-pin owed)"
+      ],
+      "source": "docs/reviews/READY_w0_delta2.md (b2ad5ef)"
+    }
+  },
+  "go": "n/a (0 calls, 0 cce)",
+  "run": {
+    "outcome_file": "experiment_results/flat_generality/flat_generality_outcome.txt (blob:cbbd2f6b / sha256-lf16:ffcb416da8e11c9e); flat_generality_arms.csv (sha256-lf16:41417dab71bded71); state/ 60 files (37 MB; no per-question list, label, key or EVAL row); LF; write-once",
+    "outcome_commit": "61c99ad (run-operator)",
+    "calls": 0,
+    "cce": 0,
+    "pool": "re-draw splits pd610c9a (af_s137), p19d9f47 (af_s2048), p8a29 (af_s42_o1), p2dca21ab5f4ef3ae (o0_clean_s42); id-disjoint only; embeddings_cache.db sha256 equal before and after (POSTRUN W1)",
+    "date": "2026-09-29 (--run 169 s, 55 partitions; --analyze 506 s; main b61e496)"
+  },
+  "review": {
+    "file": "docs/reviews/POSTRUN_w1_2026-09-29.md (80ce082)",
+    "commit": "80ce082",
+    "verdict": "VALID: identity (P6) REPRODUCED; L1_r FIRES on af_s137 and af_s42_o1, not af_s2048: k = 2; A1 and A2 do not fire (DESCRIPTIVE-ONLY); D-4 (margin, M1-only, qualifiers) and D-5 (P1 as k = 2) applied; state/ commit appropriate (bulk in git is the author's call)"
+  },
+  "criteria": [
+    {
+      "id": "D1",
+      "text": "per re-draw r (af_s137 79 leaves / pd610c9a; af_s2048 81 / p19d9f47; af_s42_o1 81 / p8a29): L1_r FIRES iff for M1 or M2, M(T_r) - M(V0_r) < -spread_V_r(M) AND the paired 95% CI excludes 0 negative (THE deciding rule); C1_r / C2_r the win form; seed-wise all-5-CIs secondary",
+      "result": "n/a",
+      "value": "L1_r FIRES on af_s137 (dM1 -0.0212 [-0.0348, -0.0078] vs spread_V 0.0133) and af_s42_o1 (-0.0372 [-0.0518, -0.0244] vs 0.0177), not on af_s2048 (-0.0102 [-0.0238, +0.0038] vs 0.0165); M1 (purity) only, M2 fires on no re-draw [af_s137 clears max(MDE80 0.0186, spread) by 0.0026, thin]",
+      "denominator": "held-out 3,448 / 3,446 / 3,437; M2 10,925 keyed"
+    },
+    {
+      "id": "D2",
+      "text": "k = number of re-draws with L1 fired (0-3), printed, never rounded",
+      "result": "n/a",
+      "value": "k = 2 (on M1 only)",
+      "denominator": "3 re-draws"
+    },
+    {
+      "id": "A1",
+      "text": "arm (a): O vs V0 at k 84 on M2, L1 form (M1 label-advantaged, printed only); POST-HOC-SEEN O vs V0 at k 82 (0.770 / 0.770; +13.949 / +14.318)",
+      "result": "n/a",
+      "value": "does not fire: M2(O) - M2(V0) = -0.248 [-0.906, +0.386] x1e-3 vs spread_V 1.232 x1e-3 (DESCRIPTIVE-ONLY; not parity)",
+      "denominator": "3,445 held-out; 10,925 keyed"
+    },
+    {
+      "id": "A2",
+      "text": "arm (a): V_A vs O on M2: FIRES iff M2(V_A,0) - M2(O) > spread_V_A(M2) AND the CI excludes 0 positive",
+      "result": "n/a",
+      "value": "does not fire: M2(V_A0) - M2(O) = +0.014 [-0.661, +0.686] x1e-3 vs spread_V_A 1.004 x1e-3 (DESCRIPTIVE-ONLY; not parity)",
+      "denominator": "10,925 keyed"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "k: 0 w.p. 0.10, 1 w.p. 0.30, 2 w.p. 0.35, 3 w.p. 0.25 (>= 2 of 3: 0.60)",
+      "result": "HELD",
+      "value": "k = 2 (prior 0.35); the binary event '>= 2 of 3' (0.60) HELD (D-5: recorded as k = 2 (prior 0.35))",
+      "denominator": "D2"
+    },
+    {
+      "id": "P2",
+      "text": "per re-draw dM1 = -0.035 (80% [-0.060, -0.010]); dM2 = -1.2e-3 (80% [-2.2, -0.2] x1e-3)",
+      "result": "HELD",
+      "value": "dM1 -0.0212 / -0.0102 / -0.0372 in [-0.060, -0.010]; dM2 -0.537 / -0.229 / -0.583 x1e-3 in [-2.2, -0.2]",
+      "denominator": "D1"
+    },
+    {
+      "id": "P3",
+      "text": "A1 does not fire: 0.75 (dM2 O - V0 = -0.3e-3, 80% [-1.2, +0.6] x1e-3)",
+      "result": "HELD",
+      "value": "A1 not fired; dM2 -0.248 x1e-3 in [-1.2, +0.6]",
+      "denominator": "A1"
+    },
+    {
+      "id": "P4",
+      "text": "A2 does not fire: 0.65",
+      "result": "HELD",
+      "value": "A2 not fired",
+      "denominator": "A2"
+    },
+    {
+      "id": "P5",
+      "text": "V_A0 >= V0 at k 84 on M2 at the point: 0.60",
+      "result": "FAILED",
+      "value": "V_A0 +13.963 < V0 +14.197 x1e-3",
+      "denominator": "arm (a)"
+    },
+    {
+      "id": "P6",
+      "text": "the identity check reproduces af_clean_s42 M1 0.727 / M2 +12.785: 0.95",
+      "result": "HELD",
+      "value": "identity reproduced (af_clean_s42 M1 0.727 / M2 +12.785)",
+      "denominator": "identity"
+    },
+    {
+      "id": "P7",
+      "text": "spread_V(M1) per re-draw in [0.015, 0.045]: 0.75",
+      "result": "FAILED",
+      "value": "af_s137 spread_V 0.0133 < 0.015 (FAILED); af_s2048 0.0165 and af_s42_o1 0.0177 in range (HELD)",
+      "denominator": "D1"
+    }
+  ],
+  "falsifier": {
+    "text": "F1 k = 0 -> the partition clause narrows to 'one draw (af_clean_s42)' (overturns the generality, not the FLAT-MIX-MMLU number). F2 A2 fires -> the loss belongs to the construction even when anchored (overturns the DESCRIPTIVE qualifier 'the anchored control ties, reported only' as the framing's reading).",
+    "fired": false,
+    "outcome": "F1 NOT FIRED (k = 2); F2 NOT FIRED (A2 not fired)"
+  },
+  "numbers_of_record": {
+    "none_yet": "registered; nothing run (the Support figures are planning values of the registration, not outcomes) [SUPERSEDED 2026-09-29 at the outcome]",
+    "L1_af_s137": "dM1 -0.0212 [-0.0348, -0.0078], spread_V 0.0133; FIRES (M1); margin over max(MDE80 0.0186, spread) 0.0026",
+    "L1_af_s2048": "dM1 -0.0102 [-0.0238, +0.0038], spread_V 0.0165; does not fire",
+    "L1_af_s42_o1": "dM1 -0.0372 [-0.0518, -0.0244], spread_V 0.0177; FIRES (M1); not independent of af/seed_42",
+    "k": "2 of 3 qwen3 anchor-free re-draws, on M1 (purity) only; M2 on none",
+    "A1": "O - V0 at k 84, M2 -0.248 [-0.906, +0.386] x1e-3 vs 1.232 (not fired; DESCRIPTIVE-ONLY)",
+    "A2": "V_A0 - O, M2 +0.014 [-0.661, +0.686] x1e-3 vs 1.004 (not fired; DESCRIPTIVE-ONLY)"
+  },
+  "sentence_of_record": "FLAT-GENERALITY (2026-09-29, 0 calls; post-run review 80ce082 VALID): the FLAT-MIX-MMLU purity loss appears in 2 of 3 qwen3 anchor-free re-draws against a flat vMF mixture at the tree's own k: af_s137 -0.0212 [-0.0348, -0.0078] and af_s42_o1 -0.0372 [-0.0518, -0.0244], not af_s2048 (-0.0102 [-0.0238, +0.0038]); key information fires on no re-draw; the anchored tree o0_clean_s42 fires neither against V0 at k 84 (A1) nor against the label-anchored V_A (A2). [On M1 (purity) only, whereas FLAT-MIX-MMLU fired on M1 and M2; af_s137 clears max(MDE80, spread_V) = 0.0186 by 0.0026 (thin); af_s42_o1 is not independent of af/seed_42; the re-draws are id-disjoint only; A1 / A2 DESCRIPTIVE-ONLY, 'not fired' is never parity; k = 2 (prior 0.35).]",
+  "chips": [
+    "REGISTERED 2026-09-27, BEFORE ANY CODE [plan]",
+    "D1 L1 SCOREABLE (BAR max(0.0186, spread_V 0.0305)); A1 / A2 DESCRIPTIVE-ONLY [plan]",
+    "ARM (a) = FLAT-MIX-ANCHORED, POST-HOC-SEEN (O vs V0 AT k 82) [plan]",
+    "RE-DRAWS ID-DISJOINT ONLY UNTIL THE STEWARD'S CHECK [plan]",
+    "NOT READY (fd6a349, B5-1 LABEL ORACLE); HELD-OUT ROUTING RULED LABEL-FREE [warn]",
+    "BUILT; READY-WITH-CONDITIONS (b2ad5ef, B5-1 CLOSED); MERGED 481b613; RUN NOT READY (C5-1 HIGH, C5-2) [warn]",
+    "VALID (POST-RUN 80ce082); RUN 61c99ad; L1 FIRES ON af_s137 AND af_s42_o1 (M1 ONLY), NOT af_s2048: k = 2 (PRIOR 0.35); F1 F2 NOT FIRED [warn]",
+    "af_s137 CLEARS max(MDE, spread) BY 0.0026 (THIN); M2 FIRES ON NO RE-DRAW; A1 A2 DESCRIPTIVE-ONLY, NOT FIRED IS NOT PARITY; af_s42_o1 NOT INDEPENDENT; ID-DISJOINT ONLY [warn]"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-27",
+      "by": "the registrar (author decisions (a)-(c) and orchestrator rulings R1-R5; insertion only; zero calls; pre-data)",
+      "text": "READY review 4f5e03d NOT READY. ORCHESTRATOR RULING R3 on N1 / N2 (pre-data): V_A files by DECLARED LABEL, each question assigned to its declared anchor (its MMLU-Pro category = O's 14 anchor labels); within each declared label the flat mixture is fit, assignment by NEAREST MEAN; arm (c) built AS REGISTERED. N1 (d) (one EM seed) and (e) (P2 / P7 per re-draw; M4 NA; fit sizes) not ruled (owed); N3 engineering. docs/judge_v2_program.md L21831-L21846 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run; pre-data) \u2014 the author's decisions (a)-(c) of 2026-09-27 and the orchestrator's rulings ...\"; _as_of the commit that writes it, parent bb30526, re-grepped)"
+    },
+    {
+      "date": "2026-09-29",
+      "by": "the registrar (research lead's rulings 1-21 accepted by the orchestrator; orchestrator rulings B5-1, C7-2; steward 5572465; delta READY fd6a349; merge cfcec54; insertion only; zero calls; pre-data)",
+      "text": "Delta READY fd6a349: NOT READY at 2650b34 (B5-1 BLOCKER: V_A routed held-out rows by declared label; M1 1.0000 (210/210) on random labels vs 0.3524 label-free). ORCHESTRATOR RULING B5-1: V_A routes held-out questions LABEL-FREE by nearest centroid across all anchors' components; fit filing stays declared_label (R3 narrowed to the fit set). Rulings 11 (V_A,s = the same seed s in all 14 anchors, s 0..4; V_A,0 the comparator) and 12 (P2 / P7 per re-draw 'n of 3', no pooled verdict; M4 'NA (not registered for arm a; V_A has no global mixture weights)'; fit sizes pinned by a registrar bracket before --run). OPEN: rebuild, random-label selftest, delta re-review. State registered -> built (NOT READY)."
+    },
+    {
+      "date": "2026-09-29",
+      "by": "the registrar (steward 8c2b846; delta-2 READY b2ad5ef; merge 481b613; the author's machine cap ~22/24 threads; orchestrator ruling STAGE0b / survey --analyze; refused gemma embed; insertion only; zero calls; pre-data)",
+      "text": "Delta-2 READY b2ad5ef: READY-WITH-CONDITIONS at 5ab4d89 (B5-1 CLOSED as built); merged by path 481b613. REGISTRAR PIN (ruling 12; C5-2; steward 8c2b846): VA_FIT_SIZES o0_clean_s42 = (944, 905, 587, 647, 504, 792, 267, 558, 656, 423, 542, 286, 666, 348), O depth-1 order Math..Philosophy, sum 8,125 = fit_n. --run NOT READY: C5-1 HIGH, C5-2 builder delta + re-pin. State built (NOT READY -> READY-WITH-CONDITIONS)."
+    },
+    {
+      "date": "2026-09-29",
+      "by": "the registrar (post-run reviews 3da93fc / 80ce082; merge 219dec0; run commits b61e496, 61c99ad; insertion only; zero calls)",
+      "text": "OUTCOME recorded (POSTRUN W1 80ce082 VALID; D-4, D-5 applied). Delta-3 READY 3da93fc at df936fa (C5-1, C5-2 discharged); merged 219dec0; run 61c99ad. k = 2 on M1 only; A1, A2 not fired; P5, P7 (af_s137) FAILED. State built -> done."
+    }
+  ],
+  "does_not_show": [
+    "anything yet: registered; not built, not run [SUPERSEDED 2026-09-29 at the outcome: the test ran; see the items below]",
+    "that trees, or this construction, are worse partitions in general",
+    "an embedder effect (EMBEDDER-CROSS-FLAT)",
+    "a second corpus (SUPERGPQA stage 1)",
+    "content-closed re-draws (id-disjoint only until the steward's check)",
+    "independence of af_s42_o1 from af/seed_42 (membership-identical)",
+    "a key-information (M2) loss on any re-draw (M2 fires on none; FLAT-MIX-MMLU fired on both M1 and M2)",
+    "parity of the anchored tree o0_clean_s42 with V0 or V_A ('not fired' is never parity)"
+  ],
+  "ledger": {
+    "row_id": "FLAT-GENERALITY",
+    "version": "v312 (2026-09-29: OUTCOME: an outcome bracket in the observed cell; two chips added (warn, warn)) | v311 (2026-09-29: a dated bracket into the observed cell; one chip added)"
+  },
+  "depends_on": [
+    "FLAT-MIX-MMLU (done)",
+    "MIX-FLAT-SELFTEST-GAPS (drafted; must merge first)",
+    "ANCHOR-FREE-REDRAW (done; the trees)",
+    "the data-steward's closure check on pd610c9a / p19d9f47 / p8a29 (RP02)",
+    "EMBEDDER-PLUMBING (for any non-qwen3 DB parameter)"
+  ],
+  "supersedes": "FLAT-MIX-ANCHORED (queue item, drafted; folded as arm (a); no record file existed)",
+  "superseded_by": null,
+  "closed_line": {
+    "closed": false,
+    "what": "closes nothing; touches no closed line (CONTEXT section 5 checked at b9491bf)"
+  },
+  "sources": [
+    "docs/judge_v2_program.md L21646-L21678 (section \"## Registered 2026-09-27 (before any code or call) \u2014 FLAT-GENERALITY: is the FLAT-MIX-MMLU loss (af_clean_s42 a measurably worse partition than a flat vMF mixture at the same k) a property of one draw ...\"; _as_of the commit that writes them, parent b9491bf, re-grepped)",
+    "docs/judge_v2_program.md L21535-L21555 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run; BEFORE any code) \u2014 Wave-0 REGISTRATIONS (record 2 of 2) ...\"; _as_of the commit that writes them, parent b9491bf, re-grepped)",
+    "docs/judge_v2_program.md L21121-L21274 (section \"## FLAT-MIX-MMLU (2026-09-26, 0 calls) \u2014 VALID (post-run review 643995a): C1 FAILED, C2 FAILED, L1 FIRES on M1 AND M2, reading T-4, F1 FIRES ...\"; _as_of b9491bf)",
+    "experiment_results/anchorfree/redraw/anchor_free_redraw_outcome.txt L316-L320",
+    "queue item FLAT-MIX-ANCHORED (folded)",
+    "docs/judge_v2_program.md L21831-L21846 (section \"## Registrar's record 2026-09-27 (insertion only; zero calls; nothing run; pre-data) \u2014 the author's decisions (a)-(c) of 2026-09-27 and the orchestrator's rulings ...\"; _as_of the commit that writes it, parent bb30526, re-grepped)",
+    "docs/plan_2026-09-15.md Amendment 26 (2026-09-27)",
+    "docs/judge_v2_program.md L21867-L21892 (section \"## Registrar's record 2026-09-29 (insertion only; zero calls; nothing run; pre-data) \u2014 the research lead's 21 pre-data rulings (accepted by the orchestrator), the data-steward's counts 5572465 ...\"; _as_of the commit that writes it, parent cfcec54, re-grepped)",
+    "docs/reviews/READY_w0_delta1.md (fd6a349)",
+    "docs/judge_v2_program.md L21894-L21903 (section \"## Registrar's record 2026-09-29 (insertion only; zero calls; nothing run; pre-data) \u2014 the data-steward's preconditions 8c2b846, the delta-2 READY b2ad5ef, the by-path merge 481b613, ...\"; _as_of the commit that writes it, parent 481b613, re-grepped)",
+    "docs/judge_v2_program.md L21960-L21968 (section \"## FLAT-GENERALITY (2026-09-29, 0 calls) \u2014 VALID (post-run review docs/reviews/POSTRUN_w1_2026-09-29.md, 80ce082): the identity check reproduces af_clean_s42 ...\"; _as_of the commit that writes it, parent 80ce082, re-grepped)",
+    "docs/judge_v2_program.md L21905-L21915 (section \"## Registrar's record 2026-09-29 (insertion only; zero calls; nothing run by the registrar) \u2014 delta-3 READY 3da93fc and by-path merge 219dec0; ...\"; _as_of the commit that writes it, parent 80ce082, re-grepped)"
+  ],
+  "last_update": "2026-09-29 (registrar: steward 8c2b846, delta-2 READY b2ad5ef, merge 481b613, author cap ~22 threads, orchestrator ruling STAGE0b / survey, refused gemma embed); 2026-09-29 (registrar: delta-3 READY 3da93fc, merge 219dec0; OUTCOME recorded, POSTRUN W1 80ce082 VALID with D-4/D-5; state done; ledger v312)",
+  "support": {
+    "a": "M1 per tree its held-out set (3,445 / 3,448 / 3,446 / 3,437), twin groups; M2 10,925 keyed; paired",
+    "b": "M1 1.0 MEASURED on af_clean_s42 (3,445 singleton twin groups, FLAT-MIX-MMLU B7), assumed for re-draws until their dry-runs print m-bar; M2 carried in the realised SE",
+    "c": "about 3,440 per tree (M1)",
+    "d": "REALISED (FLAT-MIX-MMLU outcome section 6, forward rule): M1 0.00663; M2 0.357e-3",
+    "e": "M1 2.80 x 0.00663 = 0.0186; M2 1.00e-3; effective bars max(MDE, spread_V): record spread 0.0305 (M1), 0.822e-3 (M2) -> 0.0305 and 1.00e-3",
+    "f": "D1 / L1_r SCOREABLE for the predicted loss (0.035 > 0.0305; thin margin 0.0045); A1, A2 DESCRIPTIVE-ONLY (predicted differences inside 1.00e-3); cross-draw readings and arm (c) DESCRIPTIVE",
+    "g": "the seed-spread leg does not shrink with n; a loss below max(MDE, spread_V) is unreachable at any budget; 'not fired' is live and never read as parity"
+  },
+  "cost": {
+    "calls_expected": 0,
+    "cce_expected": 0,
+    "calls_max": 0,
+    "cce_max": 0,
+    "machine": "about 1 CPU-h single-threaded (BLAS 1), chunked; a pool reader (rule 7)",
+    "priced": "UNPRICED (the experiment-manager's)"
+  },
+  "plain_description": {
+    "sq": "SQ3 Taxonomy",
+    "what": "An earlier test found the tree's leaves less pure than a flat clustering with the same number of groups on one MMLU-Pro draw. This test repeats the comparison on three other label-free tree re-draws. It also checks whether the label-anchored tree loses to a flat clustering, either with the same number of groups (84) or one that is also guided by the labels.",
+    "why": "It asks whether 'the tree partitions worse than flat clustering' is a one-off or a general property of the construction.",
+    "information": "Result (no new calls, no new builds): the purity loss reappears on 2 of 3 re-draws (one only narrowly) but not the third. The second measure, key information, loses on none. The anchored tree does not lose to either flat comparison, but that is descriptive only and is not a tie. The re-draws are separated by question id only, and one is not independent of the original draw.",
+    "written": "2026-10-07"
+  }
+}

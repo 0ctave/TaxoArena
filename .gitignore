@@ -1,0 +1,158 @@
+.gradle
+.venv/
+build/
+#!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### IntelliJ IDEA ###
+.idea/modules.xml
+.idea/jarRepositories.xml
+.idea/compiler.xml
+.idea/libraries/
+.idea
+*.iws
+*.iml
+*.ipr
+*.xml
+!src/main/resources/logback-spring.xml
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+### Mac OS ###
+.DS_Store
+
+### Secrets ###
+**/application-secret.yml
+.env
+*.env
+!.env.example
+
+# Compiler & IDE artifacts
+.kotlin/
+
+# Runtime caches and logs
+*.db
+*.db-*
+*.log
+
+# Taxonomy output & visualization files
+taxonomy_*.json
+taxonomy_*.html
+taxonomy_*.dot
+
+# Experimental runs and backups. experiment_results/ itself is tracked
+# (thesis record); its raw console logs and SQLite sidecars stay out via
+# the global *.log / *.db-* rules, and its .db files are re-included below.
+experiment_results_old/
+experiment_test_run/
+experiment_pipeline_test/
+benchmark_backups/
+/snapshots/
+plots/
+/logs/
+scratch/
+
+# LaTeX build temporaries (allows LaTeX source: .tex, .bib, .sty, .cls, .ist, figures, chapters, appendices)
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.idx
+*.ilg
+*.ind
+*.loa
+*.lof
+*.log
+*.lol
+*.lot
+*.mw
+*.nlo
+*.nls
+*.out
+*.pre
+*.run.xml
+*.synctex.gz
+*.tdo
+*.toc
+pdfa.xmpi
+
+# Generated PDF build output (preserves figure PDFs and prematter PDF assets)
+report/Abschlussarbeit_0510121.pdf
+report/main.pdf
+
+# Local tooling and machine-local state (not part of the handover)
+.mcp.json
+.claude/
+lancedb/
+__pycache__/
+*.pyc
+
+# Archived and parked artefacts: kept on disk, documented by their manifests,
+# but not tracked. The two archive manifests are re-included below.
+archive/**
+!archive/ARCHIVE_MANIFEST.md
+!archive/README.md
+testing/
+
+# Ratings-store variants (backups, secured copies, trials) and secured export folders
+*.db.*
+*_secured/*
+!*_secured/MAIN_thesis_metrics.csv
+
+# Regenerable tuning run outputs
+tuning/runs/*/output/
+
+# Temporary and state output files
+*.tmp
+copied_snapshot_id.txt
+compile.log
+algorithm_trace.log
+frozen_triples_*.json
+answer_matrix_missingness.csv
+experiment_*.toml
+reserved_test_queries.json
+eval_results/
+*.zip
+
+# Settled-batch results record: the result databases and the frozen MAIN
+# triples are tracked despite the global *.db / frozen_triples_* rules.
+!experiment_results/**/*.db
+!frozen_triples_20260727_042523_Headless_Run_Auto_ge_MAIN.json
+
+# /ratings.db is NOT tracked (untracked 2026-08-08). It is the DEFAULT write target
+# of any run launched without -Dranking.db.path, so tracking it meant a routine run
+# silently modified a committed 8 MB binary — which is exactly what happened during
+# the cross-domain trial. Nothing in the replication path reads it: the settled
+# results live in experiment_results/r8/*/ratings_r8_*.db, and generate_baselines.py
+# reads mmlu_pro_dataset_cache_v2.db despite the variable being named ratings_db.
+# HeadlessBenchmarkRunner now refuses to start when the resolved database is
+# git-tracked; see taxonomy.runner.RatingsDbGuard.
+
+# Frozen-snapshot extract for replication (full snapshots.db stays local-only)
+!/snapshots_frozen.db

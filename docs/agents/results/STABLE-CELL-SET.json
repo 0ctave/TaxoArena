@@ -1,0 +1,196 @@
+{
+  "ready": null,
+  "go": "n/a (0 calls, 0 builds; Amendment 6)",
+  "run": {
+    "outcome_file": "experiment_results/anchorfree/redraw/stable_cell_set_outcome.txt",
+    "outcome_commit": "8e8f987",
+    "calls": 0,
+    "cce": 0,
+    "pool": "p2dca21ab5f4ef3ae",
+    "date": "2026-09-19",
+    "other_files": [
+      "experiment_results/anchorfree/redraw/stable_cell_set_cells.csv"
+    ]
+  },
+  "review": {
+    "file": "docs/reviews/2026-09-19_zero_call_batch2.md §1",
+    "commit": "83cb8e5",
+    "verdict": "numbers READY (every number CONFIRMED to the digit / 4 dp); the sentence of record is permitted only with the D1 / D2 brackets"
+  },
+  "supersedes": null,
+  "superseded_by": null,
+  "closed_line": false,
+  "depends_on": [
+    "ANCHOR-FREE-REDRAW",
+    "PROFILE-RELIABILITY-INTERACTION",
+    "PROFILE-INTERVAL-ALL-UNION",
+    "ANCHOR-FREE-CERT"
+  ],
+  "last_update": "2026-09-19",
+  "id": "STABLE-CELL-SET",
+  "title": "STABLE-CELL-SET: the 5-site re-draw-stable certified set as a partition on the clean free tree R1 af_clean_s42 — does it carry a key-built profile on the pool of record?",
+  "question": "Read as a 5-cell partition of the 3,445-question pool of record (S1-S4 the discursive spine, S5 the uncertified quantitative complement n00000004), do the sites carry support, a key-built profile with intervals, key-only information and an interaction-only reliability, against the 14 bareq512_s42 anchors?",
+  "kind": "zero-call",
+  "state": "done",
+  "registration": {
+    "commit": "7bd1355",
+    "program_lines": "docs/judge_v2_program.md L7765-L7924",
+    "date": "2026-09-19"
+  },
+  "script": {
+    "path": "tools/analysis/stable_cell_set.py",
+    "sha16": "585c0048ec69370c",
+    "commit": "8e8f987"
+  },
+  "criteria": [
+    {
+      "id": "C1",
+      "text": "SUPPORT: every one of the 5 cells has >= 120 held-out questions on the 3,445-question pool of record",
+      "result": "HELD",
+      "value": "S1 289 / S2 394 / S3 584 / S4 624 / S5 1554",
+      "denominator": "3,445 judgeable pool questions of p2dca21ab5f4ef3ae"
+    },
+    {
+      "id": "C2",
+      "text": "PROFILE: the K12 interaction-only split-half R over the 5 cells >= 0.70 at the point",
+      "result": "HELD",
+      "value": "0.9295 (r 0.8684; halving SD 0.0195; LOCO 0.8163 without S5 .. 0.9517 without S2; no CI at 5 cells; a random 5-way grouping of the 14 anchors reads 0.9121 [0.8259, 0.9446]; carried by the uncertified complement S5)",
+      "denominator": "12-model ARENA12 key on the cells' held-out pool questions; 40 halvings Random(7)"
+    },
+    {
+      "id": "C3",
+      "text": "INFORMATION: F6 of the 5-cell partition >= the 14 categories' +10.791 on the 10,925 keyed questions",
+      "result": "FAILED",
+      "value": "+5.836 vs +10.791 x 1e-3; paired (a)-(b) -4.955 [-5.798, -4.095]",
+      "denominator": "10,925 keyed questions (46 models; 7,795 = 71.4% on R1's train side)"
+    }
+  ],
+  "predictions": [
+    {
+      "id": "P1",
+      "text": "(plan) 5 cells, all >= 120 held-out questions on the pool (finer band all >= 200)",
+      "result": "HELD",
+      "value": "min 289",
+      "denominator": "3,445 pool"
+    },
+    {
+      "id": "P2",
+      "text": "(plan) K12 interaction-only R over the 5 cells in [0.75, 0.88]",
+      "result": "FAILED",
+      "value": "0.9295 (model-demeaned band [0.85, 0.92]: 0.9514 FAILED)",
+      "denominator": "5 cells"
+    },
+    {
+      "id": "P3",
+      "text": "(plan) F6 of the 5-cell partition in [+8, +11] x 1e-3 AND C3 FAILS",
+      "result": "FAILED",
+      "value": "+5.836 (C3 did fail; the number is below the band)",
+      "denominator": "10,925 keyed"
+    },
+    {
+      "id": "P4",
+      "text": "(registrar) model-demeaned R exceeds the interaction-only R by >= 0.03",
+      "result": "FAILED",
+      "value": "0.9514 - 0.9295 = +0.0219",
+      "denominator": "5 cells"
+    },
+    {
+      "id": "P5",
+      "text": "(registrar) the complement cell S5 holds >= 40% of the pool",
+      "result": "HELD",
+      "value": "1554 / 3445 = 45.1%",
+      "denominator": "3,445 pool"
+    },
+    {
+      "id": "P6",
+      "text": "(registrar) the 4-cell spine-only interaction-only R is lower than the 5-cell reading by >= 0.05",
+      "result": "HELD",
+      "value": "0.8163 vs 0.9295 (-0.1132)",
+      "denominator": "4 vs 5 cells, K12"
+    },
+    {
+      "id": "P7",
+      "text": "(registrar) the undominated set differs from the overlapping anchors' in at most 1 of 5 cells",
+      "result": "HELD",
+      "value": "HELD on the set-identity reading (U = {gemini-3.1-pro} in all 5 cells; ALL-reading 0 of 5); the ANY reading fails (3 of 5) on History alone (gemini > iask 14:6, p 0.115 on 124 q)",
+      "denominator": "K12 key, exact two-sided McNemar on the cells' held-out questions"
+    }
+  ],
+  "falsifier": {
+    "text": "F1: any stable cell below 120 held-out questions (C1 fails) OR K12 interaction-only R < 0.70 (C2 fails); overturns the plan's 'honest cell for the profile' reading of the spine",
+    "fired": false
+  },
+  "numbers_of_record": {
+    "support_pool": "S1 289 / S2 394 / S3 584 / S4 624 / S5 1554 of 3,445 (0 defects); judged 241 / 306 / 533 / 546 / 1185 of 2,811; keyed 980 / 1359 / 1840 / 2190 / 4556 of 10,925",
+    "K12_5cell_interaction_only_R": "0.9295 (r 0.8684; halving SD 0.0195; LOCO -S1 0.9454 -S2 0.9517 -S3 0.9296 -S4 0.9434 -S5 0.8163; jk band [0.7296, 1.1295] is NOT a CI)",
+    "K12_5cell_model_demeaned_R": "0.9514 [0.8688, 1.0341]",
+    "K12_14anchor_like_for_like_interaction_only_R": "0.8877 [0.8337, 0.9416] on the same 3,445 q (model-demeaned 0.9257)",
+    "K12_4cell_spine_only_interaction_only_R": "0.8163 [0.6458, 0.9868] (model 0.9079)",
+    "K46": "5 cells both 0.8903 / model 0.9554; 14 anchors 0.8394 [0.7704, 0.9084]; 4 cells 0.7106 [0.5145, 0.9067]",
+    "random_5way_grouping_of_14_anchors": "interaction-only R median 0.9121 [5th 0.8259, 95th 0.9446] over 60 draws x 10 halvings (reviewer's resolution check)",
+    "logit_additive_null_K12_5cells": "model-only 0.9255, interaction-only 0.4826 [0.3465, 0.6616] (real 0.9295); variance shares 0.90 / 0.06 / 0.05",
+    "F6_x1000_on_10925_keyed": "(a) 5-cell +5.836; (b) 14 categories +10.791; (c) 82 leaves +12.785; (d) 2 depth-1 +3.604; paired (a)-(b) -4.955 [-5.798, -4.095]",
+    "F6_pool_only_3130": "self-fitted (a) +5.654 (b) +11.459 diff -5.806 [-7.506, -4.183]; train-fitted clean design (a) +5.779 (b) +12.081 diff -6.302 (reviewer)",
+    "per_cell_class_K12": "S1 PASS (profile 0.8789 / order 0.9908); S2 FAIL (profile 0.0967 [-0.3051, 0.3476] / order 0.9936 PASS: offset, no deviation profile); S3 PASS 0.9465; S4 PASS 0.8564; S5 PASS 0.9874 [COMPLEMENT]",
+    "per_cell_class_K46": "S1 PWI 0.7933; S2 FAIL 0.2909; S3 PASS 0.9006; S4 PWI 0.7227; S5 PASS 0.9803",
+    "interaction_variance_shares_by_cell": "S5 53.9%, S3 20.2%, S1 16.4%, S4 7.6%, S2 1.9% (reviewer)",
+    "undominated_sets_K12": "U = {gemini-3.1-pro_5-shots} in all 5 cells (established edges 62/62/62/63/65 of 66); anchors' pool sets {gemini} except History {gemini, iask} (14:6, p 0.115)"
+  },
+  "sentence_of_record": "an anchor-free profile home exists at 5 cells, with less key information than the 14 names [C2 0.9295 at a resolution where a random 5-way grouping of the anchors reads 0.91; carried by the uncertified complement S5 (LOCO 0.8163 without it; spine-only 0.8163 K12 / 0.7106 K46); S2 order PASS / profile FAIL; F6 54% of the names']",
+  "chips": [
+    "C1 HELD 289-1554",
+    "C2 HELD 0.9295 (5 cells; LOCO 0.82-0.95; random-grouping band 0.83-0.94)",
+    "C3 FAILED +5.8 vs +10.8",
+    "P2 P3 P4 FAILED",
+    "S5 COMPLEMENT 45% / 54% of interaction variance",
+    "S2 offset only"
+  ],
+  "brackets": [
+    {
+      "date": "2026-09-19",
+      "by": "STABLE-CELL-SET post-run review D1 (docs/reviews/2026-09-19_zero_call_batch2.md, 83cb8e5)",
+      "text": "C2 met at 5 cells where a random 5-way grouping of the anchors reads 0.91 [0.83, 0.94]; the reading depends on the complement S5 (LOCO 0.8163 without it); one certified cell (S2) carries no deviation profile; key information 54% of the names' (+5.8 vs +10.8; on the clean pool rows 48%: +5.8 vs +12.1). 'Home' is earned only in the registered, weak sense."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "STABLE-CELL-SET post-run review D2",
+      "text": "the jk95 [0.7296, 1.1295] is not a CI: state R 0.9295, halving SD 0.0195, LOCO range 0.8163-0.9517, no CI at 5 cells."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "STABLE-CELL-SET post-run review D5",
+      "text": "P7 HELD on the set-identity reading; the ANY reading fails on one under-powered anchor (History 14:6, p = 0.115)."
+    },
+    {
+      "date": "2026-09-19",
+      "by": "STABLE-CELL-SET post-run review D6",
+      "text": "pool-only F6: self-fitted -5.806; train-fitted clean design -6.302; both directions agree; the choice is labelled."
+    }
+  ],
+  "does_not_show": [
+    "a profile home in any sense stronger than the registered one (C2 is a resolution statement at 5 cells; any random 5-way grouping of the named anchors passes it)",
+    "a confidence interval on the 5-cell R (none exists at 5 cells)",
+    "the quantitative side as a CERTIFIED cell (S5 = n00000004, uncertified at 0.746)",
+    "any judge-built row on a free cell (key only; judging on R1 is not authorised)",
+    "a name for any cell (majority-train categories are descriptions)",
+    "a level comparison with PROFILE-RELIABILITY-INTERACTION's 0.8665 / 0.8118 (different question set; the like-for-like comparator is 0.8877 on the same 3,445 q)",
+    "anything on the K-SELECTION trees (not built at this reading)",
+    "a routing consequence on MMLU-Pro (U = {gemini} everywhere)"
+  ],
+  "ledger": {
+    "row_id": "STABLE-CELL-SET",
+    "version": "v116"
+  },
+  "sources": [
+    "experiment_results/anchorfree/redraw/stable_cell_set_outcome.txt (8e8f987): supports, classes, F6, reliability table, undominated sets, criteria and predictions as printed",
+    "docs/reviews/2026-09-19_zero_call_batch2.md §1 (83cb8e5): CONFIRMED status, random-grouping band, interaction variance shares, S2 reading, D1-D6, sentence of record, chips",
+    "docs/judge_v2_program.md §STABLE-CELL-SET registration L7765-L7924 and outcome section (this commit)"
+  ],
+  "plain_description": {
+    "sq": "SQ3 Taxonomy",
+    "what": "Takes the 5 cells of the label-free clean tree that stay stable across re-draws, uses them as a 5-group partition of 3,445 questions, and checks with answer keys whether they support a reliable model profile, compared with the 14 named MMLU-Pro categories.",
+    "why": "Asks whether a label-free tree yields a usable home for per-cell model profiles.",
+    "information": "It shows whether label-free cells can replace named categories for profiling. Result: done; yes in a weak sense only: reliability 0.93, but a random 5-way grouping of the named categories reaches 0.91, the result leans on one uncertified catch-all cell, and the cells carry about half the information of the 14 names.",
+    "written": "2026-10-07"
+  }
+}

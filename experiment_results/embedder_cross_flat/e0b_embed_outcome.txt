@@ -1,0 +1,97 @@
+pool p2dca21ab5f4ef3ae (pool_guard.assert_pool_of_record)
+[THREADS] OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+[SCRIPT] tools/analysis/embedder_cross_flat.py blob:f8581aab / sha256-lf16:328a7c09859b3acb / sha256-crlf16:ff57756c6aebce0d
+[PIN] tools/analysis/embedder_arms.py blob:0546800f / sha256-lf16:4bfd77986e4bfb92 / sha256-crlf16:4dfc8dd59490dd15 (verified on import)
+[PIN] tools/analysis/flat_mix_mmlu.py blob:555ae3ac / sha256-lf16:b80cec50c2eef49d / sha256-crlf16:57413483afaf7aa1 (verified on import)
+EMBEDDER-CROSS-FLAT E0b part embed (RP15b); spaces qwen3_raw, nomic_raw, nomic_card, gemma_raw, gemma_card; k [14, 82]; seeds [0, 1, 2, 3, 4]; slice 256; zero judge calls
+  mxbai: NOT RUN (not decided; the author's decision (b)); card arms are the REGISTERED SECONDARY
+  [EMB-ARMS] registrar pin: arm nomic_raw sha256 53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95 == embedder_cross_arm_pins.json
+  [EMB-ARMS] registrar pin: arm nomic_card sha256 90754dfd95849cf23ee3698a8523a17ea6e3ec3d32fc7516c78534c36301e414 == embedder_cross_arm_pins.json
+  [EMB-ARMS] registrar pin: arm gemma_raw sha256 28f2e3a41e77312ff5c92d798b95e6ea2acdb8b6591b2eab1c677fa1d5367867 == embedder_cross_arm_pins.json
+  [EMB-ARMS] registrar pin: arm gemma_card sha256 24820836f7266c08958438c1d4a0116d38416113c7602499420f7e0ca65b4e93 == embedder_cross_arm_pins.json
+PINS: every non-qwen3 arm's copy equals the registrar's pin (checked before any read of the read set or the DB of record)
+OLLAMA PREFLIGHT: /api/tags lists qwen3-embedding:latest (digest 64b933495768fbd3b87c20583d379728a07471e0c66733a9df87cd1901b3c44b)
+M1' (D2; the orchestrator's ruling, bracketed by the registrar): purity on the 3,445 held-out with each cell's majority from the 8,125 FIT texts; FLAT-MIX-MMLU's M1 (majority from its 8,324 train texts) is NOT computed; the read set is not extended
+READ SET: fit 8125, held-out 3445, keyed 10925, read set 11687 distinct texts (registered 8,125 / 3,445 / 10,925 / 11,687 after the data-steward's 3,504 correction)
+HYGIENE: held-out texts in the fit 0; held-out stem_keys in the fit 0 (both must be 0: no held-out question enters any fit)
+  [EMB-ARMS] arm qwen3_raw (qwen3-embedding:latest, REFERENCE): 11687 of 11687 needed texts have a vector; raw dims {4096: 11687}; native 4096
+ARM qwen3_raw (qwen3-embedding:latest, REFERENCE): file embeddings_cache.db sha256 52229e1ebfdda76ebaed3e461eeee80ae654dfb35ac480eb9cb9868bb0269769; 11687 vectors, native dim [4096]; sliced to 256 and renormalised; model digest at the --go n/a (the DB of record)
+  [EMB-ARMS] registrar pin: arm nomic_raw sha256 53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95 == embedder_cross_arm_pins.json
+  [EMB-ARMS] reader: arm nomic_raw reads the --target-dir copy Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\embedder_cross\embeddings_cache_nomic-embed-text_latest.db sha256 53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95 (== provenance == the registrar's pin; source Z:\FAC\TUBerlin\THESIS\TaxoArena\embeddings_cache_nomic-embed-text_latest.db sha256 53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95)
+  [EMB-ARMS] arm nomic_raw (nomic-embed-text:latest, PRIMARY): 11687 of 11687 needed texts have a vector; raw dims {768: 11687}; native 768
+ARM nomic_raw (nomic-embed-text:latest, PRIMARY): file embeddings_cache_nomic-embed-text_latest.db sha256 53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95; 11687 vectors, native dim [768]; sliced to 256 and renormalised; model digest at the --go 0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f
+  [EMB-ARMS] registrar pin: arm nomic_card sha256 90754dfd95849cf23ee3698a8523a17ea6e3ec3d32fc7516c78534c36301e414 == embedder_cross_arm_pins.json
+  [EMB-ARMS] reader: arm nomic_card reads the --target-dir copy Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\embedder_cross\embeddings_cache_nomic-embed-text_latest__card.db sha256 90754dfd95849cf23ee3698a8523a17ea6e3ec3d32fc7516c78534c36301e414 (== provenance == the registrar's pin; source Z:\FAC\TUBerlin\THESIS\TaxoArena\embeddings_cache_nomic-embed-text_latest.db sha256 53d1540a811e819ff9af27006b6929e7e89cdff6cfb96f6e2803691e85f8cb95)
+  [EMB-ARMS] arm nomic_card (nomic-embed-text:latest, SECONDARY): 11687 of 11687 needed texts have a vector; raw dims {768: 11687}; native 768
+ARM nomic_card (nomic-embed-text:latest, SECONDARY): file embeddings_cache_nomic-embed-text_latest__card.db sha256 90754dfd95849cf23ee3698a8523a17ea6e3ec3d32fc7516c78534c36301e414; 11687 vectors, native dim [768]; sliced to 256 and renormalised; model digest at the --go 0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f
+  [EMB-ARMS] registrar pin: arm gemma_raw sha256 28f2e3a41e77312ff5c92d798b95e6ea2acdb8b6591b2eab1c677fa1d5367867 == embedder_cross_arm_pins.json
+  [EMB-ARMS] reader: arm gemma_raw reads the --target-dir copy Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\embedder_cross\embeddings_cache_embeddinggemma_latest.db sha256 28f2e3a41e77312ff5c92d798b95e6ea2acdb8b6591b2eab1c677fa1d5367867 (== provenance == the registrar's pin; source Z:\FAC\TUBerlin\THESIS\TaxoArena\embeddings_cache_embeddinggemma_latest.db sha256 3e9ce57772160749e0b5ea0267713286ca4109444d5a6b676e877a5b0501df29)
+  [EMB-ARMS] arm gemma_raw (embeddinggemma:latest, PRIMARY): 11687 of 11687 needed texts have a vector; raw dims {768: 11687}; native 768
+ARM gemma_raw (embeddinggemma:latest, PRIMARY): file embeddings_cache_embeddinggemma_latest.db sha256 28f2e3a41e77312ff5c92d798b95e6ea2acdb8b6591b2eab1c677fa1d5367867; 11687 vectors, native dim [768]; sliced to 256 and renormalised; model digest at the --go NOT RECORDED (written before C-E0B-7)
+  [EMB-ARMS] registrar pin: arm gemma_card sha256 24820836f7266c08958438c1d4a0116d38416113c7602499420f7e0ca65b4e93 == embedder_cross_arm_pins.json
+  [EMB-ARMS] reader: arm gemma_card reads the --target-dir copy Z:\FAC\TUBerlin\THESIS\TaxoArena\experiment_results\embedder_cross\embeddings_cache_embeddinggemma_latest__card.db sha256 24820836f7266c08958438c1d4a0116d38416113c7602499420f7e0ca65b4e93 (== provenance == the registrar's pin; source Z:\FAC\TUBerlin\THESIS\TaxoArena\embeddings_cache_embeddinggemma_latest.db sha256 3e9ce57772160749e0b5ea0267713286ca4109444d5a6b676e877a5b0501df29)
+  [EMB-ARMS] arm gemma_card (embeddinggemma:latest, SECONDARY): 11687 of 11687 needed texts have a vector; raw dims {768: 11687}; native 768
+ARM gemma_card (embeddinggemma:latest, SECONDARY): file embeddings_cache_embeddinggemma_latest__card.db sha256 24820836f7266c08958438c1d4a0116d38416113c7602499420f7e0ca65b4e93; 11687 vectors, native dim [768]; sliced to 256 and renormalised; model digest at the --go 85462619ee721b466c5927d109d4cb765861907d5417b9109caebc4e614679f1
+CONFOUNDS (per arm; printed, not scored): prefix policy, layer_norm, context truncation (D5 proxy ceil(chars/4) > context), quantisation (registration: only qwen3 is Q4), Ollama tag digest now (D6)
+  qwen3_raw  prefix 'none'; layer_norm False; texts over context 0 of 11687 (context 32768 tokens, proxy); Q4; digest 64b933495768fbd3b87c20583d379728a07471e0c66733a9df87cd1901b3c44b
+  nomic_raw  prefix 'none'; layer_norm False; texts over context 0 of 11687 (context 2048 tokens, proxy); not Q4; digest 0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f
+  nomic_card prefix 'clustering: '; layer_norm True; texts over context 0 of 11687 (context 2048 tokens, proxy); not Q4; digest 0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f
+  gemma_raw  prefix 'none'; layer_norm False; texts over context 0 of 11687 (context 2048 tokens, proxy); not Q4; digest 85462619ee721b466c5927d109d4cb765861907d5417b9109caebc4e614679f1
+  gemma_card prefix 'task: clustering | query: '; layer_norm False; texts over context 0 of 11687 (context 2048 tokens, proxy); not Q4; digest 85462619ee721b466c5927d109d4cb765861907d5417b9109caebc4e614679f1
+REPRODUCIBILITY FLOOR (D4, DESCRIPTIVE): 500 fit texts re-embedded via /api/embed with qwen3-embedding:latest: cosine after slice-256 + renormalise min 0.998154, median 0.999363, mean 0.999314; below 0.9999: 497
+FITTED qwen3_raw: 20 partitions on 8125 fit texts (48.1 s); M2 n 10925 of 10925 keyed
+FITTED nomic_raw: 20 partitions on 8125 fit texts (45.9 s); M2 n 10925 of 10925 keyed
+FITTED nomic_card: 20 partitions on 8125 fit texts (43.7 s); M2 n 10925 of 10925 keyed
+FITTED gemma_raw: 10 partitions on 8125 fit texts (25.9 s); M2 n 10925 of 10925 keyed
+  gemma_raw k 82: VOID (ruling B6): V seed 3: mean resultant length outside (0, 1) (a one-member or degenerate cell); the whole (arm, k) cell is VOID: every contrast on it reads NA and is excluded from every summary (the orchestrator's ruling (a)); no replacement seed
+FITTED gemma_card: 20 partitions on 8125 fit texts (33.9 s); M2 n 10925 of 10925 keyed
+
+SUPPORT: denominators M1' 3445 held-out (3445 stem_key twin groups; Kish m-bar 1.0000 = DEFF measured; n_eff 3445), M2 10925 keyed; registered SE M1 0.00663 / M2 0.357e-3, MDE80 M1 0.0186 / M2 1.00e-3 (FLAT's, NOMINAL for M1'); wrong(established) and tie conventions N/A (no judge)
+(f) VERDICT LINE (registered): E0b nomic-vs-qwen3 at k 14 on M1 DESCRIPTIVE-ONLY (P1 -0.020 lies inside max(0.0186, spread) on the record's spread 0.0305); TF-IDF floor SCOREABLE (P2 -0.08 beyond 0.0305); every cross-arm contrast DESCRIPTIVE-ONLY. [registered, verbatim; its premise 0.0305 is FLAT-MIX-MMLU's spread, NOMINAL here: re-derived below with this instrument's spread (C-E0B-2)]
+
+ARMS (V seed 0 / mean over seeds 0-4; M1' purity on 3445, M2 F6 x1e-3 on 10925)
+  qwen3_raw  k 14  V0 M1' 0.6032 M2 +10.353 | V mean M1' 0.6016 M2 +10.881 | K0 M1' 0.5771 M2 +10.091
+  qwen3_raw  k 82  V0 M1' 0.7698 M2 +14.318 | V mean M1' 0.7630 M2 +13.962 | K0 M1' 0.7707 M2 +13.723
+  nomic_raw  k 14  V0 M1' 0.5852 M2 +10.703 | V mean M1' 0.5695 M2 +10.651 | K0 M1' 0.5808 M2 +10.015
+  nomic_raw  k 82  V0 M1' 0.7257 M2 +12.216 | V mean M1' 0.7131 M2 +12.490 | K0 M1' 0.7173 M2 +12.019
+  nomic_card k 14  V0 M1' 0.6061 M2 +9.855 | V mean M1' 0.5765 M2 +9.534 | K0 M1' 0.6035 M2 +9.506
+  nomic_card k 82  V0 M1' 0.7231 M2 +11.439 | V mean M1' 0.7256 M2 +11.784 | K0 M1' 0.7039 M2 +10.825
+  gemma_raw  k 14  V0 M1' 0.5524 M2 +12.526 | V mean M1' 0.5707 M2 +12.464 | K0 M1' 0.5884 M2 +11.684
+  gemma_raw  k 82  VOID (ruling B6)
+  gemma_card k 14  V0 M1' 0.6357 M2 +10.500 | V mean M1' 0.6354 M2 +10.616 | K0 M1' 0.6476 M2 +10.889
+  gemma_card k 82  V0 M1' 0.7713 M2 +13.949 | V mean M1' 0.7663 M2 +13.478 | K0 M1' 0.7585 M2 +13.843
+
+CRITERION WORSE_S,k (registered): M(V_S) - M(V_qwen3) < -spread_qwen3(M) AND the paired 95% CI's upper end < 0; V = seed 0 (D1); M = M1' (D2) or M2; record spread M1 0.0305 NOMINAL, never used; each line carries its SUPPORT tag against the MEASURED bar max(MDE, spread_qwen3) and its realised SE / MDE80 (C-E0B-2, C-E0B-6)
+  WORSE nomic_raw k=14 M1': diff -0.0180, CI [-0.0293, -0.0064], spread_qwen3 +0.0316 -> not shown worse beyond max(MDE, spread) = 0.0316 [DESCRIPTIVE-ONLY (prior -0.0200 vs bar 0.0316 = max(registered MDE 0.0186, spread_qwen3 0.0316, realised MDE80 0.0164))] | realised SE 0.0058, MDE80 0.0164 | mean-over-seeds diff -0.0321, K0 diff +0.0038, spread_nomic_raw +0.0380 (descriptive)
+  WORSE nomic_raw k=14 M2: diff +0.350e-3, CI [-0.213e-3, +0.890e-3], spread_qwen3 +1.083e-3 -> not shown worse beyond max(MDE, spread) = 1.083e-3 [DESCRIPTIVE-ONLY (no registered prior)] | realised SE 0.281e-3, MDE80 0.788e-3 | mean-over-seeds diff -0.230e-3, K0 diff -0.077e-3, spread_nomic_raw +0.434e-3 (descriptive)
+  WORSE nomic_raw k=82 M1': diff -0.0441, CI [-0.0572, -0.0305], spread_qwen3 +0.0279 -> WORSE FIRES [DESCRIPTIVE-ONLY (no registered prior)] | realised SE 0.0068, MDE80 0.0191 | mean-over-seeds diff -0.0499, K0 diff -0.0534, spread_nomic_raw +0.0226 (descriptive)
+  WORSE nomic_raw k=82 M2: diff -2.102e-3, CI [-2.915e-3, -1.362e-3], spread_qwen3 +0.822e-3 -> WORSE FIRES [DESCRIPTIVE-ONLY (no registered prior)] | realised SE 0.396e-3, MDE80 1.109e-3 | mean-over-seeds diff -1.472e-3, K0 diff -1.704e-3, spread_nomic_raw +0.628e-3 (descriptive)
+  WORSE nomic_card k=14 M1': diff +0.0029, CI [-0.0148, +0.0212], spread_qwen3 +0.0316 -> not shown worse beyond max(MDE, spread) = 0.0316 [DESCRIPTIVE-ONLY (no registered prior)] | realised SE 0.0092, MDE80 0.0257 | mean-over-seeds diff -0.0251, K0 diff +0.0264, spread_nomic_card +0.0615 (descriptive)
+  WORSE nomic_card k=14 M2: diff -0.498e-3, CI [-1.051e-3, +0.035e-3], spread_qwen3 +1.083e-3 -> not shown worse beyond max(MDE, spread) = 1.083e-3 [DESCRIPTIVE-ONLY (no registered prior)] | realised SE 0.277e-3, MDE80 0.776e-3 | mean-over-seeds diff -1.347e-3, K0 diff -0.585e-3, spread_nomic_card +0.671e-3 (descriptive)
+  WORSE nomic_card k=82 M1': diff -0.0467, CI [-0.0595, -0.0340], spread_qwen3 +0.0279 -> WORSE FIRES [DESCRIPTIVE-ONLY (no registered prior)] | realised SE 0.0065, MDE80 0.0182 | mean-over-seeds diff -0.0374, K0 diff -0.0668, spread_nomic_card +0.0081 (descriptive)
+  WORSE nomic_card k=82 M2: diff -2.880e-3, CI [-3.635e-3, -2.109e-3], spread_qwen3 +0.822e-3 -> WORSE FIRES [DESCRIPTIVE-ONLY (no registered prior)] | realised SE 0.389e-3, MDE80 1.090e-3 | mean-over-seeds diff -2.178e-3, K0 diff -2.898e-3, spread_nomic_card +0.743e-3 (descriptive)
+  WORSE gemma_raw k=14 M1': diff -0.0508, CI [-0.0665, -0.0343], spread_qwen3 +0.0316 -> WORSE FIRES [DESCRIPTIVE-ONLY (no registered prior)] | realised SE 0.0082, MDE80 0.0230 | mean-over-seeds diff -0.0309, K0 diff +0.0113, spread_gemma_raw +0.0671 (descriptive)
+  WORSE gemma_raw k=14 M2: diff +2.173e-3, CI [+1.510e-3, +2.866e-3], spread_qwen3 +1.083e-3 -> not shown worse beyond max(MDE, spread) = 1.083e-3 [DESCRIPTIVE-ONLY (no registered prior)] | realised SE 0.346e-3, MDE80 0.968e-3 | mean-over-seeds diff +1.583e-3, K0 diff +1.593e-3, spread_gemma_raw +0.444e-3 (descriptive)
+  WORSE gemma_raw k=82 M1': NA (gemma_raw k 82 VOID (ruling B6))
+  WORSE gemma_raw k=82 M2: NA (gemma_raw k 82 VOID (ruling B6))
+  WORSE gemma_card k=14 M1': diff +0.0325, CI [+0.0125, +0.0517], spread_qwen3 +0.0316 -> not shown worse beyond max(MDE, spread) = 0.0316 [DESCRIPTIVE-ONLY (no registered prior)] | realised SE 0.0100, MDE80 0.0280 | mean-over-seeds diff +0.0338, K0 diff +0.0705, spread_gemma_card +0.0046 (descriptive)
+  WORSE gemma_card k=14 M2: diff +0.147e-3, CI [-0.429e-3, +0.723e-3], spread_qwen3 +1.083e-3 -> not shown worse beyond max(MDE, spread) = 1.083e-3 [DESCRIPTIVE-ONLY (no registered prior)] | realised SE 0.294e-3, MDE80 0.823e-3 | mean-over-seeds diff -0.265e-3, K0 diff +0.798e-3, spread_gemma_card +0.720e-3 (descriptive)
+  WORSE gemma_card k=82 M1': diff +0.0015, CI [-0.0125, +0.0148], spread_qwen3 +0.0279 -> not shown worse beyond max(MDE, spread) = 0.0279 [DESCRIPTIVE-ONLY (no registered prior)] | realised SE 0.0070, MDE80 0.0195 | mean-over-seeds diff +0.0033, K0 diff -0.0122, spread_gemma_card +0.0148 (descriptive)
+  WORSE gemma_card k=82 M2: diff -0.369e-3, CI [-1.175e-3, +0.405e-3], spread_qwen3 +0.822e-3 -> not shown worse beyond max(MDE, spread) = 1.000e-3 [DESCRIPTIVE-ONLY (no registered prior)] | realised SE 0.403e-3, MDE80 1.129e-3 | mean-over-seeds diff -0.484e-3, K0 diff +0.120e-3, spread_gemma_card +0.844e-3 (descriptive)
+(f) RE-DERIVED with this instrument's spread (C-E0B-2): E0b nomic-vs-qwen3 at k 14 on M1' DESCRIPTIVE-ONLY (prior -0.0200 vs bar 0.0316 = max(registered MDE 0.0186, spread_qwen3 0.0316, realised MDE80 0.0164)); every other WORSE line DESCRIPTIVE-ONLY (no registered prior)
+
+GEOMETRY (fit texts, 256-d; printed, NOT scored; EMB-03)
+  qwen3_raw  anisotropy 0.2702 (centred -0.0001); participation ratio 90.78
+  nomic_raw  anisotropy 0.4488 (centred -0.0001); participation ratio 86.44; vs qwen3: mutual kNN@10 0.3759, linear CKA 0.5857
+  nomic_card anisotropy 0.5945 (centred -0.0001); participation ratio 62.46; vs qwen3: mutual kNN@10 0.3832, linear CKA 0.6204
+  gemma_raw  anisotropy 0.3186 (centred -0.0000); participation ratio 97.69; vs qwen3: mutual kNN@10 0.3954, linear CKA 0.5897
+  gemma_card anisotropy 0.6481 (centred 0.0001); participation ratio 45.72; vs qwen3: mutual kNN@10 0.3917, linear CKA 0.6409
+
+PREDICTIONS (priors; scored HELD / FAILED, D7)
+P1, P2, P6: scored in part cpu
+FALSIFIER F1 does not fire: 0 of 3 non-qwen3 embedding families WORSE beyond spread on M2 at k = 14 (nomic: nomic_raw M2 k 14 diff +0.350e-3: not WORSE; gemma: gemma_raw M2 k 14 diff +2.173e-3: not WORSE; mxbai: NOT RUN (not decided): counted as not WORSE); not shown; no support computed for M2 contrasts (registration (f): every cross-arm contrast DESCRIPTIVE-ONLY): a non-firing F1 is not evidence about the SQ5 wording (READY_emb_conn_e0b2 D8 ruling, C-E0B2-3)
+  SECONDARY nomic_card M2 k 14: not WORSE (not counted in F1)
+  SECONDARY gemma_card M2 k 14: not WORSE (not counted in F1)
+P5 FAILED: F1 fired: no (prior 0.35)
+
+E1 (RP09): out of scope of this script; P3 / P4 NOT SCORED here.

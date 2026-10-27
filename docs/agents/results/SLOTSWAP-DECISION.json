@@ -1,0 +1,133 @@
+{
+ "id": "SLOTSWAP-DECISION",
+ "title": "SLOTSWAP-DECISION: when a slot swap moves a MASSIVE item to another k-means cell, does the routed model stay the same more often than chance (decision-level robustness beside the cell-level S 0.760)? (readout zero-call; NOT RUNNABLE until a MASSIVE correctness matrix exists; REGISTERED 2026-10-02)",
+ "question": "Do decisions stay where addresses move (Huot et al.'s decision-level robustness) on S0's slot-swap variants?",
+ "kind": "solve",
+ "state": "registered",
+ "registration": {
+  "commit": "the commit that writes it (parent 1a922a80)",
+  "program_lines": "docs/judge_v2_program.md L23490-L23513",
+  "program_lines_as_of": "the commit that writes them, parent 1a922a80, re-grepped",
+  "date": "2026-10-02",
+  "heading": "## Registered 2026-10-02 (before any code or call) — SLOTSWAP-DECISION: for INTENT-TRANSFER-S0's 3,222 MASSIVE slot-swap variants, ...",
+  "provenance": "the orchestrator's brief of 2026-10-02 (data source to be specified); the readout, precondition DEGENERATE, Support, predictions, falsifier the registrar's; the data leg NOT registered; the author's go (plan Amendment 38) covers the readout only"
+ },
+ "script": {
+  "path": "tools/analysis/slotswap_decision.py (ABSENT; built only once the data leg's correctness file exists); imports intent_transfer_s0.py blob:f662ceb1 unchanged",
+  "sha16": null,
+  "commit": null
+ },
+ "ready": null,
+ "go": "plan Amendment 38: the author's \"register 2, 6 and 3\" (0 calls for the readouts; the 4k-match rule not engaged)",
+ "run": null,
+ "review": null,
+ "criteria": [
+  {
+   "id": "DEGENERATE",
+   "text": "precondition: NOT EVALUABLE if fewer than 2 distinct best models each own >= 10% of EVAL origin mass, or R_chance >= 0.90",
+   "result": "n/a",
+   "value": "not run",
+   "denominator": "about 773 flipped variants of S0 C4's 3,222 MASSIVE EVAL variants in 3,207 components (Kish 1.0093); two-stage bootstrap (TRAIN items within cells x variant components) B 2,000"
+  },
+  {
+   "id": "SD1",
+   "text": "D_dec = R_flip - R_chance; the INTERVAL decides: HELD iff the 95% interval lies wholly above 0; FAILED iff wholly at or below 0; UNDETERMINED otherwise. Verdict line: SCOREABLE thin (predicted +0.15 vs MDE80 0.097)",
+   "result": "n/a",
+   "value": "not run",
+   "denominator": "about 773 flipped variants of S0 C4's 3,222 MASSIVE EVAL variants in 3,207 components (Kish 1.0093); two-stage bootstrap (TRAIN items within cells x variant components) B 2,000"
+  },
+  {
+   "id": "SD2",
+   "text": "DESCRIPTIVE-ONLY: R_dec beside S 0.760 (R_dec >= S by construction; a criterion would be vacuous)",
+   "result": "n/a",
+   "value": "not run",
+   "denominator": "3,222 variants / 3,207 components"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "DEGENERATE 0.35",
+   "result": "n/a",
+   "value": "not run",
+   "denominator": "about 773 flipped variants of S0 C4's 3,222 MASSIVE EVAL variants in 3,207 components (Kish 1.0093); two-stage bootstrap (TRAIN items within cells x variant components) B 2,000"
+  },
+  {
+   "id": "P2",
+   "text": "conditional on not DEGENERATE: R_flip 0.40 [0.20, 0.65], R_chance 0.25 [0.10, 0.50], D_dec +0.15 [-0.05, +0.35]; SD1 HELD 0.55, UNDETERMINED 0.40, FAILED 0.05",
+   "result": "n/a",
+   "value": "not run",
+   "denominator": "about 773 flipped variants of S0 C4's 3,222 MASSIVE EVAL variants in 3,207 components (Kish 1.0093); two-stage bootstrap (TRAIN items within cells x variant components) B 2,000"
+  },
+  {
+   "id": "P3",
+   "text": "R_dec 0.86 [0.80, 0.93]",
+   "result": "n/a",
+   "value": "not run",
+   "denominator": "3,222 variants / 3,207 components"
+  }
+ ],
+ "falsifier": {
+  "text": "F-SD fires iff SD1 FAILED: overturns 'addresses move, decisions stay' for cell routing on the easiest known answer; F4's 'surface-sensitive' qualifier then extends from cells to routing decisions. No recorded number revised.",
+  "fired": null
+ },
+ "numbers_of_record": {},
+ "sentence_of_record": null,
+ "chips": [
+  "REGISTERED 2026-10-02, BEFORE ANY CODE; not built"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-04",
+   "by": "registrar (consistency check 2026-10-04; zero calls)",
+   "text": "the 'chips' list had drifted from the ledger row's chips (wording or replaced chips); the chips of record are the ledger's, copied verbatim into 'chips_ledger_verbatim' (ledger v379); 'chips' is kept as history."
+  }
+ ],
+ "does_not_show": [
+  "a routing gain on intent corpora",
+  "tree leaves, capability text or MMLU-Pro",
+  "natural paraphrase (slot swaps only)",
+  "judged decisions or the decision's value (identity only); any roster beyond the data leg's"
+ ],
+ "ledger": {
+  "row_id": "SLOTSWAP-DECISION",
+  "version": "v345 (2026-10-02: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "INTENT-TRANSFER-S0",
+  "INTENT-S0-SLOTSWAP-MECH"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "minutes (readout)",
+  "agent_hours": "engine-coder about 2 h after the data exist",
+  "reads_pool": false,
+  "data_leg": "MASSIVE intent-classification solves: N TRAIN items (planning 1,800, 30 per K_f 60 cell) x R models = 7,200 (R 4) to 21,600 (R 12) calls; PAID, UNPRICED, UNREGISTERED; the author's go needed above the day cap"
+ },
+ "sources": [
+  "docs/judge_v2_program.md L23490-L23513 (section \"## Registered 2026-10-02 (before any code or call) — SLOTSWAP-DECISION: for INTENT-TRANSFER-S0's 3,222 MASSIVE slot-swap variants, ...\"; _as_of the commit that writes it, parent 1a922a80, re-grepped)",
+  "docs/agents/results/INTENT-TRANSFER-S0.json (C4, F4)",
+  "docs/agents/results/INTENT-S0-SLOTSWAP-MECH.json",
+  "docs/literature/2026-10-02_related_work_pass2.md (487ac3bd) §5 row 3",
+  "docs/plan_2026-09-15.md Amendment 38"
+ ],
+ "last_update": "2026-10-04",
+ "chips_ledger_verbatim": [
+  "plan: REGISTERED 2026-10-02, BEFORE ANY CODE; NOT RUNNABLE (DATA LEG UNREGISTERED, PAID)"
+ ],
+ "plain_description": {
+  "sq": "SQ5 Invariance",
+  "what": "Planned check on the MASSIVE intent dataset: when swapping a slot word in a request moves it to another k-means cell, does the routed model stay the same more often than chance? No judge calls for the readout.",
+  "why": "It tests whether routing decisions are robust even when cell membership is sensitive to surface wording.",
+  "information": "Held would mean addresses move but decisions stay. Failed would mean routing decisions are surface-sensitive too. Result: not run yet. It is registered but cannot run until a table of which models answer each MASSIVE item correctly exists. That needs a paid data step that has not been registered.",
+  "written": "2026-10-07"
+ }
+}

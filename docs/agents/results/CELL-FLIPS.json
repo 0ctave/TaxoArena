@@ -1,0 +1,178 @@
+{
+ "id": "CELL-FLIPS",
+ "title": "CELL-FLIPS: on the union routing data, cells where a TRAIN-chosen challenger beats the TRAIN-chosen best single model on EVAL beyond noise (one-sided component bootstrap, BH q 0.05), AF-U deciding, K_0 and declared beside (zero calls; REGISTERED 2026-10-04)",
+ "question": "Does cell-conditional reporting on the anchor-free tree's cells reveal model-order changes beyond noise?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "the commit that writes it (parent ed52c912)",
+  "program_lines": "docs/judge_v2_program.md L24143-L24154",
+  "program_lines_as_of": "the commit that writes them, parent ed52c912, re-grepped",
+  "date": "2026-10-04",
+  "provenance": "docs/agents/plans/2026-10-04_10h_schedule.md (ed52c912); docs/literature/2026-10-03_tree_uses.md (7812c100); the orchestrator's brief; autonomous scheduling"
+ },
+ "script": {
+  "path": "tools/analysis/cell_flips.py",
+  "sha16": "998d39a7 (git blob, LF)",
+  "commit": "d16892fa (merged)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_cell_flips_coverage.md",
+  "commit": "untracked at bracket time (blob 59070b52, LF)",
+  "verdict": "READY (cell_flips.py 998d39a7) with B-1..B-3"
+ },
+ "go": "autonomous-scheduling authorisation (zero calls); the author's 10-hour instruction",
+ "run": {
+  "outcome_file": "experiment_results/archv2/cell_flips/cell_flips_outcome.txt (sha256 03383314...); never committed; backup E:/TaxoArena_backup_2026-10-04_cell_flips (SHA256SUMS OK)",
+  "outcome_commit": "run from main after d16892fa + 098c3f84",
+  "calls": 0,
+  "cce": 0,
+  "pool": "union EVAL 5,907 / 5,404 (draw 5a3e756)",
+  "date": "2026-10-04"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_cell_flips.md",
+  "commit": "4120f15a",
+  "verdict": "VALID (Q1, Q2; D-4)"
+ },
+ "criteria": [
+  {
+   "id": "CF1",
+   "text": "DECIDING (BH rejection count): FLIPS-EXIST iff >= 1 AF-U cell survives BH q 0.05; NONE iff 0. Verdict line: SCOREABLE but THIN (first rejection needs D_c >= 0.27 at n 48, 0.15 at n 150; planning DEFF 1.10, one-stage; two-stage 1.595 beside)",
+   "result": "HELD",
+   "value": "FLIPS-EXIST: 7 of 101 TESTED AF-U cells BH-surviving (q 0.05); 273 / 5,907 items (0.0462)",
+   "denominator": "union EVAL 5,907 items / 5,404 components; AF-U cells with challenger != best and n_EVAL >= 20"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "AF-U TESTED cells 70 [45, 100]; FLIP cells 2 [0, 6]; CF1 FLIPS-EXIST 0.65 [TESTED band fails structurally: 101 > 100, known pre-key]",
+   "result": "FAILED",
+   "value": "TESTED 101 outside [45, 100] (structural, B-2); FLIP 7 outside [0, 6]; CF1 FLIPS-EXIST occurred (p 0.65, Brier 0.1225)",
+   "denominator": "union EVAL 5,907 items / 5,404 components"
+  },
+  {
+   "id": "P2",
+   "text": "declared FLIP cells 4 [1, 10] (descriptive)",
+   "result": "HELD",
+   "value": "declared FLIP 4 in [1, 10]",
+   "denominator": "union EVAL 5,907 items / 5,404 components"
+  },
+  {
+   "id": "P3",
+   "text": "K_0 FLIP cells 2 [0, 6] (descriptive)",
+   "result": "HELD",
+   "value": "K_0 FLIP 3 in [0, 6]",
+   "denominator": "union EVAL 5,907 items / 5,404 components"
+  },
+  {
+   "id": "P4",
+   "text": "median Kendall tau (cells n >= 50) 0.75 [0.55, 0.90] (descriptive)",
+   "result": "HELD",
+   "value": "median tau 0.5861 in [0.55, 0.90] (42 cells)",
+   "denominator": "union EVAL 5,907 items / 5,404 components"
+  }
+ ],
+ "falsifier": {
+  "text": "F-CF fires iff CF1 NONE: no AF-U cell reorders the best model beyond noise at this n; the E1 framing narrows to declared cells or descriptive differences.",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "CF1": "7 of 101 TESTED AF-U cells BH-surviving (q 0.05); 273 / 5,907 items",
+  "concentration": "5 of 7 AF-U flips are BBH task cells won by internlm2_5-20b-chat; 3 of 4 declared flips are the same tasks; 125 of 273 AF-U flip items in a declared flip cell",
+  "source_level": "BBH pooled internlm - g +0.0286 (1,716 items), p 0.0086 > 0.0083: 0 source flips (descriptive)",
+  "descriptive_arms": "K_0 3 / 94; declared 4 / 44 (not ranked; D-4)",
+  "tau": "median AF-U 0.5861 (42 cells)"
+ },
+ "sentence_of_record": "CELL-FLIPS, content-closed v2 union split, 0 calls: with the TRAIN-chosen best single model (Qwen2.5-72B-Instruct) and frozen TRAIN cell picks, 7 of 101 TESTED AF-U cells are BH-surviving flips on EVAL (q 0.05; 273 of 5,907 items, 4.6%): CF1 FLIPS-EXIST, F-CF not fired. The flips concentrate: 5 of 7 are BBH task cells (movie_recommendation twice, hyperbaton, date_understanding, logical deduction) won by internlm2_5-20b-chat, the same reordering the declared task cells show (3 of the 4 declared flips; descriptive), and not a source-level one (BBH pooled +2.9pp, not BH-surviving over 6 sources; descriptive). Three AF-U flips have no declared-cell counterpart (a date_understanding sub-cell, MMLU-Pro psychology and physics sub-cells; descriptive). K_0 (3) and declared (4) are descriptive, and K_0 files by true source (D-4): no ranking of arms. Median Kendall tau of the 18-model order within AF-U cells (n ≥ 50) against the global order 0.586 (42 cells). Predictions: P1 TESTED (structural) and P1 FLIP FAILED; P2, P3, P4 HELD; Brier 0.1225. [Not licensed: 'the tree discovers order changes the labels miss'; 'BBH has a different winner'; any AF-U vs K_0 or declared count comparison; judged orders.]",
+ "chips": [
+  "REGISTERED 2026-10-04, BEFORE ANY CODE; not built",
+  "VALID (POST-RUN 4120f15a): CF1 FLIPS-EXIST 7/101; F-CF NOT FIRED",
+  "5 OF 7 BBH TASKS (INTERNLM), AS DECLARED TASK CELLS SHOW; NOT SOURCE-LEVEL; ARMS NOT RANKED (D-4)"
+ ],
+ "brackets": [
+  {
+   "date": "2026-10-04",
+   "by": "registrar (pre-data; READY_cell_flips_coverage)",
+   "text": "B-1 seeds 20261004 + j, CF-R5 NaN rule, Kish 1.31 vs 1.09; B-2 P1 TESTED 101 structural FAILED, K_0 descriptive (D-4). Programme L24147, L24148, L24150, L24151."
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (POSTRUN 4120f15a)",
+   "text": "outcome recorded. docs/judge_v2_program.md L24183-L24194 (section \"## CELL-FLIPS (2026-10-04, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent 122d6fc5)"
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (consistency check 2026-10-04; zero calls)",
+   "text": "the 'chips' list had drifted from the ledger row's chips (wording or replaced chips); the chips of record are the ledger's, copied verbatim into 'chips_ledger_verbatim' (ledger v379); 'chips' is kept as history."
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (consistency check 2026-10-04; zero calls)",
+   "text": "READY pointer completed: docs/reviews/READY_cell_flips_coverage.md committed in d16892fa (blob 59070b52, LF); 'ready' kept as written."
+  },
+  {
+   "date": "2026-10-04",
+   "by": "registrar (status correction; zero calls)",
+   "text": "status correction (testing-logic review, docs/literature/2026-10-04_testing_logic_review.md (bd5ca001)): AF-U is federated per source (prog L22633), so it is SOURCE-CONDITIONED [SC], not label-free; 'label-free' / [LF] on AF-U reads [SC]; K_0 is [SC] too (like with like); no number or verdict moves; docs/judge_v2_program.md L24259-L24263 (registrar's record; _as_of the commit that writes it, parent bd5ca001)"
+  }
+ ],
+ "does_not_show": [
+  "that the tree discovers order changes the labels miss (3 non-declared flips descriptive)",
+  "that BBH has a different winner",
+  "AF-U vs K_0 or declared count comparisons",
+  "judged orders",
+  "beyond the union roster and one draw"
+ ],
+ "ledger": {
+  "row_id": "CELL-FLIPS",
+  "version": "v376 (2026-10-04: OUTCOME bracket, OK + WARN chips) | v375 (2026-10-04: new row, PLAN chip)"
+ },
+ "depends_on": [
+  "UNION-AF-ROUTE",
+  "V2-DECLARED-CELLS"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "none; keyed correctness, not a judge's frontier order (FRONTIER / AGGREGATE / ORACLE untouched)"
+ },
+ "cost": {
+  "calls": 0,
+  "cce": 0,
+  "builds": 0,
+  "cpu": "minutes",
+  "agent_hours": "about 1.5 h",
+  "reads_pool": true
+ },
+ "outputs": "never committed: pinned by sha256, stored / backed up on E: with SHA256SUMS.txt (the author prefers E:)",
+ "sources": [
+  "docs/judge_v2_program.md L24143-L24154 (_as_of the commit that writes it, parent ed52c912, re-grepped)",
+  "docs/agents/plans/2026-10-04_10h_schedule.md (ed52c912)",
+  "docs/reviews/READY_cell_flips_coverage.md (blob 59070b52, LF; branch cell-flips-coverage aa5ddf04: cell_flips.py 998d39a7 READY, coverage_audit.py 69c55268 NOT READY as of that blob; the review file was untracked when this bracket was written)",
+  "docs/reviews/POSTRUN_cell_flips.md (4120f15a; blob 8f3e2414, LF)",
+  "docs/judge_v2_program.md L24183-L24194 (section \"## CELL-FLIPS (2026-10-04, 0 calls) — VALID ...\"; _as_of the commit that writes it, parent 122d6fc5)"
+ ],
+ "last_update": "2026-10-04",
+ "chips_ledger_verbatim": [
+  "plan: REGISTERED 2026-10-04, BEFORE ANY CODE; not built",
+  "ok: VALID (POST-RUN 4120f15a): CF1 FLIPS-EXIST 7/101; F-CF NOT FIRED",
+  "warn: 5 OF 7 BBH TASKS (INTERNLM), AS DECLARED TASK CELLS SHOW; NOT SOURCE-LEVEL; ARMS NOT RANKED"
+ ],
+ "ready_of_record": {
+  "file": "docs/reviews/READY_cell_flips_coverage.md",
+  "commit": "d16892fa",
+  "blob": "59070b52 (LF)",
+  "note": null
+ },
+ "label_status": "AF-U [SC] (source-conditioned; federated per source), not [LF]; K_0 [SC]",
+ "plain_description": {
+  "sq": "SQ1 Use",
+  "what": "On the multi-benchmark union data, with training and evaluation sides split so no question text is shared, it picks the best overall model and a per-cell challenger on the training side. It then checks on the evaluation side, cell by cell, whether the challenger really beats the overall best beyond noise. The tree is built separately inside each source benchmark, so it uses the source label (source-conditioned) and is not fully label-free. No judge calls; answer keys only.",
+  "why": "Tests the core premise of cell-conditional evaluation: do some cells of the tree have a different best model than the global leaderboard says?",
+  "information": "If no cell flips, reporting per cell adds nothing over one leaderboard. If cells flip, it does add something. Result: flips exist. 7 of 101 tested cells show a real winner change (4.6% of items), mostly reasoning-puzzle (BBH) task cells won by one model. This is the same reordering the declared task labels already show. It does not show that the tree finds order changes the labels miss (3 such flips are descriptive only), nor that BBH as a whole has a different winner. One data draw only.",
+  "written": "2026-10-07"
+ }
+}
