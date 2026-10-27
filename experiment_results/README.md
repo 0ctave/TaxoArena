@@ -23,7 +23,7 @@ Some directories need a word:
 - `r8/`: the 8-domain, 8-model batch of 2026-07-31.
 - `promoted/`: readouts of the tree of record bareq512_s42 (reserved leaf assignments and its 300-rep site null over 70 sites) and leaf assignments of a second tree on the same pool, abt2d512_s42. The snapshots themselves are not in the repository.
 - `freeze_mcs55/`: the build of the frozen tree 20260727_042523, which is geometry only.
-- `judge_solve/grok-reasoning.db`: the cached reference solves of the STACK-v2 recipe (3,432), an instrument component, not a readout.
+- `judge_solve/grok-reasoning.db` (not in the public copy): the cached reference solves of the STACK-v2 recipe (3,432), an instrument component, not a readout.
 - `day_calls_<date>.json`: the judge calls posted on each day, one row per launch (test, launch, calls, time); the day's file is the count of record for its calls.
 
 <!-- src: docs/RESULTS.md L3-L4 (r8: 8-domain, 8-model batch of 2026-07-31); prog L20856(a) _as_of 70c61579

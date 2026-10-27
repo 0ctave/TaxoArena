@@ -12,7 +12,7 @@
 >   19.7% / 10.3%) were all computed on the **pre-`c381211`** 88-leaf tree, which is
 >   superseded. **The method survives and is the right method** — including the censoring
 >   control, the reach-first reading, and the anisotropy caveat. Re-derive the numbers on the
->   frozen mcs=55 artifact ([`frozen-artifact.md`](frozen-artifact.md)). The same applies to
+>   frozen mcs=55 artifact (`frozen-artifact.md`). The same applies to
 >   the `docs/data/within_node_null_*.csv` exports and to the lambda1/lambda-bar proxy fitted
 >   against these targets (R^2 0.865, LOO Q^2 0.851 — method survives, values do not).
 >   **DONE 2026-09-07: see "CURRENT (2026-09-07, frozen mcs=55 artifact)" at the bottom of
@@ -21,7 +21,7 @@
 >   `minClusterSize = 30`; the frozen artifact uses 55, so the grid, the split-eligible
 >   population and the `2*minClusterSize` prefilter all shift. The **bar** it justifies
 >   (`proposalSeparationBar = 0.025`) is unchanged.
-> * See [`void-results.md`](void-results.md) for the full list.
+> * See `void-results.md` for the full list.
 
 Measured by `gradlew nullBySize` (`SeparationNullBySizeTest`, arm A), which drives the real
 `TaxonomySplitter.splitSingleNode` on structureless clouds rather than reimplementing it.
@@ -281,7 +281,7 @@ Measured by `gradlew withinNull` (`SeparationNullBySizeTest`, arm
 "withinNull - anisotropy-preserving null per frozen depth-1 anchor") against the frozen
 artifact **snapshot `20260727_042523_Headless_Run_Auto_ge`** (154 nodes / 87 leaves /
 14 depth-1 anchors, `minClusterSize = 55`, `proposalSeparationBar = 0.025`,
-`freeze_mcs55.toml`), read from the tracked `snapshots_frozen.db` extract. Embeddings are
+`freeze_mcs55.toml`), read from the tracked `snapshots_frozen.db` extract (not in the public copy). Embeddings are
 served strictly from `embeddings_cache.db` (read-only, hard-fail on any cache miss; coverage
 was 8299/8299 anchor-region queryIds, no duplicates).
 
@@ -377,7 +377,7 @@ not report an accept rate against its null).
 gradlew withinNull -PnullReps=300
 ```
 
-Reads `snapshots_frozen.db` (tracked; falls back to the full local `snapshots.db`) and
+Reads `snapshots_frozen.db` (tracked, not in the public copy; falls back to the full local `snapshots.db`) and
 `embeddings_cache.db`, both opened read-only; refuses to run on any snapshot other than the
 one passed via `-DsnapshotId` (default: the frozen id). Writes
 `docs/data/within_null_frozen_anchors.csv` and `docs/data/within_null_frozen_splits.csv`.
@@ -475,7 +475,7 @@ unexplored and would need their own registration.
 gradlew siteNull -PnullReps=300
 ```
 
-Reads `snapshots_frozen.db` (tracked) and `embeddings_cache.db` read-only, hard-fails on
+Reads `snapshots_frozen.db` (tracked, not in the public copy) and `embeddings_cache.db` read-only, hard-fails on
 cache misses, refuses any snapshot but the one passed via `-DsnapshotId` (default: the
 frozen id). Writes `docs/data/site_null_frozen.csv` and prints the registered-check
 verdicts and trunk membership. Runtime ~9 min at 300 reps (66 sites x 2 arms).

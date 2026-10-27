@@ -231,7 +231,7 @@ JUDGED FAMILY ARE HISTORY (one disclosure), NEVER EVIDENCE", _as_of 70c61579. --
 | `data_v2/manifests/` | manifests of the registered v2 split draws (ARCHV2-SPLIT-1, ARCHV2-SPLIT-2) and a development draw |
 | `archive/` | files moved out of the active workspace; [archive/ARCHIVE_MANIFEST.md](archive/ARCHIVE_MANIFEST.md) gives each entry's reason |
 | `tuning/`, `tune.bat` | the L9 screening record of the construction parameters (harness in `tools/tuning/`) |
-| `snapshots_frozen.db` | extract of the frozen tree 20260727_042523 (154 nodes, 87 leaves) and two granularity snapshots; geometry only, never modified |
+| `snapshots_frozen.db` (not in the public copy) | extract of the frozen tree 20260727_042523 (154 nodes, 87 leaves) and two granularity snapshots; geometry only, never modified |
 | `frozen_triples_20260727_042523_Headless_Run_Auto_ge_MAIN.json` | engine input; restore it from HEAD after any MAIN construction |
 | `reserved_leaf_assignments.csv`, `model_domain_scores.csv`, `*_secured/` | inputs that older analyses and figure checks read by path |
 | `scripts/`, `figures/` | older analysis scripts and an exploratory figure, kept because records cite them |
@@ -254,7 +254,7 @@ any MAIN construction; never modify snapshots_frozen.db; application.yml never c
 
 - Toolchain: JDK 21, Gradle 8.10 through the wrapper (`./gradlew`), Kotlin 2.1.10, Spring Boot 3.4.3.
 - `./gradlew compileKotlin compileTestKotlin` compiles the main and test sources. That is all CI runs.
-- `./gradlew test` runs the default suite. Two tests need a local cache or a local configuration value that are not in the repository (`MrlRoutingTest.testMrlConfigDefaults` and the blank-trace check of `TraceEnvelopeUnwrapTest`); on a checkout without them they are skipped, not failed, and the rest of the suite passes.
+- `./gradlew test` runs the default suite. Two tests need a local cache or a local configuration value that are not in the repository (`MrlRoutingTest.testMrlConfigDefaults` and the blank-trace check of `TraceEnvelopeUnwrapTest`); on a checkout without them they are skipped, not failed, and the rest of the suite passes. In a copy without git metadata (such as GitHub's "Download ZIP") the refusal check of `RatingsDbGuardTest`, which needs git to tell tracked from untracked files, is skipped as well.
 - A headless run: `./gradlew bootRun --args="--config experiment_configs/<run>.toml"`. Runs that call a judge or labeller need credentials in a `.env` file (copy [.env.example](.env.example); `.env` is never committed).
 - Before any reader opens a pool: `python tools/analysis/pool_guard.py --pool <id>`.
 - The ledger is edited only through `tools/analysis/ledger_patch.py`; `tools/analysis/results_index.py` regenerates `docs/agents/results/INDEX.md`.
@@ -272,14 +272,14 @@ The data caches are not in the repository: the dataset cache `mmlu_pro_dataset_c
 A construction writes to both caches by design: table `queries` in the embedding cache and table `reserved_pool_meta` in the dataset cache.
 Back both up before any construction.
 
-The public copy of this repository leaves out bulky and binary outputs (databases, arrays), the data caches, raw model and judge outputs, and third-party benchmark text.
+The public GitHub copy is a snapshot of this repository without its development history (commit hashes cited in the record refer to that history; only its early part, up to the `v1.0.x-thesis` release tags of August 2026, is on GitHub); bulky and binary outputs (databases, arrays), the data caches, raw model and judge outputs, third-party benchmark text, files containing GPQA text and unpublished drafts are not included.
 Files of those kinds that this README or the record names, such as `snapshots_frozen.db`, are therefore not in that copy.
 <!-- src: docs/reviews/2026-09-20_cache_writes_by_construction.md L7 ("A construction WRITES to both files by design,
 on every run"; (a) queries, (b) reserved_pool_meta); KNOWLEDGE.md section 1 (Embedders: qwen3-embedding of record,
 embeddings_cache.db) and section 2 rule 7 ("Back up before any construction"); docs/README.md L41-L42 _as_of
 70c61579 (local snapshots.db not in git). Public copy: D-2026-10-27-4 (1) (one snapshot commit excluding GPQA-bearing
 files, raw model/judge outputs, binary outputs, third-party benchmark text dumps and unpublished drafts) and
-D-2026-10-27-6 A2 (docs/agents/author_decisions/2026-10-27.md). The clean-clone replication sentence was deleted
+D-2026-10-27-6 A2 (docs/agents/author_decisions/2026-10-27.md); the snapshot without the history, local main and its full history unchanged (so cited commit hashes resolve only in that history): D-2026-10-27-4 (1); published as the main session's snapshot commit with this prepared version as a child commit of it, no second force-push: D-2026-10-27-7. The clean-clone replication sentence was deleted
 (REVIEW_REPO-TIDY E3; plan 3a(6)). -->
 
 ## Where the record lives

@@ -6,8 +6,8 @@ seed 42, all against the frozen taxonomy snapshot
 `20260727_042523_Headless_Run_Auto_ge` (in root `snapshots.db`).
 
 Each domain folder contains the run's own Bradley-Terry ratings store
-(`ratings_r8_<domain>.db`, tables `match_history`, `ratings`) next to its CSV/JSON
-exports (`seed_42/` with `manifest.json`, `judging/`, `validation/`, `diagnostics/`).
+(`ratings_r8_<domain>.db`, tables `match_history`, `ratings`) (not in the public copy) next to its CSV/JSON
+exports (`seed_42/` with `manifest.json`, `judging/` (not in the public copy), `validation/`, `diagnostics/`).
 All runs executed on 2026-07-31; configs are in `experiment_configs/`.
 
 | folder | config | run start (UTC) | logical comparisons (per arm) |
@@ -24,7 +24,7 @@ All runs executed on 2026-07-31; configs are in `experiment_configs/`.
 
 `verify_agree_philosophy/` is not a ninth domain: it re-runs philosophy after the
 judge-agreement export fix to verify the recorded agreement rate, and is kept beside
-the batch it validates. Its ratings store is `ratings_verify_agree.db`.
+the batch it validates. Its ratings store is `ratings_verify_agree.db` (not in the public copy).
 
 The 8-model roster (identical in every run): gemini-3.1-pro_5-shots, arx_0314,
 gpt-4o-2024-08-06, Meta-Llama-3_1-70B-Instruct, Qwen1.5-72B-Chat, Meta-Llama-3_1-8B,

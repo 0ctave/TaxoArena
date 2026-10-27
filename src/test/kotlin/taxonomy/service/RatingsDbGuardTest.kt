@@ -1,8 +1,11 @@
 package taxonomy.service
 
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
 import taxonomy.runner.RatingsDbGuard
+import java.io.File
+import java.util.concurrent.TimeUnit
 
 /**
  * The runner must refuse to write a ratings database that git tracks.
@@ -27,8 +30,38 @@ class RatingsDbGuardTest {
         }
     }
 
+    /**
+     * True when the working directory is the root of a git checkout (`.git` present: a directory in a
+     * clone, a file in a worktree) and a git executable says it is inside a work tree. Probed here,
+     * independently of [RatingsDbGuard.isTracked], so a defect in the guard's own "git could not
+     * answer" branch cannot turn the refusal check below into a skip on a git checkout.
+     */
+    private fun gitCheckoutPresent(): Boolean {
+        if (!File(".git").exists()) return false
+        return try {
+            val proc = ProcessBuilder("git", "rev-parse", "--is-inside-work-tree").redirectErrorStream(true).start()
+            val out = proc.inputStream.bufferedReader().readText()
+            if (!proc.waitFor(10, TimeUnit.SECONDS)) {
+                proc.destroyForcibly()
+                false
+            } else {
+                proc.exitValue() == 0 && out.trim() == "true"
+            }
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     @Test
     fun `a tracked database is refused`() {
+        // "Tracked" needs git metadata. A copy without it (GitHub's "Download ZIP", a git-archive export)
+        // tracks nothing, and the guard then proceeds by design (isTracked == null). Skipped, not passed, in
+        // that case; on a git checkout the refusal below is asserted unchanged.
+        assumeTrue(
+            gitCheckoutPresent(),
+            "SKIPPED (git metadata absent): no .git in the working directory, or git cannot answer; " +
+                "the refusal of a tracked database is checked only on a git checkout."
+        )
         // Any file certain to be tracked; the guard's question is "does git know this path",
         // not "is it a database".
         withProperty("build.gradle.kts") {

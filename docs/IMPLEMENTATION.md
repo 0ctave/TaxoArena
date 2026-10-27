@@ -89,7 +89,7 @@ frozen snapshot and reused. The induction model is the same model as the arena j
 - **Decidable agreement**: the exported judge-vs-key agreement counts decidable
   comparisons only (patched and verified: export 0.7520 == independent recomputation on
   the philosophy re-run).
-- **Ratings**: Bradley–Terry fit per run, stored in the run's own `ratings_*.db`
+- **Ratings**: Bradley–Terry fit per run, stored in the run's own `ratings_*.db` (not in the public copy)
   (`match_history`, `ratings`).
 - **Judge model**: `Mistral-Large-3` in every reported run; it appears in no roster, so
   there is no self-preference confound.
