@@ -1,0 +1,132 @@
+{
+ "id": "EMBED2-WORK",
+ "title": "EMBED2-WORK: the axis tree V0, matched k-means K and the text-kNN reader N re-read on a second embedder (Ollama embeddinggemma, RAW protocol) on WORK rows of MATH, MMLU, MMLU-Pro (exploratory)",
+ "question": "Do V0, K, N and N512 read the same within-anchor gain C1, and does the flat-vs-tree ordering hold, when every partition and field is rebuilt on a second embedder (embeddinggemma) instead of qwen3-embedding?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "none (exploratory, not registered); plan benchzoom docs/embed2-work.md committed 599f674 before any second-embedder vector, tree or statistic (POSTRUN row 1)",
+  "program_lines": "outcome recorded in docs/judge_v2_program.md section \"## Registrar's record 2026-10-28 (insertion only; zero calls; nothing run) — EMBED2-WORK (POSTRUN 56da993f), TAU-CONT-ALL (1d23c3c7), BBH-WORK with the BBH fetch, census and sealed split (d8441df7), ...\" L25747-L25758 (_as_of the commit that writes it, parent 8f0f5f1c, re-grepped)",
+  "date": "2026-10-27"
+ },
+ "script": {
+  "path": "benchzoom examples/embed2-work.py",
+  "sha16": "parts and --analyze at blob:e7049516 (MATH launched from blob:25dc304d, which differs by the EMB_PINS mmlu line only); embeds blob:1e7b97a1 (MATH), blob:340c4952 (MMLU-Pro; dirty, in no commit) and blob:25dc304d (MMLU) (D6); builds blob:b2c6a16b / blob:78d678e5 / blob:e7049516; tip runner blob:881f9922, plan blob:b5db60a2, test blob:de8634ee (git blobs, LF; 0 CR bytes, no CRLF rendering) (POSTRUN header)",
+  "commit": "benchzoom embed2-work 35b2724..d17fde2, merged master 57f703d"
+ },
+ "ready": null,
+ "go": "D-2026-10-27-3 (\"You can use the most relevent embedder available on ollama, for a fourth benchmark what are your solutions to download and whats the best choise and what do you need for the fresh math test ?\"; c3aada22); the main session's reading: EMBED2-WORK authorised, embeddinggemma chosen, new embedding files only",
+ "run": {
+  "outcome_file": "E:/benchzoom_demo/followups/embed2-work (SHA256SUMS 10/10, summary.txt sha256 ea79bb85...; backup E:/TaxoArena_backup_2026-10-27_embed2-work 30/30 per POSTRUN)",
+  "outcome_commit": "outputs not committed (gemma npz under E:/benchzoom_cache/emb pinned by EMB_PINS)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "WORK rows only: MATH 2,949 items / 2,946 clusters, MMLU 8,425 / 8,375, MMLU-Pro WORK rows / 7,085 clusters; vault / reserved reads 0; the local Ollama embeddinggemma only (digest 85462619..., RAW), no LLM call (POSTRUN rows 2, 10, 12)",
+  "date": "2026-10-27"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_EMBED2-WORK.md",
+  "commit": "56da993f",
+  "verdict": "OUTCOME CONFIRMED (exploratory); every deciding number reproduces to the digit; MERGEABLE; D1-D4 MEDIUM (conditions on use, not on the merge), D5-D8 LOW"
+ },
+ "criteria": [],
+ "predictions": [
+  {
+   "id": "PE1",
+   "text": "R1 prints \"K EMBEDDER-INVARIANT\"",
+   "result": "HELD",
+   "value": "K EMBEDDER-INVARIANT",
+   "denominator": "3 corpora, WORK rows"
+  },
+  {
+   "id": "PE2",
+   "text": "Ng falls below N on MATH by more than 2 paired SE",
+   "result": "FAILED",
+   "value": "Ng - N MATH +0.0617 (0.0559)",
+   "denominator": "MATH WORK, 2,949 items"
+  },
+  {
+   "id": "PE3",
+   "text": "R2 prints \"ORDERING INVARIANT\"",
+   "result": "FAILED",
+   "value": "ORDERING NOT INVARIANT (moves: MATH V0 - K)",
+   "denominator": "4 cells (V0 - K, V0 - N) x (MATH, MMLU)"
+  },
+  {
+   "id": "PE4",
+   "text": "V0g's leaf count differs from V0's by at least 10% on at least two of the three corpora",
+   "result": "FAILED",
+   "value": "34 / 93 / 76 vs 36 / 100 / 80 (within 7%)",
+   "denominator": "3 corpora"
+  },
+  {
+   "id": "PE5",
+   "text": "V0g's WORK label alignment (cAMI) keeps V0's order MATH < MMLU-Pro < MMLU",
+   "result": "HELD",
+   "value": "0.0251 < 0.3369 < 0.4382",
+   "denominator": "3 corpora, WORK rows"
+  },
+  {
+   "id": "PE6",
+   "text": "WORK leaf agreement cAMI(V0g, V0) below 0.5 on every corpus",
+   "result": "FAILED",
+   "value": "0.434 / 0.560 / 0.547",
+   "denominator": "3 corpora, WORK rows"
+  }
+ ],
+ "falsifier": {
+  "text": "none (exploratory); rules R1 and R2 each print exactly one word",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "R1 (pre-specified, g2; the cont re-read prints the same words)": "V0 EMBEDDER-INVARIANT; K EMBEDDER-INVARIANT; N NOT EMBEDDER-INVARIANT (moves on: MMLU (gemma lower)); N512 EMBEDDER-INVARIANT [D1: no movement detected at 2 paired SE (MDE80 0.05-0.16), never equality; D3: backed legs K and N512 on MATH and MMLU, V0 on MATH (borderline, MDE80 / |C1| 0.99); MMLU-Pro backs nothing] (POSTRUN verdict, rows 7, 10)",
+  "R2": "ORDERING NOT INVARIANT (moves: MATH V0 - K): qwen3 -0.1652 (0.0358) z -4.61; gemma -0.0363 (0.0279) z -1.30; post hoc paired change -0.1289 (0.0444) z -2.90 (POSTRUN row 8)",
+  "N MMLU leg (the one NOT word)": "D -0.0380, paired SE 0.0176, z -2.16; n 8,425, 8,375 clusters, DEFF 1.003, n_eff 8,397, MDE80 0.0501; cont z -2.15; V0-leaf SE 0.0221, z -1.72 (holds); fragile (D5) (POSTRUN row 7)",
+  "paired gemma - qwen3, MATH (g2)": "V0g - V0 +0.0524 (0.0380); Kg - KM -0.0765 (0.0422); Ng - N +0.0617 (0.0559); Ng512 - N512 +0.0752 (0.0539) (benchzoom docs/embed2-work.md [P2], confirmed POSTRUN row 6)",
+  "paired gemma - qwen3, MMLU (g2)": "V0g - V0 +0.0025 (0.0186); Kg - KM +0.0251 (0.0164); Ng - N -0.0380 (0.0176); Ng512 - N512 -0.0304 (0.0186) (same source)",
+  "paired gemma - qwen3, MMLU-Pro (g2)": "V0g - V0 +0.0368 (0.0212); Kg - KM +0.0351 (0.0199); Ng - N +0.0185 (0.0292); Ng512 - N512 +0.0251 (0.0303) (same source)",
+  "Support": "content-cluster DEFF 0.998-1.030 on every leg, n_eff 2,943-8,425; MDE80 0.0466-0.1587; UNDERPOWERED on V0 MMLU, V0 MMLU-Pro, K MMLU-Pro, N MMLU-Pro, N512 MMLU-Pro; V0 MATH MDE80 0.1080 vs |C1| 0.1093; realised MATH SEs 1.55x / 1.80x / 2.99x the planning SEs (V0 / K / N) (POSTRUN row 10, D3)",
+  "field vs tree": "MATH V0 - N -0.2406 (z -4.44) qwen3 vs -0.2499 (z -4.39) gemma, change +0.0093 (z +0.15); MMLU -0.0629 (z -2.97) -> -0.0224 (z -1.08), change -0.0405 (z -1.62); MMLU-Pro z -2.40 -> -1.88 (POSTRUN D2)",
+  "objects (descriptive)": "V0g leaves 34 / 93 / 76 (V0 36 / 100 / 80); cAMI(V0g, V0) 0.434 / 0.560 / 0.547; same-k k-means across embedders 0.518 / 0.648 / 0.624; two qwen3 k-means seeds 0.848 / 0.797 / 0.784 (MATH / MMLU / MMLU-Pro) (POSTRUN rows 3, 11; benchzoom [P2])"
+ },
+ "sentence_of_record": "On WORK rows of MATH, MMLU and MMLU-Pro, re-reading the axis tree, matched k-means and the text-kNN reader on a second embedder (Ollama embeddinggemma, RAW), no cross-embedder movement is detected at 2 paired SE for K and N512 on MATH and MMLU and for V0 on MATH; the full-width kNN reader reads 0.038 lower on MMLU (z -2.16), and the k-means lead over the tree on MATH shrinks from 4.6 to 1.3 SE: ORDERING NOT INVARIANT (moves: MATH V0 - K) [EXPLORATORY, adjudicates nothing; POSTRUN 56da993f D1: 'invariant' means no movement detected at 2 paired SE (MDE80 0.05-0.16), never equality; D3: no INVARIANT word is powered on all three corpora, MMLU-Pro backs nothing; D2: the field beats the tree embedder-robustly on MATH only; D4: one V0g build; D5: the N word is fragile (V0-leaf SE z -1.72)]",
+ "chips": [],
+ "brackets": [
+  {
+   "date": "2026-10-28",
+   "by": "registrar",
+   "text": "D1-D4 (POSTRUN 56da993f) bind every quotation: 'invariant' = 'no movement detected at 2 paired SE (MDE80 0.05-0.16)'; the backed legs are K and N512 on MATH and MMLU, V0 on MATH (borderline); MMLU-Pro backs nothing; \"'the soft text field beats the tree' is embedder-robust on MATH; on MMLU under gemma the lead is not established\"; V0 and V0g are one seed-0 build each (no build-variability term; a future V0g arm builds >= 3 recipe seeds per embedder)"
+  },
+  {
+   "date": "2026-10-28",
+   "by": "registrar",
+   "text": "D5: the N NOT word is printed with its V0-leaf sensitivity (z -1.72, holds) and the width change (N 4,096-d vs Ng 768-d; the width-matched N512 leg holds); D6-D8 LOW (embed provenance names end-of-run code; process cap breached in two windows, results unaffected; selftest does not pin the RAW protocol (R2) or Z80 (R7)); the benchzoom [P3] bracket carrying D1-D4 is owed (absent at master b86c014)"
+  }
+ ],
+ "does_not_show": [
+  "equality or equivalence of any reader across embedders (D1)",
+  "\"V0's gain is embedder-robust\" (D3); anything on MMLU-Pro",
+  "\"the field beats the tree\" beyond MATH under gemma (D2); \"N is embedder-dependent\" as a finding (D5)",
+  "the card-prompt protocol, other embedders or other widths; fresh items",
+  "any vault, reserved or registered number",
+  "replacing V0, its embedder or any deciding estimator of BZ-AXIS-CONFIRM-FRESH (the author's)"
+ ],
+ "ledger": null,
+ "depends_on": [
+  "FLAT-COMPARE",
+  "FRESH-RULES-SIM"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "nothing"
+ },
+ "sources": [
+  "docs/reviews/POSTRUN_EMBED2-WORK.md (56da993f)",
+  "benchzoom docs/embed2-work.md at master b86c014 (plan 599f674; run paragraph [P2])",
+  "docs/agents/author_decisions/2026-10-27.md (2e2513a5, c3aada22, d463cdb0)",
+  "docs/judge_v2_program.md section \"## Registrar's record 2026-10-28 (insertion only; zero calls; nothing run) — EMBED2-WORK (POSTRUN 56da993f), TAU-CONT-ALL (1d23c3c7), BBH-WORK with the BBH fetch, census and sealed split (d8441df7), ...\" L25747-L25758 (_as_of the commit that writes it, parent 8f0f5f1c, re-grepped)"
+ ],
+ "last_update": "2026-10-28 (registrar: record created, exploratory, no ledger row; six-postrun batch)"
+}

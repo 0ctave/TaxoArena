@@ -1,0 +1,140 @@
+{
+ "id": "BZ-GUARDS-FRESH-TAU",
+ "title": "BZ-GUARDS-FRESH-TAU (engineering): rule-A leakage guards R7/R8 in benchzoom examples/fresh-rules.py (POSTRUN_FRESH-RULES-SIM H2) and the TAU-GRID selftest fixture C2 (POSTRUN_TAU-GRID)",
+ "question": "Do the new rule-A leakage guards in fresh-rules (H2: R7, R8) and the tau-grid half-straddle fixtures (C2: V5) kill the surviving mutants while staying inert on the recorded FRESH-RULES-SIM and TAU-GRID inputs?",
+ "kind": "engineering",
+ "state": "done",
+ "registration": {
+  "commit": "none (engineering, not registered); plan benchzoom docs/guards-fresh-tau.md committed 6d671ca before any statistic (POSTRUN row 2)",
+  "program_lines": "queue item created in docs/judge_v2_program.md section \"## Registrar's record 2026-10-27 (insertion only; zero calls; nothing run) — FRESH-RULES-SIM (POSTRUN 8bebb4ee) and TAU-GRID (POSTRUN 6f16a31c) recorded done ...\" L25726-L25734 (_as_of c3aada22), paragraph QUEUE ITEMS; outcome recorded in docs/judge_v2_program.md section \"## Registrar's record 2026-10-28 (insertion only; zero calls; nothing run) — EMBED2-WORK (POSTRUN 56da993f), TAU-CONT-ALL (1d23c3c7), BBH-WORK with the BBH fetch, census and sealed split (d8441df7), ...\" L25747-L25758 (_as_of the commit that writes it, parent 8f0f5f1c, re-grepped)",
+  "date": "2026-10-27"
+ },
+ "script": {
+  "path": "benchzoom examples/fresh-rules.py, examples/tau-grid.py, examples/guards-fresh-tau.py (runner), specs",
+  "sha16": "code of record f483194 (git blobs, LF; 0 CR bytes, no CRLF rendering): fresh-rules blob:c872b725 (sha256-lf16:0a12ba74203faa6c), tau-grid blob:50b0a182 (sha256-lf16:a3c0af9a9c6ae434), runner blob:16b46824 (sha256-lf16:ed2e310a044d5cd1), specs blob:5e9d44f3 (sha256-lf16:778f56767b899835); tip 61b149c: fresh-rules blob:aa4ea09c, tau-grid blob:6ae91e19, runner blob:dc7035a1, test blob:85cbac01, plan blob:4f82e58b; AST-identical to the code of record with docstrings stripped (POSTRUN header)",
+  "commit": "benchzoom guards-fresh-tau 35b2724..61b149c, merged master 452f365"
+ },
+ "ready": null,
+ "go": "D-2026-10-27-2 (\"Do the rerun or new tests you can do in parallel\"; 2e2513a5), item 0",
+ "run": {
+  "outcome_file": "E:/benchzoom_demo/followups/guards-fresh-tau (SHA256SUMS 11/11; backup 12/12, SHA256SUMS cmp-identical, per POSTRUN)",
+  "outcome_commit": "outputs not committed",
+  "calls": 0,
+  "cce": 0,
+  "pool": "no response matrix loaded; recorded FRESH-RULES-SIM / TAU-GRID part files, _work pickles (model_responses_read False) and selftest fixtures only; vault / reserved reads 0; no run of record re-run (POSTRUN header)",
+  "date": "2026-10-27"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_GUARDS-FRESH-TAU.md",
+  "commit": "eed84b6f",
+  "verdict": "GUARDS CONFIRMED AS SPECIFIED (exploratory engineering); MERGEABLE; H2 closed for R7/R8 only (use-site variants M1/M2 survive: H1 HIGH), M-1 MEDIUM (M3): conditions before any registered reuse of rule A; C2 closed; inert on the record; L-1 to L-4 LOW"
+ },
+ "criteria": [],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "on BASE, R7, R8 and V5 SURVIVE and both controls pass (discriminator)",
+   "result": "HELD",
+   "value": "R7, R8, V5 SURVIVED; controls 9/9 and 66 PASS",
+   "denominator": "base 35b2724"
+  },
+  {
+   "id": "P2",
+   "text": "on NEW, R7, R8 and V5 (literal) are KILLED by the named refusals / fixtures",
+   "result": "HELD",
+   "value": "R7 REFUSED [H2] pool parent (630 of 630); R8 REFUSED [H2] (270 fresh items in the A build); V5 3 FAIL",
+   "denominator": "tip 61b149c"
+  },
+  {
+   "id": "P3",
+   "text": "every builder mutant applies and keeps its reference status; the reviewer's earlier mutants stay killed",
+   "result": "HELD",
+   "value": "fresh-rules 122/122, tau-grid 77/78 (X40 equivalent)",
+   "denominator": "campaign logs (223 sandbox runs)"
+  },
+  {
+   "id": "P4",
+   "text": "every new mutant (G-series, R7b, V5b, the runner's own) is killed",
+   "result": "HELD",
+   "value": "guards 15/15",
+   "denominator": "campaign logs"
+  },
+  {
+   "id": "P5",
+   "text": "on the recorded inputs every guard evaluation passes and every negative control refuses; guard.reads 0",
+   "result": "HELD",
+   "value": "65 evaluations, 0 refusals (5 G-SCORED checks and G-POOL (f) tautological, L-1); R7 / R8 negative controls 5/5",
+   "denominator": "5 splits"
+  },
+  {
+   "id": "P6",
+   "text": "the re-analysis is byte-identical NEW vs BASE for all six texts; recorded files identical except one disclosed header line",
+   "result": "HELD",
+   "value": "6/6 base = tip; 5 sha-equal to recorded, fr summary 1 line (L35)",
+   "denominator": "6 texts"
+  },
+  {
+   "id": "P7",
+   "text": "selftests pass (fresh-rules 10/10, tau-grid 0 FAIL, runner rc 0); tests pass; no new suite failure",
+   "result": "HELD",
+   "value": "HELD for the selftests: 10/0, 69/0, 12/0; full suite read from the builder's log (900 passed), not re-run",
+   "denominator": "3 selftests"
+  }
+ ],
+ "falsifier": {
+  "text": "none (engineering); each word prints exactly one value",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "words": "W-H2 H2 CLOSED for the named mutants R7 / R8 only; in substance PARTLY closed: the same leak moved to the point of use survives (M1, M2; H1); W-C2 C2 CLOSED; W-INERT INERT ON THE RECORD; W-SELFTEST SELFTESTS PASS; OVERALL GUARDS READY FOR REVIEW (reviewed; stands with the H1 qualifier) (POSTRUN verdict)",
+  "discriminator": "base 35b2724: R7, R8, V5 SURVIVED, controls pass; tip 61b149c: R7 killed (REFUSED [H2], pool parent 630 of 630), R8 killed (REFUSED [H2], rule-A build includes 270 fresh items), V5 killed (3 FAIL); controls 10/10 and 69/0 (POSTRUN rows 3-4)",
+  "dry check": "65 evaluations, 0 refusals; per split pool 2,064, fresh 885, A build 4,029, overlap 0; R7 control rows 1,883 / 1,690 / 1,559 / 1,573 / 1,867 of 2,064; R8 5/5; informative: G-BUILD x5, G-POOL (a)-(e) x5, sub25 / sub50 x10, bootA x40 and the two negative controls (POSTRUN row 6, L-1)",
+  "inertness": "re-analysis NEW = BASE byte for byte (6 texts); vs the recorded files 5 identical, fr summary 1 line (L35, the [P2] label of f3b16fb); recorded SHA256SUMS 25 + 25 verify before and after (POSTRUN rows 7, 9)",
+  "OPEN (H1 HIGH, M-1 MEDIUM)": "M1 (part_split: pool_residuals passed B0's leaves) SURVIVED, NA|L2+V0A per item moves up to 0.085; M2 (part_boot) SURVIVED, bootA G(N|L2+V0) replicates move up to 4.08; M3 (rule-A scored cells from B0's leaves) SURVIVED, 270/270 cells differ; M4 killed; the run of record is clean on these paths (POSTRUN_FRESH-RULES-SIM row 5; recorded V0A / KA0-4 cells equal the A record's own in 15/15 designs) (POSTRUN own mutants, H1, M-1)"
+ },
+ "sentence_of_record": "The rule-A leakage guards in benchzoom fresh-rules now refuse a fresh item in the A build (R8) and pool-parent leaves that are not the A record's own where v0a_old / v0a_boot are computed (R7), the tau-grid selftest separates the MAP half leg (V5), and the guards are inert on the recorded FRESH-RULES-SIM and TAU-GRID inputs: GUARDS CONFIRMED AS SPECIFIED [EXPLORATORY ENGINEERING; POSTRUN eed84b6f: H2 CLOSED for the named mutants R7 / R8 only; in substance PARTLY closed: the same leak moved to the point of use survives (M1, M2; H1); H1 (HIGH) and M-1 (MEDIUM, rule A's scored cells unguarded, M3) are OPEN: conditions before any registered reuse of the rule-A code]",
+ "chips": [],
+ "brackets": [
+  {
+   "date": "2026-10-28",
+   "by": "registrar",
+   "text": "H1 (HIGH; POSTRUN eed84b6f), OPEN: G-POOL validates a variable, not the leaves actually used; fix: spy on pool_residuals during run_part('split0'), ('bootA'), ('bootA2') in S10, assert its leaves equal the A record's own at every pool row, check_pool_parent returns the validated leaves as the only argument passed on; M1, M2 re-run and killed. Condition before any registered reuse of rule A (BZ-AXIS-CONFIRM-FRESH secondary)"
+  },
+  {
+   "date": "2026-10-28",
+   "by": "registrar",
+   "text": "M-1 (MEDIUM), OPEN: rule A's scored cells are not guarded (M3); fix: G-CELLS in part_split (V0A / KA = cells_for(recA) at the scored ids, refusing otherwise) plus an S10 check on phi*:cell:V0A; M3 re-run and killed. Same condition"
+  },
+  {
+   "date": "2026-10-28",
+   "by": "registrar",
+   "text": "L-1: '65 guard evaluations, 0 refusals' is quoted with its informative subset only; L-2 (KeyError kills of G8, G15, G16), L-3 (W-H2 / W-C2 code checks only 'killed'), L-4 (run the full suite on the merge commit) LOW. No number or word of FRESH-RULES-SIM or TAU-GRID changes; POSTRUN_FRESH-RULES-SIM H1 stands"
+  }
+ ],
+ "does_not_show": [
+  "any new or changed number or word of FRESH-RULES-SIM or TAU-GRID: nothing was re-run",
+  "that rule A is leak-free: M1, M2, M3 survive; no registered reuse of rule A before H1 and M-1 are fixed",
+  "any switch of a deciding estimator, of meter.TAU_GRID or of the tau^2 fit",
+  "anything about fresh data, the vault or a reserved side",
+  "that the full test suite passes on the merge commit (read from the builder's log only; L-4)"
+ ],
+ "ledger": null,
+ "depends_on": [
+  "FRESH-RULES-SIM",
+  "TAU-GRID"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "nothing"
+ },
+ "sources": [
+  "docs/reviews/POSTRUN_GUARDS-FRESH-TAU.md (eed84b6f)",
+  "benchzoom docs/guards-fresh-tau.md at master b86c014 (plan 6d671ca; [P1])",
+  "docs/agents/author_decisions/2026-10-27.md (2e2513a5, c3aada22, d463cdb0)",
+  "docs/judge_v2_program.md section \"## Registrar's record 2026-10-27 (insertion only; zero calls; nothing run) — FRESH-RULES-SIM (POSTRUN 8bebb4ee) and TAU-GRID (POSTRUN 6f16a31c) recorded done ...\" L25726-L25734 (_as_of c3aada22), paragraph QUEUE ITEMS",
+  "docs/judge_v2_program.md section \"## Registrar's record 2026-10-28 (insertion only; zero calls; nothing run) — EMBED2-WORK (POSTRUN 56da993f), TAU-CONT-ALL (1d23c3c7), BBH-WORK with the BBH fetch, census and sealed split (d8441df7), ...\" L25747-L25758 (_as_of the commit that writes it, parent 8f0f5f1c, re-grepped)"
+ ],
+ "last_update": "2026-10-28 (registrar: record created, exploratory, no ledger row; six-postrun batch)"
+}

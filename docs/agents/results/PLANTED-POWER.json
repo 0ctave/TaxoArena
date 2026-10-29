@@ -1,0 +1,136 @@
+{
+ "id": "PLANTED-POWER",
+ "title": "PLANTED-POWER: simulated responses with planted effects: power and SE calibration of the BZ-METER meter (exploratory)",
+ "question": "On MATH WORK with responses simulated from a WORK-fitted backbone plus planted effects, does the meter detect what is planted, without false positives, and is its reported SE calibrated against the response-redraw SD of its own estimate?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "none (exploratory, not registered); plan benchzoom docs/planted-power.md committed cffa234 before any statistic on responses, real or simulated (POSTRUN C13)",
+  "program_lines": "queue item created in docs/judge_v2_program.md section \"## Registrar's record 2026-10-27 (insertion only; zero calls; nothing run) — FRESH-RULES-SIM (POSTRUN 8bebb4ee) and TAU-GRID (POSTRUN 6f16a31c) recorded done ...\" L25726-L25734 (_as_of c3aada22), paragraph QUEUE ITEMS; outcome recorded in docs/judge_v2_program.md section \"## Registrar's record 2026-10-28 (insertion only; zero calls; nothing run) — EMBED2-WORK (POSTRUN 56da993f), TAU-CONT-ALL (1d23c3c7), BBH-WORK with the BBH fetch, census and sealed split (d8441df7), ...\" L25747-L25758 (_as_of the commit that writes it, parent 8f0f5f1c, re-grepped)",
+  "date": "2026-10-27"
+ },
+ "script": {
+  "path": "benchzoom examples/planted-power.py",
+  "sha16": "blob:f9a79973 (code 81b49a1; git blob, LF; all 390 replicates, design, repro and analyze at f9a79973 @ 81b49a1, dirty \"\"); tip blob:9d01b785 (7e7773a, docstring only) = git hash-object of the LF working file, no CRLF rendering (POSTRUN header)",
+  "commit": "benchzoom planted-power 35b2724..7e7773a, merged master b86c014"
+ },
+ "ready": null,
+ "go": "D-2026-10-27-2 (\"Do the rerun or new tests you can do in parallel\"; 2e2513a5)",
+ "run": {
+  "outcome_file": "E:/benchzoom_demo/followups/planted-power (summary.txt sha256 cfb527fc93ca3754, SHA256SUMS 6e25aba2f036115c per benchzoom docs/planted-power.md [P1]; 397/397; backup 403 files, 397 and 402 OK per POSTRUN C15)",
+  "outcome_commit": "outputs not committed",
+  "calls": 0,
+  "cce": 0,
+  "pool": "MATH WORK rows only (items fixed; responses simulated from a WORK-fitted backbone plus a planted field; 390 replicates); vault / reserved reads 0 (POSTRUN header)",
+  "date": "2026-10-27..2026-10-28 (replicates 17:48 to 08:12; analyze 2026-10-28 08:13)"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_PLANTED-POWER.md",
+  "commit": "8f0f5f1c",
+  "verdict": "OUTCOME CONFIRMED (exploratory, with qualifiers Q1-Q5); MERGEABLE; Q1 HIGH, Q3 MEDIUM, Q2 / Q4 / Q5 LOW"
+ },
+ "criteria": [],
+ "predictions": [
+  {
+   "id": "PR1",
+   "text": "under the 3-SE rule every reader's detection rate at NONE is <= 3 / 60",
+   "result": "HELD",
+   "value": "0/60 for every reader",
+   "denominator": "60 NONE replicates per reader"
+  },
+  {
+   "id": "PR2",
+   "text": "the word is NOT CALIBRATED and the worst pair's ratio is > 1.25 (understated)",
+   "result": "HELD",
+   "value": "HELD (near-forced, Q1): NOT CALIBRATED on the 9 degeneracy-free pairs at C1 0.10: x1.38-1.65 (bootstrap lower bounds 1.09-1.36)",
+   "denominator": "16 pairs (4 readers x NONE + 3 cells at C1 0.10); 9 degeneracy-free"
+  },
+  {
+   "id": "PR3",
+   "text": "power at C1 0.10, 3-SE, matched reader: V0 under TREE and K under FLAT in [0.15, 0.75]; N under KNN in [0.05, 0.60]",
+   "result": "FAILED",
+   "value": "0.62 / 0.62 / 0.84 (N 0.84 > 0.60)",
+   "denominator": "50 replicates per cell"
+  },
+  {
+   "id": "PR4",
+   "text": "mean G / T_att(matched) in [0.4, 1.0] in each of the nine matched cells with T >= 0.10",
+   "result": "FAILED",
+   "value": "1.031-1.290, all 9 above 1.0 (Q3: T_att is the fixed-tau^2 reference reader)",
+   "denominator": "9 matched cells"
+  },
+  {
+   "id": "PR5",
+   "text": "in every cell RND's 3-SE detection rate <= 0.05 and |mean G| <= 0.02",
+   "result": "HELD",
+   "value": "max rate 0, max |mean G| 0.0035",
+   "denominator": "every cell"
+  },
+  {
+   "id": "PR6",
+   "text": "under TREE at T 0.20 and 0.30 mean G(K) < mean G(V0); under FLAT mean G(V0) < mean G(K)",
+   "result": "HELD",
+   "value": "HELD",
+   "denominator": "4 cells"
+  }
+ ],
+ "falsifier": {
+  "text": "none (exploratory); the SE rule prints exactly one word",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "reproduction": "REPRODUCED: per-item max abs diff 0 on V0, KM0, RND0, L3k; C1(V0) +0.1093 SE 0.0316 (POSTRUN C1)",
+  "METER SE (pre-specified rule, MATH, NONE + C1 0.10, 4 readers)": "NOT CALIBRATED on the 9 degeneracy-free pairs at C1 0.10: x1.38-1.65 (bootstrap lower bounds 1.09-1.36); worst non-degenerate pair K at TREE_010 1.648; NONE and RND ratios degeneracy-inflated (non-degenerate 0.91-1.69); never 'worst x2.33': the CALIBRATED arm was nearly unreachable, P(CALIBRATED | the non-degenerate SE exact) 0.004 at the realised degenerate shares (POSTRUN verdict, Q1)",
+  "matched ratios with bootstrap intervals": "V0 1.63 [1.36, 1.85], K 1.55 [1.24, 1.83], N 1.38 [1.12, 1.61] (POSTRUN C7)",
+  "5-seed check (Q2)": "(5-seed ratio) / (1-seed ratio), TREE_010 r000-r011: V0 1.15 [0.82, 1.45], K 1.04 [0.77, 1.40], N 1.54 [0.85, 2.63], RND 1.73 [1.03, 3.63]: one-fold-seed meter (5-seed check: factor about 1 or above) (POSTRUN Q2)",
+  "false positives at NONE": "0/60 for every reader under the 3-SE and [R2] rules (Wilson upper 0.06) (POSTRUN C9)",
+  "power at C1 0.10, matched reader, 3-SE / [R2]": "V0 0.62 / 0.50 (31 / 25 of 50), K 0.62 / 0.60 (31 / 30), N 0.84 / 0.64 (42 / 32); 20/20 at 0.30; matched structure planted exactly: a best case (POSTRUN C10, 'Licenses')",
+  "bias (Q3)": "matched mean G / T_att 1.031-1.290; 0.052-0.333 of T_or; T_att is 'the fixed-tau^2 reference reader', not an attainability bound; 'C1 0.10' in the power curves reads 'a planted effect the meter reads as 0.11-0.13 on MATH' (POSTRUN C11, Q3)",
+  "design effect for planning (WORK-side)": "about 1.9-2.7 (ratio squared) (POSTRUN 'Licenses')"
+ },
+ "sentence_of_record": "On MATH WORK with simulated responses and planted effects, the meter shows no false positive in 60 null draws for any reader, detects a matched planted C1 0.10 in 0.62 / 0.62 / 0.84 of replicates (3-SE; V0 / K / N), and its content-cluster SE is NOT CALIBRATED on the 9 degeneracy-free pairs at C1 0.10: x1.38-1.65 (bootstrap lower bounds 1.09-1.36) [EXPLORATORY, WORK-side planning only, adjudicates nothing; POSTRUN 8f0f5f1c Q1 (HIGH): the CALIBRATED arm was nearly unreachable, NONE and RND ratios are degeneracy-inflated; Q2: one-fold-seed meter (5-seed check: factor about 1 or above); Q3: T_att is the fixed-tau^2 reference reader; the meter SE stays the deciding SE wherever registered (D-2026-10-27-5 B)]",
+ "chips": [],
+ "brackets": [
+  {
+   "date": "2026-10-28",
+   "by": "registrar",
+   "text": "Q1 (HIGH; POSTRUN 8f0f5f1c): quoted only as 'x1.38-1.65 on the 9 degeneracy-free pairs at C1 0.10 (bootstrap lower bounds 1.09-1.36)'; NONE and RND ratios 'degeneracy-inflated (non-degenerate 0.91-1.69)'; 'worst x2.33' is not quoted; the 16-pair word and PR2 say nothing beyond the 9 degeneracy-free pairs; any future rule computes the ratio on non-degenerate replicates with the degenerate count beside it and states P(CALIBRATED | calibrated) in its Support"
+  },
+  {
+   "date": "2026-10-28",
+   "by": "registrar",
+   "text": "Q2: 'one-fold-seed meter (5-seed check: factor about 1 or above)'. Q3: T_att is 'the fixed-tau^2 reference reader'; 'C1 0.10' in the power curves reads 'a planted effect the meter reads as 0.11-0.13 on MATH'. Q4: the plan's wording 'understates the sampling SD even without item sampling', not 'a lower bound on the understatement'. Q5: a trial --design (15:56) and a partial --analyze on 11 replicates (18:14) are not disclosed in [P1]; no code change followed; the benchzoom [P2] disclosure is owed (absent at master b86c014)"
+  },
+  {
+   "date": "2026-10-28",
+   "by": "registrar",
+   "text": "Bears on D-2026-10-27-5 B (meter SE primary for BZ-AXIS-CONFIRM-FRESH): note (b) of the 2026-10-28 record; B stands until the author changes it; no recorded verdict is re-read with an inflated SE; relayed to the author, no decision taken"
+  }
+ ],
+ "does_not_show": [
+  "a switch of any deciding estimator: the meter SE stays the deciding SE wherever registered (D-2026-10-27-5 B stands until the author changes it); no recorded verdict is re-read with an inflated SE",
+  "any statement about fresh data, the vault or the reserved side (no item sampling; the generator is not the real data-generating process)",
+  "MMLU or another benchmark",
+  "T_att as an attainability bound (Q3)",
+  "a calibration statement for the NONE or RND pairs (Q1)",
+  "'worst x2.33' or any 16-pair reading beyond the 9 degeneracy-free pairs"
+ ],
+ "ledger": null,
+ "depends_on": [
+  "FLAT-COMPARE"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "nothing"
+ },
+ "sources": [
+  "docs/reviews/POSTRUN_PLANTED-POWER.md (8f0f5f1c)",
+  "benchzoom docs/planted-power.md at master b86c014 (plan cffa234; run paragraph [P1])",
+  "docs/agents/author_decisions/2026-10-27.md (2e2513a5, c3aada22, d463cdb0)",
+  "docs/judge_v2_program.md section \"## Registrar's record 2026-10-27 (insertion only; zero calls; nothing run) — FRESH-RULES-SIM (POSTRUN 8bebb4ee) and TAU-GRID (POSTRUN 6f16a31c) recorded done ...\" L25726-L25734 (_as_of c3aada22), paragraph QUEUE ITEMS",
+  "docs/judge_v2_program.md section \"## Registrar's record 2026-10-28 (insertion only; zero calls; nothing run) — EMBED2-WORK (POSTRUN 56da993f), TAU-CONT-ALL (1d23c3c7), BBH-WORK with the BBH fetch, census and sealed split (d8441df7), ...\" L25747-L25758 (_as_of the commit that writes it, parent 8f0f5f1c, re-grepped)"
+ ],
+ "last_update": "2026-10-28 (registrar: record created, exploratory, no ledger row; six-postrun batch)"
+}

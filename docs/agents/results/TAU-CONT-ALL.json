@@ -1,0 +1,122 @@
+{
+ "id": "TAU-CONT-ALL",
+ "title": "TAU-CONT-ALL: the flat-vs-tree comparison re-read under a continuous tau^2 fit, with the 4096-d k-means arm and MMLU-gap cause 2 (STEM vs humanities share) folded in; WORK rows only (exploratory)",
+ "question": "Does FLAT-COMPARE's flat-vs-tree ordering (V0 - K / N / random on MATH and MMLU) stand when every tau^2 is chosen continuously on its own S-TAU criterion, and is the MMLU leaf-gain gap carried by STEM items (cause 2)?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "none (exploratory, not registered); plan benchzoom docs/tau-cont-all.md committed 3803853 before any statistic (POSTRUN row 1)",
+  "program_lines": "queue item created in docs/judge_v2_program.md section \"## Registrar's record 2026-10-27 (insertion only; zero calls; nothing run) — FRESH-RULES-SIM (POSTRUN 8bebb4ee) and TAU-GRID (POSTRUN 6f16a31c) recorded done ...\" L25726-L25734 (_as_of c3aada22), paragraph QUEUE ITEMS; outcome recorded in docs/judge_v2_program.md section \"## Registrar's record 2026-10-28 (insertion only; zero calls; nothing run) — EMBED2-WORK (POSTRUN 56da993f), TAU-CONT-ALL (1d23c3c7), BBH-WORK with the BBH fetch, census and sealed split (d8441df7), ...\" L25747-L25758 (_as_of the commit that writes it, parent 8f0f5f1c, re-grepped)",
+  "date": "2026-10-27"
+ },
+ "script": {
+  "path": "benchzoom examples/tau-cont-all.py",
+  "sha16": "blob:15c4e95f (run of record at 1be267a; git blob, LF = sha256-lf16:7d8aa62fda2e4acd); tip blob:c5ace4e1 (sha256-lf16:0fd90be2db8e603a; docstring hunk only); plan tip blob:e38b8435 (sha256-lf16:decd7a1cefe49910); test blob:b3387811 (sha256-lf16:04eb8853dff8b91b); 0 CR bytes, no CRLF rendering (POSTRUN header)",
+  "commit": "benchzoom tau-cont-all 35b2724..7f87477, merged master 6ab459b"
+ },
+ "ready": null,
+ "go": "D-2026-10-27-2 (\"Do the rerun or new tests you can do in parallel\"; 2e2513a5)",
+ "run": {
+  "outcome_file": "E:/benchzoom_demo/followups/tau-cont-all (summary.txt sha256 020f0ad97b606535, SHA256SUMS c5ee2b4ce39884da; 9/9; backup E:/TaxoArena_backup_2026-10-27_tau-cont-all 9/9 and 14/14 per POSTRUN)",
+  "outcome_commit": "outputs not committed",
+  "calls": 0,
+  "cce": 0,
+  "pool": "WORK rows only (MATH 2,949 items / 2,946 content clusters; MMLU 8,425 / 8,375; MMLU-Pro WORK rows); vault / reserved reads 0 (POSTRUN header, row 10)",
+  "date": "2026-10-27"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_TAU-CONT-ALL.md",
+  "commit": "1d23c3c7",
+  "verdict": "OUTCOME CONFIRMED (exploratory); MERGEABLE; C1, C2 record conditions (MEDIUM), C3 record relay (LOW), L1-L4 LOW"
+ },
+ "criteria": [],
+ "predictions": [
+  {
+   "id": "PM",
+   "text": "MATH: |d| <= 0.005, d = C1_cont(V0) - C1_f2(V0) (point estimate)",
+   "result": "FAILED",
+   "value": "FAILED (point estimate; 0.79 paired SE from the edge): d +0.006776 (0.002255), MDE80 0.0063",
+   "denominator": "MATH WORK, 2,949 items"
+  },
+  {
+   "id": "PU",
+   "text": "MMLU: -0.030 <= d <= -0.012 (point estimate)",
+   "result": "FAILED",
+   "value": "FAILED (point estimate; 0.56 paired SE from the edge): d -0.010144 (0.003291), MDE80 0.0092",
+   "denominator": "MMLU WORK, 8,425 items"
+  },
+  {
+   "id": "PP",
+   "text": "MMLU-Pro: |d| <= 0.010 (point estimate)",
+   "result": "HELD",
+   "value": "d -0.005121 (0.003519), 1.39 SE inside the edge; MDE80 0.0099",
+   "denominator": "MMLU-Pro WORK rows"
+  }
+ ],
+ "falsifier": {
+  "text": "none (exploratory); rule O and rule C2 each print exactly one word",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "ORDERING (pre-specified rule O, V0 - K / N / random on MATH and MMLU, cont vs f2)": "ORDERING STANDS (content-cluster SE; under V0-leaf SE the MATH V0 - K status flips, marginal; signs and C1 rank order unchanged under both) (POSTRUN C1)",
+  "rule-O z, f2 -> cont (content clusters)": "MATH V0-K -4.612 -> -4.067, V0-N -4.442 -> -4.795, V0-random +3.630 -> +3.755; MMLU -0.582 -> -0.458, -2.975 -> -2.875, +2.443 -> +2.218 (POSTRUN row 5)",
+  "leg changes cont - f2 (paired SE)": "MATH +0.0112 (0.0042), -0.0025 (0.0059), +0.0067 (0.0023); MMLU +0.0028 (0.0028), +0.0031 (0.0035), -0.0102 (0.0033): at most 0.30 (MATH) / 0.67 (MMLU) of a leg SE (POSTRUN row 5)",
+  "V0-leaf DEFF (C1; descriptive)": "MATH legs 1.89 / 1.48 / 3.22 (f2) and 1.95 / 1.55 / 3.34 (cont), n_eff 883-1,998; MMLU 1.13-2.63, n_eff 3,208-7,445; 3-SE MDE80 under the leaf SE (cont) MATH 0.199 / 0.243 / 0.227, MMLU 0.051 / 0.108 / 0.088; MATH V0 - K under the leaf SE z -3.41 (f2) -> -2.98 (cont), marginal; MATH V0 - random +2.02 / +2.06 (POSTRUN row 10, C1)",
+  "Support as printed": "content-cluster DEFF 0.999-1.007, n_eff 2,944-8,428: item-iid by construction (clusters hold at most 2 items) (POSTRUN row 10)",
+  "grid move of C1(V0)": "MATH +0.0068, MMLU -0.0101 (on MMLU the tau_L2 move, l2c -0.0104, 23% of the f2 value) (POSTRUN 'In substance', row 11)",
+  "CAUSE 2 (pre-specified rule C2, MMLU, cont, STEM vs non-STEM within-anchor leaf gain)": "NOT SUPPORTED (UNDERPOWERED): G_S +0.0468, G_N +0.0297, D2 +0.0170 (SE 0.0382, z 0.45); D2* 0.1053; MDE80 0.1086; power at D2* 0.78 (a near-boundary tag); n_S 1,810 / 8,425; SE clustered by anchor 0.0622 (17 clusters), by V0 leaf 0.0577; under f2 D2 +0.0004 (0.0446) (POSTRUN rows 2, 7, L4)",
+  "dims (descriptive)": "K4096 - K, MATH -0.0591 (0.0243) f2 / -0.0580 (0.0254) cont; N - N512, MATH +0.0729 (0.0321) f2 / +0.0574 (0.0297) cont; MMLU and MMLU-Pro |z| <= 1.0 (POSTRUN row 11, L2)",
+  "cont WORK values for the FRESH draft's PF1-PF7 (C3)": "-0.1540 / -0.2431 / +0.0072 / +0.2585 / +0.1161 / +0.2701 / +0.3592, each within 0.017 of its PF point; MATH C1(V0) under every-reader cont moves +0.0068 (0.0023), not the tau_L2-only -0.0004 (POSTRUN C3)"
+ },
+ "sentence_of_record": "On WORK rows of MATH and MMLU, with every tau^2 chosen continuously on its own S-TAU criterion, FLAT-COMPARE's V0 vs K / N / random signs and the arms' C1 rank order are unchanged: ORDERING STANDS (content-cluster SE; under V0-leaf SE the MATH V0 - K status flips, marginal; signs and C1 rank order unchanged under both); the grid moves C1(V0) by +0.0068 on MATH and -0.0101 on MMLU [EXPLORATORY, adjudicates nothing; POSTRUN 1d23c3c7 C1: the 3-SE statuses depend on the SE convention (V0-leaf DEFF 1.5-3.3 on the MATH legs); C2: PM and PU FAILED are point-estimate words 0.79 / 0.56 paired SE from the edge; CAUSE 2 NOT SUPPORTED (UNDERPOWERED), power at D2* 0.78]",
+ "chips": [],
+ "brackets": [
+  {
+   "date": "2026-10-28",
+   "by": "registrar",
+   "text": "C1 (POSTRUN 1d23c3c7): the word is quoted only as 'ORDERING STANDS (content-cluster SE; under V0-leaf SE the MATH V0 - K status flips, marginal; signs and C1 rank order unchanged under both)', with the leaf DEFF / n_eff of row 10 beside it; any FRESH registration that reads these legs names the leaf DEFF and its source (this review); FLAT-COMPARE.json bracketed"
+  },
+  {
+   "date": "2026-10-28",
+   "by": "registrar",
+   "text": "C2: PM and PU are recorded 'FAILED (point estimate; 0.79 / 0.56 paired SE from the edge)'; they do not show that the moves differ from the predicted magnitudes; PP HELD is 1.39 SE inside its edge"
+  },
+  {
+   "date": "2026-10-28",
+   "by": "registrar",
+   "text": "C3 relayed: the BZ-AXIS-CONFIRM-FRESH draft's -0.0004 is the tau_L2-only move; under every-reader cont MATH C1(V0) moves +0.0068 (0.0023); note (a) in the 2026-10-28 record; PF points not revised (no decision taken)"
+  },
+  {
+   "date": "2026-10-28",
+   "by": "registrar",
+   "text": "L1: plan section 6 (b)'s 'file sha256 e977fffa...' is the upstream hendrycks categories.py; examples/mmlu_confirm_items.py is sha256-lf16:bf48432fa5460a30 (CRLF working tree sha256-crlf16:1af0b528f4072413); the map content is verified (row 2). L2: the dims contrasts are quoted under both regimes. L4: a cause-2 follow-up clusters by anchor and is DESCRIPTIVE-ONLY at this n"
+  }
+ ],
+ "does_not_show": [
+  "switching meter.TAU_GRID / S-TAU or any deciding estimator (the author's; D-2026-10-27-5 (D) fixes the continuous fit for the FRESH test only)",
+  "replacing V0 or any arm for BZ-AXIS-CONFIRM-FRESH",
+  "any statement about fresh data, the vault or a reserved side; any registered or confirmatory word",
+  "that the 3-SE statuses are robust to the clustering (C1)",
+  "that PM / PU FAILED is evidence against the predicted magnitudes (C2)",
+  "that MMLU-gap cause 2 is settled (UNDERPOWERED; power 0.78 at D2*)"
+ ],
+ "ledger": null,
+ "depends_on": [
+  "TAU-GRID",
+  "FLAT-COMPARE"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "nothing"
+ },
+ "sources": [
+  "docs/reviews/POSTRUN_TAU-CONT-ALL.md (1d23c3c7)",
+  "benchzoom docs/tau-cont-all.md at master b86c014 (plan 3803853; run paragraph [P1])",
+  "docs/agents/author_decisions/2026-10-27.md (2e2513a5, c3aada22, d463cdb0)",
+  "docs/judge_v2_program.md section \"## Registrar's record 2026-10-27 (insertion only; zero calls; nothing run) — FRESH-RULES-SIM (POSTRUN 8bebb4ee) and TAU-GRID (POSTRUN 6f16a31c) recorded done ...\" L25726-L25734 (_as_of c3aada22), paragraph QUEUE ITEMS",
+  "docs/judge_v2_program.md section \"## Registrar's record 2026-10-28 (insertion only; zero calls; nothing run) — EMBED2-WORK (POSTRUN 56da993f), TAU-CONT-ALL (1d23c3c7), BBH-WORK with the BBH fetch, census and sealed split (d8441df7), ...\" L25747-L25758 (_as_of the commit that writes it, parent 8f0f5f1c, re-grepped)"
+ ],
+ "last_update": "2026-10-28 (registrar: record created, exploratory, no ledger row; six-postrun batch)"
+}

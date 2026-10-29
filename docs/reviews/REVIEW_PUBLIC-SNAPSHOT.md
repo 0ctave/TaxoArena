@@ -472,3 +472,11 @@ Read-only commands run by the registrar for this section:
 - `git ls-tree -r --name-only 344aa90c | wc -l`; `git ls-tree 344aa90c gradle/wrapper/gradle-wrapper.jar`
 - `git show 344aa90c:<path>` for README L234/L257/L275, RESULTS L88, r8/README L27, separation_null_by_size.md L284/L380/L478
 - `git ls-remote origin`; `gh run list -L 3`; `sha256sum` of the manifest
+
+## Round 3: wording fixes and the push of record (main session, D-2026-10-27-7)
+
+- F1, F2 and C2 of round 2 were fixed on main as 72d44757 (README L257 names the RatingsDbGuardTest skip in copies without git metadata; README L275 says the early history up to the v1.0.x-thesis tags is on GitHub; docs/separation_null_by_size.md L284/L380/L478 mark snapshots_frozen.db "not in the public copy"; one line each, docs only, not separately reviewed).
+- Child of record: ceb5901e2db031c1c2333e7c8619d5782c1ddad2, tree 1abfbacd63572e5789aa8e1d4975a00a6544fdd1 = 72d44757 minus the 207-path manifest (sha256 2b765a06...; diff-tree removals equal the manifest exactly), parent e5a29430. Delta against the audited child 344aa90c: README.md, docs/separation_null_by_size.md, docs/reviews/REVIEW_PUBLIC-SNAPSHOT.md (round 2 section), and the added records docs/reviews/POSTRUN_EMBED2-WORK.md and POSTRUN_TAU-CONT-ALL.md; no code change, so the round-2 clone (569/0/2) and no-git export (569/0/3) results carry over.
+- Main session's scan of the full child tree (scratchpad quickscan.py: GPQA 9-token windows over 546 questions and 791 answer/option strings with raw/JSON/HTML/embedded controls; exact .env and HF token values with 16-char fragments; sizes): 0 GPQA files, 0 files over 50 MB, secret-fragment hits in the same 18 files as the audited e5a29430 (the already-public Azure host name, L-1; .env.example by a generic URL suffix); raw-output markers in the 5 changed files: 0.
+- Pushed as a fast-forward (no force): origin main e5a29430 -> ceb5901e; local tag public-snapshot-2026-10-27-r2. S3: hosted CI run 40591946965 on ceb5901e, ubuntu-latest, success (1m19s). The unpushed 344aa90c (tag r1) is superseded.
+- Still open for the author: D1 (whether the three induce_rubric JSON files and four canary dry-run logs, public and under threshold, follow the rubrics.json hold-back).

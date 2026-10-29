@@ -1,0 +1,155 @@
+{
+ "id": "BBH-WORK",
+ "title": "BBH-WORK: BBH (Open LLM Leaderboard v2) fetch, census and sealed split, with exploratory WORK readouts (tree, k-means, kNN, random) and the 3/5/7 recovery check (exploratory)",
+ "question": "On BBH as a fourth benchmark (WORK rows of a seeded sealed split), does the axis tree's within-anchor leaf gain C1(V0) show at 3 SE, does k-means reach it, does the text-kNN field make it redundant, does it beat size-matched random cells, and do the text partitions recover the declared 3/5/7 sub-variants?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "none (exploratory, not registered); plan benchzoom docs/bbh-work.md committed aec5385 before every statistic on responses; split sealed and committed 458b786 before any statistic beyond counts (POSTRUN rows 4, 7)",
+  "program_lines": "outcome recorded in docs/judge_v2_program.md section \"## Registrar's record 2026-10-28 (insertion only; zero calls; nothing run) — EMBED2-WORK (POSTRUN 56da993f), TAU-CONT-ALL (1d23c3c7), BBH-WORK with the BBH fetch, census and sealed split (d8441df7), ...\" L25747-L25758 (_as_of the commit that writes it, parent 8f0f5f1c, re-grepped)",
+  "date": "2026-10-27"
+ },
+ "script": {
+  "path": "benchzoom examples/bbh-work.py (with bbh_fetch, bbh_census)",
+  "sha16": "run of record runner blob:82628180 (a77e058; parts and analyze dirty \"\"); recovery runner blob:febac9da (90c42f3); tip ee1e508: runner blob:dd80ddcc, plan blob:33dc3326 (sha256-lf16:4b73f0f9bb17512b; the working copy is MIXED EOL, 83 CRLF lines in [P2], sha256 8cb2461d973852e9; the LF blob is of record, L4), census doc blob:f56f10c8, bbh_census blob:66b65aad, bbh_fetch blob:19db843e, tests blob:41f90592 / blob:9dc6b598; split lists blob:d32499f7 / blob:54f39303 (sha256-lf16 3d4d644a7ac34d22 / 9ef05cc2cfe34c91) (git blobs, LF; POSTRUN header)",
+  "commit": "benchzoom bbh 35b2724..ee1e508, merged master 0b86efa"
+ },
+ "ready": null,
+ "go": "D-2026-10-27-4 (\"Go for them\"; d463cdb0), item (2) of the main session's reading: BBH fetched through the Open LLM Leaderboard pipeline, a seeded sealed split before any analysis, exploratory WORK readouts and the 3/5/7 recovery check; zero LLM calls",
+ "run": {
+  "outcome_file": "E:/benchzoom_demo/followups/bbh-work (SHA256SUMS 14/14; census_r2 8/8, split 3/3, work_accuracy 3/3; backups: bbh-work 23/23, SHA256SUMS sha256 55009518, and bbh SHA256SUMS sha256 3ad86bc9, 1,060 lines, per POSTRUN)",
+  "outcome_commit": "outputs not committed (split lists committed in benchzoom at ee1e508)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "BBH WORK rows only: 3,457 items x the seeded 128 of 342 KEPT models (442,496 values; 6 of 18 NC-1); RESERVED responses read 0 (2,304 RESERVED rows); the text of all 5,761 items is read by the embedding, trees, ND-1 and census (L3) (POSTRUN rows 1, 6, 14)",
+  "date": "2026-10-27"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_BBH-WORK.md",
+  "commit": "d8441df7",
+  "verdict": "FETCH / CENSUS / SPLIT CONFIRMED; MIXED-2 ACCEPTED; BBH-WORK OUTCOME CONFIRMED (exploratory, with qualifiers); MERGEABLE; C1 HIGH, C2 / C3 MEDIUM, L1-L5 LOW"
+ },
+ "criteria": [],
+ "predictions": [
+  {
+   "id": "PB1",
+   "text": "V0m's recovery word is RECOVERS SUB-VARIANTS",
+   "result": "FAILED",
+   "value": "DOES NOT RECOVER SUB-VARIANTS (C3 reading)",
+   "denominator": "2 merged anchors, 750 items each"
+  },
+  {
+   "id": "PB2",
+   "text": "R1 is C1(V0) POSITIVE AT 3 SE",
+   "result": "FAILED",
+   "value": "NOT SHOWN AT 3 SE: +0.0845 (0.0722), z 1.17",
+   "denominator": "3,457 WORK items x 128 models"
+  },
+  {
+   "id": "PB3",
+   "text": "K1 is K1 KILLED",
+   "result": "HELD",
+   "value": "K1 KILLED: V0 - K +0.0126 (0.0528)",
+   "denominator": "3,457 WORK items x 128 models"
+  },
+  {
+   "id": "PB4",
+   "text": "K2 is K2 KILLED on BBH",
+   "result": "HELD",
+   "value": "K2 KILLED on BBH (content-cluster SE, the plan's; arm A is 1.74 SE clustered by subtask and 1.87 by V0 leaf; geometric_shapes, disambiguation_qa and boolean_expressions carry 83% of N's gain; on the other 21 subtasks G(N|L2+V0) +0.29 (0.32))",
+   "denominator": "3,457 WORK items x 128 models (24 subtasks)"
+  },
+  {
+   "id": "PB5",
+   "text": "V0 vs random is TEXT STRUCTURE BEATS SIZE ALONE",
+   "result": "FAILED",
+   "value": "NOT DISTINGUISHABLE FROM SIZE ALONE (UNDERPOWERED): +0.0727 (0.0775)",
+   "denominator": "3,457 WORK items x 128 models"
+  },
+  {
+   "id": "PB6",
+   "text": "|C1(V0) cont - C1(V0) g2| < 0.010",
+   "result": "HELD",
+   "value": "0.0058",
+   "denominator": "3,457 WORK items"
+  },
+  {
+   "id": "PB7",
+   "text": "C1(N512) < C1(N) (point values)",
+   "result": "HELD",
+   "value": "N512 +2.238 < N +2.476",
+   "denominator": "3,457 WORK items"
+  },
+  {
+   "id": "PB8",
+   "text": "on the merged anchors' WORK items G(VAR | L1) >= G(V0m | L1)",
+   "result": "HELD",
+   "value": "+1.531 >= +0.017",
+   "denominator": "merged anchors' WORK items (450 per anchor)"
+  }
+ ],
+ "falsifier": {
+  "text": "none (exploratory); each pre-specified rule prints exactly one word",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "data object": "census r2 348 / 345 / 342 KEPT (EXCLUDED zephyr-orpo, Phi-3-small x2; MISSING 3); 5,761 items in 24 subtasks; 4 duplicate texts on 8 items; ND-1 385 groups, 924 items, max 8; WORK acc_norm mean 0.4753, sd 0.1051 (0.2968-0.7382), chance 0.2885, NC-1 18; MIXED-2 = exclude the odd part, then MIXED-1 (ACCEPTED) (POSTRUN rows 2, 3, 5)",
+  "R1 the tree's C1": "C1(V0) NOT SHOWN AT 3 SE: +0.0845 (0.0722), z 1.17; realised MDE80 0.2775 vs the planned 0.112; n_eff 301 (POSTRUN rows 8-10)",
+  "K1": "K1 KILLED: V0 - K +0.0126 (0.0528) (POSTRUN rows 8-9)",
+  "K2": "K2 KILLED on BBH (content-cluster SE, the plan's; arm A is 1.74 SE clustered by subtask and 1.87 by V0 leaf; geometric_shapes, disambiguation_qa and boolean_expressions carry 83% of N's gain; on the other 21 subtasks G(N|L2+V0) +0.29 (0.32)): G(N|L2+V0) +2.3142 (0.3885), 5.96 SE; G(V0|L2+N) -0.0269 (0.0316) (POSTRUN rows 8, 9, 11; C1 HIGH)",
+  "V0 vs random": "NOT DISTINGUISHABLE FROM SIZE ALONE (UNDERPOWERED): +0.0727 (0.0775), 0.94 SE; MDE80 0.2204 > C1(V0) 0.0845 (POSTRUN row 9)",
+  "C1 of the arms": "V0 +0.0845 (0.0722), K +0.0719 (0.0621), random +0.0118 (0.0385), N +2.4758 (0.3901) (POSTRUN row 8)",
+  "recovery (3/5/7)": "V0m and Km DOES NOT RECOVER SUB-VARIANTS, at V0m's 5-leaf resolution; the count is linearly present in the embedding (probe 1.000): AMI -0.0024 / -0.0024 (null p95 0.0035); VAR +1.5309 (0.2938), V0m +0.0172 (0.0616); k-means at k = 15 AMI 0.574 (k = 3 -0.002) (POSTRUN row 12, C3)",
+  "DEFF": "11.5 (n_eff 301): within-item (cross-model) correlation; content-cluster factor 1.06-1.37 (POSTRUN_BBH-WORK row 10); not re-measurable from the files of record (L1); MATH DEFF 1.05 under the same definition (C2)"
+ },
+ "sentence_of_record": "On BBH WORK rows (3,457 items x a seeded 128 of 342 models; RESERVED responses read 0), the axis tree's C1 is NOT SHOWN AT 3 SE (+0.0845, SE 0.0722; realised MDE80 0.2775), k-means reaches it (K1 KILLED), it is NOT DISTINGUISHABLE FROM SIZE ALONE (UNDERPOWERED), and the text-kNN field carries +2.48 (0.39) [EXPLORATORY, adjudicates nothing; POSTRUN d8441df7 C1 (HIGH): K2 KILLED on BBH (content-cluster SE, the plan's; arm A is 1.74 SE clustered by subtask and 1.87 by V0 leaf; geometric_shapes, disambiguation_qa and boolean_expressions carry 83% of N's gain; on the other 21 subtasks G(N|L2+V0) +0.29 (0.32)); C2: DEFF 11.5 is within-item (cross-model) correlation, content-cluster factor 1.06-1.37; C3: DOES NOT RECOVER SUB-VARIANTS at V0m's 5-leaf resolution; the count is linearly present in the embedding (probe 1.000)]",
+ "chips": [],
+ "brackets": [
+  {
+   "date": "2026-10-28",
+   "by": "registrar",
+   "text": "C1 (HIGH; POSTRUN d8441df7): K2 is quoted only as 'K2 KILLED on BBH (content-cluster SE, the plan's; arm A is 1.74 SE clustered by subtask and 1.87 by V0 leaf; geometric_shapes, disambiguation_qa and boolean_expressions carry 83% of N's gain; on the other 21 subtasks G(N|L2+V0) +0.29 (0.32))'; a BBH follow-up that reads K2 clusters by subtask and is DESCRIPTIVE-ONLY at 24 clusters"
+  },
+  {
+   "date": "2026-10-28",
+   "by": "registrar",
+   "text": "C2: 'DEFF 11-15 from templated items' and 'because BBH items are templated' read 'within-item (cross-model) correlation; content-cluster factor 1.06-1.37 (POSTRUN_BBH-WORK row 10)'; any BBH power plan uses the realised SE, not FLAT-COMPARE's MATH scaling. C3: reading (3) 'invisible to both text partitions' reads 'at V0m's 5-leaf resolution; the count is linearly present in the embedding (probe 1.000)'"
+  },
+  {
+   "date": "2026-10-28",
+   "by": "registrar",
+   "text": "L1-L5 LOW: DEFF not re-measurable from the files of record; selftest gap on the build path (R5 survives; anchor_check refuses on the real path); RESERVED text is read (a future RESERVED registration states whether trees built on all items' text are admissible); plan working copy mixed EOL (LF blob 33dc3326 of record); roster 128 of 342 (a full-342 re-run is the author's, optional); the benchzoom brackets for C1-C3 on [P2] are owed (absent at master b86c014)"
+  },
+  {
+   "date": "2026-10-28",
+   "by": "registrar",
+   "text": "D-2026-10-28-1 (4), the author's selection verbatim \"No, 128 is enough (Recommended)\" (d78972f2): BBH-WORK stays on the seeded 128 of 342 models; the optional full-roster re-run (L5) is not run; no number, word or sentence moves (docs/judge_v2_program.md section \"## Registrar's record 2026-10-28 (insertion only; zero calls; nothing run) — BZ-AXIS-CONFIRM-FRESH draft amended per D-2026-10-28-1: ...\" L25760-L25776 (_as_of the commit that writes it, parent f00481d6, re-grepped))"
+  }
+ ],
+ "does_not_show": [
+  "any RESERVED, vault, registered or confirmatory statement",
+  "\"a partition is not needed on BBH\" without C1's qualifier",
+  "\"the embedding cannot see the 3/5/7 count\" (C3); \"the tree finds no structure in BBH\" (a NOT SHOWN at MDE80 0.28)",
+  "any statement about the full 342-model roster (L5)",
+  "BBH's DEFF attributed to templated items (C2)",
+  "replacing V0 anywhere; pooling BBH with MATH / MMLU / MMLU-Pro words"
+ ],
+ "ledger": null,
+ "depends_on": [
+  "FLAT-COMPARE"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "nothing"
+ },
+ "sources": [
+  "docs/reviews/POSTRUN_BBH-WORK.md (d8441df7)",
+  "benchzoom docs/bbh-work.md at master b86c014 (plan aec5385; [P1], run paragraph [P2] incl. predictions PB1-PB8)",
+  "docs/agents/author_decisions/2026-10-27.md (2e2513a5, c3aada22, d463cdb0)",
+  "docs/judge_v2_program.md section \"## Registrar's record 2026-10-28 (insertion only; zero calls; nothing run) — EMBED2-WORK (POSTRUN 56da993f), TAU-CONT-ALL (1d23c3c7), BBH-WORK with the BBH fetch, census and sealed split (d8441df7), ...\" L25747-L25758 (_as_of the commit that writes it, parent 8f0f5f1c, re-grepped)",
+  "docs/agents/author_decisions/2026-10-28.md (d78972f2)"
+ ],
+ "last_update": "2026-10-28 (registrar: one bracket, D-2026-10-28-1 (4))"
+}
