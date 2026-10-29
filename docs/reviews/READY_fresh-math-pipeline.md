@@ -228,3 +228,129 @@ PYTHONPATH=src python -m pytest tests/test_fresh_math_pipeline.py -q -p no:cache
 PYTHONPATH=src python -m pytest -q -p no:cacheprovider                                    # 971 passed, 1 skipped, 10 deselected
 git -C Z:/FAC/TUBerlin/benchzoom merge-base --is-ancestor master fresh-math-pipeline-2; sha256sum -c SHA256SUMS   # 9/9
 ```
+
+## Delta review 2026-10-29: fresh-math-pipeline-3 (benchzoom 033c79c..2a5bf9d; D-2026-10-28-1 / -2, D-2026-10-29-1; prepare only)
+
+Reviewer: adversarial-reviewer. Zero LLM calls (proof in #1). Read-only on both repositories except this section; every probe ran in
+sandboxes under E:/TaxoArena_tmp/review_fmp3 against in-process fake servers (OLLAMA_HOST at the closed port 127.0.0.1:9, Azure variables
+cleared). Reviewed blobs (LF of record, `git hash-object`): script `blob:911f616f850adfe9cf3508f13245ee63eb7c3407`, mutants `blob:d398e919…`,
+test `blob:5c3374fa…` (both `i/lf w/lf`), plan `blob:fb464a61…` (working tree CRLF `blob:6ee2b3f4…`), go config `blob:aadd03e8…` = `{}`
+(working tree CRLF `blob:770a7206…`; the script's pin is the LF blob, correct under core.autocrlf=true). TaxoArena pins in the script still
+match (`split_side.py` 05224b5a…, `accepted_tests_ledger.py` b90e64dc…). The delta is 4 files (1,700+ / 344−), 0 under `src/`.
+
+### Verdict
+
+- **Generation go: NOT READY.** D1-D7, T1 / T4 / T5 and C9 are fixed and confirmed (table; D3 with a LOW residual, E3). Two new MEDIUM defects remain:
+  - E1, extraction: clear answer forms are still MISSING. Extraction is pinned before any output, so E1 must be fixed now.
+  - E2, D-2026-10-29-1 (2) "thinking off": the setting is enforced on the request only, and no check reads the outputs.
+  E1 and E2 need a fix and a delta review. An Azure go also needs condition C-AZ.
+  A go also needs the author's decision id, serving, roster and cap.
+- **Merge: MERGEABLE (fast-forward).** `merge-base master fresh-math-pipeline-3` = 033c79c = master. The committed go config is `{}`, so
+  `go_table_for_run` returns `{}` and the code is inert. 0 files under `src/` changed, so the execution graph needs no update.
+- **Support section: N/A** (engineering). The Holm family (m = 3) binds the registration, not this pipeline.
+
+### Per-claim table (deciding claims)
+
+| # | claim | reviewer's number / evidence | state | sev |
+|---|---|---|---|---|
+| 1 | zero LLM calls | Ollama `server.log` + `server-1..5.log`, [GIN] 2026/10/29: 0 `/api/chat`, 0 `/api/generate`. Before the review: 42 lines = 36 show, 4 tags, 2 version (the builder's dry run at 19:11 and roster at 19:12). The reviewer added 1 version + 4 show (Modelfile spot check) and the dry run's 18 show + 2 tags + 1 version; final count 68 (58 show, 6 tags, 4 version): every later probe, the selftests and the 195 mutant selftests added 0. `E:/benchzoom_cache/fresh_math_raw` is absent (no real journal or go ledger has ever been created). 0 TaxoArena day ledgers carry FRESH-MATH-GEN (5 files) | CONFIRMED | - |
+| 2 | pins: prompt b845360d, regex set 56cf4896, digest e1a81947, go config aadd03e8, script 911f616f | recomputed by importing the blob: b845360d45386fc3, 56cf4896222af049, e1a81947f64583fe; `git hash-object` aadd03e8 / 911f616f; `AUTHORISED_GO` {} and `go_table_for_run` {} | CONFIRMED | - |
+| 3 | selftest 57/57; targeted 43; full suite 986 passed, 1 skipped | 57/57 (sandbox, 12.5 s); 43 passed; 986 passed, 1 skipped, 10 deselected, 0 failed (single process, PYTHONPATH=src, benchzoom venv, 881.4 s) | CONFIRMED | - |
+| 4 | mutants 177/177 killed, control passes | re-run in a fresh camp (SCRATCH redirected, so the builder's results.json is not reused; 1 worker, 52 min 58 s): 177 killed, control passes, 0 survived | CONFIRMED | - |
+| 5 | D1: the day cap holds across launches and processes | 6 races of 2-3 PROCESSES, each with its own fake server, sharing one sandbox raw root and day ledger; the reviewer counted posts at the fake servers. Results: (a) ledger 13,985, pilot 12, 2 procs on a barrier → 7 + 8, day total **14,000**; (b) the same with 3 procs → 2 + 6 + 7 = **14,000**; (c) 13,850, 100 items, 2 procs staggered → 82 + 68 = **14,000**; (d) 13,850, 3 procs on a barrier, a 429 on each item's first request → 43 + 56 + 51 = **14,000** (retries counted); (e) 3 procs staggered → 63 + 52 + 35 = **14,000**; (f) 13,988, 3 procs staggered, with 429s → 12 posted, the other two REFUSED [G4] at start (13,990 + 12; 13,991 + 12). In 6/6 the day-ledger FRESH rows = go-ledger attempts = fake posts, with 0 recovered rows and 0 tracebacks. The prior review's 14,005 / 14,039 cases now end at 14,000 | CONFIRMED | - |
+| 6 | D2: only a dead launch is recovered, once; a live one never | Launch A hard-killed (TerminateProcess on the reviewer's own child) after 51 reserved attempts. The next launch appends `recovered:L1` 51 once; rows 63 = go ledger 63. A third launch recovers nothing (75 = 75). A live launch (60, in flight) while another launch (12) begins and ends: 0 recovered rows, 72 = 72 = fake posts | CONFIRMED | (E4 LOW) |
+| 7 | D3: the go config cannot be redirected | (a) `BZ_EXAMPLES` at a committed sandbox repo whose go config authorises D-2026-10-28-1 (reviewed script, CLI `--run`) → `REFUSED [G2] … 0 authorised decisions`. (b) Sandbox clone, go config edited to authorise D-2026-10-28-1: → [G2] modified. With `update-index --assume-unchanged` → [G2] blob 796fd741 ≠ pin. With assume-unchanged plus a clean filter injected through `GIT_CONFIG_COUNT/KEY/VALUE` → **G2 and G3 pass**, and the run stops at [G5] only because the port is closed | PARTLY | LOW (E3) |
+| 8 | D4: a following `$…$` / `**…**` span is never consumed | the six D4 strings → C (6/6); also `(C) __2__`, `C __2__`, `$C$ $2$`, `(C) $$2$$`, `**(C)** $x^2$`, ideographic space and tab before `$2$` → C | CONFIRMED | - |
+| 9 | D6 / D-2026-10-29-1 (4): clear forms → letter, ambiguous → MISSING; 157 cases + 8 | 157 + 8 = 165 counted. The four clear forms → C; `Answer: C\n\nThe answer is A positive number.` → MISSING (never A, never C). On 136 own strings: 0 WRONG letters where C was meant, but the clear forms in E1 → MISSING | PARTLY | MEDIUM (E1) |
+| 10 | extraction linear; think removal linear (M04 case) | 15 own families timed at n and 4n, up to 2.6 M chars: max 0.46 s, 4n/n ratio ≤ 5.7 (the 5.7 is on a 1 ms timing); `<thi<think>x</think>nk>\nAnswer: C` → MISSING | CONFIRMED | - |
+| 11 | D-2026-10-29-1 (3): no temperature sent; Modelfile recorded | 60 bodies captured at a fake: no `temperature` key at any depth. Ollama keys: model, messages, stream, keep_alive, think, options{seed, num_predict, num_ctx, num_thread}; Azure keys: model, max_tokens, messages. The journal records the Modelfile 0.7 (or the "unset" text), `parameters_sha256` and `ollama_version`. Real `/api/show` (Ollama 0.40.6): gemma3:12b 0.1, qwen3:8b 0.6, qwen3.5:2b 1, llama3.2:1b unset, as in the builder's table | CONFIRMED | - |
+| 12 | D-2026-10-29-1 (2): think=false to thinking-capable models; unswitchable models refused [G5] | `think: false` only to the capability-reporting models, absent for the others and for Azure. gpt-oss / deepseek-r1 / grok-4-1-fast-reasoning / Kimi-K2.6 → [G5] (selftest; own Q09, Q10 killed). **But** outputs are never checked (E2), and the Azure check is a name denylist | PARTLY | MEDIUM (E2) |
+| 13 | T1 / T4 / T5, C9, D5, D7 | the prior decisive survivors are now killed: N1 by go_cap_per_launch_cap, N4 by override_one_model_only, N5 by protocol_digest_covers_functions. C9: authorisation_sealed, plus a forged or altered Authorisation refused [G1]. D5: 6 own first opens of a fresh go ledger by 2-3 processes at once, 0 tracebacks (and the selftest's 32 threaded opens) | CONFIRMED | - |
+| 14 | dry run on v3 | own run: 49,406 stub attempts; 14/14 EQUAL; matrix sha256 4f3752b1… (real) and fec0e444… (fixture), identical to the builder's and to v2's | CONFIRMED | - |
+| 15 | roster at 7,058 (ESTIMATES) | from the builder's CSVs: 122.9 / 196.6 / 3,005.2 h over 18 models. API: 28,232 = 7,058 × 4, 3 days, 36.9 h (= 28,232 / 12.76 / 60); thinking-off subset 14,116, 2 days, 18.4 h. Spot check only (descriptive) | CONFIRMED | - |
+| 16 | the builder's new finding: `accepted_tests_ledger.append` is not cross-process safe | read b90e64dc L130-L151: a read-modify-replace through a fixed `path + ".tmp"`. This test's own appends are serialised: FRESH rows = go ledger in 8/8 own multi-process runs (6 races, kill-and-recover, live launch). Another test's concurrent append can still be lost, which would make D1 under-count | CONFIRMED | MEDIUM (C-AZ) |
+| 17 | plan before code; insertion only; backup | f2d87a1 touches 1 file (92+/0−); 0 deleted plan lines over 033c79c..2a5bf9d; 2a5bf9d touches 4 files, 0 under src/; backup SHA256SUMS 16/16 OK | CONFIRMED | - |
+
+Own mutants (sandboxed copies of blob 911f616f via `run_mutants`, SCRATCH redirected, 1 worker; control passes):
+
+| id | change | result | decisive |
+|---|---|---|---|
+| Q01 | `counted + 1 > DAY_CAP` → `counted > DAY_CAP` | killed (azure_day_cap_reread) | yes |
+| Q02 | day count = other + go-ledger attempts (this test's day-ledger rows ignored) | killed (day_cap_counts_in_flight_and_rows) | yes |
+| Q03 | the reserve counts only this launch's Azure attempts | killed (day_cap_concurrent_interleaved) | yes |
+| Q04 | an uninspectable process counts dead | SURVIVED | no (code correct; same-user processes are inspectable; E4) |
+| Q05 | the reused-pid creation-time check dropped | killed (pid_liveness) | yes |
+| Q06 | the go config blob pin dropped | killed (go_config_not_redirectable) | yes |
+| Q07 | the v2 closer run (symmetric closers across spaces) | killed (classify_table) | yes |
+| Q08 | (I) under the (L) tail rule | killed (classify_table: `I think the answer is B, but let me check` → B) | yes |
+| Q09 / Q10 / Q11 | no think=false / Azure preflight ignores thinking / temperature 0 sent | killed (ollama_pilot_values / thinking_off_refusals / ollama_pilot_values) | yes |
+| Q12 | fallback to an earlier valid line | killed (classify_table) | yes |
+| Q13 / Q14 | every unended launch dead / no day-ledger append at launch end | killed (recovery_dead_live_recorded / IndexError) | yes |
+| N1 / N4 / N5 | the prior review's decisive survivors | killed (see #13) | yes |
+
+### Defects and fixes
+
+- **E1 MEDIUM (extraction v3; fix BEFORE any output).** Clear (L) forms are MISSING. MISSING scores 0, and 1 invalid answer in a 12-item pilot
+  refuses the model, so these strings would force an extraction change after outputs exist.
+  - A `.` inside a symmetric wrapper: `Answer: **C.**`, `**Answer: C.**`, `**Final Answer: C.**`, `**Answer: (C).**`, `Answer: $C.$`,
+    `Answer: *C.*`, `__Answer: C.__`. By contrast `Answer: **C**.` → C.
+  - A LaTeX space (or no space) after a wrapper or letter: `Answer: $\textbf{(C)}\ 12$`, `Answer: (C)~12`, `Answer: C~$12$`, `Answer: (C)\,12`,
+    `Answer: (C)=12`. By contrast `Answer: $\textbf{(C) } 12$` and `Answer: (C) = 12` → C.
+  - Fix:
+    - in the eol and wrapped tails, accept `[.!]?` followed by symmetric closers;
+    - read `\ `, `~`, `\,`, `\;` and `\quad` as spaces in the tail;
+    - add these strings to EXTRACTION_CASES, then re-pin the regex sha256 and the protocol digest.
+- **E1c LOW (policy for the author under D-2026-10-29-1 (4), to record before the go).** The (I) end-of-line rule makes these MISSING:
+  - the unboxed Minerva sign-off `Final Answer: The final answer is C. I hope it is correct.` (also with `$C$`; the boxed form reads C);
+  - `The answer is C because …`;
+  - `the correct option is C, as shown.`
+  Own Q08 shows that relaxing (I) to the (L) tail rule also reads `I think the answer is B, but let me check` and `If the answer is A, then …`.
+  So the rule is a defensible conservative reading. A narrower option: accept `[.!]` + space + text after an (I) letter only when the
+  statement opens the line.
+- **E2 MEDIUM (D-2026-10-29-1 (2) checked on requests only).** Fake probe, 12-item pilots:
+  - a thinking-capable model that ignores think=false: hidden `thinking` on 12/12 rows;
+  - a model with a `<think>` block in its visible content: 12/12;
+  - an Azure deployment returning `reasoning_content`, whose name the regex does not match: 12/12.
+  All three pass G8 with 0 invalid (Azure pilot: 12 CORRECT), and the Ollama full run after the pilot is not refused. The journal still
+  says "off: think=false sent".
+  - Fix:
+    - G8 refuses a model whose pilot rows carry non-empty `thinking` / `reasoning_content` or a removed `<think>` block, and prints the count;
+    - the matrix provenance reports that count per model;
+    - for Azure, an allowlist of deployments the record knows to be non-reasoning (grok-4-1-fast-non-reasoning, Mistral-Large-3) replaces
+      the denylist regex.
+- **C-AZ (condition for an Azure go; the builder's MEDIUM, confirmed).** No other writer of the TaxoArena day ledger may run during an Azure
+  launch of this test. The alternative is a cross-test lock in `accepted_tests_ledger.append`, which is a TaxoArena change and the
+  orchestrator's to schedule.
+- **E3 LOW (D3 residual).** A clean filter injected through `GIT_CONFIG_*`, plus an assume-unchanged flag, lets an edited go config pass G2 / G3
+  (#7 b). It needs deliberate tampering, and no go entry can arise by accident.
+  - Fix: parse the go table from the pinned blob (`git cat-file blob <GO_CONFIG_BLOB>`), and run every git call with `GIT_*` removed from the
+    environment.
+- **E4 LOW (Q04).** `launch_alive`'s fail-safe branch (uninspectable counts alive) is untested. If it failed open, the label-only idempotence of
+  `_append_launch` would skip the live launch's later attempts: the day ledger under-counts, though D1 stays bounded by the go ledger.
+  - Fix: a selftest with `_proc_started` patched to "unknown". At launch end, append the go-ledger attempts minus those already recorded
+    under `L<id>`.
+- **LOW (process).** The builder's campaign runs 3 workers, and each worker's selftest spawns 2 children, so up to 9 Python processes run at
+  once. The reviewer re-ran the campaign at 1 worker (3 processes at most).
+
+### Author decisions needed (before a go)
+
+- Serving, roster and cap. A go needs a decision id; it is above 8k calls for either API option.
+- The consequence of thinking off for all: the API roster drops to 2 deployments, and gpt-oss, qwq, deepseek-r1 and magistral are out (the
+  builder's question).
+- E1c: whether an (I) statement followed by a sentence is read.
+
+### Commands (scripts in E:/TaxoArena_tmp/review_fmp3/, read-only on every input; sandboxes only)
+
+```
+LC_ALL=C grep -a "\[GIN\] 2026/10/29" $LOCALAPPDATA/Ollama/server*.log | awk '{print $NF}' | sort | uniq -c   # 0 chat/generate
+python -c "from load import load; m=load(); print(m.PROMPT_SHA, m.REGEX_SHA, m.protocol_digest(), m.go_table_for_run(m.GO_CONFIG))"   # #2
+python race_parent.py races; python race_parent.py kill        # #5, #6 (2-3 child processes, own fake server each)
+python d3_probe.py; python d3b.py                              # #7 (sandbox clone; OLLAMA_HOST=127.0.0.1:9)
+python adv3.py; python adv3b.py; python adv3c.py; python adv3d.py   # #8-#10, E1 (136 strings, 15 timing families)
+python settings_probe.py                                       # #11, #12, E2 (bodies, journal settings, thinking leak)
+fresh-math-pipeline.py --selftest (TMP/TEMP/TMPDIR/BZ_SANDBOX=st); --dry-run --out dry       # #3, #14
+python run_camp3.py own_mutants3.json mut_own 1; python run_camp3.py <worktree>/examples/fresh-math-pipeline_mutants.json mut_builder 1
+PYTHONPATH=src python -m pytest tests/test_fresh_math_pipeline.py -q -p no:cacheprovider   # 43 passed
+PYTHONPATH=src python -m pytest -q -p no:cacheprovider                                    # 986 passed, 1 skipped, 10 deselected
+git -C Z:/FAC/TUBerlin/benchzoom merge-base master fresh-math-pipeline-3; sha256sum -c SHA256SUMS   # 033c79c; 16/16
+```
