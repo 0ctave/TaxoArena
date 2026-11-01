@@ -1,0 +1,82 @@
+{
+ "id": "FRESH-CONT-SELECT",
+ "title": "FRESH-CONT-SELECT (engineering; prepare only): the per-reader continuous tau^2 selection library for the BZ-AXIS-CONFIRM-FRESH runner (DRAFTCHECK c98534d2 F2)",
+ "question": "Does a library that routes every S-TAU tau^2 through the cont rule of the FRESH draft (D of the D-2026-10-27-5 record) reproduce TAU-CONT-ALL's per-task taus bit-equal and prove by a COUNT per reader family that every tau^2 went through cont?",
+ "kind": "engineering",
+ "state": "READY",
+ "registration": {
+  "commit": "none (engineering, not registered); plan benchzoom docs/fresh-cont-select.md committed fcb7d91 before the code 7bbc08d (FCS header)",
+  "program_lines": "recorded in docs/judge_v2_program.md section \"## Registrar's record 2026-10-30 (insertion only; zero calls; nothing run) — BZ-AXIS-CONFIRM-FRESH (still drafted, NOT registered): D-2026-10-29-3 recorded; ...\" L25821-L25831 (_as_of the commit that writes it, parent fc4632f7, re-grepped), paragraph D",
+  "date": "2026-10-30"
+ },
+ "script": {
+  "path": "benchzoom examples/fresh_cont_select.py",
+  "sha16": "blob:38d1cb6eac6bba71 (git blob, LF; sha256-lf16:3176d188e3a7b944; i/lf w/lf, 0 CR, no CRLF rendering) at a71c79d; run of record blob:3939032f (sha256-lf16:a7a367fd62c6d824) at 7bbc08d, 11 docstring lines apart; test blob:f3f4ba43, mutants blob:82e1675e, plan blob:e1bf3909 (FCS header)",
+  "commit": "benchzoom fresh-cont-select b546270..a71c79d (plan fcb7d91, code 7bbc08d, reproduction a71c79d); MERGEABLE (fast-forward), not merged at master b546270 (registrar: merge-base --is-ancestor a71c79d master false)"
+ },
+ "ready": {
+  "file": "docs/reviews/READY_fresh-cont-select.md",
+  "commit": "4f4d36c2"
+ },
+ "go": "n/a (engineering library; zero LLM calls; not a generation go)",
+ "run": {
+  "outcome_file": "E:/benchzoom_demo/followups/fresh-cont-select (the builder's; backup E:/TaxoArena_backup_2026-10-29_fresh-cont-select, checksums verified per the builder); the reviewer's reruns E:/TaxoArena_tmp/review_fcs/out",
+  "outcome_commit": "outputs not committed; reproduction recorded at a71c79d",
+  "calls": 0,
+  "cce": 0,
+  "pool": "WORK rows of MATH, MMLU-Pro and MMLU through TAU-CONT-ALL's loaders; no fresh data; vault / reserved guard reads 0 (FCS rows 1-3, 11)",
+  "date": "2026-10-29/30"
+ },
+ "review": {
+  "file": "docs/reviews/READY_fresh-cont-select.md",
+  "commit": "4f4d36c2",
+  "verdict": "READY, for this piece of the pipeline: the library that the FRESH runner will import for every tau^2; not a generation go; conditions C1-C4 bind the FRESH runner's READY; D1 MEDIUM (verify() without expect cannot see a tau^2 chosen outside step) to be fixed before the runner's READY; D2-D4 LOW; Merge: MERGEABLE (fast-forward), inert (4 new paths, src/ 0 lines, 0 importers)"
+ },
+ "criteria": [],
+ "predictions": [],
+ "falsifier": {
+  "text": "none (engineering)",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "reproduction": "per-task tau^2 2,350 of 2,350 equal (25 tasks x 94 keys) on each of MATH (n 2,949, 69 models), MMLU-Pro (7,197, 23) and MMLU (8,425, 79); 188 of 188 per-item arrays at max |diff| 0.0; tau summary and fallbacks equal; guard reads 0 (FCS rows 1-3; the reviewer's own driver at a71c79d, clean tree)",
+  "COUNT": "selections through cont = made, 1,150 = 1,150 per run (chain 75, control 50, cell 875, field 150); equal to an independent count from the reference's key sets (46 cont + 48 factor-2 per task); 1,200 factor-2 selections library-checked of 1,200 made (FCS row 4)",
+  "bound": "0 of 1,150 continuous choices at 0.32 on each rerun; at 0: MATH 121, MMLU-Pro 144, MMLU 130 (FCS row 5)",
+  "rule identity": "the 6 reused TAU-GRID objects (Criterion, select, golden, select_cont, make_grids, NotConverged) AST-identical to the run of record d89d8ea1; constants 0.32 / 1e-7 / 200; g4 30 points; ties to the smallest tau^2 (FCS row 6)",
+  "tests": "selftest 14/14; builder mutants 82/82 killed, both controls pass; reviewer's own 6 of 8 killed (O1, O2 survived, not decisive: D2, D3); full suite 994 passed, 1 skipped, 11 deselected, 0 failed; targeted 52 passed (FCS rows 8-10)",
+  "calls": "0 LLM calls (Ollama 2026/10/29-30: 0 chat / generate / embed; FCS row 11)"
+ },
+ "sentence_of_record": "The per-reader cont selection library for the FRESH runner is READY (READY_fresh-cont-select 4f4d36c2): on WORK rows of MATH, MMLU-Pro and MMLU it reproduces TAU-CONT-ALL's 2,350 per-task tau^2 bit-equal and counts 1,150 = 1,150 selections through cont; it is not a generation go, and the COUNT on the FRESH run of record stays owed (conditions C1-C4, D1).",
+ "chips": [],
+ "brackets": [
+  {
+   "date": "2026-10-30",
+   "by": "registrar",
+   "text": "Record created at READY (engineering; the build preceded the item). Scope (FCS): the wrapper is shown faithful on TAU-CONT-ALL's chain, not on the FRESH chain; 'every tau^2' stays the registrar's reading (C4)."
+  }
+ ],
+ "does_not_show": [
+  "that the FRESH chain (V0', K', N', N512', rule A) routes every tau^2 through cont: no FRESH runner exists (C1, C2)",
+  "that verify() catches a bypass when expect is omitted (D1: a bypassed reader prints EQUAL)",
+  "that the cont rule is correct: the reproduction compares two callers of the same pinned TAU-GRID functions (FCS scope note)",
+  "any fresh-item statistic, embedding or tree (none produced)"
+ ],
+ "ledger": null,
+ "depends_on": [
+  "TAU-GRID",
+  "TAU-CONT-ALL"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "nothing"
+ },
+ "sources": [
+  "docs/reviews/READY_fresh-cont-select.md (4f4d36c2)",
+  "the builder's hand-back as relayed in the orchestrator's brief of 2026-10-30 (numbers confirmed by the READY review)",
+  "docs/reviews/DRAFTCHECK_BZ-AXIS-CONFIRM-FRESH-2026-10-27.md (c98534d2) F2",
+  "docs/judge_v2_program.md section \"## Registrar's record 2026-10-30 (insertion only; zero calls; nothing run) — BZ-AXIS-CONFIRM-FRESH (still drafted, NOT registered): D-2026-10-29-3 recorded; ...\" L25821-L25831 (_as_of the commit that writes it, parent fc4632f7, re-grepped)"
+ ],
+ "last_update": "2026-10-30 (registrar: created at READY; MERGEABLE, not merged; conditions C1-C4 and D1 at the FRESH runner's READY)"
+}

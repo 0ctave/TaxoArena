@@ -354,3 +354,113 @@ PYTHONPATH=src python -m pytest tests/test_fresh_math_pipeline.py -q -p no:cache
 PYTHONPATH=src python -m pytest -q -p no:cacheprovider                                    # 986 passed, 1 skipped, 10 deselected
 git -C Z:/FAC/TUBerlin/benchzoom merge-base master fresh-math-pipeline-3; sha256sum -c SHA256SUMS   # 033c79c; 16/16
 ```
+
+## Delta review 2026-10-30: fresh-math-pipeline-4 (benchzoom b546270..15ac7a2; D-2026-10-28-1 / -2, D-2026-10-29-1 / -3; prepare only)
+
+Reviewer: adversarial-reviewer. Zero LLM calls (#1). Read-only on both repositories except this section. Every probe ran in sandboxes
+under E:/TaxoArena_tmp/review_fmp4 against in-process fake servers (OLLAMA_HOST at the closed port 127.0.0.1:9, Azure variables cleared),
+except the dry run, which reads the real Ollama metadata endpoints. Reviewed blobs (LF of record, `git hash-object`):
+- script `blob:3b8928954a650390450e7e95a605525280692406` (`i/lf w/lf`; sha256-lf16:194292ce0086aa26, sha256-crlf16:29efd4715892c790);
+- capability list (NEW) `blob:b6d74a6c…` (`i/lf w/lf`, sha256-lf16:25f3893e13391743); mutants `blob:1a87c7ef…`; test `blob:ede3f48f…`;
+- plan `blob:07e8da7c…` (working tree CRLF `blob:6601bf9d…`); go config `blob:aadd03e8…` = `{}` (working tree CRLF `blob:770a7206…`).
+
+The delta is 5 files (1,932+ / 192−), 0 under `src/`. The TaxoArena pins in the script still match: `split_side.py` 05224b5a…,
+`accepted_tests_ledger.py` b90e64dc…. Items `fresh_items_v3.jsonl` sha256 169f99b714dc6ef5 and prompt b845360d are unchanged in the diff.
+
+### Verdict
+
+- **Generation go: NOT READY.** E1, E1c, E3 and E4 are fixed and confirmed. D-2026-10-29-3 is applied as worded.
+  - E2 is fixed on the pilot and the full run, but one residual MEDIUM remains. **E2-R:** G9 writes the matrix of record for a
+    thinking-off model whose violating row completes its journal. It only prints `THINKING VIOLATED`.
+  - C-AZ is implemented as a lock. Its operational cost is on the orchestrator to accept (F2, F3 LOW).
+  - Before a go, E2-R needs a fix and a short delta review. A go also needs the author's decision id, serving, roster and cap.
+- **Merge: MERGEABLE (fast-forward).** `merge-base --is-ancestor master fresh-math-pipeline-4` holds (master b546270). 0 of the 31 other
+  local branches (master included) carry unmerged changes to any of the 5 files. The committed go config is `{}`, so `go_table_for_run` returns `{}` and the code is
+  inert (dry-run refusals [G2] ×3, [G1]). 0 files under `src/` changed, so the execution graph needs no update.
+- **Support section: N/A** (engineering). The Holm family (m = 3) binds the registration, not this pipeline. No fresh-item statistic,
+  embedding or tree is computed: the dry run's matrices are the stub ones (4f3752b1… / fec0e444…, as in -2 / -3), and the Ollama log holds
+  0 `/api/embed` on 2026/10/29-30.
+
+### Per-claim table (deciding claims)
+
+| # | claim | reviewer's number / evidence | state | sev |
+|---|---|---|---|---|
+| 1 | zero LLM calls | Ollama `server.log`, [GIN] 2026/10/29: 109 show, 11 tags, 7 version; 2026/10/30: 42 show, 4 tags, 2 version. 0 `/api/chat` and 0 `/api/generate` on both days. The reviewer's dry run added 21 show + 2 tags + 1 version. The 276 mutant selftests (2 controls), the selftest, pytest and every probe added 0. `fresh_math_raw/` is absent. 0 of the 5 TaxoArena day ledgers carry FRESH-MATH. The 6 ledger files (night + 5 day) have the same sha256, mtime and size before and after the review | CONFIRMED | - |
+| 2 | pins: script 3b892895, regex 500aa691, digest 2039e504, list b6d74a6c, go aadd03e8 EMPTY; blobs from the bytes | Recomputed by importing the blob: 500aa6910d1817ca, 2039e504d4b1e203. `lf_blob_bytes` gives b6d74a6c and aadd03e8 from the file bytes, equal to `git hash-object`. `AUTHORISED_GO` {} and `go_table_for_run` {}. sha256-lf16 / crlf16 as claimed. The digest covers the list (`thinking_list=THINKING`) and 22 functions | CONFIRMED | - |
+| 3 | selftest 65/65; targeted 62; full suite 1005 passed, 1 skipped | 65/65 (sandbox, 16.4 s); 62 passed (17.1 s); full suite 1005 passed, 1 skipped, 10 deselected, 0 failed (single process, PYTHONPATH=src, benchzoom venv, 960.1 s) | CONFIRMED | - |
+| 4 | mutants 250/250 killed, control passes (1 worker) | re-run in a fresh camp (SCRATCH redirected, so the builder's results.json is not reused; 1 worker, 03:04-04:50, 105.9 min of selftests): 250 killed, control passes, 0 survived | CONFIRMED | - |
+| 5 | E1: clear forms read | the prior review's 13 E1 strings → C (13/13), plus `\textbf{C.}`, `` `C` ``, `"C"`, `“C”`. Own 80-string table (E1, E1c, D-2026-10-29-1 (4) forms, 21 ambiguous forms, quote / backtick / LaTeX-space / think-tag hunting): 0 disagreements with the reviewer's expected reading. Ambiguous stays MISSING: `C=12`, `(C)~(D)`, `"C" or "D"`, `**C.** or D`, `C.\quad D`, `` `A` is wrong; C ``, `$\text{A}\ \text{or}\ \text{C}$` | CONFIRMED | - |
+| 6 | E1c / D-2026-10-29-3 (2): the sign-off read; other (I) tails MISSING | 8 sign-off variants → C (unboxed, `$C$`, `**C**`, `(C)`, `!`, two spaces, no final `.`, boxed). `The answer is C because …` and `the correct option is C, as shown.` → MISSING. `… I hope it is correct. Actually it is D.` → MISSING. Own O4 (sign-off unanchored) killed | CONFIRMED | - |
+| 7 | differential v3→v4, 600,000 strings: 0 letter→other letter | own grammar (seed 11, 300,000, think tags included): **1** letter→other letter (v3 D → v4 B). The string has an orphan `</think>` before the last line: in v3 the stray closer kept `Final Answer:` off the line start, so v3 read an earlier line. 34 letter→MISSING, 4 letter→EMPTY (orphan closer), 1,058 MISSING→letter. Seed 12, 300,000 without think tags: 0 letter→other letter, 17 letter→MISSING (a new statement on the same line conflicts), 1,197 MISSING→letter | PARTLY | LOW (F4) |
+| 8 | strip_think v4: the text after the LAST orphan `</think>` | `Answer: C\n</think>` → EMPTY (v3: C). `trace … Answer: B\n</think>\n\nAnswer: C` → C. `<think>x</think> y </think> Answer: C` → C. Pre-specified in the plan | CONFIRMED | - |
+| 9 | E2: thinking checked on the RESPONSE; pilot refuses, not overridable; full run stops; resume refused | fake probe, 40 items: `none` with `<think>` in content, `switchable` returning hidden `thinking`, Azure `none` returning `reasoning_content` → each passes the 12-item pilot launch, then the full run is REFUSED [G8] (12/12 violations). A late leak (item 20) stops the launch; the resume is REFUSED [G8]. Stale classes (`none` with the capability, `switchable` without it) and an unlisted deployment → [G5], 0 posts. Own O1, O2, O3 and O7 killed. **But** when the violating row is the journal's LAST pending item, the launch stops with 0 pending and `--matrix` writes `fresh_math_mc_scores.parquet` (the probe: 30/30 rows, violations 1, `[MATRIX] … THINKING VIOLATED`, sha256 e0b285a8…) | PARTLY | MEDIUM (E2-R) |
+| 10 | D-2026-10-29-3 (1): the six kept with thinking ON, recorded per model | list: `on` for deepseek-r1:7b, gpt-oss:latest, magistral:latest, qwq:32b-q4_K_M, grok-4-1-fast-reasoning and Kimi-K2.6; 5 `switchable`, 15 `none`. Dry run: think=true for the 3 loadable `on` tags, think=false for the 5 qwen tags, absent for the 13 `none` tags. The journal settings record class + text (`on: cannot be switched off …`). `on` rows are never refused (40/40 recorded). The answer is read after the trace: the fake's trace names a WRONG letter and the result is 40/40 CORRECT. The API roster has 4 eligible. Note: /api/show reports the `thinking` capability for qwq, deepseek-r1:7b and magistral as for the switchable qwen3, so their `on` class follows the decision's named list, not an observation | CONFIRMED | - |
+| 11 | D-2026-10-29-1 (3): no temperature sent | 281 bodies at the fake: no `temperature` at any depth; journal records the Modelfile value (0.6) or the deployment-default text | CONFIRMED | - |
+| 12 | C-AZ: an exclusive lock; other writers refuse before posting | the selftest's `c_az_*` checks pass. Own sandbox repo: under `_lock_open`, `accepted_tests_ledger.guard` → `[LEDGER] REFUSED … unreadable`. `git commit -- <other path>` works and a stat-clean `git status` works. After a touch, `git diff`, `git add -A` and `git stash` are fatal and a copy fails (disclosed). **New:** another process's `os.remove` of the locked file succeeds (FILE_SHARE_DELETE), and the closed ledger is gone after the release. The real scan finds 21 writer scripts and 0 active writers (17 python processes, 0 unreadable). It misses 4 scripts that post judge calls and read the night ledger (bfcl_judged_pilot, ifeval_response_oracle) or read and append to it (bfcl_flip_reseed, bfcl_final_state_swap) | CONFIRMED (condition) | LOW (F2, F3) |
+| 13 | E3: go table from the pinned bytes; GIT_* removed | 5/5 production git calls run with `_git_env`. The table is parsed from the bytes whose LF blob is checked. The builder's E3a-c are killed. Own O6 (blob from an env-stripped `git hash-object`) SURVIVED: a test gap only (T-O6); the code is correct | CONFIRMED | LOW (T-O6) |
+| 14 | E4: uninspectable = alive; end-of-launch top-up | prior survivor Q04 now killed (e4_failsafe_and_topup); own O8 (no subtraction of recorded rows) killed | CONFIRMED | - |
+| 15 | dry run: 49,406 stub attempts, 7/7 EQUAL, new pins, classes, C-AZ target printed | own run: 49,406; 14/14 EQUAL; report sha256 9a7d379b0b34c6fa, byte-identical to the builder's. 21 loadable tags classed, preflight ok. Lock target `experiment_results/night_calls_2026-09-23.json`, no lock taken | CONFIRMED | - |
+| 16 | roster ESTIMATES (21 local, 164.8 h, 205-327 h; API 28,232, 3 days) | from roster_20261029_234454: 21 rows (3 `on`); 122.9 + 41.9 = 164.8 h; 122.9 + 82.4 = 205.3 h; 122.9 + 203.6 = 326.5 h; with runaway 242.2 h; API 4 × 7,058 = 28,232. Spot check only (descriptive) | CONFIRMED | - |
+| 17 | plan before code; insertion only; backup | 745586b touches 1 file (83+/0−); docs 152+/0− over the delta; backup SHA256SUMS 21/21 OK | CONFIRMED | - |
+
+Own mutants (sandboxed copies of blob 3b892895 via `run_mutants`, SCRATCH redirected, 1 worker; control passes):
+
+| id | change | result | decisive |
+|---|---|---|---|
+| O1 | an orphan `</think>` is not a thinking trace | killed (thinking_on_allowed_and_recorded) | yes |
+| O2 | a pilot override also waives the thinking refusal | killed (thinking_off_violation_refused) | yes |
+| O3 | the full-run per-response stop covers `switchable` only | killed (thinking_full_run_stop) | yes |
+| O4 | the sign-off not anchored at end of line | killed (classify_table) | yes |
+| O5 | the C-AZ lock released right after it is taken | killed (c_az_concurrent_writer) | yes |
+| O6 | the go blob from an env-stripped `git hash-object` | SURVIVED | no (code correct; repo-config filter untested: T-O6) |
+| O7 | the thinking-list pin ignored | killed (thinking_list_refusals) | yes |
+| O8 | the E4 top-up re-appends the whole launch count | killed (recovery_dead_live_recorded) | yes |
+| Q01-Q09, Q11-Q14, N1, N4, N5 | the prior reviews' decisive mutants (Q10 no longer applies: the denylist is removed); Q04 is the prior survivor | 17/17 killed (Q04 by e4_failsafe_and_topup) | yes |
+
+### Defects and fixes
+
+- **E2-R MEDIUM (G9 only warns).** A thinking-off model whose violating response is the last pending item finishes with a complete journal.
+  `write_matrix` then writes the matrix of record with `thinking_violations` 1. The plan's "the full run refuses a model with any such row
+  in its journal" never runs again, because nothing is pending.
+  - Fix: in `write_matrix`, write the partial file only, never `fresh_math_mc_scores.parquet`, when any `switchable` / `none` model has
+    `thinking_violations > 0`.
+  - Selftest: a leak on the last item of the run order, so the journal is complete → no matrix of record.
+- **F2 LOW (C-AZ, Azure go only).** FILE_SHARE_DELETE lets any process delete or rename the closed night ledger while the lock is held,
+  and the file is missing after the release. It is tracked, so `git checkout --` restores it.
+  - Fix: share mode 0. One Azure launch of this test then runs at a time, and deletion and rename are blocked as well. Alternatively,
+    check the night file's existence and sha256 after the release and refuse the next launch on a change.
+  - Add to the disclosure: when the file's stat no longer matches the index, `git diff`, `git add -A` and `git stash` are fatal.
+- **F3 LOW (C-AZ scan).** `ledger_writer_scripts` keys on `accepted_tests_ledger` / `day_calls_` and misses the 4 night-ledger scripts in #12.
+  If one of them already runs at lock time, it is not detected, and the two appenders lose their night append after posting.
+  - Fix: add `night_calls` to the predicate.
+  - For the registrar: these 4 scripts write no day-ledger row, a gap in the day cap of record that predates this pipeline.
+- **F4 LOW (record).** "letter → another letter: 0 of 600,000" holds only for strings without an orphan `</think>` (#7). Fix: one
+  insertion-only bracket under [BUILT 2026-10-29].
+- **F5 LOW (policy, pre-specified; decide before the go, never after pilot outputs).** An EMPTY `<think>\n\n</think>` in a thinking-off
+  model's content counts as a violation and is refused, not overridable (probe: 12/12 → [G8]).
+- **T-O6 LOW (test gap).** `go_config_bytes_not_git` injects the filter only through `GIT_CONFIG_*`, so a filter set in the repository's
+  own config is untested. Fix: add that case.
+
+### Author decisions needed (before a go)
+
+- Serving, roster and cap: a go needs a decision id, and either API option is above 8k calls.
+- The token cap for the `on` models. num_predict / max_tokens 8192 includes the hidden trace. qwq / deepseek-r1 traces past the cap
+  score TRUNCATED, which is invalid, and the 5% pilot bar may then refuse the models D-2026-10-29-3 (1) keeps. The cap is a protocol pin
+  and must be fixed before any output.
+- F5: whether an empty think block counts as thinking.
+
+### Commands (scripts in E:/TaxoArena_tmp/review_fmp4/, read-only on every input; sandboxes only)
+
+```
+LC_ALL=C grep -a "\[GIN\] 2026/10/3[0]\|\[GIN\] 2026/10/29" $LOCALAPPDATA/Ollama/server.log | awk '{print $NF}' | sort | uniq -c   # #1
+python -c "from load import load; m=load(); print(m.REGEX_SHA, m.protocol_digest(), m.lf_blob_bytes(m.THINKING_LIST.read_bytes()))"  # #2
+python -I adv4.py; python -I flip.py; python -I diff34.py 300000 11; python -I diff34.py 300000 12 nothink   # #5-#8, F4
+python e2_probe.py; python e2_last.py          # #9-#11, E2-R (fake server; e2_sb, e2l_sb)
+python -I gitlock_probe.py                     # #12, F2 (sandbox repo gitlock/repo)
+python -c "...ledger_writer_scripts / active_ledger_writers / _proc_list (read-only)"   # #12, F3
+fresh-math-pipeline.py --selftest (TMP/TEMP/TMPDIR/BZ_SANDBOX=st); --dry-run --out dry     # #3, #15
+python run_camp4.py <worktree>/examples/fresh-math-pipeline_mutants.json mut_builder 1; python run_camp4.py own_mutants4.json mut_own 1
+PYTHONPATH=src python -m pytest tests/test_fresh_math_pipeline.py -q -p no:cacheprovider   # 62 passed
+PYTHONPATH=src python -m pytest -q -p no:cacheprovider                                    # 1005 passed, 1 skipped, 10 deselected
+git -C Z:/FAC/TUBerlin/benchzoom merge-base --is-ancestor master fresh-math-pipeline-4; sha256sum -c SHA256SUMS   # 21/21
+```
