@@ -1,0 +1,196 @@
+{
+ "id": "BBH-HIER",
+ "title": "BBH-HIER: does any hierarchy recover BBH's known structure (family -> subtask -> 3/5/7 variant) at some depth? (text only; exploratory, WORK items; test 3 of D-2026-11-02-1)",
+ "question": "On BBH's 3,457 WORK items' text (qwen3, 512-d prefix), does any hierarchy (the record trees V0 / V0m, the anchor-free axis tree AF, bisecting k-means BKM, bisecting inside the families BKMA, average-link KAL and Ward KWD on 96 k-means centroids; flat k-means beside) recover the 20 families (G1), the 24 subtasks (G2) and the 3/5/7 variant inside the two merged families at some depth, and place the levels at the node level above matched-shape random trees?",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "none (exploratory, not registered); plan benchzoom docs/bbh-hier.md committed 2257e61 before any fit on BBH by this test and before any statistic of a partition against the gold (POSTRUN row 1)",
+  "program_lines": "outcome recorded in docs/judge_v2_program.md section \"## Registrar's record 2026-11-02 (insertion only; zero calls; nothing run) — NEST-METER (POSTRUN 2f84191d) and BBH-HIER (POSTRUN 19ab0e0a) recorded done ...\" L25864-L25871 (_as_of the commit that writes it, parent 2f84191d, re-grepped)",
+  "date": "2026-11-02"
+ },
+ "script": {
+  "path": "benchzoom examples/bbh-hier.py (with tests/test_bbh_hier.py)",
+  "sha16": "run of record runner blob:a7c41bb7 at a1786c0 (fit and analyze, dirty \"\"); tip c764409 runner AST-identical to it outside the module docstring: plan blob:550a0914 (sha256-lf16:b744ff6784d8ec10), runner blob:b6be8cfd (sha256-lf16:d0cf213e023cbfec), tests blob:09aaba83 (sha256-lf16:ecf675a4c6e3fc60) (git blobs, LF; 0 CR bytes, no CRLF rendering; POSTRUN header)",
+  "commit": "benchzoom branch bbh-hier fb39598..c764409 (local worktree Z:/FAC/TUBerlin/benchzoom_wt_bbh-hier; plan 2257e61, run a1786c0, tip c764409); MERGEABLE (fast-forward onto master fb39598; 3 new files, 0 under src/, so docs/execution_graph.md owes nothing); NOT merged at this record"
+ },
+ "ready": null,
+ "go": "D-2026-11-02-1 (9dff0985), the author verbatim \"Would also this logic have sense in a more general clusterring method, like show in the TaxoAdapt paper on the scientific litterature ? And you can start the tests 1 and 3\"; the main session's reading: tests 1 and 3 as exploratory WORK-row readouts, zero LLM calls, no reserved / vault side, CPU only (test 3)",
+ "run": {
+  "outcome_file": "E:/benchzoom_demo/followups/bbh-hier (SHA256SUMS 5/5: summary 143cdc68, readouts 6c04fd37, meta 1927179e, fits.pkl 2dce8e37, fits.txt); backup E:/TaxoArena_backup_2026-11-02_bbh-hier (8/8; SHA256SUMS.backup sha256 d82e5081) (POSTRUN header)",
+  "outcome_commit": "outputs not committed; run paragraph [P2] in benchzoom docs/bbh-hier.md at c764409",
+  "calls": 0,
+  "cce": 0,
+  "pool": "BBH WORK items' TEXT only (3,457; 900 in the two merged families), qwen3 512-d prefix; responses read 0; RESERVED rows read 0 by any new fit or statistic (Q4: the plan's pre-plan scenario counts read RESERVED items' text; real_source loads all 5,761 texts before restricting); V0 / V0m fitted by BBH-WORK on all 5,761 texts; 0 LLM calls (POSTRUN rows 2, 3, 15, 16)",
+  "date": "2026-11-02"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_BBH-HIER.md",
+  "commit": "19ab0e0a",
+  "verdict": "OUTCOME CONFIRMED (exploratory, BBH WORK items, text only, qwen3 512-d), with qualifiers Q1, Q2 (MEDIUM) and Q3-Q6, T-1 (LOW); MERGEABLE; no blocker"
+ },
+ "criteria": [],
+ "predictions": [
+  {
+   "id": "PH1",
+   "text": "BKM's G1 word is RECOVERS",
+   "result": "HELD",
+   "value": "RECOVERS, best-cut AMI 0.9605",
+   "denominator": "3,457 BBH WORK items' text (n_eff 783)"
+  },
+  {
+   "id": "PH2",
+   "text": "AF's G1 word is RECOVERS",
+   "result": "HELD",
+   "value": "RECOVERS, 0.9305",
+   "denominator": "3,457 BBH WORK items' text (n_eff 783)"
+  },
+  {
+   "id": "PH3",
+   "text": "KWD's G1 word is RECOVERS",
+   "result": "HELD",
+   "value": "RECOVERS, 0.9837",
+   "denominator": "3,457 BBH WORK items' text (n_eff 783)"
+  },
+  {
+   "id": "PH4",
+   "text": "KAL's G1 word is RECOVERS",
+   "result": "HELD",
+   "value": "RECOVERS, 1.0000",
+   "denominator": "3,457 BBH WORK items' text (n_eff 783)"
+  },
+  {
+   "id": "PH5",
+   "text": "V0m's 3/5/7 word is IN NEITHER",
+   "result": "HELD",
+   "value": "IN NEITHER (max cAMI 0.000)",
+   "denominator": "900 WORK items of the two merged families (450 each; n_eff 69)"
+  },
+  {
+   "id": "PH6",
+   "text": "AF's 3/5/7 word is IN NEITHER",
+   "result": "HELD",
+   "value": "IN NEITHER",
+   "denominator": "900 WORK items of the two merged families (450 each; n_eff 69)"
+  },
+  {
+   "id": "PH7",
+   "text": "BKMA's 3/5/7 word is IN BOTH",
+   "result": "FAILED",
+   "value": "IN ONE (tracking_shuffled_objects 0.5031 at depth 6, 26 cells; logical_deduction max 0.4936, 27-28 cells); Q1: both families' depth-6 cuts are pure in the variant (homogeneity 1.000); the family difference is the cell count (26 vs 27-28), not separation",
+   "denominator": "900 WORK items of the two merged families (450 each; n_eff 69)"
+  },
+  {
+   "id": "PH8",
+   "text": "BKM's 3/5/7 word is IN BOTH",
+   "result": "FAILED",
+   "value": "IN NEITHER (max 0.000)",
+   "denominator": "900 WORK items of the two merged families (450 each; n_eff 69)"
+  },
+  {
+   "id": "PH9",
+   "text": "BKMA: in both merged families the first depth with cAMI vs SCN >= 0.5 is shallower than the first variant-separating depth (or the variant never separates)",
+   "result": "HELD",
+   "value": "the scenario first; the variant beneath it",
+   "denominator": "900 WORK items of the two merged families (450 each; n_eff 69)"
+  },
+  {
+   "id": "PH10",
+   "text": "BKMA's within-family node-level HF against VAR is < 0.60 in both merged families",
+   "result": "HELD",
+   "value": "0.500 / 0.500 (the family node alone)",
+   "denominator": "900 WORK items of the two merged families (450 each; n_eff 69)"
+  },
+  {
+   "id": "PH11",
+   "text": "D4 (FLAT - BKM) at G2 is FLAT HIGHER",
+   "result": "HELD",
+   "value": "+0.0118 (0.0051) FLAT HIGHER; quoted only as 'FLAT's best single fit among 95 k beats BKM's best nested cut' (Q2)",
+   "denominator": "3,457 BBH WORK items' text (n_eff 783)"
+  },
+  {
+   "id": "PH12",
+   "text": "D2 (BKM - KWD) at G1 is NEITHER",
+   "result": "FAILED",
+   "value": "KWD HIGHER: -0.0231 (0.0049)",
+   "denominator": "3,457 BBH WORK items' text (n_eff 783)"
+  },
+  {
+   "id": "PH13",
+   "text": "DP at G1 is ABOVE-RANDOM for AF, BKM, KAL and KWD",
+   "result": "HELD",
+   "value": "ABOVE-RANDOM for all four (above the p97.5 of 200 matched-shape random trees; Q5)",
+   "denominator": "3,457 BBH WORK items' text (n_eff 783)"
+  },
+  {
+   "id": "PH14",
+   "text": "V0m's best-cut AMI against SCN (900 family items) >= 0.80",
+   "result": "HELD",
+   "value": "1.000",
+   "denominator": "900 WORK items of the two merged families (450 each; n_eff 69)"
+  }
+ ],
+ "falsifier": {
+  "text": "none (exploratory); each pre-specified rule (LEVEL, SEPARATION, NULL, CONTRAST) prints exactly one word (plan section 6)",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "best-cut AMI G1 / G2 (seed means; bootstrap SD)": "AF 0.9305 (0.0049) / 0.8855 (0.0089); BKM 0.9605 (0.0020) / 0.9147 (0.0064); KAL 1.0000 (0.0000) / 0.9517 (0.0045); KWD 0.9837 (0.0008) / 0.9363 (0.0046); V0m and BKMA BY CONSTRUCTION / 0.9517 (0.0045); V0 BY CONSTRUCTION at both; FLAT (best k, not nested) 0.9736 (0.0008) / 0.9265 (0.0041); the variant-blind ceiling AMI(G1, G2) 0.9517 (3,457 WORK items; 2,662 content clusters, Kish 4.416, n_eff 783)",
+  "level words": "G1 RECOVERS for every anchor-free hierarchy (AF, BKM, KAL, KWD); V0 / V0m / BKMA have it by construction (Q6); G2 RECOVERS (V0m, AF, BKM, BKMA, KAL, KWD) is reached by variant-blind partitions (V0m, BKMA, KAL exactly at 0.9517): never quoted as 'recovers the subtasks' (Q6)",
+  "node level": "DP and HF ABOVE-RANDOM at G1 and G2 for every non-anchored method: above the p97.5 of 200 matched-shape random trees (Q5) (POSTRUN row 6)",
+  "3/5/7": "no node of any hierarchy other than V0 is a variant: HF vs VAR 0.500 in both merged families (the family node alone) for V0m, AF, BKM, BKMA, KAL, KWD; 'ANY HIERARCHY SEPARATES 3/5/7 IN BOTH MERGED FAMILIES: NO'; IN NEITHER for V0m, AF, BKM, KAL, KWD (KAL and KWD max cAMI 0.2646 in logical_deduction, 0.2199 in tracking_shuffled_objects); BKMA IN ONE (tracking_shuffled_objects), quoted only with Q1: both families' depth-6 cuts are pure in the variant (homogeneity 1.000); the family difference is the cell count (26 vs 27-28), not separation; the robust finding: no node is a variant, plus BKMA G3 0.988 (scenario x variant beneath the scenario) (900 family items; 360 clusters, Kish 13.0, n_eff 69)",
+  "contrasts (D, SE = boot (+) MC)": "D1 BKM - AF G1 +0.0300 (0.0050), G2 +0.0292 (0.0049) BKM HIGHER; D2 BKM - KWD G1 -0.0231 (0.0049), G2 -0.0216 (0.0049) KWD HIGHER; D3 KWD - KAL G1 -0.0163 (0.0026), G2 -0.0154 (0.0025) KAL HIGHER; D4 FLAT - BKM G1 +0.0130 (0.0049), G2 +0.0118 (0.0051) FLAT HIGHER, quoted only as 'FLAT's best single fit among 95 k beats BKM's best nested cut' (Q2; at matched k 20 / 24 BKM is at or above FLAT); realised MDE80 0.007-0.014 at G1 / G2 (n_eff 783)",
+  "D5 / D6 (within families)": "BKMA - V0m and BKMA - BKM +0.4983 (0.0327) BKMA HIGHER; n 900, n_eff 69, MDE80 0.092; Q3: post hoc (c)'s mechanism is wrong (both sides biased up under the bootstrap, 0.0000 -> 0.1055 and 0.4983 -> 0.5318); the word stands (D / SE 15.2)",
+  "fits (WORK rows)": "AF 22 leaves; BKM 96; BKMA 82 = 18 + 2 x 32; KAL 96; KWD 96; V0 40 and V0m 41 leaves (record trees) (benchzoom [P2])",
+  "predictions": "11 of 14 HELD (PH7, PH8, PH12 FAILED); mean Brier 0.1189 (POSTRUN row 13)",
+  "tests": "tests/test_bbh_hier.py 4 passed (selftest included); full suite 1,022 passed, 1 skipped, 12 deselected, 0 failed; the builder's mutants 90/90 killed on the final pass r3 (not re-run by the reviewer); the reviewer's own R0-R8: R3, R5 SURVIVED (T-1) (POSTRUN row 17)"
+ },
+ "sentence_of_record": "On BBH's 3,457 WORK texts (qwen3, 512-d prefix), every anchor-free hierarchy tried recovers the 20 families at some cut (AMI 0.93-1.00) and places them above the p97.5 of 200 matched-shape random trees; no hierarchy other than the subtask-anchored V0 has a node that is a variant; the 3/5/7 variant is not recovered as the gold's second level and appears only as a refinement beneath the scenario (BKMA G3 0.988) [EXPLORATORY, text only, adjudicates nothing; POSTRUN 19ab0e0a: Q1 (MEDIUM) BKMA's IN ONE: both families' depth-6 cuts are pure in the variant (homogeneity 1.000); the family difference is the cell count (26 vs 27-28), not separation; Q2 (MEDIUM) D4 is 'FLAT's best single fit among 95 k beats BKM's best nested cut', never 'flat beats nested'; Q6 G2 RECOVERS is variant-blind, never 'recovers the subtasks'; V0 / V0m carry their all-5,761-texts fit]",
+ "chips": [],
+ "brackets": [
+  {
+   "date": "2026-11-02",
+   "by": "registrar",
+   "text": "Record created at done (exploratory; the run preceded the record). Q1 (MEDIUM; POSTRUN 19ab0e0a): BKMA's 'IN ONE' comes from the cell count, not from separation (a pure split scores below 0.5 once it has more than 27 equal cells); every quote of it carries 'both families' depth-6 cuts are pure in the variant (homogeneity 1.000); the family difference is the cell count (26 vs 27-28), not separation', and 'ANY HIERARCHY SEPARATES 3/5/7 IN BOTH: NO' is quoted with it"
+  },
+  {
+   "date": "2026-11-02",
+   "by": "registrar",
+   "text": "Q2 (MEDIUM): D4 FLAT HIGHER (and PH11 HELD) takes the best of 95 separate k-means fits (the best k beats the median of its neighbouring k by 0.02-0.06 per seed, more than D4); quoted only as 'FLAT's best single fit among 95 k beats BKM's best nested cut', never as 'flat partitions beat nested ones at matched granularity' nor as support for TREE-CUT-GRANULARITY's direction; at matched k 20 / 24 BKM is at or above FLAT"
+  },
+  {
+   "date": "2026-11-02",
+   "by": "registrar",
+   "text": "Q3-Q6, T-1 (LOW): post hoc (c)'s mechanism replaced (both sides biased up under the bootstrap); the plan's pre-plan scenario counts read RESERVED items' text (no response; no new fit or statistic touched a RESERVED row); 'above every random arrangement' reads 'above the p97.5 of 200 matched-shape random trees'; 'every hierarchy recovers the family level' reads 'every anchor-free hierarchy (AF, BKM, KAL, KWD); V0 / V0m / BKMA have it by construction'; the reviewer's mutants R3, R5 survive the selftest (fixes before the runner is reused). The benchzoom [P3] carrying them is owed (absent at c764409); branch MERGEABLE, not merged (the orchestrator's)"
+  }
+ ],
+ "does_not_show": [
+  "any statement about models or responses (text only; BBH-WORK's meter is the response-side evidence)",
+  "any family difference in 3/5/7 separation (Q1)",
+  "'flat beats nested' or support for TREE-CUT-GRANULARITY's direction (Q2)",
+  "'recovers the subtasks' (Q6)",
+  "any claim on RESERVED or fresh items, other embedders or other corpora; the TaxoAdapt generalisation is untested",
+  "anything that replaces V0; V0 / V0m numbers carry their all-5,761-texts fit"
+ ],
+ "ledger": null,
+ "depends_on": [
+  "BBH-WORK",
+  "GRANULARITY-GT",
+  "FLAT-COMPARE",
+  "STABILITY-VS-KMEANS",
+  "TREE-CUT-GRANULARITY"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "nothing"
+ },
+ "sources": [
+  "docs/reviews/POSTRUN_BBH-HIER.md (19ab0e0a)",
+  "benchzoom docs/bbh-hier.md at c764409 (plan 2257e61: sections 6, 7, 8; run paragraph [P2])",
+  "docs/agents/author_decisions/2026-11-02.md (9dff0985)",
+  "docs/judge_v2_program.md section \"## Registrar's record 2026-11-02 (insertion only; zero calls; nothing run) — NEST-METER (POSTRUN 2f84191d) and BBH-HIER (POSTRUN 19ab0e0a) recorded done ...\" L25864-L25871 (_as_of the commit that writes it, parent 2f84191d, re-grepped)"
+ ],
+ "last_update": "2026-11-02 (registrar: created at done (exploratory))"
+}

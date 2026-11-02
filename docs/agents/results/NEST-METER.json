@@ -1,0 +1,145 @@
+{
+ "id": "NEST-METER",
+ "title": "NEST-METER: the tree's cut against nested (bisecting) and flat k-means at matched granularity, on the meter, at every level (MATH, MMLU-Pro, BBH, MMLU; exploratory, WORK rows; test 1 of D-2026-11-02-1)",
+ "question": "At matched granularity (the tree's per-anchor cell counts at levels B, C and L), does a NESTED k-means hierarchy give the tree's zoom (a hierarchy whose cuts nest) with flat k-means' quality on the meter? Contrasts D_nest = C1(BKM-A) - C1(TREE), D_flat = C1(KF) - C1(TREE), D_cost = C1(KF) - C1(BKM-A), cont regime, words at 3 SE clustered by V0 leaf, on MATH, MMLU-Pro, BBH and MMLU WORK rows.",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "none (exploratory, not registered); plan benchzoom docs/nest-meter.md committed 27b14de before any code and any statistic (POSTRUN row 1)",
+  "program_lines": "outcome recorded in docs/judge_v2_program.md section \"## Registrar's record 2026-11-02 (insertion only; zero calls; nothing run) — NEST-METER (POSTRUN 2f84191d) and BBH-HIER (POSTRUN 19ab0e0a) recorded done ...\" L25864-L25871 (_as_of the commit that writes it, parent 2f84191d, re-grepped)",
+  "date": "2026-11-02"
+ },
+ "script": {
+  "path": "benchzoom examples/nest-meter.py (with examples/nest-meter_mutants.json, tests/test_nest_meter.py)",
+  "sha16": "run of record runner blob:1b14f621 at 64f9b8f (dirty \"\" in all four parts and analyze_code); tip 0581fb3 runner AST-identical to it outside the module docstring: plan blob:e62f2db6 (sha256-lf16:33fcce36a2764041), runner blob:e2d58f2a (sha256-lf16:23ba288e0cb48521), mutant spec blob:51b06f98 (sha256-lf16:24f6ae79fd8cc9b8), tests blob:b243e33f (sha256-lf16:146c58093dee6204) (git blobs, LF; 0 CR bytes, no CRLF rendering; POSTRUN header)",
+  "commit": "benchzoom branch nest-meter fb39598..0581fb3 (local worktree Z:/FAC/TUBerlin/benchzoom_wt_nest-meter; plan 27b14de, code e4c6768, hardened selftest and mutants 64f9b8f, record 0581fb3); MERGEABLE (fast-forward onto master fb39598; 4 new files, 0 under src/, so docs/execution_graph.md owes nothing); NOT merged at this record"
+ },
+ "ready": null,
+ "go": "D-2026-11-02-1 (9dff0985), the author verbatim \"Would also this logic have sense in a more general clusterring method, like show in the TaxoAdapt paper on the scientific litterature ? And you can start the tests 1 and 3\"; the main session's reading: tests 1 and 3 as exploratory WORK-row readouts, zero LLM calls, no reserved / vault side, CPU only (test 1)",
+ "run": {
+  "outcome_file": "E:/benchzoom_demo/followups/nest-meter (SHA256SUMS 11/11; summary.txt sha256 8833f577, SHA256SUMS sha256 79b50290; one partial readout summary_partial_20261102T151839Z.txt, disclosed); backup E:/TaxoArena_backup_2026-11-02_nest-meter (18/18 in the backup and against the source; SHA256SUMS_backup sha256 ae0e9843) (POSTRUN header)",
+  "outcome_commit": "outputs not committed; run paragraph [P1] in benchzoom docs/nest-meter.md at 0581fb3",
+  "calls": 0,
+  "cce": 0,
+  "pool": "WORK rows only: MATH 2,949 x 69, MMLU-Pro 7,197 x 23, BBH 3,457 x 128, MMLU 8,425 x 79 (items x models); RESERVED / vault responses read 0 (guard reads 0 at load and end of every part); partitions read all items' TEXT, as V0 / FLAT-COMPARE (plan section 2); 0 LLM calls, 0 Ollama requests on 2026-11-02 (POSTRUN rows 9, 10)",
+  "date": "2026-11-02"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_NEST-METER.md",
+  "commit": "2f84191d",
+  "verdict": "OUTCOME CONFIRMED (exploratory, WORK rows, cont regime, SE clustered by V0 leaf), with qualifiers Q1, Q2 (MEDIUM) and Q3-Q6 (LOW); MERGEABLE; no blocker"
+ },
+ "criteria": [],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "(nesting costs nothing detectable) D_cost is NEITHER (or IDENTICAL) in every cell where some anchor has k_a >= 3 (MATH C, L; MMLU-Pro C, L; MMLU C, L)",
+   "result": "HELD",
+   "value": "D_cost NEITHER in all 6 cells; a low-power NEITHER prediction: weak evidence (plan section 10)",
+   "denominator": "6 dataset x level cells; WORK rows"
+  },
+  {
+   "id": "P2",
+   "text": "(nested k-means never loses to the tree) D_nest is not WORSE in any cell below A (MATH B, C, L; MMLU-Pro B, C, L; MMLU B, C, L; BBH L)",
+   "result": "HELD",
+   "value": "no WORSE in 10 cells; a low-power prediction: weak evidence",
+   "denominator": "10 dataset x level cells; WORK rows"
+  },
+  {
+   "id": "P3",
+   "text": "(nested k-means keeps most of flat k-means' MATH lead) at MATH L, D_nest > 0 and D_nest >= 0.5 x D_flat (point estimates; FAILED if D_flat <= 0)",
+   "result": "HELD",
+   "value": "D_nest +0.0813 >= 0.5 x D_flat +0.0770; margin 0.0042 (0.004248), SE_leaf 0.0295, z 0.14 (never quoted without z 0.14; Q1, Q4)",
+   "denominator": "MATH WORK 2,949 items x 69 models, level L (36 cells)"
+  },
+  {
+   "id": "P4",
+   "text": "(finer nested cells carry more on MATH) C1(BKM-A) on MATH strictly increases B -> C -> L (point estimates)",
+   "result": "HELD",
+   "value": "+0.0720 < +0.1800 < +0.1974; L - C step +0.0174 (SE 0.0260, z 0.67), C - B +0.1080 (0.0431, z 2.50) (Q1)",
+   "denominator": "MATH WORK 2,949 items x 69 models, levels B / C / L (14 / 25 / 36 cells)"
+  },
+  {
+   "id": "P5",
+   "text": "(the anchors help nested k-means on MATH) C1(BKM-A) > C1(BKM) at MATH L (point estimate)",
+   "result": "FAILED",
+   "value": "C1(BKM-A) +0.1974 < C1(BKM) +0.2340; D -0.0366 (SE 0.0642, z -0.57) (Q1)",
+   "denominator": "MATH WORK 2,949 items x 69 models, level L"
+  },
+  {
+   "id": "P6",
+   "text": "(MMLU: no k-means arm separates from the tree) D_nest and D_flat are NEITHER (or IDENTICAL) at MMLU B, C and L",
+   "result": "HELD",
+   "value": "NEITHER at B, C, L for both; a low-power prediction: weak evidence",
+   "denominator": "MMLU WORK 8,425 items x 79 models, levels B / C / L (33 / 58 / 100 cells)"
+  }
+ ],
+ "falsifier": {
+  "text": "none (exploratory); each pre-specified contrast prints exactly one word (BETTER / WORSE iff |D| >= 3 SE_leaf, else NEITHER; IDENTICAL where the arms are the same partition); a BETTER or WORSE word anywhere was the informative outcome (plan sections 8, 10); none occurred",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "words": "all 30 cells below the anchors NEITHER at 3 SE_leaf (cont), 15 of them (UNDERPOWERED) (MMLU-Pro C, L; BBH L; MMLU C, L); 12 at the anchors IDENTICAL by construction; 42 words, 0 mismatches against the plan's rule (POSTRUN row 5)",
+  "largest z": "MATH L D_flat +0.1540 (SE_leaf 0.0518), z 2.98: quoted 'NEITHER at z 2.98 (reproduced)'; a reproduction of TAU-CONT-ALL known before the plan, not new evidence (Q3)",
+  "MATH (B 14 / C 25 / L 36 cells; D (SE_leaf; z))": "D_nest +0.0047 (0.0107; +0.44) / +0.0531 (0.0332; +1.60) / +0.0813 (0.0409; +1.98); D_flat +0.0016 (0.0099; +0.16) / +0.1037 (0.0426; +2.43) / +0.1540 (0.0518; +2.98); D_cost -0.0031 (0.0030; -1.02) / +0.0506 (0.0292; +1.74) / +0.0728 (0.0374; +1.94); all NEITHER (2,949 items x 69 models)",
+  "MMLU-Pro (B 28 / C 51 / L 80 cells)": "D_nest +0.0022 (0.0019) / +0.0194 (0.0135) / +0.0238 (0.0166); D_flat +0.0012 (0.0018) / +0.0114 (0.0110) / +0.0082 (0.0128); D_cost -0.0010 (0.0007) / -0.0080 (0.0141) / -0.0157 (0.0192); all NEITHER, C and L (UNDERPOWERED) (7,197 items x 23 models)",
+  "BBH (L 40 cells)": "D_nest -0.0058 (0.0602); D_flat -0.0037 (0.0642); D_cost +0.0021 (0.0362); NEITHER (UNDERPOWERED) x 3 (3,457 items x 128 models)",
+  "MMLU (B 33 / C 58 / L 100 cells)": "D_nest +0.0033 (0.0054) / -0.0138 (0.0179) / +0.0055 (0.0126); D_flat +0.0019 (0.0056) / -0.0237 (0.0190) / +0.0057 (0.0132); D_cost -0.0015 (0.0022) / -0.0099 (0.0144) / +0.0002 (0.0145); all NEITHER, C and L (UNDERPOWERED) (8,425 items x 79 models)",
+  "support": "DEFF_leaf 0.49 (MATH B D_cost) - 2.66 (MATH L D_nest), n_eff 1,107-12,459, SE_leaf / SE_content 0.75-1.60; leaf clusters 36 / 80 / 40 / 100; MDE80 MATH 0.012-0.199, MMLU 0.008-0.073, MMLU-Pro 0.003-0.074, BBH 0.139-0.247; the D_cost MDE80s are lower bounds (Q5) (POSTRUN row 6)",
+  "beside, never the word": "under the meter (content-cluster) SE MATH C D_flat z 3.07, L D_nest z 3.18, L D_flat z 4.07 would read BETTER; under f2 at SE_leaf MATH L D_flat +0.1652, z 3.41 BETTER; every other cell NEITHER under both (POSTRUN row 7; Q4: not 3.19 / 4.06)",
+  "C1 by level, MATH (cont; B / C / L; SE_leaf)": "TREE +0.0673 (0.0411) / +0.1269 (0.0632) / +0.1161 (0.0594); BKM-A +0.0720 (0.0429) / +0.1800 (0.0720) / +0.1974 (0.0705); BKM +0.2319 (0.0593) / +0.2572 (0.0654) / +0.2340 (0.0621), at A +0.2702 (0.0795); KF +0.0689 (0.0428) / +0.2306 (0.0783) / +0.2701 (0.0773); RND -0.0033 / -0.0040 / -0.0052 (benchzoom [P1] table, reproduced by the POSTRUN)",
+  "reproduction": "REPRODUCED (bit-equal) on all four datasets: TREE, KF_0-4, RND_0-4 at L equal to FLAT-COMPARE f2 and TAU-CONT-ALL cont on MATH, MMLU-Pro and MMLU (V0 leaves equal), and to BBH-WORK f2 on BBH; the two negative controls differ (POSTRUN row 4)",
+  "levels": "MATH 7/14/25/36, MMLU-Pro 14/28/51/80, MMLU 17/33/58/100, BBH 24/40 cells (A/B/C/L); depth 5 dropped by the plan's 'at most 4 levels' rule (POSTRUN row 2)",
+  "tests": "selftest via tests/test_nest_meter.py 6 passed; full suite 1,023 passed, 1 skipped, 13 deselected, 0 failed; '73/73 killed' joins r1 (72 killed, blob 8d3b64d4) and r2 (X71, blob 00ec8f91) (Q6); the reviewer's own N0-N6: N2 SURVIVED (Q2) (POSTRUN rows 11, 12)",
+  "runtime": "harness MATH 671 s, MMLU-Pro 276 s, BBH 1,663 s, MMLU 2,508 s; about 1 h 30 min of parts (3 workers, BLAS 1) (benchzoom [P1])"
+ },
+ "sentence_of_record": "On WORK rows of MATH, MMLU-Pro, MMLU and BBH (cont regime, SE clustered by V0 leaf), at the tree's own per-anchor cell counts, no contrast among the tree cut, nested within-anchor bisecting k-means and flat within-anchor k-means separates at 3 SE at any level: a nested k-means hierarchy is not detectably worse than the tree at any level, and the price of nesting relative to flat k-means is not detected [EXPLORATORY, adjudicates nothing; POSTRUN 2f84191d: never 'equal', 'equivalent' or 'nesting is free'; no ordering of BKM-A, TREE and KF at any level; MATH L D_flat NEITHER at z 2.98 (reproduced) (Q3); Q1 (MEDIUM) P3-P5 margins at noise level (z 0.14 / 0.67 / -0.57): the share of the MATH lead that survives nesting is 0.53 with an SE of about 0.19; Q2 (MEDIUM) mutant N2 survives the selftest, the run unaffected; MDE80 up to 0.199 / 0.074 / 0.073 / 0.247; 15 of 30 cells UNDERPOWERED]",
+ "chips": [],
+ "brackets": [
+  {
+   "date": "2026-11-02",
+   "by": "registrar",
+   "text": "Record created at done (exploratory; the run preceded the record). Q1 (MEDIUM; POSTRUN 2f84191d): P3-P5 and readings 2-4 rest on margins at noise level (P3 z 0.14, P4 z 0.67, P5 z -0.57); reading (2) 'about half of flat k-means' lead survives nesting' reads 'the share of the MATH lead that survives nesting is 0.53 with an SE of about 0.19 even holding D_flat fixed (0.0295 / 0.1540), and D_flat itself is z 2.98'; 'P3 HELD by 0.0043' is never quoted (Q4: 0.0042, and never without z 0.14)"
+  },
+  {
+   "date": "2026-11-02",
+   "by": "registrar",
+   "text": "Q2 (MEDIUM): the reviewer's mutant N2 (part_stats 'leaf' grouping = content clusters) survives the selftest and would flip MATH C D_flat, L D_nest, L D_flat to BETTER; the run is unaffected (TREE@L equals the saved leaf array; SE_leaf reproduced to 2.2e-16); fix owed in a new benchzoom commit (S5 assertion that the words' clusters equal n_leaf on a fixture where n_leaf != n_clusters; N2 added to nest-meter_mutants.json); no rerun"
+  },
+  {
+   "date": "2026-11-02",
+   "by": "registrar",
+   "text": "Q3-Q6 (LOW): MATH L D_flat 'NEITHER at z 2.98 (reproduced)', 0.02 SE under the bar, BETTER under the meter SE (4.07), f2 (3.41) or without the MC term (3.04): a reproduction of TAU-CONT-ALL, not new evidence; meter z 3.18 / 4.07, not 3.19 / 4.06; the D_cost MDE80s are lower bounds (SE_leaf clusters on the tree's leaves; DEFF_leaf 0.49 on MATH B D_cost); '73/73' joins two blobs (8d3b64d4, 00ec8f91). The benchzoom [P2] carrying Q1 and Q3-Q6 is owed (absent at 0581fb3); branch MERGEABLE, not merged (the orchestrator's)"
+  }
+ ],
+ "does_not_show": [
+  "'equal', 'equivalent' or 'nesting is free' (P1, P2, P6 were low-power NEITHER predictions)",
+  "any ordering of BKM-A, TREE and KF at any level (every point estimate under 2.5 SE_leaf; MATH L D_flat a reproduction)",
+  "the 'about half' decomposition of flat k-means' MATH lead (Q1: share 0.53, SE about 0.19)",
+  "a BETTER word from the meter SE or the f2 regime (beside, never the word)",
+  "any vault / RESERVED / fresh-item claim, any other embedder or corpus, or a TaxoAdapt-style generalisation",
+  "anything that replaces V0 for BZ-AXIS-CONFIRM-FRESH or switches a deciding estimator"
+ ],
+ "ledger": null,
+ "depends_on": [
+  "FLAT-COMPARE",
+  "TAU-CONT-ALL",
+  "BBH-WORK",
+  "NESTING",
+  "STABILITY-VS-KMEANS",
+  "TREE-CUT-GRANULARITY"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "nothing"
+ },
+ "sources": [
+  "docs/reviews/POSTRUN_NEST-METER.md (2f84191d)",
+  "benchzoom docs/nest-meter.md at 0581fb3 (plan 27b14de: sections 1, 8, 9, 10; run paragraph [P1])",
+  "docs/agents/author_decisions/2026-11-02.md (9dff0985)",
+  "docs/judge_v2_program.md section \"## Registrar's record 2026-11-02 (insertion only; zero calls; nothing run) — NEST-METER (POSTRUN 2f84191d) and BBH-HIER (POSTRUN 19ab0e0a) recorded done ...\" L25864-L25871 (_as_of the commit that writes it, parent 2f84191d, re-grepped)"
+ ],
+ "last_update": "2026-11-02 (registrar: created at done (exploratory))"
+}
