@@ -3,8 +3,8 @@
     "title": "TaxoArena queue of record",
     "owner": "experiment-manager",
     "created": "2026-09-19T14:34+02:00",
-    "last_update": "2026-11-02 (registrar: NEST-METER and BBH-HIER created at done (exploratory), D-2026-11-02-1; BZ-AXIS-CONFIRM-FRESH drafted -> paused per D-2026-11-01-1; FRESH-MATH-PIPELINE, FRESH-CONT-SELECT, FRESH-RULE-A notes (merged at benchzoom master fb39598, paused with the parent); ledger v430)",
-    "head_at_update": "2f84191d",
+    "last_update": "2026-11-03 (registrar: SKILL-BACKOFF created at done (exploratory), D-2026-11-03-1, POSTRUN 59520e3f; ledger v430)",
+    "head_at_update": "59520e3f",
     "ledger_version": "v430",
     "mode_of_last_call": "both (night of 2026-09-23, phased A/B/C under plan Amendment 9)",
     "ranking_sources": [
@@ -9504,6 +9504,40 @@
       "blocker": "none",
       "lane": "cpu",
       "notes": "[2026-11-02 registrar] queue item created at done (absent before; the run preceded the item). done (exploratory; zero LLM calls; BBH WORK items' text only; responses read 0): POSTRUN_BBH-HIER 19ab0e0a OUTCOME CONFIRMED (exploratory, BBH WORK items, text only, qwen3 512-d), with qualifiers Q1, Q2 (MEDIUM) and Q3-Q6, T-1 (LOW); MERGEABLE. G1 RECOVERS for every anchor-free hierarchy (AF, BKM, KAL, KWD; V0 / V0m / BKMA by construction); G2 RECOVERS is variant-blind (never 'recovers the subtasks'); no node is a variant; 3/5/7 IN BOTH: NO; BKMA IN ONE quoted only with Q1 (pure depth-6 cuts in both families; cell count 26 vs 27-28, not separation); D4 quoted only as 'FLAT's best single fit among 95 k beats BKM's best nested cut' (Q2). 11 of 14 predictions HELD (PH7, PH8, PH12 FAILED). Owed in benchzoom: [P3] (Q1-Q6) and T-1 fixes before reuse. Record docs/agents/results/BBH-HIER.json; no ledger row. docs/judge_v2_program.md section \"## Registrar's record 2026-11-02 (insertion only; zero calls; nothing run) — NEST-METER (POSTRUN 2f84191d) and BBH-HIER (POSTRUN 19ab0e0a) recorded done ...\" L25864-L25871 (_as_of the commit that writes it, parent 2f84191d, re-grepped)"
+    },
+    {
+      "id": "SKILL-BACKOFF",
+      "kind": "zero-call",
+      "registration": "not registered (exploratory, WORK only); outcome recorded (done (exploratory), not registered): docs/judge_v2_program.md section \"## Registrar's record 2026-11-03 (insertion only; zero calls; nothing run) — SKILL-BACKOFF (POSTRUN 59520e3f) recorded done ...\" L25873-L25883 (_as_of the commit that writes it, parent 59520e3f, re-grepped)",
+      "depends_on": [
+        "NEST-METER",
+        "FLAT-COMPARE",
+        "TREE-BACKOFF",
+        "BBH-WORK"
+      ],
+      "blocks": [],
+      "ready_file": "n/a (exploratory; plan a629375 before any statistic on responses; post-run review docs/reviews/POSTRUN_SKILL-BACKOFF.md 59520e3f, MERGEABLE, not merged)",
+      "last_update": "2026-11-03",
+      "value": {
+        "rank": "UNRANKED (the experiment-manager's)"
+      },
+      "title": "SKILL-BACKOFF: per-cell skill estimates with and without back-off; which hierarchy makes them best (MATH, MMLU-Pro, BBH, MMLU; exploratory, WORK rows; test 2 of D-2026-11-02-1, run under D-2026-11-03-1)",
+      "state": "done (exploratory)",
+      "script": "benchzoom branch skill-backoff f9a8985..73fde4e (local; run of record bbda88e, examples/skill-backoff.py blob:729a93b5, git blob LF; tip runner blob:a09bebfa, docstring only); not merged",
+      "go": "D-2026-11-03-1 (Test 2: \"Yes, run it (Recommended)\"; cf643c14), test 2 of D-2026-11-02-1",
+      "author_decision": "D-2026-11-03-1",
+      "cost": {
+        "cce_max": 0,
+        "cce_expected": 0,
+        "calls_max": 0,
+        "calls_expected": 0,
+        "reads_pool": false,
+        "posts_llm": false,
+        "priced": "NOT PRICED; the experiment-manager's"
+      },
+      "blocker": "none",
+      "lane": "cpu",
+      "notes": "[2026-11-03 registrar] queue item created at done (absent before; the run preceded the item). done (exploratory; zero LLM calls; WORK rows only; RESERVED / vault responses read 0): POSTRUN_SKILL-BACKOFF 59520e3f \"SKILL-BACKOFF: OUTCOME CONFIRMED (exploratory, WORK rows, the four rosters, V0's leaf granularity), with qualifiers Q1-Q3 (MEDIUM) and Q4-Q7 (LOW)\"; MERGEABLE. RP REPRODUCED (bit-equal, 18 / 18) on all four. Z_hier NEITHER and Z_nest NEITHER on all four (not detected under one common tau, Q2); Z_bo BETTER on MATH +10.28, BBH +2.57, MMLU +2.55 (MMLU-Pro +1.17, z 2.47 NEITHER); V_rnd NEITHER; B_lab BETTER on all four (+47 to +207). P2-P9 HELD, P1 FAILED (MATH V_tree NEITHER), P10 FAILED (MATH median tau*(TREE-BO) 1000). Q1 'raw leaf rates unusable' on MATH only; Q2 the gain is shrinkage toward the label, internal levels not shown to help; Q3 V_kf BETTER on MATH / MMLU-Pro thin (z 3.11 / 3.03 at KF-cell SE, label SE NEITHER). Build interrupted by a usage limit after plan a629375 and resumed before 8e7e925 (POSTRUN row 1 CONFIRMS no statistic before the plan, one code state). Owed in benchzoom: [P3] (Q1-Q4, Q6) and the Q5 selftest commit. Record docs/agents/results/SKILL-BACKOFF.json; no ledger row. docs/judge_v2_program.md section \"## Registrar's record 2026-11-03 (insertion only; zero calls; nothing run) — SKILL-BACKOFF (POSTRUN 59520e3f) recorded done ...\" L25873-L25883 (_as_of the commit that writes it, parent 59520e3f, re-grepped)"
     }
   ],
   "last_update": "2026-10-28"

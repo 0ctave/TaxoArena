@@ -248,6 +248,7 @@ One record per experiment; the record is the machine-readable face of the progra
 | SCHEDULING | done | zero-call | SCHEDULING (2026-09-13, zero calls): the match scheduler IS the problem, and the fix needs no answer key: answers disagree on 16.9% of top-4 question-pairs; ... | SCHEDULING | 2026-09-22 |
 | SELECTIVE-ORDER | done | zero-call | SELECTIVE-ORDER (2026-09-14, zero calls): REGISTERED FAIL: selective spends 58% more calls than always-single and buys exactly the same board (rho 0.9580, 3 ... | SELECTIVE-ORDER | 2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307) |
 | SITE-SUPPORT | done | zero-call | SITE-SUPPORT (2026-10-04, 0 calls) — VALID; SB1 NOT-SHOWN, F-SS FIRED. On the four anchor-free MMLU-Pro re-draw trees [LF] (264 sites on 2,772 common items; ... | SITE-SUPPORT | 2026-10-05 |
+| SKILL-BACKOFF | done | zero-call | On WORK rows of MATH, MMLU-Pro, BBH and MMLU (per-cell skill estimates at V0's leaf granularity, held-out log-loss, words at 3 SE_word = max(SE_content, SE_l... |  | 2026-11-03 (registrar: created at done (exploratory)) |
 | SPLIT-EXPOSURE-SENSITIVITY | done | zero-call | SPLIT-EXPOSURE-SENSITIVITY (zero calls): on 12 of 13 cells (the rubric family RUBRIC-512 / -SS / -R, LEAF-POWERED, LADDER, STACK, STACK-v2, J6), removing the... | SPLIT-EXPOSURE-SENSITIVITY | 2026-09-27 (registrar: [P-FAM] class bracket, ruling 5effe96; ledger v307) |
 | SPLIT-FUNCTION-IMPL | done | engineering | SPLIT-FUNCTION-IMPL + TRAIN-ONLY-TREE (item 18, 2026-09-16, zero calls): side = f(item) with a per-row assertion in Kotlin and Python; GATE = hash in [300, 4... | SPLIT-FUNCTION-IMPL | 2026-09-23 (registrar: CK-CLOSE-v1 adopted by the author; docs/judge_v2_program.md L15013-L15025) |
 | SPLIT-RATIO | done | build | SPLIT-RATIO (2026-09-10, zero calls): registered readout 0.20; prediction ('0.30 is the knee') NOT supported: leaves 100 / 85 / 76 and certified 12/84 / 8/68... | SPLIT-RATIO | 2026-09-22 |
@@ -297,4 +298,4 @@ One record per experiment; the record is the machine-readable face of the progra
 | E1-REPLICATES | withdrawn | zero-call | E1-REPLICATES WITHDRAWN pre-data (2026-10-03; no build ran): at a fixed split construction is effectively deterministic (H9-REM order SD 0.00104; R4 af_s42_o... | E1-REPLICATES | 2026-10-04 |
 | STAGE3-MATH | withdrawn | judged | STAGE3-MATH HELD (2026-09-16, before any call): the plan made STAGE3-MATH conditional on item 7 landing and its dry-run passing on the real checker table; th... | STAGE3-MATH | 2026-09-23 |
 
-291 records.
+292 records.

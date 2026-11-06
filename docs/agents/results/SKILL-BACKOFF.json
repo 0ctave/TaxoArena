@@ -1,0 +1,181 @@
+{
+ "id": "SKILL-BACKOFF",
+ "title": "SKILL-BACKOFF: per-cell skill estimates with and without back-off; which hierarchy makes them best (MATH, MMLU-Pro, BBH, MMLU; exploratory, WORK rows; test 2 of D-2026-11-02-1, run under D-2026-11-03-1)",
+ "question": "Can a model's skill be read reliably at fine granularity, and which hierarchy makes those per-cell estimates best? Per-model per-cell skill estimates p[c, m] at V0's leaf granularity (NEST-METER's level L, matched cell counts), scored by held-out log-loss on WORK rows; arms LABELS, TREE-RAW, TREE-BO, BKMA-BO, KF-BO, RND-BO (TREE-BL, BKMA-BL, BKMA-SM descriptive); contrasts Z_hier = BKMA-BO - TREE-BO, Z_bo = TREE-BO - TREE-RAW, Z_nest = KF-BO - BKMA-BO, V_* = arm - LABELS, B_lab = LABELS-b - LABELS; words at 3 SE_word = max(SE_content, SE_leaf), SE_label beside (plan sections 1, 3, 5, 7).",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "none (exploratory, not registered); plan benchzoom docs/skill-backoff.md committed a629375 (2026-11-03 01:25:46 +0100) before any statistic on responses (POSTRUN row 1)",
+  "program_lines": "outcome recorded in docs/judge_v2_program.md section \"## Registrar's record 2026-11-03 (insertion only; zero calls; nothing run) — SKILL-BACKOFF (POSTRUN 59520e3f) recorded done ...\" L25873-L25883 (_as_of the commit that writes it, parent 59520e3f, re-grepped)",
+  "date": "2026-11-03"
+ },
+ "script": {
+  "path": "benchzoom examples/skill-backoff.py (with examples/skill-backoff_mutants.json, tests/test_skill_backoff.py; plan docs/skill-backoff.md)",
+  "sha16": "run of record runner blob:729a93b5 at HEAD bbda88e (dirty \"\" in all four parts and analyze_code); tip 73fde4e runner AST-identical to it outside the module docstring: plan blob:a682dfab (sha256-lf16:8b03e095b8906e44), runner blob:a09bebfa (sha256-lf16:c6df5560c8c10476), mutant spec blob:bd063ea3 (sha256-lf16:6e9802ebaf309436), tests blob:e18d3222 (sha256-lf16:5ce3e48f5720b6bf) (git blobs, LF; 0 CR bytes, no CRLF rendering; POSTRUN header)",
+  "commit": "benchzoom branch skill-backoff f9a8985..73fde4e (local worktree Z:/FAC/TUBerlin/benchzoom_wt_skill-backoff; plan a629375, build 8e7e925 with [P1] before the run, selftest hardened bbda88e, run paragraph [P2] 73fde4e); MERGEABLE (fast-forward onto master f9a8985; 4 new files, 0 under src/, so docs/execution_graph.md owes nothing); NOT merged at this record"
+ },
+ "ready": null,
+ "go": "D-2026-11-03-1 (cf643c14), the author's selection verbatim Test 2: \"Yes, run it (Recommended)\", meaning as worded: run test 2 as an exploratory WORK-row readout: zero model calls, CPU only, plan before any statistic, independent review, registrar records; test 2 of D-2026-11-02-1 (9dff0985)",
+ "run": {
+  "outcome_file": "E:/benchzoom_demo/followups/skill-backoff (SHA256SUMS 11/11 OK; summary.txt sha256 4a4c64c2); backup E:/TaxoArena_backup_2026-11-03_skill-backoff (24 files = 23 listed + SHA256SUMS, 23/23 OK, parts' hashes equal to the output dir's) (POSTRUN header)",
+  "outcome_commit": "outputs not committed; run paragraph [P2] in benchzoom docs/skill-backoff.md at 73fde4e",
+  "calls": 0,
+  "cce": 0,
+  "pool": "WORK rows only: MATH 2,949 x 69, MMLU-Pro 7,197 x 23, BBH 3,457 x 128, MMLU 8,425 x 79 (items x models); RESERVED / vault responses read 0 (guard 0 at every check; MMLU [0, 0]); partitions = NEST-METER's (TEXT of all items, as V0); 0 LLM calls (POSTRUN rows 5, 10)",
+  "date": "2026-11-03"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_SKILL-BACKOFF.md",
+  "commit": "59520e3f",
+  "verdict": "SKILL-BACKOFF: OUTCOME CONFIRMED (exploratory, WORK rows, the four rosters, V0's leaf granularity), with qualifiers Q1-Q3 (MEDIUM) and Q4-Q7 (LOW); merge_ok: YES (MERGEABLE); no BLOCKER"
+ },
+ "criteria": [],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "V_tree BETTER on MATH",
+   "result": "FAILED",
+   "value": "MATH V_tree +0.25 x 1e-3 nats, SE_word 0.21, z 1.2: NEITHER",
+   "denominator": "MATH WORK 2,949 items x 69 models"
+  },
+  {
+   "id": "P2",
+   "text": "V_tree's point estimate > 0 on every dataset",
+   "result": "HELD",
+   "value": "V_tree +0.25 / +10.67 / +0.55 / +15.14 (MATH / MMLU-Pro / BBH / MMLU)",
+   "denominator": "WORK rows MATH 2,949 x 69, MMLU-Pro 7,197 x 23, BBH 3,457 x 128, MMLU 8,425 x 79 (items x models); 5 folds x 5 fold seeds"
+  },
+  {
+   "id": "P3",
+   "text": "Z_bo not WORSE and D >= 0 on every dataset",
+   "result": "HELD",
+   "value": "Z_bo +10.28 BETTER / +1.17 NEITHER (z 2.47) / +2.57 BETTER / +2.55 BETTER (MATH / MMLU-Pro / BBH / MMLU); Q2: the gain is shrinkage toward the label",
+   "denominator": "WORK rows MATH 2,949 x 69, MMLU-Pro 7,197 x 23, BBH 3,457 x 128, MMLU 8,425 x 79 (items x models); 5 folds x 5 fold seeds"
+  },
+  {
+   "id": "P4",
+   "text": "Z_hier NEITHER (or IDENTICAL) on every dataset",
+   "result": "HELD",
+   "value": "Z_hier NEITHER +0.26 / +0.83 / +0.17 / +0.70 (MATH / MMLU-Pro / BBH / MMLU); MDE80 0.75 / 2.13 / 0.78 / 4.54; a NEITHER prediction (Q2: not detected under one common tau)",
+   "denominator": "WORK rows MATH 2,949 x 69, MMLU-Pro 7,197 x 23, BBH 3,457 x 128, MMLU 8,425 x 79 (items x models); 5 folds x 5 fold seeds"
+  },
+  {
+   "id": "P5",
+   "text": "Z_nest NEITHER (or IDENTICAL) on every dataset",
+   "result": "HELD",
+   "value": "Z_nest NEITHER +0.67 / +0.48 / -0.08 / +2.93 (MATH / MMLU-Pro / BBH / MMLU); a NEITHER prediction (Q2: not detected under one common tau)",
+   "denominator": "WORK rows MATH 2,949 x 69, MMLU-Pro 7,197 x 23, BBH 3,457 x 128, MMLU 8,425 x 79 (items x models); 5 folds x 5 fold seeds"
+  },
+  {
+   "id": "P6",
+   "text": "V_rnd not BETTER and the median tau*(RND-BO) over tasks x seeds >= 200 (inf counts) on every dataset",
+   "result": "HELD",
+   "value": "V_rnd NEITHER -0.02 / -0.02 / -0.04 / -0.02; median tau*(RND-BO) inf / inf / 1000 / 1000 (MATH / MMLU-Pro / BBH / MMLU)",
+   "denominator": "WORK rows MATH 2,949 x 69, MMLU-Pro 7,197 x 23, BBH 3,457 x 128, MMLU 8,425 x 79 (items x models); 5 folds x 5 fold seeds"
+  },
+  {
+   "id": "P7",
+   "text": "Z_bo in bin S > Z_bo in bin L (points) on at least 3 of the datasets where both bins hold items",
+   "result": "HELD",
+   "value": "S > L on 4 of 4: +18.28 vs +5.91, +1.74 vs +0.90, +8.08 vs 0, +6.93 vs +0.74 (MATH / MMLU-Pro / BBH / MMLU); Q6 (LOW): BBH's L bin is zero by construction (862 items / 6 single-leaf labels, every arm LABELS); P7 holds 3/3 without BBH",
+   "denominator": "V0-leaf WORK-size bins S (< 64 items), L (>= 112 items); items / leaves per bin in [P2]"
+  },
+  {
+   "id": "P8",
+   "text": "(secondary) V_tree-b < V_tree (points) on every dataset",
+   "result": "HELD",
+   "value": "V_tree-b / V_tree 0.69 / 0.016 / 0.41 / 0.087 (MATH / MMLU-Pro / BBH / MMLU)",
+   "denominator": "WORK rows MATH 2,949 x 69, MMLU-Pro 7,197 x 23, BBH 3,457 x 128, MMLU 8,425 x 79 (items x models); 5 folds x 5 fold seeds"
+  },
+  {
+   "id": "P9",
+   "text": "(secondary) B_lab BETTER on every dataset",
+   "result": "HELD",
+   "value": "B_lab +47.3 / +193.7 / +109.3 / +207.3, z 10.2 / 25.5 / 9.7 / 35.2 (MATH / MMLU-Pro / BBH / MMLU)",
+   "denominator": "WORK rows MATH 2,949 x 69, MMLU-Pro 7,197 x 23, BBH 3,457 x 128, MMLU 8,425 x 79 (items x models); 5 folds x 5 fold seeds"
+  },
+  {
+   "id": "P10",
+   "text": "the median tau*(TREE-BO, primary) over the 25 tasks lies in [10, 200] on MATH, MMLU-Pro and MMLU",
+   "result": "FAILED",
+   "value": "MATH 1000 (11 x 500, 13 x 1000, 1 x inf); MMLU-Pro 50 and MMLU 50 inside",
+   "denominator": "25 tasks (5 folds x 5 fold seeds) per dataset"
+  }
+ ],
+ "falsifier": {
+  "text": "none (exploratory); each pre-specified contrast prints exactly one word (BETTER / WORSE iff |D| >= 3 SE_word, else NEITHER; IDENTICAL where the arms are bit-equal); predictions P1-P10 scored HELD / FAILED (plan sections 7, 8)",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "units": "D x 1e-3 nats of held-out log-loss per (item, model) cell, positive = the first-named arm better; z = D / SE_word; SE_word = max(SE_content, SE_leaf); order MATH / MMLU-Pro / BBH / MMLU (plan sections 5, 7; [P2], confirmed by POSTRUN row 6)",
+  "Z_hier (BKMA-BO - TREE-BO)": "NEITHER +0.26 (z 1.4) / NEITHER +0.83 (1.5) / NEITHER +0.17 (0.9) / NEITHER +0.70 (0.6); MDE80 0.75 / 2.13 / 0.78 / 4.54",
+  "Z_bo (TREE-BO - TREE-RAW)": "BETTER +10.28 (z 6.42; SE_word 1.6016 [content]) / NEITHER +1.17 (2.47; SE_word 0.4726) / BETTER +2.57 (3.8) / BETTER +2.55 (6.2)",
+  "Z_nest (KF-BO - BKMA-BO)": "NEITHER +0.67 (2.1) / NEITHER +0.48 (0.6) / NEITHER -0.08 (-0.8) / NEITHER +2.93 (2.7)",
+  "V_raw (TREE-RAW - LABELS)": "WORSE -10.03 (-5.8) / NEITHER +9.50 (2.2) / NEITHER -2.01 (-1.8) / BETTER +12.60 (3.84; label SE beside NEITHER) (Q1)",
+  "V_tree (TREE-BO - LABELS)": "NEITHER +0.25 (1.2) / NEITHER +10.67 (2.7) / NEITHER +0.55 (1.0) / BETTER +15.14 (4.76; SE_word 3.1795 [leaf])",
+  "V_bkma (BKMA-BO - LABELS)": "NEITHER +0.51 (1.7) / NEITHER +11.50 (2.8) / NEITHER +0.73 (1.3) / BETTER +15.84 (4.9)",
+  "V_kf (KF-BO - LABELS)": "BETTER +1.18 (3.4) / BETTER +11.97 (3.2) / NEITHER +0.65 (1.2) / BETTER +18.78 (5.4); label SE beside NEITHER on MATH and MMLU-Pro; Q3: z by KF_s cell 3.11 / 3.06 / 1.15 / 4.95, two-way V0 leaf x KF_s 3.11 / 3.03 / 1.15 / 4.89",
+  "V_rnd (RND-BO - LABELS)": "NEITHER -0.02 (-2.0) / NEITHER -0.02 (-2.4) / NEITHER -0.04 (-1.1) / NEITHER -0.02 (-1.4)",
+  "label SE beside": "NEITHER where the word reads BETTER at MATH V_kf, MMLU-Pro V_kf and MMLU V_raw (primary); in the secondary at 6 BETTER words: MATH V_kf-b; MMLU-Pro V_bkma-b, V_kf-b; MMLU V_tree-b, V_bkma-b, V_kf-b (Q4)",
+  "secondary (-b, backbone offset)": "Z_bo-b BETTER and V_raw-b WORSE on all four; Z_hier-b, Z_nest-b, V_rnd-b NEITHER on all four; V_tree-b BETTER on MMLU only (+1.32, z 5.5); V_bkma-b BETTER on MMLU-Pro (+0.23, 3.1) and MMLU (+1.37, 5.6); V_kf-b BETTER on MATH (+0.35, 3.7), MMLU-Pro (+0.21, 3.1) and MMLU (+1.17, 4.8)",
+  "B_lab (LABELS-b - LABELS)": "BETTER on all four: +47.3 / +193.7 / +109.3 / +207.3; z 10.2 / 25.5 / 9.7 / 35.2",
+  "tau* medians (primary)": "TREE-BO 1000 / 50 / 100 / 50; RND-BO inf / inf / 1000 / 1000; MATH KF-BO 100, BKMA-BO 500 (POSTRUN row 3)",
+  "Z_bo by size (D (SE_word) items / leaves)": "MATH S +18.28 (7.05) 343 / 6, M +9.60 (1.70) 2,341 / 28, L +5.91 (3.18) 265 / 2; MMLU-Pro S +1.74 (2.80) 603 / 11, M +1.22 (0.66) 4,444 / 53, L +0.90 (0.51) 2,150 / 16; BBH S +8.08 (2.80) 418 / 7, M +2.52 (0.74) 2,177 / 27, L 0 (862 / 6, every arm LABELS); MMLU S +6.93 (1.59) 1,016 / 18, M +2.39 (0.47) 5,428 / 66, L +0.74 (0.82) 1,981 / 16 (descriptive)",
+  "internal levels (Q2, descriptive)": "TREE-BL - TREE-RAW MATH +10.69, MMLU-Pro +1.73 (SE_word 0.32), BBH equal to Z_bo, MMLU +1.97; TREE-BO - TREE-BL -0.41 (0.15) / -0.57 (0.30) / IDENTICAL / +0.57 (0.30); BKMA-BO - BKMA-BL -0.49 (0.20) / -0.59 (0.27) on MATH / MMLU-Pro, +0.12 (0.35) on MMLU",
+  "support": "MATH Z_hier DEFF 1.12, n_eff 2,624, MDE80 0.752; MMLU-Pro arm-vs-LABELS leaf DEFF realised 9.2-13.6 (the planning simulation understated it; the words use the realised SEs) (POSTRUN row 9)",
+  "reproduction": "RP REPRODUCED (bit-equal, 18 / 18) on all four; RA (BBH, beside) REPRODUCED, max |diff| 5.6e-17 over 128 models, read from the part JSON only (POSTRUN row 12 UNDETERMINED, LOW)",
+  "review checks": "64 words + 4 B_lab words recomputed, 0 mismatches (max gap vs readouts.csv 4.6e-6 scaled); independent MATH re-fit max |diff| 0.0 for 19 primary units, 9.9e-14 for 3 secondary; unseen cells: 0 test items and 0 (item, model) pairs on all four; partitions = NEST-METER's (POSTRUN rows 2-6)",
+  "tests": "suite 1,034 passed, 1 skipped, 0 failed (the builder's; not re-run by the reviewer, 0 src/ files); test file 7 fast + 1 slow passed; selftest S1-S8 PASS; the builder's mutants 116/116 killed, controls pass; the reviewer's R1, R5, R6 killed, R2-R4 SURVIVED, none decisive (Q5) (POSTRUN row 11, own mutants)",
+  "runtime": "95 min on 3 workers, BLAS 1: MATH 721 s, MMLU-Pro 344 s, BBH 1,825 s, MMLU 2,803 s ([P2])"
+ },
+ "sentence_of_record": "On WORK rows of MATH, MMLU-Pro, BBH and MMLU (per-cell skill estimates at V0's leaf granularity, held-out log-loss, words at 3 SE_word = max(SE_content, SE_leaf)), shrinking per-model leaf rates toward the label predicts held-out WORK responses better than the raw leaf rates on MATH, BBH and MMLU (Z_bo BETTER; MMLU-Pro z 2.47 NEITHER); which hierarchy the estimates back off along (V0 vs nested bisecting k-means) is not detected (Z_hier NEITHER; MDE80 0.75 / 2.13 / 0.78 / 4.54), nor flat KF vs nested BKMA (Z_nest NEITHER); random cells of V0's sizes carry nothing; the backbone dwarfs every cell effect (B_lab +47 to +207, z >= 9.7) [EXPLORATORY, adjudicates nothing; POSTRUN 59520e3f: Q1 (MEDIUM) on MATH the raw leaf rate is worse than the label rate, on MMLU better (label SE NEITHER), NEITHER on MMLU-Pro and BBH; Q2 (MEDIUM) the back-off gain is shrinkage toward the label, the internal levels not shown to help, so Z_hier and Z_nest are 'not detected under one common tau'; Q3 (MEDIUM) V_kf BETTER on MATH and MMLU-Pro is thin (z 3.11 / 3.03 at KF-cell SE; label SE NEITHER) and not a cells comparison; never 'equal' hierarchies, 'k-means cells beat the tree's cells', 'the tree's internal levels help', or any per-cell board, interval or profile]",
+ "chips": [],
+ "brackets": [
+  {
+   "date": "2026-11-03",
+   "by": "registrar",
+   "text": "Record created at done (exploratory; the run preceded the record). Usage-limit interruption and resume: the build stopped on a usage limit after the plan a629375 (01:25) and was resumed before the build commit 8e7e925 (11:28); the resume checked first that a629375 precedes every draft file, that the only scripts run before it (time_backbone.py, time_task.py, plan_sim.py) drew synthetic responses only, and that no output existed (benchzoom 8e7e925 message); POSTRUN row 1 CONFIRMS (reflog holds only a629375, 8e7e925, bbda88e, 73fde4e after f9a8985; output dir born 12:16:08 after bbda88e 12:15:58; all four parts and analyze at blob 729a93b5 / bbda88e / dirty \"\"). Deviations of form recorded before the run in [P1]: (a) a content-cluster mismatch refuses the part instead of printing a DISCREPANCY line; (b) a census sha mismatch reads 'DISCREPANCY (beside)' instead of refusing (Q7)"
+  },
+  {
+   "date": "2026-11-03",
+   "by": "registrar",
+   "text": "Q1-Q3 (MEDIUM; POSTRUN 59520e3f): Q1 reading (1) 'the raw V0 leaf rate is not a usable skill estimate on its own' holds on MATH only; read 'on MATH the raw leaf rate is worse than the label rate; on MMLU better (label SE NEITHER); NEITHER on MMLU-Pro and BBH.' Q2 back-off = shrinkage toward the label, not the hierarchy; the internal levels at one common tau cost on MATH and MMLU-Pro (TREE-BO - TREE-BL -0.41 / -0.57; BKMA-BO - BKMA-BL -0.49 / -0.59, descriptive); 'nesting adds nothing detectable' reads 'is not detected under one common tau'. Q3 V_kf BETTER on MATH and MMLU-Pro is thin (z 3.11 / 3.03 with SE by KF_s cell or two-way; label SE NEITHER) and compares one-level with four-level shrinkage; no 'k-means cells better' reading. Registrar's note on Q2 (copied figures, nothing re-derived): the POSTRUN's 'label-only shrinkage is at least Z_bo' holds on MATH (+10.69 vs +10.28), MMLU-Pro (+1.73 vs +1.17) and BBH (equal), not on MMLU (+1.97 vs +2.55; internal levels +0.57, SE_word 0.30, descriptive, as its next sentence states); for the benchzoom [P3] bracket"
+  },
+  {
+   "date": "2026-11-03",
+   "by": "registrar",
+   "text": "Q4-Q7 (LOW): Q4 the six secondary label-SE disagreements (MATH V_kf-b; MMLU-Pro V_bkma-b, V_kf-b; MMLU V_tree-b, V_bkma-b, V_kf-b) are not stated in [P2]; Q5 the selftest does not pin the unseen count or the seeded cstat (the reviewer's R2-R4 survive; fix in a new commit, selftest only, no rerun); Q6 P7's BBH cell is zero by construction, P7 holds 3/3 without BBH; Q7 [P1](b) weakens RA's sha check to a beside line, RA's sha matched in the run. The benchzoom [P3] bracket and the Q5 selftest commit are owed (absent at 73fde4e); branch MERGEABLE, not merged (the orchestrator's)"
+  }
+ ],
+ "does_not_show": [
+  "any fresh, vault, RESERVED or registered claim (WORK rows only, exploratory)",
+  "'equal' hierarchies: Z_hier and Z_nest are NEITHER under one common tau (Q2), MDE80 up to 4.54",
+  "'k-means cells beat the tree's cells' (Q3: V_kf thin at KF-cell SE, label SE NEITHER, different shrinkage depth)",
+  "'the tree's internal levels help' (Q2: they cost on MATH and MMLU-Pro, descriptively)",
+  "a general 'raw leaf rates are unusable' (Q1: WORSE on MATH only, BETTER on MMLU)",
+  "any per-cell board, interval or profile (PROFILE-TREE-ROBUST / KEY-SUBANCHOR-SCALE stays closed), or anything that replaces V0 for BZ-AXIS-CONFIRM-FRESH"
+ ],
+ "ledger": null,
+ "depends_on": [
+  "NEST-METER",
+  "FLAT-COMPARE",
+  "TREE-BACKOFF",
+  "HIER-FAIR-BACKOFF",
+  "BBH-WORK",
+  "PLANTED-POWER"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "nothing; does not reopen PROFILE-TREE-ROBUST / KEY-SUBANCHOR-SCALE (per-cell estimates enter only as predictors scored in aggregate; plan section 9)"
+ },
+ "sources": [
+  "docs/reviews/POSTRUN_SKILL-BACKOFF.md (59520e3f)",
+  "benchzoom docs/skill-backoff.md at 73fde4e (plan a629375: sections 1, 3, 5, 7, 8, 9; [P1] build notes; run paragraph [P2])",
+  "benchzoom commit 8e7e925 message (usage-limit resume)",
+  "docs/agents/author_decisions/2026-11-03.md (cf643c14); docs/agents/author_decisions/2026-11-02.md (9dff0985)",
+  "docs/judge_v2_program.md section \"## Registrar's record 2026-11-03 (insertion only; zero calls; nothing run) — SKILL-BACKOFF (POSTRUN 59520e3f) recorded done ...\" L25873-L25883 (_as_of the commit that writes it, parent 59520e3f, re-grepped)"
+ ],
+ "last_update": "2026-11-03 (registrar: created at done (exploratory))"
+}

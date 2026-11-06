@@ -1,5 +1,58 @@
 # TaxoArena
 
+**When does scoring language models per domain change which model you should use, or which comparison you can trust, compared with one pooled leaderboard?**
+
+<!-- Summary on top, D-2026-11-03-2 (docs/agents/author_decisions/2026-11-03.md): the author's draft, with the
+wording changes listed there. Every figure is quoted from the sections below, _as_of cf643c14. -->
+
+### Why it matters
+
+Leaderboards average over many kinds of questions.
+An evaluator choosing a model for a specific workload needs to know whether the pooled ranking still holds inside each domain, and whether a per-domain comparison is reliable enough to act on.
+TaxoArena measures both, and also what that finer-grained evaluation costs.
+<!-- src: prog L21446 (central question: "which model an evaluator should use, or which pairwise comparison it may
+trust ... What does that cost"), _as_of 70c61579 -->
+
+### Setup at a glance
+
+- **Engine:** Kotlin + Spring Boot evaluation engine, with Python analysis tools.
+- **Benchmarks:** MMLU-Pro, BBH, SuperGPQA, MATH, LiveCodeBench (and a six-corpus union).
+- **Models:** rosters of 12 to 49 models, depending on the test.
+- **Domains ("cells"):** the benchmark's own labels where they exist; otherwise a taxonomy tree built from question embeddings on the training split only.
+- **Rigor:** every reported result comes from a registered test, with its ledger row.
+  No split is called held-out unless it passed a content check for near-duplicates, not just distinct ids; results on id-only splits say so.
+  Gains come with 95% intervals or standard errors.
+  A taxonomy split is called certified only under per-family hierarchical FDR control (q = 0.05); two do.
+- **Judge accuracy** always means agreement with an answer key or an executed checker, never human preference.
+<!-- src: build.gradle.kts L5, L9; corpora and rosters as in the results below (ROUTER-REGRET-MMLU 12 and 46,
+key profile 37, HARNESS-EXTRACTOR 18, LCB stage 0 26, SUPERGPQA-STAGE0b 49; union paeec37aa28063c75); prog L21446
+(cells); "Each result below comes from a registered test" (results preamble); docs/agents/CONTEXT.md section 4
+rule 12 (split words); ledger CERT-RESOLUTION (Chemistry n00000006, Engineering n00000015); prog L21448 S2 -->
+
+### Key results
+
+- **Per-domain routing helps, modestly.**
+  Picking a model per declared domain beats the best single model by **+2.67 pp** (95% CI [+1.46, +3.89], 5,907 items).
+  Caveat: BBH carries 0.728 of that gain; without BBH the gain is +1.03 pp [−0.27, +2.32], which includes zero.
+- **When domains don't differ, there is nothing to route.**
+  On MMLU-Pro alone, one model is best in all 14 categories for both a 12-model and a 46-model roster; the routing gain is 0.000 by category and −0.002 by tree leaf (SE 0.007), on a split checked by id only.
+- **The answer scorer can reorder the leaderboard.**
+  On MATH, three answer scorers reorder 18 models: minimum pairwise Kendall tau-b −0.0473, rank shifts of up to 15.
+  This confirms a disclosed pilot, on a split checked by id only.
+- **Negative and open results are reported.**
+  The embedding taxonomy is *not* shown better than per-source k-means at matched cell counts (falsifier fired), and the judged half of the reliability question is still open.
+<!-- src: ledger V2-DECLARED-CELLS, ROUTER-REGRET-MMLU, HARNESS-EXTRACTOR, UNION-AF-ROUTE (F-AK); prog L21500
+(judged half of SQ2 OPEN); each quoted from the SQ1 USE, SQ2 TRUST and Scoring lists below -->
+
+### Read more
+
+The full record follows below: the framing, the research plan, the registered results with their ledger rows, and the closed lines.
+M.Sc. thesis, TU Berlin (Prof. O. Kao).
+<!-- src: report/01_Document_administration/b_Meta.tex L43 (M.Sc. Computer Science), L72 (Technische Universität
+Berlin), L77 (supervisor) -->
+
+---
+
 <!-- Repo tidy, D-2026-10-27-1 (docs/agents/author_decisions/2026-10-27.md). Every factual line carries a
 source comment: a ledger row id (docs/test_ledger.html, the last bracket wins), a record JSON
 (docs/agents/results/<ID>.json) or a programme span (docs/judge_v2_program.md, "prog"), _as_of 70c61579.
