@@ -1,0 +1,140 @@
+{
+ "id": "SUPERGPQA-LEVELS",
+ "title": "SUPERGPQA-LEVELS: do SuperGPQA's declared finer levels (discipline > field > subfield) carry per-model signal beyond their parent? (exploratory; key only; content-closed EVAL; lead #3 of D-2026-11-06-3)",
+ "question": "On SuperGPQA minus its 1,251 MMLU-Pro collisions (split sg893684444c6df3e9, content-closed under CK-CLOSE-v1; the stored key only), do the declared field (72) beyond the discipline (13), and the declared subfield (285) beyond the field, add held-out per-model predictive information under the BZ-METER chain on declared group readers (fits on TRAIN, scores on EVAL; words at 3 SE_word clustered by the tested level's cells, meter SE beside), and does a per-field routing policy beat the per-discipline one? A second statistic on the STAGE0b EVAL (plan sections 1, 4, 5, 7).",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "none (exploratory, not registered); plan benchzoom docs/supergpqa-levels.md committed af4bccc (2026-11-06 14:57:25) before any statistic on responses (POSTRUN row 1)",
+  "program_lines": "outcome recorded in docs/judge_v2_program.md section \"## Registrar's record 2026-11-07 (insertion only; zero calls; nothing run) — SUPERGPQA-LEVELS (POSTRUN 33c8d3ef), ROSTER-STRUCTURE-METER (298b9cc9) and CERT-DIP-SITES (a51d4c53) recorded done ...\" L25885-L25895 (_as_of the commit that writes it, parent a51d4c53, re-grepped)",
+  "date": "2026-11-06"
+ },
+ "script": {
+  "path": "benchzoom examples/supergpqa-levels.py (with examples/supergpqa-levels_mutants.json, tests/test_supergpqa_levels.py; plan docs/supergpqa-levels.md)",
+  "sha16": "run of record runner blob:95eede91 at HEAD 9be5093 (dirty ''), plan blob:817c99f6, meter blob:f31973af; tip db52ea6: plan blob:12767b05 (sha256-lf16:1207845f9f104244), runner blob:c4138aa6 (sha256-lf16:34e6a2b96c86ec9c; AST-identical to 95eede91 outside the module docstring), mutant spec blob:61d16b20 (sha256-lf16:af351c2bd85371a8), tests blob:4663d95d (sha256-lf16:ac6592732ce7c09e) (git blobs, LF; 0 CR bytes, no CRLF rendering; POSTRUN header)",
+  "commit": "benchzoom branch supergpqa-levels 4d08a3d..db52ea6 (local worktree Z:/FAC/TUBerlin/benchzoom_wt_supergpqa-levels; 4 new files, 0 under src/; fast-forward; MERGEABLE, NOT merged)"
+ },
+ "ready": null,
+ "go": "D-2026-11-06-3 (b42c3300), the author's selection verbatim \"SuperGPQA finer levels (#3)\" (zero-call leads), meaning as worded: start #3 SUPERGPQA-LEVELS (content-checked split, CPU), zero calls",
+ "run": {
+  "outcome_file": "E:/benchzoom_demo/followups/supergpqa-levels (outcome.json sha256 c5c3dbc8100595c6, summary.txt sha256 d346bc895d6d9324; _rerun bit-equal on 10 / 10 files; _support beside); backup E:/TaxoArena_backup_2026-11-06_supergpqa-levels (35 / 35 OK)",
+  "outcome_commit": "outputs not committed; run paragraph [P1] in benchzoom docs/supergpqa-levels.md at db52ea6",
+  "calls": 0,
+  "cce": 0,
+  "pool": "stored key only (experiment_results/supergpqa/supergpqa_stage0b_key.db sha256 9898d91a..., mode=ro&immutable=1; sides EVAL / TRAIN only); 7,591 EVAL items x 49 models (split sg893684444c6df3e9, CK-CLOSE-v1, minus 1,251 MMLU-Pro collisions); fits on 17,687 TRAIN items; sealed / RESERVED / vault rows read 0 (POSTRUN row 2)",
+  "date": "2026-11-06"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_SUPERGPQA-LEVELS.md",
+  "commit": "33c8d3ef",
+  "verdict": "SUPERGPQA-LEVELS: OUTCOME CONFIRMED (exploratory; key only; a second statistic on the STAGE0b EVAL; population SuperGPQA minus its 1,251 MMLU-Pro collisions), with qualifiers Q1-Q2 (MEDIUM) and Q3-Q6 (LOW); MERGEABLE: YES; no BLOCKER"
+ },
+ "criteria": [],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "G(field | discipline) is SUPPORTED (prior 0.75)",
+   "result": "FAILED",
+   "value": "field|disc INCONCLUSIVE (+1.5955, SE_word 0.6681, z 2.39)",
+   "denominator": "7,591 EVAL items x 49 models (split sg893684444c6df3e9, CK-CLOSE-v1, minus 1,251 MMLU-Pro collisions); fits on 17,687 TRAIN items"
+  },
+  {
+   "id": "P2",
+   "text": "G(field | discipline) point in [0.15, 2.50] x1e-3 nats per cell",
+   "result": "HELD",
+   "value": "+1.5955",
+   "denominator": "7,591 EVAL items x 49 models (split sg893684444c6df3e9, CK-CLOSE-v1, minus 1,251 MMLU-Pro collisions); fits on 17,687 TRAIN items"
+  },
+  {
+   "id": "P3",
+   "text": "G(subfield | field) is not SUPPORTED (0.65)",
+   "result": "FAILED",
+   "value": "sub|field SUPPORTED (+0.2799, SE_word 0.0664, z 4.22; Q1)",
+   "denominator": "7,591 EVAL items x 49 models (split sg893684444c6df3e9, CK-CLOSE-v1, minus 1,251 MMLU-Pro collisions); fits on 17,687 TRAIN items"
+  },
+  {
+   "id": "P4",
+   "text": "G(subfield | field) point < G(field | discipline) point (0.85)",
+   "result": "HELD",
+   "value": "0.2799 < 1.5955",
+   "denominator": "7,591 EVAL items x 49 models (split sg893684444c6df3e9, CK-CLOSE-v1, minus 1,251 MMLU-Pro collisions); fits on 17,687 TRAIN items"
+  },
+  {
+   "id": "P5",
+   "text": "tau^2 selected for the subfield reader <= tau^2 for the field reader (0.70)",
+   "result": "HELD",
+   "value": "0.02 <= 0.04",
+   "denominator": "7,591 EVAL items x 49 models (split sg893684444c6df3e9, CK-CLOSE-v1, minus 1,251 MMLU-Pro collisions); fits on 17,687 TRAIN items"
+  },
+  {
+   "id": "P6",
+   "text": "the routing word is NEITHER (0.75)",
+   "result": "HELD",
+   "value": "NEITHER (+0.11pp, SE_2stage 0.48pp, MDE80 1.83pp)",
+   "denominator": "7,591 EVAL items; B 2,000"
+  },
+  {
+   "id": "P7",
+   "text": "G_route point in [-1.00, +0.60] pp (written having seen STAGE0b's field grain)",
+   "result": "HELD",
+   "value": "+0.11pp (+0.1054)",
+   "denominator": "7,591 EVAL items"
+  },
+  {
+   "id": "P8",
+   "text": "G(discipline | backbone) (secondary) is SUPPORTED (0.90)",
+   "result": "FAILED",
+   "value": "disc|L0 INCONCLUSIVE (+2.6844, SE_word 0.8986, z 2.99)",
+   "denominator": "7,591 EVAL items x 49 models (split sg893684444c6df3e9, CK-CLOSE-v1, minus 1,251 MMLU-Pro collisions); fits on 17,687 TRAIN items"
+  }
+ ],
+ "falsifier": {
+  "text": "F1 fires iff the field|disc word is NOT SUPPORTED or DEGENERATE; it overturns the prior of P1 and the planned SQ5 sentence 'structure below the coarse label on a fourth corpus', no recorded number; INCONCLUSIVE and BELOW INTEREST do not fire it (plan section 9)",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "units": "x 1e-3 nats per (model, EVAL item) cell; SE_word clustered by the tested level's cells; z = g / SE_word; tau^2 L1 0.08, L2 0.04, L3 0.02 ([P1]; POSTRUN rows 6-9)",
+  "field|disc (DECIDING)": "+1.5955, SE_word 0.6681 (72 fields), DEFF 52.8, n_eff 144, MDE80 2.57, q95 0.0000, z 2.39: INCONCLUSIVE, quoted only as 'not detected at 3 SE_word (MDE80 2.57 > g)' (Q2); meter SE 0.1452 beside reads SUPPORTED (never the word)",
+  "sub|field (DECIDING)": "+0.2799, SE_word 0.0664 (285 subfields), DEFF 3.5, n_eff 2,157, MDE80 0.25, q95 0.0015, z 4.22: SUPPORTED, quoted only with Q1; by field SE 0.0938 (z 2.98), by discipline 0.0964 (z 2.90): INCONCLUSIVE",
+  "disc|L0 (secondary)": "+2.6844, SE_word 0.8986 (13 disciplines), DEFF 56.1, n_eff 135, MDE80 3.45, q95 0.0000, z 2.99: INCONCLUSIVE (meter SE beside SUPPORTED)",
+  "routing G_route (per-field - per-discipline policy)": "+0.11pp (+0.1054), SE_2stage 0.48pp (reviewer's bootstrap 0.474), DEFF 2.66, n_eff 2,859, MDE80 1.83pp, z 0.22: NEITHER (DESCRIPTIVE-ONLY); normal 95% [-0.83, +1.04]pp, percentile [-1.62, +0.22]pp (Q6); 32 of 72 fields and 153 of 285 subfields change argmax",
+  "reproduction": "STAGE0b RP1-RP4 REPRODUCED; rerun bit-equal 10 / 10 files; own meter driver bit-equal on 4 per-item arrays, 600 null gains to 1.4e-17",
+  "Support as realised": "planned MDE80 for field|disc about 0.3 at g 0.6, realised 2.57 (REFUTED as a projection, Q2); SE_word / SE_meter 4.60 vs 1.5-2.6 planned",
+  "tests": "selftest PASS; mutants 79 / 79 non-equivalent killed (X39a equivalent; 4 crash-kills, Q5); reviewer's own 9 / 10 killed (OM8b survives, Q4); suite 1,039 passed, 1 skipped, 15 deselected, 0 failed"
+ },
+ "sentence_of_record": "On SuperGPQA minus its 1,251 MMLU-Pro collisions (stored key only; 7,591 EVAL items x 49 models), the declared subfield adds held-out per-model predictive information beyond the declared field on the content-closed EVAL (g +0.28 x 1e-3 nats per cell, SE 0.066 clustered by subfield as planned, z 4.2; exploratory; second statistic on the STAGE0b EVAL; DESCRIPTIVE-ONLY at the planned Support (section 11 b); size unpredicted (P3 FAILED); INCONCLUSIVE when clustered by field, z 2.98); the field's gain beyond the discipline (+1.60) is not detected at 3 SE_word (SE 0.67 by field, z 2.39, MDE80 2.57 > g; DEFF 52.8, n_eff 144); a per-field policy does not route beyond the per-discipline one (+0.11pp, SE 0.48pp, MDE80 1.83pp; descriptive) [EXPLORATORY, adjudicates nothing; POSTRUN 33c8d3ef Q1-Q6; which levels read SUPPORTED is a property of the SE convention, not evidence that subfields carry more than fields]",
+ "chips": [],
+ "brackets": [
+  {
+   "date": "2026-11-07",
+   "by": "registrar",
+   "text": "Record created at done (exploratory; the run preceded the record). The plan's own Support rule (section 11 b) made sub|field DESCRIPTIVE-ONLY for a SUPPORTED word; the [P1] 'Licensed' line and the build hand-back omit Q1; this record carries Q1 verbatim (POSTRUN: '[P2] or the registrar's record verbatim'). Q3 null non-binding (q95 0) at disc|L0 and field|disc; Q5 4 crash-kills (X70, X71, X77, X79), not 2."
+  }
+ ],
+ "does_not_show": [
+  "'no structure below the discipline' (field|disc is an underpowered non-detection, MDE80 2.57 > g 1.60; Q2)",
+  "that subfields carry more than fields (field gain 5.7x the subfield gain; the word order is a property of the SE convention; Q1)",
+  "which fields or models carry the gain (no board or profile; PROFILE-TREE-ROBUST / KEY-SUBANCHOR-SCALE stays closed)",
+  "a size beyond the intervals, anything about the 1,251 excluded items, other rosters or prompts",
+  "anything about a text-built tree or TaxoAdapt-style hierarchies (lead 9, not started); SQ5's 'nothing below the declared label' for this corpus"
+ ],
+ "ledger": null,
+ "depends_on": [
+  "SUPERGPQA-STAGE0b",
+  "BZ-METER-AXIS"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "nothing; no per-field board or profile (PROFILE-TREE-ROBUST / KEY-SUBANCHOR-SCALE not reopened)"
+ },
+ "sources": [
+  "docs/reviews/POSTRUN_SUPERGPQA-LEVELS.md (33c8d3ef)",
+  "benchzoom docs/supergpqa-levels.md at db52ea6 (plan af4bccc sections 1, 2, 8, 9, 10; run paragraph [P1])",
+  "docs/agents/author_decisions/2026-11-06.md (b42c3300), D-2026-11-06-3",
+  "docs/agents/plans/2026-11-06_leads.md (b42d58ef) '### 3. SUPERGPQA-LEVELS'",
+  "docs/judge_v2_program.md section \"## Registrar's record 2026-11-07 (insertion only; zero calls; nothing run) — SUPERGPQA-LEVELS (POSTRUN 33c8d3ef), ROSTER-STRUCTURE-METER (298b9cc9) and CERT-DIP-SITES (a51d4c53) recorded done ...\" L25885-L25895 (_as_of the commit that writes it, parent a51d4c53, re-grepped)"
+ ],
+ "last_update": "2026-11-07 (registrar: created at done (exploratory))"
+}

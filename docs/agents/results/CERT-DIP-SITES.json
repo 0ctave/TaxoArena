@@ -1,0 +1,152 @@
+{
+ "id": "CERT-DIP-SITES",
+ "title": "CERT-DIP-SITES: the split-dip rule under hierarchical BH at every site of the two trees of record; are Chemistry n00000006 and Engineering n00000015 among the MODAL sites? (exploratory; zero calls; lead #7 of D-2026-11-06-3)",
+ "question": "Q1: which sites of each tree of record (bareq512_s42 R512; af_clean_s42 R256; each in its own block, never joined) are MODAL along their own split axis under CERT-SPLIT-DIP's sample-splitting dip rule, unchanged, with CERT-RESOLUTION's prefix-closed hierarchical BH at per-family FDR q = 0.05? Q2: are bareq512_s42's two J-certified sites among them? Q3: how does the MODAL set sit beside the J hierarchical set of the same tree? Members' construction rows only (plan sections 1-6).",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "none (exploratory, not registered); plan docs/agents/plans/2026-11-07_cert_dip_sites.md committed 67c0a16a (03:41:46) on branch cert-dip-sites before any statistic on tree members' vectors (POSTRUN row C17)",
+  "program_lines": "outcome recorded in docs/judge_v2_program.md section \"## Registrar's record 2026-11-07 (insertion only; zero calls; nothing run) — SUPERGPQA-LEVELS (POSTRUN 33c8d3ef), ROSTER-STRUCTURE-METER (298b9cc9) and CERT-DIP-SITES (a51d4c53) recorded done ...\" L25885-L25895 (_as_of the commit that writes it, parent a51d4c53, re-grepped)",
+  "date": "2026-11-07"
+ },
+ "script": {
+  "path": "tools/analysis/cert_dip_sites.py on TaxoArena branch cert-dip-sites (plan docs/agents/plans/2026-11-07_cert_dip_sites.md; not on main until merged)",
+  "sha16": "runner blob:6ae15e5d (sha256-lf16:2589f379665dba05) = d0408d27 = tip; plan at the run blob:34e80c3b (sha256-lf16:e1832ad64e51e133) = 67c0a16a = the cache meta's plan pin; plan at the tip blob:4649fc18 (sha256-lf16:811bb0381eb08d92), +26 / -0; imported modules = main's blobs (cert_split_dip 1d46cd73, cert_resolution dbe9425d, embedder_guard 3fd9aea5, cert_planted 028f05a2) (git blobs, LF; 0 CR bytes, no CRLF rendering; POSTRUN header)",
+  "commit": "TaxoArena branch cert-dip-sites 298b9cc9..b56d5008 (worktree .claude/worktrees/cert-dip-sites; 3 commits, 2 new files, 0 under src/; MERGEABLE, by a merge commit or a rebase since main moved to a51d4c53; NOT merged)"
+ },
+ "ready": null,
+ "go": "D-2026-11-06-3 (b42c3300), the author's selection verbatim \"Dip certificate (#7)\" (zero-call leads), meaning as worded: start #7 CERT-DIP-SITES (in a window with no other data readers), zero calls",
+ "run": {
+  "outcome_file": "E:/TaxoArena_tmp/cert_dip_sites/ (outcome sha256 2e9a962fc1be4ab4, sites CSV 6511fd0afdfa11cd, cache 354ad4d8da1d8ecb); backup E:/TaxoArena_backup_2026-11-06_cert-dip-sites (record, rerun, logs; SHA256SUMS.txt 4111f3e3d82cde67, 16 / 16 OK); rerun REPRODUCED (bit-equal)",
+  "outcome_commit": "outputs not committed; run-of-record bracket [P1] in the plan at b56d5008 (branch cert-dip-sites)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "construction rows (members) of bareq512_s42 (R512, id-disjoint only) and af_clean_s42 (R256, content-closed); embeddings_cache.db / snapshots.db at mode=ro&immutable=1, -wal 0 bytes, rule-7 window; DB sha256 equal before and after; no held-out / vault / sealed / EVAL row read (Q5: on the split words of record and the code path, no id intersection cited)",
+  "date": "2026-11-07"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_CERT-DIP-SITES.md",
+  "commit": "a51d4c53",
+  "verdict": "CERT-DIP-SITES: OUTCOME CONFIRMED (EXPLORATORY; construction rows of each tree; each tree in its own block, never joined), with qualifiers Q1 (MEDIUM) and Q2-Q5 (LOW); MERGEABLE: YES; no BLOCKER; D1-D2 LOW code defects for reuse"
+ },
+ "criteria": [],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "G0 SIZE-OK on each tree (0.95); NULL rate 0.00 [0.00, 0.02] on each",
+   "result": "HELD",
+   "value": "0 of 700 (bareq512_s42); 0 of 690 (af_clean_s42)",
+   "denominator": "bareq512_s42 (R512, id-disjoint only): 70 sites, construction rows; af_clean_s42 (R256, content-closed): 69 sites, construction rows"
+  },
+  {
+   "id": "P2",
+   "text": "NULL-TREE: at most 1 of the 10 replicates of each tree has >= 1 hierarchical rejection",
+   "result": "HELD",
+   "value": "0 of 10 on each tree",
+   "denominator": "10 null-tree replicates per tree"
+  },
+  {
+   "id": "P3",
+   "text": "W2 (bareq512_s42): BOTH 0.20, ONE 0.45, NEITHER 0.35 (Brier)",
+   "result": "n/a",
+   "value": "ONE (n00000015); Brier 0.465",
+   "denominator": "bareq512_s42 (R512, id-disjoint only): 70 sites, construction rows"
+  },
+  {
+   "id": "P4",
+   "text": "|D| bareq512_s42 3 [0, 10]",
+   "result": "HELD",
+   "value": "1",
+   "denominator": "bareq512_s42 (R512, id-disjoint only): 70 sites, construction rows"
+  },
+  {
+   "id": "P5",
+   "text": "|D| af_clean_s42 12 [3, 30]",
+   "result": "FAILED",
+   "value": "2 (below the band)",
+   "denominator": "af_clean_s42 (R256, content-closed): 69 sites, construction rows"
+  },
+  {
+   "id": "P6",
+   "text": "af_clean_s42's root n00000001 in D (0.90; Brier)",
+   "result": "n/a",
+   "value": "yes; Brier 0.010",
+   "denominator": "af_clean_s42 (R256, content-closed): 69 sites, construction rows"
+  },
+  {
+   "id": "P7-bareq512_s42",
+   "text": "PLANT certified share 0.75 [0.50, 0.95]",
+   "result": "HELD",
+   "value": "0.914 (64 of 70)",
+   "denominator": "bareq512_s42 (R512, id-disjoint only): 70 sites, construction rows"
+  },
+  {
+   "id": "P7-af_clean_s42",
+   "text": "PLANT certified share 0.80 [0.55, 0.97]",
+   "result": "FAILED",
+   "value": "1.000 (69 of 69), above 0.97",
+   "denominator": "af_clean_s42 (R256, content-closed): 69 sites, construction rows"
+  },
+  {
+   "id": "P8",
+   "text": "W3: bareq512_s42 MORE 0.40 / SAME 0.20 / FEWER 0.40; af_clean_s42 MORE 0.60 / SAME 0.10 / FEWER 0.30 (Brier)",
+   "result": "n/a",
+   "value": "FEWER on both; Brier 0.560 / 0.860",
+   "denominator": "bareq512_s42 (R512, id-disjoint only): 70 sites, construction rows; af_clean_s42 (R256, content-closed): 69 sites, construction rows"
+  },
+  {
+   "id": "P9",
+   "text": "af_clean_s42's 8 J sites, >= 6 in D (HELD iff in [6, 8])",
+   "result": "FAILED",
+   "value": "1 of 8 (n00000005 tested p_site 1; 6 J sites UNTESTED, prefix closure; Q3)",
+   "denominator": "af_clean_s42 (R256, content-closed): 69 sites, construction rows"
+  }
+ ],
+ "falsifier": {
+  "text": "F-DIP fires on a tree iff G0 reads ANTI-CONSERVATIVE on it OR >= 3 of its 10 NULL-TREE replicates have >= 1 hierarchical rejection; it overturns, for that tree, the reading 'a MODAL site has modal structure along its split axis that its own moment-matched Gaussian lacks' (plan section 9)",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "bareq512_s42 (R512, id-disjoint only)": "G0 SIZE-OK (0 of 700 null draws; CP upper 0.00526); D = {Engineering n00000015, p_site 1.41519e-05 vs the TOP-family bar 0.05 / 14 = 0.00357}; Chemistry n00000006 p_site 0.326, TOP rank 5 of 14, no split-dip word (Q1); 55 of 70 UNTESTED; W1 SOME; W2 ONE; W3 FEWER (1 vs 2; overlap 1 of 2); PLANT 64 of 70; NULL-TREE 0 of 10",
+  "af_clean_s42 (R256, content-closed)": "G0 SIZE-OK (0 of 690; CP upper 0.00533); D = {root n00000001, p_site 0.000207610; n00000004, p_site 0}; 64 of 69 UNTESTED; W1 SOME; W3 FEWER (2 vs 8; overlap 1 of 8; n00000005 tested p_site 1; 6 J sites UNTESTED (prefix closure)); PLANT 69 of 69; NULL-TREE 0 of 10",
+  "Support (re-derived by the reviewer)": "G0 SE 0.00824 / 0.00830, MDE80 0.0231 / 0.0232; PLANT SE 0.0518; P(>= 3 of 10 | 0.05) 0.0115; post-run DEFF NA (0 events; worst case DEFF 10 still SIZE-OK)",
+  "tests": "selftest 66 PASS; mutants 46 / 46 killed (X29 by KeyError); reviewer's own 2 of 6 killed (OM1, OM2, OM5, OM6 survive, none decisive: D2); TaxoArena gradle suite 569 tests, 0 failed, 2 skipped"
+ },
+ "sentence_of_record": "On the construction rows of each tree of record, each tree in its own block (never joined): on bareq512_s42 (R512, id-disjoint only) Engineering n00000015 is MODAL (split-dip) at per-family FDR q = 0.05 (hierarchical BH over nested sites, bareq512_s42, R512; EXPLORATORY), the only such site of 70; Chemistry n00000006: no split-dip word (reached in the TOP family of 14, p_site 0.326, rank 5; EXPLORATORY); FEWER than the J hierarchical set (1 vs 2; overlap 1 of 2); on af_clean_s42 (R256, content-closed) the root n00000001 and n00000004 are MODAL (split-dip) at per-family FDR q = 0.05 (hierarchical BH over nested sites, af_clean_s42, R256; EXPLORATORY), FEWER than the J set (2 vs 8; overlap 1 of 8; n00000005 tested p_site 1; 6 J sites UNTESTED (prefix closure)); the size gate is Gaussian-only and was never near its bar (0 events: 700 of 700 (bareq512_s42); 690 of 690 (af_clean_s42)); F-DIP not fired on either tree [EXPLORATORY; not a certificate: the J site null stays THE certificate; POSTRUN a51d4c53 Q1-Q5]",
+ "chips": [],
+ "brackets": [
+  {
+   "date": "2026-11-07",
+   "by": "registrar",
+   "text": "Record created at done (exploratory; the run preceded the record). Q1: the build hand-back's 'Chemistry n00000006 is not modal' and the b56d5008 subject's 'Chemistry n00000006 not' break plan section 6 ('No site is called not modal, unimodal or unreal') and are not quoted; 'UNTESTED' is never 'not modal'. Q4: [P1]'s '1,390 NULL draws' joins R512 and R256 counts; quoted only as '700 of 700 (bareq512_s42); 690 of 690 (af_clean_s42)'. D1: the runner's clean-tree check is vacuous (pathspecs under tools/analysis/tools/analysis/...; the plan unguarded), no consequence on the record (cache plan pin 34e80c3b = 67c0a16a); fix before reuse."
+  }
+ ],
+ "does_not_show": [
+  "a certificate: the J site null stays THE certificate; 'certified at per-family FDR q = 0.05' stays the J wording for Chemistry n00000006 and Engineering n00000015 of bareq512_s42",
+  "that Chemistry n00000006 or any unselected / UNTESTED site lacks modes (Q1); k > 2 modes or the tree's own partition",
+  "size against non-Gaussian unimodal shapes beyond the dip's own calibration (Q2: the gate never fired on a matched Gaussian, 0 events)",
+  "a tree-wide FDR; anything across R512 and R256 (never joined)",
+  "the frozen, o0_clean_s42 or af_bareq512_s42 trees; other embedders; held-out data; any judge, board or profile"
+ ],
+ "ledger": null,
+ "depends_on": [
+  "CERT-SPLIT-DIP",
+  "CERT-RESOLUTION",
+  "MIX-LRT-SITE"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "nothing; L6's dip half stays OPEN (explored here, exploratory, not registered); its LR / BIC half stays CLOSED NEGATIVE (MIX-LRT-SITE)"
+ },
+ "sources": [
+  "docs/reviews/POSTRUN_CERT-DIP-SITES.md (a51d4c53)",
+  "docs/agents/plans/2026-11-07_cert_dip_sites.md at b56d5008 (branch cert-dip-sites; sections 1, 6, 8, 9, 10; [P1])",
+  "docs/agents/author_decisions/2026-11-06.md (b42c3300), D-2026-11-06-3",
+  "docs/agents/plans/2026-11-06_leads.md (b42d58ef) '### 7. CERT-DIP-SITES (rank 7)'",
+  "docs/agents/KNOWLEDGE.md section 1 (trees, split words)",
+  "docs/judge_v2_program.md section \"## Registrar's record 2026-11-07 (insertion only; zero calls; nothing run) — SUPERGPQA-LEVELS (POSTRUN 33c8d3ef), ROSTER-STRUCTURE-METER (298b9cc9) and CERT-DIP-SITES (a51d4c53) recorded done ...\" L25885-L25895 (_as_of the commit that writes it, parent a51d4c53, re-grepped)"
+ ],
+ "last_update": "2026-11-07 (registrar: created at done (exploratory))"
+}

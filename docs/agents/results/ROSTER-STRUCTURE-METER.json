@@ -1,0 +1,156 @@
+{
+ "id": "ROSTER-STRUCTURE-METER",
+ "title": "ROSTER-STRUCTURE-METER: does the meter's cell structure change with roster size (fit effect) or concentrate among strong models? (exploratory, WORK rows only; lead #6 of D-2026-11-06-3)",
+ "question": "On WORK rows of MMLU-Pro (320 models), MATH (69) and BBH (seeded 128), (Q1) is there a roster-size effect of the fit on the meter's reading of the SAME models (E = a sub-roster's own fit minus the full fit), and does the size curve follow it? (Q2) within the full fit, do the strong models carry more structure than the weak (C_str; C_info beside)? Cont regime; words at 3 SE_word, SE_word = SE_leaf (+) draw MC (E) or (+) model term (C_str) (plan sections 1, 5, 7).",
+ "kind": "zero-call",
+ "state": "done",
+ "registration": {
+  "commit": "none (exploratory, not registered); plan benchzoom docs/roster-structure-meter.md committed c39fcd3 (2026-11-06 14:49:33) before any statistic on responses (POSTRUN row 1)",
+  "program_lines": "outcome recorded in docs/judge_v2_program.md section \"## Registrar's record 2026-11-07 (insertion only; zero calls; nothing run) — SUPERGPQA-LEVELS (POSTRUN 33c8d3ef), ROSTER-STRUCTURE-METER (298b9cc9) and CERT-DIP-SITES (a51d4c53) recorded done ...\" L25885-L25895 (_as_of the commit that writes it, parent a51d4c53, re-grepped)",
+  "date": "2026-11-06"
+ },
+ "script": {
+  "path": "benchzoom examples/roster-structure-meter.py (with examples/roster-structure-meter_mutants.json, tests/test_roster_structure_meter.py; plan docs/roster-structure-meter.md)",
+  "sha16": "run of record runner blob:d5d99e1e (sha256-lf16:069e89a70e252534) at 1074ea6 (all three parts, --analyze and the second run; dirty ''), plan blob:b71ab989; tip 9b65440: plan blob:2200b675 (sha256-lf16:e090437f63d531e0), runner blob:d78996c4 (sha256-lf16:4f3d30765fb61d50; AST-identical to d5d99e1e outside the module docstring), mutant spec blob:d0b83dca (sha256-lf16:980915047d5834ae), tests blob:098421fd (sha256-lf16:8c76d51209bc7b97) (git blobs, LF; 0 CR bytes, no CRLF rendering; POSTRUN header)",
+  "commit": "benchzoom branch roster-structure-meter 4d08a3d..9b65440 (local worktree Z:/FAC/TUBerlin/benchzoom_wt_roster-structure-meter; 4 new files, 0 under src/; fast-forward; MERGEABLE, NOT merged)"
+ },
+ "ready": null,
+ "go": "D-2026-11-06-3 (b42c3300), the author's selection verbatim \"Roster size (#6)\" (zero-call leads), meaning as worded: start #6 ROSTER-STRUCTURE-METER (WORK rows only), zero calls",
+ "run": {
+  "outcome_file": "E:/benchzoom_demo/followups/roster-structure-meter (summary.txt 887b1a22, readouts.csv 04eb65b2; 9 / 9) and _rerun (2,249 / 2,249 arrays byte-equal; 9 / 9); backup E:/TaxoArena_backup_2026-11-06_roster-structure-meter (30 / 30)",
+  "outcome_commit": "outputs not committed; run paragraph [P1] in benchzoom docs/roster-structure-meter.md at 9b65440",
+  "calls": 0,
+  "cce": 0,
+  "pool": "WORK rows only: MATH 2,949 x 69, BBH 3,457 x 128, MMLU-Pro 7,197 x 320 (+ REC23, 23 models); vault / reserved / sealed reads 0 (guard_reads_end [0] / [0] / [0, 0]; MMLU-Pro vault rows sealed in a VaultGuard in memory, never armed: Q7)",
+  "date": "2026-11-06"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_ROSTER-STRUCTURE-METER.md",
+  "commit": "298b9cc9",
+  "verdict": "ROSTER-STRUCTURE-METER: OUTCOME CONFIRMED (exploratory; WORK rows only; one V0 per dataset; MMLU-Pro one fold seed), with qualifiers Q1-Q2 (MEDIUM) and Q3-Q8 (LOW); MERGEABLE: YES; no BLOCKER"
+ },
+ "criteria": [],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "MMLU-Pro: E(k) < 0 at every k = 1..6 (R 160 ... 5)",
+   "result": "FAILED",
+   "value": "E(R 5) +0.1550 > 0",
+   "denominator": "MMLU-Pro WORK 7,197 items x 320 models (random sub-roster draws, nested; one fold seed)"
+  },
+  {
+   "id": "P2",
+   "text": "MMLU-Pro: E(6) (R 5) < E(1) (R 160)",
+   "result": "FAILED",
+   "value": "E(R 5) +0.1550 vs E(R 160) -0.0006",
+   "denominator": "MMLU-Pro WORK 7,197 items x 320 models (random sub-roster draws, nested; one fold seed)"
+  },
+  {
+   "id": "P3",
+   "text": "MMLU-Pro: G_full(4) > 0 and G_own(4) < 0.5 x G_full(4) (R 20; the record's 23-vs-320 gap as a size reading)",
+   "result": "FAILED",
+   "value": "G_own +0.0111 vs G_full +0.0152, ratio 0.735 (a point outcome; Q1)",
+   "denominator": "MMLU-Pro WORK 7,197 items x 320 models (random sub-roster draws, nested; one fold seed)"
+  },
+  {
+   "id": "P4",
+   "text": "MMLU-Pro: C_str > 0",
+   "result": "HELD",
+   "value": "+0.0600 (SE_word 0.0234; by point only, Q3)",
+   "denominator": "MMLU-Pro WORK 7,197 x 320, strong / weak halves at the median"
+  },
+  {
+   "id": "P5",
+   "text": "MMLU-Pro: I_STRONG > I_WEAK",
+   "result": "HELD",
+   "value": "0.1338 > 0.1211",
+   "denominator": "MMLU-Pro WORK 7,197 x 320"
+  },
+  {
+   "id": "P6",
+   "text": "MATH: I_STRONG < I_WEAK and C_str < 0",
+   "result": "HELD",
+   "value": "I 0.0051 < 0.1019; C_str -0.2757",
+   "denominator": "MATH WORK 2,949 x 69"
+  },
+  {
+   "id": "P7",
+   "text": "no E(k) word reads HIGHER (25 cells)",
+   "result": "FAILED",
+   "value": "6 HIGHER (L2|L1: MMLU-Pro R <= 40, MATH R 34 / 17)",
+   "denominator": "25 E cells on WORK"
+  },
+  {
+   "id": "P8",
+   "text": "MATH: E(4) < 0 (R 4)",
+   "result": "HELD",
+   "value": "-0.0184",
+   "denominator": "MATH WORK 2,949 x 69"
+  },
+  {
+   "id": "P9",
+   "text": "BBH: every E(k) word reads NEITHER (5 cells)",
+   "result": "HELD",
+   "value": "5 / 5 NEITHER",
+   "denominator": "BBH WORK 3,457 x 128"
+  },
+  {
+   "id": "P10",
+   "text": "G(TOP | STRONG) > 0 on MMLU-Pro",
+   "result": "HELD",
+   "value": "+0.0314",
+   "denominator": "MMLU-Pro WORK 7,197 x 320"
+  }
+ ],
+ "falsifier": {
+  "text": "none (exploratory); each pre-specified contrast prints exactly one word at 3 SE_word (plan section 7); predictions P1-P10 scored HELD / FAILED (section 8)",
+  "fired": false
+ },
+ "numbers_of_record": {
+  "units": "G and E x 1e-3 nats per cell, cont regime; SE_word = SE_leaf (+) draw MC (E) or (+) model term (C_str) (POSTRUN per-claim table)",
+  "words": "30 cells: 6 HIGHER, 0 LOWER / STRONG / WEAK, 24 NEITHER (17 UNDERPOWERED); meter SE beside differs at 4 of 30 (never the word)",
+  "E L3a|L2 MMLU-Pro": "R 160 -0.0006 (0.0023), R 80 -0.0057 (0.0031), R 40 -0.0025 (0.0064), R 20 -0.0040 (0.0151; DEFF_leaf 2.92, n_eff 2,464, MDE80 0.058; +-2 SE_word [-0.034, +0.026]), R 10 -0.0089 (0.0580), R 5 +0.1550 (0.1840); all 15 L3a|L2 cells (MATH, BBH, MMLU-Pro) NEITHER",
+  "E L2|L1 HIGHER": "MMLU-Pro R 40 and below +0.1917 (0.0572), +0.4083 (0.1027), +0.9341 (0.2076), +2.3350 (0.5546); MATH R 34 +0.4300 (0.0979), R 17 +1.3990 (0.1925); z 3.35-7.27; 4 robust to a 1.9x larger draw term, nested draws (Q4)",
+  "C_str MMLU-Pro L3a|L2": "+0.0600, SE_word 0.0234 (items 0.0180 (+) model 0.0151), z 2.56, DEFF_leaf 2.17, n_eff 3,314, MDE80 0.0900: NEITHER (UNDERPOWERED); meter SE beside z 3.09 would read STRONG (never the word)",
+  "reproduction": "REPRODUCED (bit-equal) per the plan's section 6 checks (Q5): MATH and BBH vs NEST-METER; MMLU-Pro REC23 arrays and the WEAK list (weak_half.json); second run 2,249 / 2,249 arrays",
+  "tests": "mutants 115 / 115 killed (r1 113 + r2 X11-X13); reviewer's 8 / 8 killed; suite 1,038 passed, 1 skipped, 15 deselected, 0 failed (log); test module 5 / 5 with slow"
+ },
+ "sentence_of_record": "On WORK rows (MATH 2,949 x 69, BBH 3,457 x 128, MMLU-Pro 7,197 x 320; one V0 per dataset; MMLU-Pro one fold seed), at the leaf level no fit effect of roster size is detected at 3 SE_word (MMLU-Pro R 20: E -0.0040, SE_word 0.0151, MDE80 0.058; random 20-model draws); the record's 23-vs-320 gap is not reproduced as a size reading; composition (which 23) is untested (REC23 reproduction-only); the label-level gain G(L2|L1) that a small roster's own fit reads exceeds the full fit's reading of the same models (6 cells HIGHER (4 robust to a 1.9x larger draw term; nested draws)); the mechanism (a weaker backbone) is untested; by point the strong half carries more leaf structure on MMLU-Pro (C_str +0.0600, SE_word 0.0234, z 2.56: NEITHER, UNDERPOWERED) [EXPLORATORY, adjudicates nothing; POSTRUN 298b9cc9 Q1-Q8; label-level meter gains are not comparable across roster sizes]",
+ "chips": [],
+ "brackets": [
+  {
+   "date": "2026-11-07",
+   "by": "registrar",
+   "text": "Record created at done (exploratory; the run preceded the record). The build hand-back's 'the 23-vs-320 difference on record is not a roster-size effect' is REFUTED as worded (Q1: E's +-2 SE_word interval contains the WORK-side gap of about -0.024 implied by the record; plan section 9 reads a NEITHER as 'not detected', never 'no effect') and 'small rosters read more structure' is PARTLY right (Q2: a larger gain over each small roster's own weaker backbone); neither is quoted. This record carries the POSTRUN's fixes verbatim ('[P2] of the plan, or into the registrar's record verbatim')."
+  }
+ ],
+ "does_not_show": [
+  "'the 23-vs-320 difference is not a roster-size effect' (Q1: not detected, MDE80 0.058; the 23 of record are a specific roster)",
+  "'small rosters read more structure' (Q2: a larger label-level gain over a weaker own backbone; mechanism untested)",
+  "which-models (composition) effects: REC23 is reproduction-only",
+  "'the strong half carries more' beyond the point (Q3: NEITHER at 3 SE_word)",
+  "any vault, fresh or registered claim; other fold seeds on MMLU-Pro (one fold seed)"
+ ],
+ "ledger": null,
+ "depends_on": [
+  "NEST-METER",
+  "BZ-METER-AXIS",
+  "BZ-MMLUPRO-MOREMODELS",
+  "PLANTED-POWER",
+  "BBH-WORK"
+ ],
+ "supersedes": null,
+ "superseded_by": null,
+ "closed_line": {
+  "closes": false,
+  "what": "nothing"
+ },
+ "sources": [
+  "docs/reviews/POSTRUN_ROSTER-STRUCTURE-METER.md (298b9cc9)",
+  "benchzoom docs/roster-structure-meter.md at 9b65440 (plan c39fcd3 sections 1, 7, 8, 9; run paragraph [P1])",
+  "docs/agents/author_decisions/2026-11-06.md (b42c3300), D-2026-11-06-3",
+  "docs/agents/plans/2026-11-06_leads.md (b42d58ef) '### 6. ROSTER-STRUCTURE-METER (rank 6)'",
+  "docs/judge_v2_program.md section \"## Registrar's record 2026-11-07 (insertion only; zero calls; nothing run) — SUPERGPQA-LEVELS (POSTRUN 33c8d3ef), ROSTER-STRUCTURE-METER (298b9cc9) and CERT-DIP-SITES (a51d4c53) recorded done ...\" L25885-L25895 (_as_of the commit that writes it, parent a51d4c53, re-grepped)"
+ ],
+ "last_update": "2026-11-07 (registrar: created at done (exploratory))"
+}
