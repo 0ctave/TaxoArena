@@ -1,59 +1,227 @@
 {
  "id": "BBH-RESERVED-CONFIRM",
- "title": "BBH-RESERVED-CONFIRM: the one-time read of BBH's sealed RESERVED side (does a per-subtask policy fitted on WORK beat the best single model; do label-free cells recover at least half?) — PREPARED, DRAFTED, NOT REGISTERED; sealed side UNREAD (lead #4 of D-2026-11-06-3)",
- "question": "On BBH's sealed RESERVED side (2,304 items of SPLIT-1), with an Open LLM Leaderboard roster (R128 or R342, the author's), (C1) does the per-subtask policy fitted on the 3,457 WORK items beat the best single model fitted there, (C2) do label-free cells (spherical k-means at the subtask count k = 24 on qwen3 512-d text vectors) beat it, and (C3) do they recover at least half of the declared gain (L = G_FREE - 0.5 G_DEC > 0)? T1 placebo trigger first; the INTERVAL decides each (draft 'Readouts and criteria'). DRAFT ONLY: nothing registered, nothing sealed opened.",
+ "title": "BBH-RESERVED-CONFIRM: the one-time read of BBH's sealed RESERVED side, R342, cells from the WORK texts only, the anchor-free tree deciding C2 / C3 — REGISTERED 2026-11-07 (not opened); sealed side UNREAD; freeze / open NOT READY; O3 the author's (lead #4 of D-2026-11-06-3; D-2026-11-07-1) [2026-11-10 registrar: OPENED once at F 54ed9bf; OUTCOME CONFIRMED (POSTRUN a4912f25): C1 HELD, C2 HELD, C3 UNDETERMINED BY INTERVAL (not cited); done]",
+ "question": "On BBH's sealed RESERVED side (2,304 items of SPLIT-1), with all 342 KEPT Open LLM Leaderboard models, (C1) does the per-subtask policy fitted on the 3,457 WORK items beat the best single model fitted there (G_DEC), (C2) do the anchor-free tree's cells (AF-I, fitted on the 3,457 WORK texts only; 22 leaves chosen by the recipe) beat it (G_AFI), and (C3, gated on C1 HELD) do they recover at least half of the declared gain (L = G_AFI - 0.5 G_DEC > 0)? G4 refusal first, then the T1 placebo trigger; the INTERVAL decides C1-C3, the POINT decides F1 (registration 'READOUTS AND CRITERIA', [R-7])",
  "kind": "zero-call",
- "state": "drafted",
+ "state": "done",
  "registration": {
-  "commit": "none (NOT registered); draft docs/agents/plans/2026-11-06_bbh-reserved-confirm_registration_draft.md committed b1baa4cb (blob:18c2f8c2, LF); the registration, when written, must precede the commit that sets the runner's four constants (registrar's ruling (ii))",
-  "program_lines": "preparation recorded in docs/judge_v2_program.md section \"## Registrar's record 2026-11-07 (insertion only; zero calls; nothing run) — SUPERGPQA-LEVELS (POSTRUN 33c8d3ef), ROSTER-STRUCTURE-METER (298b9cc9) and CERT-DIP-SITES (a51d4c53) recorded done ...\" L25885-L25895 (_as_of the commit that writes it, parent a51d4c53, re-grepped) (paragraph BBH-RESERVED-CONFIRM)",
-  "date": "2026-11-06 (draft)"
+  "commit": "the commit that writes this record (parent a58dfd28); registration text from draft v2 docs/agents/plans/2026-11-07_bbh-reserved-confirm_registration_draft_v2.md (79becdd4; blob:b24aadf0, LF) with DELTA a58dfd28 D1 / D6 applied",
+  "program_lines": "docs/judge_v2_program.md \"## Registered 2026-11-07 (before any call; the sealed runner is pre-registration code, ruling (ii)) — BBH-RESERVED-CONFIRM: on BBH's sealed RESERVED side, with all 342 KEPT models, does a per-subtask policy fitted on WORK beat the best single model, and do the anchor-free tree's cells, built from the WORK texts only, recover at least half of that gain? (zero-call; one-time sealed read)\" L25897-L26018 (_as_of the commit that writes it, parent a58dfd28, re-grepped; the runner's REG_HEADING matches exactly 1 line, L25897) [2026-11-10 registrar: the FREEZE_SHA bracket (condition (4); OP4) appended at L26019; the section now spans L25897-L26019 (_as_of the commit that writes it, parent 4c45716e, re-grepped); the REG_HEADING pattern still matches 1 line, L25897]",
+  "date": "2026-11-07",
+  "state_qualifier": "registered (not opened): the four runner constants PENDING; nothing sealed read [2026-11-10 registrar: constants set at f307079; frozen (FREEZE_SHA 5320b3283434ea0511a4df0bd8fb1fac9b574a0c61257debed15692b13b21b82); FREEZE_SHA commit F 54ed9bfff765b02dcbcd893fe51248122d66aca4; the author's go D-2026-11-10-1; READY (open on F iff OP6-OP8 of READY 1c4a2c54; NOT opened; sealed side unread)] [2026-11-10 registrar: OPENED once (OP6-OP8 held); outcome of record in docs/judge_v2_program.md \"## BBH-RESERVED-CONFIRM (2026-11-10, 0 calls) — OUTCOME CONFIRMED (POSTRUN a4912f25; the one-time sealed read, R342, opened once at benchzoom F 54ed9bf): G4 and T1 not fired; C1 HELD (G_DEC +5.25pp [+2.95, +7.55]); C2 HELD (G_AFI +3.73pp [+1.26, +6.21]); C3 UNDETERMINED BY INTERVAL (L +1.11pp [-0.69, +2.90]; DESCRIPTIVE-ONLY Support; not cited); F1 not fired; predictions 7 of 8 HELD (P5 FAILED), Brier 0.0704\" L26021-L26041 (_as_of the commit that writes it, parent a4912f25, re-grepped); done]"
  },
  "script": {
-  "path": "benchzoom examples/bbh-reserved-confirm.py (sealed-side runner; open / freeze refuse while its four registration constants are PENDING) and examples/bbh-reserved-prep.py (WORK estimate); tests/test_bbh_reserved_confirm.py; plan docs/bbh-reserved-prep.md",
-  "sha16": "reviewed blobs (READY header; git hash-object, LF): bbh-reserved-confirm.py blob:e0a6d70e (LF working tree), bbh-reserved-prep.py blob:dafd9eda (CRLF working-tree rendering blob:aaad88f4), docs/bbh-reserved-prep.md blob:e19f0d0b, tests blob:f46fe171; WORK run of record at b4a3057",
-  "commit": "benchzoom branch bbh-reserved-prep 4d08a3d..a922fe7 (local worktree Z:/FAC/TUBerlin/benchzoom_wt_bbh-reserved-prep; plan 4675b56, WORK runner b4a3057, sealed runner fa37758, tip a922fe7 docstring only; 6 new files, 0 under src/; not merged, merge not asked)"
+  "path": "benchzoom examples/bbh-reserved-confirm.py (sealed runner, pre-registration code, ruling (ii)); examples/bbh_reserved_common.py (shared code check + AF pool); examples/bbh-reserved-tree.py (tree-arm WORK runner); examples/bbh-reserved-prep.py (WORK estimate core); tests/test_bbh_reserved_confirm.py; plan docs/bbh-reserved-prep.md",
+  "sha16": "DELTA a58dfd28 header (git hash-object, LF, = HEAD:): confirm blob:5acb0671; common blob:fe5530b0; tree blob:cc955d59 (= f87461a, run of record); prep blob:dafd9eda (working-tree CRLF rendering blob:aaad88f4; = b4a3057); tests blob:877e9cc7; plan blob:bc6fb750 [2026-11-10 registrar: at F (git blobs, LF; i/lf w/lf, no CRLF rendering): confirm blob:5e0dfca320132455a1bde8e05db9dd280cdc7c70, tests blob:dedcabd6708b668da0c36aa240275d4c006711e5 = READY 1c4a2c54 row 15 rehearsal pins; manifest pin at F (READY row 15, checked at OP6): 31 files sha256 de21fc92f33abceb22d63eb3d72062ea1d71836211b8aad8f14530c5e405cecc]",
+  "commit": "benchzoom branch bbh-reserved-prep tip 727cc67 (local worktree Z:/FAC/TUBerlin/benchzoom_wt_bbh-reserved-prep, porcelain empty; not merged); plan [P3] 01d9c79, tree runner f87461a, [P4] 6fab746; four constants PENDING [2026-11-10 registrar: constants commit f30707931f8f182de1f5ecd0a5053ad413f3c874 (READY 1c4a2c54); the FREEZE_SHA commit F = 54ed9bfff765b02dcbcd893fe51248122d66aca4 (parent f307079; rev-list count 1; 2 files, numstat 1 / 1 and 2 / 2; three replacements of \"PENDING\"; builder's OP3 hand-back), the tip; local, not merged, not pushed]",
+  "prior": "READY 814bafa6 blobs: confirm blob:e0a6d70e, plan blob:e19f0d0b, tests blob:f46fe171 (tip a922fe7)",
+  "freeze": "OP1 at f307079 (the run-operator's hand-back): E:/benchzoom_demo/followups/bbh-reserved-confirm/freeze_R342_work.json, 1,827,631 bytes, sha256 5320b3283434ea0511a4df0bd8fb1fac9b574a0c61257debed15692b13b21b82 (= FREEZE_SHA; re-hashed by the registrar, equal); printed code head f307079, manifest sha256 2c1d180cea44e4077cd37f945b5376059c0da18e639b852c6bb2babfdeeeb935, registration 26edca97428a8538b9eae60b8eea8a2f331593d8; backup (OP2) E:/TaxoArena_backup_2026-11-10_bbh-reserved-confirm/ (2 / 2 OK; SHA256SUMS sha256 d7befeeab8e8c37b3a3af9a02567dba13ab13a3b3337808b4098de6380206b36); F's logs E:/TaxoArena_backup_2026-11-10_bbh-reserved-op3/ (4 / 4 OK; SHA256SUMS sha256 5fdf5dbd92c53e77eb2f78a622b6969ce267a0bbd588eb2c78eb8fc00c4937a8); at F selftest 157 PASS / 0 FAIL, pytest 15 passed"
  },
  "ready": {
-  "file": "docs/reviews/READY_bbh-reserved-confirm.md",
-  "commit": "814bafa6",
-  "verdict": "Preparation: READY to go to the author; `freeze` / `open`: NOT READY (C1 HIGH must be fixed, C2-C6 go into the registration, a delta READY on the commit that sets the four constants, including a real `reserved --dry-run` under the registered roster and text option)"
+  "file": "docs/reviews/READY_bbh-reserved-confirm_open.md",
+  "commit": "1c4a2c54",
+  "verdict": "`freeze --roster 342 --text work` at f307079: READY (done, OP1-OP2); `open`: NOT READY at f307079; `open` on the FREEZE_SHA commit F: READY iff every one of OP3-OP8 holds (manifest pin de21fc92; D2 carried as operator step, D3-D5 LOW). As of 2026-11-10: OP3 F 54ed9bfff765b02dcbcd893fe51248122d66aca4 (builder), OP4 this bracket (count on main >= 1), OP5 D-2026-11-10-1 met; OP6-OP8 the run-operator's, not yet run [2026-11-10 registrar: OP6-OP8 held (the run-operator's hand-back; POSTRUN rows 1-2); `open` ran once at F, exit 0]",
+  "prior": "DELTA docs/reviews/DELTA_bbh-reserved-confirm_fixes.md (a58dfd28): READY-FOR-REGISTRATION: yes, with D1 (MEDIUM) and D6 (LOW) worded into the registration; `freeze` / `open`: NOT READY (unchanged gate: the registration, the constants commit, a delta READY on that commit with a real `reserved --dry-run --roster 342 --text work`, and D2 (MEDIUM) fixed or carried as an operator check; D3-D5 (LOW) into that delta); docs/reviews/READY_bbh-reserved-confirm.md (814bafa6): preparation READY to go to the author; freeze / open NOT READY (C1 HIGH, C2-C4 MEDIUM, C5-C6 LOW; all confirmed fixed by DELTA a58dfd28)"
  },
- "go": "needed: the author's O1 (roster), O2 (text admissibility), O3 (whether and when to open; which words may cite the outcome) and the C4 choice; D-2026-11-06-3 (3) authorised preparation only (\"Prepare BBH only (Recommended)\": nothing sealed is opened; the main session comes back to the author before the one-time opening)",
- "run": null,
- "review": null,
- "criteria": [],
- "predictions": [],
+ "go": "D-2026-11-10-1 (docs/agents/author_decisions/2026-11-10.md, 4c45716e; the author's O3, written before anything after OP4): selections verbatim: \"BBH sealed side (2,304 items, can be read only once): open it, and when?\" = \"Open now (Recommended)\"; \"Once it is open, where may the outcome be cited?\" = \"As registered (Recommended)\"; on top of D-2026-11-07-1 (O1 R342, O2 WORK texts only, C4 anchor-free tree). `open` runs once; a REFUSED outcome is recorded and never retried without a new go; no push, no merge decided",
+ "run": {
+  "outcome_file": "E:/benchzoom_demo/followups/bbh-reserved-confirm/outcome.txt (sha256 ccf78a00e5a103c82b41eaaa070b7aceba09b71de4e9670233caccd3371e71e7) + outcome.json (sha256 26c3dd20d7ccae75f75bb51044db026f170ecc547b567f066e3e3682cdbb46d1) + OPENED.json (sha256 b60d0e7c0b1191724ebcf489bfd422162be22877785554a5370ff42cbffe27f4); sha256 of the file bytes; SHA256SUMS 2 / 2 OK (re-run by the registrar); 5 entries, 0 REFUSED; backup E:/TaxoArena_backup_2026-11-10_bbh-reserved-confirm-open (8 / 8 OK, re-run by the registrar; SHA256SUMS sha256 f01fbd303fa794937aec969759fb5d86cf1f527ecc41936acfa1313fce775c7a); never committed",
+  "outcome_commit": "outcome not committed (opened at benchzoom bbh-reserved-prep F 54ed9bfff765b02dcbcd893fe51248122d66aca4; manifest 31 files de21fc92f33abceb22d63eb3d72062ea1d71836211b8aad8f14530c5e405cecc; repository modules executed after the code check 0)",
+  "calls": 0,
+  "cce": 0,
+  "pool": "BBH SPLIT-1, the sealed RESERVED side (sealed = ND-1-group-disjoint by construction; never content-closed): the 2,304 RESERVED items (24 subtasks) in 1,829 content clusters (Kish 3.385; planning transport WORK Kish 4.416); fit side 3,457 WORK items (2,662 clusters); R342 (ids sha256 71c12468); two-stage bootstrap B = 2,000",
+  "date": "2026-11-10 (OPENED.json opened_utc 2026-11-10T12:44:32.983551+00:00; one open, exit 0; at most 3 threads)",
+  "programme_section": "docs/judge_v2_program.md \"## BBH-RESERVED-CONFIRM (2026-11-10, 0 calls) — OUTCOME CONFIRMED (POSTRUN a4912f25; the one-time sealed read, R342, opened once at benchzoom F 54ed9bf): G4 and T1 not fired; C1 HELD (G_DEC +5.25pp [+2.95, +7.55]); C2 HELD (G_AFI +3.73pp [+1.26, +6.21]); C3 UNDETERMINED BY INTERVAL (L +1.11pp [-0.69, +2.90]; DESCRIPTIVE-ONLY Support; not cited); F1 not fired; predictions 7 of 8 HELD (P5 FAILED), Brier 0.0704\" L26021-L26041 (_as_of the commit that writes it, parent a4912f25, re-grepped)"
+ },
+ "review": {
+  "file": "docs/reviews/POSTRUN_BBH-RESERVED-CONFIRM.md",
+  "commit": "a4912f25",
+  "verdict": "OUTCOME CONFIRMED, every deciding number reproduced to the digit (own code, registered streams re-implemented; diffs 0.00); no BLOCKER; D1 LOW (no G4 line), D2 LOW (no Brier line), D3 LOW (the identity line for L's SE is a tautology); W1 twins (561 of 2,304; word 'sealed'; twin-free L never cited), W2 C3 not cited, W3 C2 is this one tree; checker mutants RM1-RM5 5 / 5 killed; output directory unchanged by the review"
+ },
+ "criteria": [
+  {
+   "id": "G4",
+   "text": "REFUSAL, evaluated first: a two-stage SE of 0 or not finite for G_DEC, G_AFI, G_PLACEBO or L refuses (never a verdict)",
+   "result": "n/a",
+   "value": "NOT FIRED: the outcome prints no G4 line (POSTRUN D1 LOW); POSTRUN row 8: SE2 1.17 / 1.26 / 1.32 / 0.91pp (G_DEC / G_AFI / G_PLACEBO / L), all finite and > 0; outcome_REFUSED_* count 0",
+   "denominator": "the 2,304 RESERVED items (24 subtasks) in 1,829 content clusters (Kish 3.385; planning transport WORK Kish 4.416); fit side 3,457 WORK items (2,662 clusters); R342 (ids sha256 71c12468); two-stage bootstrap B = 2,000"
+  },
+  {
+   "id": "T1",
+   "text": "VALIDITY TRIGGER, evaluated second: placebo (24 subtask labels permuted over all 5,761 items, default_rng([20261106, 8]), fitted on WORK) G_PLACEBO interval wholly above 0 -> C1-C3 'UNDETERMINED (BY TRIGGER: T1 the placebo manufactures gain)', F1 NOT EVALUATED, every prediction UNDETERMINED (BY TRIGGER)",
+   "result": "n/a",
+   "value": "NOT FIRED: G_PLACEBO -2.78pp, two-stage 95% [-5.36, -0.19]pp (SE2 1.32pp; percentile [-6.47, -1.23]; i.i.d. SE 0.72, one-stage 0.74; DEFF 3.39, n_eff 679, MDE80 3.69pp); not wholly above 0",
+   "denominator": "the 2,304 RESERVED items (24 subtasks) in 1,829 content clusters (Kish 3.385; planning transport WORK Kish 4.416); fit side 3,457 WORK items (2,662 clusters); R342 (ids sha256 71c12468); two-stage bootstrap B = 2,000"
+  },
+  {
+   "id": "C1",
+   "text": "DECLARED GAIN G_DEC = acc_R(DEC) - acc_R(BS), both fitted on all WORK rows: HELD iff interval (point +- 1.96 x SE2) wholly above 0; FAILED iff wholly below 0; UNDETERMINED otherwise; INTERVAL decides; FAILS at planned n iff point below about -2.63pp; Support SCOREABLE (5.38 > MDE80 3.75)",
+   "result": "HELD",
+   "value": "G_DEC +5.25pp, two-stage 95% [+2.95, +7.55]pp (SE2 1.17pp; percentile [+1.93, +6.63]; i.i.d. SE 0.67, one-stage 0.66; DEFF 3.06, n_eff 753, MDE80 3.28pp); interval wholly above 0",
+   "denominator": "the 2,304 RESERVED items (24 subtasks) in 1,829 content clusters (Kish 3.385; planning transport WORK Kish 4.416); fit side 3,457 WORK items (2,662 clusters); R342 (ids sha256 71c12468); two-stage bootstrap B = 2,000"
+  },
+  {
+   "id": "C2",
+   "text": "LABEL-FREE GAIN G_AFI = acc_R(AFI) - acc_R(BS), AFI = anchor-free tree on the 3,457 WORK texts, RESERVED rows filed by nearest-child descent: same three words on the interval; FAILS at planned n iff point below about -2.41pp; Support SCOREABLE (4.91 > MDE80 3.43)",
+   "result": "HELD",
+   "value": "G_AFI +3.73pp, two-stage 95% [+1.26, +6.21]pp (SE2 1.26pp; percentile [+0.57, +5.57]; i.i.d. SE 0.67, one-stage 0.81; DEFF 3.55, n_eff 650, MDE80 3.54pp); AFI = the anchor-free tree on the 3,457 WORK texts, 22 leaves chosen by the recipe; interval wholly above 0",
+   "denominator": "the 2,304 RESERVED items (24 subtasks) in 1,829 content clusters (Kish 3.385; planning transport WORK Kish 4.416); fit side 3,457 WORK items (2,662 clusters); R342 (ids sha256 71c12468); two-stage bootstrap B = 2,000"
+  },
+  {
+   "id": "C3",
+   "text": "AT LEAST HALF RECOVERED L = G_AFI - 0.5 G_DEC: NOT EVALUATED unless C1 HELD; then HELD iff L's interval wholly above 0, FAILED iff wholly below 0, UNDETERMINED otherwise; FAILS at planned n iff point below about -1.80pp; Support DESCRIPTIVE-ONLY (2.22 < MDE80 2.57; D1 sensitivity: SE_L 0.77pp, MDE80 2.17pp, SCOREABLE by 0.06pp, power 0.82, deciding nothing)",
+   "result": "UNDETERMINED",
+   "value": "UNDETERMINED BY INTERVAL (evaluated: C1 HELD): L = G_AFI - 0.5 G_DEC +1.11pp, two-stage 95% [-0.69, +2.90]pp (SE2 0.91pp, 0.9148 in POSTRUN row 11; percentile [-1.13, +2.49]; i.i.d. SE 0.41, one-stage 0.59; DEFF 4.88, n_eff 472, MDE80 2.56pp); the point would read HELD (POSTRUN RM5), the interval decides as registered; DESCRIPTIVE-ONLY Support; not cited (W2)",
+   "denominator": "the 2,304 RESERVED items (24 subtasks) in 1,829 content clusters (Kish 3.385; planning transport WORK Kish 4.416); fit side 3,457 WORK items (2,662 clusters); R342 (ids sha256 71c12468); two-stage bootstrap B = 2,000"
+  },
+  {
+   "id": "F1",
+   "text": "FALSIFIER, on the POINT: fires iff G_DEC <= 0 (registration FALSIFIER; [R-7])",
+   "result": "n/a",
+   "value": "NOT FIRED: point G_DEC +5.25pp > 0; consistent with C1 HELD",
+   "denominator": "the 2,304 RESERVED items (24 subtasks) in 1,829 content clusters (Kish 3.385; planning transport WORK Kish 4.416); fit side 3,457 WORK items (2,662 clusters); R342 (ids sha256 71c12468); two-stage bootstrap B = 2,000"
+  }
+ ],
+ "predictions": [
+  {
+   "id": "P1",
+   "text": "C1 is HELD; confidence 0.98",
+   "result": "HELD",
+   "value": "C1 HELD; confidence 0.98; Brier 0.0004",
+   "denominator": "the 2,304 RESERVED items (24 subtasks) in 1,829 content clusters (Kish 3.385; planning transport WORK Kish 4.416); fit side 3,457 WORK items (2,662 clusters); R342 (ids sha256 71c12468); two-stage bootstrap B = 2,000"
+  },
+  {
+   "id": "P2",
+   "text": "G_DEC lies in [+3.66, +7.10]pp (point); confidence 0.80",
+   "result": "HELD",
+   "value": "G_DEC +5.25pp (point) in [+3.66, +7.10]; confidence 0.80; Brier 0.04",
+   "denominator": "the 2,304 RESERVED items (24 subtasks) in 1,829 content clusters (Kish 3.385; planning transport WORK Kish 4.416); fit side 3,457 WORK items (2,662 clusters); R342 (ids sha256 71c12468); two-stage bootstrap B = 2,000"
+  },
+  {
+   "id": "P3",
+   "text": "C2 is HELD; confidence 0.98",
+   "result": "HELD",
+   "value": "C2 HELD; confidence 0.98; Brier 0.0004",
+   "denominator": "the 2,304 RESERVED items (24 subtasks) in 1,829 content clusters (Kish 3.385; planning transport WORK Kish 4.416); fit side 3,457 WORK items (2,662 clusters); R342 (ids sha256 71c12468); two-stage bootstrap B = 2,000"
+  },
+  {
+   "id": "P4",
+   "text": "S = G_AFI / G_DEC lies in [0.70, 1.30] (point); confidence 0.86",
+   "result": "HELD",
+   "value": "S = G_AFI / G_DEC 0.7107 (point) in [0.70, 1.30]; confidence 0.86; Brier 0.0196",
+   "denominator": "the 2,304 RESERVED items (24 subtasks) in 1,829 content clusters (Kish 3.385; planning transport WORK Kish 4.416); fit side 3,457 WORK items (2,662 clusters); R342 (ids sha256 71c12468); two-stage bootstrap B = 2,000"
+  },
+  {
+   "id": "P5",
+   "text": "C3 is HELD; confidence 0.68 REGISTERED at planning SE_L 0.917pp (D1 sensitivity range 0.68-0.82 beside, deciding nothing; Brier on 0.68)",
+   "result": "FAILED",
+   "value": "C3 UNDETERMINED BY INTERVAL, not HELD; confidence 0.68; Brier 0.4624 (0.6724 at the 0.82 sensitivity, beside)",
+   "denominator": "the 2,304 RESERVED items (24 subtasks) in 1,829 content clusters (Kish 3.385; planning transport WORK Kish 4.416); fit side 3,457 WORK items (2,662 clusters); R342 (ids sha256 71c12468); two-stage bootstrap B = 2,000"
+  },
+  {
+   "id": "P6",
+   "text": "T1 does not fire; confidence 0.98",
+   "result": "HELD",
+   "value": "T1 not fired; confidence 0.98; Brier 0.0004",
+   "denominator": "the 2,304 RESERVED items (24 subtasks) in 1,829 content clusters (Kish 3.385; planning transport WORK Kish 4.416); fit side 3,457 WORK items (2,662 clusters); R342 (ids sha256 71c12468); two-stage bootstrap B = 2,000"
+  },
+  {
+   "id": "P7",
+   "text": "F1 does not fire; confidence 1.00",
+   "result": "HELD",
+   "value": "F1 not fired; confidence 1.00; Brier 0",
+   "denominator": "the 2,304 RESERVED items (24 subtasks) in 1,829 content clusters (Kish 3.385; planning transport WORK Kish 4.416); fit side 3,457 WORK items (2,662 clusters); R342 (ids sha256 71c12468); two-stage bootstrap B = 2,000"
+  },
+  {
+   "id": "P8",
+   "text": "L_AFI lies in [+1.05, +3.40]pp (point); confidence 0.80",
+   "result": "HELD",
+   "value": "L_AFI +1.107pp (point) in [+1.05, +3.40] (also in the unrounded [1.046, 3.397]); confidence 0.80; Brier 0.04",
+   "denominator": "the 2,304 RESERVED items (24 subtasks) in 1,829 content clusters (Kish 3.385; planning transport WORK Kish 4.416); fit side 3,457 WORK items (2,662 clusters); R342 (ids sha256 71c12468); two-stage bootstrap B = 2,000"
+  }
+ ],
  "falsifier": {
-  "text": "DRAFT (not registered): F1 FIRES iff the point G_DEC <= 0 on the sealed side; then the BBH part of key result 1 is not transported to a second roster on a sealed side ('BBH carries 0.728' stays a one-roster, 18-model statement); C2 or C3 FAILED narrows the framing's last clause for BBH at this roster; each overturns only a wording, never a recorded number (draft 'Falsifier')",
-  "fired": false
+  "text": "F1 FIRES iff the POINT G_DEC <= 0 on the sealed side; overturns the transport of key result 1's BBH part ('BBH carries 0.728 of G', V2-DECLARED-CELLS C1) to a second roster on a sealed side (it stays a one-roster, 18-model statement); C2 or C3 FAILED narrows the framing's last clause for BBH at this roster; each overturns only a wording, never a recorded number. F1 and C1 can fire together: both scored, recorded joined 'C1 UNDETERMINED BY INTERVAL / F1 FIRED AT THE POINT' ([R-7])",
+  "fired": false,
+  "outcome": "NOT FIRED (point G_DEC +5.25pp > 0); C2 and C3 not FAILED: key result 1's BBH part transports to a second roster on a sealed side; the framing's last clause is not narrowed for BBH at R342; nothing recorded is revised (outcome.txt; POSTRUN row 12)"
  },
  "numbers_of_record": {
-  "status": "EXPLORATORY WORK-side estimate only (WORK rows: 3,457 items, 24 subtasks, 2,662 clusters, Kish 4.416; R128 ids sha256 c47b3eb5 / R342 71c12468); sealed RESERVED responses read 0; reader constructed 0 times; 0 OPENED.json / freeze files (READY rows 1-3, 12)",
+  "status": "EXPLORATORY WORK-side estimate only (WORK rows: 3,457 items, 24 subtasks, 2,662 clusters, Kish 4.416; R128 ids sha256 c47b3eb5 / R342 71c12468); sealed RESERVED responses read 0; reader constructed 0 times; 0 OPENED.json / freeze files (READY rows 1-3, 12) [2026-11-07 registrar: REGISTERED (not opened) at prog L25897-L26018; DELTA a58dfd28 row 14: SealedReader constructed at 1 production site after open_refusals; 0 OPENED.json / freeze files; sealed side still unread] [2026-11-10 registrar: OPENED once; the outcome of record is under the keys 'OUTCOME ...' (outcome.txt / outcome.json, POSTRUN a4912f25 OUTCOME CONFIRMED); the keys before them are the pre-opening WORK-side history, exploratory]",
   "design A G_DEC (R128 / R342)": "+3.269pp (SE 0.577) / +5.380pp (0.605), reviewer's own draws; build +3.27 (0.59) / +5.38 (0.60)",
-  "G_FKI (k-means at k = 24, declared count; C4)": "build +3.29 / +5.33pp (share 1.01 / 0.99); reviewer's independent k-means +3.329 / +5.417pp",
+  "G_FKI (k-means at k = 24, declared count; C4)": "build +3.29 / +5.33pp (share 1.01 / 0.99); reviewer's independent k-means +3.329 / +5.417pp [SUPERSEDED 2026-11-07 by the registration (prog L25897-L26018): O1 R342, C4 the anchor-free tree decides C2 / C3; the registered Support is under the keys 'REGISTERED ...']",
   "placebo G_PLACEBO": "-2.690 / -3.298pp",
   "design B (projected sealed-side SE; DEFF MEASURED)": "mean points +2.823 / +4.584; SE_proj 1.221 / 1.349 (draft 1.24 / 1.34); power of C1 0.763 / 0.979; n_eff 763 / 674",
-  "C3 SE_L": "exact identity 0.635-0.656 / 0.693-0.712 (draft's equal-variance approximation 0.74 / 0.80; C2 MEDIUM); C3 power 0.72-0.74 / 0.96-0.97 (draft 0.61 / 0.91); MDE80 1.78-1.84 / 1.94-1.99",
-  "MDE80 (2.80 x SE_proj; draft Support (e))": "C1 3.47 / 3.75pp; C2 2.99 / 3.28pp; C3 about 2.08 / 2.23pp (approximation)",
-  "Support verdict lines (registrar's ruling (i), for the registration)": "R128: C1 DESCRIPTIVE-ONLY (+3.27 < 3.47), C2 SCOREABLE (3.29 > 2.99), C3 DESCRIPTIVE-ONLY (1.66 < 1.78-1.84; 2.08 approx.); R342: C1 SCOREABLE (5.38 > 3.75), C2 SCOREABLE (5.33 > 3.28), C3 SCOREABLE (2.64 > 1.94-1.99; 2.23 approx.); 'THIN' is not a Support word (C5); power prints beside",
-  "tests": "suite 1,043 passed, 1 skipped, 0 failed; sealed runner mutants 61 / 61, WORK runner 60 / 61 (X59 equivalent); reviewer's OM1-OM5 killed, OM6 SURVIVED (C1)"
+  "C3 SE_L": "exact identity 0.635-0.656 / 0.693-0.712 (draft's equal-variance approximation 0.74 / 0.80; C2 MEDIUM); C3 power 0.72-0.74 / 0.96-0.97 (draft 0.61 / 0.91); MDE80 1.78-1.84 / 1.94-1.99 [SUPERSEDED 2026-11-07 by the registration (prog L25897-L26018): O1 R342, C4 the anchor-free tree decides C2 / C3; the registered Support is under the keys 'REGISTERED ...']",
+  "MDE80 (2.80 x SE_proj; draft Support (e))": "C1 3.47 / 3.75pp; C2 2.99 / 3.28pp; C3 about 2.08 / 2.23pp (approximation) [SUPERSEDED 2026-11-07 by the registration (prog L25897-L26018): O1 R342, C4 the anchor-free tree decides C2 / C3; the registered Support is under the keys 'REGISTERED ...']",
+  "Support verdict lines (registrar's ruling (i), for the registration)": "R128: C1 DESCRIPTIVE-ONLY (+3.27 < 3.47), C2 SCOREABLE (3.29 > 2.99), C3 DESCRIPTIVE-ONLY (1.66 < 1.78-1.84; 2.08 approx.); R342: C1 SCOREABLE (5.38 > 3.75), C2 SCOREABLE (5.33 > 3.28), C3 SCOREABLE (2.64 > 1.94-1.99; 2.23 approx.); 'THIN' is not a Support word (C5); power prints beside [SUPERSEDED 2026-11-07 by the registration (prog L25897-L26018): O1 R342, C4 the anchor-free tree decides C2 / C3; the registered Support is under the keys 'REGISTERED ...']",
+  "tests": "suite 1,043 passed, 1 skipped, 0 failed; sealed runner mutants 61 / 61, WORK runner 60 / 61 (X59 equivalent); reviewer's OM1-OM5 killed, OM6 SURVIVED (C1)",
+  "REGISTERED design A' points (R342, WORK; DELTA row 7, float-equal)": "G_DEC +5.3804pp (SE 0.611), G_AFI +4.9118pp (0.572), M_AFI -0.4686pp (0.242), L_AFI +2.2216pp (0.316), S 0.9129; WORK 3,457 rows, 2,662 clusters, Kish 4.416",
+  "REGISTERED Support (b)-(c) DEFF2 / n_eff (MEASURED, design B / B')": "DEFF2 G_DEC 3.42, G_AFI 3.39, L_AFI 4.14, M_AFI 4.99 (reviewer 3.38 / 3.49 / 4.17 / 4.79); n_eff = 2,304 / DEFF2: 674 / 680 / 557",
+  "REGISTERED Support (d) SE (planning)": "SE_proj G_DEC 1.339pp, G_AFI 1.2267pp (reviewer 1.249), M_AFI 1.0364pp, G_PLACEBO 1.34pp; C3 SE_L by the exact identity 0.9173pp (reviewer's draws 0.921); n = 2,304 RESERVED",
+  "REGISTERED Support (e)-(f) MDE80 and words": "C1 3.75pp -> SCOREABLE (5.38); C2 3.43pp -> SCOREABLE (4.91); C3 2.57pp -> DESCRIPTIVE-ONLY (2.22); runner prints 3.44 / 2.58; D1 sensitivity at design A' per-row SD: SE_L 0.77pp, MDE80 2.17pp, SCOREABLE by 0.06pp, power 0.82 (deciding nothing)",
+  "REGISTERED predictions (80% ranges)": "P2 G_DEC [+3.66, +7.10]pp; P4 S [0.70, 1.30]; P8 L_AFI [+1.05, +3.40]pp; P5 confidence 0.68 (range 0.68-0.82)",
+  "OUTCOME denominator": "the 2,304 RESERVED items (24 subtasks) in 1,829 content clusters (Kish 3.385; planning transport WORK Kish 4.416); fit side 3,457 WORK items (2,662 clusters); R342 (ids sha256 71c12468); two-stage bootstrap B = 2,000; 787,968 RESERVED values = 2,304 x 342, no NaN; largest cluster 31 (POSTRUN row 5)",
+  "OUTCOME accuracies on RESERVED (policies fitted on all WORK rows)": "BS 0.7591 (internlm/internlm2_5-20b-chat); DEC 0.8116; FAM 0.8116; PLACEBO 0.7313; FKI 0.8107; AFI 0.7964; ORACLE 1.0000 (n 2,304)",
+  "OUTCOME G4": "NOT FIRED (no line in the outcome, POSTRUN D1; SE2 1.17 / 1.26 / 1.32 / 0.91pp, all finite and > 0, POSTRUN row 8)",
+  "OUTCOME T1 G_PLACEBO": "-2.78pp, two-stage 95% [-5.36, -0.19]pp (SE2 1.32pp; DEFF 3.39; n_eff 679; MDE80 3.69pp; n 2,304 in 1,829 clusters): NOT FIRED",
+  "OUTCOME C1 G_DEC": "+5.25pp, two-stage 95% [+2.95, +7.55]pp (SE2 1.17pp; percentile [+1.93, +6.63]; DEFF 3.06; n_eff 753; MDE80 3.28pp; n 2,304 in 1,829 clusters): HELD",
+  "OUTCOME C2 G_AFI": "+3.73pp, two-stage 95% [+1.26, +6.21]pp (SE2 1.26pp; percentile [+0.57, +5.57]; DEFF 3.55; n_eff 650; MDE80 3.54pp; n 2,304 in 1,829 clusters): HELD",
+  "OUTCOME C3 L": "+1.11pp, two-stage 95% [-0.69, +2.90]pp (SE2 0.91pp; percentile [-1.13, +2.49]; DEFF 4.88; n_eff 472; MDE80 2.56pp; n 2,304 in 1,829 clusters): UNDETERMINED BY INTERVAL (not cited)",
+  "OUTCOME F1": "NOT FIRED (point G_DEC +5.25pp > 0)",
+  "OUTCOME Support realised vs planned (SE2 / DEFF / n_eff / MDE80)": "C1 1.17 / 3.06 / 753 / 3.28 vs 1.34 / 3.42 / 674 / 3.75; C2 1.26 / 3.55 / 650 / 3.54 vs 1.23 / 3.39 / 680 / 3.43; C3 0.915 / 4.88 / 472 / 2.56 vs 0.917 / 4.14 / 557 / 2.57 (POSTRUN D3: the informative comparison; the identity line 0.9148 = 0.9148 is a tautology); one-stage DEFF from the RESERVED clusters alone 0.96 / 1.46 / 2.06 (bootstrap), 0.98 / 1.54 / 2.26 (linearised) (POSTRUN row 14)",
+  "OUTCOME Brier": "0.0704 over the 8 predictions (7 HELD; P5 FAILED) at the registered confidences (P5 0.68); per prediction 0.0004 / 0.04 / 0.0004 / 0.0196 / 0.4624 / 0.0004 / 0 / 0.04; 0.0967 with P5 at 0.82 (beside, deciding nothing) (POSTRUN row 15 and D2; the outcome prints none)",
+  "OUTCOME beside (deciding nothing)": "FKI (k set to the declared count, 24): G_FKI +5.16pp [+3.05, +7.26], L_FKI +2.53pp [+1.29, +3.77], S_FKI 0.9818 [0.7262, 1.4595]; S 0.7107 [0.1818, 1.0962]; M -1.52pp [-3.23, +0.20]; G_FAM +5.25pp [+3.15, +7.35]; G_ORACLE +24.09pp [+21.67, +26.51]; leave-one-subtask-out G_DEC +4.22 to +5.58pp; DEC picks 10 distinct models",
+  "OUTCOME twins (W1)": "561 of 2,304 RESERVED rows (24.3 %) have a WORK cosine twin >= 0.98 (text only); G_DEC without them +6.31pp (point); POSTRUN W1 twin-free L +2.29pp is post hoc, never quoted as a C3 reading or as 'half recovered'",
+  "OUTCOME robustness (POSTRUN row 13)": "every word unchanged under an independent stream ([424242, 1] / [424242, 2]), the percentile interval, the one-stage SE and a linearised cluster SE"
  },
- "sentence_of_record": "BBH-RESERVED-CONFIRM is prepared and drafted, NOT registered: the sealed RESERVED side of BBH SPLIT-1 is unread (0 RESERVED responses read; the sealed reader constructed 0 times); the preparation is READY to go to the author and freeze / open is NOT READY (READY 814bafa6: C1 HIGH, C2-C6, a delta READY on the constants commit); the WORK-side estimate (exploratory) is G_DEC +3.269pp (SE 0.577) / +5.380pp (0.605) at R128 / R342, projected sealed-side SE 1.221 / 1.349 [draft b1baa4cb; no outcome; the author's O1 roster, O2 text admissibility, O3 whether and when to open, and C4 open]",
- "chips": [],
+ "sentence_of_record": "BBH-RESERVED-CONFIRM (2026-11-10, 0 LLM calls; one-time sealed read): a per-subtask policy fitted on WORK beats the best single model on BBH's sealed RESERVED side, 342 KEPT models: G_DEC +5.25pp [+2.95, +7.55], n 2,304 (1,829 content clusters) (C1 HELD); the anchor-free tree fitted on the 3,457 WORK texts (22 leaves, chosen by the recipe) also beats it: G_AFI +3.73pp [+1.26, +6.21] (C2 HELD). [sealed = ND-1-group-disjoint by construction, never content-closed: 561 of 2,304 RESERVED rows have a WORK cosine twin; C2 is this one tree, its SE conditional on it; C3 (at least half recovered) UNDETERMINED at a DESCRIPTIVE-ONLY Support and not cited; G4, T1, F1 not fired; 7 of 8 predictions HELD (P5 FAILED), Brier 0.0704; POSTRUN a4912f25 OUTCOME CONFIRMED] [2026-11-10 registrar: the sentence above is of record (prog L26021-L26041); the pre-opening text that follows is kept verbatim as history, superseded] [REGISTERED 2026-11-07, NOT OPENED (prog L25897-L26018); sealed side unread; the drafted-state sentence that follows is superseded by its closing bracket] BBH-RESERVED-CONFIRM is prepared and drafted, NOT registered: the sealed RESERVED side of BBH SPLIT-1 is unread (0 RESERVED responses read; the sealed reader constructed 0 times); the preparation is READY to go to the author and freeze / open is NOT READY (READY 814bafa6: C1 HIGH, C2-C6, a delta READY on the constants commit); the WORK-side estimate (exploratory) is G_DEC +3.269pp (SE 0.577) / +5.380pp (0.605) at R128 / R342, projected sealed-side SE 1.221 / 1.349 [draft b1baa4cb; no outcome; the author's O1 roster, O2 text admissibility, O3 whether and when to open, and C4 open] [CORRECTED 2026-11-07 by the registrar: REGISTERED (not opened) at prog L25897-L26018 under D-2026-11-07-1 (R342; cells from the WORK texts only; the anchor-free tree decides C2 / C3); Support C1 and C2 SCOREABLE, C3 DESCRIPTIVE-ONLY (D1 sensitivity beside); split word 'sealed', never 'content-closed'; freeze / open NOT READY (DELTA a58dfd28); O3 the author's; the sealed side unread; no outcome] [CORRECTED 2026-11-10 by the registrar: frozen at f307079 (FREEZE_SHA 5320b328..., bracketed into the registration section, L26019); FREEZE_SHA commit F 54ed9bf; the author's go D-2026-11-10-1 (open now; cite as registered); `open` READY on F iff OP6-OP8 of READY 1c4a2c54; NOT opened; the sealed side unread; no outcome]",
+ "chips": [
+  "C1 HELD (G_DEC +5.25pp [+2.95, +7.55]; sealed side, R342)",
+  "C2 HELD (G_AFI +3.73pp [+1.26, +6.21]; this one anchor-free tree)",
+  "C3 UNDETERMINED BY INTERVAL (DESCRIPTIVE-ONLY; not cited)",
+  "G4 / T1 / F1 NOT FIRED",
+  "P5 FAILED, 7 of 8 HELD (Brier 0.0704)",
+  "SEALED, not content-closed (561 of 2,304 with a WORK twin)"
+ ],
  "brackets": [
   {
    "date": "2026-11-07",
    "by": "registrar",
    "text": "Record created at drafted (prepared, NOT registered; the sealed side UNREAD). State 'drafted', not 'READY': READY 814bafa6 makes the PREPARATION READY to go to the author and `freeze` / `open` NOT READY. Conditions before freeze / open: C1 HIGH (the clean-tree refusal does not cover bbh-reserved-confirm.py; pinned CONFIRM_BLOB and a refusal selftest), C2 MEDIUM (C3's SE by the exact identity; P5, P8 re-derived), C3 MEDIUM (open verifies REG_COMMIT exists and carries the registration heading), C4 MEDIUM ('k set to the declared count'; the anchor-free arm beside or deciding), C5 LOW, C6 LOW (G4 before T1), L1, L2 LOW, Q1 (API-level seal). Registrar's rulings: (i) Support verdict lines as in numbers_of_record; (ii) rule 1: the sealed runner was built before any registration, as D-2026-11-06-3 (3) asked; the registration names that code as pre-registration, states H2's two deviations (two scripts; C3 on L) and precedes the constants commit, whose delta READY follows it; (iii) split word 'sealed' (ND-1-group-disjoint; NOT content-closed; no CK-CLOSE check: H1); whether a CK-CLOSE text check is owed is decided at the registration with O2; (iv) H3: predictions are proposals, fixed and re-pinned at registration. OPEN, the author's: O1 R128 / R342; O2 (a) WORK texts only / (b) all 5,761 texts; O3 whether and when to open and which words may cite it; C4 k-means at k = 24 or the anchor-free tree for C2 / C3."
+  },
+  {
+   "date": "2026-11-07",
+   "by": "registrar",
+   "text": "REGISTERED (not opened) at prog L25897-L26018 (heading verbatim in registration.program_lines; the runner's REG_HEADING matches exactly 1 line). Text = draft v2 79becdd4 with DELTA a58dfd28 D1 (Support (f) sensitivity line, P5 range 0.68-0.82; registered confidence 0.68) and D6 (H2 (c), the shared module's AF pool; a [P5] bracket owed on the benchzoom plan) applied. Registrar's rulings: [R-H1] split word 'sealed' (ND-1-group-disjoint by construction), never 'content-closed'; no CK-CLOSE text check ordered before the opening (it would read RESERVED texts outside the one admitted read and decide no word); cosine twins printed beside at the opening. [R-H2] three pre-registration deviations confirmed: (a) two scripts, (b) C3 on L, (c) common AF pool. [R-H3] predictions fixed = the draft's; runner PREDICTIONS[342] / SUPPORT_PLAN equal them (DELTA row 13). [R-7] INTERVAL decides C1-C3, POINT decides F1, both scored and recorded joined when they fire together. Author's O1 / O2 / C4 recorded verbatim; O3 open. Conditions before freeze / open: [P5] bracket and constants commit; delta READY on it with a real reserved --dry-run --roster 342 --text work, carrying D2 (MEDIUM) and D3-D5 (LOW); freeze with FREEZE_SHA bracketed into the registration; the author's go (O3); the run-operator's open."
+  },
+  {
+   "date": "2026-11-10",
+   "by": "registrar",
+   "text": "OP4 of READY 1c4a2c54 (D4): FREEZE_SHA 5320b3283434ea0511a4df0bd8fb1fac9b574a0c61257debed15692b13b21b82 bracketed into the registration section by insertion (docs/judge_v2_program.md bracket \"[FREEZE_SHA BRACKETED 2026-11-10 by the registrar ...\" at L26019, the last line of the section \"## Registered 2026-11-07 (before any call; the sealed runner is pre-registration code, ruling (ii)) — BBH-RESERVED-CONFIRM: ...\" (section L25897-L26019, _as_of the commit that writes it, parent 4c45716e, re-grepped)). Freeze (OP1, operator): exit 0 at f307079, its line verbatim in the bracket; file and backup in script.freeze. F (OP3, builder) = 54ed9bfff765b02dcbcd893fe51248122d66aca4, blobs confirm 5e0dfca3... / tests dedcabd6... (git blobs, LF) = READY row 15. The author's go (OP5): D-2026-11-10-1 (docs/agents/author_decisions/2026-11-10.md, 4c45716e; the author's O3, written before anything after OP4): selections verbatim: \"BBH sealed side (2,304 items, can be read only once): open it, and when?\" = \"Open now (Recommended)\"; \"Once it is open, where may the outcome be cited?\" = \"As registered (Recommended)\"; on top of D-2026-11-07-1 (O1 R342, O2 WORK texts only, C4 anchor-free tree). `open` runs once; a REFUSED outcome is recorded and never retried without a new go; no push, no merge decided. State registered -> READY: READY 1c4a2c54 committed and now recorded; `open` READY on F iff OP6 (real reserved --dry-run at F: manifest 31 files de21fc92..., findings 0, FREEZE_SHA and frozen object 5320b328..., sealed reader 0), OP7 and OP8 hold; NOT opened; sealed side unread; zero calls."
+  },
+  {
+   "date": "2026-11-10",
+   "by": "registrar",
+   "text": "OPENED once and outcome of record (POSTRUN a4912f25, OUTCOME CONFIRMED; authority D-2026-11-10-1 on top of D-2026-11-07-1). The run-operator's OP6-OP8 held (dry run at F: manifest 31 files de21fc92, findings 0, FREEZE_SHA = frozen object 5320b328, sealed reader 0; OP7 HEAD F, porcelain 0; OP8 `open` once, exit 0, modules after the code check 0). State READY -> run-unreviewed -> done in this one commit (outcome and review arrived together). Words: G4 not fired (POSTRUN D1: no line; SE2 all finite and > 0), T1 not fired, C1 HELD, C2 HELD, C3 UNDETERMINED BY INTERVAL, F1 not fired; P1-P4, P6-P8 HELD, P5 FAILED; Brier 0.0704 (POSTRUN D2; 0.0967 at P5 0.82, beside); D3 realised SE_L 0.915 vs planned 0.917 recorded, the identity line a tautology. Citing per D-2026-11-10-1 (2): C1 for key result 1's BBH part as a second roster on a sealed side; C2 for the framing's last clause, as this one tree (W3); C3 not cited (W2), never as 'the anchor-free tree does not recover half'; twin-free L never cited (W1); the word 'sealed' only. sentence_of_record: the outcome sentence prepended, the pre-opening text kept verbatim after it. Programme docs/judge_v2_program.md \"## BBH-RESERVED-CONFIRM (2026-11-10, 0 calls) — OUTCOME CONFIRMED (POSTRUN a4912f25; the one-time sealed read, R342, opened once at benchzoom F 54ed9bf): G4 and T1 not fired; C1 HELD (G_DEC +5.25pp [+2.95, +7.55]); C2 HELD (G_AFI +3.73pp [+1.26, +6.21]); C3 UNDETERMINED BY INTERVAL (L +1.11pp [-0.69, +2.90]; DESCRIPTIVE-ONLY Support; not cited); F1 not fired; predictions 7 of 8 HELD (P5 FAILED), Brier 0.0704\" L26021-L26041 (_as_of the commit that writes it, parent a4912f25, re-grepped); ledger v431 (new section-7 row BBH-RESERVED-CONFIRM before BZ-MMLUPRO-MOREMODELS). README change needs a push go; benchzoom bbh-reserved-prep stays local, not merged."
   }
  ],
  "does_not_show": [
-  "anything about the sealed RESERVED side (unread): every number here is WORK-side and exploratory",
+  "anything about the sealed RESERVED side (unread): every number here is WORK-side and exploratory [CORRECTED 2026-11-10 by the registrar: OPENED once; the 'OUTCOME ...' numbers of record are sealed-side; the pre-opening numbers stay WORK-side and exploratory]",
   "'content-closed' for BBH's split (no CK-CLOSE check; the word is 'sealed')",
-  "a label-free result: the 'label-free' arm is k-means at the declared count k = 24 (C4)"
+  "a label-free result: the 'label-free' arm is k-means at the declared count k = 24 (C4) [CORRECTED 2026-11-07 by the registrar: C4 decided by the author (D-2026-11-07-1): the anchor-free tree decides C2 / C3; k-means FK-I prints beside, 'k set to the declared count']",
+  "a per-subtask claim (top-3 share of the contributions 0.592 at R342 on WORK)",
+  "'the tree beats k-means' or the reverse (FK-I is beside, k set from the labels)",
+  "the share S as a decision (DESCRIPTIVE-ONLY)",
+  "a FAILED or UNDETERMINED C3 as 'the anchor-free tree does not recover half' (C3 DESCRIPTIVE-ONLY at R342)",
+  "a content-closed or held-out side (no CK-CLOSE check; 561 of 2,304 RESERVED rows have a WORK cosine twin; the word is 'sealed') [outcome 2026-11-10]",
+  "that the anchor-free tree recovers, or fails to recover, half of the declared gain (C3 UNDETERMINED BY INTERVAL; the twin-free L +2.29pp is post hoc) [outcome 2026-11-10]",
+  "anchor-free trees in general: SE2 keeps the one frozen tree fixed, so tree-construction variance is not in it (POSTRUN W3) [outcome 2026-11-10]",
+  "other corpora, rosters, embedders or judged verdicts (key-scored acc_norm, BBH only), a model ranking, or anything about the 18-model union roster (V2-DECLARED-CELLS stands as written) [outcome 2026-11-10]"
  ],
- "ledger": null,
+ "ledger": {
+  "row_id": "BBH-RESERVED-CONFIRM",
+  "version": "v431"
+ },
  "depends_on": [
   "BBH-WORK",
   "BBH-HIER",
@@ -70,7 +238,20 @@
   "docs/agents/plans/2026-11-06_bbh-reserved-confirm_registration_draft.md (b1baa4cb; sections Hygiene, Author's choices, Readouts and criteria, Predictions, Support, Falsifier, Open items)",
   "docs/agents/author_decisions/2026-11-06.md (b42c3300), D-2026-11-06-3",
   "docs/agents/plans/2026-11-06_leads.md (b42d58ef) '### 4. BBH-RESERVED-CONFIRM (rank 4)'",
-  "docs/judge_v2_program.md section \"## Registrar's record 2026-11-07 (insertion only; zero calls; nothing run) — SUPERGPQA-LEVELS (POSTRUN 33c8d3ef), ROSTER-STRUCTURE-METER (298b9cc9) and CERT-DIP-SITES (a51d4c53) recorded done ...\" L25885-L25895 (_as_of the commit that writes it, parent a51d4c53, re-grepped)"
+  "docs/judge_v2_program.md section \"## Registrar's record 2026-11-07 (insertion only; zero calls; nothing run) — SUPERGPQA-LEVELS (POSTRUN 33c8d3ef), ROSTER-STRUCTURE-METER (298b9cc9) and CERT-DIP-SITES (a51d4c53) recorded done ...\" L25885-L25895 (_as_of the commit that writes it, parent a51d4c53, re-grepped)",
+  "docs/agents/plans/2026-11-07_bbh-reserved-confirm_registration_draft_v2.md (79becdd4; blob:b24aadf0, LF)",
+  "docs/reviews/DELTA_bbh-reserved-confirm_fixes.md (a58dfd28; verdict, rows 2, 7, 9-15, D1-D6)",
+  "docs/agents/author_decisions/2026-11-07.md (a9bb09d3), D-2026-11-07-1",
+  "docs/judge_v2_program.md \"## Registered 2026-11-07 (before any call; the sealed runner is pre-registration code, ruling (ii)) — BBH-RESERVED-CONFIRM: on BBH's sealed RESERVED side, with all 342 KEPT models, does a per-subtask policy fitted on WORK beat the best single model, and do the anchor-free tree's cells, built from the WORK texts only, recover at least half of that gain? (zero-call; one-time sealed read)\" L25897-L26018 (_as_of the commit that writes it, parent a58dfd28, re-grepped; the runner's REG_HEADING matches exactly 1 line, L25897)",
+  "docs/reviews/READY_bbh-reserved-confirm_open.md (1c4a2c54; verdict, row 15, 'Run-operator steps' OP1-OP8)",
+  "docs/agents/author_decisions/2026-11-10.md (4c45716e), D-2026-11-10-1 (selections verbatim)",
+  "the run-operator's OP1-OP2 freeze hand-back and the builder's OP3 hand-back (2026-11-10, relayed in the registrar's brief); freeze file, backups and F's blobs re-checked by the registrar (sha256sum, sha256sum -c, git rev-parse F:<path>)",
+  "docs/judge_v2_program.md bracket \"[FREEZE_SHA BRACKETED 2026-11-10 by the registrar ...\" at L26019, the last line of the section \"## Registered 2026-11-07 (before any call; the sealed runner is pre-registration code, ruling (ii)) — BBH-RESERVED-CONFIRM: ...\" (section L25897-L26019, _as_of the commit that writes it, parent 4c45716e, re-grepped)",
+  "E:/benchzoom_demo/followups/bbh-reserved-confirm/outcome.txt (sha256 ccf78a00...) and outcome.json (sha256 26c3dd20...), OPENED.json (b60d0e7c...); SHA256SUMS 2 / 2 OK and the open backup 8 / 8 OK, re-run by the registrar",
+  "the run-operator's OP6-OP8 hand-back (2026-11-10, relayed in the registrar's brief)",
+  "docs/reviews/POSTRUN_BBH-RESERVED-CONFIRM.md (a4912f25; verdict, rows 1-16, D1-D3, W1-W3, 'Citable as registered (D-2026-11-10-1)')",
+  "docs/agents/author_decisions/2026-11-10.md (4c45716e), D-2026-11-10-1 meaning (2), verbatim",
+  "docs/judge_v2_program.md \"## BBH-RESERVED-CONFIRM (2026-11-10, 0 calls) — OUTCOME CONFIRMED (POSTRUN a4912f25; the one-time sealed read, R342, opened once at benchzoom F 54ed9bf): G4 and T1 not fired; C1 HELD (G_DEC +5.25pp [+2.95, +7.55]); C2 HELD (G_AFI +3.73pp [+1.26, +6.21]); C3 UNDETERMINED BY INTERVAL (L +1.11pp [-0.69, +2.90]; DESCRIPTIVE-ONLY Support; not cited); F1 not fired; predictions 7 of 8 HELD (P5 FAILED), Brier 0.0704\" L26021-L26041 (_as_of the commit that writes it, parent a4912f25, re-grepped)"
  ],
- "last_update": "2026-11-07 (registrar: created at drafted; preparation READY 814bafa6, freeze / open NOT READY)"
+ "last_update": "2026-11-10 (registrar: OPENED once; OUTCOME CONFIRMED (POSTRUN a4912f25): C1 HELD, C2 HELD, C3 UNDETERMINED BY INTERVAL (not cited); P5 FAILED, Brier 0.0704; done; ledger v431)"
 }

@@ -110,6 +110,37 @@ trees, qwen3), TREE-BACKOFF, HIER-FAIR-BACKOFF, UNION-AF-ROUTE (AF-U, federated 
   <!-- src: README.md L145-L151 (quoted); ledger UNION-AF-ROUTE (chips "VALID (POST-RUN 589c04ae): U1 HELD (THIN); F-AK
   FIRES (MIRRORED FILING)", "U3b SHORTFALL -1.15pp VS DECLARED, NEVER PARITY; ... F-AK MISSES BY 0.0002 UNDER THE
   REGISTERED RULE (Q1)"; CORRECTED 2026-10-04 bracket [SC]) -->
+- `BBH-RESERVED-CONFIRM` (registered 2026-11-07, recorded 2026-11-10, after tests 1-3): on BBH, cells built without the labels beat the best single model on a sealed side.
+  The test read BBH's sealed RESERVED side once: 2,304 items in 1,829 content clusters, 342 Open LLM Leaderboard models, acc_norm against the answer key (no judge, so no tie convention applies).
+  The anchor-free tree fitted on the 3,457 WORK texts alone (22 leaves, a count chosen by the recipe) beats the best single model chosen on WORK by +3.73pp, two-stage 95% [+1.26, +6.21] (SE 1.26pp, DEFF 3.55, n_eff 650, MDE80 3.54pp).
+  The per-subtask policy on the declared labels beats it by +5.25pp [+2.95, +7.55] (SE 1.17pp, DEFF 3.06, n_eff 753, MDE80 3.28pp).
+  The placebo, which permutes the subtask labels, manufactured no gain: -2.78pp [-5.36, -0.19].
+  Whether the tree recovers at least half of the declared gain is undetermined, at a Support registered as descriptive-only; the record does not cite it either way.
+  This is one frozen tree: its interval holds the tree fixed, so it speaks neither for anchor-free trees in general nor for the tree against k-means.
+  Within those bounds it supports the framing's last clause, a TRAIN-only embedding taxonomy reading the cells where labels are missing, for BBH at this roster.
+  "Sealed" means the census's near-duplicate groups (ND-1) were kept to one side by construction; it never means content-closed.
+  The split was not CK-CLOSE-checked, and 561 of the 2,304 RESERVED items have a WORK cosine twin (0.98 or more).
+  Seven of the eight registered predictions held; P5, that the half-recovery criterion would hold, failed (Brier 0.0704).
+  This was the one read of BBH's sealed side; the tests of sections 4 to 7 read none of its responses.
+  <!-- src: REVISED 2026-11-10 by the science writer under D-2026-11-10-1 (2) ("C2 may support the framing's last clause, and
+  C3 only if it is HELD. The side is always called 'sealed'"): this bullet is added; nothing else in the file changed.
+  ledger BBH-RESERVED-CONFIRM (v431; chips "C2 HELD (G_AFI +3.73pp [+1.26, +6.21]; this one anchor-free tree)", "C1 HELD
+  (G_DEC +5.25pp [+2.95, +7.55]; sealed side, R342)", "C3 UNDETERMINED BY INTERVAL (DESCRIPTIVE-ONLY; not cited)", "G4 / T1
+  / F1 NOT FIRED", "P5 FAILED, 7 of 8 HELD (Brier 0.0704)", "SEALED, not content-closed (561 of 2,304 with a WORK twin)");
+  prog L25897 (registered 2026-11-07), L25911 (sealed = ND-1-group-disjoint by construction, never content-closed; no
+  CK-CLOSE check), L25916 (placebo permutes the 24 subtask labels), L25966 (P5: C3 is HELD), L25999 (key-scored acc_norm),
+  L25908 (BBH-WORK, BBH-HIER read 0 RESERVED responses); prog L26021-L26041 _as_of 1348d8de: L26024 (one open; the side is
+  spent), L26025 (denominators), L26028 (T1), L26029 (C1), L26030 (C2, 22 leaves chosen by the recipe), L26031 (C3
+  UNDETERMINED, not cited), L26034 (predictions, Brier), L26035 (twins), L26038 (CITING: "C2 may support the framing's last
+  clause on this corpus and roster, for this one tree; C3 is not cited"), L26039 (3) (not anchor-free trees in general;
+  SE2 keeps the one frozen tree fixed), (4) (not "the tree beats k-means" or the reverse); prog L21446 (the framing's last
+  clause, verbatim in README.md); benchzoom docs/bbh_census.md L49 (ND-1 = near-duplicate grouping), L52-L53 (whole groups
+  on one side); BBH-RESERVED-CONFIRM.json sentence_of_record, does_not_show -->
+  <!-- numbers to source rows (this bullet): 2,304 / 1,829 / 342 / 3,457 -> prog L26025; 22 leaves, +3.73pp [+1.26, +6.21],
+  SE2 1.26, DEFF 3.55, n_eff 650, MDE80 3.54 -> prog L26030; +5.25pp [+2.95, +7.55], SE2 1.17, DEFF 3.06, n_eff 753, MDE80
+  3.28 -> prog L26029; -2.78pp [-5.36, -0.19] -> prog L26028; 561 of 2,304, cosine 0.98 -> prog L26035; 7 of 8, P5 FAILED,
+  Brier 0.0704 (at the registered confidences; 0.0967 with P5 at 0.82, beside) -> prog L26034; all also in the ledger row
+  BBH-RESERVED-CONFIRM observed cell, v431 -->
 
 ## 3. Objects, the meter and the word rules
 

@@ -17,7 +17,7 @@ trust ... What does that cost"), _as_of 70c61579 -->
 
 - **Engine:** Kotlin + Spring Boot evaluation engine, with Python analysis tools.
 - **Benchmarks:** MMLU-Pro, BBH, SuperGPQA, MATH, LiveCodeBench (and a six-corpus union).
-- **Models:** rosters of 12 to 49 models, depending on the test.
+- **Models:** rosters of 12 to 342 models, depending on the test.
 - **Domains ("cells"):** the benchmark's own labels where they exist; otherwise a taxonomy tree built from question embeddings on the training split only.
 - **Rigor:** every reported result comes from a registered test, with its ledger row.
   No split is called held-out unless it passed a content check for near-duplicates, not just distinct ids; results on id-only splits say so.
@@ -25,7 +25,8 @@ trust ... What does that cost"), _as_of 70c61579 -->
   A taxonomy split is called certified only under per-family hierarchical FDR control (q = 0.05); two do.
 - **Judge accuracy** always means agreement with an answer key or an executed checker, never human preference.
 <!-- src: build.gradle.kts L5, L9; corpora and rosters as in the results below (ROUTER-REGRET-MMLU 12 and 46,
-key profile 37, HARNESS-EXTRACTOR 18, LCB stage 0 26, SUPERGPQA-STAGE0b 49; union paeec37aa28063c75); prog L21446
+key profile 37, HARNESS-EXTRACTOR 18, LCB stage 0 26, SUPERGPQA-STAGE0b 49, BBH-RESERVED-CONFIRM 342 (prog L26025,
+ledger v431; range changed from "12 to 49" under D-2026-11-10-2); union paeec37aa28063c75); prog L21446
 (cells); "Each result below comes from a registered test" (results preamble); docs/agents/CONTEXT.md section 4
 rule 12 (split words); ledger CERT-RESOLUTION (Chemistry n00000006, Engineering n00000015); prog L21448 S2 -->
 
@@ -34,6 +35,17 @@ rule 12 (split words); ledger CERT-RESOLUTION (Chemistry n00000006, Engineering 
 - **Per-domain routing helps, modestly.**
   Picking a model per declared domain beats the best single model by **+2.67 pp** (95% CI [+1.46, +3.89], 5,907 items).
   Caveat: BBH carries 0.728 of that gain; without BBH the gain is +1.03 pp [−0.27, +2.32], which includes zero.
+  On BBH alone, the routing gain holds for a second roster on a sealed side.
+  With 342 Open LLM Leaderboard models, picking a model per BBH subtask (fitted on 3,457 other BBH items) beats the best single model by **+5.25 pp** (95% CI [+2.95, +7.55], 2,304 sealed items, read once).
+  "Sealed" means near-duplicate groups were kept to one side by construction.
+  The split never went through the content check above, and 561 of the 2,304 items have a text twin (cosine 0.98 or more) among the fitting items.
+  <!-- src: added 2026-11-10 under D-2026-11-10-1 (2) ("C1 may update the BBH part of key result 1 as a second roster on a
+  sealed side"); ledger BBH-RESERVED-CONFIRM (v431; chips "C1 HELD (G_DEC +5.25pp [+2.95, +7.55]; sealed side, R342)",
+  "SEALED, not content-closed (561 of 2,304 with a WORK twin)"); prog L26021-L26041 _as_of 1348d8de (L26025 n 2,304 RESERVED,
+  fit side 3,457 WORK, R342; L26029 C1 HELD two-stage 95%; L26035 twins 561 of 2,304, cosine >= 0.98; L26036 "Key result 1's
+  BBH part transports to a second roster on a sealed side"); prog L25911 (sealed = ND-1-group-disjoint by construction, never
+  content-closed; no CK-CLOSE check); benchzoom docs/bbh_census.md L49 (ND-1 = near-duplicate grouping: equal loose keys or
+  character 5-gram Jaccard >= 0.95), L52-L53 (SPLIT-1: whole groups on one side); BBH-RESERVED-CONFIRM.json sentence_of_record -->
 - **When domains don't differ, there is nothing to route.**
   On MMLU-Pro alone, one model is best in all 14 categories for both a 12-model and a 46-model roster; the routing gain is 0.000 by category and −0.002 by tree leaf (SE 0.007), on a split checked by id only.
 - **The answer scorer can reorder the leaderboard.**
@@ -159,6 +171,26 @@ RECORD-RECIPE-EDGE-AUDIT part 1 is a recorded fact (prog L20822) -->
   <!-- src: ledger ROUTE-SOURCE-NULL: chips "VALID (POST-RUN b5ed5e96): RS1 UNDETERMINED (D_S +0.51pp [-0.67, +1.68];
   G_AF ABOVE RWS p97.5)", "RWS 183 BLOCKS, NOT THE REGISTERED 123 ... [SC], NEVER LABEL-FREE"; [OUTCOME 2026-10-04]
   (MDE80 1.68pp); ROUTE-SOURCE-NULL.json does_not_show "that source explains the gain (G_AF above the RWS band)" -->
+- `BBH-RESERVED-CONFIRM` (BBH's sealed RESERVED side, read once; 342 Open LLM Leaderboard models).
+  A per-subtask policy fitted on the 3,457 WORK items beats the best single model chosen there by +5.25pp, two-stage 95% [+2.95, +7.55] (n 2,304 RESERVED items in 1,829 content clusters; SE 1.17pp, DEFF 3.06, n_eff 753, MDE80 3.28pp).
+  This makes the BBH part of the `V2-DECLARED-CELLS` result a second-roster statement on a sealed side, beside the 18 union models.
+  It says nothing about the 18-model union roster itself.
+  The placebo, which permutes the subtask labels, manufactured no gain: -2.78pp [-5.36, -0.19].
+  "Sealed" means the census's near-duplicate groups (ND-1) were kept to one side by construction; it never means content-closed.
+  The split was not CK-CLOSE-checked, and 561 of the 2,304 RESERVED items have a WORK cosine twin (0.98 or more).
+  Scoring is acc_norm against the answer key; the test made zero LLM calls, and the post-run review reproduced every deciding number.
+  <!-- src: added 2026-11-10 under D-2026-11-10-1 (2); ledger BBH-RESERVED-CONFIRM (v431; chips "C1 HELD (G_DEC +5.25pp
+  [+2.95, +7.55]; sealed side, R342)", "G4 / T1 / F1 NOT FIRED", "SEALED, not content-closed (561 of 2,304 with a WORK
+  twin)"); prog L26021-L26041 _as_of 1348d8de: L26025 (2,304 RESERVED in 1,829 clusters; R342; fit side 3,457 WORK), L26028
+  (T1 G_PLACEBO -2.78pp [-5.36, -0.19], not fired), L26029 (C1 HELD; SE2 1.17, DEFF 3.06, n_eff 753, MDE80 3.28), L26035
+  (twins), L26036 (FALSIFIER: "Key result 1's BBH part transports to a second roster on a sealed side ... V2-DECLARED-CELLS
+  stands as written"), L26038 (CITING), L26039 (6) ("anything about the 18-model union roster"), L26023 (POSTRUN a4912f25
+  "OUTCOME CONFIRMED, every deciding number reproduced to the digit"); prog L25911 (sealed, ND-1, no CK-CLOSE), L25916
+  (placebo permutes the 24 subtask labels), L25999 (key-scored acc_norm); benchzoom docs/bbh_census.md L49 (ND-1 is the
+  census's near-duplicate grouping), L52-L53 (whole groups on one side); BBH-RESERVED-CONFIRM.json sentence_of_record -->
+  <!-- numbers to source rows (this bullet): +5.25pp [+2.95, +7.55], SE2 1.17, DEFF 3.06, n_eff 753, MDE80 3.28 -> prog L26029
+  / ledger BBH-RESERVED-CONFIRM observed cell; 2,304 / 1,829 / 3,457 / 342 -> prog L26025; -2.78pp [-5.36, -0.19] -> prog
+  L26028; 561 of 2,304, cosine 0.98 -> prog L26035; 18 union models -> prog L26038 -->
 - `ROUTER-REGRET-MMLU` (a registered descriptive baseline).
   On MMLU-Pro alone, one model (gemini-3.1-pro) is best in all 14 anchors (the MMLU-Pro categories) on both rosters, 12 and 46 models.
   The routing gain is 0.000 at anchor level and -0.002 at leaf level (bootstrap SE 0.007; 3,130 reserved keyed questions).
