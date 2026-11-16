@@ -63,6 +63,12 @@ M.Sc. thesis, TU Berlin (Prof. O. Kao).
 <!-- src: report/01_Document_administration/b_Meta.tex L43 (M.Sc. Computer Science), L72 (Technische Universität
 Berlin), L77 (supervisor) -->
 
+The thesis as built on 2026-08-02: [docs/thesis/TaxoArena-thesis-2026-08-02.pdf](docs/thesis/TaxoArena-thesis-2026-08-02.pdf) (206 pages).
+It predates the 2026-09-09 pool incident; where it differs, the results in this README, made after that incident, supersede it.
+<!-- src: D-2026-11-16-1 (docs/agents/author_decisions/2026-11-16.md), the label as the author's option worded it; the
+file is report/TaxoArena-report.pdf copied unchanged (PDF creationDate 2026-08-02 19:30, 206 pages, sha256
+9016840ec4a8afe1b5c1414bb91234ba514b0d6609cd4bdf436365e4786c3f96) -->
+
 ---
 
 <!-- Repo tidy, D-2026-10-27-1 (docs/agents/author_decisions/2026-10-27.md). Every factual line carries a
@@ -312,7 +318,7 @@ JUDGED FAMILY ARE HISTORY (one disclosure), NEVER EVIDENCE", _as_of 70c61579. --
 | `experiment_configs/` | run configs (TOML) and pool pins; see [experiment_configs/README.md](experiment_configs/README.md) |
 | `experiment_results/` | committed outputs and readouts; see [experiment_results/README.md](experiment_results/README.md) |
 | `docs/` | the record, the design and older documents; index in [docs/README.md](docs/README.md) |
-| `report/` | the thesis sources (LaTeX), the author's. Its "certified fixed point" sentences hold for the frozen artefact 20260727_042523 only, not for the tree of record bareq512_s42 (docs/judge_v2_program.md L20860, item (e)). Rewriting it is the author's alone (docs/judge_v2_program.md L21453) |
+| `report/` | the thesis sources (LaTeX), the author's. Its "certified fixed point" sentences hold for the frozen artefact 20260727_042523 only, not for the tree of record bareq512_s42 (docs/judge_v2_program.md L20860, item (e)). Rewriting it is the author's alone (docs/judge_v2_program.md L21453). Its 2026-08-02 build is docs/thesis/TaxoArena-thesis-2026-08-02.pdf; the same holds there |
 | `data_v2/manifests/` | manifests of the registered v2 split draws (ARCHV2-SPLIT-1, ARCHV2-SPLIT-2) and a development draw |
 | `archive/` | files moved out of the active workspace; [archive/ARCHIVE_MANIFEST.md](archive/ARCHIVE_MANIFEST.md) gives each entry's reason |
 | `tuning/`, `tune.bat` | the L9 screening record of the construction parameters (harness in `tools/tuning/`) |
@@ -389,6 +395,7 @@ record at 2026-09-17) -->
 ## Licence
 
 The repository is released under the MIT licence; see [LICENSE](LICENSE).
-The exception is the thesis text in `report/`, which is all rights reserved.
+The exception is the thesis text in `report/` and its PDF in `docs/thesis/`, which are all rights reserved.
 <!-- src: D-2026-10-27-6 A5 (docs/agents/author_decisions/2026-10-27.md): "MIT licence for the repository; the README
-notes that the thesis text in report/ is all rights reserved"; copyright holder = the git user name (0ctave). -->
+notes that the thesis text in report/ is all rights reserved"; copyright holder = the git user name (0ctave). The
+PDF in docs/thesis/ (the same text, built) added under D-2026-11-16-1. -->
